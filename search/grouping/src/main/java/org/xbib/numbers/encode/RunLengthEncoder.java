@@ -41,9 +41,6 @@ public class RunLengthEncoder {
 
     private final NumberFormat format = NumberFormat.getInstance();
 
-    public RunLengthEncoder() {
-    }
-
     public RunLengthEncoder member(Number number) {
         this.members.add(number);
         return this;

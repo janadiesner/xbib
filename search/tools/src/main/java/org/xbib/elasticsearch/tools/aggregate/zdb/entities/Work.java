@@ -2,6 +2,7 @@ package org.xbib.elasticsearch.tools.aggregate.zdb.entities;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -74,6 +75,8 @@ public class Work extends Edition {
         }
         return list;
     }
+
+    private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 
     private final static class WorkComparator implements Comparator<Work> {
 

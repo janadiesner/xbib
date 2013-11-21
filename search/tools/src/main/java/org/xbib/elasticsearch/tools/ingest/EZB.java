@@ -64,9 +64,9 @@ import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
 import org.xbib.rdf.io.xml.XmlReader;
 import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
-import org.xbib.tools.util.FormatUtil;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
+import org.xbib.util.FormatUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -101,12 +101,12 @@ public final class EZB extends AbstractImporter<Long, AtomicLong> {
         try {
             OptionParser parser = new OptionParser() {
                 {
-                    accepts("elasticsearch").withRequiredArg().ofType(String.class).required();
-                    accepts("index").withRequiredArg().ofType(String.class).required();
-                    accepts("type").withRequiredArg().ofType(String.class).required();
                     accepts("path").withRequiredArg().ofType(String.class).required();
                     accepts("pattern").withRequiredArg().ofType(String.class).required().defaultsTo("*.xml");
                     accepts("threads").withRequiredArg().ofType(Integer.class).defaultsTo(1);
+                    accepts("elasticsearch").withRequiredArg().ofType(String.class).required();
+                    accepts("index").withRequiredArg().ofType(String.class).required();
+                    accepts("type").withRequiredArg().ofType(String.class).required();
                     accepts("maxbulkactions").withRequiredArg().ofType(Integer.class).defaultsTo(100);
                     accepts("maxconcurrentbulkrequests").withRequiredArg().ofType(Integer.class).defaultsTo(10);
                     accepts("mock").withOptionalArg().ofType(Boolean.class).defaultsTo(Boolean.FALSE);
@@ -116,12 +116,12 @@ public final class EZB extends AbstractImporter<Long, AtomicLong> {
             if (options.hasArgument("help")) {
                 System.err.println("Help for " + EZB.class.getCanonicalName() + lf
                         + " --help                 print this help message" + lf
+                        + " --pattern <pattern>    a regex for selecting matching file names for input (default: *.xml)" + lf
+                        + " --threads <n>          the number of threads (optional, default: 1)"
                         + " --elasticsearch <uri>  Elasticesearch URI" + lf
                         + " --index <index>        Elasticsearch index name" + lf
                         + " --type <type>          Elasticsearch type name" + lf
                         + " --path <path>          a file path from where the input files are recursively collected (required)" + lf
-                        + " --pattern <pattern>    a regex for selecting matching file names for input (default: *.xml)" + lf
-                        + " --threads <n>          the number of threads (optional, default: 1)"
                         + " --maxbulkactions <n>   the number of bulk actions per request (optional, default: 100)"
                         + " --maxconcurrentbulkrequests <n>the number of concurrent bulk requests (optional, default: 10)"
                 );
@@ -296,35 +296,38 @@ public final class EZB extends AbstractImporter<Long, AtomicLong> {
                 }
                 case "type_id": {
                     switch (Integer.parseInt(content)) {
-                        case 1: return "Volltext nur online";
-                        case 2: return "Volltext online und Druckausgabe";
-                        case 9: return "lokale Zeitschrift";
-                        case 11: return "retrodigitalisiert";
+                        case 1: return "full-text-online"; //"Volltext nur online";
+                        case 2: return "full-text-online-and-print"; //"Volltext online und Druckausgabe";
+                        case 9: return "local"; //"lokale Zeitschrift";
+                        case 11: return "digitized"; //"retrodigitalisiert";
                     }
                 }
                 case "license_type_id" : {
                     switch (Integer.parseInt(content)) {
-                        case 1 : return "Einzellizenz";
-                        case 2 : return "Konsortiallizenz";
-                        case 4 : return "Nationallizenz";
+                        case 1 : return "local-license"; // "Einzellizenz";
+                        case 2 : return "consortia-license"; //"Konsortiallizenz";
+                        case 4 : return "supra-regional-license"; // "Nationallizenz";
+                        default: return content;
                     }
                 }
                 case "price_type_id" : {
                     switch (Integer.parseInt(content)) {
-                        case 1 : return "lizenzfrei";
-                        case 2 : return "Kostenlos mit Druckausgabe";
-                        case 3 : return "Kostenpflichtig";
+                        case 1 : return "no-fee"; //"lizenzfrei";
+                        case 2 : return "no-fee-included-in-print"; //"Kostenlos mit Druckausgabe";
+                        case 3 : return "fee"; //"Kostenpflichtig";
+                        default: return content;
                     }
                 }
                 case "ill_code" : {
                     switch (content) {
-                        case "n" : return "nein";
-                        case "l" : return "ja, Leihe und Kopie";
-                        case "k" : return "ja, nur Kopie";
-                        case "e" : return "ja, auch elektronischer Versand an Nutzer";
-                        case "ln" : return "ja, Leihe und Kopie (nur Inland)";
-                        case "kn" : return "ja, nur Kopie (nur Inland)";
-                        case "en" : return "ja, auch elektronischer Versand an Nutzer (nur Inland)";
+                        case "n" : return "no"; // "nein";
+                        case "l" : return "copy-loan"; //"ja, Leihe und Kopie";
+                        case "k" : return "copy"; //"ja, nur Kopie";
+                        case "e" : return "copy-electronic";  //"ja, auch elektronischer Versand an Nutzer";
+                        case "ln" : return "copy-loan-domestic";  //"ja, Leihe und Kopie (nur Inland)";
+                        case "kn" : return "copy-domestic";  //"ja, nur Kopie (nur Inland)";
+                        case "en" : return "copy-electronic-domestic";  //"ja, auch elektronischer Versand an Nutzer (nur Inland)";
+                        default: throw new IllegalArgumentException("unknown ill_code: " + content);
                     }
                 }
             }

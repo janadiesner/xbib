@@ -45,7 +45,7 @@ import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.xcontent.ContentBuilder;
-import org.xbib.tools.util.AtomicIntegerIterator;
+import org.xbib.util.AtomicIntegerIterator;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;

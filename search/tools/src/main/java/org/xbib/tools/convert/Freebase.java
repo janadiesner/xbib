@@ -42,9 +42,9 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.turtle.TurtleReader;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
-import org.xbib.tools.util.FormatUtil;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
+import org.xbib.util.FormatUtil;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

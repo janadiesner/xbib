@@ -51,8 +51,8 @@ import org.xbib.rdf.Literal;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
 
 import java.io.BufferedReader;
 import java.io.IOException;

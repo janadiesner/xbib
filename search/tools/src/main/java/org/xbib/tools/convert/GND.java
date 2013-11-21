@@ -42,9 +42,9 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.rdfxml.RdfXmlReader;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
-import org.xbib.tools.util.FormatUtil;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
+import org.xbib.util.FormatUtil;
 import org.xml.sax.InputSource;
 
 import java.io.FileOutputStream;
@@ -59,7 +59,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
-import static org.xbib.tools.util.FormatUtil.formatMillis;
+import static org.xbib.util.FormatUtil.formatMillis;
 
 /**
  * Convert GND from RDF/XML to Turtle or Ntriples

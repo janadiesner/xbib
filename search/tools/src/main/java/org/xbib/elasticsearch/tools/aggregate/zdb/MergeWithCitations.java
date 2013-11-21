@@ -51,10 +51,10 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.elasticsearch.tools.aggregate.WrappedSearchHit;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Manifestation;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
-import org.xbib.tools.util.ExceptionFormatter;
-import org.xbib.tools.util.FormatUtil;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
+import org.xbib.util.ExceptionFormatter;
+import org.xbib.util.FormatUtil;
 import org.xbib.util.Strings;
 
 import java.io.IOException;

@@ -156,7 +156,7 @@ public class ISSN implements StandardNumber {
     private final static Pattern ISSN_PATTERN = Pattern.compile("[\\p{Digit}xX\\-]+");
 
     /**
-     * Helper method for cleaning values such as "ISBN 3-9803350-5-4 kart. : DM 24.00"
+     * Helper method for cleaning values
      */
     private String purify(String s) {
         Matcher m = ISSN_PATTERN.matcher(s);

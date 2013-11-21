@@ -33,6 +33,7 @@ package org.xbib.elasticsearch.tools.aggregate.zdb.entities;
 
 import org.xbib.map.MapBasedAnyObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -224,7 +225,19 @@ public class Holding extends MapBasedAnyObject {
 
     private Map<String, Object> buildInfo() {
         Map<String, Object> m = new LinkedHashMap();
-        m.put("location", map().get("location")); // marcorg, shelf marks
+        Object o = map().get("Location");
+        if (!(o instanceof List)) {
+            o = Arrays.asList(o);
+        }
+        List l = new ArrayList();
+        l.addAll((List)o);
+        Object p = map().get("AdditionalLocation");
+        if (!(p instanceof List)) {
+            p = Arrays.asList(p);
+        }
+        l.addAll((List)p);
+        m.put("location", l); // marcorg, shelf marks
+
         m.put("textualholdings", map().get("textualholdings"));
         m.put("holdings", map().get("holdings"));
         m.put("links", map().get("ElectronicLocationAndAccess"));

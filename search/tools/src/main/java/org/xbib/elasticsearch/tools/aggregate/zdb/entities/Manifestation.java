@@ -31,6 +31,13 @@
  */
 package org.xbib.elasticsearch.tools.aggregate.zdb.entities;
 
+import com.google.common.base.Supplier;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.SetMultimap;
+
+import org.elasticsearch.common.collect.Sets;
 import org.xbib.date.DateUtil;
 import org.xbib.grouping.bibliographic.endeavor.PublishedJournal;
 import org.xbib.map.MapBasedAnyObject;
@@ -38,18 +45,18 @@ import org.xbib.map.MapBasedAnyObject;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class Manifestation extends MapBasedAnyObject implements Comparable<Manifestation> {
+public class Manifestation extends MapBasedAnyObject
+        implements Comparable<Manifestation> {
 
     private final DecimalFormat df = new DecimalFormat("0000");
-
-    protected final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 
     private final String id;
 
@@ -72,8 +79,6 @@ public class Manifestation extends MapBasedAnyObject implements Comparable<Manif
     private final Integer lastDate;
 
     private final String description;
-
-    private final Map<String,Object> identifiers;
 
     private boolean isHead;
 
@@ -107,6 +112,12 @@ public class Manifestation extends MapBasedAnyObject implements Comparable<Manif
 
     private List links;
 
+    private final Map<String,Object> identifiers;
+
+    private SetMultimap<String, String> relations;
+
+    private SetMultimap<String, Manifestation> relatedManifestations;
+
     public Manifestation(Map<String, Object> m) {
         super(m);
         // we use DNB ID. ZDB ID collides with GND ID. Example: 21573803
@@ -114,7 +125,7 @@ public class Manifestation extends MapBasedAnyObject implements Comparable<Manif
         this.externalID = getString("IdentifierZDB.identifierZDB");
         buildTitle();
         this.publisher = getString("PublicationStatement.publisherName");
-        this.publisherPlace = getString("PublicationStatement.placeOfPublication");
+        this.publisherPlace = getPublisherPlace();
         this.language = getString("Language.value", "unknown");
         findCountry();
         Integer firstDate = getInteger("date1");
@@ -145,6 +156,11 @@ public class Manifestation extends MapBasedAnyObject implements Comparable<Manif
         // last, compute key
         this.key = computeKey();
         this.identifiers = makeIdentifiers();
+
+        this.relations = makeRelations();
+
+        this.relatedManifestations = newRelatedManifestations();
+
         // unique identifier
         StringBuilder p = new StringBuilder();
         if (publisher != null) {
@@ -286,6 +302,19 @@ public class Manifestation extends MapBasedAnyObject implements Comparable<Manif
         return links;
     }
 
+    public Manifestation addRelation(String key, String value) {
+        relations.put(key, value);
+        return this;
+    }
+
+    public SetMultimap<String, String> relations() {
+        return relations;
+    }
+
+    public Set<String> relation(String key) {
+        return relations.get(key);
+    }
+
     public String getUniqueIdentifier() {
         return unique;
     }
@@ -302,6 +331,35 @@ public class Manifestation extends MapBasedAnyObject implements Comparable<Manif
             title = title.substring(0, pos - 1);
         }
         setTitle(title);
+    }
+
+    private String getPublisherPlace() {
+        Object o = map().get("PublicationStatement");
+        if (o == null) {
+            return "";
+        }
+        if (!(o instanceof List)) {
+            o = Arrays.asList(o);
+        }
+        StringBuilder sb = new StringBuilder();
+        List<Map<String,Object>> list = (List<Map<String,Object>>)o;
+        for (Map<String,Object> m : list) {
+            o = m.get("placeOfPublication");
+            if (o == null) {
+                continue;
+            }
+            if (!(o instanceof List)) {
+                o = Arrays.asList(o);
+            }
+            List<String> l = (List<String>)o;
+            for (String s : l) {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append(s);
+            }
+        }
+        return sb.toString();
     }
 
     private void findLinks() {
@@ -321,12 +379,10 @@ public class Manifestation extends MapBasedAnyObject implements Comparable<Manif
         if (o != null) {
             if (o instanceof List) {
                 List l = (List) o;
-                for (Object s : l) {
-                    this.contentType = "text";
-                    this.mediaType = "computer";
-                    this.carrierType = s.toString();
-                    return;
-                }
+                this.contentType = "text";
+                this.mediaType = "computer";
+                this.carrierType = l.iterator().next().toString();
+                return;
             } else {
                 this.contentType = "text";
                 this.mediaType = "computer";
@@ -471,7 +527,7 @@ public class Manifestation extends MapBasedAnyObject implements Comparable<Manif
     }
 
     private void findCountry() {
-        Object o = getAnyObject("publishingCountry.isoCountryCodes");
+        Object o = getAnyObject("publishingCountry.isoCountryCodesSource");
         if (o instanceof List) {
             this.country = (List<String>)o;
         } else if (o instanceof String) {
@@ -480,7 +536,7 @@ public class Manifestation extends MapBasedAnyObject implements Comparable<Manif
             this.country = l;
         } else {
             List<String> l = new ArrayList();
-            l.add("unbekannt");
+            l.add("unknown");
             this.country = l;
         }
     }
@@ -507,6 +563,62 @@ public class Manifestation extends MapBasedAnyObject implements Comparable<Manif
         return m;
     }
 
+    private final static Supplier<Set<String>> supplier = new Supplier<Set<String>>() {
+
+        @Override
+        public Set<String> get() {
+            return Sets.newLinkedHashSet();
+        }
+    };
+
+    private SetMultimap<String, String> makeRelations() {
+        Map<String, Collection<String>> map = Maps.newTreeMap();
+        SetMultimap<String, String> multi = Multimaps.newSetMultimap(map, supplier);
+        for (String entry : relationEntries) {
+            Object o = map().get(entry);
+            if (o == null) {
+                continue;
+            }
+            if (!(o instanceof List)) {
+                o = Arrays.asList(o);
+            }
+            for (Object s : (List) o) {
+                Map<String, Object> m = (Map<String, Object>) s;
+                String value = (String)m.get("identifierDNB");
+                String key = (String)m.get("relation");
+                if (key != null && value != null) {
+                    multi.put(key, value);
+                }
+            }
+        }
+        return multi;
+    }
+
+    private final static String[] relationEntries = new String[]{
+            "PrecedingEntry",
+            "SucceedingEntry",
+            "OtherEditionEntry",
+            "OtherRelationshipEntry",
+            "SupplementSpecialIssueEntry",
+            "SupplementParentEntry" // verbindet Titel auch mit (Datenbank)werken über "In" = "isPartOf" --> Work/Work
+    };
+
+    public static String[] relationEntries() {
+        return relationEntries;
+    }
+
+    private SetMultimap<String, Manifestation> newRelatedManifestations() {
+        return HashMultimap.create();
+    }
+
+    public void addRelatedManifestation(String relation, Manifestation manifestation) {
+        relatedManifestations.put(relation, manifestation);
+    }
+
+    public SetMultimap<String, Manifestation> getRelatedManifestations() {
+        return relatedManifestations;
+    }
+
     public String getKey() {
         return key;
     }
@@ -520,6 +632,7 @@ public class Manifestation extends MapBasedAnyObject implements Comparable<Manif
         return externalID.compareTo(m.externalID());
     }
     private final static IDComparator idComparator = new IDComparator();
+
 
     private static class IDComparator implements Comparator<Manifestation> {
 

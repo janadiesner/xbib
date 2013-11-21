@@ -42,8 +42,8 @@ import org.elasticsearch.search.SearchHit;
 import org.xbib.elasticsearch.support.client.SearchClient;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

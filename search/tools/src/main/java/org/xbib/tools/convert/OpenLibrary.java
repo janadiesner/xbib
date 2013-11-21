@@ -41,9 +41,9 @@ import org.xbib.io.file.Finder;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
-import org.xbib.tools.util.FormatUtil;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
+import org.xbib.util.FormatUtil;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;

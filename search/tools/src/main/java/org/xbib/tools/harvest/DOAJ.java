@@ -50,8 +50,8 @@ import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleProperty;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
 import org.xbib.xml.XSD;
 
 import javax.xml.namespace.QName;
@@ -64,7 +64,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
-import static org.xbib.tools.opt.util.DateConverter.datePattern;
+import static org.xbib.options.util.DateConverter.datePattern;
 
 /**
  *

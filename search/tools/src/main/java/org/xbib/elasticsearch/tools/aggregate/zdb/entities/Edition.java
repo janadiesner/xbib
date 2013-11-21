@@ -32,10 +32,13 @@
 package org.xbib.elasticsearch.tools.aggregate.zdb.entities;
 
 import java.util.Comparator;
+import java.util.GregorianCalendar;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class Edition extends Manifestation {
+
+    private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 
     private final String key;
 
@@ -88,9 +91,13 @@ public class Edition extends Manifestation {
                 return 0;
             }
             Integer i1 = e1.getManifestations().first().lastDate();
-            if (i1 == null) i1 = currentYear;
+            if (i1 == null) {
+                i1 = currentYear;
+            }
             Integer i2 = e2.getManifestations().first().lastDate();
-            if (i2 == null) i2 = currentYear;
+            if (i2 == null) {
+                i2 = currentYear;
+            }
             return i2.compareTo(i1);
         }
     }

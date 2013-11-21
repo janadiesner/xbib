@@ -1,0 +1,369 @@
+
+package org.xbib.standardnumber;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * The International Standard Book Number (ISBN) is a 13-digit number
+ * that uniquely identifies books and book-like products published
+ * internationally.
+ *
+ * The purpose of the ISBN is to establish and identify one title or
+ * edition of a title from one specific publisher
+ * and is unique to that edition, allowing for more efficient marketing of products by booksellers,
+ * libraries, universities, wholesalers and distributors.
+ *
+ * Every ISBN consists of thirteen digits and whenever it is printed it is preceded by the letters ISBN.
+ * The thirteen-digit number is divided into four parts of variable length, each part separated by a hyphen.
+ *
+ * This class is based upon the ISBN converter and formatter class
+ * Copyright 2000-2005 by Openly Informatics, Inc. http://www.openly.com/
+ *
+ * @see <a href="http://www.s.org/standards/home/s/international/html/usm12.htm">The ISBN Users' Manual</a>
+ * @see <a href="http://www.ietf.org/html.charters/OLD/urn-charter.html">The IETF URN Charter</a>
+ * @see <a href="http://www.iana.org/assignments/urn-namespaces">The IANA URN assignments</a>
+ * @see <a href="http://www.isbn-international.org/download/List%20of%20Ranges.pdf">ISBN prefix list</a>
+ */
+public class ISBN implements Comparable<ISBN>, StandardNumber {
+
+    private static final Pattern PATTERN = Pattern.compile("[\\p{Digit}xX\\-]+");
+
+    private static final List<String> ranges = new ISBNRangeMessageConfigurator().getRanges();
+
+    private String value;
+
+    private String formatted;
+
+    private boolean createWithChecksum;
+
+    private String eanvalue;
+
+    private boolean eanPreferred;
+
+    private boolean valid;
+
+    /**
+     * Set ISBN value
+     *
+     * @param value the ISBN candidate string
+     */
+    @Override
+    public ISBN setValue(String value) {
+        Matcher m = PATTERN.matcher(value);
+        if (m.find()) {
+            this.value = dehyphenate(value.substring(m.start(), m.end()));
+        }
+        return this;
+    }
+
+    /**
+     * Prefer European Article Number (EAN, ISBN-13)
+     */
+    public ISBN ean() {
+        this.eanPreferred = true;
+        return this;
+    }
+
+    @Override
+    public ISBN checksum() {
+        this.createWithChecksum = true;
+        return this;
+    }
+
+    @Override
+    public int compareTo(ISBN isbn) {
+        return value != null ? value.compareTo(isbn.getValue()): -1;
+    }
+
+    /**
+     * Check for this ISBN number validity
+     *
+     * @return true if valid, false otherwise
+     */
+    @Override
+    public ISBN verify() throws NumberFormatException {
+        check();
+        this.valid = eanPreferred ? eanvalue != null : value != null;
+        if (!valid) {
+            throw new NumberFormatException("invalid number");
+        }
+        return this;
+    }
+
+    /**
+     * Get the normalized value of this standard book number
+     * 
+     * @return the value of this standard book number
+     */
+    @Override
+    public String getValue() {
+        return eanPreferred ? eanvalue : value;
+    }
+
+    /**
+     * Get printable representation of this standard book number
+     *
+     * @return ISBN-13, with (fixed) check digit
+     */
+    @Override
+    public String format() {
+        if (formatted == null) {
+            if (!valid) {
+                return "";
+            }
+            this.formatted = eanPreferred ? fix(eanvalue) : fix("978-" + value);
+        }
+        return formatted;
+    }
+
+    /**
+     * Get country and publisher code
+     * '978' = old bookland ISBNs with old publisher codes
+     * '979' = new bookland ISBNs with new publisher codes assigned, different from old codes(!)
+     * @return the country/publisher code from ISBN
+     */
+    public String getCountryAndPublisherCode()  {
+        // we don't care about the wrong checksum when we fix the value
+        String code = eanvalue != null ? fix(eanvalue) : fix("978" + value);
+        String s = code.substring(4);
+        int pos1 = s.indexOf('-');
+        if (pos1 <= 0) {
+            return null;
+        }
+        String pubCode = s.substring(pos1 + 1);
+        int pos2 = pubCode.indexOf('-');
+        if (pos2 <= 0) {
+            return null;
+        }
+        return code.substring(0, pos1 + pos2 + 5);
+    }
+
+    private String hyphenate(String prefix, String isbn) {
+        StringBuilder sb = new StringBuilder(prefix.substring(0, 4)); // '978-', '979-'
+        prefix = prefix.substring(4);
+        isbn = isbn.substring(3); // 978, 979
+        int i = 0;
+        int j = 0;
+        while (i < prefix.length()) {
+            char ch = prefix.charAt(i++);
+            if (ch == '-') {
+                sb.append('-'); // set first hyphen
+            } else {
+                sb.append(isbn.charAt(j++));
+            }
+        }
+        sb.append('-'); // set second hyphen
+        while (j < (isbn.length() - 1)) {
+            sb.append(isbn.charAt(j++));
+        }
+        sb.append('-'); // set third hyphen
+        sb.append(isbn.charAt(isbn.length() - 1));
+        return sb.toString();
+    }
+
+    public ISBN parse() {
+        return this;
+    }
+
+    private void check() throws NumberFormatException {
+        if (value == null) {
+            throw new NumberFormatException("must not be null");
+        }
+        int i;
+        int val;
+        if (value.length() < 9) {
+            throw new NumberFormatException("too short");
+        }
+        if (value.length() == 10) {
+            // ISBN-10
+            int checksum = 0;
+            int weight = 10;
+            for (i = 0; weight > 0; i++) {
+                val = value.charAt(i) == 'X' || value.charAt(i) == 'x' ? 10
+                        : value.charAt(i) - '0';
+                if (val >= 0) {
+                    if (val == 10 && weight != 1) {
+                        throw new NumberFormatException("bad X symbol"); // bad place for X
+                    }
+                    checksum += weight * val;
+                    weight--;
+                } else {
+                    throw new NumberFormatException("invalid char"); // invalid char
+                }
+            }
+            String s = value.substring(0, 9);
+            if (checksum % 11 != 0) {
+                if (createWithChecksum) {
+                    this.value = s + createCheckDigit10(s);
+                } else {
+                    throw new NumberFormatException("bad checksum"); // bad checksum
+                }
+            }
+            if (eanPreferred) {
+                this.eanvalue = "978" + s + createCheckDigit13("978" + s);
+            }
+        } else if (value.length() == 13) {
+            // ISBN-13 "book land"
+            if (!value.startsWith("978") && !value.startsWith("979")) {
+                throw new IllegalArgumentException("bad prefix, must be 978 or 979: " + value);
+            }
+            int checksum13 = 0;
+            int weight13 = 1;
+            for (i = 0; i < 13; i++) {
+                val = value.charAt(i) == 'X' || value.charAt(i) == 'x' ? 10 : value.charAt(i) - '0';
+                if (val >= 0) {
+                    if (val == 10) {
+                        throw new NumberFormatException("bad symbol: " + value);
+                    }
+                    checksum13 += (weight13 * val);
+                    weight13 = (weight13 + 2) % 4;
+                } else {
+                    throw new NumberFormatException("invalid char");
+                }
+            }
+            // set value
+            if ((checksum13 % 10) != 0) {
+                if (eanPreferred && createWithChecksum) {
+                    // with checksum
+                    this.eanvalue = value.substring(0, 12) + createCheckDigit13(value.substring(0, 12));
+                } else {
+                    throw new NumberFormatException("bad checksum");
+                }
+            } else {
+                // correct checksum
+                this.eanvalue = value;
+            }
+            if (!eanPreferred && (eanvalue.startsWith("978") || eanvalue.startsWith("979"))) {
+                // create 10-digit from 13-digit
+                this.value = eanvalue.substring(3, 12) + createCheckDigit10(eanvalue.substring(3, 12));
+            } else {
+                // 10 digit version not available - not an error
+                this.value = null;
+            }
+        } else if (value.length() == 9) {
+            String s = value.substring(0, 9);
+            // repair ISBN-10 ?
+            if (createWithChecksum) {
+                // create 978 from 10-digit without checksum
+                this.eanvalue = "978" + s + createCheckDigit13("978" + s);
+                this.value = s + createCheckDigit10(s);
+            } else {
+                throw new NumberFormatException("invalid");
+            }
+        } else if (value.length() == 12) {
+            // repair ISBN-13 ?
+            if (!value.startsWith("978") && !value.startsWith("979")) {
+                throw new NumberFormatException("bad prefix");
+            }
+            if (createWithChecksum) {
+                String s = value.substring(0, 9);
+                String t = value.substring(3, 12);
+                // create 978 from 10-digit
+                this.eanvalue = "978" + s + createCheckDigit13("978" + s);
+                this.value = t + createCheckDigit10(t);
+            } else {
+                throw new NumberFormatException("invalid");
+            }
+        } else {
+            throw new NumberFormatException("invalid");
+        }
+    }
+
+    /**
+     * Returns a ISBN check digit for the first 9 digits in a string
+     *
+     * @param value the value
+     * @return check digit
+     *
+     * @throws NumberFormatException
+     */
+    private char createCheckDigit10(String value) throws NumberFormatException {
+        int checksum = 0;
+        int val;
+        int l = value.length();
+        for (int i = 0; i < l; i++) {
+            val = value.charAt(i) - '0';
+            if (val < 0 || val > 9) {
+                throw new NumberFormatException("not a digit in " + value);
+            }
+            checksum += val * (10-i);
+        }
+        int mod = checksum % 11;
+        return mod == 0 ? '0' : mod == 1 ? 'X' : (char)((11-mod) + '0');
+    }
+
+    /**
+     * Returns an ISBN check digit for the first 12 digits in a string
+     *
+     * @param value the value
+     * @return check digit
+     *
+     * @throws NumberFormatException
+     */
+    private char createCheckDigit13(String value) throws NumberFormatException {
+        int checksum = 0;
+        int weight;
+        int val;
+        int l = value.length();
+        for (int i = 0; i < l; i++) {
+            val = value.charAt(i) - '0';
+            if (val < 0 || val > 9) {
+                throw new NumberFormatException("not a digit in " + value);
+            }
+            weight = i % 2 == 0 ? 1 : 3;
+            checksum += weight * val;
+        }
+        int mod = 10 - checksum % 10;
+        return mod == 10 ? '0' : (char)(mod + '0');
+    }
+
+    private String fix(String isbn) {
+        if (isbn == null) {
+            return null;
+        }
+        for (int i = 0; i < ranges.size(); i += 2) {
+            if (isInRange(isbn, ranges.get(i), ranges.get(i + 1)) == 0) {
+                return hyphenate(ranges.get(i), isbn);
+            }
+        }
+        return isbn;
+    }
+
+    /**
+     * Check if ISBN is within a given value range
+     * @param isbn ISBN to check
+     * @param begin lower ISBN
+     * @param end  higher ISBN
+     * @return -1 if too low, 1 if too high, 0 if range matches
+     */
+    private int isInRange(String isbn, String begin, String end) {
+        String b = dehyphenate(begin);
+        int blen = b.length();
+        int c = isbn.substring(0, blen).compareTo(b);
+        if (c < 0) {
+            return -1;
+        }
+        String e = dehyphenate(end);
+        int elen = e.length();
+        c = e.compareTo(isbn.substring(0, elen));
+        if (c < 0) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public String dehyphenate(String isbn) {
+        StringBuilder sb = new StringBuilder(isbn);
+        int i = sb.indexOf("-");
+        while (i >= 0) {
+            sb.deleteCharAt(i);
+            i = sb.indexOf("-");
+        }
+        return sb.toString();
+    }
+
+}
+
+

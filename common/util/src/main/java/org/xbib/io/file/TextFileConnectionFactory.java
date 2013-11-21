@@ -57,23 +57,25 @@ public final class TextFileConnectionFactory
 
     @Override
     public boolean canOpen(URI uri) {
-        return uri.getScheme().startsWith("file");
+        return uri != null && (uri.getScheme() == null || "file".equals(uri.getScheme().substring(0,4)));
     }
 
     @Override
     public InputStream open(URI uri) throws IOException {
-        String scheme = uri.getScheme();
         if (!canOpen(uri)) {
             return null;
         }
         String path = uri.getSchemeSpecificPart();
         InputStream in = new FileInputStream(path);
-        if (scheme.endsWith("gz") || path.endsWith(".gz")) {
-            return service.getCodec("gz").decode(in);
-        } else if (scheme.endsWith("bz2") || path.endsWith(".bz2")) {
-            return service.getCodec("bz2").decode(in);
-        } else if (scheme.endsWith("xz") || path.endsWith(".xz")) {
-            return service.getCodec("xz").decode(in);
+        String scheme = uri.getScheme();
+        if (scheme != null) {
+            if (scheme.endsWith("gz") || path.endsWith(".gz")) {
+                return service.getCodec("gz").decode(in);
+            } else if (scheme.endsWith("bz2") || path.endsWith(".bz2")) {
+                return service.getCodec("bz2").decode(in);
+            } else if (scheme.endsWith("xz") || path.endsWith(".xz")) {
+                return service.getCodec("xz").decode(in);
+            }
         }
         return in;
     }

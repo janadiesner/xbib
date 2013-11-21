@@ -45,8 +45,8 @@ import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.standardnumber.ISSN;
 import org.xbib.standardnumber.InvalidStandardNumberException;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
 
 import java.io.EOFException;
 import java.io.FileWriter;
@@ -91,7 +91,7 @@ public class SerialsDB {
             };
             final OptionSet options = parser.parse(args);
             if (options.hasArgument("help")) {
-                System.err.println("Help for " + ArticleDB.class.getCanonicalName() + lf
+                System.err.println("Help for " + SerialsDB.class.getCanonicalName() + lf
                         + " --help                 print this help message" + lf
                         + " --input <path>         a file path from where the input files are collected (required)" + lf
                         + " --pattern <pattern>    a regex for selecting matching file names for input (default: titleFile.csv)" + lf

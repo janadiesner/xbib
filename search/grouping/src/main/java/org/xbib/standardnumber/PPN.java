@@ -37,13 +37,12 @@ package org.xbib.standardnumber;
  */
 public class PPN implements StandardNumber {
 
-    private String original;
     private String value;
+
     private boolean isValid;
 
     public PPN(String value)
             throws InvalidStandardNumberException {
-        this.original = value;
         parse(value);
     }
 
@@ -58,7 +57,7 @@ public class PPN implements StandardNumber {
 
     @Override
     public String getOriginal() {
-        return original;
+        return value;
     }
 
     @Override
@@ -93,9 +92,8 @@ public class PPN implements StandardNumber {
      */
     private void parse(String value) throws InvalidStandardNumberException {
         this.isValid = false;
-        String s = value;
-        if (check(s)) {
-            this.value = s;
+        if (check(value)) {
+            this.value = value;
             this.isValid = true;
         } else {
             throw new InvalidStandardNumberException("bad PPN checksum");
@@ -115,15 +113,16 @@ public class PPN implements StandardNumber {
         int checksum = 0;
         int weight = 1;
         int val;
-        if (theChars[theChars.length - 1] == 'X') {
-            theChars[theChars.length - 1] = '0' + 10;
+        int l = theChars.length - 1;
+        if (theChars[l] == 'X' || theChars[l] == 'x') {
+            theChars[l] = '0' + 10;
         }
-        for (int i = theChars.length - 1; i >= 0; i--) {
+        for (int i = l; i >= 0; i--) {
             val = theChars[i] - '0';
             if (val < 0 || val > 10) {
                 throw new InvalidStandardNumberException("not a digit in PPN");
             }
-            checksum += (val * weight++);
+            checksum += val * weight++;
         }
         return checksum % 11 == 0;
     }

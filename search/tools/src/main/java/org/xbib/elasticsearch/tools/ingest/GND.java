@@ -44,8 +44,8 @@ import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.turtle.TurtleReader;
 import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
 
 import java.io.IOException;
 import java.io.InputStream;

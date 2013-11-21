@@ -14,7 +14,7 @@ import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.xcontent.ContentBuilder;
-import org.xbib.tools.util.AtomicIntegerIterator;
+import org.xbib.util.AtomicIntegerIterator;
 
 import java.io.IOException;
 import java.net.URI;

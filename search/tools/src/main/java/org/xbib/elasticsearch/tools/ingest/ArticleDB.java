@@ -64,9 +64,9 @@ import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.text.InvalidCharacterException;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
-import org.xbib.tools.util.FormatUtil;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
+import org.xbib.util.FormatUtil;
 import org.xbib.util.Entities;
 import org.xbib.xml.XMLUtil;
 

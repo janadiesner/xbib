@@ -48,8 +48,8 @@ import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.xcontent.ContentBuilder;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
 
 import java.io.IOException;
 import java.io.StringWriter;

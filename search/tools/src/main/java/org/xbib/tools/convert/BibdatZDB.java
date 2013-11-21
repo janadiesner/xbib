@@ -51,9 +51,9 @@ import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.xcontent.ContentBuilder;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
-import org.xbib.tools.util.FormatUtil;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
+import org.xbib.util.FormatUtil;
 import org.xml.sax.InputSource;
 
 import java.io.File;

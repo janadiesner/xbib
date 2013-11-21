@@ -52,9 +52,9 @@ import org.xbib.marc.dialects.MarcXmlTarReader;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.xcontent.ContentBuilder;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
-import org.xbib.tools.util.FormatUtil;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
+import org.xbib.util.FormatUtil;
 
 import java.io.IOException;
 import java.net.URI;

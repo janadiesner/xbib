@@ -81,7 +81,7 @@ public class CSVTokenizer extends StreamTokenizer {
         sb.append("Token[");
         switch (ttype) {
             case TT_DELIMITER:
-                sb.append("DELIMITER").append("], line " + lineno());
+                sb.append("DELIMITER").append("], line ").append(lineno());
                 break;
             default:
                 sb.append(super.toString().substring(6));

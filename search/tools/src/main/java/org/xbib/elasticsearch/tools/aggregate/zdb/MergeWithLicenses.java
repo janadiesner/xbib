@@ -59,10 +59,15 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Supplier;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.SetMultimap;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.collect.Sets;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -73,6 +78,7 @@ import org.xbib.elasticsearch.support.client.IngestClient;
 import org.xbib.elasticsearch.support.client.SearchClient;
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.date.DateUtil;
+import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Cluster;
 import org.xbib.util.URIUtil;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -82,10 +88,10 @@ import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Holding;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.License;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Manifestation;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Work;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
-import org.xbib.tools.util.ExceptionFormatter;
-import org.xbib.tools.util.FormatUtil;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
+import org.xbib.util.ExceptionFormatter;
+import org.xbib.util.FormatUtil;
 
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -292,7 +298,7 @@ public class MergeWithLicenses {
         this.size = size;
         this.millis = millis;
 
-        this.docs = Collections.synchronizedSet(new HashSet());
+        this.docs =  Sets.newConcurrentHashSet();  //Collections.synchronizedSet(new HashSet());
 
         this.identifier = identifier;
 
@@ -386,16 +392,12 @@ public class MergeWithLicenses {
 
         private final Queue<ClusterBuildContinuation> buildQueue;
 
-        private final Set<String> visited;
-
-        private final Set<Manifestation> cluster;
+        private Set<Manifestation> cluster;
 
         public MergePump(int i) {
             this.buildQueue = new ConcurrentLinkedQueue();
             this.logger = LoggerFactory.getLogger(MergeWithLicenses.class.getName() + "-pump-" + i);
             this.mapper = new ObjectMapper();
-            this.visited = new HashSet();
-            this.cluster = new TreeSet(Manifestation.getIdComparator());
         }
 
         public Queue<ClusterBuildContinuation> getBuildQueue() {
@@ -418,11 +420,11 @@ public class MergeWithLicenses {
                         break;
                     }
                     m = new Manifestation(mapper.readValue(t.hit().source(), Map.class));
-                    if (filterForProcess(m)) {
+                    //if (filterForProcess(m)) {
                         process(m);
-                    } else {
-                        logger.debug("filtered, not processed: {}", m);
-                    }
+                    //} else {
+                    //    logger.debug("filtered, not processed: {}", m);
+                    //}
                     count++;
                     if (count % size == 0) {
                          logger.info("count={} queries={} hits={} manifestations={} holdings={} licences={}",
@@ -449,8 +451,7 @@ public class MergeWithLicenses {
         }
 
         private boolean filterForProcess(Manifestation manifestation) {
-            return manifestation.isHead()
-                    && !manifestation.isSupplement()
+            return !manifestation.isSupplement()
                     && !manifestation.isPart()
                     && !manifestation.hasPrint(); // "each online has print edition" rule
         }
@@ -462,23 +463,60 @@ public class MergeWithLicenses {
             }
             docs.add(docid);
 
-            cluster.clear();
+            this.cluster = new TreeSet(Manifestation.getIdComparator());
             cluster.add(manifestation);
-            visited.clear();
-            visited.add(docid);
 
-            buildCluster(manifestation, visited, cluster);
+            retrieveCluster(cluster, manifestation);
             countManifestations.addAndGet(cluster.size());
 
-            Set<Work> leaders = electWorkLeaders(cluster);
+            for (Manifestation m : cluster) {
+                logger.info("Manifestation: {}", m.externalID());
+                setAllRelationsBetween(m, cluster);
+                for (String relation : m.getRelatedManifestations().keySet()) {
+                    logger.info("Relation: {}", relation);
+                    for (Manifestation related : m.getRelatedManifestations().get(relation)) {
+                        logger.info("    {}", related.externalID());
+                    }
+                }
+            }
 
+            // build cluster
+            Cluster c = new Cluster(cluster);
+            List<Set<Manifestation>> list = c.chronoStreams();
+            logger.info("{} -> {}", cluster.size(), list.size());
+            for (Set<Manifestation> set : list) {
+                logger.info("----");
+                for (Manifestation m : set) {
+                    logger.info("{} {} {}-{} {} {}",
+                            m.externalID(),
+                            m.title(),
+                            m.firstDate(), m.lastDate(),
+                            m.isPart() ? "(Reihe)" : "",
+                            m.isSupplement() ? "(Suppl.)" : "");
+                    // near neighbors
+                    if (!m.getRelatedManifestations().get("hasOnlineEdition").isEmpty()) {
+                        logger.info("   online = {}", m.getRelatedManifestations().get("hasOnlineEditions"));
+                    }
+                    if (!m.getRelatedManifestations().get("hasPrintEdition").isEmpty()) {
+                        logger.info("   print = {}", m.getRelatedManifestations().get("hasPrintEdition"));
+                    }
+                    if (!m.getRelatedManifestations().get("hasSupplement").isEmpty()) {
+                        logger.info("   suppl = {}", m.getRelatedManifestations().get("hasSupplement"));
+                    }
+                    if (!m.getRelatedManifestations().get("hasPart").isEmpty()) {
+                        logger.info("   parts = {}", m.getRelatedManifestations().get("hasPart"));
+                    }
+                }
+            }
+
+            /*Set<Work> leaders = electWorkLeaders(cluster);
             if (logger.isDebugEnabled()) {
                 logger.debug("elected {} leaders from cluster {} -> {}",
                         leaders.size(), cluster, leaders);
-            }
+            }*/
 
             // try to assign all other manifestations in the cluster to one of the leaders
-            boolean ready = false;
+            /*boolean ready = false;
             while (!ready) {
                 Collection<Manifestation> manifestations = new ArrayList(cluster); // must be a list!
                 boolean found = false;
@@ -500,8 +538,9 @@ public class MergeWithLicenses {
                 for (Manifestation m : cluster) {
                     leaders.add(new Work(m));
                 }
-            }
+            }*/
 
+            Set<Work> leaders = Sets.newHashSet();
             for (Work work : leaders) {
                 Set<Holding> holdings = new HashSet();
                 Set<License> licenses = new HashSet();
@@ -557,21 +596,13 @@ public class MergeWithLicenses {
             }
         }
 
-        private void buildCluster(Manifestation manifestation,
-                                          Set<String> visited,
-                                          Collection<Manifestation> manifestations)
-                throws IOException {
-            // search for the manifestations we reference to and all manifestations that reference to us
-            String id = manifestation.id();
-
-            Set<String> neighbors = new HashSet();
-            neighborIDs(manifestation, relatedEditions, neighbors);
-            neighborIDs(manifestation, relatedManifestations, neighbors);
-            neighbors.removeAll(visited); // do not search twice
-
+        private void retrieveCluster(Collection<Manifestation> cluster,
+                Manifestation manifestation) throws IOException {
+            SetMultimap<String, String> relations = manifestation.relations();
+            Set<String> neighbors =  Sets.newHashSet(relations.values());
             QueryBuilder queryBuilder = neighbors.isEmpty() ?
-                    termQuery("_all", id) :
-                    boolQuery().should(termQuery("_all", id))
+                    termQuery("_all",  manifestation.id()) :
+                    boolQuery().should(termQuery("_all",  manifestation.id()))
                             .should(termsQuery("IdentifierDNB.identifierDNB", neighbors.toArray()));
             SearchRequestBuilder searchRequest = client.prepareSearch()
                     .setQuery(queryBuilder)
@@ -582,13 +613,7 @@ public class MergeWithLicenses {
             if (sourceTitleType != null) {
                 searchRequest.setTypes(sourceTitleType);
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("buildCluster request = {}", searchRequest.toString());
-            }
             SearchResponse searchResponse = searchRequest.execute().actionGet();
-            if (logger.isDebugEnabled()) {
-                logger.debug("hits={}", searchResponse.getHits().getTotalHits());
-            }
             searchResponse = client.prepareSearchScroll(searchResponse.getScrollId())
                     .setScroll(TimeValue.timeValueMillis(millis))
                    .execute().actionGet();
@@ -598,7 +623,7 @@ public class MergeWithLicenses {
                 return;
             }
             ClusterBuildContinuation cont =
-                    new ClusterBuildContinuation(id, searchResponse, 0, neighbors, visited, manifestations);
+                    new ClusterBuildContinuation(manifestation, searchResponse, 0, cluster);
             buildQueue.offer(cont);
             while (!buildQueue.isEmpty()) {
                 continueClusterBuild(buildQueue.poll());
@@ -606,59 +631,56 @@ public class MergeWithLicenses {
         }
 
         private void continueClusterBuild(ClusterBuildContinuation c) throws IOException {
-            String id = c.id;
             SearchResponse searchResponse = c.searchResponse;
-            int pos = c.pos;
-            Set<String> neighbors = c.neighbors;
-            Set<String> visited = c.visited;
-            Collection<Manifestation> manifestations = c.manifestations;
             SearchHits hits;
-            boolean collided = false;
             do {
                 hits = searchResponse.getHits();
-                for (int i = pos; i < hits.getHits().length; i++ ) {
+                for (int i = c.pos; i < hits.getHits().length; i++ ) {
                     SearchHit hit = hits.getAt(i);
                     countHits.incrementAndGet();
                     Manifestation m = new Manifestation(mapper.readValue(hit.source(), Map.class));
-                    // detect collision
-                    collided = detectCollisionAndTransfer(m, c, i);
+                    boolean collided = detectCollisionAndTransfer(m, c, i);
                     if (collided) {
-                        break;
+                        return;
                     }
                     if (docs.contains(m.id())) {
                         continue;
                     }
-                    if (neighbors.contains(m.id())) {
-                        manifestations.add(m);
-                        if (!visited.contains(m.id())) {
-                            visited.add(m.id());
-                            docs.add(m.id());
-                            buildCluster(m, visited, manifestations);
+                    docs.add(m.id());
+                    c.cluster.add(m);
+                    boolean expandCluster = false;
+                    for (String relation : findTheRelationsBetween(c.manifestation, m.id())) {
+                        if (relation == null) {
+                            logger.warn("unknown relation {}", relation);
+                            continue;
                         }
-                    } else {
-                        String relation = checkRelationEntries(m, id);
-                        if (relation != null) {
-                            manifestations.add(m);
-                            if (relatedManifestations.contains(relation)) {
-                                if (!visited.contains(m.id())) {
-                                    visited.add(m.id());
-                                    docs.add(m.id());
-                                    buildCluster(m, visited, manifestations);
-                                }
-                            } else if (relatedEditions.contains(relation)) {
-                                if (!visited.contains(m.id())) {
-                                    visited.add(m.id());
-                                    docs.add(m.id());
-                                    buildCluster(m, visited, manifestations);
-                                }
-                            } else if (!relatedWorks.contains(relation)) {
-                                missingRelationsLogger.warn("{} {}", m, relation);
-                            }
+                        c.manifestation.addRelatedManifestation(relation, m);
+                        String inverse = inverseRelations.get(relation);
+                        if (inverse == null) {
+                            logger.warn("no inverse relation for {}", relation);
+                        } else {
+                            m.addRelatedManifestation(inverse, c.manifestation);
+                            expandCluster = true;
                         }
                     }
-                }
-                if (collided) {
-                    break;
+                    // other direction (missing entries in catalog are possible)
+                    for (String relation : findTheRelationsBetween(m, c.manifestation.id())) {
+                        if (relation == null) {
+                            logger.warn("unknown relation {}", relation);
+                            continue;
+                        }
+                        m.addRelatedManifestation(relation, c.manifestation);
+                        String inverse = inverseRelations.get(relation);
+                        if (inverse == null) {
+                            logger.warn("no inverse relation for {}", relation);
+                        } else {
+                            c.manifestation.addRelatedManifestation(inverse, m);
+                            expandCluster = true;
+                        }
+                    }
+                    if (expandCluster && !m.isSupplement()) {
+                        retrieveCluster(c.cluster, m);
+                    }
                 }
                 searchResponse = client.prepareSearchScroll(searchResponse.getScrollId())
                         .setScroll(TimeValue.timeValueMillis(millis))
@@ -675,7 +697,7 @@ public class MergeWithLicenses {
                     continue;
                 }
                 if (pump.getCluster().contains(manifestation)) {
-                    logger.warn("collision detected for {}", manifestation);
+                    logger.warn("collision detected for {} at hit pos {}", manifestation, pos);
                     c.pos = pos;
                     pump.getBuildQueue().offer(c);
                     return true;
@@ -772,30 +794,18 @@ public class MergeWithLicenses {
         }
     }
 
-    private String checkRelationEntries(Manifestation manifestation, String id) {
+    private Set<String> findTheRelationsBetween(Manifestation manifestation, String id) {
         if (manifestation.id().equals(id)) {
             return null;
         }
-        for (String entry : relationEntries) {
+        Set<String> relationNames = new HashSet<String>();
+        for (String entry : Manifestation.relationEntries()) {
             String s = checkEntry(manifestation.map().get(entry), id);
             if (s != null) {
-                return s;
+                relationNames.add(s);
             }
         }
-        return null;
-    }
-
-    private String checkAllRelationEntries(Manifestation manifestation, String id) {
-        if (manifestation.id().equals(id)) {
-            return null;
-        }
-        for (String entry : allRelationEntries) {
-            String s = checkEntry(manifestation.map().get(entry), id);
-            if (s != null) {
-                return s;
-            }
-        }
-        return null;
+        return relationNames;
     }
 
     private String checkEntry(Object o, String id) {
@@ -805,8 +815,8 @@ public class MergeWithLicenses {
             }
             for (Object s : (List) o) {
                 Map<String, Object> entry = (Map<String, Object>) s;
-                Object e = entry.get("identifierDNB");
-                if (entry != null && id.equals(e)) {
+                String value = (String)entry.get("identifierDNB");
+                if (id.equals(value)) {
                     return (String)entry.get("relation");
                 }
             }
@@ -814,25 +824,42 @@ public class MergeWithLicenses {
         return null;
     }
 
-    private void neighborIDs(Manifestation manifestation, Set<String> relations, Set<String> ids) {
-        for (String relationEntry : relationEntries) {
-            Object o = manifestation.map().get(relationEntry);
-            if (o == null) {
-                continue;
-            }
-            if (!(o instanceof List)) {
-                o = Arrays.asList(o);
-            }
-            for (Object p : (List) o) {
-                Map<String, Object> entry = (Map<String, Object>) p;
-                if (relations.contains(entry.get("relation"))) {
-                    ids.add((String) entry.get("identifierDNB"));
+    private void setAllRelationsBetween(Manifestation manifestation, Collection<Manifestation> cluster) {
+        for (String relation : Manifestation.relationEntries()) {
+            Object o = manifestation.map().get(relation);
+            if (o != null) {
+                if (!(o instanceof List)) {
+                    o = Arrays.asList(o);
+                }
+                for (Object s : (List) o) {
+                    Map<String, Object> entry = (Map<String, Object>) s;
+                    String key = (String)entry.get("relation");
+                    if (key == null) {
+                        logger.warn("entry {} has no relation name in {}", entry, manifestation.externalID());
+                        continue;
+                    }
+                    String value = (String)entry.get("identifierDNB");
+                    for (Manifestation m : cluster) {
+                        if (m.id().equals(manifestation.id())) {
+                            continue;
+                        }
+                        if (m.id().equals(value)) {
+                            manifestation.addRelatedManifestation(key, m);
+                            String inverse = inverseRelations.get(key);
+                            if (inverse == null) {
+                                logger.warn("no inverse relation for {} in {}", key, manifestation.externalID());
+                            } else {
+                                m.addRelatedManifestation(inverse, manifestation);
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 
-    private Set<Work> electWorkLeaders(Collection<Manifestation> cluster) {
+
+    /*private Set<Work> electWorkLeaders(Collection<Manifestation> cluster) {
         Set<Work> leaders = new TreeSet<Work>(Work.getWorkComparator());
         Set<Manifestation> manifestations = new TreeSet<Manifestation>(Manifestation.getIdComparator());
         manifestations.addAll(cluster);
@@ -891,7 +918,7 @@ public class MergeWithLicenses {
         // not every relation has an inverse relation, so check the other way round :(
         s = checkAllRelationEntries(m2, m1.id());
         return s != null;
-    }
+    }*/
 
     private Map<String, Edition> electEditionLeaders(Set<Manifestation> manifestations) {
         Map<String, Edition> m = new TreeMap();
@@ -1063,7 +1090,7 @@ public class MergeWithLicenses {
         builder.startObject()
                 .field("_boost", boost)
                 .field("id", work.externalID())
-                .field("preferredWorkTitle", work.title())
+                .field("title", work.title())
                 .field("key", work.getUniqueIdentifier())
                 .field("firstDate", firstDate)
                 .field("lastDate", lastDate)
@@ -1117,6 +1144,7 @@ public class MergeWithLicenses {
                 .field("id", manifestation.externalID())
                 .field("title", getTitle(manifestation))
                 .field("publisher", manifestation.publisher())
+                .field("publisherPlace", manifestation.publisherPlace())
                 .field("country", manifestation.country())
                 .field("language", manifestation.language())
                 .field("identifiers", manifestation.getIdentifiers())
@@ -1160,7 +1188,7 @@ public class MergeWithLicenses {
             String pid = manifestation.getPrintID();
             String oid = manifestation.getOnlineExternalID();
             // Loop over dates and find out if there are services for this date offered by libraries.
-            boolean written = false;
+            List<Integer> foundDates = new ArrayList();
             for (Integer date : dates) {
                 Map<String,List<Holding>> services = new HashMap();
                 // filter holdings for this date
@@ -1240,13 +1268,24 @@ public class MergeWithLicenses {
                     }
                 }
                 if (!services.isEmpty()) {
-                    written = true;
+                    foundDates.add(date);
                     writeVolume(date, manifestation, services);
                 }
             }
             // not a single date with service found?
-            if (!written) {
+            if (foundDates.isEmpty()) {
                 writeVolume(null, manifestation, null);
+            } else {
+                // summary
+                XContentBuilder builder = jsonBuilder();
+                builder.startObject()
+                        .field("dates", foundDates)
+                        .endObject();
+                ingest.indexDocument(targetIndex,
+                        targetManifestationsType,
+                        manifestation.externalID(),
+                        builder.string());
+                countWrites.incrementAndGet();
             }
         }
     }
@@ -1259,7 +1298,6 @@ public class MergeWithLicenses {
         builder.startObject()
                 .field("id", manifestation.externalID())
                 .field("date", date)
-                .field("preferredTitle", manifestation.title())
                 .field("title", getTitle(manifestation))
                 .field("contentType", manifestation.contentType())
                 .field("key", manifestation.getUniqueIdentifier())
@@ -1295,7 +1333,7 @@ public class MergeWithLicenses {
             }
             builder.endArray();
         }
-        String id = manifestation.externalID() + (date != null ? date : "");
+        String id = manifestation.externalID() + (date != null ? "_" + date : "");
         ingest.indexDocument(targetIndex,
                 targetManifestationsType,
                 id,
@@ -1314,39 +1352,13 @@ public class MergeWithLicenses {
         return m;
     }
 
-    private Manifestation merge(Manifestation m1, Manifestation m2) {
-        // title statement and preferredTitle: always print title statement instead of online
-        if (m1.hasPrint()) {
-            Map<String, Object> t = (Map<String, Object>) m2.map().get("TitleStatement");
-            m1.map().put("TitleStatement", t);
-            m1.setTitle(m2.title());
-        }
-        return m1;
-    }
 
-    private final String[] allRelationEntries = new String[]{
-            "PrecedingEntry",
-            "SucceedingEntry",
-            "OtherEditionEntry",
-            "OtherRelationshipEntry",
-            "SupplementSpecialIssueEntry",
-            "SupplementParentEntry"
-    };
-
-    private final String[] relationEntries = new String[]{
-            "PrecedingEntry",
-            "SucceedingEntry",
-            "OtherEditionEntry",
-            "OtherRelationshipEntry",
-            "SupplementSpecialIssueEntry"
-            //"SupplementParentEntry", weglassen: verbindet Titel auch mit (Datenbank)werken über "In" = "isPartOf" --> Work/Work
-    };
-
+/*
     private final Set<String> relatedWorks = new HashSet<String>() {{
         add("hasPart");
         add("isPartOf");
-        add("hasSupplement"); // TODO
-        add("isSupplementOf"); // TODO
+        add("hasSupplement");
+        add("isSupplementOf");
     }};
 
     private final Set<String> relatedEditions = new HashSet<String>() {{
@@ -1357,6 +1369,10 @@ public class MergeWithLicenses {
     }};
 
     private final Set<String> relatedManifestations = new HashSet<String>() {{
+        // chronological entries
+        add("precededBy");
+        add("succeededBy");
+        // editions
         add("hasOriginalEdition");
         add("hasPrintEdition");
         add("hasOnlineEdition");
@@ -1378,7 +1394,8 @@ public class MergeWithLicenses {
         add("hasBoxedEdition");
         add("hasReproduction");
         add("hasSummary");
-        // other relation direction
+
+        // inverse relations
         add("isOriginalEditionOf");
         add("isPrintEditionOf");
         add("isOnlineEditionOf");
@@ -1390,38 +1407,102 @@ public class MergeWithLicenses {
         add("isDigitizedEditionOf");
         add("isSpatialEditionOf");
         add("isTemporalEditionOf");
+        add("isLocalEditionOf");
         add("isPartialEditionOf");
         add("isAdditionalEditionOf");
+        add("isDerivedEditionOf");
         add("isHardcoverEditionOf");
         add("isManuscriptEditionOf");
         add("isBoxedEditionOf");
         add("isReproductionOf");
         add("isSummaryOf");
-        // chronological entries
-        add("precededBy");
-        add("succeededBy");
+    }};*/
+
+    private final Map<String,String> inverseRelations = new HashMap<String,String>() {{
+
+        put("precededBy", "succeededBy");
+        put("succeededBy", "precededBy");
+
+        // work relations
+        put("hasPart", "isPartOf");
+        put("hasSupplement", "isSupplementOf");
+        put("isPartOf", "hasPart");
+        put("isSupplementOf", "hasSupplement");
+
+        // expression relations
+        put("hasLanguageEdition", "isLanguageEditionOf");
+        put("hasTranslation", "isTranslationOf");
+        put("isLanguageEditionOf", "hasLanguageEdition");
+        put("isTranslationOf", "hasTranslation");
+
+        // manifestation relations
+        put("hasOriginalEdition", "isOriginalEditionOf");
+        put("hasPrintEdition", "isPrintEditionOf");
+        put("hasOnlineEdition", "isOnlineEditionOf");
+        put("hasBrailleEdition", "isBrailleEditionOf");
+        put("hasDVDEdition", "isDVDEditionOf");
+        put("hasCDEdition", "isCDEditionOf");
+        put("hasDiskEdition", "isDiskEditionOf");
+        put("hasMicroformEdition", "isMicroformEditionOf");
+        put("hasDigitizedEdition", "isDigitizedEditionOf");
+        put("hasSpatialEdition", "isSpatialEditionOf");
+        put("hasTemporalEdition", "isTemporalEditionOf");
+        put("hasPartialEdition", "isPartialEditionOf");
+        put("hasTransientEdition", "isTransientEditionOf");
+        put("hasLocalEdition", "isLocalEditionOf");
+        put("hasAdditionalEdition", "isAdditionalEditionOf");
+        put("hasAlternativeEdition", "isAdditionalEditionOf");
+        put("hasDerivedEdition", "isDerivedEditionOf");
+        put("hasHardcoverEdition", "isHardcoverEditionOf");
+        put("hasManuscriptEdition", "isManuscriptEditionOf");
+        put("hasBoxedEdition", "isBoxedEditionOf");
+        put("hasReproduction", "isReproductionOf");
+        put("hasSummary", "isSummaryOf");
+
+        put("isOriginalEditionOf", "hasOriginalEdition");
+        put("isPrintEditionOf", "hasPrintEdition");
+        put("isOnlineEditionOf", "hasOnlineEdition");
+        put("isBrailleEditionOf", "hasBrailleEdition");
+        put("isDVDEditionOf", "hasDVDEdition");
+        put("isCDEditionOf", "hasCDEdition");
+        put("isDiskEditionOf", "hasDiskEdition");
+        put("isMicroformEditionOf", "hasMicroformEdition");
+        put("isDigitizedEditionOf", "hasMicroformEdition");
+        put("isSpatialEditionOf", "hasSpatialEdition");
+        put("isTemporalEditionOf", "hasTemporalEdition");
+        put("isPartialEditionOf", "hasPartialEdition");
+        put("isTransientEditionOf", "hasTransientEdition");
+        put("isLocalEditionOf", "hasLocalEdition");
+        put("isAdditionalEditionOf", "hasAdditionalEdition");
+        put("isDerivedEditionOf", "hasDerivedEdition");
+        put("isHardcoverEditionOf", "hasHardcoverEdition");
+        put("isManuscriptEditionOf", "hasManuscriptEdition");
+        put("isBoxedEditionOf", "hasBoxedEdition");
+        put("isReproductionOf", "hasReproduction");
+        put("isSummaryOf", "hasSummary");
+
     }};
 
     private class ClusterBuildContinuation {
-        String id;
-        SearchResponse searchResponse;
+        final Manifestation manifestation;
+        final SearchResponse searchResponse;
+        //final Set<String> neighbors;
+        //final Set<String> visited;
+        final Collection<Manifestation> cluster;
         int pos;
-        Set<String> neighbors;
-        Set<String> visited;
-        Collection<Manifestation> manifestations;
 
-        ClusterBuildContinuation(String id,
+        ClusterBuildContinuation(Manifestation manifestation,
                                  SearchResponse searchResponse,
                                  int pos,
-                                 Set<String> neighbors,
-                                 Set<String> visited,
-                                 Collection<Manifestation> manifestations) {
-            this.id = id;
+                                 //Set<String> neighbors,
+                                 //Set<String> visited,
+                                 Collection<Manifestation> cluster) {
+            this.manifestation = manifestation;
             this.searchResponse = searchResponse;
             this.pos = pos;
-            this.neighbors = neighbors;
-            this.visited = visited;
-            this.manifestations = manifestations;
+            //this.neighbors = neighbors;
+            //this.visited = visited;
+            this.cluster = cluster;
         }
     }
 

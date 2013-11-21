@@ -382,6 +382,11 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.xbib</groupId>
+                <artifactId>standardnumber</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>13.0.1</version>
@@ -600,8 +605,10 @@
         <module>common/jacc</module>
         <module>common/io</module>
         <module>common/dict</module>
+        <module>common/graph</module>
 
         <module>search/grouping</module>
+        <module>search/standardnumber</module>
         <module>search/content</module>
         <module>search/elements</module>
         <module>search/query</module>

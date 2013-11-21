@@ -53,8 +53,8 @@ import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.rdfxml.RdfXmlReader;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -63,7 +63,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.util.Date;
 
-import static org.xbib.tools.opt.util.DateConverter.datePattern;
+import static org.xbib.options.util.DateConverter.datePattern;
 
 /**
  *

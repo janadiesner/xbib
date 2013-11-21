@@ -43,8 +43,8 @@ import org.xbib.oai.client.OAIClientFactory;
 import org.xbib.oai.record.ListRecordsRequest;
 import org.xbib.oai.record.ListRecordsResponseListener;
 import org.xbib.oai.util.xml.XmlMetadataHandler;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -54,7 +54,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.xbib.tools.opt.util.DateConverter.datePattern;
+import static org.xbib.options.util.DateConverter.datePattern;
 
 public class MacsOAI {
 

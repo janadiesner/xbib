@@ -52,10 +52,10 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.elasticsearch.tools.aggregate.WrappedSearchHit;
 import org.xbib.elasticsearch.tools.aggregate.zdb.MergeWithLicenses;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Manifestation;
-import org.xbib.tools.opt.OptionParser;
-import org.xbib.tools.opt.OptionSet;
-import org.xbib.tools.util.ExceptionFormatter;
-import org.xbib.tools.util.FormatUtil;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
+import org.xbib.util.ExceptionFormatter;
+import org.xbib.util.FormatUtil;
 import org.xbib.util.Strings;
 
 import java.io.IOException;
@@ -78,9 +78,7 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchPhrasePrefixQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchPhraseQuery;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
