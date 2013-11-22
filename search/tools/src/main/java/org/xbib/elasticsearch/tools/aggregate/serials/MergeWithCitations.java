@@ -407,7 +407,7 @@ public class MergeWithCitations {
             // filter out supplement or sub-part manifestations
             return //"computer".equals(manifestation.mediaType()) &&
                     !manifestation.isSupplement() &&
-                    !manifestation.isPart();
+                    !manifestation.isPartial();
         }
 
         private void process(Manifestation manifestation) throws IOException {

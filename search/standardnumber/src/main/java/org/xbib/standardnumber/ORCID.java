@@ -11,8 +11,8 @@ import java.net.URI;
  */
 public class ORCID extends ISNI {
 
-    public ORCID setValue(String value) {
-        super.setValue(value);
+    public ORCID set(String value) {
+        super.set(value);
         return this;
     }
 
@@ -21,8 +21,8 @@ public class ORCID extends ISNI {
         return this;
     }
 
-    public ORCID parse() {
-        super.parse();
+    public ORCID normalize() {
+        super.normalize();
         return this;
     }
 
@@ -32,7 +32,7 @@ public class ORCID extends ISNI {
     }
 
     public URI toURI() {
-        return URI.create("http://orcid.org/" + getValue());
+        return URI.create("http://orcid.org/" + normalized());
     }
 
 }

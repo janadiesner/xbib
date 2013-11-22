@@ -27,11 +27,11 @@ public class IBAN implements Comparable<IBAN>, StandardNumber {
 
     @Override
     public int compareTo(IBAN iban) {
-        return iban != null ? getValue().compareTo(iban.getValue()) : -1;
+        return iban != null ? normalized().compareTo(iban.normalized()) : -1;
     }
 
     @Override
-    public IBAN setValue(String value) {
+    public IBAN set(String value) {
         Matcher m = PATTERN.matcher(value);
         if (m.find()) {
             this.value = value.substring(m.start(), m.end());
@@ -46,7 +46,7 @@ public class IBAN implements Comparable<IBAN>, StandardNumber {
     }
 
     @Override
-    public IBAN parse() {
+    public IBAN normalize() {
         this.value = parse(value);
         return this;
     }
@@ -62,7 +62,7 @@ public class IBAN implements Comparable<IBAN>, StandardNumber {
     }
 
     @Override
-    public String getValue() {
+    public String normalized() {
         return formatted;
     }
 

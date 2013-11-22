@@ -13,15 +13,12 @@ public class EAN implements Comparable<EAN>, StandardNumber {
 
     @Override
     public int compareTo(EAN ean) {
-        return ean != null ? getValue().compareTo(ean.getValue()) : -1;
+        return ean != null ? normalized().compareTo(ean.normalized()) : -1;
     }
 
     @Override
-    public EAN setValue(String value) {
-        Matcher m = PATTERN.matcher(value);
-        if (m.find()) {
-            this.value = value.substring(m.start(), m.end());
-        }
+    public EAN set(String value) {
+        this.value = value;
         return this;
     }
 
@@ -32,8 +29,11 @@ public class EAN implements Comparable<EAN>, StandardNumber {
     }
 
     @Override
-    public EAN parse() {
-        this.value = despace(value);
+    public EAN normalize() {
+        Matcher m = PATTERN.matcher(value);
+        if (m.find()) {
+            this.value = despace(value.substring(m.start(), m.end()));
+        }
         return this;
     }
 
@@ -44,7 +44,7 @@ public class EAN implements Comparable<EAN>, StandardNumber {
     }
 
     @Override
-    public String getValue() {
+    public String normalized() {
         return value;
     }
 

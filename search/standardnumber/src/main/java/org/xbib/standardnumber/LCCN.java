@@ -67,7 +67,7 @@ public class LCCN implements Comparable<LCCN>, StandardNumber {
 
     private String formatted;
 
-    public LCCN setValue(String value) {
+    public LCCN set(String value) {
         Matcher m = PATTERN.matcher(value);
         if (m.find()) {
             this.value = value.substring(m.start(), m.end());
@@ -77,10 +77,10 @@ public class LCCN implements Comparable<LCCN>, StandardNumber {
 
     @Override
     public int compareTo(LCCN o) {
-        return value != null ?  value.compareTo(o.getValue()) : -1;
+        return value != null ?  value.compareTo(o.normalized()) : -1;
     }
 
-    public String getValue() {
+    public String normalized() {
         return value;
     }
 
@@ -88,11 +88,17 @@ public class LCCN implements Comparable<LCCN>, StandardNumber {
         return this;
     }
 
-    public LCCN parse() {
+    public LCCN normalize() {
         this.value = clean(value);
         return this;
     }
 
+    /**
+     * Never raise an error, there is no checksum for an LCCN
+     *
+     * @return this LCCN
+     * @throws NumberFormatException
+     */
     public LCCN verify() throws NumberFormatException {
         return this;
     }

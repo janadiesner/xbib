@@ -8,21 +8,21 @@ public class ZDBTest extends Assert {
 
     @Test
     public void testZDB1() throws Exception {
-        ZDB zdb = new ZDB().setValue("127").parse().verify();
-        assertEquals("127", zdb.getValue());
+        ZDB zdb = new ZDB().set("127").normalize().verify();
+        assertEquals("127", zdb.normalized());
     }
 
     @Test
     public void testZDB2() throws Exception {
-        ZDB zdb = new ZDB().setValue("127976-2").parse().verify();
-        assertEquals("1279762", zdb.getValue());
+        ZDB zdb = new ZDB().set("127976-2").normalize().verify();
+        assertEquals("1279762", zdb.normalized());
         assertEquals("127976-2", zdb.format());
     }
 
     @Test
     public void testZDB3() throws Exception {
-        ZDB zdb = new ZDB().setValue("1279760").checksum().parse().verify();
-        assertEquals("1279762", zdb.getValue());
+        ZDB zdb = new ZDB().set("1279760").checksum().normalize().verify();
+        assertEquals("1279762", zdb.normalized());
         assertEquals("127976-2", zdb.format());
     }
 

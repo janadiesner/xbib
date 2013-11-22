@@ -1,16 +1,32 @@
 package org.xbib.standardnumber;
 
+/**
+ * A standard number is a number that
+ *
+ * - is backed by an international standard or a de-facto community use
+ *
+ * - can accept alphanumeric values (digits and letters and separator characters)
+ *
+ * - can be normalized
+ *
+ * - can be verified and raise en error is verification fails
+ *
+ * - must have a checksum
+ *
+ * - can be formatted to a printable representation
+ *
+ */
 public interface StandardNumber {
 
-    StandardNumber setValue(String value);
+    StandardNumber set(String value);
 
     StandardNumber checksum();
 
-    StandardNumber parse();
+    StandardNumber normalize();
 
     StandardNumber verify() throws NumberFormatException;
 
-    String getValue();
+    String normalized();
 
     String format();
 }

@@ -9,16 +9,16 @@ public class UPCTest extends Assert {
     @Test
     public void testUPC() throws Exception {
         String value = "796030114977";
-        UPC upc = new UPC().setValue(value).parse().verify();
-        assertEquals("796030114977", upc.getValue());
+        UPC upc = new UPC().set(value).normalize().verify();
+        assertEquals("796030114977", upc.normalized());
         assertEquals("796030114977", upc.format());
     }
 
     @Test
     public void testUPC2() throws Exception {
         String value = "036000291452";
-        UPC upc = new UPC().setValue(value).parse().verify();
-        assertEquals("036000291452", upc.getValue());
+        UPC upc = new UPC().set(value).normalize().verify();
+        assertEquals("036000291452", upc.normalized());
         assertEquals("036000291452", upc.format());
     }
 

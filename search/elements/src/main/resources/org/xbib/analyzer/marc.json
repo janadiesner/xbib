@@ -2096,17 +2096,36 @@
     "SeriesStatement" : {
         "values":[
             /* 490 = series statement */
-            "490$0$ $3a","490$0$ $a","490$1$ $av",
+            "490$0$ $3a",
+            "490$0$ $a",
+            "490$1$ $av",
             "490$1$ $a",
             /* 810 = series added entry - corporate name */
             "810$2$ $4atvw",
             /* 830 = series added entry = uniform title */
             "830$ $0$9avw"
         ],
-        "subfields" : {
+        "tags" : {
+           "490" : "SeriesStatement",
+           "810" : "SeriesCorporateName",
+           "830" : "SeriesUniformTitle"
+        },
+        "SeriesStatement" : {
             "a" : "value",
             "v" : "volume",
             "3" : "materialsSpecified"
+        },
+        "SeriesCorporateName" : {
+            "4" : "relator",
+            "a" : "value",
+            "t" : "title",
+            "v" : "volume",
+            "w" : "controlNumber"
+        },
+        "SeriesUniformTitle" : {
+            "a" : "value",
+            "v" : "volume",
+            "w" : "controlNumber"
         }
     },
     "Note" : {
@@ -2231,9 +2250,6 @@
         /* 751 = added entry - geographic name */
         "751$ $ $024a"
         ],
-        "tags" : {
-            "600" : "subjectPersonalName"
-        },
         "subfields" : {
             "a" : "value",
             "b" : "numeration",
@@ -3071,35 +3087,35 @@
             "Mehrjahresausg. von" : "isTemporalEditionOf",
             "Ferienausg. von" : "isTemporalEditionOf",
             "Ersch. alternierend mit" : "isTemporalEditionOf",
-            "Vollst. Ausg." : "isPartialEditionOf",
-            "Teilausg." : "hasPartialEdition",
-            "Teilausg. von" : "isPartialEditionOf",
-            "Teilident. Ausg." : "hasPartialEdition",
-            "Teils in" : "hasPartialEdition",
-            "Ersch. teils zus. mit" : "hasPartialEdition",
-            "Dt. Teilausg." : "hasPartialEdition",
-            "Auszug" : "hasPartialEdition",
-            "Ausz." : "hasPartialEdition",
-            "Ausw." : "hasPartialEdition",
-            "Ausw. ab 1898" : "hasPartialEdition",
-            "Ausw. aus" : "hasPartialEdition",
-            "Ausw. bis 1896" : "hasPartialEdition",
-            "Ausw. von" : "hasPartialEdition",
-            "Auswahl" : "hasPartialEdition",
-            "Auswahl aus" : "hasPartialEdition",
-            "Auswahlausg. zu" : "hasPartialEdition",
-            "Auswahlindex" : "hasPartialEdition",
-            "Auswahlkum." : "hasPartialEdition",
-            "Auswahlrepr. zu" : "hasPartialEdition",
-            "Auswahlsammlung" : "hasPartialEdition",
-            "Auszugsweise auch in" : "hasPartialEdition",
-            "Auszugsweise auch in 17/18 von" : "hasPartialEdition",
-            "Auszugsweise auch in 31 von" : "hasPartialEdition",
-            "Auszugsweiser Vorabdr." : "hasPartialEdition",
-            "Auszüge" : "hasPartialEdition",
-            "Auszüge aus" : "isPartialEditionOf",
-            "Auszüge daraus" : "hasPartialEdition",
-            "Auzüge aus" : "isPartialEditionOf",
+            "Vollst. Ausg." : "isPartOf",
+            "Teilausg." : "isPartOf",
+            "Teilausg. von" : "isPartOf",
+            "Teilident. Ausg." : "isPartOf",
+            "Teils in" : "isPartOf",
+            "Ersch. teils zus. mit" : "isPartOf",
+            "Dt. Teilausg." : "isPartOf",
+            "Auszug" : "isPartOf",
+            "Ausz." : "isPartOf",
+            "Ausw." : "isPartOf",
+            "Ausw. ab 1898" : "isPartOf",
+            "Ausw. aus" : "isPartOf",
+            "Ausw. bis 1896" : "isPartOf",
+            "Ausw. von" : "isPartOf",
+            "Auswahl" : "isPartOf",
+            "Auswahl aus" : "isPartOf",
+            "Auswahlausg. zu" : "isPartOf",
+            "Auswahlindex" : "isPartOf",
+            "Auswahlkum." : "isPartOf",
+            "Auswahlrepr. zu" : "isPartOf",
+            "Auswahlsammlung" : "isPartOf",
+            "Auszugsweise auch in" : "isPartOf",
+            "Auszugsweise auch in 17/18 von" : "isPartOf",
+            "Auszugsweise auch in 31 von" : "isPartOf",
+            "Auszugsweiser Vorabdr." : "isPartOf",
+            "Auszüge" : "isPartOf",
+            "Auszüge aus" : "isPartOf",
+            "Auszüge daraus" : "isPartOf",
+            "Auzüge aus" : "isPartOf",
             "Aktualisierte Kurzfassung von" : "isVersionOf",
             "Aktualisierte u. erw. Ausg. von" : "isVersionOf",
             "Aktualisierung" : "isVersionOf",
@@ -3171,11 +3187,11 @@
             "In#": "isPartOf",
             "In:": "isPartOf",
             "Darin" : "isPartOf",
-            "Daraus" : "hasPart",
+            "Daraus" : "isPartOf",
             "Enth. in" : "isPartOf",
             "Aus" : "isPartOf",
             "Ausz. aus" : "isPartOf",
-            "Dt. Ausz." : "hasPart", /* Auszug */
+            "Dt. Ausz." : "isPartOf",
             "Ersch. später in" : "succeededBy",
             "Teils inhaltl. ident. u. aufgeg. in" : "succeededBy",
             "Früher u.d.T.:" : "precededBy",
@@ -3336,10 +3352,13 @@
                 ".*Spezialausgabe.*" : "hasSupplement"
             },
             {
-                "\\d+\\.\\d{4}.*" : "hasPart" /* einzelne Jahre und Hefte */
+                "\\d+\\.\\d{4}.*" : "isPartOf" /* einzelne Jahre und Hefte */
             },
             {
-                "\\d{4}.*" : "hasPart" /* einzelne Jahre und Hefte */
+                "\\d{4}.*" : "isPartOf" /* einzelne Jahre und Hefte */
+            },
+            {
+                ".*" : "other"
             }
         ]
     },
@@ -3357,6 +3376,7 @@
         "relation" : {
             "Vorg." : "precededBy",
             "Vorg.:" : "precededBy",
+            "Vorg. -->" : "precededBy",
             "Vorg. --->" : "precededBy",
             "Als Vorgänger gilt" : "precededBy",
             "Als Vorg. gilt" : "precededBy",
@@ -3569,10 +3589,10 @@
                 "CD\\-ROM\\-Ausg\\..*" : "hasCDEdition"
             },
             {
-                "\\d+\\.\\d{4}.*" : "hasPart" /* einzelne Jahre und Hefte */
+                "\\d+\\.\\d{4}.*" : "isPartOf" /* einzelne Jahre und Hefte */
             },
             {
-                "\\d{4}.*" : "hasPart" /* einzelne Jahre und Hefte */
+                "\\d{4}.*" : "isPartOf" /* einzelne Jahre und Hefte */
             },
             {
                 ".*" : "other"
@@ -3689,7 +3709,7 @@
             "zu"  : "succeededBy",
             "zu:"  : "succeededBy",
             "In"  : "isPartOf",
-            "Darin" : "hasPart",
+            "Darin" : "isPartOf",
             "Ab"  : "succeededBy",
             "In u. aufgeg. in"  : "succeededBy",
             "In u. aufgeg.in"  : "succeededBy",
@@ -3764,10 +3784,10 @@
                 "CD\\-ROM\\-Ausg\\..*" : "hasCDEdition"
             },
             {
-                "\\d+\\.\\d{4}.*" : "hasPart" /* einzelne Jahre und Hefte */
+                "\\d+\\.\\d{4}.*" : "isPartOf" /* einzelne Jahre und Hefte */
             },
             {
-                "\\d{4}.*" : "hasPart" /* einzelne Jahre und Hefte */
+                "\\d{4}.*" : "isPartOf" /* einzelne Jahre und Hefte */
             },
             {
                 ".*" : "other"

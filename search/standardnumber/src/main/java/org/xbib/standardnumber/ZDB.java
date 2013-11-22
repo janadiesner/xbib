@@ -20,7 +20,7 @@ public class ZDB implements Comparable<ZDB>, StandardNumber {
 
     private boolean createWithChecksum;
 
-    public ZDB setValue(String value) {
+    public ZDB set(String value) {
         Matcher m = PATTERN.matcher(value);
         if (m.find()) {
             this.value = value.substring(m.start(), m.end());
@@ -30,10 +30,10 @@ public class ZDB implements Comparable<ZDB>, StandardNumber {
 
     @Override
     public int compareTo(ZDB o) {
-        return value != null ?  value.compareTo(o.getValue()) : -1;
+        return value != null ?  value.compareTo(o.normalized()) : -1;
     }
 
-    public String getValue() {
+    public String normalized() {
         return value;
     }
 
@@ -42,7 +42,7 @@ public class ZDB implements Comparable<ZDB>, StandardNumber {
         return this;
     }
 
-    public ZDB parse() {
+    public ZDB normalize() {
         this.value = dehyphenate(value);
         return this;
     }

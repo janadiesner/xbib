@@ -7,26 +7,26 @@ public class ISMNTest extends Assert {
 
     @Test
     public void testISMN() throws Exception {
-        ISMN ismn = new ISMN().setValue("M-2306-7118-7").parse().verify();
-        assertEquals("9790230671187", ismn.getValue());
+        ISMN ismn = new ISMN().set("M-2306-7118-7").normalize().verify();
+        assertEquals("9790230671187", ismn.normalized());
         assertEquals("9790230671187", ismn.format());
-        assertEquals("9790230671187", ismn.checksum().toGTIN().getValue());
+        assertEquals("9790230671187", ismn.checksum().toGTIN().normalized());
     }
 
     @Test
     public void testISMN2() throws Exception {
-        ISMN ismn = new ISMN().setValue("979-0-3452-4680-5").parse().verify();
-        assertEquals("9790345246805", ismn.getValue());
+        ISMN ismn = new ISMN().set("979-0-3452-4680-5").normalize().verify();
+        assertEquals("9790345246805", ismn.normalized());
         assertEquals("9790345246805", ismn.format());
-        assertEquals("9790345246805", ismn.checksum().toGTIN().getValue());
+        assertEquals("9790345246805", ismn.checksum().toGTIN().normalized());
     }
 
     @Test
     public void testISMNChecksum() throws Exception {
-        ISMN ismn = new ISMN().setValue("979-0-3452-4680").checksum().parse().verify();
-        assertEquals("9790345246805", ismn.getValue());
+        ISMN ismn = new ISMN().set("979-0-3452-4680").checksum().normalize().verify();
+        assertEquals("9790345246805", ismn.normalized());
         assertEquals("9790345246805", ismn.format());
-        assertEquals("9790345246805", ismn.toGTIN().getValue());
+        assertEquals("9790345246805", ismn.toGTIN().normalized());
     }
 
 }

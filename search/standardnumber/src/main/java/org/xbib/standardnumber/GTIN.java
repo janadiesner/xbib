@@ -46,11 +46,11 @@ public class GTIN implements Comparable<GTIN>, StandardNumber {
 
     @Override
     public int compareTo(GTIN gtin) {
-        return gtin != null ? getValue().compareTo(gtin.getValue()) : -1;
+        return gtin != null ? normalized().compareTo(gtin.normalized()) : -1;
     }
 
     @Override
-    public GTIN setValue(String value) {
+    public GTIN set(String value) {
         Matcher m = PATTERN.matcher(value);
         if (m.find()) {
             this.value = value.substring(m.start(), m.end());
@@ -65,7 +65,7 @@ public class GTIN implements Comparable<GTIN>, StandardNumber {
     }
 
     @Override
-    public GTIN parse() {
+    public GTIN normalize() {
         this.value = dehyphenate(value);
         return this;
     }
@@ -77,7 +77,7 @@ public class GTIN implements Comparable<GTIN>, StandardNumber {
     }
 
     @Override
-    public String getValue() {
+    public String normalized() {
         return value;
     }
 

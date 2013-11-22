@@ -9,16 +9,16 @@ public class IBANTest extends Assert {
     @Test
     public void testIBAN1() throws Exception {
         String value = "GB82 WEST 1234 5698 7654 32";
-        IBAN iban = new IBAN().setValue(value).parse().verify();
-        assertEquals(iban.getValue(), "GB82WEST12345698765432");
+        IBAN iban = new IBAN().set(value).normalize().verify();
+        assertEquals(iban.normalized(), "GB82WEST12345698765432");
         assertEquals(iban.format(), "GB82WEST12345698765432");
     }
 
     @Test
     public void testIBAN2() throws Exception {
         String value = "NL91ABNA0417164300";
-        IBAN iban = new IBAN().setValue(value).parse().verify();
-        assertEquals("NL91ABNA0417164300", iban.getValue());
+        IBAN iban = new IBAN().set(value).normalize().verify();
+        assertEquals("NL91ABNA0417164300", iban.normalized());
         assertEquals("NL91ABNA0417164300", iban.format());
     }
 
@@ -29,7 +29,7 @@ public class IBANTest extends Assert {
                 "TN5912345678901234567890"
         };
         for (String value : str) {
-            new IBAN().setValue(value).parse().verify();
+            new IBAN().set(value).normalize().verify();
         }
     }
 
@@ -88,7 +88,7 @@ public class IBANTest extends Assert {
                 "TR330006100519786457841326"
         };
         for (String value : str) {
-            new IBAN().setValue(value).parse().verify();
+            new IBAN().set(value).normalize().verify();
         }
     }
 

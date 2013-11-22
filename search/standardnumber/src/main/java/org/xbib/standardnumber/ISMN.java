@@ -20,11 +20,11 @@ public class ISMN implements Comparable<ISMN>, StandardNumber {
 
     @Override
     public int compareTo(ISMN ismn) {
-        return ismn != null ? getValue().compareTo(ismn.getValue()) : -1;
+        return ismn != null ? normalized().compareTo(ismn.normalized()) : -1;
     }
 
     @Override
-    public ISMN setValue(String value) {
+    public ISMN set(String value) {
         Matcher m = PATTERN.matcher(value);
         if (m.find()) {
             this.value = value.substring(m.start(), m.end());
@@ -39,7 +39,7 @@ public class ISMN implements Comparable<ISMN>, StandardNumber {
     }
 
     @Override
-    public ISMN parse() {
+    public ISMN normalize() {
         this.value = (value.startsWith("979") ? "" : "979") + dehyphenate(value.replace('M', '0'));
         return this;
     }
@@ -51,7 +51,7 @@ public class ISMN implements Comparable<ISMN>, StandardNumber {
     }
 
     @Override
-    public String getValue() {
+    public String normalized() {
         return value;
     }
 
@@ -61,7 +61,7 @@ public class ISMN implements Comparable<ISMN>, StandardNumber {
     }
 
     public GTIN toGTIN() throws NumberFormatException {
-        return new GTIN().setValue(value).parse().verify();
+        return new GTIN().set(value).normalize().verify();
     }
 
     private void check() throws NumberFormatException {

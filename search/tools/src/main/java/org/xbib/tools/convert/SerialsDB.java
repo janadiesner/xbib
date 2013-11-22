@@ -43,8 +43,6 @@ import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.standardnumber.ISSN;
-import org.xbib.standardnumber.InvalidStandardNumberException;
 import org.xbib.options.OptionParser;
 import org.xbib.options.OptionSet;
 
@@ -152,13 +150,6 @@ public class SerialsDB {
                     Resource resource = resourceContext.newResource();
                     String issn1 = buildISSN(issnArr, 0);
                     String issn2 = buildISSN(issnArr, 1);
-                    try {
-                        if (issn1 != null) {
-                            new ISSN(issn1);
-                        }
-                        if (issn2 != null) {
-                            new ISSN(issn2);
-                        }
                         if (issn1 != null && issn1.equals(issn2)) {
                             issn2 = null;
                         }
@@ -184,9 +175,6 @@ public class SerialsDB {
                         } else {
                             logger.info("ignoring double serial title: {}", journalTitle);
                         }
-                    } catch (InvalidStandardNumberException ex) {
-                        // skip fake ISSN titles
-                    }
                 }
                 i++;
             }

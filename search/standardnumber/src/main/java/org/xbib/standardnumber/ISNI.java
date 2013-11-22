@@ -30,7 +30,7 @@ public class ISNI implements Comparable<ISNI>, StandardNumber {
      * @param value the value
      */
     @Override
-    public ISNI setValue(String value) {
+    public ISNI set(String value) {
         Matcher m = PATTERN.matcher(value);
         if (m.find()) {
             this.value = value.substring(m.start(), m.end());
@@ -46,7 +46,7 @@ public class ISNI implements Comparable<ISNI>, StandardNumber {
 
     @Override
     public int compareTo(ISNI isni) {
-        return value != null ? value.compareTo((isni).getValue()) : -1;
+        return value != null ? value.compareTo((isni).normalized()) : -1;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class ISNI implements Comparable<ISNI>, StandardNumber {
      * @return value
      */
     @Override
-    public String getValue() {
+    public String normalized() {
         return value;
     }
 
@@ -76,7 +76,7 @@ public class ISNI implements Comparable<ISNI>, StandardNumber {
         return formatted;
     }
 
-    public ISNI parse() {
+    public ISNI normalize() {
         this.value = clean(value);
         return this;
     }

@@ -39,10 +39,8 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -59,9 +57,6 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Supplier;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -94,6 +89,8 @@ import org.xbib.util.ExceptionFormatter;
 import org.xbib.util.FormatUtil;
 
 
+import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Sets.newTreeSet;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
@@ -452,8 +449,37 @@ public class MergeWithLicenses {
 
         private boolean filterForProcess(Manifestation manifestation) {
             return !manifestation.isSupplement()
-                    && !manifestation.isPart()
+                    && !manifestation.isPartial()
                     && !manifestation.hasPrint(); // "each online has print edition" rule
+        }
+
+        private Set<Manifestation> used = newHashSet();
+
+        private void logManifestation(Manifestation m, int indent) {
+            logger.info("{} {} {} {}-{} {} {} {}",
+                    indent,
+                    m.externalID(),
+                    m.title(),
+                    m.firstDate(), m.lastDate(),
+                    m.country(),
+                    m.isPartial() ? "(Unterreihe)" : "",
+                    m.isSupplement() ? "(Suppl.)" : "");
+            // neighbors
+            Set<String> relations = m.getRelatedManifestations().keySet();
+            for (String relation : relations) {
+                logger.info("{}    {} = {}",
+                        indent,
+                        relation,
+                        m.getRelatedManifestations().get(relation));
+                if (relation.startsWith("has")) {
+                    for (Manifestation mm : m.getRelatedManifestations().get(relation)) {
+                        if (!used.contains(mm)) {
+                            used.add(mm);
+                            logManifestation(mm, indent+1);
+                        }
+                    }
+                }
+            }
         }
 
         private void process(Manifestation manifestation) throws IOException {
@@ -463,51 +489,36 @@ public class MergeWithLicenses {
             }
             docs.add(docid);
 
-            this.cluster = new TreeSet(Manifestation.getIdComparator());
+            this.cluster = newTreeSet(Manifestation.getIdComparator());
             cluster.add(manifestation);
-
-            retrieveCluster(cluster, manifestation);
+            if (!manifestation.isSupplement()) {
+                retrieveCluster(cluster, manifestation);
+            }
             countManifestations.addAndGet(cluster.size());
 
             for (Manifestation m : cluster) {
-                logger.info("Manifestation: {}", m.externalID());
+                logger.info("{}", m.externalID());
                 setAllRelationsBetween(m, cluster);
                 for (String relation : m.getRelatedManifestations().keySet()) {
-                    logger.info("Relation: {}", relation);
-                    for (Manifestation related : m.getRelatedManifestations().get(relation)) {
-                        logger.info("    {}", related.externalID());
-                    }
+                    logger.info("     {} = {}", relation, m.getRelatedManifestations().get(relation));
                 }
             }
 
             // build cluster
             Cluster c = new Cluster(cluster);
             List<Set<Manifestation>> list = c.chronoStreams();
-            logger.info("{} -> {}", cluster.size(), list.size());
+            logger.info("CLUSTERED: {} -> {}", cluster.size(), list.size());
+
+            used.clear();
             for (Set<Manifestation> set : list) {
                 logger.info("----");
                 for (Manifestation m : set) {
-                    logger.info("{} {} {}-{} {} {}",
-                            m.externalID(),
-                            m.title(),
-                            m.firstDate(), m.lastDate(),
-                            m.isPart() ? "(Reihe)" : "",
-                            m.isSupplement() ? "(Suppl.)" : "");
-                    // near neighbors
-                    if (!m.getRelatedManifestations().get("hasOnlineEdition").isEmpty()) {
-                        logger.info("   online = {}", m.getRelatedManifestations().get("hasOnlineEditions"));
-                    }
-                    if (!m.getRelatedManifestations().get("hasPrintEdition").isEmpty()) {
-                        logger.info("   print = {}", m.getRelatedManifestations().get("hasPrintEdition"));
-                    }
-                    if (!m.getRelatedManifestations().get("hasSupplement").isEmpty()) {
-                        logger.info("   suppl = {}", m.getRelatedManifestations().get("hasSupplement"));
-                    }
-                    if (!m.getRelatedManifestations().get("hasPart").isEmpty()) {
-                        logger.info("   parts = {}", m.getRelatedManifestations().get("hasPart"));
-                    }
+                    used.add(m);
+                    logManifestation(m, 0);
                 }
             }
+
+            logger.info("docs = {}", docs);
 
             /*Set<Work> leaders = electWorkLeaders(cluster);
             if (logger.isDebugEnabled()) {
@@ -643,12 +654,18 @@ public class MergeWithLicenses {
                     if (collided) {
                         return;
                     }
+                    // global docs
                     if (docs.contains(m.id())) {
                         continue;
                     }
                     docs.add(m.id());
+                    // check for local cluster docs (avoid loops)
+                    if (c.cluster.contains(m)) {
+                        continue;
+                    }
                     c.cluster.add(m);
-                    boolean expandCluster = false;
+                    boolean temporalRelation = false;
+                    boolean carrierRelation = false;
                     for (String relation : findTheRelationsBetween(c.manifestation, m.id())) {
                         if (relation == null) {
                             logger.warn("unknown relation {}", relation);
@@ -660,8 +677,13 @@ public class MergeWithLicenses {
                             logger.warn("no inverse relation for {}", relation);
                         } else {
                             m.addRelatedManifestation(inverse, c.manifestation);
-                            expandCluster = true;
                         }
+                        temporalRelation = temporalRelation
+                                || "precededBy".equals(relation)
+                                || "succeededBy".equals(relation);
+                        carrierRelation = carrierRelation
+                                || "hasPrintEdition".equals(relation)
+                                || "hasOnlineEdition".equals(relation);
                     }
                     // other direction (missing entries in catalog are possible)
                     for (String relation : findTheRelationsBetween(m, c.manifestation.id())) {
@@ -675,10 +697,16 @@ public class MergeWithLicenses {
                             logger.warn("no inverse relation for {}", relation);
                         } else {
                             c.manifestation.addRelatedManifestation(inverse, m);
-                            expandCluster = true;
                         }
+                        temporalRelation = temporalRelation
+                                || "precededBy".equals(relation)
+                                || "succeededBy".equals(relation);
+                        carrierRelation = carrierRelation
+                                || "hasPrintEdition".equals(relation)
+                                || "hasOnlineEdition".equals(relation);
                     }
-                    if (expandCluster && !m.isSupplement()) {
+                    // expand cluster for this manifestation iff temporal or carrier relation
+                    if (temporalRelation || carrierRelation) {
                         retrieveCluster(c.cluster, m);
                     }
                 }
@@ -871,7 +899,7 @@ public class MergeWithLicenses {
             Integer firstDate = (first != null && first.firstDate() != null) ? first.firstDate() : DateUtil.getYear();
             if (manifestation.isHead()
                     && !manifestation.isSupplement()
-                    && !manifestation.isPart()
+                    && !manifestation.isPartial()
                     && !manifestation.hasPrint()
                     && (!isConnected(manifestation, leaders)
                          || (first != null && workDate.compareTo(firstDate) < 0 ))

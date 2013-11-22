@@ -41,6 +41,7 @@ import org.elasticsearch.common.collect.Sets;
 import org.xbib.date.DateUtil;
 import org.xbib.grouping.bibliographic.endeavor.PublishedJournal;
 import org.xbib.map.MapBasedAnyObject;
+import org.xbib.util.Strings;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -66,6 +67,10 @@ public class Manifestation extends MapBasedAnyObject
 
     private String title;
 
+    private String corporate;
+
+    private String meeting;
+
     private final String publisher;
 
     private final String publisherPlace;
@@ -80,9 +85,7 @@ public class Manifestation extends MapBasedAnyObject
 
     private final String description;
 
-    private boolean isHead;
-
-    private boolean isPart;
+    private boolean isPartial;
 
     private String printID;
 
@@ -91,10 +94,6 @@ public class Manifestation extends MapBasedAnyObject
     private String printExternalID;
 
     private String onlineExternalID;
-
-    private boolean hasPrint;
-
-    private boolean hasOnline;
 
     private String contentType;
 
@@ -123,7 +122,14 @@ public class Manifestation extends MapBasedAnyObject
         // we use DNB ID. ZDB ID collides with GND ID. Example: 21573803
         this.id = getString("IdentifierDNB.identifierDNB");
         this.externalID = getString("IdentifierZDB.identifierZDB");
-        buildTitle();
+
+        this.isPartial = getString("TitleStatement.titlePartName") != null
+                || getString("TitleStatement.titlePartNumber") != null;
+
+        makeTitle();
+        makeCorporate();
+        makeMeeting();
+
         this.publisher = getString("PublicationStatement.publisherName");
         this.publisherPlace = getPublisherPlace();
         this.language = getString("Language.value", "unknown");
@@ -132,11 +138,6 @@ public class Manifestation extends MapBasedAnyObject
         this.firstDate = firstDate == null ? null : firstDate == 9999 ? null : firstDate;
         Integer lastDate = getInteger("date2");
         this.lastDate = lastDate == null ? null : lastDate == 9999 ? null : lastDate;
-        this.isHead = !map().containsKey("SucceedingEntry");
-        this.isPart = getString("TitleStatement.titlePartName") != null
-                || getString("TitleStatement.titlePartNumber") != null;
-        findPrintEditionLink();
-        findOnlineEditionLink();
         findLinks();
         this.description = getString("DatesOfPublication.value");
         // recognize supplement
@@ -155,6 +156,8 @@ public class Manifestation extends MapBasedAnyObject
         computeContentTypes();
         // last, compute key
         this.key = computeKey();
+
+        // ISSN, CODEN, ...
         this.identifiers = makeIdentifiers();
 
         this.relations = makeRelations();
@@ -218,6 +221,14 @@ public class Manifestation extends MapBasedAnyObject
         return title;
     }
 
+    public String corporateName() {
+        return corporate;
+    }
+
+    public String meetingName() {
+        return meeting;
+    }
+
     public String publisher() {
         return publisher;
     }
@@ -258,20 +269,16 @@ public class Manifestation extends MapBasedAnyObject
         return supplementExternalID;
     }
 
-    public boolean isHead() {
-        return isHead;
-    }
-
-    public boolean isPart() {
-        return isPart;
+    public boolean isPartial() {
+        return isPartial;
     }
 
     public boolean hasPrint() {
-        return hasPrint;
+        return id.equals(onlineID) && printID != null;
     }
 
     public boolean hasOnline() {
-        return hasOnline;
+        return id.equals(printID) && onlineID != null;
     }
 
     public String getPrintID() {
@@ -319,9 +326,26 @@ public class Manifestation extends MapBasedAnyObject
         return unique;
     }
 
-    private void buildTitle() {
-        String title = getString("TitleStatement.titleMain");
-        // shorten title (series statement after '/' or ':') to raise probability of matching.
+    private void makeTitle() {
+        // shorten title (series statement after '/' or ':')
+        String title = cleanTitle(getString("TitleStatement.titleMain"));
+        if (isPartial) {
+            String partName = cleanTitle(getString("TitleStatement.titlePartName"));
+            if (!Strings.isNullOrEmpty(partName)) {
+                title += " / " + partName;
+            }
+            String partNumber = cleanTitle(getString("TitleStatement.titlePartNumber"));
+            if (!Strings.isNullOrEmpty(partNumber)) {
+                title += " / " + partNumber;
+            }
+        }
+        setTitle(title);
+    }
+
+    private String cleanTitle(String title) {
+        if (title == null) {
+            return null;
+        }
         int pos = title.indexOf('/');
         if (pos > 0) {
             title = title.substring(0, pos - 1);
@@ -330,7 +354,16 @@ public class Manifestation extends MapBasedAnyObject
         if (pos > 0) {
             title = title.substring(0, pos - 1);
         }
-        setTitle(title);
+        title = title.replaceAll("\\[.*?\\]","").trim();
+        return title;
+    }
+
+    private void makeCorporate() {
+        this.corporate = getString("CorporateName.corporateName");
+    }
+
+    private void makeMeeting() {
+        this.meeting = getString("MeetingName.meetingName");
     }
 
     private String getPublisherPlace() {
@@ -488,44 +521,6 @@ public class Manifestation extends MapBasedAnyObject
         return df.format(d2) + df.format(delta) + sb.toString();
     }
 
-    private void findPrintEditionLink() {
-        this.hasPrint = false;
-        Object o = map().get("OtherEditionEntry");
-        if (o == null) {
-            return;
-        }
-        if (!(o instanceof List)) {
-            o = Arrays.asList(o);
-        }
-        for (Map<String,Object> m : (List<Map<String,Object>>)o) {
-            if ("hasPrintEdition".equals(m.get("relation"))) {
-                this.hasPrint = true;
-                this.printID = (String)m.get("identifierDNB");
-                this.printExternalID = (String)m.get("identifierZDB");
-                return;
-            }
-        }
-    }
-
-    private void findOnlineEditionLink() {
-        this.hasOnline = false;
-        Object o = map().get("OtherEditionEntry");
-        if (o == null) {
-            return;
-        }
-        if (!(o instanceof List)) {
-            o = Arrays.asList(o);
-        }
-        for (Map<String,Object> m : (List<Map<String,Object>>)o) {
-            if ("hasOnlineEdition".equals(m.get("relation"))) {
-                this.hasOnline = true;
-                this.onlineID = (String)m.get("identifierDNB");
-                this.onlineExternalID = (String)m.get("identifierZDB");
-                return;
-            }
-        }
-    }
-
     private void findCountry() {
         Object o = getAnyObject("publishingCountry.isoCountryCodesSource");
         if (o instanceof List) {
@@ -545,21 +540,25 @@ public class Manifestation extends MapBasedAnyObject
         Map<String,Object> m = new HashMap();
         // get and convert all ISSN
         Object o = map().get("IdentifierISSN");
-        if (o == null) {
-            return m;
-        }
-        if (!(o instanceof List)) {
-            o = Arrays.asList(o);
-        }
-        List<String> issns = new ArrayList();
-        List<Map<String,Object>> l = (List<Map<String,Object>>)o;
-        for (Map<String, Object> aL : l) {
-            String s = (String) aL.get("value");
-            if (s != null) {
-                issns.add(s.replaceAll("\\-", "").toLowerCase());
+        if (o != null) {
+            if (!(o instanceof List)) {
+                o = Arrays.asList(o);
             }
+            List<String> issns = new ArrayList();
+            List<Map<String,Object>> l = (List<Map<String,Object>>)o;
+            for (Map<String, Object> aL : l) {
+                String s = (String) aL.get("value");
+                if (s != null) {
+                    issns.add(s.replaceAll("\\-", "").toLowerCase());
+                }
+            }
+            m.put("issn", issns);
         }
-        m.put("issn", issns);
+        // get CODEN
+        o = map().get("IdentifierCODEN");
+        if (o != null) {
+            m.put("coden", o);
+        }
         return m;
     }
 
@@ -588,6 +587,17 @@ public class Manifestation extends MapBasedAnyObject
                 String key = (String)m.get("relation");
                 if (key != null && value != null) {
                     multi.put(key, value);
+                    if ("hasOnlineEdition".equals(key)) {
+                        this.printID = id();
+                        this.printExternalID = externalID();
+                        this.onlineID = value;
+                        this.onlineExternalID = (String)m.get("identifierZDB");
+                    } else if ("hasPrintEdition".equals(key)) {
+                        this.onlineID = id();
+                        this.onlineExternalID = externalID();
+                        this.printID = value;
+                        this.printExternalID =  (String)m.get("identifierZDB");
+                    }
                 }
             }
         }

@@ -8,14 +8,14 @@ public class PPNTest extends Assert {
     
     @Test
     public void testPPN1() throws Exception {
-        PPN ppn = new PPN().setValue("641379617").parse().verify();
-        assertEquals(ppn.getValue(), "641379617");
+        PPN ppn = new PPN().set("641379617").normalize().verify();
+        assertEquals(ppn.normalized(), "641379617");
     }
 
     @Test
     public void testPPN2() throws Exception {
-        PPN ppn = new PPN().setValue("101115658X").parse().verify();
-        assertEquals(ppn.getValue(), "101115658X");
+        PPN ppn = new PPN().set("101115658X").normalize().verify();
+        assertEquals(ppn.normalized(), "101115658X");
     }
 
 }

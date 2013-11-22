@@ -64,7 +64,7 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
     private boolean createWithChecksum;
 
     @Override
-    public ISSN setValue(String value) {
+    public ISSN set(String value) {
         Matcher m = PATTERN.matcher(value);
         if (m.find()) {
             this.value = dehyphenate(value.substring(m.start(), m.end()));
@@ -80,10 +80,10 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
 
     @Override
     public int compareTo(ISSN issn) {
-        return value != null ? value.compareTo((issn).getValue()) : -1;
+        return value != null ? value.compareTo((issn).normalized()) : -1;
     }
 
-    public ISSN parse() {
+    public ISSN normalize() {
         this.value = dehyphenate(value);
         return this;
     }
@@ -99,7 +99,7 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
      * @return value
      */
     @Override
-    public String getValue() {
+    public String normalized() {
         return value;
     }
 
@@ -144,12 +144,12 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
     }
 
     public GTIN toGTIN() throws NumberFormatException {
-        return new GTIN().setValue("977" + value.substring(0,7) + "000").checksum().parse().verify();
+        return new GTIN().set("977" + value.substring(0, 7) + "000").checksum().normalize().verify();
     }
 
     public GTIN toGTIN(String additionalCode) throws NumberFormatException {
         // "977" + ISSN + add-on + placeholder for checksum
-        return new GTIN().setValue("977" + value.substring(0,7) + additionalCode + "0").checksum().parse().verify();
+        return new GTIN().set("977" + value.substring(0, 7) + additionalCode + "0").checksum().normalize().verify();
     }
 
     private String dehyphenate(String isbn) {

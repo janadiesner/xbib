@@ -13,11 +13,11 @@ public class UPC implements Comparable<UPC>, StandardNumber {
 
     @Override
     public int compareTo(UPC upc) {
-        return upc != null ? getValue().compareTo(upc.getValue()) : -1;
+        return upc != null ? normalized().compareTo(upc.normalized()) : -1;
     }
 
     @Override
-    public UPC setValue(String value) {
+    public UPC set(String value) {
         Matcher m = PATTERN.matcher(value);
         if (m.find()) {
             this.value = value.substring(m.start(), m.end());
@@ -32,7 +32,7 @@ public class UPC implements Comparable<UPC>, StandardNumber {
     }
 
     @Override
-    public UPC parse() {
+    public UPC normalize() {
         return this;
     }
 
@@ -43,7 +43,7 @@ public class UPC implements Comparable<UPC>, StandardNumber {
     }
 
     @Override
-    public String getValue() {
+    public String normalized() {
         return value;
     }
 

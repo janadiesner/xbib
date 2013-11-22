@@ -26,11 +26,11 @@ public class ISTC implements Comparable<ISTC>, StandardNumber {
 
     @Override
     public int compareTo(ISTC istc) {
-        return istc != null ? getValue().compareTo(istc.getValue()) : -1;
+        return istc != null ? normalized().compareTo(istc.normalized()) : -1;
     }
 
     @Override
-    public ISTC setValue(String value) {
+    public ISTC set(String value) {
         Matcher m = PATTERN.matcher(value);
         if (m.find()) {
             this.value = value.substring(m.start(), m.end());
@@ -45,7 +45,7 @@ public class ISTC implements Comparable<ISTC>, StandardNumber {
     }
 
     @Override
-    public ISTC parse() {
+    public ISTC normalize() {
         this.value = clean(value);
         return this;
     }
@@ -57,7 +57,7 @@ public class ISTC implements Comparable<ISTC>, StandardNumber {
     }
 
     @Override
-    public String getValue() {
+    public String normalized() {
         return value;
     }
 
