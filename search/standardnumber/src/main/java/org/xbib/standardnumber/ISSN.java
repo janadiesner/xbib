@@ -5,6 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * ISO 3297: International Standard Serial Number (ISSN)
+ *
  * The International Standard Serial Number (ISSN) is a unique
  * eight-digit number used to identify a print or electronic periodical
  * publication. The ISSN system was adopted as international standard
@@ -64,11 +66,8 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
     private boolean createWithChecksum;
 
     @Override
-    public ISSN set(String value) {
-        Matcher m = PATTERN.matcher(value);
-        if (m.find()) {
-            this.value = dehyphenate(value.substring(m.start(), m.end()));
-        }
+    public ISSN set(CharSequence value) {
+        this.value = value != null ? value.toString() : null;
         return this;
     }
 
@@ -80,11 +79,15 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
 
     @Override
     public int compareTo(ISSN issn) {
-        return value != null ? value.compareTo((issn).normalized()) : -1;
+        return value != null ? value.compareTo((issn).normalizedValue()) : -1;
     }
 
+    @Override
     public ISSN normalize() {
-        this.value = dehyphenate(value);
+        Matcher m = PATTERN.matcher(value);
+        if (m.find()) {
+            this.value = dehyphenate(value.substring(m.start(), m.end()));
+        }
         return this;
     }
 
@@ -99,7 +102,7 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
      * @return value
      */
     @Override
-    public String normalized() {
+    public String normalizedValue() {
         return value;
     }
 
@@ -108,6 +111,7 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
      *
      * @return the formatted number
      */
+    @Override
     public String format() {
         if (formatted == null) {
             if (!valid) {
@@ -116,6 +120,15 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
             this.formatted = value.substring(0, 4) + "-" + value.substring(4, 8);
         }
         return formatted;
+    }
+
+    public GTIN toGTIN() throws NumberFormatException {
+        return new GTIN().set("977" + value.substring(0, 7) + "000").checksum().normalize().verify();
+    }
+
+    public GTIN toGTIN(String additionalCode) throws NumberFormatException {
+        // "977" + ISSN + add-on + placeholder for checksum
+        return new GTIN().set("977" + value.substring(0, 7) + additionalCode + "0").checksum().normalize().verify();
     }
 
     private void check() throws NumberFormatException {
@@ -141,15 +154,6 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
         if (!valid) {
             throw new NumberFormatException("invalid checksum: " + chk + " != " + value.charAt(l));
         }
-    }
-
-    public GTIN toGTIN() throws NumberFormatException {
-        return new GTIN().set("977" + value.substring(0, 7) + "000").checksum().normalize().verify();
-    }
-
-    public GTIN toGTIN(String additionalCode) throws NumberFormatException {
-        // "977" + ISSN + add-on + placeholder for checksum
-        return new GTIN().set("977" + value.substring(0, 7) + additionalCode + "0").checksum().normalize().verify();
     }
 
     private String dehyphenate(String isbn) {

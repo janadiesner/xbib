@@ -6,11 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *  International Standard Name Identifier (ISNI)
- *
- *  ISO 2772
- *
- *  ISNI ISO 277729
+ *  ISO 27729: International Standard Name Identifier (ISNI)
  *
  * Checksum is in accordance to ISO/IEC 7064:2003, MOD 11-2
  */
@@ -30,11 +26,8 @@ public class ISNI implements Comparable<ISNI>, StandardNumber {
      * @param value the value
      */
     @Override
-    public ISNI set(String value) {
-        Matcher m = PATTERN.matcher(value);
-        if (m.find()) {
-            this.value = value.substring(m.start(), m.end());
-        }
+    public ISNI set(CharSequence value) {
+        this.value = value != null ? value.toString() : null;
         return this;
     }
 
@@ -46,7 +39,7 @@ public class ISNI implements Comparable<ISNI>, StandardNumber {
 
     @Override
     public int compareTo(ISNI isni) {
-        return value != null ? value.compareTo((isni).normalized()) : -1;
+        return value != null ? value.compareTo((isni).normalizedValue()) : -1;
     }
 
     @Override
@@ -60,7 +53,7 @@ public class ISNI implements Comparable<ISNI>, StandardNumber {
      * @return value
      */
     @Override
-    public String normalized() {
+    public String normalizedValue() {
         return value;
     }
 
@@ -69,6 +62,7 @@ public class ISNI implements Comparable<ISNI>, StandardNumber {
      *
      * @return the formatted number
      */
+    @Override
     public String format() {
         if (formatted == null) {
             this.formatted = value;
@@ -76,8 +70,12 @@ public class ISNI implements Comparable<ISNI>, StandardNumber {
         return formatted;
     }
 
+    @Override
     public ISNI normalize() {
-        this.value = clean(value);
+        Matcher m = PATTERN.matcher(value);
+        if (m.find()) {
+            this.value = clean(value.substring(m.start(), m.end()));
+        }
         return this;
     }
 

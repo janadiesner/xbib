@@ -9,13 +9,13 @@ public class PPNTest extends Assert {
     @Test
     public void testPPN1() throws Exception {
         PPN ppn = new PPN().set("641379617").normalize().verify();
-        assertEquals(ppn.normalized(), "641379617");
+        assertEquals(ppn.normalizedValue(), "641379617");
     }
 
     @Test
     public void testPPN2() throws Exception {
         PPN ppn = new PPN().set("101115658X").normalize().verify();
-        assertEquals(ppn.normalized(), "101115658X");
+        assertEquals(ppn.normalizedValue(), "101115658X");
     }
 
 }

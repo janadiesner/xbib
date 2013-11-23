@@ -4,7 +4,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The International Standard Text Code (ISO 21047) is a global identification system
+ * ISO 21047: International Standard Text Code (ISTC)
+ *
+ * The International Standard Text Code is a global identification system
  * for textual works that is primarily intended for use by publishers, bibliographic
  * services, retailers, libraries and rights management agencies
  * to collocate different manifestations of the same title under a work-level record.
@@ -26,15 +28,12 @@ public class ISTC implements Comparable<ISTC>, StandardNumber {
 
     @Override
     public int compareTo(ISTC istc) {
-        return istc != null ? normalized().compareTo(istc.normalized()) : -1;
+        return istc != null ? normalizedValue().compareTo(istc.normalizedValue()) : -1;
     }
 
     @Override
-    public ISTC set(String value) {
-        Matcher m = PATTERN.matcher(value);
-        if (m.find()) {
-            this.value = value.substring(m.start(), m.end());
-        }
+    public ISTC set(CharSequence value) {
+        this.value = value != null ? value.toString() : null;
         return this;
     }
 
@@ -46,7 +45,10 @@ public class ISTC implements Comparable<ISTC>, StandardNumber {
 
     @Override
     public ISTC normalize() {
-        this.value = clean(value);
+        Matcher m = PATTERN.matcher(value);
+        if (m.find()) {
+            this.value = clean(value.substring(m.start(), m.end()));
+        }
         return this;
     }
 
@@ -57,7 +59,7 @@ public class ISTC implements Comparable<ISTC>, StandardNumber {
     }
 
     @Override
-    public String normalized() {
+    public String normalizedValue() {
         return value;
     }
 

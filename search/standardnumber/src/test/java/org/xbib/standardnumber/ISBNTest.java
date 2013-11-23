@@ -8,7 +8,7 @@ public class ISBNTest extends Assert {
 
     @Test
     public void testDehypenate() {
-        assertEquals(new ISBN().dehyphenate("000-111-333"), "000111333");
+        assertEquals(new ISBN().set("000-111-333").normalize().normalizedValue(), "000111333");
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -20,7 +20,7 @@ public class ISBNTest extends Assert {
     public void testDirtyISBN() throws Exception {
         String value = "ISBN 3-9803350-5-4 kart. : DM 24.00";
         ISBN isbn = new ISBN().set(value).normalize().verify();
-        assertEquals(isbn.normalized(), "3980335054");
+        assertEquals(isbn.normalizedValue(), "3980335054");
     }
 
     @Test(expectedExceptions = NumberFormatException.class)
@@ -33,14 +33,14 @@ public class ISBNTest extends Assert {
     public void fixChecksum() throws Exception {
         String value = "3616065810";
         ISBN isbn = new ISBN().set(value).checksum().normalize().verify();
-        assertEquals(isbn.normalized(), "361606581X");
+        assertEquals(isbn.normalizedValue(), "361606581X");
     }
 
     @Test
     public void testEAN() throws Exception {
         String value = "978-3-551-75213-0";
         ISBN ean = new ISBN().set(value).ean().normalize().verify();
-        assertEquals(ean.normalized(), "9783551752130");
+        assertEquals(ean.normalizedValue(), "9783551752130");
         assertEquals(ean.format(), "978-3-551-75213-0");
     }
 
@@ -48,7 +48,7 @@ public class ISBNTest extends Assert {
     public void testEAN2() throws Exception {
         String value = "978-3-551-75213-1";
         ISBN ean = new ISBN().set(value).ean().checksum().normalize().verify();
-        assertEquals(ean.normalized(), "9783551752130");
+        assertEquals(ean.normalizedValue(), "9783551752130");
         assertEquals(ean.format(), "978-3-551-75213-0");
     }
 

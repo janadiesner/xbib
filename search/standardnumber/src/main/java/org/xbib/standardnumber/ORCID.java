@@ -11,28 +11,32 @@ import java.net.URI;
  */
 public class ORCID extends ISNI {
 
-    public ORCID set(String value) {
+    @Override
+    public ORCID set(CharSequence value) {
         super.set(value);
         return this;
     }
 
+    @Override
     public ORCID checksum() {
         super.checksum();
         return this;
     }
 
+    @Override
     public ORCID normalize() {
         super.normalize();
         return this;
     }
 
+    @Override
     public ORCID verify() throws NumberFormatException {
         super.verify();
         return this;
     }
 
     public URI toURI() {
-        return URI.create("http://orcid.org/" + normalized());
+        return URI.create("http://orcid.org/" + normalizedValue());
     }
 
 }

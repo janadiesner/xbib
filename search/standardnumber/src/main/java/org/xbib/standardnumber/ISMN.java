@@ -4,9 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * ISMN (International Standard Music Number)
- *
- * ISMN standard (ISO 10957)
+ * ISO 10957: International Standard Music Number (ISMN)
  *
  * @see <a href="http://www.ismn-international.org/download/Web_ISMN%20Manual_2008-3.pdf">ISMN Manual 2008</a>
  */
@@ -20,15 +18,12 @@ public class ISMN implements Comparable<ISMN>, StandardNumber {
 
     @Override
     public int compareTo(ISMN ismn) {
-        return ismn != null ? normalized().compareTo(ismn.normalized()) : -1;
+        return ismn != null ? normalizedValue().compareTo(ismn.normalizedValue()) : -1;
     }
 
     @Override
-    public ISMN set(String value) {
-        Matcher m = PATTERN.matcher(value);
-        if (m.find()) {
-            this.value = value.substring(m.start(), m.end());
-        }
+    public ISMN set(CharSequence value) {
+        this.value = value != null ? value.toString() : null;
         return this;
     }
 
@@ -40,7 +35,11 @@ public class ISMN implements Comparable<ISMN>, StandardNumber {
 
     @Override
     public ISMN normalize() {
-        this.value = (value.startsWith("979") ? "" : "979") + dehyphenate(value.replace('M', '0'));
+        Matcher m = PATTERN.matcher(value);
+        if (m.find()) {
+            this.value = value.substring(m.start(), m.end());
+            this.value = (value.startsWith("979") ? "" : "979") + dehyphenate(value.replace('M', '0'));
+        }
         return this;
     }
 
@@ -51,7 +50,7 @@ public class ISMN implements Comparable<ISMN>, StandardNumber {
     }
 
     @Override
-    public String normalized() {
+    public String normalizedValue() {
         return value;
     }
 

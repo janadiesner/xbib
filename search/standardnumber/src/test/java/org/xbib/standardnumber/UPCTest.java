@@ -10,7 +10,7 @@ public class UPCTest extends Assert {
     public void testUPC() throws Exception {
         String value = "796030114977";
         UPC upc = new UPC().set(value).normalize().verify();
-        assertEquals("796030114977", upc.normalized());
+        assertEquals("796030114977", upc.normalizedValue());
         assertEquals("796030114977", upc.format());
     }
 
@@ -18,7 +18,7 @@ public class UPCTest extends Assert {
     public void testUPC2() throws Exception {
         String value = "036000291452";
         UPC upc = new UPC().set(value).normalize().verify();
-        assertEquals("036000291452", upc.normalized());
+        assertEquals("036000291452", upc.normalizedValue());
         assertEquals("036000291452", upc.format());
     }
 

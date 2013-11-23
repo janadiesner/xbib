@@ -20,38 +20,44 @@ public class ZDB implements Comparable<ZDB>, StandardNumber {
 
     private boolean createWithChecksum;
 
-    public ZDB set(String value) {
-        Matcher m = PATTERN.matcher(value);
-        if (m.find()) {
-            this.value = value.substring(m.start(), m.end());
-        }
+    @Override
+    public ZDB set(CharSequence value) {
+        this.value = value != null ? value.toString() : null;
         return this;
     }
 
     @Override
     public int compareTo(ZDB o) {
-        return value != null ?  value.compareTo(o.normalized()) : -1;
+        return value != null ?  value.compareTo(o.normalizedValue()) : -1;
     }
 
-    public String normalized() {
+    @Override
+    public String normalizedValue() {
         return value;
     }
 
+    @Override
     public ZDB checksum() {
         this.createWithChecksum = true;
         return this;
     }
 
+    @Override
     public ZDB normalize() {
-        this.value = dehyphenate(value);
+        Matcher m = PATTERN.matcher(value);
+        if (m.find()) {
+            this.value = dehyphenate(value.substring(m.start(), m.end()));
+        }
         return this;
     }
 
+    @Override
     public ZDB verify() throws NumberFormatException {
         check();
         return this;
     }
 
+    @Override
     public String format() {
         if (formatted == null) {
             StringBuilder sb = new StringBuilder(value);

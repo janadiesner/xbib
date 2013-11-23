@@ -10,7 +10,7 @@ public class GTINTest extends Assert {
     public void testGTIN() throws Exception {
         String value = "4104420033801";
         GTIN gtin = new GTIN().set(value).normalize().verify();
-        assertEquals("4104420033801", gtin.normalized());
+        assertEquals("4104420033801", gtin.normalizedValue());
         assertEquals("4104420033801", gtin.format());
     }
 
@@ -18,7 +18,7 @@ public class GTINTest extends Assert {
     public void testISSNGTIN() throws Exception {
         String value = "977-1869712-03-8";
         GTIN gtin = new GTIN().set(value).normalize().verify();
-        assertEquals("9771869712038", gtin.normalized());
+        assertEquals("9771869712038", gtin.normalizedValue());
         assertEquals("9771869712038", gtin.format());
     }
 
@@ -26,7 +26,7 @@ public class GTINTest extends Assert {
     public void testGTIN2() throws Exception {
         String value = "4191054501707";
         GTIN gtin = new GTIN().set(value).normalize().verify();
-        assertEquals("4191054501707", gtin.normalized());
+        assertEquals("4191054501707", gtin.normalizedValue());
         assertEquals("4191054501707", gtin.format());
     }
 
@@ -34,7 +34,7 @@ public class GTINTest extends Assert {
     public void testISBNGTIN() throws Exception {
         String value = "9783652002264";
         GTIN gtin = new GTIN().set(value).normalize().verify();
-        assertEquals("9783652002264", gtin.normalized());
+        assertEquals("9783652002264", gtin.normalizedValue());
         assertEquals("9783652002264", gtin.format());
     }
 

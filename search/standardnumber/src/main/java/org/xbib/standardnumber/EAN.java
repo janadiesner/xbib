@@ -3,6 +3,13 @@ package org.xbib.standardnumber;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ *  European Article Number is a 13-digit barcoding standard for marking products
+ *  sold at retail point of sale.
+ *
+ *  Numbers encoded in UPC and EAN barcodes are known as
+ *  Global Trade Item Numbers (GTIN).
+ */
 public class EAN implements Comparable<EAN>, StandardNumber {
 
     private static final Pattern PATTERN = Pattern.compile("[\\p{Digit}\\s]{0,18}");
@@ -13,12 +20,12 @@ public class EAN implements Comparable<EAN>, StandardNumber {
 
     @Override
     public int compareTo(EAN ean) {
-        return ean != null ? normalized().compareTo(ean.normalized()) : -1;
+        return ean != null ? normalizedValue().compareTo(ean.normalizedValue()) : -1;
     }
 
     @Override
-    public EAN set(String value) {
-        this.value = value;
+    public EAN set(CharSequence value) {
+        this.value = value != null ? value.toString() : null;
         return this;
     }
 
@@ -44,7 +51,7 @@ public class EAN implements Comparable<EAN>, StandardNumber {
     }
 
     @Override
-    public String normalized() {
+    public String normalizedValue() {
         return value;
     }
 
@@ -54,6 +61,9 @@ public class EAN implements Comparable<EAN>, StandardNumber {
     }
 
     private void check() throws NumberFormatException {
+        if (value == null) {
+            throw new NumberFormatException("null is invalid");
+        }
         int l = value.length() - 1;
         int checksum = 0;
         int weight;

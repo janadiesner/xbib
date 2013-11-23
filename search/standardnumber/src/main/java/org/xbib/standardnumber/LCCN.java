@@ -13,12 +13,12 @@ import java.util.regex.Pattern;
  * The year is two or four digits. (For 2000 and earlier the year is two digits,
  * for 2001 and later, four digits.)
  * The serial number (after normalization) is six digits.
- * (An un-normalized LCCN may have a serial number of 1-6 digits, which is
- * left-filled with zeros when normalized.)
+ * (An un-normalizedValue LCCN may have a serial number of 1-6 digits, which is
+ * left-filled with zeros when normalizedValue.)
  *
  * Syntax of a Normalized LCCN
  *
- *  A normalized LCCN is a character string eight to twelve characters in length.
+ *  A normalizedValue LCCN is a character string eight to twelve characters in length.
  *  (For purposes of this description characters are ordered
  *  from left to right -- "first" means "leftmost".)
  *  The rightmost eight characters are always digits.
@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  *
  *  Normalization of LCCNs
  *
- *  An LCCN is to be normalized to its canonical form described in the syntax
+ *  An LCCN is to be normalizedValue to its canonical form described in the syntax
  *  description above, as follows:
  *
  *  Remove all blanks.
@@ -67,29 +67,32 @@ public class LCCN implements Comparable<LCCN>, StandardNumber {
 
     private String formatted;
 
-    public LCCN set(String value) {
-        Matcher m = PATTERN.matcher(value);
-        if (m.find()) {
-            this.value = value.substring(m.start(), m.end());
-        }
+    public LCCN set(CharSequence value) {
+        this.value = value != null ? value.toString() : null;
         return this;
     }
 
     @Override
     public int compareTo(LCCN o) {
-        return value != null ?  value.compareTo(o.normalized()) : -1;
+        return value != null ?  value.compareTo(o.normalizedValue()) : -1;
     }
 
-    public String normalized() {
+    @Override
+    public String normalizedValue() {
         return value;
     }
 
+    @Override
     public LCCN checksum() {
         return this;
     }
 
+    @Override
     public LCCN normalize() {
-        this.value = clean(value);
+        Matcher m = PATTERN.matcher(value);
+        if (m.find()) {
+            this.value = clean(value.substring(m.start(), m.end()));
+        }
         return this;
     }
 
@@ -99,10 +102,12 @@ public class LCCN implements Comparable<LCCN>, StandardNumber {
      * @return this LCCN
      * @throws NumberFormatException
      */
+    @Override
     public LCCN verify() throws NumberFormatException {
         return this;
     }
 
+    @Override
     public String format() {
         if (formatted == null) {
             this.formatted = value;

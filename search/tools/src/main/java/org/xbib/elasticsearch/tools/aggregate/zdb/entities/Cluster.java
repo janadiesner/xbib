@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -21,6 +23,8 @@ import static com.google.common.collect.Sets.newTreeSet;
 
 public class Cluster extends TreeSet<Manifestation> {
 
+    private final static Logger logger = LoggerFactory.getLogger(Cluster.class.getName());
+
     public Cluster(Collection<Manifestation> c) {
         super(c);
     }
@@ -34,11 +38,13 @@ public class Cluster extends TreeSet<Manifestation> {
         List<Set<Manifestation>> chronoStreams = newLinkedList();
         while (!manifestations.isEmpty()) {
             Manifestation manifestation = manifestations.removeFirst();
+            logger.info("chronostreaming {}", manifestation.externalID());
 
             // chronological
             TreeSet<Manifestation> children = newTreeSet(chronoComparator);
             children.add(manifestation);
             makeChronoStream(manifestation, children);
+
             //chronoStreams.add(children);
             // by country
             // TODO sort countries, put most important on top

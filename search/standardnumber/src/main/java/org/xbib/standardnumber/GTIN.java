@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  */
 public class GTIN implements Comparable<GTIN>, StandardNumber {
 
-    private static final Pattern PATTERN = Pattern.compile("[\\p{Digit}\\-]{0,18}");
+    private static final Pattern PATTERN = Pattern.compile("[\\p{Digit}\\-]{8,18}");
 
     private String value;
 
@@ -46,15 +46,12 @@ public class GTIN implements Comparable<GTIN>, StandardNumber {
 
     @Override
     public int compareTo(GTIN gtin) {
-        return gtin != null ? normalized().compareTo(gtin.normalized()) : -1;
+        return gtin != null ? normalizedValue().compareTo(gtin.normalizedValue()) : -1;
     }
 
     @Override
-    public GTIN set(String value) {
-        Matcher m = PATTERN.matcher(value);
-        if (m.find()) {
-            this.value = value.substring(m.start(), m.end());
-        }
+    public GTIN set(CharSequence value) {
+        this.value = value != null ? value.toString() : null;
         return this;
     }
 
@@ -66,7 +63,10 @@ public class GTIN implements Comparable<GTIN>, StandardNumber {
 
     @Override
     public GTIN normalize() {
-        this.value = dehyphenate(value);
+        Matcher m = PATTERN.matcher(value);
+        if (m.find()) {
+            this.value = dehyphenate(value.substring(m.start(), m.end()));
+        }
         return this;
     }
 
@@ -77,7 +77,7 @@ public class GTIN implements Comparable<GTIN>, StandardNumber {
     }
 
     @Override
-    public String normalized() {
+    public String normalizedValue() {
         return value;
     }
 
@@ -87,6 +87,9 @@ public class GTIN implements Comparable<GTIN>, StandardNumber {
     }
 
     private void check() throws NumberFormatException {
+        if (value == null) {
+            throw new NumberFormatException("null is invalid");
+        }
         int l = value.length() - 1;
         int checksum = 0;
         int weight;

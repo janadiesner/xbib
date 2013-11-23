@@ -478,6 +478,8 @@ public class MergeWithLicenses {
                             logManifestation(mm, indent+1);
                         }
                     }
+                } else {
+                    logger.warn("not logging: {}", relation);
                 }
             }
         }
@@ -1448,14 +1450,16 @@ public class MergeWithLicenses {
 
     private final Map<String,String> inverseRelations = new HashMap<String,String>() {{
 
+        // we do not inverse work relations. This may easily fail (no exact data)
+
+        //put("hasPart", "isPartOf");
+        //put("hasSupplement", "isSupplementOf");
+        //put("isPartOf", "hasPart");
+        //put("isSupplementOf", "hasSupplement");
+
+        // temporal axis
         put("precededBy", "succeededBy");
         put("succeededBy", "precededBy");
-
-        // work relations
-        put("hasPart", "isPartOf");
-        put("hasSupplement", "isSupplementOf");
-        put("isPartOf", "hasPart");
-        put("isSupplementOf", "hasSupplement");
 
         // expression relations
         put("hasLanguageEdition", "isLanguageEditionOf");

@@ -16,7 +16,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The International Standard Book Number (ISBN) is a 13-digit number
+ * ISO 2108: International Standard Book Number (ISBN)
+ *
+ * The International Standard Book Number is a 13-digit number
  * that uniquely identifies books and book-like products published
  * internationally.
  *
@@ -60,19 +62,8 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
      * @param value the ISBN candidate string
      */
     @Override
-    public ISBN set(String value) {
-        Matcher m = PATTERN.matcher(value);
-        if (m.find()) {
-            this.value = dehyphenate(value.substring(m.start(), m.end()));
-        }
-        return this;
-    }
-
-    /**
-     * Prefer European Article Number (EAN, ISBN-13)
-     */
-    public ISBN ean() {
-        this.eanPreferred = true;
+    public ISBN set(CharSequence value) {
+        this.value = value != null ? value.toString() : null;
         return this;
     }
 
@@ -84,7 +75,16 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
 
     @Override
     public int compareTo(ISBN isbn) {
-        return value != null ? value.compareTo(isbn.normalized()): -1;
+        return value != null ? value.compareTo(isbn.normalizedValue()): -1;
+    }
+
+    @Override
+    public ISBN normalize() {
+        Matcher m = PATTERN.matcher(value);
+        if (m.find()) {
+            this.value = dehyphenate(value.substring(m.start(), m.end()));
+        }
+        return this;
     }
 
     /**
@@ -108,7 +108,7 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
      * @return the value of this standard book number
      */
     @Override
-    public String normalized() {
+    public String normalizedValue() {
         return eanPreferred ? eanvalue : value;
     }
 
@@ -126,6 +126,14 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
             this.formatted = eanPreferred ? fix(eanvalue) : fix("978-" + value);
         }
         return formatted;
+    }
+
+    /**
+     * Prefer European Article Number (EAN, ISBN-13)
+     */
+    public ISBN ean() {
+        this.eanPreferred = true;
+        return this;
     }
 
     /**
@@ -170,10 +178,6 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
         sb.append('-'); // set third hyphen
         sb.append(isbn.charAt(isbn.length() - 1));
         return sb.toString();
-    }
-
-    public ISBN normalize() {
-        return this;
     }
 
     private void check() throws NumberFormatException {
@@ -363,7 +367,7 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
         return 0;
     }
 
-    public String dehyphenate(String isbn) {
+    private String dehyphenate(String isbn) {
         StringBuilder sb = new StringBuilder(isbn);
         int i = sb.indexOf("-");
         while (i >= 0) {
@@ -460,9 +464,7 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
         public List<String> getRanges() {
             return ranges;
         }
-
     }
-
 
 }
 

@@ -2497,7 +2497,7 @@
             "Mehrjahres-DVD-Ausg." : "hasDVDEdition",
             "10-Jahres-DVD-Ausg." : "hasDVDEdition",
             "DVD-Jahresausg.": "hasDVDEdition",
-            "DVD-ROM-Beil." : "hasSupplement",
+            "DVD-ROM-Beil." : "hasDVDEdition",
             "CD-ROM-/DVD-ROM-Ausg." : "hasDVDEdition",
             "CD-ROM- u. DVD-Ausg." : "hasDVDEdition",
             "CD-ROM/DVD-Ausg." : "hasDVDEdition",
@@ -3197,8 +3197,8 @@
             "Früher u.d.T.:" : "precededBy",
             "Hervorgeg. aus und Beil. zu" : "precededBy",
             "Anfangs Beil." : "hasSupplement",
-            "Anfangs Beil. zu" : "precededBy",
-            "Später Beil. zu" : "succeededBy",
+            "Anfangs Beil. zu" : "isSupplementOf",
+            "Später Beil. zu" : "isSupplementOf",
             "Spätere Ausg." : "succeededBy",
             "Neuausg. von" : "precededBy",
             "Darin aufgeg.:" : "succeededBy",
@@ -3219,38 +3219,28 @@
             "Beih. zu" : "isSupplementOf",
             "Erg." : "hasSupplement",
             "Erg. Bd." : "hasSupplement",
-            "Erg. Bd. 1960/61 - 1961/62" : "hasSupplement",
             "Erg. Tab." : "hasSupplement",
             "Erg. Tabellen" : "hasSupplement",
-            "Erg. ab 1992" : "hasSupplement",
-            "Erg. ab 1993" : "hasSupplement",
             "Erg. zu" : "hasSupplement",
-            "Erg. zu 1974/75 von" : "hasSupplement",
-            "Erg. zu 1975/76 von" : "hasSupplement",
-            "Erg. zu 1976/77 von" : "hasSupplement",
             "Erg.-Ausg. zu" : "hasSupplement",
             "Erg.-Bd." : "hasSupplement",
-            "Erg.-Bd. 1884" : "hasSupplement",
-            "Erg.-Bd. zu 2.1997" : "hasSupplement",
             "Erg.-Bl." : "hasSupplement",
             "Erg.-Blätter" : "hasSupplement",
             "Erg.-H." : "hasSupplement",
-            "Erg.-H. 1898 - 1938" : "hasSupplement",
             "Erg.-H. zu" : "hasSupplement",
-            "Erg.-H. zu T.2" : "hasSupplement",
             "Erg.-Lfg." : "hasSupplement",
             "Erg.-Liste" : "hasSupplement",
             "Erg.-Reihe" : "hasSupplement",
             "Erg.-Schr." : "hasSupplement",
             "Erg.-Tab. u. CD-ROM-Ausg." : "hasSupplement",
             "Erg.Bd." : "hasSupplement",
-            "Ergänzende Dokumentation zu"  : "hasSupplement",
+            "Ergänzende Dokumentation zu"  : "isSupplementOf",
             "Ergänzter Ausz. aus" : "hasSupplement",
             "Ergänzter Auszug aus" : "hasSupplement",
             "Ergänzung" : "hasSupplement",
-            "Ergänzung zu" : "hasSupplement",
+            "Ergänzung zu" : "isSupplementOf",
             "Ergänzungen" : "hasSupplement",
-            "Ergänzungs-Bd. zu" : "hasSupplement",
+            "Ergänzungs-Bd. zu" : "isSupplementOf",
             "Ergänzungsausg." : "hasSupplement",
             "Ergänzungsbd." : "hasSupplement",
             "Ergänzungsbl." : "hasSupplement",
@@ -3288,11 +3278,6 @@
                   3 - Bibliographic level */
             "8" : "sequenceNumber"
         },
-        "relationshipInformationpattern" : [
-            {
-                 ".*von" : "isPartOf"
-             }
-        ],
         "relationpattern" : [
             {
                 "Vorg..*u. Forts." : "hasTransientEdition"
@@ -3307,55 +3292,64 @@
                 ".*Beil.*" : "hasSupplement"
             },
             {
+                ".*Suppl.*zu" : "isSupplementOf"
+            },
+            {
                 ".*Suppl.*" : "hasSupplement"
+            },
+            {
+                ".*Anhang.*zu" : "isSupplementOf"
             },
             {
                 ".*Anhang.*" : "hasSupplement"
             },
             {
+                ".*Annex.*zu" : "isSupplementOf"
+            },
+            {
                 ".*Annex.*" : "hasSupplement"
+            },
+            {
+                ".*Appendix.*zu" : "isSupplementOf"
             },
             {
                 ".*Appendix.*" : "hasSupplement"
             },
             {
+                ".*Beiheft.*zu" : "isSupplementOf"
+            },
+            {
                 ".*Beiheft.*" : "hasSupplement"
+            },
+            {
+                ".*Extra.*zu" : "isSupplementOf"
             },
             {
                 ".*Extra.*" : "hasSupplement"
             },
             {
+                ".*Nachtrag.*zu" : "isSupplementOf"
+            },
+            {
                 ".*Nachtrag.*" : "hasSupplement"
             },
             {
-                ".*Sonderband.*" : "hasSupplement"
+                ".*Sonder.*zu" : "isSupplementOf"
             },
             {
-                ".*Sonderausgabe.*" : "hasSupplement"
+                ".*Sonder.*" : "hasSupplement"
             },
             {
-                ".*Sonderbericht.*" : "hasSupplement"
-            },
-            {
-                ".*Sonderdruck.*" : "hasSupplement"
-            },
-            {
-                ".*Sonderheft.*" : "hasSupplement"
+                ".*Special edition.*zu" : "isSupplementOf"
             },
             {
                 ".*Special edition.*" : "hasSupplement"
             },
             {
+                ".*Spezial.*zu" : "isSupplementOf"
+            },
+            {
                 ".*Spezial.*" : "hasSupplement"
-            },
-            {
-                ".*Spezialausgabe.*" : "hasSupplement"
-            },
-            {
-                "\\d+\\.\\d{4}.*" : "isPartOf" /* einzelne Jahre und Hefte */
-            },
-            {
-                "\\d{4}.*" : "isPartOf" /* einzelne Jahre und Hefte */
             },
             {
                 ".*" : "other"
@@ -3589,12 +3583,6 @@
                 "CD\\-ROM\\-Ausg\\..*" : "hasCDEdition"
             },
             {
-                "\\d+\\.\\d{4}.*" : "isPartOf" /* einzelne Jahre und Hefte */
-            },
-            {
-                "\\d{4}.*" : "isPartOf" /* einzelne Jahre und Hefte */
-            },
-            {
                 ".*" : "other"
             }
         ]
@@ -3736,7 +3724,6 @@
             "Onlineausg. und Forts." : "succeededBy",
             "Ersch. alternierend mit" : "hasAlternativeEdition",
             "Ersch. alternierend zu; später Forts." : "succeededBy",
-            "Sonderdr." : "hasSupplement",
             "Vorg. u. Forts.:" : "hasTransientEdition",
             "Vorg. u.Forts.:" : "hasTransientEdition",
             "In u. Vorg. u. Forts."  : "hasTransientEdition",
@@ -3782,12 +3769,6 @@
             },
             {
                 "CD\\-ROM\\-Ausg\\..*" : "hasCDEdition"
-            },
-            {
-                "\\d+\\.\\d{4}.*" : "isPartOf" /* einzelne Jahre und Hefte */
-            },
-            {
-                "\\d{4}.*" : "isPartOf" /* einzelne Jahre und Hefte */
             },
             {
                 ".*" : "other"
