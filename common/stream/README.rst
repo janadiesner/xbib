@@ -13,7 +13,7 @@ Built around an extension of the familiar `Iterator` interface, the language can
 A stream is a lazily-evaluated sequence of data elements. Consumers process the elements as these become available, and discard them as soon as they are no longer required. This is of value when the sequence is large and originates from secondary storage or the network. Consumers need not wait for the entire dataset to become available before they can start to process it, nor do they need to fit it in main memory. This keeps them responsive when working at large scale.
 
 
-.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/streams-concept.png
+.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-concept.png
    :align: center
 
 Use Cases
@@ -38,7 +38,7 @@ More complex uses cases involve multiple streams, producers, and consumers. As a
 * publishes a stream `S3` of updated elements and passes its locator back to `B` so as to have the updates committed
 * obtains from `B` the locator of a stream `S4` of commit outcomes, and consumes it to report or otherwise handle the failures that may have occurred in the process
 ￼
-.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/streams-usecase.png
+.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-usecase.png
    :align: center
 
 Programming over Streams
@@ -59,7 +59,7 @@ The Stream Interface
 
 The streams library revolves around the model defined by the `Stream` interface. The interface defines an API for iterating over streams of homogeneously typed elements. The API extends the standard `Iterator` API to reflect the arbitrary origin of the data, which includes memory, secondary storage, and network.
 
-.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/streams-usecase.png
+.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-usecase.png
    :align: center
 
 The interface shows that `Stream`s are:
@@ -108,7 +108,7 @@ Sentences are comprised of clauses. Based on the verb clause that starts a sente
 
 All the verb clauses above are implemented as static methods of the `Streams` class. The methods return objects that capture the state of the sentence under construction. These objects offer instance methods that allows us continue the construction of the sentence in a type-safe manner.
 
-.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/streams-sentences.png
+.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-sentences.png
    :align: center
 ￼
 To fold a `Stream` of strings into a `Stream` of 10-string elements, we can write::
@@ -181,7 +181,7 @@ Given a `Stream`, we can transform its elements into elements of another `Stream
 
 Visually, it’s as if we were ''piping'' the input stream into the output stream and see the elements that enter at one end of the resulting pipe come out changed as they exit at the other end. We may of course change the type of elements as they flow through the pipe, or update them in place. While we can define arbitrarily complex transformations, we will normally keep them simple: parse strings into objects, serialise objects into strings, extract selected information from objects, change that information, create new objects from that information, and so on.
 
-.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/streams-pipe.png
+.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-pipe.png
    :align: center
 
 We define transformations by implementing the `Generator` interface::
@@ -233,7 +233,7 @@ We can fold a `Stream`::
 
 Here we are grouping a maximum of 50 strings at the time. We will terminate the output stream with a smaller group if there are less than 50 elements left in the input stream.
 
-.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/streams-fold.png
+.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-fold.png
    :align: center
 
 ￼Conversely, we can unfold a `Stream`, i.e. expand each of its elements into a `Stream` using a `Generator`, and then flatten all such `Stream`s into a final single `Stream`.
@@ -250,7 +250,7 @@ The following sentence inverts the transformation above::
 
 Our `Generator`s may derive arbitrary `Stream`s from individual elements of the input `Stream`. For example, if we pass each element of the input stream to a service that returns a `Stream`, we obtain a final `Stream` that flattens all the elements returned by the service across all our calls.
 
-.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/streams-unfold.png
+.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-unfold.png
    :align: center
 
 Guarding Streams
@@ -272,7 +272,7 @@ We may of course implement such policies at the point of stream consumption, rel
  };
  Stream<MyElement> guarded = guard(stream).with(handler);
 
-.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/streams-guard.png
+.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-guard.png
    :align: center
 
 When a failure occurs, the `Stream` implementation passes the failure to `handle()` and the handler responds with `FaultResponse.CONTINUE` if the failure should be ignored and `FaultResponse.STOP` if the failure should silently stop the iteration. The handler may also re-throw the same or another exception.
@@ -287,7 +287,7 @@ When convenient, we can also extend `CountingHandler`, a `FaultHandler` that kee
   }
  };
 
-.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/streams-handlers.png
+.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-handlers.png
    :align: center
 
 What failures can a policy observe? There are two broad classes to consider. Some failures are ''unrecoverable'', i.e. carry the guarantee that the consumer will not be able to read further elements from the stream. Others are instead ''recoverable'', i.e. indicate that there is a good chance that continuing the iteration may produce more elements. (Note that recoverability here is with respect to the iteration alone, the client may always recover in a broader context).
@@ -310,7 +310,7 @@ To help out defining policies outside or inside `FaultHandler`s, the `streams` l
 
 * we have already encountered `StreamSkipException`s when talking about `Generator`s and `pipe` sentences. These exceptions, however, do not capture actual failures but serve as signals for `Stream` implementations. They indicate there is no transformation for a given element of an input `Stream`, i.e. the element should simply be excluded from the output stream.
 ￼
-.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/streams-exceptions.png
+.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-exceptions.png
    :align: center
 
 Building on the reusability of `FaultHandlers` and the hierarchy above, the `Streams` class includes constants for generic `FaultHandler`s which capture common failure handling policies:
@@ -340,7 +340,7 @@ Like with failures, we may wish to encapsulate a lifetime policy within `Stream`
  Stream<MyElement> stream = ...;
  Stream<MyElement> monitored = monitor(stream).with(listener);
 
-.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/streams-monitor.png
+.. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-monitor.png
    :align: center
 ￼
 Notice that
