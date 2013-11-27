@@ -31,7 +31,6 @@
  */
 package org.xbib.elasticsearch.tools.aggregate.zdb;
 
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -53,11 +52,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.SetMultimap;
+
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -74,6 +73,8 @@ import org.xbib.elasticsearch.support.client.SearchClient;
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.date.DateUtil;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Cluster;
+import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Indicator;
+import org.xbib.util.Strings;
 import org.xbib.util.URIUtil;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -89,6 +90,10 @@ import org.xbib.util.ExceptionFormatter;
 import org.xbib.util.FormatUtil;
 
 
+import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Maps.newTreeMap;
+import static com.google.common.collect.Queues.newSynchronousQueue;
+import static com.google.common.collect.Sets.newConcurrentHashSet;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.google.common.collect.Sets.newTreeSet;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -127,6 +132,8 @@ public class MergeWithLicenses {
     private String sourceHoldingsType;
     private String sourceLicenseIndex;
     private String sourceLicenseType;
+    private String sourceIndicatorIndex;
+    private String sourceIndicatorType;
 
     // Elastiscearch target index/type
     private String targetIndex;
@@ -139,12 +146,13 @@ public class MergeWithLicenses {
     private String identifier;
 
     // counters
-    private final static AtomicLong countQueries = new AtomicLong(0L);
-    private final static AtomicLong countHits = new AtomicLong(0L);
-    private final static AtomicLong countWrites = new AtomicLong(0L);
-    private final static AtomicLong countManifestations = new AtomicLong(0L);
-    private final static AtomicLong countHoldings = new AtomicLong(0L);
-    private final static AtomicLong countLicenses = new AtomicLong(0L);
+    private final static AtomicLong queryCounter = new AtomicLong(0L);
+    private final static AtomicLong hitCounter = new AtomicLong(0L);
+    private final static AtomicLong writeCounter = new AtomicLong(0L);
+    private final static AtomicLong manifestationCounter = new AtomicLong(0L);
+    private final static AtomicLong holdingCounter = new AtomicLong(0L);
+    private final static AtomicLong licenseCounter = new AtomicLong(0L);
+    private final static AtomicLong indicatorCounter = new AtomicLong(0L);
 
     private Set<String> docs;
 
@@ -222,7 +230,7 @@ public class MergeWithLicenses {
                     .aggregate();
             long t1 = System.currentTimeMillis();
 
-            long d = countWrites.get(); //number of documents written
+            long d = writeCounter.get(); //number of documents written
             long bytes = ingest.getVolumeInBytes();
             double dps = d * 1000.0 / (double)(t1 - t0);
             double avg = bytes / (d + 1.0); // avoid div by zero
@@ -242,14 +250,14 @@ public class MergeWithLicenses {
                     formatter.format(dps),
                     formatter.format(mbps));
 
-            double qps = countQueries.get() * 1000.0 / (double)(t1 - t0);
+            double qps = queryCounter.get() * 1000.0 / (double)(t1 - t0);
             logger.info("queries={} qps={} hits={} manifestations={} holdings={} licenses={}",
-                    countQueries.get(),
+                    queryCounter.get(),
                     formatter.format(qps),
-                    countHits.get(),
-                    countManifestations.get(),
-                    countHoldings.get(),
-                    countLicenses.get());
+                    hitCounter.get(),
+                    manifestationCounter.get(),
+                    holdingCounter.get(),
+                    indicatorCounter.get());
 
 
             ingest.shutdown();
@@ -276,12 +284,39 @@ public class MergeWithLicenses {
         // ZDB BIB
         this.sourceTitleIndex = params.get("bibIndex");
         this.sourceTitleType = params.get("bibType");
+        if (Strings.isNullOrEmpty(sourceTitleIndex)) {
+            throw new IllegalArgumentException("no bibIndex parameter given");
+        }
+        if (Strings.isNullOrEmpty(sourceTitleType)) {
+            throw new IllegalArgumentException("no bibType parameter given");
+        }
         // ZDB HOL
         this.sourceHoldingsIndex = params.get("holIndex");
         this.sourceHoldingsType = params.get("holType");
+        if (Strings.isNullOrEmpty(sourceHoldingsIndex)) {
+            throw new IllegalArgumentException("no holIndex parameter given");
+        }
+        if (Strings.isNullOrEmpty(sourceHoldingsType)) {
+            throw new IllegalArgumentException("no holType parameter given");
+        }
         // EZB licenses
         this.sourceLicenseIndex = params.get("licenseIndex");
         this.sourceLicenseType = params.get("licenseType");
+        if (Strings.isNullOrEmpty(sourceLicenseIndex)) {
+            throw new IllegalArgumentException("no licenseIndex parameter given");
+        }
+        if (Strings.isNullOrEmpty(sourceLicenseType)) {
+            throw new IllegalArgumentException("no licenseType parameter given");
+        }
+        // EZB indicators from web service
+        this.sourceIndicatorIndex = params.get("indicatorIndex");
+        this.sourceIndicatorType = params.get("indicatorType");
+        if (Strings.isNullOrEmpty(sourceIndicatorIndex)) {
+            throw new IllegalArgumentException("no indicatorIndex parameter given");
+        }
+        if (Strings.isNullOrEmpty(sourceIndicatorType)) {
+            throw new IllegalArgumentException("no indicatorType parameter given");
+        }
 
         params = URIUtil.parseQueryString(targetURI);
 
@@ -300,8 +335,8 @@ public class MergeWithLicenses {
         this.identifier = identifier;
 
         this.numPumps = numPumps;
-        this.pumps = new HashSet();
-        this.pumpQueue = new SynchronousQueue(true);
+        this.pumps = newHashSet();
+        this.pumpQueue = newSynchronousQueue();
         this.pumpService = Executors.newFixedThreadPool(numPumps);
         this.pumpLatch = new CountDownLatch(numPumps);
         for (int i = 0; i < numPumps; i++) {
@@ -426,11 +461,11 @@ public class MergeWithLicenses {
                     if (count % size == 0) {
                          logger.info("count={} queries={} hits={} manifestations={} holdings={} licences={}",
                                  count,
-                                 countQueries.get(),
-                                 countHits.get(),
-                                 countManifestations.get(),
-                                 countHoldings.get(),
-                                 countLicenses.get());
+                                 queryCounter.get(),
+                                 hitCounter.get(),
+                                 manifestationCounter.get(),
+                                 holdingCounter.get(),
+                                 indicatorCounter.get());
                     }
                 }
             } catch (InterruptedException e) {
@@ -447,80 +482,97 @@ public class MergeWithLicenses {
             return true;
         }
 
-        private boolean filterForProcess(Manifestation manifestation) {
-            return !manifestation.isSupplement()
-                    && !manifestation.isPartial()
-                    && !manifestation.hasPrint(); // "each online has print edition" rule
-        }
+        private Set<Manifestation> used = newConcurrentHashSet();
 
-        private Set<Manifestation> used = newHashSet();
-
-        private void logManifestation(Manifestation m, int indent) {
-            logger.info("{} {} {} {}-{} {} {} {}",
+        private void logManifestation(Manifestation m, String relation, int indent) {
+            logger.info("{} {} {} {} {}-{} {} {} {} {}",
                     indent,
+                    relation,
                     m.externalID(),
                     m.title(),
                     m.firstDate(), m.lastDate(),
                     m.country(),
+                    m.contentType() + "/" + m.mediaType() + "/" + m.carrierType(),
                     m.isPartial() ? "(Unterreihe)" : "",
                     m.isSupplement() ? "(Suppl.)" : "");
-            // neighbors
+            if (used.contains(m)) {
+                // loop detected
+                return;
+            }
+            used.add(m);
             Set<String> relations = m.getRelatedManifestations().keySet();
-            for (String relation : relations) {
-                logger.info("{}    {} = {}",
-                        indent,
-                        relation,
-                        m.getRelatedManifestations().get(relation));
-                if (relation.startsWith("has")) {
-                    for (Manifestation mm : m.getRelatedManifestations().get(relation)) {
-                        if (!used.contains(mm)) {
-                            used.add(mm);
-                            logManifestation(mm, indent+1);
-                        }
+            for (String rel : relations) {
+                if (Manifestation.carrierEditions().contains(rel)
+                        || "hasPart".equals(rel) || "hasSupplement".equals(rel)) {
+                    for (Manifestation mm : m.getRelatedManifestations().get(rel)) {
+                        logManifestation(mm, rel, indent+1);
                     }
-                } else {
-                    logger.warn("not logging: {}", relation);
                 }
             }
         }
 
         private void process(Manifestation manifestation) throws IOException {
-            String docid = manifestation.id();
-            if (docs.contains(docid)) {
+            if (docs.contains(manifestation.externalID())) {
                 return;
             }
-            docs.add(docid);
+            docs.add(manifestation.externalID());
 
             this.cluster = newTreeSet(Manifestation.getIdComparator());
             cluster.add(manifestation);
+            // supplements: do not build a cluster for them.
             if (!manifestation.isSupplement()) {
                 retrieveCluster(cluster, manifestation);
             }
-            countManifestations.addAndGet(cluster.size());
+            manifestationCounter.addAndGet(cluster.size());
 
+            // update all relations between manifestations in the cluster
             for (Manifestation m : cluster) {
-                logger.info("{}", m.externalID());
                 setAllRelationsBetween(m, cluster);
-                for (String relation : m.getRelatedManifestations().keySet()) {
-                    logger.info("     {} = {}", relation, m.getRelatedManifestations().get(relation));
-                }
             }
 
             // build cluster
             Cluster c = new Cluster(cluster);
-            List<Set<Manifestation>> list = c.chronoStreams();
-            logger.info("CLUSTERED: {} -> {}", cluster.size(), list.size());
+            List<Set<Manifestation>> chronoStreams = c.chronoStreams();
 
             used.clear();
-            for (Set<Manifestation> set : list) {
+            for (Set<Manifestation> chronoStream : chronoStreams) {
+                // per chrono stream, find holdings, licenses, indicators
+                Set<Holding> holdings = Sets.newHashSet();
+                searchHoldings(chronoStream, holdings);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("found {} holdings for manifestations {}",
+                            holdings.size(), chronoStream);
+                }
+                Set<License> licenses = Sets.newHashSet();
+                searchLicenses(chronoStream, licenses);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("found {} licenses for manifestations {}",
+                            licenses.size(), chronoStream);
+                }
+                Set<Indicator> indicators = Sets.newHashSet();
+                searchIndicators(chronoStream, indicators);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("found {} indicators for manifestations {}",
+                            indicators.size(), chronoStream);
+                }
+
+                // bring date order into holdings, licenses, indicators
+                Map<Integer, Set<Holding>> holdingsByDate = reorderHoldingsByDate(holdings);
+                Map<Integer, Set<License>> licensesByDate = reorderLicensesByDate(licenses);
+                Map<Integer, Set<Indicator>> indicatorByDate = reorderIndicatorsByDate(indicators);
+
+                logger.info("{} {} {}", holdingsByDate.size(), licensesByDate.size(), indicatorByDate.size());
+
+                // dump chrono stream
                 logger.info("----");
-                for (Manifestation m : set) {
-                    used.add(m);
-                    logManifestation(m, 0);
+                for (Manifestation m : chronoStream) {
+                    logManifestation(m, "", 0);
                 }
             }
 
-            logger.info("docs = {}", docs);
+            logger.info("docs = {}", docs.size());
+
+            logger.info("used = {}", used.size());
 
             /*Set<Work> leaders = electWorkLeaders(cluster);
             if (logger.isDebugEnabled()) {
@@ -574,7 +626,7 @@ public class MergeWithLicenses {
                 if (logger.isDebugEnabled()) {
                     logger.debug("work {}: found {} holdings ", work, holdings.size());
                 }
-                countHoldings.addAndGet(holdings.size());
+                holdingCounter.addAndGet(holdings.size());
                 // search for license documents
                 if (logger.isDebugEnabled()) {
                     logger.debug("work {}: searching licenses for manifestations {}", work, manifestationsTargetIDs);
@@ -583,7 +635,7 @@ public class MergeWithLicenses {
                 if (logger.isDebugEnabled()) {
                     logger.debug("work {}: found {} licenses ", work, licenses.size());
                 }
-                countLicenses.addAndGet(licenses.size());
+                indicatorCounter.addAndGet(licenses.size());
                 // output phase, write everything out
                 if (logger.isDebugEnabled()) {
                     logger.debug("writing work {} title '{}'", work, work.title());
@@ -630,7 +682,7 @@ public class MergeWithLicenses {
             searchResponse = client.prepareSearchScroll(searchResponse.getScrollId())
                     .setScroll(TimeValue.timeValueMillis(millis))
                    .execute().actionGet();
-            countQueries.incrementAndGet();
+            queryCounter.incrementAndGet();
             SearchHits hits = searchResponse.getHits();
             if (hits.getHits().length == 0) {
                 return;
@@ -650,17 +702,17 @@ public class MergeWithLicenses {
                 hits = searchResponse.getHits();
                 for (int i = c.pos; i < hits.getHits().length; i++ ) {
                     SearchHit hit = hits.getAt(i);
-                    countHits.incrementAndGet();
+                    hitCounter.incrementAndGet();
                     Manifestation m = new Manifestation(mapper.readValue(hit.source(), Map.class));
                     boolean collided = detectCollisionAndTransfer(m, c, i);
                     if (collided) {
                         return;
                     }
                     // global docs
-                    if (docs.contains(m.id())) {
+                    if (docs.contains(m.externalID())) {
                         continue;
                     }
-                    docs.add(m.id());
+                    docs.add(m.externalID());
                     // check for local cluster docs (avoid loops)
                     if (c.cluster.contains(m)) {
                         continue;
@@ -684,8 +736,7 @@ public class MergeWithLicenses {
                                 || "precededBy".equals(relation)
                                 || "succeededBy".equals(relation);
                         carrierRelation = carrierRelation
-                                || "hasPrintEdition".equals(relation)
-                                || "hasOnlineEdition".equals(relation);
+                                || Manifestation.carrierEditions().contains(relation);
                     }
                     // other direction (missing entries in catalog are possible)
                     for (String relation : findTheRelationsBetween(m, c.manifestation.id())) {
@@ -704,18 +755,20 @@ public class MergeWithLicenses {
                                 || "precededBy".equals(relation)
                                 || "succeededBy".equals(relation);
                         carrierRelation = carrierRelation
-                                || "hasPrintEdition".equals(relation)
-                                || "hasOnlineEdition".equals(relation);
+                                || Manifestation.carrierEditions().contains(relation);
                     }
                     // expand cluster for this manifestation iff temporal or carrier relation
-                    if (temporalRelation || carrierRelation) {
+                    // also expand if there are any other print/online editions
+                    if (temporalRelation
+                            || carrierRelation
+                            || m.hasCarrierRelations()) {
                         retrieveCluster(c.cluster, m);
                     }
                 }
                 searchResponse = client.prepareSearchScroll(searchResponse.getScrollId())
                         .setScroll(TimeValue.timeValueMillis(millis))
                         .execute().actionGet();
-                countQueries.incrementAndGet();
+                queryCounter.incrementAndGet();
                 hits = searchResponse.getHits();
             } while (hits.getHits().length > 0);
         }
@@ -734,6 +787,17 @@ public class MergeWithLicenses {
                 }
             }
             return false;
+        }
+
+        private void searchHoldings(Collection<Manifestation> manifestations, Set<Holding> holdings) throws IOException {
+            Set<String> ids = Sets.newHashSet();
+            for (Manifestation m : manifestations) {
+                ids.add(m.externalID());
+                if (m.getPrintExternalID() != null) {
+                    ids.add(m.getPrintExternalID());
+                }
+            }
+            searchHoldings(ids, holdings);
         }
 
         private void searchHoldings(Set<String> ids, Set<Holding> holdings) throws IOException {
@@ -771,14 +835,25 @@ public class MergeWithLicenses {
                     if (hits.getHits().length == 0) {
                         break;
                     }
-                    countQueries.incrementAndGet();
+                    queryCounter.incrementAndGet();
                     for (SearchHit hit : hits) {
-                        countHits.incrementAndGet();
+                        hitCounter.incrementAndGet();
                         Holding holding = new Holding(mapper.readValue(hit.source(), Map.class));
                         holdings.add(holding);
                     }
                 }
             }
+        }
+
+        private void searchLicenses(Collection<Manifestation> manifestations, Set<License> licenses) throws IOException {
+            Set<String> ids = Sets.newHashSet();
+            for (Manifestation m : manifestations) {
+                ids.add(m.externalID());
+                if (m.getOnlineExternalID() != null) {
+                    ids.add(m.getOnlineExternalID());
+                }
+            }
+            searchLicenses(ids, licenses);
         }
 
         private void searchLicenses(Set<String> ids, Set<License> licenses) throws IOException {
@@ -805,6 +880,9 @@ public class MergeWithLicenses {
                     logger.debug("searchLicenses request = {}", searchRequest.toString());
                 }
                 SearchResponse searchResponse = searchRequest.execute().actionGet();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("hits = {}", searchResponse.getHits().getTotalHits());
+                }
                 while (true) {
                     searchResponse = client.prepareSearchScroll(searchResponse.getScrollId())
                             .setScroll(TimeValue.timeValueMillis(millis))
@@ -813,11 +891,71 @@ public class MergeWithLicenses {
                     if (hits.getHits().length == 0) {
                         break;
                     }
-                    countQueries.incrementAndGet();
+                    queryCounter.incrementAndGet();
                     for (SearchHit hit : hits) {
-                        countHits.incrementAndGet();
+                        hitCounter.incrementAndGet();
                         License license = new License(mapper.readValue(hit.source(), Map.class));
-                        licenses.add(license);
+                        if (license.getISIL().startsWith("DE-")) {
+                            licenses.add(license);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void searchIndicators(Collection<Manifestation> manifestations, Set<Indicator> indicators) throws IOException {
+            Set<String> ids = Sets.newHashSet();
+            for (Manifestation m : manifestations) {
+                ids.add(m.externalID());
+                if (m.getOnlineExternalID() != null) {
+                    ids.add(m.getOnlineExternalID());
+                }
+            }
+            searchIndicators(ids, indicators);
+        }
+
+        private void searchIndicators(Set<String> ids, Set<Indicator> indicators) throws IOException {
+            if (ids == null || ids.isEmpty()) {
+                return;
+            }
+            // split ids into portions of 1024 (default max clauses for Lucene)
+            Object[] array = ids.toArray();
+            for (int begin = 0; begin < array.length; begin += 1024) {
+                int end = begin + 1024 > array.length ? array.length : begin + 1024;
+                Object[] subarray = Arrays.copyOfRange(array, begin, end);
+                QueryBuilder queryBuilder = termsQuery("xbib:identifier", subarray);
+                // size is per shard
+                SearchRequestBuilder searchRequest = client.prepareSearch()
+                        .setQuery(queryBuilder)
+                        .setSize(size)
+                        .setSearchType(SearchType.SCAN)
+                        .setScroll(TimeValue.timeValueMillis(millis));
+                searchRequest.setIndices(sourceIndicatorIndex);
+                if (sourceLicenseType != null) {
+                    searchRequest.setTypes(sourceIndicatorType);
+                }
+                if (logger.isDebugEnabled()) {
+                    logger.debug("searchIndicators request = {}", searchRequest.toString());
+                }
+                SearchResponse searchResponse = searchRequest.execute().actionGet();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("hits = {}", searchResponse.getHits().getTotalHits());
+                }
+                while (true) {
+                    searchResponse = client.prepareSearchScroll(searchResponse.getScrollId())
+                            .setScroll(TimeValue.timeValueMillis(millis))
+                            .execute().actionGet();
+                    SearchHits hits = searchResponse.getHits();
+                    if (hits.getHits().length == 0) {
+                        break;
+                    }
+                    queryCounter.incrementAndGet();
+                    for (SearchHit hit : hits) {
+                        hitCounter.incrementAndGet();
+                        Indicator indicator = new Indicator(mapper.readValue(hit.source(), Map.class));
+                        if (indicator.getISIL().startsWith("DE-")) {
+                            indicators.add(indicator);
+                        }
                     }
                 }
             }
@@ -888,68 +1026,6 @@ public class MergeWithLicenses {
         }
     }
 
-
-    /*private Set<Work> electWorkLeaders(Collection<Manifestation> cluster) {
-        Set<Work> leaders = new TreeSet<Work>(Work.getWorkComparator());
-        Set<Manifestation> manifestations = new TreeSet<Manifestation>(Manifestation.getIdComparator());
-        manifestations.addAll(cluster);
-        for (Manifestation manifestation : manifestations) {
-            Iterator<Work> it = leaders.iterator();
-            Work first = it.hasNext() ? it.next() : null;
-            Work work = new Work(manifestation);
-            Integer workDate = work.firstDate() != null ? work.firstDate() :  DateUtil.getYear();
-            Integer firstDate = (first != null && first.firstDate() != null) ? first.firstDate() : DateUtil.getYear();
-            if (manifestation.isHead()
-                    && !manifestation.isSupplement()
-                    && !manifestation.isPartial()
-                    && !manifestation.hasPrint()
-                    && (!isConnected(manifestation, leaders)
-                         || (first != null && workDate.compareTo(firstDate) < 0 ))
-                    ) {
-                leaders.add(work);
-                cluster.remove(manifestation);
-            }
-        }
-        return leaders;
-    }
-
-    private boolean isConnected(Manifestation manifestation, Collection<Manifestation> manifestations) {
-        if (manifestations.isEmpty()) {
-            return false;
-        }
-        for (Manifestation m : manifestations) {
-            if (isConnected(manifestation, m)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isConnected(Manifestation manifestation, Set<Work> works) {
-        if (works.isEmpty()) {
-            return false;
-        }
-        for (Manifestation m : works) {
-            if (isConnected(manifestation, m)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isConnected(Manifestation m1, Manifestation m2) {
-        if (m1.id().equals(m2.id())) {
-            return true;
-        }
-        String s = checkAllRelationEntries(m1, m2.id());
-        if (s != null) {
-            return true;
-        }
-        // not every relation has an inverse relation, so check the other way round :(
-        s = checkAllRelationEntries(m2, m1.id());
-        return s != null;
-    }*/
-
     private Map<String, Edition> electEditionLeaders(Set<Manifestation> manifestations) {
         Map<String, Edition> m = new TreeMap();
         for (Manifestation manifestation : manifestations) {
@@ -965,7 +1041,7 @@ public class MergeWithLicenses {
     }
 
     private Map<Integer, Set<Holding>> reorderHoldingsByDate(Set<Holding> holdings) {
-        Map<Integer, Set<Holding>> holdingsByDate = new TreeMap();
+        Map<Integer, Set<Holding>> holdingsByDate = newTreeMap();
         for (Holding holding : holdings) {
             List<Integer> dates = null;
             // first, our dates!
@@ -974,7 +1050,7 @@ public class MergeWithLicenses {
                 if (!(o instanceof List)) {
                     o = Arrays.asList(o);
                 }
-                dates = new ArrayList();
+                dates = newLinkedList();
                 dates.addAll((List<Integer>)o);
             } else {
                 o = holding.map().get("FormattedEnumerationAndChronology");
@@ -1012,8 +1088,7 @@ public class MergeWithLicenses {
         int[] begin = new int[groups.size()];
         int[] end = new int[groups.size()];
         int max = 0;
-        for (int i = 0; i < groups.size(); i++) {
-            Map<String, Object> m = groups.get(i);
+        for (Map<String, Object> m : groups) {
             Object o = m.get("movingwall");
             if (o != null) {
                 logger.warn("movingwall detected: {}", o);
@@ -1060,7 +1135,7 @@ public class MergeWithLicenses {
                 }
             }
         }
-        List<Integer> dates = new ArrayList();
+        List<Integer> dates = newLinkedList();
         for (int i = 0; i < max+1; i++) {
             if (begin[i] > 0 && end[i] > 0) {
                 for (int d = begin[i]; d <= end[i]; d++) {
@@ -1074,18 +1149,33 @@ public class MergeWithLicenses {
     }
 
     private Map<Integer, Set<License>> reorderLicensesByDate(Set<License> licenses) {
-        Map<Integer, Set<License>> licensesByDate = new TreeMap();
+        Map<Integer, Set<License>> licensesByDate = newTreeMap();
         for (License license : licenses) {
             for (Integer d : license.dates()) {
                 Set<License> l = licensesByDate.get(d);
                 if (l == null) {
-                    l = new HashSet();
+                    l = newHashSet();
                 }
                 l.add(license);
                 licensesByDate.put(d, l);
             }
         }
         return licensesByDate;
+    }
+
+    private Map<Integer, Set<Indicator>> reorderIndicatorsByDate(Set<Indicator> indicators) {
+        Map<Integer, Set<Indicator>> indicatorsByDate = newTreeMap();
+        for (Indicator indicator : indicators) {
+            for (Integer d : indicator.dates()) {
+                Set<Indicator> l = indicatorsByDate.get(d);
+                if (l == null) {
+                    l = newHashSet();
+                }
+                l.add(indicator);
+                indicatorsByDate.put(d, l);
+            }
+        }
+        return indicatorsByDate;
     }
 
     private void writeWork(Work work,
@@ -1100,12 +1190,12 @@ public class MergeWithLicenses {
             return;
         }
         XContentBuilder builder = jsonBuilder();
-        List<String> editionIDs = new ArrayList();
+        List<String> editionIDs = newLinkedList();
         for (Edition expr : work.getEditions()) {
             editionIDs.add(expr.externalID());
         }
         // compute ISIL set
-        Set<String> isils = new HashSet();
+        Set<String> isils = newHashSet();
         for (Holding holding : holdings) {
             if (holding.getISIL() != null) {
                 isils.add(holding.getISIL());
@@ -1166,13 +1256,13 @@ public class MergeWithLicenses {
                 targetWorksType,
                 work.externalID(),
                 builder.string());
-        countWrites.incrementAndGet();
+        writeCounter.incrementAndGet();
     }
 
     private void writeManifestation(XContentBuilder builder, Manifestation manifestation) throws IOException {
         builder.startObject()
                 .field("id", manifestation.externalID())
-                .field("title", getTitle(manifestation))
+                .field("title", manifestation.cleanTitle())
                 .field("publisher", manifestation.publisher())
                 .field("publisherPlace", manifestation.publisherPlace())
                 .field("country", manifestation.country())
@@ -1315,7 +1405,7 @@ public class MergeWithLicenses {
                         targetManifestationsType,
                         manifestation.externalID(),
                         builder.string());
-                countWrites.incrementAndGet();
+                writeCounter.incrementAndGet();
             }
         }
     }
@@ -1328,7 +1418,7 @@ public class MergeWithLicenses {
         builder.startObject()
                 .field("id", manifestation.externalID())
                 .field("date", date)
-                .field("title", getTitle(manifestation))
+                .field("title", manifestation.cleanTitle())
                 .field("contentType", manifestation.contentType())
                 .field("key", manifestation.getUniqueIdentifier())
                 .field("identifiers", manifestation.getIdentifiers());
@@ -1368,94 +1458,15 @@ public class MergeWithLicenses {
                 targetManifestationsType,
                 id,
                 builder.string());
-        countWrites.incrementAndGet();
+        writeCounter.incrementAndGet();
     }
-
-    private Map<String,Object> getTitle(Manifestation manifestation) {
-        Map<String, Object> m = (Map<String, Object>) manifestation.map().get("TitleStatement");
-        if (m != null) {
-            String titleMedium = (String) m.get("titleMedium");
-            if ("[Elektronische Ressource]".equals(titleMedium)) {
-                m.remove("titleMedium");
-            }
-        }
-        return m;
-    }
-
-
-/*
-    private final Set<String> relatedWorks = new HashSet<String>() {{
-        add("hasPart");
-        add("isPartOf");
-        add("hasSupplement");
-        add("isSupplementOf");
-    }};
-
-    private final Set<String> relatedEditions = new HashSet<String>() {{
-        add("hasLanguageEdition");
-        add("hasTranslation");
-        add("isLanguageEditionOf");
-        add("isTranslationOf");
-    }};
-
-    private final Set<String> relatedManifestations = new HashSet<String>() {{
-        // chronological entries
-        add("precededBy");
-        add("succeededBy");
-        // editions
-        add("hasOriginalEdition");
-        add("hasPrintEdition");
-        add("hasOnlineEdition");
-        add("hasBrailleEdition");
-        add("hasDVDEdition");
-        add("hasCDEdition");
-        add("hasDiskEdition");
-        add("hasMicroformEdition");
-        add("hasDigitizedEdition");
-        add("hasSpatialEdition");
-        add("hasTemporalEdition");
-        add("hasPartialEdition");
-        add("hasLocalEdition");
-        add("hasAdditionalEdition");
-        add("hasAlternativeEdition");
-        add("hasDerivedEdition");
-        add("hasHardcoverEdition");
-        add("hasManuscriptEdition");
-        add("hasBoxedEdition");
-        add("hasReproduction");
-        add("hasSummary");
-
-        // inverse relations
-        add("isOriginalEditionOf");
-        add("isPrintEditionOf");
-        add("isOnlineEditionOf");
-        add("isBrailleEditionOf");
-        add("isDVDEditionOf");
-        add("isCDEditionOf");
-        add("isDiskEditionOf");
-        add("isMicroformEditionOf");
-        add("isDigitizedEditionOf");
-        add("isSpatialEditionOf");
-        add("isTemporalEditionOf");
-        add("isLocalEditionOf");
-        add("isPartialEditionOf");
-        add("isAdditionalEditionOf");
-        add("isDerivedEditionOf");
-        add("isHardcoverEditionOf");
-        add("isManuscriptEditionOf");
-        add("isBoxedEditionOf");
-        add("isReproductionOf");
-        add("isSummaryOf");
-    }};*/
 
     private final Map<String,String> inverseRelations = new HashMap<String,String>() {{
 
-        // we do not inverse work relations. This may easily fail (no exact data)
-
-        //put("hasPart", "isPartOf");
-        //put("hasSupplement", "isSupplementOf");
-        //put("isPartOf", "hasPart");
-        //put("isSupplementOf", "hasSupplement");
+        put("hasPart", "isPartOf");
+        put("hasSupplement", "isSupplementOf");
+        put("isPartOf", "hasPart");
+        put("isSupplementOf", "hasSupplement");
 
         // temporal axis
         put("precededBy", "succeededBy");
@@ -1467,7 +1478,7 @@ public class MergeWithLicenses {
         put("isLanguageEditionOf", "hasLanguageEdition");
         put("isTranslationOf", "hasTranslation");
 
-        // manifestation relations
+        // manifestation (carrier) relations
         put("hasOriginalEdition", "isOriginalEditionOf");
         put("hasPrintEdition", "isPrintEditionOf");
         put("hasOnlineEdition", "isOnlineEditionOf");
@@ -1477,6 +1488,8 @@ public class MergeWithLicenses {
         put("hasDiskEdition", "isDiskEditionOf");
         put("hasMicroformEdition", "isMicroformEditionOf");
         put("hasDigitizedEdition", "isDigitizedEditionOf");
+
+        // manifestation (edited) relations
         put("hasSpatialEdition", "isSpatialEditionOf");
         put("hasTemporalEdition", "isTemporalEditionOf");
         put("hasPartialEdition", "isPartialEditionOf");

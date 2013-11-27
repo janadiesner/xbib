@@ -69,6 +69,10 @@ public class Holding extends MapBasedAnyObject {
 
     public Holding(Map<String, Object> m) {
         super(m);
+        build();
+    }
+
+    protected void build() {
         this.id = getString("identifierRecord");
         this.parent = getString("identifierParent"); // DNB-ID
         Object leader = map().get("leader");

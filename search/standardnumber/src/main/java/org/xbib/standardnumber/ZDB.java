@@ -7,6 +7,9 @@ import java.util.regex.Pattern;
 /**
  * Zeitschriftendatenbank ID
  *
+ *  ZDB is the world’s largest specialized database for serial titles (journals, annuals, newspapers, also
+ *  e-journals).
+ *
  * @see <a href="http://support.d-nb.de/iltis/onlineRoutinen/Pruefziffernberechnung.htm"></a>Prüfziffernberechnung in ILTIS</a>
  * @see <a href="https://wiki.dnb.de/pages/viewpage.action?pageId=48139522">DNB Wiki</a>
  */

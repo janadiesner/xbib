@@ -45,6 +45,11 @@ public class License extends Holding {
 
     public License(Map<String, Object> m) {
         super(m);
+        build();
+    }
+
+    @Override
+    protected void build() {
         super.id = getString("ezb:license_entry_id");
         this.parent = getString("ezb:zdbid");
         this.isil = getString("ezb:isil");

@@ -3,6 +3,24 @@ package org.xbib.standardnumber;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * ISO 15420 Universal Product Code (UPC)
+ *
+ * The Universal Product Code (UPC) is a barcode symbology (i.e., a specific type of barcode)
+ * that is widely used in the United States, Canada, the United Kingdom, Australia,
+ * New Zealand and in other countries for tracking trade items in stores.
+ * Its most common form, the UPC-A, consists of 12 numerical digits, which are uniquely
+ * assigned to each trade item.
+ *
+ * Along with the related EAN barcode, the UPC is the barcode mainly used for scanning
+ * of trade items at the point of sale, per GS1 specifications.
+ *
+ * UPC data structures are a component of GTINs (Global Trade Item Numbers).
+ *
+ * All of these data structures follow the global GS1 specification which bases on
+ * international standards.
+ *
+ */
 public class UPC implements Comparable<UPC>, StandardNumber {
 
     private static final Pattern PATTERN = Pattern.compile("[\\p{Digit}]{0,12}");

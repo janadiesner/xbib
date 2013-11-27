@@ -6,7 +6,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *  ISO 27729: International Standard Name Identifier (ISNI)
+ * ISO 27729: International Standard Name Identifier (ISNI)
+ *
+ * The International Standard Name Identifier (ISNI) is a method for uniquely identifying
+ * the public identities of contributors to media content such as books, TV programmes,
+ * and newspaper articles. Such an identifier consists of 16 numerical digits divided
+ * into four blocks.
  *
  * Checksum is in accordance to ISO/IEC 7064:2003, MOD 11-2
  */

@@ -1,11 +1,13 @@
 package org.xbib.elasticsearch.tools.aggregate.zdb.entities;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Sets.newTreeSet;
 
 public class Work extends Edition {
 
@@ -37,7 +39,7 @@ public class Work extends Edition {
     }
 
     public Set<String> allIDs() {
-        Set<String> result = new TreeSet();
+        Set<String> result = newTreeSet();
         result.add(id());
         for (Manifestation m : manifestations) {
             result.add(m.id());
@@ -46,7 +48,7 @@ public class Work extends Edition {
     }
 
     public Set<String> allTargetIDs() {
-        Set<String> result = new TreeSet();
+        Set<String> result = newTreeSet();
         result.add(externalID());
         for (Manifestation m : manifestations) {
             result.add(m.externalID());
@@ -55,7 +57,7 @@ public class Work extends Edition {
     }
 
     public Set<Integer> allDates() {
-        Set<Integer> result = new TreeSet();
+        Set<Integer> result = newTreeSet();
         for (Manifestation m : manifestations) {
             result.addAll(toList(m.firstDate(), m.lastDate()));
         }
@@ -63,7 +65,7 @@ public class Work extends Edition {
     }
 
     private List<Integer> toList(Integer firstDate, Integer lastDate) {
-        List<Integer> list = new ArrayList();
+        List<Integer> list = newLinkedList();
         if (firstDate == null) {
             return list;
         }

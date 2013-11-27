@@ -5,7 +5,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Pica-productienummers
+ * Pica Productie Nummer
+ *
+ * A catalog record numbering system, uniquely identifying records, used by PICA
+ * (Project voor geIntegreerde Catalogus Automatisering) integrated library systems.
+ *
  */
 public class PPN implements Comparable<PPN>, StandardNumber {
 

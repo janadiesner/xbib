@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 /**
  * ISO 3297: International Standard Serial Number (ISSN)
  *
+ * Z39.50 BIB-1 Use Attribute 8
+ *
  * The International Standard Serial Number (ISSN) is a unique
  * eight-digit number used to identify a print or electronic periodical
  * publication. The ISSN system was adopted as international standard
@@ -66,6 +68,11 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
     private boolean createWithChecksum;
 
     @Override
+    public int compareTo(ISSN issn) {
+        return value != null ? normalizedValue().compareTo(issn.normalizedValue()) : -1;
+    }
+
+    @Override
     public ISSN set(CharSequence value) {
         this.value = value != null ? value.toString() : null;
         return this;
@@ -77,10 +84,6 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
         return this;
     }
 
-    @Override
-    public int compareTo(ISSN issn) {
-        return value != null ? value.compareTo((issn).normalizedValue()) : -1;
-    }
 
     @Override
     public ISSN normalize() {
@@ -113,12 +116,6 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
      */
     @Override
     public String format() {
-        if (formatted == null) {
-            if (!valid) {
-                return value;
-            }
-            this.formatted = value.substring(0, 4) + "-" + value.substring(4, 8);
-        }
         return formatted;
     }
 
@@ -146,10 +143,6 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
         }
         int chk = checksum % 11;
         char p = chk == 0 ? '0' : chk == 1 ? 'X' : (char)((11-chk) + '0');
-        /*int mod = sum % 11;
-        mod = mod == 0 ? 0 : 11 - mod; 
-        char p = mod == 10 ? 'X' : (char) ('0' + mod);
-        */
         this.valid = p == Character.toUpperCase(value.charAt(l));
         if (!valid) {
             throw new NumberFormatException("invalid checksum: " + chk + " != " + value.charAt(l));
@@ -163,6 +156,7 @@ public class ISSN implements Comparable<ISSN>, StandardNumber {
             sb.deleteCharAt(i);
             i = sb.indexOf("-");
         }
+        this.formatted = sb.substring(0, 4) + "-" + sb.substring(4, 8);
         return sb.toString();
     }
 

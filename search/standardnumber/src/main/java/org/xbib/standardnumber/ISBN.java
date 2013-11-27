@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 /**
  * ISO 2108: International Standard Book Number (ISBN)
  *
+ * Z39.50 BIB-1 Use Attribute 7
+ *
  * The International Standard Book Number is a 13-digit number
  * that uniquely identifies books and book-like products published
  * internationally.

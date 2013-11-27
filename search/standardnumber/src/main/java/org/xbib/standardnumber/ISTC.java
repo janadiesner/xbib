@@ -6,10 +6,18 @@ import java.util.regex.Pattern;
 /**
  * ISO 21047: International Standard Text Code (ISTC)
  *
- * The International Standard Text Code is a global identification system
- * for textual works that is primarily intended for use by publishers, bibliographic
- * services, retailers, libraries and rights management agencies
- * to collocate different manifestations of the same title under a work-level record.
+ * The International Standard Text Code (ISTC) is a numbering system for the unique identification
+ * of text-based works; the term “work” can refer to any content appearing in conventional
+ * printed books, audio-books, static e-books or enhanced digital books, as well as content
+ * which might appear in a newspaper or journal.
+ *
+ * The ISTC provides sales analysis systems, retail websites, library catalogs and other
+ * bibliographic systems with a method of automatically linking together publications
+ * of the “same content” and/or “related content”, thus improving discoverability of
+ * products and efficiencies.
+ *
+ * An ISTC number is the link between a user’s search for a piece of content and the
+ * ultimate sale or loan of a publication.
  *
  * The standard was formally published in March 2009
  *

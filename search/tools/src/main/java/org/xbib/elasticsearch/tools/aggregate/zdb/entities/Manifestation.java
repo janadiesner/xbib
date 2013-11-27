@@ -35,6 +35,7 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.SetMultimap;
 
 import org.elasticsearch.common.collect.Sets;
@@ -322,6 +323,27 @@ public class Manifestation extends MapBasedAnyObject
         return relations.get(key);
     }
 
+    public boolean hasCarrierRelations() {
+        for (String key : relations.keys()) {
+            if (carrierEditions.contains(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public Map<String,Object> cleanTitle() {
+        Map<String, Object> m = (Map<String, Object>) map().get("TitleStatement");
+        if (m != null) {
+            String titleMedium = (String) m.get("titleMedium");
+            if ("[Elektronische Ressource]".equals(titleMedium)) {
+                m.remove("titleMedium");
+            }
+        }
+        return m;
+    }
+
     public String getUniqueIdentifier() {
         return unique;
     }
@@ -604,17 +626,31 @@ public class Manifestation extends MapBasedAnyObject
         return multi;
     }
 
-    private final static String[] relationEntries = new String[]{
+    private final static Set<String> relationEntries = Sets.newHashSet(
             "PrecedingEntry",
             "SucceedingEntry",
             "OtherEditionEntry",
             "OtherRelationshipEntry",
             "SupplementSpecialIssueEntry",
             "SupplementParentEntry" // verbindet Titel auch mit (Datenbank)werken über "In" = "isPartOf" --> Work/Work
-    };
+    );
 
-    public static String[] relationEntries() {
+    public static Set<String> relationEntries() {
         return relationEntries;
+    }
+
+    private final static Set<String> carrierEditions =  Sets.newHashSet(
+            "hasPrintEdition",
+            "hasOnlineEdition",
+            "hasBrailleEdition",
+            "hasCDEdition",
+            "hasDVDEdition",
+            "hasMicroformEdition",
+            "hasDigitizedEdition"
+    );
+
+    public static Set<String> carrierEditions() {
+        return carrierEditions;
     }
 
     private SetMultimap<String, Manifestation> newRelatedManifestations() {
@@ -638,11 +674,20 @@ public class Manifestation extends MapBasedAnyObject
     }
 
     @Override
+    public boolean equals(Object other) {
+        return toString().equals(other.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
+
+    @Override
     public int compareTo(Manifestation m) {
         return externalID.compareTo(m.externalID());
     }
     private final static IDComparator idComparator = new IDComparator();
-
 
     private static class IDComparator implements Comparator<Manifestation> {
 

@@ -5,6 +5,21 @@ import java.util.regex.Pattern;
 
 /**
  * ISO 15707: International Standard Musical Work Code (ISWC)
+ *
+ * International Standard Musical Work Code (ISWC) is a unique identifier for
+ * musical works, similar to ISBN.
+ *
+ * Its primary purpose is in collecting society administration, and to clearly identify works in
+ * legal contracts. It would also be useful in library cataloging.
+ *
+ * Due to the fact that a musical work can have multiple authors, it is inevitable that,
+ * on rare occasions, a duplicate ISWC might exist and might not be detected immediately.
+ *
+ * Because of the existing business practices among collecting societies, it is not possible
+ * to simply declare an ISWC as obsolete. In such cases, as soon as they are identified,
+ * the system will deal with duplicate registrations by linking such registration records
+ * in the ISWC database.
+ *
  */
 public class ISWC implements Comparable<ISWC>, StandardNumber {
 

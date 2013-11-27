@@ -1,9 +1,7 @@
 package org.xbib.elasticsearch.tools.aggregate.zdb.entities;
 
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Multiset;
 import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Sets;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 
@@ -34,6 +32,7 @@ public class Cluster extends TreeSet<Manifestation> {
     }
 
     public List<Set<Manifestation>> chronoStreams(TreeSet<Manifestation> set) {
+        logger.info("input to chronostreaming {}", set);
         LinkedList<Manifestation> manifestations = newLinkedList(set);
         List<Set<Manifestation>> chronoStreams = newLinkedList();
         while (!manifestations.isEmpty()) {
@@ -47,8 +46,9 @@ public class Cluster extends TreeSet<Manifestation> {
 
             //chronoStreams.add(children);
             // by country
-            // TODO sort countries, put most important on top
-            chronoStreams.addAll(splitIntoCountrySegments(children));
+            List<Set<Manifestation>> countries = splitIntoCountrySegments(children);
+            logger.info("after chronostreaming {} ---> {}: {}", manifestation, children, countries);
+            chronoStreams.addAll(countries);
 
             // neighborhood
             makeNeighborStreams(manifestation, children);
@@ -60,8 +60,30 @@ public class Cluster extends TreeSet<Manifestation> {
         return chronoStreams;
     }
 
+    public Integer findFirstDate(Collection<Manifestation> manifestations) {
+        // search for manifestatation of first publication date
+        Manifestation m1 = manifestations.iterator().next();
+        for (Manifestation m : manifestations) {
+            if (m.firstDate() < m1.firstDate()) {
+                m1 = m;
+            }
+        }
+        return m1.firstDate();
+    }
+
+    public Integer findLastDate(Collection<Manifestation> manifestations) {
+        // search for manifestatation of first publication date
+        Manifestation m1 = manifestations.iterator().next();
+        for (Manifestation m : manifestations) {
+            if (m.lastDate() > m1.lastDate()) {
+                m1 = m;
+            }
+        }
+        return m1.lastDate();
+    }
+
     private void makeChronoStream(Manifestation manifestation, TreeSet<Manifestation> result)  {
-        Set<Manifestation> set = newHashSet();
+        Set<Manifestation> set = newTreeSet();
         set.addAll(manifestation.getRelatedManifestations().get("precededBy"));
         set.addAll(manifestation.getRelatedManifestations().get("succeededBy"));
         set.removeAll(result);
@@ -76,12 +98,15 @@ public class Cluster extends TreeSet<Manifestation> {
                 ImmutableSetMultimap.copyOf(manifestation.getRelatedManifestations());
         Set<String> keys = neighbors.keySet();
         for (String relation : keys) {
-            Set<Manifestation> relatedNeighbors = neighbors.get(relation);
-            for (Manifestation neighbor : relatedNeighbors) {
-                TreeSet<Manifestation> children = newTreeSet(chronoComparator);
-                children.add(neighbor);
-                makeChronoStream(neighbor, children);
-                result.addAll(children);
+            // only "has" relations
+            if (relation.startsWith("has")) {
+                Set<Manifestation> relatedNeighbors = neighbors.get(relation);
+                for (Manifestation neighbor : relatedNeighbors) {
+                    TreeSet<Manifestation> children = newTreeSet(chronoComparator);
+                    children.add(neighbor);
+                    makeChronoStream(neighbor, children);
+                    result.addAll(children);
+                }
             }
         }
     }
@@ -135,16 +160,21 @@ public class Cluster extends TreeSet<Manifestation> {
                     .append(m2.id())
                     .toString();
 
+            if ("31203".equals(m1.id()) || "31203".equals(m2.id())) {
+                logger.info("compare {} {} {} {}", m1, s1, m2, s2);
+            }
+
             return s2.compareTo(s1);
         }
     }
 
-    private final static Integer findCarrierTypeKey(Manifestation m) {
+    private static Integer findCarrierTypeKey(Manifestation m) {
         switch (m.carrierType()) {
             case "volume": return 1;
             case "online resource" : return 2;
-            case "microform" : return 3;
-            case "other" : return 4;
+            case "computer disc" : return 3;
+            case "microform" : return 4;
+            case "other" : return 5;
             default: throw new IllegalArgumentException("unknown carrier: " + m.carrierType() + " in " + m.externalID());
         }
     }
@@ -174,12 +204,10 @@ public class Cluster extends TreeSet<Manifestation> {
             }
 
             Integer d1 = f1.firstDate() == null ? currentYear : f1.firstDate();
-            Integer c1 = "volume".equals(f1.carrierType()) ? 1 :
-                    "online resource".equals(f1.carrierType()) ? 2 : 3;
+            Integer c1 = findCarrierTypeKey(f1);
 
             Integer d2 = f2.firstDate() == null ? currentYear : f2.firstDate();
-            Integer c2 = "volume".equals(f2.carrierType()) ? 1 :
-                    "online resource".equals(f2.carrierType()) ? 2 : 3;
+            Integer c2 = findCarrierTypeKey(f2);
 
             String s1 = new StringBuilder()
                     .append(Integer.toString(d1))
@@ -205,10 +233,8 @@ public class Cluster extends TreeSet<Manifestation> {
             if (m1 == m2) {
                 return 0;
             }
-            Integer i1 = "volume".equals(m1.carrierType()) ? 3 :
-                    "online resource".equals(m1.carrierType()) ? 2 : 1;
-            Integer i2 = "volume".equals(m2.carrierType()) ? 3 :
-                    "online resource".equals(m2.carrierType()) ? 2 : 1;
+            Integer i1 = findCarrierTypeKey(m1);
+            Integer i2 = findCarrierTypeKey(m2);
             return i1.compareTo(i2);
         }
     }

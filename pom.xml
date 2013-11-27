@@ -606,6 +606,7 @@
         <module>common/io</module>
         <module>common/dict</module>
         <module>common/graph</module>
+        <module>common/stream</module>
 
         <module>search/grouping</module>
         <module>search/standardnumber</module>

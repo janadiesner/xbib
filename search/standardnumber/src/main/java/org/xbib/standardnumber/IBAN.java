@@ -7,9 +7,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *  International Bank Account Number (IBAN)
+ *  ISO 13616 International Bank Account Number (IBAN)
  *
- *  ISO 13616:2007
+ * The International Bank Account Number (IBAN) is an internationally agreed means of
+ * identifying bank accounts across national borders with a reduced risk of transcription
+ * errors. It was originally adopted by the European Committee for Banking Standards (ECBS)
+ * and later as an international standard under ISO 13616:1997. The current standard
+ * is ISO 13616:2007, which indicates SWIFT as the formal registrar.
  *
  *  Checksum in accordance to ISO 7064 MOD-97
  */

@@ -4,6 +4,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Library of Congress Call Number
+ *
+ * Bib-1 Use Attribute 16
+ *
  * An LCCN is an identifier assigned by the Library of Congress for a metadata record
  * (e.g., bibliographic record, authority record).
  *
@@ -58,6 +62,8 @@ import java.util.regex.Pattern;
  *  " 79139101 /AC/r932" normalizes to "79139101"
  *
  *  @see <a href="http://www.loc.gov/marc/lccn-namespace.html#syntax">LCCN</a>
+ *
+ *  @see <a href="http://www.loc.gov/z3950/agency/defns/bib1.html">Z39.50 BIB-1 LCCN</a>
  */
 public class LCCN implements Comparable<LCCN>, StandardNumber {
 

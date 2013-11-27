@@ -6,7 +6,31 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * ISO 15706: International Standard Audiovisual Number (ISAN)
+ * ISO 15706 International Standard Audiovisual Number (ISAN)
+ *
+ * The International Standard Audiovisual Number (ISAN) is a unique identifier for
+ * audiovisual works and related versions, similar to ISBN for books.
+ *
+ * It was developed within an ISO (International Organisation for Standardisation) TC46/SC9
+ * working group. ISAN is managed and run by ISAN-IA.
+ *
+ * The ISAN standard (ISO standard 15706:2002 & ISO 15706-2) is recommended or required
+ * as the audiovisual identifier of choice for producers, studios, broadcasters,
+ * Internet media providers and video games publishers who need to encode, track, and
+ * distribute video in a variety of formats.
+ *
+ * It provides a unique, internationally recognized and permanent reference number for each
+ * audiovisual work and related versions registered in the ISAN system.
+ *
+ * ISAN identifies works throughout their entire life cycle from conception, to production,
+ * to distribution and consumption.
+ *
+ * ISANs can be incorporated in both digital and physical media, such as theatrical
+ * release prints, DVDs, publications, advertising, marketing materials and packaging,
+ * as well as licensing contracts to uniquely identify works.
+ *
+ * The ISAN identifier is incorporated in many draft and final standards such as
+ * AACS, DCI, MPEG, DVB, and ATSC.
  */
 public class ISAN implements Comparable<ISAN>, StandardNumber {
 
@@ -17,6 +41,8 @@ public class ISAN implements Comparable<ISAN>, StandardNumber {
     private String formatted;
 
     private boolean versioned;
+
+    private boolean createChecksum;
 
     @Override
     public int compareTo(ISAN isan) {
@@ -31,7 +57,6 @@ public class ISAN implements Comparable<ISAN>, StandardNumber {
 
     @Override
     public ISAN checksum() {
-        // TODO
         return this;
     }
 
