@@ -103,12 +103,6 @@ public interface MarcXchangeListener {
     void endDataField(Field field);
 
     /**
-     * Before the record end
-     * @param trailer information about the trailer
-     */
-    void trailer(String trailer);
-
-    /**
      * End of a record
      */
     void endRecord();

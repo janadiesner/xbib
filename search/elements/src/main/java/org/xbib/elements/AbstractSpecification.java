@@ -137,7 +137,7 @@ public abstract class AbstractSpecification {
                     String clazzName = getPackageFromPath(path + format) + key;
                     Class clazz = loadClass(cl, clazzName);
                     if (clazz == null) {
-                        // custom class name
+                        // custom class name, try without package
                         clazz = loadClass(cl, key);
                     }
                     if (clazz != null) {
@@ -253,6 +253,9 @@ public abstract class AbstractSpecification {
 
     public void dump(String format, Writer writer) throws IOException {
         Map<String,Object> m = map().get(format);
+        if (m == null) {
+            throw new IOException("format "+ format + " missing");
+        }
         elements = new TreeMap();
         dump(null, m);
         ObjectMapper mapper = new ObjectMapper();

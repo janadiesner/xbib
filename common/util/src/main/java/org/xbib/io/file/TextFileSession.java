@@ -31,6 +31,10 @@
  */
 package org.xbib.io.file;
 
+import org.xbib.io.Session;
+import org.xbib.io.StreamCodecService;
+import org.xbib.io.StringPacket;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -40,10 +44,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
-
-import org.xbib.io.Session;
-import org.xbib.io.StreamCodecService;
-import org.xbib.io.StringPacket;
 
 /**
  * A File session
@@ -94,7 +94,7 @@ public class TextFileSession<P extends StringPacket> implements Session<P> {
                 }
                 if (filename.endsWith(".gz")) {
                     FileInputStream in = new FileInputStream(file);
-                    this.reader =  new InputStreamReader(factory.getCodec("gz").decode(in), encoding);
+                    this.reader = new InputStreamReader(factory.getCodec("gz").decode(in), encoding);
                     this.isOpen = true;
                 } else if (filename.endsWith(".bz2")) {
                     FileInputStream in = new FileInputStream(file);
@@ -127,9 +127,9 @@ public class TextFileSession<P extends StringPacket> implements Session<P> {
                     this.writer = new OutputStreamWriter(factory.getCodec("bz2").encode(out), encoding);
                     this.isOpen = true;
                 } else if (filename.endsWith(".xz")) {
-                        FileInputStream in = new FileInputStream(file);
-                        this.reader = new InputStreamReader(factory.getCodec("xz").decode(in), encoding);
-                        this.isOpen = true;
+                    FileInputStream in = new FileInputStream(file);
+                    this.reader = new InputStreamReader(factory.getCodec("xz").decode(in), encoding);
+                    this.isOpen = true;
                 } else {
                     FileOutputStream out = new FileOutputStream(file);
                     this.writer = new OutputStreamWriter(out, encoding);
@@ -181,13 +181,13 @@ public class TextFileSession<P extends StringPacket> implements Session<P> {
     }
 
     public P newPacket() {
-        return (P)new StringPacket();
+        return (P) new StringPacket();
     }
 
     public P read() throws IOException {
         char[] ch = new char[1024];
         reader.read(ch);
-        return (P)new StringPacket().packet(new String(ch));
+        return (P) new StringPacket().packet(new String(ch));
     }
 
     public void write(P packet) throws IOException {

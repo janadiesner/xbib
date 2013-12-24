@@ -10,7 +10,7 @@ import org.xbib.stream.exceptions.StreamStopSignal;
  *
  * @param <E1> the type of elements in the input stream
  * @param <E2> the type of elements in the output stream
- * @see Stream
+ * @see {@link Stream}
  */
 public interface Generator<E1, E2> {
 

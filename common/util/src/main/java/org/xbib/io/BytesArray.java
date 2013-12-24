@@ -48,11 +48,11 @@ public class BytesArray implements BytesReference {
     public BytesArray(String bytes) {
         this(toBytes(bytes));
     }
-    
+
     private static byte[] toBytes(String bytes) {
         try {
-        return bytes.getBytes("UTF-8");
-        } catch(UnsupportedEncodingException e) {
+            return bytes.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
             return null;
         }
     }
@@ -69,17 +69,17 @@ public class BytesArray implements BytesReference {
         this.length = length;
     }
 
-    
+
     public byte get(int index) {
         return bytes[offset + index];
     }
 
-    
+
     public int length() {
         return length;
     }
 
-    
+
     public BytesReference slice(int from, int length) {
         if (from < 0 || (from + length) > this.length) {
             throw new IllegalArgumentException("can't slice a buffer with length [" + this.length + "], with slice parameters from [" + from + "], length [" + length + "]");
@@ -87,17 +87,17 @@ public class BytesArray implements BytesReference {
         return new BytesArray(bytes, offset + from, length);
     }
 
-    
+
     public StreamInput streamInput() {
         return new BytesStreamInput(bytes, offset, length, false);
     }
 
-    
+
     public void writeTo(OutputStream os) throws IOException {
         os.write(bytes, offset, length);
     }
 
-    
+
     public byte[] toBytes() {
         if (offset == 0 && bytes.length == length) {
             return bytes;
@@ -105,32 +105,32 @@ public class BytesArray implements BytesReference {
         return Arrays.copyOfRange(bytes, offset, offset + length);
     }
 
-    
+
     public BytesArray toBytesArray() {
         return this;
     }
 
-    
+
     public BytesArray copyBytesArray() {
         return new BytesArray(Arrays.copyOfRange(bytes, offset, offset + length));
     }
 
-    
+
     public boolean hasArray() {
         return true;
     }
 
-    
+
     public byte[] array() {
         return bytes;
     }
 
-    
+
     public int arrayOffset() {
         return offset;
     }
 
-    
+
     public String toUtf8() {
         if (length == 0) {
             return "";
@@ -142,7 +142,7 @@ public class BytesArray implements BytesReference {
         }
     }
 
-    
+
     public boolean equals(Object obj) {
         return bytesEquals((BytesArray) obj);
     }
@@ -163,7 +163,7 @@ public class BytesArray implements BytesReference {
         }
     }
 
-    
+
     public int hashCode() {
         int result = 0;
         final int end = offset + length;
@@ -262,6 +262,7 @@ public class BytesArray implements BytesReference {
     }
 
     public static final boolean JRE_IS_64BIT;
+
     static {
         String OS_ARCH = System.getProperty("os.arch");
         String x = System.getProperty("sun.arch.data.model");

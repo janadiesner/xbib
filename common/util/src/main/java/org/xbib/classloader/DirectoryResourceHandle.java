@@ -16,12 +16,12 @@
  */
 package org.xbib.classloader;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URL;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.cert.Certificate;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;

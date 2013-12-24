@@ -33,10 +33,11 @@ package org.xbib.analyzer.dublincore;
 
 import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.ElementBuilderFactory;
-import org.xbib.elements.BasicElementMapper;
+import org.xbib.elements.AbstractElementMapper;
+import org.xbib.elements.KeyValuePipeline;
 
 public class DublinCoreElementMapper
-        extends BasicElementMapper<String, String, DublinCoreElement, DublinCoreContext> {
+        extends AbstractElementMapper<String, String, DublinCoreElement, DublinCoreContext> {
 
     public DublinCoreElementMapper(String format) {
         super("/org/xbib/analyzer/", format, new DublinCoreSpecification());
@@ -56,5 +57,10 @@ public class DublinCoreElementMapper
             }
         });
         return this;
+    }
+
+    @Override
+    protected KeyValuePipeline createPipeline(int i) {
+        return new KeyValuePipeline(i, specification, queue, map, factory);
     }
 }

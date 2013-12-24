@@ -1,7 +1,8 @@
 package org.xbib.stream.handlers;
 
 /**
- * A partial implementation for {@link org.xbib.stream.handlers.FaultHandler} that count failures and keep track of the last observed failure.
+ * A partial implementation for {@link org.xbib.stream.handlers.FaultHandler}
+ * that count failures and keep track of the last observed failure.
  */
 public abstract class CountingHandler implements FaultHandler {
 
@@ -18,8 +19,8 @@ public abstract class CountingHandler implements FaultHandler {
     /**
      * Indicates whether iteration should continue or stop the iteration on the occurrence of an iteration failure.
      *
-     * @param failure      the failure
-     * @param lastFailure  the failure observed previously, or <code>null</code> if this is the first observed failure
+     * @param failure the failure
+     * @param lastFailure the failure observed previously, or <code>null</code> if this is the first observed failure
      * @param failureCount the number of failures counted so far, <code>0</code> if this is the first observed failure
      * @throws RuntimeException if no element can be yielded from the input element
      */

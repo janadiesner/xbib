@@ -46,11 +46,10 @@ import java.util.Queue;
 
 /**
  * An in-memory buffer that provides OutputStream and InputStream interfaces.
- *
+ * <p/>
  * This is more efficient than using ByteArrayOutputStream/ByteArrayInputStream
- *
+ * <p/>
  * This implementation usese LinkedList and is not thread safe.
- *
  */
 public class ChunkedStream implements Appendable {
 

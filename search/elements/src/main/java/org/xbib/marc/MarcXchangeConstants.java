@@ -73,8 +73,6 @@ public interface MarcXchangeConstants {
 
     String MARC21_NS_URI = "http://www.loc.gov/MARC21/slim";
 
-    String MARC21_NS_PREFIX = "marc";
-
     String MARC21_SCHEMA = "http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd";
     
 }

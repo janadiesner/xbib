@@ -36,7 +36,6 @@ import java.io.OutputStream;
 /**
  * Interface used by output streams that wrap other output streams, so that the
  * underlying output stream can be retrieved.
- *
  */
 public interface OutputStreamWrapper {
 

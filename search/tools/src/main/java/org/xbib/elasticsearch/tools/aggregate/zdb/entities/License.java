@@ -31,17 +31,25 @@
  */
 package org.xbib.elasticsearch.tools.aggregate.zdb.entities;
 
-import org.xbib.date.DateUtil;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Maps.newHashMap;
+
 public class License extends Holding {
+
+    private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
+
+    protected String servicetype;
+
+    protected String servicemode;
+
+    protected String servicedistribution;
 
     public License(Map<String, Object> m) {
         super(m);
@@ -70,14 +78,14 @@ public class License extends Holding {
     }
 
     protected List<Integer> buildDateArray() {
-        List<Integer> dates = new ArrayList();
+        List<Integer> dates = newLinkedList();
         String firstDate = getString("ezb:license_period.ezb:first_date");
         int first;
         int last;
         if (firstDate != null) {
             first = Integer.parseInt(firstDate);
             String lastDate = getString("ezb:license_period.ezb:last_date");
-            last = lastDate == null ? DateUtil.getYear() : Integer.parseInt(lastDate);
+            last = lastDate == null ? currentYear : Integer.parseInt(lastDate);
             if (first > 0 && last > 0) {
                 for (int d = first; d <= last; d++) {
                     dates.add(d);
@@ -89,7 +97,7 @@ public class License extends Holding {
             Matcher m = movingWallPattern.matcher(movingWall);
             if (m.matches()) {
                 int delta = Integer.parseInt(m.group(1));
-                last = DateUtil.getYear();
+                last = currentYear;
                 first = last - delta;
                 if ("+".startsWith(movingWall)) {
                     for (int d = first; d <= last; d++) {
@@ -108,68 +116,90 @@ public class License extends Holding {
     private final static Pattern movingWallPattern = Pattern.compile("^[+-](\\d+)Y$");
 
     private Map<String, Object> buildInfo() {
-        Map<String, Object> m = new LinkedHashMap();
+        Map<String, Object> m = newHashMap();
 
-        // location, marcorg, region not present...
-
-        Map<String, Object> service = new LinkedHashMap();
+        Map<String, Object> service = newHashMap();
         service.put("organization", getString("ezb:isil") );
-        /*
-                        case "n" : return "nein";
-                        case "l" : return "ja, Leihe und Kopie";
-                        case "k" : return "ja, nur Kopie";
-                        case "e" : return "ja, auch elektronischer Versand an Nutzer";
-                        case "ln" : return "ja, Leihe und Kopie (nur Inland)";
-                        case "kn" : return "ja, nur Kopie (nur Inland)";
-                        case "en" : return "ja, auch elektronischer Versand an Nutzer (nur Inland)";
-
-         */
-        String servicemode = getString("ezb:ill_relevance.ezb:ill_code");
-        if (servicemode != null) {
-            switch(servicemode) {
+        String s = getString("ezb:ill_relevance.ezb:ill_code");
+        if (s != null) {
+            switch(s) {
+                case "n":
                 case "nein":
                 {
-                    service.put("servicetype", "none");
+                    servicetype = "none";
+                    servicemode = "none";
+                    servicedistribution = "none";
                     break;
                 }
+                case "l":
                 case "ja, Leihe und Kopie":
+                {
+                    servicetype = "interlibraryloan";
+                    servicemode = "copy-loan";
+                    servicedistribution = "transmission";
+                    break;
+                }
                 case "ja, Leihe und Kopie (nur Inland)":
                 {
-                    service.put("servicetype", "interlibraryloan");
-                    service.put("servicemode", "copy-loan");
+                    servicetype = "interlibraryloan";
+                    servicemode = "copy-loan";
+                    servicedistribution = "transmission-domestic-only";
                     break;
                 }
+                case "k":
                 case "ja, nur Kopie":
+                {
+                    servicetype = "interlibraryloan";
+                    servicemode = "copy";
+                    servicedistribution = "transmission";
+                    break;
+                }
+                case "kn":
                 case "ja, nur Kopie (nur Inland)":
                 {
-                    service.put("servicetype", "interlibraryloan");
-                    service.put("servicemode", "copy");
+                    servicetype = "interlibraryloan";
+                    servicemode = "copy";
+                    servicedistribution = "transmission-domestic-only";
                     break;
                 }
+                case "e":
                 case "ja, auch elektronischer Versand an Nutzer":
+                {
+                    servicetype = "interlibraryloan";
+                    servicemode = "copy";
+                    servicedistribution = "electronic";
+                    break;
+                }
+                case "en":
                 case "ja, auch elektronischer Versand an Nutzer (nur Inland)":
                 {
-                    service.put("servicetype", "interlibraryloan");
-                    service.put("servicemode", "copy-electronic");
+                    servicetype = "interlibraryloan";
+                    servicemode = "copy";
+                    servicedistribution = "electronic-domestic-only";
                     break;
                 }
             }
         }
-        String s = getString("ezb:ill_relevance.ezb:inland_only");
-        String t = getString("ezb:ill_relevance.ezb:il_electronic_forbidden");
-        if ("true".equals(s) && "true".equals(t)) {
-            service.put("servicedistribution", Arrays.asList("n", "p"));
-        } else if ("true".equals(s)) {
-            service.put("servicedistribution", "n");
-        } else if ("true".equals(t)) {
-            service.put("servicedistribution", "p");
+
+        String q = getString("ezb:ill_relevance.ezb:inland_only");
+        String r = getString("ezb:ill_relevance.ezb:il_electronic_forbidden");
+        if ("true".equals(q) && "true".equals(r)) {
+            servicedistribution = "postal-domestic-only";
+        } else if ("true".equals(q)) {
+            servicedistribution = "domestic-only";
+        } else if ("true".equals(r)) {
+            servicedistribution = "postal";
         }
         service.put("servicecomment", getString("ezb:ill_relevance.ezb:comment"));
+
+        service.put("servicetype", servicetype);
+        service.put("servicemode", servicemode);
+        service.put("servicedistribution", servicedistribution);
         m.put("service", service);
 
         // no textualholdings
 
-        Map<String, Object> holdings = new LinkedHashMap();
+        Map<String, Object> holdings = newHashMap();
         holdings.put("firstvolume", getString("ezb:license_period.ezb:first_volume"));
         holdings.put("firstdate", getString("ezb:license_period.ezb:first_date"));
         holdings.put("lastvolume", getString("ezb:license_period.ezb:last_volume"));
@@ -180,12 +210,12 @@ public class License extends Holding {
         holdings.put("available", avail);
         m.put("holdings", holdings);
 
-        Map<String, Object> link = new LinkedHashMap();
+        Map<String, Object> link = newHashMap();
         link.put("uri", map().get("ezb:reference_url"));
         link.put("nonpublicnote", "Verlagsangebot"); // ZDB = "Volltext"
         m.put("links", Arrays.asList(link));
 
-        Map<String, Object> license = new LinkedHashMap();
+        Map<String, Object> license = newHashMap();
         license.put("type", map().get("ezb:type_id"));
         license.put("licensetype", map().get("ezb:license_type_id"));
         license.put("pricetype", map().get("ezb:price_type_id"));
@@ -195,4 +225,20 @@ public class License extends Holding {
         return m;
     }
 
+    protected Character findCarrierTypeKey() {
+        switch (carrierType) {
+            case "online resource" : return servicedistribution.startsWith("postal") ? '3' : '1';
+            case "volume": return '2';
+            case "computer disc" : return '4';
+            case "computer tape cassette" : return '4';
+            case "computer chip cartridge" : return '4';
+            case "microform" : return '5';
+            case "other" : return '6';
+            default: throw new IllegalArgumentException("unknown carrier: " + carrierType());
+        }
+    }
+
+    public String getRoutingKey() {
+        return String.valueOf(findRegionKey()) + findCarrierTypeKey();
+    }
 }

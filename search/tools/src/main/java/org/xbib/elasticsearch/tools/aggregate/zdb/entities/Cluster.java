@@ -1,9 +1,38 @@
+/*
+ * Licensed to Jörg Prante and xbib under one or more contributor
+ * license agreements. See the NOTICE.txt file distributed with this work
+ * for additional information regarding copyright ownership.
+ *
+ * Copyright (C) 2012 Jörg Prante and xbib
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, see http://www.gnu.org/licenses
+ * or write to the Free Software Foundation, Inc., 51 Franklin Street,
+ * Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * The interactive user interfaces in modified source and object code
+ * versions of this program must display Appropriate Legal Notices,
+ * as required under Section 5 of the GNU Affero General Public License.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public
+ * License, these Appropriate Legal Notices must retain the display of the
+ * "Powered by xbib" logo. If the display of the logo is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Powered by xbib".
+ */
 package org.xbib.elasticsearch.tools.aggregate.zdb.entities;
 
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -16,104 +45,71 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static com.google.common.collect.Lists.newLinkedList;
-import static com.google.common.collect.Sets.newHashSet;
 import static com.google.common.collect.Sets.newTreeSet;
 
 public class Cluster extends TreeSet<Manifestation> {
-
-    private final static Logger logger = LoggerFactory.getLogger(Cluster.class.getName());
 
     public Cluster(Collection<Manifestation> c) {
         super(c);
     }
 
-    public List<Set<Manifestation>> chronoStreams() {
-        return chronoStreams(this);
+    public List<TimeLine> timeLines() {
+        return timeLines(this);
     }
 
-    public List<Set<Manifestation>> chronoStreams(TreeSet<Manifestation> set) {
-        logger.info("input to chronostreaming {}", set);
+    public List<TimeLine> timeLines(TreeSet<Manifestation> set) {
         LinkedList<Manifestation> manifestations = newLinkedList(set);
-        List<Set<Manifestation>> chronoStreams = newLinkedList();
+        List<TimeLine> timeLines = newLinkedList();
         while (!manifestations.isEmpty()) {
             Manifestation manifestation = manifestations.removeFirst();
-            logger.info("chronostreaming {}", manifestation.externalID());
-
-            // chronological
-            TreeSet<Manifestation> children = newTreeSet(chronoComparator);
+            TreeSet<Manifestation> children = newTreeSet(TIME_COMPARATOR);
             children.add(manifestation);
-            makeChronoStream(manifestation, children);
-
-            //chronoStreams.add(children);
-            // by country
-            List<Set<Manifestation>> countries = splitIntoCountrySegments(children);
-            logger.info("after chronostreaming {} ---> {}: {}", manifestation, children, countries);
-            chronoStreams.addAll(countries);
-
-            // neighborhood
-            makeNeighborStreams(manifestation, children);
-
+            // make a time line
+            makeTimeLine(manifestation, children);
+            // split time line by country
+            List<TimeLine> countries = splitIntoCountrySegments(new TimeLine(children));
+            timeLines.addAll(countries);
+            // find neighborhood
+            makeNeighborTimeLines(manifestation, children);
             manifestations.removeAll(children);
         }
         // sort by first publication date
-        Collections.sort(chronoStreams, chronoStreamComparator);
-        return chronoStreams;
+        Collections.sort(timeLines, TIME_LINE_COMPARATOR);
+        return timeLines;
     }
 
-    public Integer findFirstDate(Collection<Manifestation> manifestations) {
-        // search for manifestatation of first publication date
-        Manifestation m1 = manifestations.iterator().next();
-        for (Manifestation m : manifestations) {
-            if (m.firstDate() < m1.firstDate()) {
-                m1 = m;
-            }
-        }
-        return m1.firstDate();
-    }
-
-    public Integer findLastDate(Collection<Manifestation> manifestations) {
-        // search for manifestatation of first publication date
-        Manifestation m1 = manifestations.iterator().next();
-        for (Manifestation m : manifestations) {
-            if (m.lastDate() > m1.lastDate()) {
-                m1 = m;
-            }
-        }
-        return m1.lastDate();
-    }
-
-    private void makeChronoStream(Manifestation manifestation, TreeSet<Manifestation> result)  {
+    private void makeTimeLine(Manifestation manifestation, TreeSet<Manifestation> result)  {
         Set<Manifestation> set = newTreeSet();
         set.addAll(manifestation.getRelatedManifestations().get("precededBy"));
         set.addAll(manifestation.getRelatedManifestations().get("succeededBy"));
         set.removeAll(result);
         result.addAll(set);
         for (Manifestation m : set) {
-            makeChronoStream(m, result);
+            makeTimeLine(m, result);
         }
     }
 
-    private void makeNeighborStreams(Manifestation manifestation, TreeSet<Manifestation> result) {
+    private void makeNeighborTimeLines(Manifestation manifestation, TreeSet<Manifestation> result) {
         SetMultimap<String,Manifestation> neighbors =
                 ImmutableSetMultimap.copyOf(manifestation.getRelatedManifestations());
         Set<String> keys = neighbors.keySet();
         for (String relation : keys) {
-            // only "has" relations
+            // check all "has" relations and make time lines of them
             if (relation.startsWith("has")) {
                 Set<Manifestation> relatedNeighbors = neighbors.get(relation);
                 for (Manifestation neighbor : relatedNeighbors) {
-                    TreeSet<Manifestation> children = newTreeSet(chronoComparator);
+                    TreeSet<Manifestation> children = newTreeSet(TIME_COMPARATOR);
                     children.add(neighbor);
-                    makeChronoStream(neighbor, children);
+                    makeTimeLine(neighbor, children);
                     result.addAll(children);
                 }
             }
         }
     }
 
-    private List<Set<Manifestation>> splitIntoCountrySegments(TreeSet<Manifestation> manifestations) {
-        List<Set<Manifestation>> countrySegments = newLinkedList();
-        Set<Manifestation> countrySegment = newTreeSet(chronoComparator);
+    private List<TimeLine> splitIntoCountrySegments(TimeLine manifestations) {
+        List<TimeLine> countrySegments = newLinkedList();
+        Set<Manifestation> countrySegment = newTreeSet(TIME_COMPARATOR);
         Iterator<Manifestation> it = manifestations.iterator();
         Manifestation m = it.next();
         countrySegment.add(m);
@@ -122,18 +118,20 @@ public class Cluster extends TreeSet<Manifestation> {
             m = it.next();
             if (!country.equals(m.country().toString())) {
                 country = m.country().toString();
-                countrySegments.add(countrySegment);
-                countrySegment = newTreeSet(chronoComparator);
+                countrySegments.add(new TimeLine(countrySegment,
+                        manifestations.getFirstDate(), manifestations.getLastDate()));
+                countrySegment = newTreeSet(TIME_COMPARATOR);
             }
             countrySegment.add(m);
         }
-        countrySegments.add(countrySegment);
+        countrySegments.add(new TimeLine(countrySegment,
+                manifestations.getFirstDate(), manifestations.getLastDate()));
         return countrySegments;
     }
 
     private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 
-    private final static class ChronoComparator implements Comparator<Manifestation> {
+    private final static class TimeComparator implements Comparator<Manifestation> {
 
         @Override
         public int compare(Manifestation m1, Manifestation m2) {
@@ -160,46 +158,53 @@ public class Cluster extends TreeSet<Manifestation> {
                     .append(m2.id())
                     .toString();
 
-            if ("31203".equals(m1.id()) || "31203".equals(m2.id())) {
-                logger.info("compare {} {} {} {}", m1, s1, m2, s2);
-            }
-
             return s2.compareTo(s1);
         }
     }
 
     private static Integer findCarrierTypeKey(Manifestation m) {
         switch (m.carrierType()) {
-            case "volume": return 1;
             case "online resource" : return 2;
-            case "computer disc" : return 3;
-            case "microform" : return 4;
-            case "other" : return 5;
+            case "volume": return 1;
+            case "computer disc" : return 4;
+            case "computer tape cassette" : return 4;
+            case "computer chip cartridge" : return 4;
+            case "microform" : return 5;
+            case "multicolored" : return 6;
+            case "other" : return 6;
             default: throw new IllegalArgumentException("unknown carrier: " + m.carrierType() + " in " + m.externalID());
         }
     }
 
-    private final static ChronoComparator chronoComparator = new ChronoComparator();
+    private final static TimeComparator TIME_COMPARATOR = new TimeComparator();
 
-
-    private final static class ChronoStreamComparator implements Comparator<Set<Manifestation>> {
+    private final static class TimeLineComparator implements Comparator<Set<Manifestation>> {
 
         @Override
         public int compare(Set<Manifestation> set1, Set<Manifestation> set2) {
             if (set1 == set2) {
                 return 0;
             }
-            // search for manifestatation of first publication date
             Manifestation f1 = set1.iterator().next();
+            if (f1 == null || f1.firstDate() == null) {
+                return -1;
+            }
             for (Manifestation m : set1) {
-                if (m.firstDate() < f1.firstDate()) {
-                    f1 = m;
+                if (m != null && m.firstDate() != null) {
+                    if (m.firstDate() < f1.firstDate()) {
+                        f1 = m;
+                    }
                 }
             }
             Manifestation f2 = set2.iterator().next();
+            if (f2 == null || f2.firstDate() == null) {
+                return 1;
+            }
             for (Manifestation m : set2) {
-                if (m.firstDate() < f2.firstDate()) {
-                    f2 = m;
+                if (m != null && m.firstDate() != null) {
+                    if (m.firstDate() < f2.firstDate()) {
+                        f2 = m;
+                    }
                 }
             }
 
@@ -225,20 +230,6 @@ public class Cluster extends TreeSet<Manifestation> {
         }
     }
 
-    private final static ChronoStreamComparator chronoStreamComparator = new ChronoStreamComparator();
-
-    private final static class CarrierComparator implements Comparator<Manifestation> {
-        @Override
-        public int compare(Manifestation m1, Manifestation m2) {
-            if (m1 == m2) {
-                return 0;
-            }
-            Integer i1 = findCarrierTypeKey(m1);
-            Integer i2 = findCarrierTypeKey(m2);
-            return i1.compareTo(i2);
-        }
-    }
-
-    private final static CarrierComparator carrierComparator = new CarrierComparator();
+    private final static TimeLineComparator TIME_LINE_COMPARATOR = new TimeLineComparator();
 
 }

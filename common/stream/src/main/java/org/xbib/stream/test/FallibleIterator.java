@@ -12,9 +12,11 @@ import java.util.List;
  */
 public class FallibleIterator<E> implements Iterator<E> {
 
-    final List<? extends Object> elements;
-    final Class<E> clazz;
-    int index;
+    private final List<? extends Object> elements;
+
+    private final Class<E> clazz;
+
+    private int index;
 
     /**
      * Creates an instance with a given type of the elements and given actual elements.

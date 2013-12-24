@@ -6,18 +6,14 @@ import org.xbib.stream.Stream;
  * A {@link org.xbib.stream.generators.Filter} that changes the elements of the input {@link Stream}.
  *
  * @param <E> the type of input elements
- * @author Fabio Simeoni
  */
 public abstract class Processor<E> extends Filter<E, E> {
 
     @Override
     public final E yield(E element) {
-
         process(element);
         return element;
     }
-
-    ;
 
     /**
      * Processes an element of a {@link Stream}.

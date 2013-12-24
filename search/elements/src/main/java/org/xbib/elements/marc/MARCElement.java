@@ -34,8 +34,6 @@ package org.xbib.elements.marc;
 import java.util.Map;
 import org.xbib.elements.Element;
 import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.bibliographic.BibliographicProperties;
-import org.xbib.elements.bibliographic.ExtraBibliographicProperties;
 import org.xbib.analyzer.dublincore.DublinCoreProperties;
 import org.xbib.analyzer.dublincore.DublinCoreTerms;
 import org.xbib.analyzer.dublincore.DublinCoreTermsProperties;
@@ -55,8 +53,6 @@ public abstract class MARCElement
         DublinCoreProperties,
         DublinCoreTerms,
         DublinCoreTermsProperties,
-        BibliographicProperties,
-        ExtraBibliographicProperties,
         MarcXchangeConstants {
 
     protected static final Logger logger = LoggerFactory.getLogger(MARCElement.class.getName());

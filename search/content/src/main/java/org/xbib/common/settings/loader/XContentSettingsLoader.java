@@ -25,6 +25,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
 import org.xbib.common.xcontent.XContentFactory;
 import org.xbib.common.xcontent.XContentParser;
 import org.xbib.common.xcontent.XContentType;

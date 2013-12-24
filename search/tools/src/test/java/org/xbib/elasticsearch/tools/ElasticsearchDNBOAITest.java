@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import org.testng.annotations.Test;
-import org.xbib.date.DateUtil;
+import org.xbib.util.DateUtil;
 import org.xbib.elasticsearch.support.client.MockIngestClient;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;

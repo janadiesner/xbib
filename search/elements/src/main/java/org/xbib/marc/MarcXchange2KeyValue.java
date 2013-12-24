@@ -90,13 +90,6 @@ public class MarcXchange2KeyValue implements
     }
 
     @Override
-    public void end(Object trailer) {
-        for (KeyValueStreamListener<FieldCollection, String> listener : listeners) {
-            listener.end(trailer);
-        }
-    }
-
-    @Override
     public void beginRecord(String format, String type) {
         begin();
         keyValue(FieldCollection.FORMAT_KEY, format);
@@ -111,11 +104,6 @@ public class MarcXchange2KeyValue implements
     @Override
     public void leader(String label) {
         keyValue(FieldCollection.LEADER_KEY, label);
-    }
-
-    @Override
-    public void trailer(String trailer) {
-        end(trailer);
     }
 
     @Override

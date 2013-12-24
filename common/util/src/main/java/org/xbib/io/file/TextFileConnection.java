@@ -31,16 +31,16 @@
  */
 package org.xbib.io.file;
 
+import org.xbib.io.Connection;
+import org.xbib.io.Session;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import org.xbib.io.Connection;
-import org.xbib.io.Session;
 
 /**
  * File connection
- *
  */
 public class TextFileConnection implements Connection<TextFileSession> {
 

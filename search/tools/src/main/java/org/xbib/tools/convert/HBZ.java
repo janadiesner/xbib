@@ -31,19 +31,20 @@
  */
 package org.xbib.tools.convert;
 
-import org.xbib.elements.ElementOutput;
+import org.xbib.elements.CountableElementOutput;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilder;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilderFactory;
 import org.xbib.elements.marc.dialects.mab.MABElementMapper;
-import org.xbib.importer.AbstractImporter;
-import org.xbib.importer.ImportService;
-import org.xbib.importer.Importer;
-import org.xbib.importer.ImporterFactory;
+import org.xbib.pipeline.AbstractPipeline;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.pipeline.SimplePipelineExecutor;
+import org.xbib.pipeline.Pipeline;
 import org.xbib.io.file.Finder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.dialects.MarcXmlTarReader;
+import org.xbib.pipeline.element.CounterElement;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
@@ -65,15 +66,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * Converter tool for Hochschulbibliothekszentrum (HBZ) MAB data in MarcXml TAR clobs
  *
  */
-public final class HBZ extends AbstractImporter<Long, AtomicLong> {
+public final class HBZ extends AbstractPipeline<CounterElement> {
 
     private final static Logger logger = LoggerFactory.getLogger(HBZ.class.getSimpleName());
 
     private final static String lf = System.getProperty("line.separator");
 
-    private final static AtomicLong fileCounter = new AtomicLong(0L);
-
-    private final static AtomicLong outputCounter = new AtomicLong(0L);
+    private final static CounterElement fileCounter = new CounterElement().set(new AtomicLong(0L));
 
     private static Queue<URI> input;
 
@@ -128,17 +127,20 @@ public final class HBZ extends AbstractImporter<Long, AtomicLong> {
 
             long t0 = System.currentTimeMillis();
 
-            ImportService service = new ImportService().threads(threads).factory(
-                    new ImporterFactory() {
+            SimplePipelineExecutor service = new SimplePipelineExecutor()
+                    .concurrency(threads)
+                    .provider(new PipelineProvider() {
                         @Override
-                        public Importer newImporter() {
+                        public Pipeline get() {
                             return new HBZ();
                         }
-                    }).execute();
+                    })
+                    .execute()
+                    .waitFor();
 
             long t1 = System.currentTimeMillis();
 
-            long docs = outputCounter.get();
+            long docs = out.getCounter();
             logger.info("Indexing complete. {} files, {} docs, {} ms",
                     fileCounter,
                     docs,
@@ -181,7 +183,7 @@ public final class HBZ extends AbstractImporter<Long, AtomicLong> {
     }
 
     @Override
-    public AtomicLong next() {
+    public CounterElement next() {
         final URI uri = input.poll();
         done = uri == null;
         if (done) {
@@ -213,7 +215,7 @@ public final class HBZ extends AbstractImporter<Long, AtomicLong> {
                 unknownKeys.addAll(mapper.unknownKeys());
             }
             mapper.close();
-            fileCounter.incrementAndGet();
+            fileCounter.get().incrementAndGet();
         } catch (Exception ex) {
             logger.error("error while reading document: " + ex.getMessage(), ex);
             done = true;
@@ -224,20 +226,13 @@ public final class HBZ extends AbstractImporter<Long, AtomicLong> {
     final MABElementBuilderFactory buildFactory = new MABElementBuilderFactory() {
         public MABElementBuilder newBuilder() {
             return new MABElementBuilder()
-                    .addOutput(new OurElementOutput());
+                    .addOutput(out);
         }
     };
 
-    final class OurElementOutput implements ElementOutput<ResourceContext,Resource> {
+    private final static OurElementOutput out = new OurElementOutput();
 
-        @Override
-        public boolean enabled() {
-            return true;
-        }
-
-        @Override
-        public void enabled(boolean enabled) {
-        }
+    private final static class OurElementOutput extends CountableElementOutput<ResourceContext,Resource> {
 
         @Override
         public void output(ResourceContext context, ContentBuilder contentBuilder) throws IOException {
@@ -246,7 +241,8 @@ public final class HBZ extends AbstractImporter<Long, AtomicLong> {
                     try {
                         StringWriter sw = new StringWriter();
                         new TurtleWriter().output(sw).write(context.resource());
-                        logger.info(sw.toString());
+                        counter.incrementAndGet();
+                        //logger.info(sw.toString());
                     } catch (IOException ex) {
                         logger.error(ex.getMessage(), ex);
                     }
@@ -256,10 +252,6 @@ public final class HBZ extends AbstractImporter<Long, AtomicLong> {
             }
         }
 
-        @Override
-        public long getCounter() {
-            return outputCounter.get();
-        }
     }
 
 }

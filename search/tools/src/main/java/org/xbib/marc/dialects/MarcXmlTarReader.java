@@ -35,9 +35,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -49,7 +49,8 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.xbib.importer.AbstractImporter;
+import org.xbib.marc.MarcXchangeConstants;
+import org.xbib.pipeline.AbstractPipeline;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
 import org.xbib.io.Packet;
@@ -59,10 +60,11 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.pipeline.element.CounterElement;
 import org.xbib.util.Strings;
 
-public class MarcXmlTarReader<P extends Packet> extends AbstractImporter<Object, P>
-        implements MarcXchangeListener, Iterator<P> {
+public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<CounterElement>
+        implements MarcXchangeConstants, MarcXchangeListener {
 
     private final Logger logger = LoggerFactory.getLogger(MarcXmlTarReader.class.getName());
 
@@ -70,7 +72,9 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractImporter<Object,
 
     private URI uri;
 
-    private Iterator<Integer> iterator;
+    private Iterator<Long> iterator;
+
+    private CounterElement counter = new CounterElement().set(new AtomicLong(0L));
 
     private Connection<TarSession> connection;
 
@@ -96,7 +100,7 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractImporter<Object,
         return this;
     }
 
-    public MarcXmlTarReader setIterator(Iterator<Integer> iterator) {
+    public MarcXmlTarReader setIterator(Iterator<Long> iterator) {
         this.iterator = iterator;
         return this;
     }
@@ -124,13 +128,6 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractImporter<Object,
     public void leader(String label) {
         if (listener != null) {
             listener.leader(label);
-        }
-    }
-
-    @Override
-    public void trailer(String trailer) {
-        if (listener != null) {
-            listener.trailer(trailer);
         }
     }
 
@@ -187,7 +184,7 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractImporter<Object,
     }
 
     @Override
-    public P next() {
+    public CounterElement next() {
         return nextRead();
     }
 
@@ -229,7 +226,7 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractImporter<Object,
         }
     }
 
-    private P nextRead() {
+    private CounterElement nextRead() {
         if (clob == null || clob.length() == 0) {
             // special case, message length 0 means deletion
             return null;
@@ -246,12 +243,11 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractImporter<Object,
                     xmlReader.nextEvent();
                 }
             }
-            trailer(clob);
         } catch (XMLStreamException e) {
             logger.error(e.getMessage(), e);
         }
         prepared = false;
-        return packet;
+        return counter;
     }
 
     private void processEvent(Stack<Field> stack, XMLEvent event) {
@@ -271,40 +267,40 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractImporter<Object,
                 String attributeLocalName = attributeName.getLocalPart();
                 String attributeValue = attr.getValue();
                 switch (attributeLocalName) {
-                    case "tag":
+                    case TAG:
                         tag = attributeValue;
                         break;
-                    case "ind1":
+                    case IND + "1":
                         ind1 = attributeValue.charAt(0);
                         if (ind1 == '-') {
                             ind1 = ' '; // replace illegal '-' symbols
                         }
                         break;
-                    case "ind2":
+                    case IND + "2":
                         ind2 = attributeValue.charAt(0);
                         if (ind2 == '-') {
                             ind2 = ' '; // replace illegal '-' symbols
                         }
                         break;
-                    case "code":
+                    case CODE:
                         code = attributeValue.charAt(0);
                         break;
-                    case "format":
+                    case FORMAT:
                         format = attributeValue;
                         break;
-                    case "type":
+                    case TYPE:
                         type = attributeValue;
                         break;
                 }
             }
             switch (localName) {
-                case "subfield":
+                case SUBFIELD:
                     Field f = stack.peek();
                     Field subfield = new Field(f.tag(), f.indicator(), Character.toString(code));
                     stack.push(subfield);
                     beginSubField(subfield);
                     break;
-                case "datafield": {
+                case DATAFIELD: {
                     Field field = ind2 != '\u0000'
                             ? new Field(tag, Character.toString(ind1) + Character.toString(ind2))
                             : new Field(tag, Character.toString(ind1));
@@ -312,13 +308,13 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractImporter<Object,
                     beginDataField(field);
                     break;
                 }
-                case "controlfield": {
+                case CONTROLFIELD: {
                     Field field = new Field(tag);
                     stack.push(field);
                     beginControlField(field);
                     break;
                 }
-                case "record":
+                case RECORD:
                     if (!inRecord) {
                         beginRecord(format != null ? format : "AlephPublish", type);
                         inRecord = true;
@@ -334,22 +330,22 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractImporter<Object,
             EndElement element = (EndElement) event;
             String localName = element.getName().getLocalPart();
             switch (localName) {
-                case "subfield":
+                case SUBFIELD:
                     stack.peek().data(sb.toString());
                     endSubField(stack.pop());
                     break;
-                case "datafield":
+                case DATAFIELD:
                     // can't have data
                     endDataField(stack.pop());
                     break;
-                case "controlfield":
+                case CONTROLFIELD:
                     stack.peek().data(sb.toString());
                     endControlField(stack.pop());
                     break;
-                case "leader":
+                case LEADER:
                     leader(sb.toString());
                     break;
-                case "record":
+                case RECORD:
                     if (inRecord) {
                         endRecord();
                         inRecord = false;
@@ -397,7 +393,7 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractImporter<Object,
      *  Read packet, optionally check if iterator gives enough numbers
      *  (assuming iterator counts from 1)
      *
-     * @param session
+     * @param session session
      * @return
      * @throws IOException
      */

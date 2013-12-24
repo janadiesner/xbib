@@ -94,12 +94,12 @@ public class KeyValuePipeline<K,V,E extends Element,C extends ResourceContext>
 
     public Boolean call() {
         try {
-            logger.info("key/value pipeline {} starting", getClass().getName());
+            logger.debug("key/value pipeline {} starting", getClass().getName());
             while(true) {
                 List<KeyValue> e = queue.take();
                 // poison element? then quit
                 if (e.isEmpty()) {
-                    logger.info("key/value pipeline ending {}", getClass());
+                    logger.debug("key/value pipeline ending {}", getClass());
                     break;
                 }
                 // only a single marker element in list? then skip
@@ -116,7 +116,7 @@ public class KeyValuePipeline<K,V,E extends Element,C extends ResourceContext>
                     K key = kv.key();
                     V value = kv.value();
                     if (key == null) {
-                        builder.end(value);
+                        builder.end();
                         end = true;
                     } else {
                         build(key, value);

@@ -51,10 +51,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
-import org.xbib.importer.AbstractImporter;
-import org.xbib.importer.ImportService;
-import org.xbib.importer.Importer;
-import org.xbib.importer.ImporterFactory;
+
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.pipeline.AbstractPipeline;
+import org.xbib.pipeline.SimplePipelineExecutor;
+import org.xbib.pipeline.Pipeline;
 import org.xbib.io.progress.BytesProgressWatcher;
 import org.xbib.io.InputService;
 import org.xbib.io.progress.ProgressMonitoredOutputStream;
@@ -68,16 +69,17 @@ import org.xbib.marc.MarcXchangeAdapter;
 import org.xbib.marc.dialects.AlephSequentialReader;
 import org.xbib.options.OptionParser;
 import org.xbib.options.OptionSet;
+import org.xbib.pipeline.element.CounterElement;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
-public class AlephSeq2MarcXML extends AbstractImporter<Long, AtomicLong> {
+public class AlephSeq2MarcXML extends AbstractPipeline<CounterElement> {
 
     private final static Logger logger = LoggerFactory.getLogger(AlephSeq2MarcXML.class.getName());
 
-    private final static AtomicLong fileCounter = new AtomicLong(0L);
+    private final static CounterElement fileCounter = new CounterElement().set(new AtomicLong(0L));
 
     private final int BUFFER_SIZE = 8192;
 
@@ -140,7 +142,7 @@ public class AlephSeq2MarcXML extends AbstractImporter<Long, AtomicLong> {
             final List<Integer> enable = (List<Integer>) options.valuesOf("enable");
             final String linkformat = (String) options.valueOf("linkformat");
             final Long splitsize = (Long) options.valueOf("splitsize");
-            fileCounter.set((Long) options.valueOf("counter"));
+            fileCounter.get().set((Long) options.valueOf("counter"));
             final Integer threads = (Integer) options.valueOf("threads");
 
             System.err.println("AlephSeq2MarcXML running with the following parameters");
@@ -153,14 +155,19 @@ public class AlephSeq2MarcXML extends AbstractImporter<Long, AtomicLong> {
             System.err.println("enable = " + enable + " ");
             System.err.println("linkformat (for MARC 956) = " + linkformat + " (default:\"http://index.hbz-nrw.de/query/services/document/xhtml/hbz/title/%s\")");
 
-            ImportService service = new ImportService().threads(threads).factory(
-                    new ImporterFactory() {
+            SimplePipelineExecutor service = new SimplePipelineExecutor()
+                    .concurrency(threads)
+                    .provider(new PipelineProvider() {
 
                         @Override
-                        public Importer newImporter() {
+                        public Pipeline get() {
                             return new AlephSeq2MarcXML().setInput(input).setEnable(enable).setLinkPattern(linkformat).setSplitSize(splitsize);
                         }
-                    }).execute();
+                    })
+                    .prepare()
+                    .execute()
+                    .waitFor();
+            service.shutdown();
         } catch (IOException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
             System.exit(1);
@@ -210,7 +217,7 @@ public class AlephSeq2MarcXML extends AbstractImporter<Long, AtomicLong> {
     }
 
     @Override
-    public AtomicLong next() {
+    public CounterElement next() {
         URI uri = input.isEmpty() ? null : input.poll();
         done = uri == null;
         if (done) {
@@ -252,10 +259,6 @@ public class AlephSeq2MarcXML extends AbstractImporter<Long, AtomicLong> {
                                 }
                             }
                         }
-                    }
-
-                    @Override
-                    public void trailer(String trailer) {
                         if (watcher.getBytesTransferred() > splitsize) {
                             try {
                                 reader.getAdapter().endCollection();
@@ -268,6 +271,7 @@ public class AlephSeq2MarcXML extends AbstractImporter<Long, AtomicLong> {
                             }
                         }
                     }
+
                 });
                 reader.setProperty(Iso2709Reader.SCHEMA, "marc21");
                 reader.setProperty(Iso2709Reader.FORMAT, "Marc21");
@@ -298,7 +302,7 @@ public class AlephSeq2MarcXML extends AbstractImporter<Long, AtomicLong> {
         if (!dir.isDirectory() && !dir.canWrite()) {
             throw new IOException("unable to write to directory " + output);
         }
-        String filename = dir + File.separator + basename + "_" + fileCounter.getAndIncrement() + ".xml";
+        String filename = dir + File.separator + basename + "_" + fileCounter.get().getAndIncrement() + ".xml";
         OutputStream out = new ProgressMonitoredOutputStream(new FileOutputStream(filename), watcher);
         return new OutputStreamWriter(out, OUTPUT_ENCODING);
     }

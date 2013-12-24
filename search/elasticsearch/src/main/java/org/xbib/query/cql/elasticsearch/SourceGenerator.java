@@ -31,9 +31,10 @@
  */
 package org.xbib.query.cql.elasticsearch;
 
+import org.xbib.common.xcontent.XContentBuilder;
+import org.xbib.common.xcontent.XContentFactory;
+
 import java.io.IOException;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 
 public class SourceGenerator {
 

@@ -45,11 +45,13 @@
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>woodstox-core-asl</artifactId>
         </dependency>
+        <!--
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <type>jar</type>
         </dependency>
+        -->
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>

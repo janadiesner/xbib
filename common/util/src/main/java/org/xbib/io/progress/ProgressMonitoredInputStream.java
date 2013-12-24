@@ -50,11 +50,11 @@ public class ProgressMonitoredInputStream extends InputStream implements InputSt
      * notification messages to a progress watcher when bytes are read from the
      * stream.
      *
-     * @param inputStream the input stream to wrap, whose byte transfer count
-     * will be monitored.
+     * @param inputStream     the input stream to wrap, whose byte transfer count
+     *                        will be monitored.
      * @param progressWatcher a watcher object that stores information about the
-     * bytes read from a stream, and allows calculations to be perfomed using
-     * this information.
+     *                        bytes read from a stream, and allows calculations to be perfomed using
+     *                        this information.
      */
     public ProgressMonitoredInputStream(InputStream inputStream, BytesProgressWatcher progressWatcher) {
         if (inputStream == null) {

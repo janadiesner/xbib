@@ -38,6 +38,7 @@ import java.io.StreamTokenizer;
 public class CSVTokenizer extends StreamTokenizer {
 
     public static final int TT_DELIMITER = -5;
+
     public static final int TT_QUOTED = -6;
     private char delimChar;
 

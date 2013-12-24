@@ -35,10 +35,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
-import org.xbib.elements.ElementOutput;
-import org.xbib.importer.ImportService;
-import org.xbib.importer.Importer;
-import org.xbib.importer.ImporterFactory;
+import org.xbib.elements.CountableElementOutput;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.pipeline.SimplePipelineExecutor;
+import org.xbib.pipeline.Pipeline;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;
@@ -51,27 +51,11 @@ public class AlephXmlMABTest {
     private static final Logger logger = LoggerFactory.getLogger(AlephXmlMABTest.class.getName());
 
     public void testAlephXML() throws InterruptedException, ExecutionException {
-        final ElementOutput<MABContext,Resource> output = new ElementOutput<MABContext,Resource>() {
-
-            long counter;
-
-            @Override
-            public boolean enabled() {
-                return true;
-            }
-            @Override
-            public void enabled(boolean enabled) {
-
-            }
+        final CountableElementOutput<MABContext,Resource> output = new CountableElementOutput<MABContext,Resource>() {
             @Override
             public void output(MABContext context, ContentBuilder contentBuilder) throws IOException {
                 logger.info("resource size = {}", context.resource().size());
-                counter++;
-            }
-
-            @Override
-            public long getCounter() {
-                return counter;
+                counter.incrementAndGet();
             }
         };
 
@@ -83,16 +67,19 @@ public class AlephXmlMABTest {
         final MABElementMapper mapper = new MABElementMapper("mab/hbz/dialect")
                 .start(builderFactory);
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
-        final ImporterFactory factory = new ImporterFactory() {
+        final PipelineProvider provider = new PipelineProvider() {
 
             @Override
-            public Importer newImporter() {
+            public Pipeline get() {
                 return new MarcXmlTarReader()
                         .setURI(URI.create("tarbz2:src/test/resources/20120805_20120806"))
                         .setListener(kv);
             }
         };
-        new ImportService().threads(1).factory(factory).execute();
+        new SimplePipelineExecutor()
+                .concurrency(1)
+                .provider(provider)
+                .execute();
         mapper.close();
     }
 

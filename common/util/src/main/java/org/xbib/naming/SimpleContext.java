@@ -31,9 +31,6 @@
  */
 package org.xbib.naming;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Properties;
 import javax.naming.Binding;
 import javax.naming.CompositeName;
 import javax.naming.CompoundName;
@@ -48,19 +45,27 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.NotContextException;
 import javax.naming.OperationNotSupportedException;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Properties;
 
 /**
  * A simple context that implements a flat context in memory.
- *
  */
 public class SimpleContext implements Context {
-    /** the name parser is a flat name parser */
+    /**
+     * the name parser is a flat name parser
+     */
     private static NameParser myParser = new FlatNameParser();
 
-    /** the bindings are stored in a hashtable */
+    /**
+     * the bindings are stored in a hashtable
+     */
     private Hashtable bindings = new Hashtable(11);
 
-    /** the environment is a hash table */
+    /**
+     * the environment is a hash table
+     */
     private Hashtable myEnv;
 
     /**
@@ -77,13 +82,11 @@ public class SimpleContext implements Context {
      *
      * @param propName
      * @param propVal
-     *
      * @return the old object
-     *
      * @throws NamingException
      */
     public Object addToEnvironment(String propName, Object propVal)
-        throws NamingException {
+            throws NamingException {
         if (myEnv == null) {
             this.myEnv = new Hashtable();
         }
@@ -96,10 +99,9 @@ public class SimpleContext implements Context {
      * details.
      *
      * @param name the name to bind; may not be empty
-     * @param obj the object to bind; possibly null
-     *
-     * @throws NamingException if a naming exception is encountered
-     * @throws InvalidNameException DOCUMENT ME!
+     * @param obj  the object to bind; possibly null
+     * @throws NamingException           if a naming exception is encountered
+     * @throws InvalidNameException      DOCUMENT ME!
      * @throws NameAlreadyBoundException DOCUMENT ME!
      */
     public void bind(String name, Object obj) throws NamingException {
@@ -120,8 +122,7 @@ public class SimpleContext implements Context {
      * name) must already exist.
      *
      * @param name the name to bind; may not be empty
-     * @param obj the object to bind; possibly null
-     *
+     * @param obj  the object to bind; possibly null
      * @throws NamingException if a naming exception is encountered
      */
     public void bind(Name name, Object obj) throws NamingException {
@@ -144,13 +145,11 @@ public class SimpleContext implements Context {
      *
      * @param name
      * @param prefix
-     *
      * @return the composed name
-     *
      * @throws NamingException
      */
     public String composeName(String name, String prefix)
-        throws NamingException {
+            throws NamingException {
         Name result = composeName(new CompositeName(name), new CompositeName(prefix));
 
         return result.toString();
@@ -161,9 +160,7 @@ public class SimpleContext implements Context {
      *
      * @param name
      * @param prefix
-     *
      * @return the composed name
-     *
      * @throws NamingException
      */
     public Name composeName(Name name, Name prefix) throws NamingException {
@@ -178,9 +175,7 @@ public class SimpleContext implements Context {
      * Create subcontext
      *
      * @param name
-     *
      * @return the context
-     *
      * @throws NamingException
      * @throws OperationNotSupportedException DOCUMENT ME!
      */
@@ -192,9 +187,7 @@ public class SimpleContext implements Context {
      * Create subcontext
      *
      * @param name
-     *
      * @return the context
-     *
      * @throws NamingException
      */
     public Context createSubcontext(Name name) throws NamingException {
@@ -206,7 +199,6 @@ public class SimpleContext implements Context {
      * Destroy subcontext
      *
      * @param name
-     *
      * @throws NamingException
      * @throws OperationNotSupportedException
      */
@@ -218,7 +210,6 @@ public class SimpleContext implements Context {
      * Destroy subcontext
      *
      * @param name
-     *
      * @throws NamingException
      */
     public void destroySubcontext(Name name) throws NamingException {
@@ -230,7 +221,6 @@ public class SimpleContext implements Context {
      * Get environment
      *
      * @return the environment hash table
-     *
      * @throws NamingException
      */
     public Hashtable getEnvironment() throws NamingException {
@@ -245,7 +235,6 @@ public class SimpleContext implements Context {
      * Get name in namespace
      *
      * @return the name
-     *
      * @throws NamingException
      */
     public String getNameInNamespace() throws NamingException {
@@ -256,9 +245,7 @@ public class SimpleContext implements Context {
      * Get name parser
      *
      * @param name
-     *
      * @return the name parser
-     *
      * @throws NamingException
      */
     public NameParser getNameParser(String name) throws NamingException {
@@ -269,9 +256,7 @@ public class SimpleContext implements Context {
      * Get name parser
      *
      * @param name
-     *
      * @return the name parser
-     *
      * @throws NamingException
      */
     public NameParser getNameParser(Name name) throws NamingException {
@@ -283,9 +268,7 @@ public class SimpleContext implements Context {
      * List a name
      *
      * @param name
-     *
      * @return the naming enumeration
-     *
      * @throws NamingException
      * @throws NotContextException
      */
@@ -306,9 +289,7 @@ public class SimpleContext implements Context {
      * List a name
      *
      * @param name
-     *
      * @return the naming enumeration
-     *
      * @throws NamingException
      */
     public NamingEnumeration list(Name name) throws NamingException {
@@ -320,14 +301,12 @@ public class SimpleContext implements Context {
      * List bindings
      *
      * @param name
-     *
      * @return the naming enumeration
-     *
      * @throws NamingException
      * @throws NotContextException
      */
     public NamingEnumeration listBindings(String name)
-        throws NamingException {
+            throws NamingException {
         if (name.equals("")) {
             // listing this context
             return new FlatBindings(bindings.keys());
@@ -344,9 +323,7 @@ public class SimpleContext implements Context {
      * List bindings
      *
      * @param name
-     *
      * @return the naming enumeration
-     *
      * @throws NamingException
      */
     public NamingEnumeration listBindings(Name name) throws NamingException {
@@ -358,9 +335,7 @@ public class SimpleContext implements Context {
      * Retrieves the named object. See lookup(Name) for details.
      *
      * @param name the name of the object to look up
-     *
      * @return the object bound to <code>name</code>
-     *
      * @throws NamingException
      * @throws NameNotFoundException
      */
@@ -384,9 +359,7 @@ public class SimpleContext implements Context {
      * may be accessed concurrently).</p>
      *
      * @param name the name of the object to look up
-     *
      * @return the object bound to <code>name</code>
-     *
      * @throws NamingException if a naming exception is encountered
      */
     public Object lookup(Name name) throws NamingException {
@@ -398,9 +371,7 @@ public class SimpleContext implements Context {
      * Lookup link
      *
      * @param name
-     *
      * @return the object
-     *
      * @throws NamingException
      */
     public Object lookupLink(String name) throws NamingException {
@@ -412,9 +383,7 @@ public class SimpleContext implements Context {
      * Lookup link
      *
      * @param name
-     *
      * @return the object
-     *
      * @throws NamingException
      */
     public Object lookupLink(Name name) throws NamingException {
@@ -426,9 +395,8 @@ public class SimpleContext implements Context {
      * Rebind a name to an object.
      *
      * @param name the name to rebind
-     * @param obj the object to rebind
-     *
-     * @throws NamingException if a naming exception is encountered
+     * @param obj  the object to rebind
+     * @throws NamingException      if a naming exception is encountered
      * @throws InvalidNameException
      */
     public void rebind(String name, Object obj) throws NamingException {
@@ -444,7 +412,6 @@ public class SimpleContext implements Context {
      *
      * @param name
      * @param obj
-     *
      * @throws NamingException
      */
     public void rebind(Name name, Object obj) throws NamingException {
@@ -456,13 +423,11 @@ public class SimpleContext implements Context {
      * Remove from environment
      *
      * @param propName
-     *
      * @return the object removed
-     *
      * @throws NamingException
      */
     public Object removeFromEnvironment(String propName)
-        throws NamingException {
+            throws NamingException {
         if (myEnv == null) {
             return null;
         }
@@ -475,14 +440,13 @@ public class SimpleContext implements Context {
      *
      * @param oldname
      * @param newname
-     *
      * @throws NamingException
-     * @throws InvalidNameException 
-     * @throws NameAlreadyBoundException 
-     * @throws NameNotFoundException 
+     * @throws InvalidNameException
+     * @throws NameAlreadyBoundException
+     * @throws NameNotFoundException
      */
     public void rename(String oldname, String newname)
-        throws NamingException {
+            throws NamingException {
         if (oldname.equals("") || newname.equals("")) {
             throw new InvalidNameException("Cannot rename empty name");
         }
@@ -507,7 +471,6 @@ public class SimpleContext implements Context {
      *
      * @param oldname
      * @param newname
-     *
      * @throws NamingException
      */
     public void rename(Name oldname, Name newname) throws NamingException {
@@ -519,7 +482,6 @@ public class SimpleContext implements Context {
      * Unbind object
      *
      * @param name
-     *
      * @throws NamingException
      * @throws InvalidNameException
      */
@@ -535,7 +497,6 @@ public class SimpleContext implements Context {
      * Unbind object
      *
      * @param name
-     *
      * @throws NamingException
      */
     public void unbind(Name name) throws NamingException {
@@ -568,7 +529,6 @@ public class SimpleContext implements Context {
          * Test if there are more elements
          *
          * @return true if there are more elements
-         *
          * @throws NamingException
          */
         public boolean hasMore() throws NamingException {
@@ -588,7 +548,6 @@ public class SimpleContext implements Context {
          * Return next element
          *
          * @return the element
-         *
          * @throws NamingException
          */
         public Object next() throws NamingException {
@@ -611,7 +570,9 @@ public class SimpleContext implements Context {
      * Class for flat name parsing
      */
     private static class FlatNameParser implements NameParser {
-        /** syntax properties */
+        /**
+         * syntax properties
+         */
         private static Properties syntax = new Properties();
 
         static {
@@ -623,9 +584,7 @@ public class SimpleContext implements Context {
          * Parse name
          *
          * @param name the name to parse
-         *
          * @return the parsed name object
-         *
          * @throws NamingException if name can't be parsed
          */
         public Name parse(String name) throws NamingException {
@@ -658,7 +617,6 @@ public class SimpleContext implements Context {
          * Alias for hasMoreElements
          *
          * @return true if there are more elements
-         *
          * @throws NamingException
          */
         public boolean hasMore() throws NamingException {
@@ -678,7 +636,6 @@ public class SimpleContext implements Context {
          * Alias for next element
          *
          * @return next element
-         *
          * @throws NamingException
          */
         public Object next() throws NamingException {

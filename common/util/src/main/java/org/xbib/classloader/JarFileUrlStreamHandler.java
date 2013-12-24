@@ -53,6 +53,7 @@ public class JarFileUrlStreamHandler extends URLStreamHandler {
         handler.setExpectedUrl(url);
         return url;
     }
+
     private URL expectedUrl;
     private final JarFile jarFile;
     private final JarEntry jarEntry;

@@ -32,16 +32,19 @@
 package org.xbib.elasticsearch.tools.aggregate;
 
 import org.elasticsearch.search.SearchHit;
+import org.xbib.pipeline.element.Element;
 
-public class WrappedSearchHit {
+public class WrappedSearchHit implements Element<SearchHit> {
 
-    private final SearchHit hit;
+    private SearchHit hit;
 
-    public WrappedSearchHit(SearchHit hit) {
+    public WrappedSearchHit set(SearchHit hit) {
         this.hit = hit;
+        return this;
     }
 
-    public SearchHit hit() {
+    public SearchHit get() {
         return hit;
     }
+
 }

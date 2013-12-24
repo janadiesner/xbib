@@ -39,7 +39,8 @@ import java.util.Map;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.common.xcontent.XContentBuilder;
+
+import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.elasticsearch.action.search.support.BasicRequest;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -47,7 +48,8 @@ import org.xbib.query.cql.CQLParser;
 import org.xbib.query.cql.elasticsearch.ESFilterGenerator;
 import org.xbib.query.cql.elasticsearch.ESQueryGenerator;
 
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
+import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
+
 
 /**
  * Common Query Language request for Elasticsearch
@@ -306,6 +308,9 @@ public class CQLSearchRequest extends BasicRequest {
 
     public CQLSearchResponse executeGet(Logger queryLogger) throws IOException {
         CQLSearchResponse response = new CQLSearchResponse();
+        if (getRequestBuilder() == null) {
+            return response;
+        }
         long t0 = System.currentTimeMillis();
         response.setGetResponse(getRequestBuilder().execute().actionGet());
         long t1 = System.currentTimeMillis();

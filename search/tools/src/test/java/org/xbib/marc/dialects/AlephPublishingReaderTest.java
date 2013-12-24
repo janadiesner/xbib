@@ -35,17 +35,17 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ResourceBundle;
 
+import org.xbib.elements.CountableElementOutput;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilder;
 import org.xbib.elements.marc.dialects.mab.MABContext;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilderFactory;
 import org.xbib.elements.marc.dialects.mab.MABElementMapper;
-import org.xbib.elements.ElementOutput;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.xcontent.ContentBuilder;
-import org.xbib.util.AtomicIntegerIterator;
+import org.xbib.util.IntervalIterator;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;
@@ -56,27 +56,11 @@ public class AlephPublishingReaderTest {
 
     public void testAleph2MarcXChange() throws IOException {
 
-        final ElementOutput<MABContext,Resource> output = new ElementOutput<MABContext,Resource>() {
-            long counter;
-
-            @Override
-            public void enabled(boolean enabled) {
-            }
-            
-            @Override
-            public boolean enabled() {
-                return true;
-            }
-
+        final CountableElementOutput<MABContext,Resource> output = new CountableElementOutput<MABContext,Resource>() {
             @Override
             public void output(MABContext context, ContentBuilder contentBuilder) throws IOException{
                 logger.info("MAB context resource = {}", context.resource());
-                counter++;
-            }
-
-            @Override
-            public long getCounter() {
-                return counter;
+                counter.incrementAndGet();
             }
         };
         final MABElementBuilderFactory builderFactory = new MABElementBuilderFactory() {
@@ -110,18 +94,16 @@ public class AlephPublishingReaderTest {
         Integer from = Integer.parseInt(bundle.getString("from"));
         Integer to = Integer.parseInt(bundle.getString("to"));
 
-        AlephPublishingReader reader = new AlephPublishingReader()
+        try (AlephPublishingReader reader = new AlephPublishingReader()
                 .setListener(kv)
-                .setIterator(new AtomicIntegerIterator(from, to))
+                .setIterator(new IntervalIterator(from, to))
                 .setLibrary(library)
                 .setSetName(setName)
-                .setURI(URI.create(uriStr));
-        try {
+                .setURI(URI.create(uriStr))) {
             while (reader.hasNext()) {
                 logger.info(reader.next().toString());
             }
         } finally {
-            reader.close();
             mapper.close();
         }
     }

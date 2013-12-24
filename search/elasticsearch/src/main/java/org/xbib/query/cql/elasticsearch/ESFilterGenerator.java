@@ -31,8 +31,8 @@
  */
 package org.xbib.query.cql.elasticsearch;
 
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.xbib.date.DateUtil;
+import org.xbib.common.xcontent.XContentBuilder;
+import org.xbib.util.DateUtil;
 import org.xbib.query.cql.BooleanGroup;
 import org.xbib.query.cql.BooleanOperator;
 import org.xbib.query.cql.Comparitor;
@@ -53,7 +53,6 @@ import org.xbib.query.cql.SyntaxException;
 import org.xbib.query.cql.Term;
 import org.xbib.query.cql.Visitor;
 import org.xbib.query.cql.elasticsearch.model.Facet;
-import org.xbib.query.cql.elasticsearch.model.Filter;
 import org.xbib.query.cql.elasticsearch.model.QueryModel;
 
 import java.io.IOException;

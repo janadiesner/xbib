@@ -60,8 +60,6 @@ public class MacsOAI {
 
     private final static Logger logger = LoggerFactory.getLogger(MacsOAI.class.getName());
 
-    private static OptionSet options;
-
     private OAIClient client;
 
     private final static AtomicLong counter = new AtomicLong(0L);
@@ -84,7 +82,7 @@ public class MacsOAI {
                     accepts("output").withOptionalArg().ofType(String.class).defaultsTo("macs.xml");
                 }
             };
-            options = parser.parse(args);
+            OptionSet options = parser.parse(args);
 
             String server = (String) options.valueOf("server");
             String prefix = (String) options.valueOf("prefix");

@@ -31,12 +31,11 @@
  */
 package org.xbib.elements.marc.dialects.pica;
 
-import org.xbib.elements.BasicElementMapper;
+import org.xbib.elements.AbstractElementMapper;
 import org.xbib.elements.KeyValuePipeline;
 import org.xbib.marc.FieldCollection;
 
-public class PicaElementMapper
-        extends BasicElementMapper<FieldCollection, String, PicaElement, PicaContext> {
+public class PicaElementMapper extends AbstractElementMapper<FieldCollection, String, PicaElement, PicaContext> {
 
     public PicaElementMapper(String format) {
         super("/org/xbib/analyzer/", format, new PicaSpecification());
@@ -53,11 +52,11 @@ public class PicaElementMapper
     }
 
     public PicaElementMapper start() {
-        super.start(new PicaBuilderFactory());
+        super.start(new PicaElementBuilderFactory());
         return this;
     }
 
-    public PicaElementMapper start(PicaBuilderFactory factory) {
+    public PicaElementMapper start(PicaElementBuilderFactory factory) {
         super.start(factory);
         return this;
     }

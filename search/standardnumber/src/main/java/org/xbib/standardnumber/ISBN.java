@@ -42,13 +42,11 @@ import java.util.regex.Pattern;
  */
 public class ISBN implements Comparable<ISBN>, StandardNumber {
 
-    private static final Pattern PATTERN = Pattern.compile("[\\p{Digit}xX\\-]+");
+    private static final Pattern PATTERN = Pattern.compile("[\\p{Digit}xX\\-]{10,17}");
 
     private static final List<String> ranges = new ISBNRangeMessageConfigurator().getRanges();
 
     private String value;
-
-    private String formatted;
 
     private boolean createWithChecksum;
 
@@ -83,9 +81,7 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
     @Override
     public ISBN normalize() {
         Matcher m = PATTERN.matcher(value);
-        if (m.find()) {
-            this.value = dehyphenate(value.substring(m.start(), m.end()));
-        }
+        this.value = m.find() ? dehyphenate(value.substring(m.start(), m.end())) : null;
         return this;
     }
 
@@ -106,7 +102,7 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
 
     /**
      * Get the normalized value of this standard book number
-     * 
+     *
      * @return the value of this standard book number
      */
     @Override
@@ -121,20 +117,21 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
      */
     @Override
     public String format() {
-        if (formatted == null) {
-            if (!valid) {
-                return "";
-            }
-            this.formatted = eanPreferred ? fix(eanvalue) : fix("978-" + value);
-        }
-        return formatted;
+        return valid ? eanPreferred ?
+                fix(eanvalue != null ? eanvalue : "978" + value) :
+                fix("978" +value).substring(4) :
+                "";
+    }
+
+    public boolean isEAN() {
+        return eanvalue != null;
     }
 
     /**
      * Prefer European Article Number (EAN, ISBN-13)
      */
-    public ISBN ean() {
-        this.eanPreferred = true;
+    public ISBN ean(boolean preferEAN) {
+        this.eanPreferred = preferEAN;
         return this;
     }
 
@@ -186,6 +183,7 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
         if (value == null) {
             throw new NumberFormatException("must not be null");
         }
+        eanvalue = null;
         int i;
         int val;
         if (value.length() < 9) {
@@ -222,7 +220,7 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
         } else if (value.length() == 13) {
             // ISBN-13 "book land"
             if (!value.startsWith("978") && !value.startsWith("979")) {
-                throw new IllegalArgumentException("bad prefix, must be 978 or 979: " + value);
+                throw new NumberFormatException("bad prefix, must be 978 or 979: " + value);
             }
             int checksum13 = 0;
             int weight13 = 1;
@@ -356,7 +354,9 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
     private int isInRange(String isbn, String begin, String end) {
         String b = dehyphenate(begin);
         int blen = b.length();
-        int c = isbn.substring(0, blen).compareTo(b);
+        int c = blen <= isbn.length() ?
+                isbn.substring(0, blen).compareTo(b) :
+                isbn.compareTo(b);
         if (c < 0) {
             return -1;
         }
@@ -469,5 +469,3 @@ public class ISBN implements Comparable<ISBN>, StandardNumber {
     }
 
 }
-
-

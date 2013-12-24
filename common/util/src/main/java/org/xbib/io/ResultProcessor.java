@@ -35,7 +35,6 @@ import java.io.IOException;
 
 /**
  * An interface for result processors
- *
  */
 public interface ResultProcessor<R> {
 

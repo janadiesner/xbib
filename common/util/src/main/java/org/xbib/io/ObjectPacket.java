@@ -32,7 +32,7 @@
 package org.xbib.io;
 
 public class ObjectPacket implements Packet<Object> {
-    
+
     private String name;
 
     private long number;
@@ -43,7 +43,7 @@ public class ObjectPacket implements Packet<Object> {
 
     public ObjectPacket() {
     }
-    
+
     public ObjectPacket(String name, long number, String link) {
         name(name);
         number(number);
@@ -86,7 +86,7 @@ public class ObjectPacket implements Packet<Object> {
         this.object = object;
         return this;
     }
-    
+
     public Object packet() {
         return object;
     }

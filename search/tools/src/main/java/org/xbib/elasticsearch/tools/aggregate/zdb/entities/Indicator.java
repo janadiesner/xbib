@@ -1,14 +1,45 @@
+/*
+ * Licensed to Jörg Prante and xbib under one or more contributor
+ * license agreements. See the NOTICE.txt file distributed with this work
+ * for additional information regarding copyright ownership.
+ *
+ * Copyright (C) 2012 Jörg Prante and xbib
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, see http://www.gnu.org/licenses
+ * or write to the Free Software Foundation, Inc., 51 Franklin Street,
+ * Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * The interactive user interfaces in modified source and object code
+ * versions of this program must display Appropriate Legal Notices,
+ * as required under Section 5 of the GNU Affero General Public License.
+ *
+ * In accordance with Section 7(b) of the GNU Affero General Public
+ * License, these Appropriate Legal Notices must retain the display of the
+ * "Powered by xbib" logo. If the display of the logo is not reasonably
+ * feasible for technical reasons, the Appropriate Legal Notices must display
+ * the words "Powered by xbib".
+ */
 package org.xbib.elasticsearch.tools.aggregate.zdb.entities;
 
 import org.xbib.util.Strings;
 
 import java.util.GregorianCalendar;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 
 public class Indicator extends License {
@@ -62,35 +93,66 @@ public class Indicator extends License {
     private Map<String, Object> buildInfo() {
         Map<String, Object> m = newLinkedHashMap();
         Map<String, Object> service = newLinkedHashMap();
-        String servicemode = getString("xbib:interlibraryloanCode");
-        if (servicemode != null) {
-            switch(servicemode) {
+        String s = getString("xbib:interlibraryloanCode");
+        if (s != null) {
+            switch(s) {
                 // 4,5 mio
                 case "kxn" : // 1.061.340
+                {
+                    servicetype = "interlibraryloan";
+                    servicemode = "copy";
+                    servicedistribution = "transmission-domestic-only";
+                    break;
+                }
                 case "kxx" : // 1.376.538
                 {
-                    service.put("servicetype", "interlibraryloan");
-                    service.put("servicemode", "copy");
+                    servicetype = "interlibraryloan";
+                    servicemode = "copy";
+                    servicedistribution = "transmission";
                     break;
                 }
                 case "kpn" : // 1.684.164
+                {
+                    servicetype = "interlibraryloan";
+                    servicemode = "copy";
+                    servicedistribution = "postal-domestic-only";
+                    break;
+                }
                 case "kpx" : // 104.579
                 {
-                    service.put("servicetype", "interlibraryloan");
-                    service.put("servicemode", "copy-non-electronic");
+                    servicetype = "interlibraryloan";
+                    servicemode = "copy";
+                    servicedistribution = "postal";
+                    break;
                 }
                 case "exn" : // 172.778
+                {
+                    servicetype = "interlibraryloan";
+                    servicemode = "copy";
+                    servicedistribution = "electronic-domestic-only";
+                    break;
+                }
                 case "exx" : // 116.673
                 {
-                    service.put("servicetype", "interlibraryloan");
-                    service.put("servicemode", "copy-electronic");
+                    servicetype = "interlibraryloan";
+                    servicemode = "copy";
+                    servicedistribution = "electronic";
+                    break;
+                }
+                default: {
+                    servicetype = "none";
+                    servicemode = "none";
+                    servicedistribution = "none";
                     break;
                 }
             }
         }
         service.put("servicecomment", getString("xbib:comment"));
+        service.put("servicetype", servicetype);
+        service.put("servicemode", servicemode);
+        service.put("servicedistribution", servicedistribution);
         m.put("service", service);
-        Map<String, Object> holdings = new LinkedHashMap();
+        Map<String, Object> holdings = newHashMap();
         holdings.put("firstvolume", getString("xbib:firstVolume"));
         holdings.put("firstissue", getString("xbib:firstIssue"));
         holdings.put("firstdate", getString("xbib:firstDate"));
@@ -101,4 +163,7 @@ public class Indicator extends License {
         return m;
     }
 
+    public String getRoutingKey() {
+        return new StringBuilder().append(findRegionKey()).append(findCarrierTypeKey()).toString();
+    }
 }

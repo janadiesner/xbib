@@ -65,13 +65,11 @@ public class DNB {
 
     private final static Logger logger = LoggerFactory.getLogger(DNB.class.getSimpleName());
 
-    private static OptionSet options;
-
-    private OAIClient client;
+    private final OAIClient client;
 
     private final static AtomicLong counter = new AtomicLong(0L);
 
-    private TarSession session;
+    private final TarSession session;
 
     public static void main(String[] args) throws Exception {
         int exitcode = 0;
@@ -88,7 +86,7 @@ public class DNB {
                     accepts("output").withOptionalArg().ofType(String.class).defaultsTo("dnb.xml");
                 }
             };
-            options = parser.parse(args);
+            OptionSet options = parser.parse(args);
 
             String server = (String) options.valueOf("server");
             String prefix = (String) options.valueOf("prefix");
@@ -161,6 +159,7 @@ public class DNB {
                 Packet p = session.newPacket();
                 p.name(getIdentifier());
                 String s = getWriter().toString();
+                // DNB delivers Unicode in non-canonical form, so normalize here
                 s = Normalizer.normalize(s, Normalizer.Form.NFC);
                 p.packet(s);
                 session.write(p);

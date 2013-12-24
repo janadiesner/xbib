@@ -11,6 +11,4 @@ public class NoOpGenerator<E> implements Generator<E, E> {
     public E yield(E element) {
         return element;
     }
-
-    ;
 }

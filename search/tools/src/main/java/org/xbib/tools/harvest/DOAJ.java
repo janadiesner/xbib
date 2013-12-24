@@ -31,7 +31,7 @@
  */
 package org.xbib.tools.harvest;
 
-import org.xbib.date.DateUtil;
+import org.xbib.util.DateUtil;
 import org.xbib.io.NullWriter;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
@@ -75,15 +75,11 @@ public class DOAJ {
 
     private final static Logger logger = LoggerFactory.getLogger(DOAJ.class.getSimpleName());
 
-    private static OptionSet options;
-
     private OAIClient client;
 
     private final static AtomicLong counter = new AtomicLong(0L);
 
     private final OutputStream out;
-
-    private String output;
 
     public static void main(String[] args) throws Exception {
         int exitcode = 0;
@@ -100,7 +96,7 @@ public class DOAJ {
                     accepts("output").withOptionalArg().ofType(String.class).defaultsTo("oai.ttl");
                 }
             };
-            options = parser.parse(args);
+            OptionSet options = parser.parse(args);
 
             String server = (String) options.valueOf("server");
             String prefix = (String) options.valueOf("prefix");
@@ -129,7 +125,6 @@ public class DOAJ {
 
     DOAJ(OAIClient client, String output) throws IOException {
         this.client = client;
-        this.output = output;
         String fileName = DateUtil.today() + "_" + output + ".gz";
         FileOutputStream fout = new FileOutputStream(fileName);
         this.out = new GZIPOutputStream(fout){

@@ -37,7 +37,6 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Utilities for message digests
- *
  */
 public class MessageDigestUtil {
 
@@ -73,8 +72,9 @@ public class MessageDigestUtil {
     public String toString() {
         return bytesToHex(md.digest());
     }
+
     private char hexDigit[] = {'0', '1', '2', '3', '4', '5', '6', '7',
-        '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+            '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     private String bytesToHex(byte[] b) {
         StringBuilder buf = new StringBuilder();

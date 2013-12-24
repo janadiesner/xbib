@@ -76,6 +76,7 @@ public class ByteBufferInputOutputStream extends InputStream implements Appendab
             put(buffer);
         }
     }
+
     public int read() throws IOException {
         if (byteBuffer == null) {
             return -1;

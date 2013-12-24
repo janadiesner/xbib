@@ -31,13 +31,13 @@
  */
 package org.xbib.elements.marc.dialects.mab;
 
-import org.xbib.elements.BasicElementMapper;
+import org.xbib.elements.AbstractElementMapper;
 import org.xbib.elements.KeyValuePipeline;
 import org.xbib.elements.marc.MARCSpecification;
 import org.xbib.marc.FieldCollection;
 
 public class MABElementMapper
-        extends BasicElementMapper<FieldCollection, String, MABElement, MABContext> {
+        extends AbstractElementMapper<FieldCollection, String, MABElement, MABContext> {
 
     public MABElementMapper(String format) {
         super("/org/xbib/analyzer/", format, new MARCSpecification());

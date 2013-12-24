@@ -26,6 +26,11 @@
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
+            <artifactId>elements</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
             <type>jar</type>
         </dependency>

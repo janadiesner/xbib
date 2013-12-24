@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import static java.util.Collections.unmodifiableList;
-import static org.xbib.options.internal.Reflection.findConverter;
 import static org.xbib.util.Objects.ensureNotNull;
 import static org.xbib.util.Strings.isNullOrEmpty;
 

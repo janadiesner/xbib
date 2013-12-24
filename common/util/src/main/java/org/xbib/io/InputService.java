@@ -65,20 +65,20 @@ public class InputService {
     }
 
     public static String getString(InputStream input, String encoding) throws IOException {
-        return getString(new InputStreamReader(input,encoding));
+        return getString(new InputStreamReader(input, encoding));
     }
-    
+
     public static String getString(Reader input) throws IOException {
         StringWriter output = new StringWriter();
         char[] buffer = new char[DEFAULT_BUFFER_SIZE];
         int n;
-        while ((n = input.read(buffer))!= -1) {
+        while ((n = input.read(buffer)) != -1) {
             output.write(buffer, 0, n);
         }
         return output.toString();
     }
 
-    public static Set<String> getTextLinesFromInputStream(String name)  {
+    public static Set<String> getTextLinesFromInputStream(String name) {
         Set<String> set = new HashSet();
         try {
             InputStream in = InputService.class.getResourceAsStream(name);
@@ -93,4 +93,4 @@ public class InputService {
         }
         return set;
     }
- }
+}

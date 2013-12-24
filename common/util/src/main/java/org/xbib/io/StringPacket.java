@@ -87,7 +87,7 @@ public class StringPacket implements Packet<String> {
         this.string = string;
         return this;
     }
-    
+
     public String packet() {
         return string;
     }
@@ -108,6 +108,6 @@ public class StringPacket implements Packet<String> {
     public String toString() {
         return string;
     }
-    
-    
+
+
 }

@@ -31,7 +31,7 @@
  */
 package org.xbib.elements.support;
 
-import org.xbib.date.DateUtil;
+import org.xbib.util.DateUtil;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
@@ -430,8 +430,8 @@ public class EnumerationAndChronology {
                         logger.warn("too many years: {}-{} (from {},{})",
                                 start, end, begindate, enddate);
                     // RDA: 1500
-                    // Acta eruditorum 1682
-                    // Phil. Trans. 1655 (but not in print)
+                    // Acta eruditorum: 1682
+                    // Phil. Trans.: 1655 (but not in print)
                     } else if (start < 1500 || end < 1500) {
                         logger.warn("too early: {},{} ({},{})",
                                 start, end, begindate, enddate);

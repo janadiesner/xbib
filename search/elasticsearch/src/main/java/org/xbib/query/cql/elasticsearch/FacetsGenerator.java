@@ -31,7 +31,7 @@
  */
 package org.xbib.query.cql.elasticsearch;
 
-import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.query.cql.SyntaxException;
 import org.xbib.strings.encode.QuotedStringTokenizer;
 

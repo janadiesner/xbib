@@ -33,7 +33,7 @@ package org.xbib.elements.marc;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.elements.ElementOutput;
+import org.xbib.elements.CountableElementOutput;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -59,7 +59,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class MARCElementsTest extends Assert {
 
@@ -67,11 +66,11 @@ public class MARCElementsTest extends Assert {
 
     @Test
     public void testSetupOfElements() throws Exception {
-        MARCElementMapper mapper = new MARCElementMapper("marc").start();
-        Writer writer = new FileWriter("marcelements.json");
-        mapper.dump("marc", writer);
+        MARCElementMapper mapper = new MARCElementMapper("marc/bib").start();
+        Writer writer = new FileWriter("target/marc-bib-elements.json");
+        mapper.dump("marc/bib", writer);
         writer.close();
-
+        // test mapper in a MarcXchange listener
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
         Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);
         reader.setProperty(Iso2709Reader.FORMAT, "MARC");
@@ -87,18 +86,7 @@ public class MARCElementsTest extends Assert {
         InputStream in = getClass().getResourceAsStream("stb-bonn.mrc");
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         Writer w = new OutputStreamWriter(new FileOutputStream("target/DE-369.xml"), "UTF-8");
-        final ElementOutput output = new ElementOutput<ResourceContext, Resource>() {
-            final AtomicLong counter = new AtomicLong();
-
-            @Override
-            public boolean enabled() {
-                return true;
-            }
-
-            @Override
-            public void enabled(boolean enabled) {
-
-            }
+        final CountableElementOutput output = new CountableElementOutput<ResourceContext, Resource>() {
 
             @Override
             public void output(ResourceContext context, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
@@ -113,10 +101,6 @@ public class MARCElementsTest extends Assert {
                 logger.debug("out={}", sw.toString());
             }
 
-            @Override
-            public long getCounter() {
-                return counter.get();
-            }
         };
         MARCElementBuilderFactory factory = new MARCElementBuilderFactory() {
             public MARCElementBuilder newBuilder() {
@@ -125,7 +109,7 @@ public class MARCElementsTest extends Assert {
                 return builder;
             }
         };
-        MARCElementMapper mapper = new MARCElementMapper("marc")
+        MARCElementMapper mapper = new MARCElementMapper("marc/bib")
                 .detectUnknownKeys(true)
                 .start(factory);
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);

@@ -10,11 +10,12 @@ import java.util.NoSuchElementException;
 /**
  * Partial {@link Stream} implementation based on look-ahead operations over an underlying stream.
  * <p/>
- * The implementation attempts to prefetch the output of {@link #next()} in {@link #hasNext()}. If a failure occurs,
- * {@link #hasNext()}:
- * <p/>
- * <li>keeps consuming the underlying stream as long as the failure is a {@link org.xbib.stream.exceptions.StreamSkipSignal};
- * <li>consults a {@link org.xbib.stream.handlers.FaultHandler} for all the other failures. If the {@link org.xbib.stream.handlers.FaultHandler} re-throws the same or a
+ * The implementation attempts to prefetch the output of {@link #next()} in {@link #hasNext()}.
+ * If a failure occurs, {@link #hasNext()}
+ * keeps consuming the underlying stream as long as the failure is a
+ * {@link org.xbib.stream.exceptions.StreamSkipSignal}
+ * and consults a {@link org.xbib.stream.handlers.FaultHandler} for all the other failures.
+ * If the {@link org.xbib.stream.handlers.FaultHandler} re-throws the same or a
  * different exception, the implementation throws it at the following {@link #next()}.
  *
  * @param <E> the type of stream elements
@@ -37,7 +38,9 @@ public abstract class LookAheadStream<E> implements Stream<E> {
 
     // iteration state
     protected Boolean hasNext;
+
     protected NullOr<E> element;
+
     private RuntimeException failure;
 
     /**
@@ -133,7 +136,6 @@ public abstract class LookAheadStream<E> implements Stream<E> {
         element = null;
         hasNext = null;
     }
-
 
     /**
      * Returns an element of the underlying stream

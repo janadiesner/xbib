@@ -4,8 +4,6 @@ import org.xbib.stream.Stream;
 
 /**
  * Provides {@link Thread}s for the asynchronous publicaton of {@link Stream}.
- *
- * @author Fabio Simeoni
  */
 public interface ThreadProvider {
 

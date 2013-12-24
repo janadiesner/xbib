@@ -39,7 +39,7 @@ public class ISBNTest extends Assert {
     @Test
     public void testEAN() throws Exception {
         String value = "978-3-551-75213-0";
-        ISBN ean = new ISBN().set(value).ean().normalize().verify();
+        ISBN ean = new ISBN().set(value).ean(true).normalize().verify();
         assertEquals(ean.normalizedValue(), "9783551752130");
         assertEquals(ean.format(), "978-3-551-75213-0");
     }
@@ -47,7 +47,7 @@ public class ISBNTest extends Assert {
     @Test
     public void testEAN2() throws Exception {
         String value = "978-3-551-75213-1";
-        ISBN ean = new ISBN().set(value).ean().checksum().normalize().verify();
+        ISBN ean = new ISBN().set(value).ean(true).checksum().normalize().verify();
         assertEquals(ean.normalizedValue(), "9783551752130");
         assertEquals(ean.format(), "978-3-551-75213-0");
     }
@@ -56,6 +56,6 @@ public class ISBNTest extends Assert {
     public void testWrongAndDirtyEAN() throws Exception {
         // correct ISBN-10 is 3-451-04112-X
         String value = "ISBN ISBN 3-451-4112-X kart. : DM 24.80";
-        new ISBN().set(value).ean().checksum().normalize().verify();
+        new ISBN().set(value).ean(true).checksum().normalize().verify();
     }
 }

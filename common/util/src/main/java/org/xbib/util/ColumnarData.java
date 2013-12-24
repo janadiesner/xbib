@@ -38,13 +38,11 @@ import java.util.List;
 import static java.lang.Integer.MIN_VALUE;
 import static java.lang.System.getProperty;
 import static java.util.Collections.max;
-
 import static org.xbib.util.Column.BY_HEIGHT;
 import static org.xbib.util.Strings.EMPTY;
 
 /**
  * <p>A means to display data in a text grid.</p>
- *
  */
 public class ColumnarData {
     private static final String LINE_SEPARATOR = getProperty("line.separator");

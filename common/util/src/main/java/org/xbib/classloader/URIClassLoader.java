@@ -57,7 +57,7 @@ import java.util.jar.Manifest;
  * files with spaces in the path. SUN acknowledges the problem, but refuses to
  * modify the behavior for compatibility reasons; see Java Bug Parade 4273532,
  * 4466485.
- *
+ * <p/>
  * Additionally, the JAR caching policy used by URLClassLoader is system-wide
  * and inflexible: once downloaded JAR files are never re-downloaded, even if
  * one creates a fresh instance of the class loader that happens to have the
@@ -66,12 +66,11 @@ import java.util.jar.Manifest;
  * potentially separate part of the system, by creating URL connection to one of
  * the URLs of that class loader search path and closing the associated JAR
  * file. See Java Bug Parade 4405789, 4388666, 4639900.
- *
+ * <p/>
  * This class avoids these problems by 1) using URIs instead of URLs for the
  * search path (thus enforcing strict syntax conformance and defining precise
  * escaping semantics), and 2) using custom URLStreamHandler which ensures
  * per-classloader JAR caching policy.
- *
  */
 public class URIClassLoader extends URLClassLoader {
 

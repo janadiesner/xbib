@@ -32,13 +32,11 @@
 package org.xbib.oai.record;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.xbib.date.DateUtil;
+import org.xbib.util.DateUtil;
 import org.xbib.io.http.HttpResponse;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;

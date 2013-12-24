@@ -32,10 +32,9 @@
 package org.xbib.elasticsearch;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.xbib.elasticsearch.support.client.DocumentIngest;
-import org.xbib.elements.ElementOutput;
+import org.xbib.elements.CountableElementOutput;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.xcontent.ContentBuilder;
@@ -43,37 +42,16 @@ import org.xbib.rdf.xcontent.ContentBuilder;
 /**
  * Index RDF resources into Elasticsearch
  *
- *
  * @param <C>
  * @param <R>
  */
 public class ResourceSink<C extends ResourceContext, R extends Resource>
-        implements ElementOutput<C, R> {
+        extends CountableElementOutput<C, R> {
 
     private final DocumentIngest ingester;
 
-    private final AtomicInteger resourceCounter = new AtomicInteger(0);
-
-    private boolean enabled;
-
     public ResourceSink(final DocumentIngest ingester) {
         this.ingester = ingester;
-    }
-
-    @Override
-    public boolean enabled() {
-        this.enabled = Boolean.parseBoolean(System.getProperty(getClass().getName())) || enabled;
-        return enabled;
-    }
-    
-    @Override
-    public void enabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    @Override
-    public long getCounter() {
-        return resourceCounter.longValue();
     }
 
     final ResourceIndexer<R> resourceIndexer = new ResourceIndexer<R>() {
@@ -126,7 +104,7 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
         } else {
             resourceIndexer.index(resource, contentBuilder.build(context, resource));
         }
-        resourceCounter.incrementAndGet();
+        counter.incrementAndGet();
     }
 
     public void flush() {
@@ -136,8 +114,8 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
     /**
      * The IRI host is interpreted as the Elasticsearch index
      *
-     * @param resource
-     * @return
+     * @param resource the resource
+     * @return the index
      */
     protected String makeIndex(R resource) {
         return resource.id().getHost();
@@ -146,8 +124,8 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
     /**
      * The IRI query is interpreted as the Elasticsearch index type
      *
-     * @param resource
-     * @return
+     * @param resource the resource
+     * @return the type
      */
     protected String makeType(R resource) {
         return resource.id().getQuery();
@@ -156,8 +134,8 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
     /**
      * The IRI fragment is  interpreted as the Elasticsearch document ID
      *
-     * @param resource
-     * @return
+     * @param resource the resource
+     * @return the id
      */
     protected String makeId(R resource) {
         String id = resource.id().getFragment();

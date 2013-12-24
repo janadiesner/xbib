@@ -155,18 +155,17 @@ public class Streams {
     /**
      * A {@link NoOpGenerator}.
      */
-    public static NoOpGenerator<String> no_serialiser = new NoOpGenerator<String>();
+    public static NoOpGenerator<String> noserialiser = new NoOpGenerator<String>();
 
     /**
      * Returns a {@link NoOpGenerator}.
      *
      * @return the generator
      */
-    public static <E> NoOpGenerator<E> no_op(Stream<E> stream) {
+    public static <E> NoOpGenerator<E> noOp(Stream<E> stream) {
         return new NoOpGenerator<E>();
     }
 
-    // HANDLERS
     /**
      * A {@link RethrowHandler} for failure handling.
      */

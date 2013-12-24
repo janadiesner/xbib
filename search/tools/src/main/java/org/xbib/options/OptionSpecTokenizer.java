@@ -33,9 +33,6 @@ package org.xbib.options;
 
 import java.util.NoSuchElementException;
 
-import static org.xbib.options.ParserRules.RESERVED_FOR_EXTENSIONS;
-import static org.xbib.options.ParserRules.ensureLegalOption;
-
 /**
  * <p>Tokenizes a short option specification string.</p>
  *

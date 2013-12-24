@@ -44,10 +44,6 @@ import org.xbib.rdf.xcontent.ContentBuilder;
  */
 public interface ElementOutput<C extends ResourceContext, R extends Resource> {
 
-    boolean enabled();
-    
-    void enabled(boolean enabled);
-
     void output(C context, ContentBuilder<C,R> builder) throws IOException;
 
     long getCounter();

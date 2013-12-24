@@ -34,18 +34,19 @@ package org.xbib.tools.convert;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-
 import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
-import org.xbib.importer.AbstractImporter;
-import org.xbib.importer.ImportService;
-import org.xbib.importer.Importer;
-import org.xbib.importer.ImporterFactory;
 import org.xbib.io.file.Finder;
 import org.xbib.io.file.TextFileConnectionFactory;
-import org.xbib.util.URIUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.options.OptionParser;
+import org.xbib.options.OptionSet;
+import org.xbib.pipeline.AbstractPipeline;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.pipeline.SimplePipelineExecutor;
+import org.xbib.pipeline.element.CounterElement;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.RDF;
@@ -56,9 +57,8 @@ import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.text.InvalidCharacterException;
-import org.xbib.options.OptionParser;
-import org.xbib.options.OptionSet;
 import org.xbib.util.Entities;
+import org.xbib.util.URIUtil;
 import org.xbib.xml.XMLUtil;
 
 import java.io.BufferedReader;
@@ -80,7 +80,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Convert article DB
  */
-public class ArticleDB extends AbstractImporter<Long, AtomicLong> {
+public class ArticleDB extends AbstractPipeline<CounterElement> {
 
     private final static Logger logger = LoggerFactory.getLogger(ArticleDB.class.getName());
 
@@ -104,8 +104,6 @@ public class ArticleDB extends AbstractImporter<Long, AtomicLong> {
 
     private boolean done = false;
 
-    private static String outputFilename;
-
     private static SerialsDB serialsdb;
 
     private static Map<String,Resource> serials;
@@ -114,7 +112,7 @@ public class ArticleDB extends AbstractImporter<Long, AtomicLong> {
 
     private final static AtomicLong dupCounter = new AtomicLong(0L);
 
-    private final static AtomicLong counter = new AtomicLong(0L);
+    private final static CounterElement counter = new CounterElement().set(new AtomicLong(0L));
 
     public static void main(String[] args) {
         int exitcode = 0;
@@ -172,7 +170,7 @@ public class ArticleDB extends AbstractImporter<Long, AtomicLong> {
             context.addNamespace("prism", "http://prismstandard.org/namespaces/basic/2.1/");
             resourceContext.newNamespaceContext(context);
 
-            outputFilename = (String)options.valueOf("output");
+            String outputFilename = (String) options.valueOf("output");
 
             // for proper resources
 
@@ -217,15 +215,16 @@ public class ArticleDB extends AbstractImporter<Long, AtomicLong> {
 
             missingserials = new FileWriter("missingserials.txt");
 
-            ImportService service = new ImportService()
-                    .threads(threads)
-                    .factory(
-                            new ImporterFactory() {
-                                @Override
-                                public Importer newImporter() {
-                                    return new ArticleDB(writer, noserialWriter, errorWriter);
-                                }
-                            }).execute().shutdown();
+            SimplePipelineExecutor service = new SimplePipelineExecutor()
+                    .concurrency(threads)
+                    .provider(new PipelineProvider() {
+                        @Override
+                        public Pipeline get() {
+                            return new ArticleDB(writer, noserialWriter, errorWriter);
+                        }
+                    })
+                    .execute()
+                    .waitFor();
 
             logger.info("articles conversion complete: {} counts, {} dups", counter.get(), dupCounter.get());
 
@@ -266,15 +265,15 @@ public class ArticleDB extends AbstractImporter<Long, AtomicLong> {
     }
 
     @Override
-    public AtomicLong next() {
+    public CounterElement next() {
         if (done) {
-            return new AtomicLong(1L);
+            return counter;
         }
         try {
             URI uri = input.poll();
             if (uri != null) {
                 logger.info("starting process of {}, {} files left, {} counts, {} dups",
-                        uri, input.size(), counter.get(), dupCounter.get());
+                        uri, input.size(), counter.get().get(), dupCounter.get());
                 process(uri);
             } else {
                 done = true;
@@ -283,7 +282,7 @@ public class ArticleDB extends AbstractImporter<Long, AtomicLong> {
             logger.error(e.getMessage(), e);
             done = true;
         }
-        return new AtomicLong(1L);
+        return counter;
     }
 
     protected void process(URI uri) throws Exception {

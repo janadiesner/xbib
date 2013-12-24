@@ -1,28 +1,9 @@
-/*
- * Licensed to ElasticSearch and Shay Banon under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. ElasticSearch licenses this
- * file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
 package org.xbib.common.xcontent;
 
 import com.google.common.collect.Maps;
-import org.xbib.common.bytes.BytesArray;
-import org.xbib.common.bytes.BytesReference;
-import org.xbib.common.Pair;
+import org.xbib.common.io.BytesArray;
+import org.xbib.common.io.BytesReference;
 import org.xbib.common.xcontent.xml.XmlXParams;
 
 import java.io.IOException;
@@ -30,9 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- */
 public class XContentHelper {
 
     public static XContentParser createParser(BytesReference bytes) throws IOException {
@@ -46,7 +24,7 @@ public class XContentHelper {
         return XContentFactory.xContent(data, offset, length).createParser(data, offset, length);
     }
 
-    public static Pair<XContentType, Map<String, Object>> convertToMap(BytesReference bytes, boolean ordered) {
+    public static Map<String, Object> convertToMap(BytesReference bytes, boolean ordered) {
         if (bytes.hasArray()) {
             return convertToMap(bytes.array(), bytes.arrayOffset(), bytes.length(), ordered);
         }
@@ -56,29 +34,29 @@ public class XContentHelper {
                 contentType = XContentFactory.xContentType(bytes);
                 parser = XContentFactory.xContent(contentType).createParser(bytes.streamInput());
             if (ordered) {
-                return Pair.tuple(contentType, parser.mapOrderedAndClose());
+                return parser.mapOrderedAndClose();
             } else {
-                return Pair.tuple(contentType, parser.mapAndClose());
+                return parser.mapAndClose();
             }
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to parse content to map", e);
         }
     }
 
-    public static Pair<XContentType, Map<String, Object>> convertToMap(byte[] data, boolean ordered) {
+    public static Map<String, Object> convertToMap(byte[] data, boolean ordered) {
         return convertToMap(data, 0, data.length, ordered);
     }
 
-    public static Pair<XContentType, Map<String, Object>> convertToMap(byte[] data, int offset, int length, boolean ordered){
+    public static Map<String, Object> convertToMap(byte[] data, int offset, int length, boolean ordered){
         try {
             XContentParser parser;
             XContentType contentType;
                 contentType = XContentFactory.xContentType(data, offset, length);
                 parser = XContentFactory.xContent(contentType).createParser(data, offset, length);
             if (ordered) {
-                return Pair.tuple(contentType, parser.mapOrderedAndClose());
+                return parser.mapOrderedAndClose();
             } else {
-                return Pair.tuple(contentType, parser.mapAndClose());
+                return parser.mapAndClose();
             }
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to parse content to map", e);

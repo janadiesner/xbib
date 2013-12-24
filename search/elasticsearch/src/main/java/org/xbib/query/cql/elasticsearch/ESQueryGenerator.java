@@ -31,8 +31,8 @@
  */
 package org.xbib.query.cql.elasticsearch;
 
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.xbib.date.DateUtil;
+import org.xbib.common.xcontent.XContentBuilder;
+import org.xbib.util.DateUtil;
 import org.xbib.query.cql.*;
 import org.xbib.query.cql.Visitor;
 import org.xbib.query.cql.elasticsearch.model.Facet;

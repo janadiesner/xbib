@@ -36,10 +36,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.testng.annotations.Test;
-import org.xbib.elements.ElementOutput;
+import org.xbib.elements.CountableElementOutput;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -58,17 +57,7 @@ public class ZDBOAIMARCElementsTest {
     @Test
     public void testOAIElements() throws Exception {
 
-        final AtomicLong counter = new AtomicLong();
-
-        final ElementOutput output = new ElementOutput<ResourceContext, Resource>() {
-            @Override
-            public boolean enabled() {
-                return true;
-            }
-
-            @Override
-            public void enabled(boolean enabled) {
-            }
+        final CountableElementOutput output = new CountableElementOutput<ResourceContext, Resource>() {
 
             @Override
             public void output(ResourceContext context, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
@@ -82,11 +71,6 @@ public class ZDBOAIMARCElementsTest {
                     counter.incrementAndGet();
                 }
             }
-
-            @Override
-            public long getCounter() {
-                return counter.get();
-            }
         };
 
         MARCElementBuilderFactory factory = new MARCElementBuilderFactory() {
@@ -95,7 +79,7 @@ public class ZDBOAIMARCElementsTest {
                 return builder;
             }
         };
-        MARCElementMapper mapper = new MARCElementMapper("marc").start(factory);
+        MARCElementMapper mapper = new MARCElementMapper("marc/zdb/bib").start(factory);
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
         InputStream in = getClass().getResourceAsStream("/org/xbib/marc/xml/zdb-oai-marc.xml");
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));

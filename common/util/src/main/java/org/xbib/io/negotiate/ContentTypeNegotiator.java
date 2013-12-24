@@ -63,15 +63,16 @@ public class ContentTypeNegotiator {
     /**
      * Overrides the Accept header for certain user agents. This can be
      * used to implement special-case handling for user agents that send
-     * faulty Accept headers. 
-     * @param userAgentString A pattern to be matched against the User-Agent header;
-     * 		<tt>null</tt> means regardless of User-Agent
+     * faulty Accept headers.
+     *
+     * @param userAgentString      A pattern to be matched against the User-Agent header;
+     *                             <tt>null</tt> means regardless of User-Agent
      * @param originalAcceptHeader Only override the Accept header if the user agent
-     * 		sends this header; <tt>null</tt> means always override  
-     * @param newAcceptHeader The Accept header to be used instead
+     *                             sends this header; <tt>null</tt> means always override
+     * @param newAcceptHeader      The Accept header to be used instead
      */
     public void addUserAgentOverride(Pattern userAgentString,
-            String originalAcceptHeader, String newAcceptHeader) {
+                                     String originalAcceptHeader, String newAcceptHeader) {
         this.userAgentOverrides.add(new AcceptHeaderOverride(
                 userAgentString, originalAcceptHeader, newAcceptHeader));
     }

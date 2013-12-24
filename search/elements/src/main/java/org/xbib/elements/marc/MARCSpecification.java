@@ -43,7 +43,10 @@ public class MARCSpecification extends AbstractSpecification {
 
     private final static Logger logger = LoggerFactory.getLogger(MARCSpecification.class.getName());
 
+    private String value;
+
     protected Map addSpec(String value, Element element, Map map) {
+        this.value = value;
         int pos = value.indexOf('$');
         String h = pos > 0 ? value.substring(0,pos) : null;
         String t = pos > 0 ? value.substring(pos+1) : value;
@@ -54,7 +57,7 @@ public class MARCSpecification extends AbstractSpecification {
     private Map addSpec(String head, String tail, Element element, Map map) {
         if (head == null) {
             if (map.containsKey(tail)) {
-                logger.warn("already exist in map: {} {}", tail, map);
+                logger.warn("already exist in map: value={} {} {}", value, tail, map);
                 return map;
             }
             map.put(tail, element);
@@ -74,6 +77,5 @@ public class MARCSpecification extends AbstractSpecification {
             return map;
         }
     }
-
 
 }

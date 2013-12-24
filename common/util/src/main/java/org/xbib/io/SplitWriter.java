@@ -37,13 +37,13 @@ import java.io.Writer;
 /**
  * A writer that can switch over to a new writer. This is useful for example,
  * when a large file must be split into smaller ones.
- *
+ * <p/>
  * Large XML files produced by a {@link javax.xml.transform.stream.StreamResult}
  * can be split by manipulating the SAX handler. At the split condition, the
  * handler should send endDocument(), then performing a flush on the
- * StreamResult Writer, split with this Writerm and then continue 
+ * StreamResult Writer, split with this Writerm and then continue
  * with startDocument().
- *
+ * <p/>
  * Most of the code is copied from OpenJDK's BufferedWriter. Because
  * BufferedWriter uses a private instance of the internal writer, it can not be
  * extended.
@@ -69,9 +69,8 @@ public class SplitWriter extends Writer {
      * of the given size.
      *
      * @param out A Writer
-     * @param sz Output-buffer size, a positive integer
-     *
-     * @exception IllegalArgumentException If sz is <= 0
+     * @param sz  Output-buffer size, a positive integer
+     * @throws IllegalArgumentException If sz is <= 0
      */
     public SplitWriter(Writer out, int sz) {
         this.lock = this;
@@ -109,7 +108,7 @@ public class SplitWriter extends Writer {
     /**
      * Writes a single character.
      *
-     * @exception IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs
      */
     @Override
     public void write(int c) throws IOException {
@@ -135,7 +134,7 @@ public class SplitWriter extends Writer {
 
     /**
      * Writes a portion of an array of characters.
-     *
+     * <p/>
      * <p> Ordinarily this method stores characters from the given array into
      * this stream's buffer, flushing the buffer to the underlying stream as
      * needed. If the requested length is at least as large as the buffer,
@@ -144,10 +143,9 @@ public class SplitWriter extends Writer {
      * <code>BufferedWriter</code>s will not copy data unnecessarily.
      *
      * @param cbuf A character array
-     * @param off Offset from which to start reading characters
-     * @param len Number of characters to write
-     *
-     * @exception IOException If an I/O error occurs
+     * @param off  Offset from which to start reading characters
+     * @param len  Number of characters to write
+     * @throws IOException If an I/O error occurs
      */
     @Override
     public void write(char cbuf[], int off, int len) throws IOException {
@@ -186,18 +184,17 @@ public class SplitWriter extends Writer {
 
     /**
      * Writes a portion of a String.
-     *
+     * <p/>
      * <p> If the value of the <tt>len</tt> parameter is negative then no
      * characters are written. This is contrary to the specification of this
-     * method in the {@linkplain java.io.Writer#write(java.lang.String,int,int)
+     * method in the {@linkplain java.io.Writer#write(java.lang.String, int, int)
      * superclass}, which requires that an {@link IndexOutOfBoundsException} be
      * thrown.
      *
-     * @param s String to be written
+     * @param s   String to be written
      * @param off Offset from which to start reading characters
      * @param len Number of characters to be written
-     *
-     * @exception IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs
      */
     public void write(String s, int off, int len) throws IOException {
         synchronized (lock) {
@@ -219,7 +216,7 @@ public class SplitWriter extends Writer {
     /**
      * Flushes the stream.
      *
-     * @exception IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs
      */
     @Override
     public void flush() throws IOException {
@@ -232,7 +229,7 @@ public class SplitWriter extends Writer {
     /**
      * Closes the stream.
      *
-     * @exception IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs
      */
     @Override
     public void close() throws IOException {

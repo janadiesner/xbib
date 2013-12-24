@@ -11,6 +11,7 @@ import org.xbib.stream.exceptions.StreamStopSignal;
 public final class StreamConsumer<T> {
 
     private final Stream<T> stream;
+
     private final Callback<T> callback;
 
     /**
@@ -35,7 +36,6 @@ public final class StreamConsumer<T> {
     private void consume() {
 
         try {
-            consuming:
             while (stream.hasNext()) {
 
                 T next = stream.next();
@@ -43,9 +43,9 @@ public final class StreamConsumer<T> {
                 try {
                     callback.consume(next);
                 } catch (StreamSkipSignal skip) {
-                    continue consuming;
+                    continue;
                 } catch (StreamStopSignal stop) {
-                    break consuming;
+                    break;
                 }
             }
         } finally {

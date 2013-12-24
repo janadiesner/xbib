@@ -3,6 +3,8 @@ package org.xbib.common.xcontent;
 import com.google.common.io.ByteStreams;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.xbib.common.settings.ImmutableSettings;
+import org.xbib.common.settings.Settings;
 import org.xbib.common.xcontent.xml.XmlNamespaceContext;
 import org.xbib.common.xcontent.xml.XmlXParams;
 import org.xbib.logging.Logger;
@@ -12,7 +14,9 @@ import javax.xml.namespace.QName;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.StringReader;
 
+import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 import static org.xbib.common.xcontent.XContentFactory.xmlBuilder;
 
 public class XmlBuilderTest extends Assert {
@@ -160,6 +164,14 @@ public class XmlBuilderTest extends Assert {
         ByteStreams.copy(in, out);
         byte[] buf = out.toByteArray();
         logger.info("xml (parse from json) = {}", XContentHelper.convertToXml(params, buf, 0, buf.length, false));
+    }
+
+    @Test
+    public void testParseReader() throws Exception {
+        StringReader sr = new StringReader("{\"name\":\"value\"}");
+        Settings settings = settingsBuilder()
+                .loadFromReader(sr).build();
+        logger.info("{}", settings.getAsMap());
     }
 
 }

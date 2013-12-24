@@ -1,21 +1,3 @@
-/*
- * Licensed to ElasticSearch and Shay Banon under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. ElasticSearch licenses this
- * file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
 package org.xbib.common.xcontent;
 
@@ -24,21 +6,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Date;
 import java.util.Map;
-import org.joda.time.DateTimeZone;
-import org.joda.time.ReadableInstant;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-import org.xbib.common.bytes.BytesArray;
-import org.xbib.common.bytes.BytesReference;
-import org.xbib.common.io.BytesStream;
+
+import org.xbib.common.io.BytesArray;
+import org.xbib.common.io.BytesReference;
+import org.xbib.common.io.stream.BytesStream;
 import org.xbib.common.io.FastByteArrayOutputStream;
 import org.xbib.common.xcontent.support.XContentMapConverter;
 
-/**
- *
- */
 public final class XContentBuilder implements BytesStream {
 
     public static enum FieldCaseConversion {
@@ -56,7 +31,7 @@ public final class XContentBuilder implements BytesStream {
         CAMELCASE
     }
 
-    public final static DateTimeFormatter defaultDatePrinter = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
+    //public final static DateTimeFormatter defaultDatePrinter = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
 
     protected static FieldCaseConversion globalFieldCaseConversion = FieldCaseConversion.NONE;
 
@@ -248,6 +223,14 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder fieldIfNotNull(String name, String value) throws IOException {
+        if (value != null) {
+            field(name);
+            generator.writeString(value);
+        }
+        return this;
+    }
+
     public XContentBuilder field(String name, String value, FieldCaseConversion conversion) throws IOException {
         field(name, conversion);
         if (value == null) {
@@ -258,11 +241,27 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder fieldIfNotNull(String name, String value, FieldCaseConversion conversion) throws IOException {
+        if (value != null) {
+            field(name, conversion);
+            generator.writeString(value);
+        }
+        return this;
+    }
+
     public XContentBuilder field(String name, Integer value) throws IOException {
         field(name);
         if (value == null) {
             generator.writeNull();
         } else {
+            generator.writeNumber(value.intValue());
+        }
+        return this;
+    }
+
+    public XContentBuilder fieldIfNotNull(String name, Integer value) throws IOException {
+        if (value != null) {
+            field(name);
             generator.writeNumber(value.intValue());
         }
         return this;
@@ -284,6 +283,14 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder fieldIfNotNull(String name, Long value) throws IOException {
+        if (value != null) {
+            field(name);
+            generator.writeNumber(value.longValue());
+        }
+        return this;
+    }
+
     public XContentBuilder field(String name, long value) throws IOException {
         field(name);
         generator.writeNumber(value);
@@ -295,6 +302,14 @@ public final class XContentBuilder implements BytesStream {
         if (value == null) {
             generator.writeNull();
         } else {
+            generator.writeNumber(value.floatValue());
+        }
+        return this;
+    }
+
+    public XContentBuilder fieldIfNotNull(String name, Float value) throws IOException {
+        if (value != null) {
+            field(name);
             generator.writeNumber(value.floatValue());
         }
         return this;
@@ -316,6 +331,14 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder fieldIfNotNull(String name, Double value) throws IOException {
+        if (value != null) {
+            field(name);
+            generator.writeNumber(value);
+        }
+        return this;
+    }
+
     public XContentBuilder field(String name, double value) throws IOException {
         field(name);
         generator.writeNumber(value);
@@ -325,7 +348,6 @@ public final class XContentBuilder implements BytesStream {
     public XContentBuilder field(String name, BigDecimal value) throws IOException {
         return field(name, value, value.scale(), RoundingMode.HALF_UP, true);
     }
-
 
     public XContentBuilder field(String name, BigDecimal value, int scale, RoundingMode rounding, boolean toDouble) throws IOException {
         field(name);
@@ -447,12 +469,8 @@ public final class XContentBuilder implements BytesStream {
             field(name, ((Byte) value).byteValue());
         } else if (type == Boolean.class) {
             field(name, ((Boolean) value).booleanValue());
-        } else if (value instanceof Date) {
-            field(name, (Date) value);
         } else if (type == byte[].class) {
             field(name, (byte[]) value);
-        } else if (value instanceof ReadableInstant) {
-            field(name, (ReadableInstant) value);
         } else if (value instanceof Map) {
             //noinspection unchecked
             field(name, (Map<String, Object>) value);
@@ -474,6 +492,13 @@ public final class XContentBuilder implements BytesStream {
             field(name, (ToXContent) value);
         } else {
             field(name, value.toString());
+        }
+        return this;
+    }
+
+    public XContentBuilder fieldIfNotNull(String name, Object value) throws IOException {
+        if (value != null) {
+            return field(name, value);
         }
         return this;
     }
@@ -501,8 +526,6 @@ public final class XContentBuilder implements BytesStream {
             value((Boolean) value);
         } else if (type == byte[].class) {
             value((byte[]) value);
-        } else if (value instanceof Date) {
-            value((Date) value);
         } else if (value instanceof BytesReference) {
             value((BytesReference) value);
         } else if (value instanceof Map) {
@@ -529,26 +552,6 @@ public final class XContentBuilder implements BytesStream {
             generator.writeBinary(value);
         }
         return this;
-    }
-
-    public XContentBuilder field(String name, ReadableInstant date) throws IOException {
-        field(name);
-        return value(date);
-    }
-
-    public XContentBuilder field(String name, ReadableInstant date, DateTimeFormatter formatter) throws IOException {
-        field(name);
-        return value(date, formatter);
-    }
-
-    public XContentBuilder field(String name, Date date) throws IOException {
-        field(name);
-        return value(date);
-    }
-
-    public XContentBuilder field(String name, Date date, DateTimeFormatter formatter) throws IOException {
-        field(name);
-        return value(date, formatter);
     }
 
     public XContentBuilder nullField(String name) throws IOException {
@@ -591,28 +594,6 @@ public final class XContentBuilder implements BytesStream {
     public XContentBuilder value(boolean value) throws IOException {
         generator.writeBoolean(value);
         return this;
-    }
-
-    public XContentBuilder value(ReadableInstant date) throws IOException {
-        return value(date, defaultDatePrinter);
-    }
-
-    public XContentBuilder value(ReadableInstant date, DateTimeFormatter dateTimeFormatter) throws IOException {
-        if (date == null) {
-            return nullValue();
-        }
-        return value(dateTimeFormatter.print(date));
-    }
-
-    public XContentBuilder value(Date date) throws IOException {
-        return value(date, defaultDatePrinter);
-    }
-
-    public XContentBuilder value(Date date, DateTimeFormatter dateTimeFormatter) throws IOException {
-        if (date == null) {
-            return nullValue();
-        }
-        return value(dateTimeFormatter.print(date.getTime()));
     }
 
     public XContentBuilder value(Integer value) throws IOException {

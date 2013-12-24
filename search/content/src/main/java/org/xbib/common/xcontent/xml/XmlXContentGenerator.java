@@ -34,7 +34,7 @@ package org.xbib.common.xcontent.xml;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 
-import org.xbib.common.bytes.BytesReference;
+import org.xbib.common.io.BytesReference;
 import org.xbib.common.xcontent.XContentGenerator;
 import org.xbib.common.xcontent.XContentHelper;
 import org.xbib.common.xcontent.XContentParser;

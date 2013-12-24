@@ -147,7 +147,7 @@ public class MergeWithCitations {
             };
             OptionSet options = parser.parse(args);
             if (options.hasArgument("help")) {
-                System.err.println("Help for " + MergeWithLicenses.class.getCanonicalName() + lf
+                System.err.println("Help for " + MergeHoldingsLicenses.class.getCanonicalName() + lf
                         + " --help                 print this help message" + lf
                         + " --source <uri>         URI for connecting to the Elasticsearch source" + lf
                         + " --target <uri>         URI for connecting to Elasticsearch target" + lf
@@ -178,7 +178,7 @@ public class MergeWithCitations {
                     .newClient(sourceURI);
 
             IngestClient ingest = new IngestClient()
-                    .maxBulkActions(maxBulkActions)
+                    .maxActionsPerBulkRequest(maxBulkActions)
                     .maxConcurrentBulkRequests(maxConcurrentBulkRequests)
                     .newClient(targetURI);
 
@@ -281,7 +281,7 @@ public class MergeWithCitations {
             }
             for (SearchHit hit : hits) {
                 try {
-                    pumpQueue.put(new WrappedSearchHit(hit));
+                    pumpQueue.put(new WrappedSearchHit().set(hit));
                     counter.decrementAndGet();
                 } catch (InterruptedException e) {
                     logger.error("interrupted");
@@ -292,7 +292,7 @@ public class MergeWithCitations {
         for (int i = 0; i < numPumps; i++) {
             try {
                 // poison element
-                pumpQueue.put(new WrappedSearchHit(null));
+                pumpQueue.put(new WrappedSearchHit().set(null));
             } catch (InterruptedException e) {
                 logger.error("interrupted");
             }
@@ -315,7 +315,7 @@ public class MergeWithCitations {
 
         long t1 = System.currentTimeMillis();
         long d = countWrites; //number of documents written
-        long bytes = ingest.getVolumeInBytes();
+        long bytes = ingest.getTotalSizeInBytes();
         double dps = d * 1000.0 / (double)(t1 - t0);
         double avg = bytes / (d + 1.0); // avoid div by zero
         double mbps = (bytes * 1000.0 / (double)(t1 - t0)) / (1024.0 * 1024.0) ;
@@ -369,11 +369,11 @@ public class MergeWithCitations {
                 long count = 0;
                 while (true) {
                     WrappedSearchHit t = pumpQueue.take();
-                    if (t.hit() == null) {
+                    if (t.get() == null) {
                         logger.info("received 'end of pump' message");
                         break;
                     }
-                    m = new Manifestation(mapper.readValue(t.hit().source(), Map.class));
+                    m = new Manifestation(mapper.readValue(t.get().source(), Map.class));
                     if (filterForProcess(m)) {
                         process(m);
                     }

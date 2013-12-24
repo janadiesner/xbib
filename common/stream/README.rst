@@ -39,7 +39,6 @@ More complex uses cases involve multiple streams, producers, and consumers. As a
 * obtains from `B` the locator of a stream `S4` of commit outcomes, and consumes it to report or otherwise handle the failures that may have occurred in the process
 ￼
 .. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-usecase.png
-   :align: center
 
 Programming over Streams
 ------------------------
@@ -60,7 +59,6 @@ The Stream Interface
 The streams library revolves around the model defined by the `Stream` interface. The interface defines an API for iterating over streams of homogeneously typed elements. The API extends the standard `Iterator` API to reflect the arbitrary origin of the data, which includes memory, secondary storage, and network.
 
 .. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-usecase.png
-   :align: center
 
 The interface shows that `Stream`s are:
 
@@ -109,7 +107,6 @@ Sentences are comprised of clauses. Based on the verb clause that starts a sente
 All the verb clauses above are implemented as static methods of the `Streams` class. The methods return objects that capture the state of the sentence under construction. These objects offer instance methods that allows us continue the construction of the sentence in a type-safe manner.
 
 .. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-sentences.png
-   :align: center
 ￼
 To fold a `Stream` of strings into a `Stream` of 10-string elements, we can write::
 
@@ -182,7 +179,6 @@ Given a `Stream`, we can transform its elements into elements of another `Stream
 Visually, it’s as if we were ''piping'' the input stream into the output stream and see the elements that enter at one end of the resulting pipe come out changed as they exit at the other end. We may of course change the type of elements as they flow through the pipe, or update them in place. While we can define arbitrarily complex transformations, we will normally keep them simple: parse strings into objects, serialise objects into strings, extract selected information from objects, change that information, create new objects from that information, and so on.
 
 .. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-pipe.png
-   :align: center
 
 We define transformations by implementing the `Generator` interface::
 
@@ -288,7 +284,6 @@ When convenient, we can also extend `CountingHandler`, a `FaultHandler` that kee
  };
 
 .. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-handlers.png
-   :align: center
 
 What failures can a policy observe? There are two broad classes to consider. Some failures are ''unrecoverable'', i.e. carry the guarantee that the consumer will not be able to read further elements from the stream. Others are instead ''recoverable'', i.e. indicate that there is a good chance that continuing the iteration may produce more elements. (Note that recoverability here is with respect to the iteration alone, the client may always recover in a broader context).
 
@@ -311,7 +306,6 @@ To help out defining policies outside or inside `FaultHandler`s, the `streams` l
 * we have already encountered `StreamSkipException`s when talking about `Generator`s and `pipe` sentences. These exceptions, however, do not capture actual failures but serve as signals for `Stream` implementations. They indicate there is no transformation for a given element of an input `Stream`, i.e. the element should simply be excluded from the output stream.
 ￼
 .. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-exceptions.png
-   :align: center
 
 Building on the reusability of `FaultHandlers` and the hierarchy above, the `Streams` class includes constants for generic `FaultHandler`s which capture common failure handling policies:
 
@@ -341,7 +335,6 @@ Like with failures, we may wish to encapsulate a lifetime policy within `Stream`
  Stream<MyElement> monitored = monitor(stream).with(listener);
 
 .. image:: https://github.com/xbib/xbib/raw/master/src/site/resources/Streams-monitor.png
-   :align: center
 ￼
 Notice that
 

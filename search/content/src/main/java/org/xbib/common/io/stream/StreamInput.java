@@ -31,9 +31,8 @@
  */
 package org.xbib.common.io.stream;
 
-import org.joda.time.DateTime;
-import org.xbib.common.bytes.BytesArray;
-import org.xbib.common.bytes.BytesReference;
+import org.xbib.common.io.BytesArray;
+import org.xbib.common.io.BytesReference;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -298,8 +297,6 @@ public abstract class StreamInput extends InputStream {
                 return readByte();
             case 12:
                 return new Date(readLong());
-            case 13:
-                return new DateTime(readLong());
             case 14:
                 return readBytesReference();
             default:

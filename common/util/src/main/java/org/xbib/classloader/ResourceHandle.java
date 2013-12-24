@@ -47,7 +47,6 @@ import java.util.jar.Manifest;
  * <p/>
  * As soon as the handle is no longer in use, it should be explicitly
  * {@link #close}d, similarly to I/O streams.
- *
  */
 public interface ResourceHandle {
     /**
@@ -63,7 +62,7 @@ public interface ResourceHandle {
 
     /**
      * Does this resource refer to a directory.  Directory resources are commly used
-     * as the basis for a URL in client application.  A directory resource has 0 bytes for it's content. 
+     * as the basis for a URL in client application.  A directory resource has 0 bytes for it's content.
      */
     boolean isDirectory();
 

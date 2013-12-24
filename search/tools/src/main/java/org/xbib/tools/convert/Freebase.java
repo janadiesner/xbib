@@ -31,15 +31,16 @@
  */
 package org.xbib.tools.convert;
 
-import org.xbib.importer.AbstractImporter;
-import org.xbib.importer.ImportService;
-import org.xbib.importer.Importer;
-import org.xbib.importer.ImporterFactory;
+import org.xbib.pipeline.AbstractPipeline;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.pipeline.SimplePipelineExecutor;
+import org.xbib.pipeline.Pipeline;
 import org.xbib.io.InputService;
 import org.xbib.io.file.Finder;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.element.CounterElement;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.turtle.TurtleReader;
 import org.xbib.options.OptionParser;
@@ -63,13 +64,13 @@ import java.util.zip.GZIPOutputStream;
  * This conversion generates NTriples or Turtle format.
  *
  */
-public class Freebase extends AbstractImporter<Long, AtomicLong> {
+public class Freebase extends AbstractPipeline<CounterElement> {
 
     private final static Logger logger = LoggerFactory.getLogger(Freebase.class.getName());
 
     private final static String lf = System.getProperty("line.separator");
 
-    private final static AtomicLong fileCounter = new AtomicLong(0L);
+    private final static CounterElement fileCounter = new CounterElement().set(new AtomicLong(0L));
 
     private final static AtomicLong docCounter = new AtomicLong(0L);
 
@@ -118,13 +119,16 @@ public class Freebase extends AbstractImporter<Long, AtomicLong> {
             base = IRI.create((String)options.valueOf("base"));
 
             long t0 = System.currentTimeMillis();
-            ImportService service = new ImportService().threads(threads).factory(
-                    new ImporterFactory() {
+            SimplePipelineExecutor service = new SimplePipelineExecutor()
+                    .concurrency(threads)
+                    .provider(new PipelineProvider() {
                         @Override
-                        public Importer newImporter() {
+                        public Pipeline get() {
                             return new Freebase();
                         }
-                    }).execute();
+                    })
+                    .execute()
+                    .waitFor();
 
             long t1 = System.currentTimeMillis();
             long docs = docCounter.get();
@@ -171,7 +175,7 @@ public class Freebase extends AbstractImporter<Long, AtomicLong> {
     }
 
     @Override
-    public AtomicLong next() {
+    public CounterElement next() {
         URI uri = input.poll();
         done = uri == null;
         if (done) {
@@ -180,7 +184,7 @@ public class Freebase extends AbstractImporter<Long, AtomicLong> {
         try {
             InputStream in = InputService.getInputStream(uri);
             String output = (String)options.valueOf("output");
-            if (fileCounter.get() > 0) {
+            if (fileCounter.get().get() > 0) {
                 output += "." + fileCounter.get();
             }
             if (!output.endsWith(".gz")) {
@@ -193,13 +197,11 @@ public class Freebase extends AbstractImporter<Long, AtomicLong> {
             };
             NTripleWriter writer = new NTripleWriter()
                     .output(out);
-
-
             new TurtleReader(base)
                     .setTripleListener(writer)
                     .parse(in);
             in.close();
-            fileCounter.incrementAndGet();
+            fileCounter.get().incrementAndGet();
         } catch (Exception ex) {
             logger.error("error while parsing from stream: " + ex.getMessage(), ex);
         }

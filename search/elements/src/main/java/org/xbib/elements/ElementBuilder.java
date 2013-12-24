@@ -52,8 +52,6 @@ public interface ElementBuilder<K, V, E extends Element, C extends ResourceConte
     void build(E element, K key, V value);
 
     void end();
-    
-    void end(Object trailer);
 
     ElementBuilder<K,V,E,C> addOutput(ElementOutput output);
 }

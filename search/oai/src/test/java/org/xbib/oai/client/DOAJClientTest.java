@@ -32,7 +32,7 @@
 package org.xbib.oai.client;
 
 import org.testng.annotations.Test;
-import org.xbib.date.DateUtil;
+import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;

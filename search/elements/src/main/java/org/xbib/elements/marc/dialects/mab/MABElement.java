@@ -33,8 +33,6 @@ package org.xbib.elements.marc.dialects.mab;
 
 import org.xbib.elements.Element;
 import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.bibliographic.BibliographicProperties;
-import org.xbib.elements.bibliographic.ExtraBibliographicProperties;
 import org.xbib.analyzer.dublincore.DublinCoreProperties;
 import org.xbib.analyzer.dublincore.DublinCoreTerms;
 import org.xbib.analyzer.dublincore.DublinCoreTermsProperties;
@@ -54,8 +52,6 @@ public abstract class MABElement
         DublinCoreProperties, 
         DublinCoreTerms,
         DublinCoreTermsProperties,
-        BibliographicProperties,
-        ExtraBibliographicProperties,
         MarcXchangeConstants {
 
     protected static final Logger logger = LoggerFactory.getLogger(MABElement.class.getName());

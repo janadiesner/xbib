@@ -1,6 +1,7 @@
 package org.xbib.marc.dialects;
 
 import org.testng.annotations.Test;
+import org.xbib.elements.CountableElementOutput;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilder;
 import org.xbib.elements.marc.dialects.mab.MABContext;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilderFactory;
@@ -14,7 +15,7 @@ import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.xcontent.ContentBuilder;
-import org.xbib.util.AtomicIntegerIterator;
+import org.xbib.util.IntervalIterator;
 
 import java.io.IOException;
 import java.net.URI;
@@ -24,32 +25,13 @@ public class MarcXmlTarReaderTest {
 
     private final Logger logger = LoggerFactory.getLogger(AlephPublishingReaderTest.class.getName());
 
-    private MABElementMapper mapper;
-
     @Test
     public void testMABTarImport() throws Exception {
-        final ElementOutput<MABContext,Resource> output = new ElementOutput<MABContext,Resource>() {
-            long counter;
-
-            @Override
-            public void enabled(boolean enabled) {
-                
-            }
-            @Override
-            public boolean enabled() {
-                return true;
-            }
-
+        final ElementOutput<MABContext,Resource> output = new CountableElementOutput<MABContext,Resource>() {
             @Override
             public void output(MABContext context, ContentBuilder contentBuilder) throws IOException {
-                counter++;
+                counter.incrementAndGet();
             }
-
-            @Override
-            public long getCounter() {
-                return counter;
-            }
-            
         };
 
         ResourceBundle bundle = ResourceBundle.getBundle("org.xbib.marc.dialects.alephtest");
@@ -62,7 +44,8 @@ public class MarcXmlTarReaderTest {
                 return new MABElementBuilder().addOutput(output);
             }
         };
-        final MABElementMapper mapper = new MABElementMapper("mab/hbz/dialect").start(builderFactory);
+        final MABElementMapper mapper = new MABElementMapper("mab/hbz/tit")
+                .start(builderFactory);
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                 .addListener(mapper)
                 .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
@@ -81,7 +64,7 @@ public class MarcXmlTarReaderTest {
                 });
 
         new MarcXmlTarReader()
-                .setIterator(new AtomicIntegerIterator(from, to))
+                .setIterator(new IntervalIterator(from, to))
                 .setURI(URI.create(uriStr))
                 .setListener(kv);
     }

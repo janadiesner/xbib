@@ -44,7 +44,6 @@ import java.util.StringTokenizer;
 
 /**
  * URI utilities
- *
  */
 public final class URIUtil {
 
@@ -54,6 +53,7 @@ public final class URIUtil {
 
     private URIUtil() {
     }
+
     /**
      * Used to convert to hex.  We don't use Integer.toHexString, since
      * it converts to lower case (and the Sun docs pretty clearly specify
@@ -66,18 +66,16 @@ public final class URIUtil {
      * string of a given URI. Existing keys will be overwritten.
      *
      * @param uri
-     * @param key 
+     * @param key
      * @param value
      * @param encoding
-     *
      * @return uri
-     *
-     * @throws UnsupportedEncodingException 
+     * @throws UnsupportedEncodingException
      * @throws URISyntaxException
      */
     public static URI addParameter(URI uri, String key, String value, Charset encoding)
             throws UnsupportedEncodingException, URISyntaxException {
-        Map<String,String> m = parseQueryString(uri, encoding);
+        Map<String, String> m = parseQueryString(uri, encoding);
         m.put(key, value);
         String query = renderQueryString(m);
         return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), query, uri.getFragment());
@@ -87,18 +85,16 @@ public final class URIUtil {
      * This method adds a map of key/value parameters to the query
      * string of a given URI. Existing keys will be overwritten.
      *
-     * @param uri 
-     * @param m 
-     * @param encoding 
-     *
+     * @param uri
+     * @param m
+     * @param encoding
      * @return the URI
-     *
-     * @throws UnsupportedEncodingException 
-     * @throws URISyntaxException 
+     * @throws UnsupportedEncodingException
+     * @throws URISyntaxException
      */
-    public static URI addParameter(URI uri, Map<String,String> m, Charset encoding)
+    public static URI addParameter(URI uri, Map<String, String> m, Charset encoding)
             throws URISyntaxException {
-        Map<String,String> oldMap = parseQueryString(uri, encoding);
+        Map<String, String> oldMap = parseQueryString(uri, encoding);
         oldMap.putAll(m);
         String query = renderQueryString(oldMap);
         return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), query, uri.getFragment());
@@ -106,7 +102,7 @@ public final class URIUtil {
 
     private static String concat(Collection<String> c) {
         StringBuilder sb = new StringBuilder();
-        for (Iterator<String> it = c.iterator(); it.hasNext();) {
+        for (Iterator<String> it = c.iterator(); it.hasNext(); ) {
             if (sb.length() > 0) {
                 sb.append(",");
             }
@@ -122,11 +118,9 @@ public final class URIUtil {
      * fragment identifier. This method will translate any escaped characters
      * back to the original.
      *
-     * @param s The URI to decode.
+     * @param s        The URI to decode.
      * @param encoding The encoding to decode into.
-     *
      * @return The decoded URI
-     *
      */
     public static String decode(String s, Charset encoding) {
         StringBuilder sb = new StringBuilder();
@@ -160,7 +154,7 @@ public final class URIUtil {
 
     /**
      * <p>Escape a string into URI syntax</p>
-     *  <p>This function applies the URI escaping rules defined in
+     * <p>This function applies the URI escaping rules defined in
      * section 2 of [RFC 2396], as amended by [RFC 2732], to the string
      * supplied as the first argument, which typically represents all or part
      * of a URI, URI reference or IRI. The effect of the function is to
@@ -169,26 +163,24 @@ public final class URIUtil {
      * the octets used to represent the character in US-ASCII for characters
      * in the ASCII repertoire, and a different character encoding for
      * non-ASCII characters.</p>
-     *  <p>If the second argument is true, all characters are escaped
+     * <p>If the second argument is true, all characters are escaped
      * other than lower case letters a-z, upper case letters A-Z, digits 0-9,
      * and the characters referred to in [RFC 2396] as "marks": specifically,
      * "-" | "_" | "." | "!" | "~" | "" | "'" | "(" | ")". The "%" character
      * itself is escaped only if it is not followed by two hexadecimal digits
      * (that is, 0-9, a-f, and A-F).</p>
-     *  <p>[RFC 2396] does not define whether escaped URIs should use
+     * <p>[RFC 2396] does not define whether escaped URIs should use
      * lower case or upper case for hexadecimal digits. To ensure that escaped
      * URIs can be compared using string comparison functions, this function
      * must always use the upper-case letters A-F.</p>
-     *  <p>The character encoding used as the basis for determining the
+     * <p>The character encoding used as the basis for determining the
      * octets depends on the setting of the second argument.</p>
      *
-     * @param s The String to convert
+     * @param s        The String to convert
      * @param encoding The encoding to use for unsafe characters
-     *
      * @return The converted String
-     *
-     * @exception UnsupportedEncodingException If the named encoding is not
-     *            supported
+     * @throws UnsupportedEncodingException If the named encoding is not
+     *                                      supported
      */
     public static String encode(String s, Charset encoding) {
         int length = s.length();
@@ -234,11 +226,9 @@ public final class URIUtil {
      * Useful for processing command line input.
      *
      * @param s the URI string
-     *
      * @return a string with the URL encoded data.
-     *
-     * @throws UnsupportedEncodingException 
-     * @throws URISyntaxException 
+     * @throws UnsupportedEncodingException
+     * @throws URISyntaxException
      */
     public static URI encodeQueryString(String s) throws URISyntaxException {
         if (s == null) {
@@ -269,9 +259,7 @@ public final class URIUtil {
      * Get properties from URI
      *
      * @param uri the URI
-     *
      * @return the properties
-     *
      * @throws UnsupportedEncodingException
      */
     public static Properties getPropertiesFromURI(URI uri) {
@@ -303,7 +291,7 @@ public final class URIUtil {
         String[] ui = (userInfo != null) ? userInfo.split(":") : new String[]{};
         properties.setProperty("username", (ui.length > 0) ? ui[0] : "");
         properties.setProperty("password", (ui.length > 1) ? ui[1] : "");
-        Map<String,String> m = parseQueryString(uri);
+        Map<String, String> m = parseQueryString(uri);
         if ((m != null) && (m.size() > 0)) {
             properties.setProperty("requestkeys", concat(m.keySet()));
             properties.setProperty("requestquery", renderQueryString(m));
@@ -338,8 +326,7 @@ public final class URIUtil {
      * froim '0' till '9', or one of the characters '-', '_', '.' or ''. Such
      * 'safe' character don't have to be url encoded.
      *
-     * @param c 
-     *
+     * @param c
      * @return true or false
      */
     private static boolean isSafe(char c) {
@@ -353,12 +340,10 @@ public final class URIUtil {
      * decode plus characters. The encoding is UTF-8.
      *
      * @param uri the URI to examine for request parameters
-     *
      * @return a map
-     *
      * @throws UnsupportedEncodingException
      */
-    public static Map<String,String> parseQueryString(URI uri) {
+    public static Map<String, String> parseQueryString(URI uri) {
         return parseQueryString(uri, UTF8);
     }
 
@@ -367,15 +352,13 @@ public final class URIUtil {
      * request parameters. We do not rely on java.net.URI because it does not
      * decode plus characters.
      *
-     * @param uri the URI to examine for request parameters
+     * @param uri      the URI to examine for request parameters
      * @param encoding the encoding
-     *
      * @return a Map
-     *
-     * @throws UnsupportedEncodingException 
+     * @throws UnsupportedEncodingException
      * @throws IllegalArgumentException
      */
-    public static Map<String,String> parseQueryString(URI uri, Charset encoding) {
+    public static Map<String, String> parseQueryString(URI uri, Charset encoding) {
         return parseQueryString(uri, encoding, null);
     }
 
@@ -384,14 +367,14 @@ public final class URIUtil {
      * request parameters. We do not rely on java.net.URI because it does not
      * decode plus characters. A listener can process the parameters in order.
      *
-     * @param uri the URI to examine for request parameters
+     * @param uri      the URI to examine for request parameters
      * @param encoding the encoding
      * @param listener a listner for processing the URI parameters in order, or null
      * @return a Map of parameters
      * @throws UnsupportedEncodingException
      */
-    public static Map<String,String> parseQueryString(URI uri, Charset encoding, ParameterListener listener) {
-        Map<String,String> m = new HashMap();
+    public static Map<String, String> parseQueryString(URI uri, Charset encoding, ParameterListener listener) {
+        Map<String, String> m = new HashMap();
         if (uri == null) {
             throw new IllegalArgumentException();
         }
@@ -412,9 +395,9 @@ public final class URIUtil {
                 k = pair.substring(0, pos);
                 v = decode(pair.substring(pos + 1, pair.length()), encoding);
             }
-            m.put(k,v);
+            m.put(k, v);
             if (listener != null) {
-                listener.received(k,v);
+                listener.received(k, v);
             }
         }
         return m;
@@ -425,18 +408,16 @@ public final class URIUtil {
      * into a URL encoded querystring format.
      *
      * @param m a map of key/value arrays.
-     *
      * @return a string with the URL encoded data.
-     *
      * @throws UnsupportedEncodingException
      */
-    public static String renderQueryString(Map<String,String> m)  {
+    public static String renderQueryString(Map<String, String> m) {
         String key = null;
         String value = null;
         StringBuilder out = new StringBuilder();
         Charset encoding = m.containsKey("encoding") ? Charset.forName(m.get("encoding")) : UTF8;
-        for (Iterator<Map.Entry<String,String>> iter = m.entrySet().iterator(); iter.hasNext();) {
-            Map.Entry<String,String> me = iter.next();
+        for (Iterator<Map.Entry<String, String>> iter = m.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry<String, String> me = iter.next();
             key = me.getKey();
             String o = me.getValue();
             value = o != null ? encode(o, encoding) : null;
@@ -458,14 +439,13 @@ public final class URIUtil {
      * string for queries.
      *
      * @param m a map of key/value arrays.
-     *
      * @return a string
      */
-    public static String renderRawQueryString(Map<String,String> m) {
+    public static String renderRawQueryString(Map<String, String> m) {
         String key;
         String value;
         StringBuilder out = new StringBuilder();
-        for (Iterator<Map.Entry<String, String>> iter = m.entrySet().iterator(); iter.hasNext();) {
+        for (Iterator<Map.Entry<String, String>> iter = m.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry<String, String> me = iter.next();
             key = me.getKey();
             value = me.getValue();

@@ -31,7 +31,7 @@
  */
 package org.xbib.oai.client;
 
-import org.xbib.date.DateUtil;
+import org.xbib.util.DateUtil;
 import org.xbib.io.Connection;
 import org.xbib.io.Packet;
 import org.xbib.io.Session;

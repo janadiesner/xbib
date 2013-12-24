@@ -61,6 +61,7 @@ public class JarFileUrlConnection extends JarURLConnection {
             throw new ExceptionInInitializerError(e);
         }
     }
+
     private final URL url;
     private final JarFile jarFile;
     private final JarEntry jarEntry;

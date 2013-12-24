@@ -265,6 +265,13 @@
             </plugin>
             <plugin>
                 <artifactId>maven-site-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-module-markdown</artifactId>
+                        <version>1.3</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>com.github.github</groupId>
@@ -387,6 +394,11 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.xbib</groupId>
+                <artifactId>mapdb</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>15.0</version>
@@ -399,6 +411,11 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
+                <version>2.2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
                 <version>2.2.0</version>
             </dependency>
             <dependency>
@@ -424,7 +441,7 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
-                <version>4.0.10.Final</version>
+                <version>4.0.13.Final</version>
             </dependency>
             <dependency>
                 <groupId>joda-time</groupId>
@@ -569,7 +586,22 @@
 
     <profiles>
         <profile>
-            <id>es-090</id>
+            <id>elasticsearch-019</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.xbib.elasticsearch.plugin</groupId>
+                        <artifactId>elasticsearch-support</artifactId>
+                        <version>0.19.11.1</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+        <profile>
+            <id>elasticsearch-090</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -578,19 +610,22 @@
                     <dependency>
                         <groupId>org.xbib.elasticsearch.plugin</groupId>
                         <artifactId>elasticsearch-support</artifactId>
-                        <version>0.90.5.4</version>
+                        <version>0.90.7.3</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
         </profile>
         <profile>
-            <id>es-019</id>
+            <id>elasticsearch-100</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
             <dependencyManagement>
                 <dependencies>
                     <dependency>
                         <groupId>org.xbib.elasticsearch.plugin</groupId>
                         <artifactId>elasticsearch-support</artifactId>
-                        <version>0.19.11.1</version>
+                        <version>1.0.0.Beta2.3</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -607,6 +642,7 @@
         <module>common/dict</module>
         <module>common/graph</module>
         <module>common/stream</module>
+        <module>common/mapdb</module>
 
         <module>search/grouping</module>
         <module>search/standardnumber</module>

@@ -31,7 +31,6 @@
  */
 package org.xbib.io.chunk;
 
-import org.xbib.io.chunk.ChunkedStream;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 
@@ -41,12 +40,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * An in-memory buffer that provides OutputStream and InputStream interfaces.
- *
+ * <p/>
  * This is more efficient than using ByteArrayOutputStream/ByteArrayInputStream
- *
+ * <p/>
  * This implementation is thread safe and blocks writers until there is a reader
  * that processes chunks.
- *
  */
 public class BlockingChunkedStream extends ChunkedStream {
 
@@ -66,7 +64,7 @@ public class BlockingChunkedStream extends ChunkedStream {
 
     protected void produce(StreamChunk chunk) throws IOException {
         try {
-            ((BlockingQueue<StreamChunk>)chunks).put(chunk);
+            ((BlockingQueue<StreamChunk>) chunks).put(chunk);
         } catch (InterruptedException e) {
             throw new IOException("interrupted");
         }
@@ -74,7 +72,7 @@ public class BlockingChunkedStream extends ChunkedStream {
 
     protected StreamChunk consume() throws IOException {
         try {
-           return ((BlockingQueue<StreamChunk>)chunks).take();
+            return ((BlockingQueue<StreamChunk>) chunks).take();
         } catch (InterruptedException e) {
             throw new IOException("interrupted");
         }
@@ -86,7 +84,7 @@ public class BlockingChunkedStream extends ChunkedStream {
             closed = true;
             if (currentWriteChunk.bytesUnread() > 0) {
                 try {
-                    ((BlockingQueue<StreamChunk>)chunks).put(currentWriteChunk);
+                    ((BlockingQueue<StreamChunk>) chunks).put(currentWriteChunk);
                 } catch (InterruptedException e) {
                     throw new IOException("interrupted");
                 }

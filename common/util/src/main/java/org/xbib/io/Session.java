@@ -32,14 +32,12 @@
 package org.xbib.io;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 /**
- *  The Session interface is an object for being opened,
- *  receive operations, and being closed.
- *  Sessions must be opened before the first operation
- *  and closed after the last operation.
- *
+ * The Session interface is an object for being opened,
+ * receive operations, and being closed.
+ * Sessions must be opened before the first operation
+ * and closed after the last operation.
  */
 public interface Session<P extends Packet> {
 
@@ -72,12 +70,14 @@ public interface Session<P extends Packet> {
 
     /**
      * Create new session packet
+     *
      * @return
      */
     P newPacket();
 
     /**
      * Read packet from session
+     *
      * @return
      * @throws IOException
      */
@@ -85,6 +85,7 @@ public interface Session<P extends Packet> {
 
     /**
      * Write packet to session
+     *
      * @param packet
      * @throws IOException
      */

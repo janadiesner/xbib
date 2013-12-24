@@ -43,11 +43,10 @@ public class CQLSearchSupport extends SearchClient {
 
     @Override
     public CQLSearchSupport newClient() {
-        super.newClient(findURI());
+        this.newClient(findURI());
         return this;
     }
 
-    @Override
     public CQLSearchSupport newClient(URI uri) {
         super.newClient(uri);
         return this;

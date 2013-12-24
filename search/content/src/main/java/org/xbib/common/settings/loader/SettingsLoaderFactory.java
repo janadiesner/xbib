@@ -19,6 +19,10 @@
 
 package org.xbib.common.settings.loader;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.CharBuffer;
+
 /**
  * A settings loader factory automatically trying to identify what type of
  * {@link SettingsLoader} to use.
@@ -59,4 +63,21 @@ public final class SettingsLoaderFactory {
         }
         return new PropertiesSettingsLoader();
     }
+
+    public static SettingsLoader loaderFromReader(Reader reader) throws IOException {
+        reader.mark(256);
+        CharBuffer cb = CharBuffer.allocate(256);
+        reader.read(cb);
+        cb.flip();
+        String source = cb.toString();
+        reader.reset();
+        if (source.indexOf('{') != -1 && source.indexOf('}') != -1) {
+            return new JsonSettingsLoader();
+        }
+        if (source.indexOf(':') != -1) {
+            return new YamlSettingsLoader();
+        }
+        return new PropertiesSettingsLoader();
+    }
+
 }

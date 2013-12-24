@@ -12,9 +12,10 @@ import java.util.NoSuchElementException;
 public class IteratorStream<E> implements Stream<E> {
 
     private final Iterator<E> iterator;
-    private boolean closed;
+
     private final IteratorAdapter<E> adapter;
 
+    private boolean closed;
 
     /**
      * Creates an instance that adapts a given {@link IteratorAdapter}.

@@ -41,7 +41,6 @@ import java.util.TreeMap;
  * bytes that have been transferred in the current session and the time this has
  * taken, and the number of bytes and time taken overal (eg for transfers that
  * have been restarted).
- *
  */
 public class BytesProgressWatcher {
 
@@ -65,7 +64,7 @@ public class BytesProgressWatcher {
      * bytes.
      *
      * @param bytesToTransfer the number of bytes that will be transferred, eg
-     * the size of a file being uploaded.
+     *                        the size of a file being uploaded.
      */
     public BytesProgressWatcher(long bytesToTransfer) {
         this.bytesToTransfer = bytesToTransfer;
@@ -84,7 +83,6 @@ public class BytesProgressWatcher {
      * called automatically when a transfer is started (ie the first bytes are
      * registered in the method {@link #updateBytesTransferred(long)}), or when
      * a transfer is restarted (eg due to transmission errors).
-     *
      */
     public synchronized void resetWatcher() {
         startTimeCurrentTransferMS = System.currentTimeMillis();
@@ -246,7 +244,7 @@ public class BytesProgressWatcher {
 
     /**
      * @param progressWatchers all the watchers involved in the same byte
-     * transfer operation.
+     *                         transfer operation.
      * @return the total number of bytes to transfer.
      */
     public static long sumBytesToTransfer(BytesProgressWatcher[] progressWatchers) {
@@ -259,7 +257,7 @@ public class BytesProgressWatcher {
 
     /**
      * @param progressWatchers all the watchers involved in the same byte
-     * transfer operation.
+     *                         transfer operation.
      * @return the total number of bytes already transferred.
      */
     public static long sumBytesTransferred(BytesProgressWatcher[] progressWatchers) {
@@ -272,7 +270,7 @@ public class BytesProgressWatcher {
 
     /**
      * @param progressWatchers all the watchers involved in the same byte
-     * transfer operation.
+     *                         transfer operation.
      * @return an estimate of the time (in seconds) it will take for the
      * transfer to completed, based on the number of bytes remaining to transfer
      * and the overall bytes/second rate.
@@ -280,7 +278,7 @@ public class BytesProgressWatcher {
     public static long calculateRemainingTime(BytesProgressWatcher[] progressWatchers) {
         long bytesRemaining =
                 sumBytesToTransfer(progressWatchers)
-                - sumBytesTransferred(progressWatchers);
+                        - sumBytesTransferred(progressWatchers);
         double bytesPerSecond = calculateOverallBytesPerSecond(progressWatchers);
 
         if (Math.abs(bytesPerSecond) < 0.001d) {
@@ -295,7 +293,7 @@ public class BytesProgressWatcher {
 
     /**
      * @param progressWatchers all the watchers involved in the same byte
-     * transfer operation.
+     *                         transfer operation.
      * @return the overall rate of bytes/second over all transfers for all
      * watchers.
      */
@@ -331,7 +329,7 @@ public class BytesProgressWatcher {
 
     /**
      * @param progressWatchers all the watchers involved in the same byte
-     * transfer operation.
+     *                         transfer operation.
      * @return the rate of bytes/second that has been achieved recently (ie
      * within the last
      * {@link #SECONDS_OF_HISTORY} seconds).

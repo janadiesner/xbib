@@ -31,10 +31,9 @@
  */
 package org.xbib.elements.marc.dialects.pica;
 
-import org.xbib.analyzer.pica.zdb.bib.LibraryAddressProperties;
+import org.xbib.analyzer.pica.zdb.bibdat.LibraryAddressProperties;
 import org.xbib.elements.Element;
 import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.bibliographic.ExtraBibliographicProperties;
 import org.xbib.analyzer.dublincore.DublinCoreProperties;
 import org.xbib.analyzer.dublincore.DublinCoreTerms;
 import org.xbib.analyzer.dublincore.DublinCoreTermsProperties;
@@ -46,11 +45,10 @@ import org.xbib.marc.FieldCollection;
 import java.util.Map;
 
 public abstract class PicaElement
-        implements Element<FieldCollection, String, PicaBuilder>, 
+        implements Element<FieldCollection, String, PicaElementBuilder>,
         DublinCoreProperties, 
         DublinCoreTerms, 
         DublinCoreTermsProperties,
-        ExtraBibliographicProperties,
         LibraryAddressProperties {
 
     protected static final Logger logger = LoggerFactory.getLogger(PicaElement.class.getName());
@@ -74,7 +72,7 @@ public abstract class PicaElement
     }
 
     @Override
-    public PicaElement build(PicaBuilder builder, FieldCollection key, String value) {
+    public PicaElement build(PicaElementBuilder builder, FieldCollection key, String value) {
         return this;
     }
 

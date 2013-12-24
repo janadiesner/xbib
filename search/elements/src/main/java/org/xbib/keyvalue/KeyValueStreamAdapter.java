@@ -34,11 +34,10 @@ package org.xbib.keyvalue;
 public class KeyValueStreamAdapter<K,V> implements KeyValueStreamListener<K,V> {
 
     /**
-     * Begin a key/value stream
+     * Begin a key/value sequence
      */
     @Override
     public void begin() {
-        
     }
     
     /**
@@ -48,23 +47,12 @@ public class KeyValueStreamAdapter<K,V> implements KeyValueStreamListener<K,V> {
      */
     @Override
     public void keyValue(K key, V value) {
-        
     }
     
     /**
-     * End a key/value stream
+     * End a key/value sequence
      */
     @Override
     public void end() {
-        
-    }
-    
-    /**
-     * End a key/value stream with an information object
-     * @param info 
-     */
-    @Override
-    public void end(Object info) {
-        
     }
 }

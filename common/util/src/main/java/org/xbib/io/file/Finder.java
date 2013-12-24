@@ -53,7 +53,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A finder for traversing PathFiles
- *
  */
 public class Finder extends SimpleFileVisitor<Path> {
 
@@ -78,18 +77,20 @@ public class Finder extends SimpleFileVisitor<Path> {
     }
 
     public Finder chronologicallySorted() {
-        this.comparator = new Comparator<PathFile>(){
+        this.comparator = new Comparator<PathFile>() {
             public int compare(PathFile p1, PathFile p2) {
                 return p1.getAttributes().lastModifiedTime().compareTo(p2.getAttributes().lastModifiedTime());
-            } };
+            }
+        };
         return this;
     }
 
     public Finder pathSorted() {
-        this.comparator = new Comparator<PathFile>(){
+        this.comparator = new Comparator<PathFile>() {
             public int compare(PathFile p1, PathFile p2) {
                 return p1.getPath().toUri().compareTo(p2.getPath().toUri());
-            } };
+            }
+        };
         return this;
     }
 
@@ -123,7 +124,7 @@ public class Finder extends SimpleFileVisitor<Path> {
         Path name = path.getFileName();
         if (name != null && matcher.matches(name)) {
             if (modifiedSince == null || attrs.lastModifiedTime().toMillis() > modifiedSince.toMillis()) {
-                input.add(new PathFile(path,attrs));
+                input.add(new PathFile(path, attrs));
             }
         }
         return FileVisitResult.CONTINUE;

@@ -35,28 +35,35 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
-import com.google.common.collect.Multiset;
 import com.google.common.collect.SetMultimap;
 
-import org.elasticsearch.common.collect.Sets;
-import org.xbib.date.DateUtil;
-import org.xbib.grouping.bibliographic.endeavor.PublishedJournal;
-import org.xbib.map.MapBasedAnyObject;
-import org.xbib.util.Strings;
-
+import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.xbib.common.xcontent.XContentBuilder;
+import org.xbib.grouping.bibliographic.endeavor.PublishedJournal;
+import org.xbib.map.MapBasedAnyObject;
+import org.xbib.pipeline.PipelineRequest;
+import org.xbib.util.Strings;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Sets.newLinkedHashSet;
+
 public class Manifestation extends MapBasedAnyObject
-        implements Comparable<Manifestation> {
+        implements Comparable<Manifestation>, PipelineRequest {
+
+    private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 
     private final DecimalFormat df = new DecimalFormat("0000");
 
@@ -67,6 +74,8 @@ public class Manifestation extends MapBasedAnyObject
     private final String key;
 
     private String title;
+
+    private String shortTitle;
 
     private String corporate;
 
@@ -88,6 +97,10 @@ public class Manifestation extends MapBasedAnyObject
 
     private boolean isPartial;
 
+    private boolean isSupplement;
+
+    private boolean isMicroform;
+
     private String printID;
 
     private String onlineID;
@@ -102,8 +115,6 @@ public class Manifestation extends MapBasedAnyObject
 
     private String carrierType;
 
-    private boolean isSupplement;
-
     private String supplementID;
 
     private String supplementExternalID;
@@ -114,9 +125,13 @@ public class Manifestation extends MapBasedAnyObject
 
     private final Map<String,Object> identifiers;
 
-    private SetMultimap<String, String> relations;
+    private final SetMultimap<String, String> relations;
 
-    private SetMultimap<String, Manifestation> relatedManifestations;
+    private final SetMultimap<String, Manifestation> relatedManifestations;
+
+    private final SetMultimap<String, Holding> relatedHoldings;
+
+    private final SetMultimap<Integer, Holding> evidenceByDate;
 
     public Manifestation(Map<String, Object> m) {
         super(m);
@@ -161,9 +176,14 @@ public class Manifestation extends MapBasedAnyObject
         // ISSN, CODEN, ...
         this.identifiers = makeIdentifiers();
 
+        // relations to other manifestations on ID basis
         this.relations = makeRelations();
-
+        // prepare the construction of relations to manifestations
         this.relatedManifestations = newRelatedManifestations();
+        // prepare the construction of relations to holdings
+        this.relatedHoldings = newRelatedHolding();
+        // prepare holdings by date
+        this.evidenceByDate = HashMultimap.create();
 
         // unique identifier
         StringBuilder p = new StringBuilder();
@@ -179,12 +199,16 @@ public class Manifestation extends MapBasedAnyObject
                 .createIdentifier();
     }
 
+    public Long size() {
+        return Integer.valueOf(map().size()).longValue();
+    }
+
     public String id() {
-        return id;
+        return !isMicroform ? id : id + "m";
     }
 
     public String externalID() {
-        return externalID;
+        return !isMicroform ? externalID : externalID + "m";
     }
 
     public Manifestation contentType(String contentType) {
@@ -220,6 +244,10 @@ public class Manifestation extends MapBasedAnyObject
 
     public String title() {
         return title;
+    }
+
+    public String shortTitle() {
+        return shortTitle;
     }
 
     public String corporateName() {
@@ -274,12 +302,24 @@ public class Manifestation extends MapBasedAnyObject
         return isPartial;
     }
 
+    public boolean isMicroform() {
+        return isMicroform;
+    }
+
+    public boolean isPrint() {
+        return printID != null && id.equals(printID);
+    }
+
     public boolean hasPrint() {
-        return id.equals(onlineID) && printID != null;
+        return printID != null && id.equals(onlineID);
+    }
+
+    public boolean isOnline() {
+        return onlineID != null && id.equals(onlineID);
     }
 
     public boolean hasOnline() {
-        return id.equals(printID) && onlineID != null;
+        return onlineID != null && id.equals(printID);
     }
 
     public String getPrintID() {
@@ -310,11 +350,6 @@ public class Manifestation extends MapBasedAnyObject
         return links;
     }
 
-    public Manifestation addRelation(String key, String value) {
-        relations.put(key, value);
-        return this;
-    }
-
     public SetMultimap<String, String> relations() {
         return relations;
     }
@@ -332,8 +367,43 @@ public class Manifestation extends MapBasedAnyObject
         return false;
     }
 
+    public boolean isInRange(Integer date) {
+        if (firstDate() == null) {
+            return true; // no date
+        }
+        if (date < firstDate()) {
+            return false;
+        }
+        return lastDate() == null || lastDate() < date;
+    }
 
-    public Map<String,Object> cleanTitle() {
+
+    public String getUniqueIdentifier() {
+        return unique;
+    }
+
+    public Manifestation cloneMicroformEdition() {
+        if (map().containsKey("physicalDescriptionMicroform")) {
+            // secondary microform?
+            if ("secondary-microform".equals(getString("otherCodes.genre"))) {
+                Manifestation secondary = new Manifestation(map());
+                secondary.isMicroform = true;
+                secondary.contentType = "text";
+                secondary.mediaType = "microform";
+                secondary.carrierType = "other";
+                createRelation("OtherEditionEntry", "hasMicroformEdition", this, secondary);
+                createRelation("OtherEditionEntry", "hasPrintEdition", secondary, this);
+                // remove all microform hints from this
+                map().remove("physicalDescriptionMicroform");
+                map().remove("AdditionalPhysicalFormNote");
+                map().remove("otherCodes");
+                return secondary;
+            }
+        }
+        return null;
+    }
+
+    private Map<String,Object> cleanTitle() {
         Map<String, Object> m = (Map<String, Object>) map().get("TitleStatement");
         if (m != null) {
             String titleMedium = (String) m.get("titleMedium");
@@ -344,27 +414,24 @@ public class Manifestation extends MapBasedAnyObject
         return m;
     }
 
-    public String getUniqueIdentifier() {
-        return unique;
-    }
-
     private void makeTitle() {
         // shorten title (series statement after '/' or ':')
-        String title = cleanTitle(getString("TitleStatement.titleMain"));
+        String title = clean(getString("TitleStatement.titleMain"));
         if (isPartial) {
-            String partName = cleanTitle(getString("TitleStatement.titlePartName"));
+            String partName = clean(getString("TitleStatement.titlePartName"));
             if (!Strings.isNullOrEmpty(partName)) {
                 title += " / " + partName;
             }
-            String partNumber = cleanTitle(getString("TitleStatement.titlePartNumber"));
+            String partNumber = clean(getString("TitleStatement.titlePartNumber"));
             if (!Strings.isNullOrEmpty(partNumber)) {
                 title += " / " + partNumber;
             }
         }
         setTitle(title);
+        this.shortTitle = clean(title);
     }
 
-    private String cleanTitle(String title) {
+    private String clean(String title) {
         if (title == null) {
             return null;
         }
@@ -445,13 +512,6 @@ public class Manifestation extends MapBasedAnyObject
                 return;
             }
         }
-        // microform (plus unmediated text)
-        if (map().containsKey("physicalDescriptionMicroform")) {
-            this.contentType = "text";
-            this.mediaType = "microform";
-            this.carrierType = "other";
-            return;
-        }
         // before assuming unmediated text, check title strings for media phrases
         String[] phraseTitles = new String[]{
                 getString("AdditionalPhysicalFormNote.value"),
@@ -470,14 +530,6 @@ public class Manifestation extends MapBasedAnyObject
                         return;
                     }
                 }
-                for (String t : MF) {
-                    if (s.contains(t)) {
-                        this.contentType = "text";
-                        this.mediaType = "microform";
-                        this.carrierType = "other";
-                        return;
-                    }
-                }
             }
         }
         // default
@@ -486,14 +538,28 @@ public class Manifestation extends MapBasedAnyObject
         this.carrierType = "volume";
     }
 
+    private void createRelation(String key, String subkey, Manifestation parent, Manifestation child) {
+
+        Map<String,Object> relation = newHashMap();
+        relation.put("relation", subkey);
+        relation.put("identifierDNB", child.id());
+        relation.put("identifierZDB", child.externalID());
+
+        Object o = parent.map().get(key);
+        if (o == null) {
+            o = newArrayList();
+        }
+        if (!(o instanceof List)) {
+            o = Arrays.asList(o);
+        }
+        // we must build a new list
+        List<Map<String,Object>> l = newLinkedList((List<Map<String, Object>>) o);
+        l.add(relation);
+        parent.map().put(key, l);
+    }
+
     private final String[] ER = new String[]{
             "Elektronische Ressource"
-    };
-
-    private final String[] MF = new String[]{
-            "Mikroform",
-            "Microfiche",
-            "secondary-microform"
     };
 
     private String computeKey() {
@@ -534,8 +600,8 @@ public class Manifestation extends MapBasedAnyObject
         int d1;
         int d2 = 0;
         try {
-            d1 = firstDate == null ? DateUtil.getYear() : firstDate;
-            d2 = lastDate == null ? DateUtil.getYear() : lastDate;
+            d1 = firstDate == null ? currentYear : firstDate;
+            d2 = lastDate == null ? currentYear : lastDate;
             delta = d2 - d1;
         } catch (NumberFormatException e) {
             delta = 0;
@@ -548,25 +614,25 @@ public class Manifestation extends MapBasedAnyObject
         if (o instanceof List) {
             this.country = (List<String>)o;
         } else if (o instanceof String) {
-            List<String> l = new ArrayList();
+            List<String> l = newLinkedList();
             l.add((String)o);
             this.country = l;
         } else {
-            List<String> l = new ArrayList();
+            List<String> l = newLinkedList();
             l.add("unknown");
             this.country = l;
         }
     }
 
     private Map<String,Object> makeIdentifiers() {
-        Map<String,Object> m = new HashMap();
+        Map<String,Object> m = newHashMap();
         // get and convert all ISSN
         Object o = map().get("IdentifierISSN");
         if (o != null) {
             if (!(o instanceof List)) {
                 o = Arrays.asList(o);
             }
-            List<String> issns = new ArrayList();
+            List<String> issns = newLinkedList();
             List<Map<String,Object>> l = (List<Map<String,Object>>)o;
             for (Map<String, Object> aL : l) {
                 String s = (String) aL.get("value");
@@ -588,7 +654,7 @@ public class Manifestation extends MapBasedAnyObject
 
         @Override
         public Set<String> get() {
-            return Sets.newLinkedHashSet();
+            return newLinkedHashSet();
         }
     };
 
@@ -626,7 +692,7 @@ public class Manifestation extends MapBasedAnyObject
         return multi;
     }
 
-    private final static Set<String> relationEntries = Sets.newHashSet(
+    private final static Set<String> relationEntries = newHashSet(
             "PrecedingEntry",
             "SucceedingEntry",
             "OtherEditionEntry",
@@ -639,7 +705,7 @@ public class Manifestation extends MapBasedAnyObject
         return relationEntries;
     }
 
-    private final static Set<String> carrierEditions =  Sets.newHashSet(
+    private final static Set<String> carrierEditions =  newHashSet(
             "hasPrintEdition",
             "hasOnlineEdition",
             "hasBrailleEdition",
@@ -657,12 +723,160 @@ public class Manifestation extends MapBasedAnyObject
         return HashMultimap.create();
     }
 
+    private SetMultimap<String, Holding> newRelatedHolding() {
+        return HashMultimap.create();
+    }
+
     public void addRelatedManifestation(String relation, Manifestation manifestation) {
         relatedManifestations.put(relation, manifestation);
     }
 
+    public void addRelatedHolding(String relation, Holding holding) {
+        relatedHoldings.put(relation, holding);
+    }
+
+    public void addEvidenceByDate(Integer date, Holding holding) {
+        evidenceByDate.put(date, holding);
+    }
+
     public SetMultimap<String, Manifestation> getRelatedManifestations() {
         return relatedManifestations;
+    }
+
+    public SetMultimap<Integer, Holding> getEvidenceByDate() {
+        return evidenceByDate;
+    }
+
+    public void buildSnippet(XContentBuilder builder, int indent, String relation, Set<Manifestation> visited)
+        throws IOException {
+        if (relation == null) {
+            builder.startObject();
+        } else {
+            builder.startObject(relation);
+        }
+        builder.field("id", externalID())
+                .field("title", cleanTitle())
+                .field("corporateName", corporateName())
+                .field("meetingName", meetingName())
+                .field("country", country())
+                .field("language", language())
+                .field("publisherPlace", publisherPlace())
+                .field("publisher", publisher())
+                .field("identifiers", getIdentifiers())
+                .field("firstDate", firstDate())
+                .field("lastDate", lastDate())
+                .field("contentType", contentType())
+                .field("mediaType", mediaType())
+                .field("carrierType", carrierType())
+                .field("isPartial", isPartial())
+                .field("isSupplement", isSupplement());
+        if (hasOnline()) {
+            builder.field("hasOnline", getOnlineExternalID());
+        }
+        if (hasPrint()) {
+            builder.field("hasPrint", getPrintExternalID());
+        }
+        if (visited.contains(this)) {
+            builder.endObject();
+            // loop detected
+            return;
+        }
+        visited.add(this);
+        // append other carriers, parts, supplements
+        Set<String> relations = getRelatedManifestations().keySet();
+        for (String rel : relations) {
+            if (Manifestation.carrierEditions().contains(rel)
+                    || "hasPart".equals(rel) || "hasSupplement".equals(rel)) {
+                for (Manifestation mm : getRelatedManifestations().get(rel)) {
+                    mm.buildSnippet(builder, indent + 1, rel, visited);
+                }
+            }
+        }
+        builder.endObject();
+    }
+
+    public void build(XContentBuilder builder) throws IOException {
+        builder.startObject();
+        builder.field("id", externalID())
+                .field("title", cleanTitle())
+                .field("corporateName", corporateName())
+                .field("meetingName", meetingName())
+                .field("country", country())
+                .field("language", language())
+                .field("publisherPlace", publisherPlace())
+                .field("publisher", publisher())
+                .field("identifiers", getIdentifiers())
+                .field("firstDate", firstDate())
+                .field("lastDate", lastDate())
+                .field("contentType", contentType())
+                .field("mediaType", mediaType())
+                .field("carrierType", carrierType())
+                .field("isPartial", isPartial())
+                .field("isSupplement", isSupplement());
+        if (hasOnline()) {
+            builder.field("hasOnline", getOnlineExternalID());
+        }
+        if (hasPrint()) {
+            builder.field("hasPrint", getPrintExternalID());
+        }
+        builder.startArray("relations");
+        for (String rel : getRelatedManifestations().keySet()) {
+            for (Manifestation mm : getRelatedManifestations().get(rel)) {
+                builder.startObject()
+                    .field("relation", rel)
+                    .field("id", mm.externalID)
+                    .endObject();
+            }
+        }
+        builder.endArray();
+        builder.array("links", getLinks());
+        builder.endObject();
+    }
+
+    public void buildService(XContentBuilder builder, Integer date, Set<Holding> holdings)
+            throws IOException {
+        if (holdings == null || holdings.isEmpty()) {
+            return;
+        }
+        builder.startObject()
+                .field("id", externalID())
+                .field("date", date)
+                .field("contentType", contentType())
+                .field("key", getUniqueIdentifier())
+                .field("identifiers", getIdentifiers());
+        if (hasOnline()) {
+            builder.field("hasOnline", getOnlineExternalID());
+        }
+        if (hasPrint()) {
+            builder.field("hasPrint", getPrintExternalID());
+        }
+        builder.field("links", getLinks());
+
+        SetMultimap<String,Holding> libraries = HashMultimap.create();
+        for (Holding holding : holdings) {
+            libraries.put(holding.getISIL(), holding);
+        }
+        builder.field("libraryCount", libraries.size())
+                .startArray("libraries");
+        for (String library : libraries.keySet()) {
+            Set<Holding> services = libraries.get(library);
+            builder.startObject()
+                    .field("isil", library)
+                    .field("serviceCount", services.size())
+                    .startArray("service");
+            for (Holding service : services) {
+                builder.startObject()
+                        .field("id", service.id())
+                        .field("mediaType", service.mediaType())
+                        .field("carrierType", service.carrierType())
+                        .field("serviceisil", service.getServiceISIL())
+                        .field("info", service.holdingInfo())
+                        .endObject();
+            }
+            builder.endArray().endObject();
+        }
+        builder.endArray();
+        builder.endObject();
     }
 
     public String getKey() {

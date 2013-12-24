@@ -33,6 +33,8 @@ package org.xbib.common.settings;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -40,8 +42,12 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
-import java.util.*;
-import org.xbib.common.Booleans;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.xbib.common.io.stream.StreamInput;
 import org.xbib.common.io.stream.StreamOutput;
 import org.xbib.common.property.PropertyPlaceholder;
@@ -168,9 +174,12 @@ public class ImmutableSettings implements Settings {
 
     @Override
     public Boolean getAsBoolean(String setting, Boolean defaultValue) {
-        return Booleans.parseBoolean(get(setting), defaultValue);
+        String value = get(setting);
+        if (value == null) {
+            return defaultValue;
+        }
+        return !(value.equals("false") || value.equals("0") || value.equals("off") || value.equals("no"));
     }
-
 
     @Override
     public String[] getAsArray(String settingPrefix) throws SettingsException {
@@ -250,8 +259,7 @@ public class ImmutableSettings implements Settings {
 
     @Override
     public int hashCode() {
-        int result = settings != null ? settings.hashCode() : 0;
-        return result;
+        return settings != null ? settings.hashCode() : 0;
     }
 
     public static Settings readSettingsFromStream(StreamInput in) throws IOException {
@@ -502,6 +510,18 @@ public class ImmutableSettings implements Settings {
                 put(loadedSettings);
             } catch (Exception e) {
                 throw new SettingsException("Failed to load settings from [" + resourceName + "]", e);
+            }
+            return this;
+        }
+
+        public Builder loadFromReader(Reader reader) throws SettingsException {
+            try {
+                BufferedReader br = new BufferedReader(reader);
+                SettingsLoader settingsLoader = SettingsLoaderFactory.loaderFromReader(br);
+                put(settingsLoader.load(copyToString(br)));
+                br.close();
+            } catch (Exception e) {
+                throw new SettingsException("Failed to load settings from reader", e);
             }
             return this;
         }

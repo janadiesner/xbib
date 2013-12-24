@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -56,7 +57,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.xbib.importer.AbstractImporter;
+import org.xbib.pipeline.AbstractPipeline;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
 import org.xbib.io.Session;
@@ -67,9 +68,10 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.pipeline.element.CounterElement;
 
-public class AlephPublishingReader extends AbstractImporter<Integer, Integer>
-        implements MarcXchangeListener, Iterator<Integer> {
+public class AlephPublishingReader extends AbstractPipeline<CounterElement>
+        implements MarcXchangeListener {
 
     private final static Logger logger = LoggerFactory.getLogger(AlephPublishingReader.class.getName());
     private XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -80,9 +82,9 @@ public class AlephPublishingReader extends AbstractImporter<Integer, Integer>
 
     private URI uri;
 
-    private Iterator<Integer> iterator;
+    private Iterator<Long> iterator;
 
-    private Integer sysNumber;
+    private CounterElement sysNumber = new CounterElement().set(new AtomicLong(0L));
 
     private String library;
 
@@ -112,7 +114,7 @@ public class AlephPublishingReader extends AbstractImporter<Integer, Integer>
         return this;
     }
 
-    public AlephPublishingReader setIterator(Iterator<Integer> iterator) {
+    public AlephPublishingReader setIterator(Iterator<Long> iterator) {
         this.iterator = iterator;
         return this;
     }
@@ -143,7 +145,7 @@ public class AlephPublishingReader extends AbstractImporter<Integer, Integer>
     }
 
     @Override
-    public Integer next() {
+    public CounterElement next() {
         return nextRead();
     }
 
@@ -170,13 +172,6 @@ public class AlephPublishingReader extends AbstractImporter<Integer, Integer>
     public void leader(String label) {
         if (listener != null) {
             listener.leader(label);
-        }
-    }
-
-    @Override
-    public void trailer(String trailer) {
-        if (listener != null) {
-            listener.trailer(trailer);
         }
     }
 
@@ -270,7 +265,7 @@ public class AlephPublishingReader extends AbstractImporter<Integer, Integer>
         do {
             skip = false;
             synchronized (lock) {
-                this.sysNumber = iterator.hasNext() ? iterator.next() : null;
+                sysNumber.get().set(iterator.hasNext() ? iterator.next() : null);
             }
             if (sysNumber == null) {
                 this.prepared = false;
@@ -310,7 +305,7 @@ public class AlephPublishingReader extends AbstractImporter<Integer, Integer>
         return false;
     }
 
-    private Integer nextRead() {
+    private CounterElement nextRead() {
         if (clob == null) {
             return null;
         }
@@ -323,7 +318,6 @@ public class AlephPublishingReader extends AbstractImporter<Integer, Integer>
                     xmlReader.nextEvent();
                 }
             }
-            trailer(clob);
         } catch (XMLStreamException e) {
             logger.error(e.getMessage(), e);
         }

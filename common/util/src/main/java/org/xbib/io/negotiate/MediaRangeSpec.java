@@ -115,7 +115,8 @@ public class MediaRangeSpec {
 
     /**
      * Parses an HTTP Accept header into a List of MediaRangeSpecs
-     * @return A List of MediaRangeSpecs 
+     *
+     * @return A List of MediaRangeSpecs
      */
     public static List parseAccept(String s) {
         List result = new ArrayList();
@@ -133,6 +134,7 @@ public class MediaRangeSpec {
     private static String escape(String s) {
         return s.replaceAll("[\\\\\"]", "\\\\$0");
     }
+
     private final String type;
     private final String subtype;
     private final List parameterNames;
@@ -141,8 +143,8 @@ public class MediaRangeSpec {
     private final double quality;
 
     private MediaRangeSpec(String type, String subtype,
-            List parameterNames, List parameterValues,
-            double quality) {
+                           List parameterNames, List parameterValues,
+                           double quality) {
         this.type = type;
         this.subtype = subtype;
         this.parameterNames = Collections.unmodifiableList(parameterNames);

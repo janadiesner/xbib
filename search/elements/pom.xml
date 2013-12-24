@@ -28,10 +28,10 @@
                 <directory>src/main/resources</directory>
             </resource>
             <resource>
-                <directory>src/main/groovy</directory>
+                <directory>src/test/groovy</directory>
             </resource>
             <resource>
-                <directory>src/main/ruby</directory>
+                <directory>src/test/ruby</directory>
             </resource>
         </resources>
     </build>

@@ -100,10 +100,6 @@ public class MarcXmlReaderTest {
                 logger.debug("endRecord");
             }
 
-            @Override
-            public void trailer(String trailer) {
-                logger.debug("trailer " + trailer);
-            }
         });
         reader.parse();
     }

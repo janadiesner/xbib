@@ -31,6 +31,11 @@
  */
 package org.xbib.elements.bibliographic;
 
+import org.xbib.rdf.Identifier;
+import org.xbib.rdf.Node;
+import org.xbib.rdf.Property;
+import org.xbib.rdf.simple.SimpleFactory;
+
 /**
  * XBIB name space
  *
@@ -41,4 +46,8 @@ public interface XBIB {
 
     /** The URI of this name space */
     String NS_URI = "http://xbib.org/elements/";
+
+    final SimpleFactory<Identifier,Property,Node> SIMPLE_FACTORY = SimpleFactory.getInstance();
+
+    Property IDENTIFIER_AUTHORITY_ISIL = SIMPLE_FACTORY.asPredicate(NS_URI + "identifierAuthorityISIL");
 }

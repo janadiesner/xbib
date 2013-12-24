@@ -69,21 +69,13 @@ public abstract class AbstractElementBuilder<K, V, E extends Element, C extends 
 
     @Override
     public void end() {
-        end(null);
-    }
-
-    @Override
-    public void end(Object info) {
-        C context = contexts.get();
+       C context = contexts.get();
         context.prepareForOutput();
         for (ElementOutput output : outputs) {
-            if (output.enabled()) {
-                try {
-                   output.output(context, context.contentBuilder() );
-                } catch (IOException e) {
-                    logger.error("output failed: " + e.getMessage(), e);
-                    output.enabled(false);
-                }
+            try {
+               output.output(context, context.contentBuilder() );
+            } catch (IOException e) {
+                logger.error("output failed: " + e.getMessage(), e);
             }
         }
     }

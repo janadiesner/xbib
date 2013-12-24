@@ -35,4 +35,14 @@ import org.xbib.analyzer.dublincore.DublinCoreContext;
 
 public class PicaContext extends DublinCoreContext {
 
+    String id;
+
+    public void setID(String id) {
+        this.id = id;
+    }
+
+    public String getID() {
+        return id;
+    }
+
 }

@@ -48,6 +48,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.testng.annotations.Test;
+import org.xbib.elements.CountableElementOutput;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilder;
 import org.xbib.elements.marc.dialects.mab.MABContext;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilderFactory;
@@ -91,36 +92,21 @@ public class MABDisketteTest {
         InputStream in = getClass().getResourceAsStream("/test/mgl.txt");
         MABDisketteReader br = new MABDisketteReader(new BufferedReader(new InputStreamReader(in, "cp850")));
         Writer w = new OutputStreamWriter(new FileOutputStream("target/mgl3.xml"), "UTF-8");
-        final ElementOutput<MABContext,Resource> output = new ElementOutput<MABContext,Resource>() {
-            long counter;
-
-            @Override
-            public void enabled(boolean enabled) {
-                
-            }
-            @Override
-            public boolean enabled() {
-                return true;
-            }
+        final ElementOutput<MABContext,Resource> output = new CountableElementOutput<MABContext,Resource>() {
 
             @Override
             public void output(MABContext context, ContentBuilder contentBuilder) throws IOException {
                 logger.info("resource size={}", context.resource().size());
-                counter++;
+                counter.incrementAndGet();
             }
 
-            @Override
-            public long getCounter() {
-                return counter;
-            }
-            
         };
         final MABElementBuilderFactory builderFactory = new MABElementBuilderFactory() {
             public MABElementBuilder newBuilder() {
                 return new MABElementBuilder().addOutput(output);
             }
         };
-        final MABElementMapper mapper = new MABElementMapper("mab/hbz/dialect")
+        final MABElementMapper mapper = new MABElementMapper("mab/hbz/tit")
                 .start(builderFactory);
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                 .addListener(mapper)
@@ -147,10 +133,6 @@ public class MABDisketteTest {
                         logger.debug("end object");
                     }
 
-                    @Override
-                    public void end(Object info) {
-                        logger.debug("end object (info={})", info);
-                    }
                 });
 
         Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);

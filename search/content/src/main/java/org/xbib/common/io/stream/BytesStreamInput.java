@@ -31,8 +31,8 @@
  */
 package org.xbib.common.io.stream;
 
-import org.xbib.common.bytes.BytesArray;
-import org.xbib.common.bytes.BytesReference;
+import org.xbib.common.io.BytesArray;
+import org.xbib.common.io.BytesReference;
 
 import java.io.EOFException;
 import java.io.IOException;

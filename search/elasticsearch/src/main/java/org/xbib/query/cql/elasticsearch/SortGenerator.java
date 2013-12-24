@@ -33,8 +33,9 @@ package org.xbib.query.cql.elasticsearch;
 
 import java.io.IOException;
 import java.util.Stack;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
+
+import org.xbib.common.xcontent.XContentBuilder;
+import org.xbib.common.xcontent.XContentFactory;
 import org.xbib.query.cql.SyntaxException;
 
 /**
@@ -90,6 +91,8 @@ public class SortGenerator implements Visitor {
                             break;
                     }
                 }
+                builder.field("ignore_unmapped", true);
+                builder.field("missing", "_last");
                 builder.endObject();
                 builder.endObject();
             }

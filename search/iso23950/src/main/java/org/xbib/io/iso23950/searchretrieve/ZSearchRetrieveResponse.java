@@ -31,14 +31,11 @@
  */
 package org.xbib.io.iso23950.searchretrieve;
 
-import org.xbib.io.iso23950.RecordIdentifierSetter;
 import org.xbib.sru.SRUVersion;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
 import org.xbib.sru.util.SRUFilterReader;
 import org.xbib.io.iso23950.ZResponse;
 import org.xbib.io.iso23950.ZSession;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.sru.searchretrieve.SearchRetrieveResponse;
 import org.xml.sax.InputSource;
@@ -55,15 +52,13 @@ import java.io.Writer;
 import java.util.Arrays;
 
 public class ZSearchRetrieveResponse extends SearchRetrieveResponse
-        implements ZResponse, RecordIdentifierSetter {
+        implements ZResponse {
 
     private SearchRetrieveRequest request;
 
     private ZSession session;
 
     private byte[] records;
-
-    private byte[] errors;
 
     private String format;
 
@@ -87,7 +82,7 @@ public class ZSearchRetrieveResponse extends SearchRetrieveResponse
     }
 
     public ZSearchRetrieveResponse setErrors(byte[] errors) {
-        this.errors = errors;
+        byte[] errors1 = errors;
         return this;
     }
 
@@ -121,7 +116,6 @@ public class ZSearchRetrieveResponse extends SearchRetrieveResponse
         InputSource source = new InputSource(new InputStreamReader(in, "ISO-8859-1"));
         SRUFilterReader reader = new SRUFilterReader(this, "UTF-8");
         try {
-            reader.setRecordIdentifierSetter(this);
             reader.setProperty(Iso2709Reader.FORMAT, format);
             reader.setProperty(Iso2709Reader.TYPE, type);
             StreamResult streamResult = new StreamResult(writer);
@@ -142,10 +136,6 @@ public class ZSearchRetrieveResponse extends SearchRetrieveResponse
         return this;
     }
 
-    @Override
-    public String setRecordIdentifier(String identifier) {
-        return null;
-    }
 }
 
 

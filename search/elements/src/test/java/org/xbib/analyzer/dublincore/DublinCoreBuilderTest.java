@@ -33,11 +33,10 @@ package org.xbib.analyzer.dublincore;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.elements.ElementOutput;
+import org.xbib.elements.CountableElementOutput;
 import org.xbib.keyvalue.KeyValueReader;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -47,33 +46,18 @@ import org.xbib.rdf.xcontent.ContentBuilder;
 public class DublinCoreBuilderTest extends Assert {
 
     private final Logger logger = LoggerFactory.getLogger(DublinCoreBuilderTest.class.getName());
-    
 
     @Test
     public void testDublinCoreBuilder() throws Exception {
         StringReader sr = new StringReader("100=John Doe\n200=Hello Word\n300=2012\n400=1");
-        ElementOutput<DublinCoreContext,Resource> output = new ElementOutput<DublinCoreContext, Resource>() {
+        CountableElementOutput<DublinCoreContext,Resource> output = new CountableElementOutput<DublinCoreContext, Resource>() {
 
-            final AtomicLong counter = new AtomicLong(0L);
-
-            @Override
-            public boolean enabled() {
-                return true;
-            }
-            @Override
-            public void enabled(boolean enabled) {
-                
-            }
             @Override
             public void output(DublinCoreContext context, ContentBuilder builder) throws IOException {
                 logger.info("resource = {}", context.resource());
                 counter.incrementAndGet();
             }
 
-            @Override
-            public long getCounter() {
-                return counter.get();
-            }
         };
         
         DublinCoreBuilder builder = new DublinCoreBuilder().addOutput(output);

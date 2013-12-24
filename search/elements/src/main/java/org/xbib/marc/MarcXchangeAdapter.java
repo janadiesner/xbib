@@ -73,8 +73,4 @@ public class MarcXchangeAdapter implements MarcXchangeListener {
     public void endSubField(Field designator) {
     }
 
-    @Override
-    public void trailer(String trailer) {
-    }
-    
 }

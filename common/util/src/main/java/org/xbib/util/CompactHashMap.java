@@ -41,7 +41,7 @@ import java.util.Set;
 
 /**
  * A memory-efficient hash map.
- *
+ * <p/>
  * Modified version of com.google.gwt.dev.util.collect.HashMap
  *
  * @param <K> the key type
@@ -71,6 +71,7 @@ public class CompactHashMap<K, V> implements Map<K, V> {
     static Object unmaskNullKey(Object k) {
         return (k == NULL_KEY) ? null : k;
     }
+
     /**
      * Backing store for all the keys; transient due to custom serialization.
      * Default access to avoid synthetic accessors from inner classes.

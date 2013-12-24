@@ -40,7 +40,6 @@ import java.io.OutputStream;
  * bytes is increased, and at a set minimum interval (eg after at least 1024
  * bytes) a {@link org.xbib.io.progress.BytesProgressWatcher} implementation is notified of the count
  * of bytes read since the last notification.
- *
  */
 public class ProgressMonitoredOutputStream extends OutputStream implements OutputStreamWrapper {
 
@@ -52,11 +51,11 @@ public class ProgressMonitoredOutputStream extends OutputStream implements Outpu
      * notification messages to a progress watcher when bytes are written to the
      * stream.
      *
-     * @param outputStream the output stream to wrap, whose byte transfer count
-     * will be monitored.
+     * @param outputStream    the output stream to wrap, whose byte transfer count
+     *                        will be monitored.
      * @param progressWatcher a watcher object that stores information about the
-     * bytes read from a stream, and allows calculations to be perfomed using
-     * this information.
+     *                        bytes read from a stream, and allows calculations to be perfomed using
+     *                        this information.
      */
     public ProgressMonitoredOutputStream(OutputStream outputStream, BytesProgressWatcher progressWatcher) {
         if (outputStream == null) {

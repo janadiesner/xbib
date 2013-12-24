@@ -61,8 +61,10 @@ public class PicaPipeline extends KeyValuePipeline<FieldCollection, String, Pica
     @Override
     protected void build(FieldCollection fields, String value) {
         if (fields == null) {
+            logger.debug("fields is null!");
             return;
         }
+        logger.debug("pica fields = {} value = {}", fields, value);
         String key = fields.toSpec();
         PicaElement element = (PicaElement) specification.getElement(key, map());
         if (element != null) {

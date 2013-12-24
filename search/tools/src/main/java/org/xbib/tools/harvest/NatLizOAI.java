@@ -60,8 +60,6 @@ public class NatLizOAI {
 
     private final static Logger logger = LoggerFactory.getLogger(NatLizOAI.class.getName());
 
-    private static OptionSet options;
-
     private OAIClient client;
 
     private final static AtomicLong counter = new AtomicLong(0L);
@@ -83,7 +81,7 @@ public class NatLizOAI {
                     accepts("output").withOptionalArg().ofType(String.class).defaultsTo("oai.ttl");
                 }
             };
-            options = parser.parse(args);
+            OptionSet options = parser.parse(args);
 
             String server = (String) options.valueOf("server");
             String prefix = (String) options.valueOf("prefix");

@@ -33,7 +33,6 @@ package org.xbib.options;
 
 import org.xbib.options.util.KeyValuePair;
 import org.xbib.util.AbbreviationMap;
-import org.xbib.options.util.KeyValuePair;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -46,12 +45,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
-import static org.xbib.options.OptionException.unrecognizedOption;
-import static org.xbib.options.OptionParserState.moreOptions;
-import static org.xbib.options.ParserRules.RESERVED_FOR_EXTENSIONS;
-import static org.xbib.options.ParserRules.ensureLegalOptions;
-import static org.xbib.options.ParserRules.isLongOptionToken;
-import static org.xbib.options.ParserRules.isShortOptionToken;
 
 /**
  * <p>Parses command line arguments, using a syntax that attempts to take from the best of POSIX {@code getopt()}

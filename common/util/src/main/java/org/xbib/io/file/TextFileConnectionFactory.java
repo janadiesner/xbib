@@ -31,14 +31,15 @@
  */
 package org.xbib.io.file;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionFactory;
 import org.xbib.io.InputStreamFactory;
 import org.xbib.io.StreamCodecService;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 
 /**
  * A file connection service
@@ -57,7 +58,7 @@ public final class TextFileConnectionFactory
 
     @Override
     public boolean canOpen(URI uri) {
-        return uri != null && (uri.getScheme() == null || "file".equals(uri.getScheme().substring(0,4)));
+        return uri != null && (uri.getScheme() == null || "file".equals(uri.getScheme().substring(0, 4)));
     }
 
     @Override

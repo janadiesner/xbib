@@ -2,14 +2,15 @@ package org.xbib.marc.dialects;
 
 import java.io.IOException;
 
+import org.xbib.elements.CountableElementOutput;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilder;
 import org.xbib.elements.marc.dialects.mab.MABContext;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilderFactory;
 import org.xbib.elements.marc.dialects.mab.MABElementMapper;
 import org.xbib.elements.ElementOutput;
-import org.xbib.importer.ImportService;
-import org.xbib.importer.Importer;
-import org.xbib.importer.ImporterFactory;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.pipeline.SimplePipelineExecutor;
+import org.xbib.pipeline.Pipeline;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.xcontent.ContentBuilder;
@@ -25,43 +26,25 @@ public class ConcurrentMABTarReaderTest {
      * @throws Exception
      */
     public void testMABTarImport() throws Exception {
-        ImporterFactory factory = new ImporterFactory() {
+        new SimplePipelineExecutor()
+                .concurrency(Runtime.getRuntime().availableProcessors())
+                .provider(new PipelineProvider() {
 
-            @Override
-            public Importer newImporter() {
-                return createImporter();
-            }
-        };
-        new ImportService()
-                .threads(Runtime.getRuntime().availableProcessors())
-                .factory(factory)
+                    @Override
+                    public Pipeline get() {
+                        return createImporter();
+                    }
+                })
                 .execute();
         mapper.close();
     }
     
-    private Importer createImporter() {
-        final ElementOutput<MABContext,Resource> output = new ElementOutput<MABContext,Resource>() {
-            long counter;
-
-            @Override
-            public void enabled(boolean enabled) {
-                
-            }
-            @Override
-            public boolean enabled() {
-                return true;
-            }
-
+    private Pipeline createImporter() {
+        final ElementOutput<MABContext,Resource> output = new CountableElementOutput<MABContext,Resource>() {
             @Override
             public void output(MABContext context, ContentBuilder contentBuilder) throws IOException {
-                counter++;
+                counter.incrementAndGet();
             }
-
-            @Override
-            public long getCounter() {
-                return counter;
-            }
-            
         };
         final MABElementBuilderFactory builderFactory = new MABElementBuilderFactory() {
             public MABElementBuilder newBuilder() {

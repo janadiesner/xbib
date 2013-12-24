@@ -123,10 +123,4 @@ public class KeyValueReader extends BufferedReader
         }
     }
 
-    @Override
-    public void end(Object info) {
-        if (listener != null) {
-            listener.end(info);
-        }
-    }
 }

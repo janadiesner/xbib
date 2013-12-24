@@ -20,7 +20,7 @@
 package org.xbib.common.xcontent.support;
 
 
-import org.xbib.common.bytes.BytesReference;
+import org.xbib.common.io.BytesReference;
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.common.xcontent.XContentGenerator;
 import org.xbib.common.xcontent.XContentParser;
@@ -33,9 +33,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- */
 public class XContentMapConverter {
 
     public static interface MapFactory {
@@ -180,8 +177,6 @@ public class XContentMapConverter {
             writeObjectArray(gen, (Object[]) value);
         } else if (type == byte[].class) {
             gen.writeBinary((byte[]) value);
-        } else if (value instanceof Date) {
-            gen.writeString(XContentBuilder.defaultDatePrinter.print(((Date) value).getTime()));
         } else if (value instanceof BytesReference) {
             BytesReference bytes = (BytesReference) value;
             if (!bytes.hasArray()) {

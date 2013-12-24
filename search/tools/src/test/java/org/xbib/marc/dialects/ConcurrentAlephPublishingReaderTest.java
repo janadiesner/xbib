@@ -38,19 +38,18 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicLong;
 
+import org.xbib.elements.CountableElementOutput;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilder;
 import org.xbib.elements.marc.dialects.mab.MABContext;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilderFactory;
 import org.xbib.elements.marc.dialects.mab.MABElementMapper;
-import org.xbib.elements.ElementOutput;
-import org.xbib.importer.ImportService;
-import org.xbib.importer.Importer;
-import org.xbib.importer.ImporterFactory;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.pipeline.SimplePipelineExecutor;
+import org.xbib.pipeline.Pipeline;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.xcontent.ContentBuilder;
-import org.xbib.util.AtomicIntegerIterator;
+import org.xbib.util.IntervalIterator;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;
@@ -59,11 +58,9 @@ public class ConcurrentAlephPublishingReaderTest {
 
     private final static Logger logger = LoggerFactory.getLogger(AlephPublishingReader.class.getName());
 
-    private final Iterator<Integer> iterator = new AtomicIntegerIterator(1, 100);
+    private final Iterator<Long> iterator = new IntervalIterator(1, 100);
 
     private final int threads = 4;
-
-    private final AtomicLong count = new AtomicLong(0L);
 
     private String library;
 
@@ -83,37 +80,23 @@ public class ConcurrentAlephPublishingReaderTest {
         for (int i = 0; i < threads; i++) {
             uris.add(URI.create(uriStr));
         }
-        ImportService service = new ImportService().threads(threads).factory(
-                new ImporterFactory() {
+        SimplePipelineExecutor service = new SimplePipelineExecutor()
+                .concurrency(threads)
+                .provider(new PipelineProvider() {
 
                     @Override
-                    public Importer newImporter() {
-                        return createImporter();
+                    public Pipeline get() {
+                        return createPipeline();
                     }
-                }).execute();
-        logger.info("count = " + count + " result = " + service.results());
+                })
+                .execute();
     }
 
-    private Importer createImporter() {
-        final ElementOutput<MABContext,Resource> output = new ElementOutput<MABContext,Resource>() {
-
-            @Override
-            public void enabled(boolean enabled) {
-                
-            }
-            @Override
-            public boolean enabled() {
-                return true;
-            }
-
+    private Pipeline createPipeline() {
+        final CountableElementOutput<MABContext,Resource> output = new CountableElementOutput<MABContext,Resource>() {
             @Override
             public void output(MABContext context, ContentBuilder contentBuilder) throws IOException {
-                count.incrementAndGet();
-            }
-
-            @Override
-            public long getCounter() {
-                return count.get();
+                counter.incrementAndGet();
             }
         };
         final MABElementBuilderFactory builderFactory = new MABElementBuilderFactory() {
@@ -123,7 +106,9 @@ public class ConcurrentAlephPublishingReaderTest {
         };
         final MABElementMapper mapper = new MABElementMapper("mab").start(builderFactory);
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
-        return new AlephPublishingReader().setListener(kv).setIterator(iterator)
+        return new AlephPublishingReader()
+                .setListener(kv)
+                .setIterator(iterator)
                 .setLibrary(library)
                 .setSetName(setName);
     }

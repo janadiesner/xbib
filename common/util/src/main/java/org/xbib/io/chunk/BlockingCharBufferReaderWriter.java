@@ -21,15 +21,15 @@ public class BlockingCharBufferReaderWriter extends CharBufferReaderWriter {
 
     protected void put(CharBuffer buffer) throws IOException {
         try {
-            ((BlockingQueue<CharBuffer>)queue).put(buffer);
+            ((BlockingQueue<CharBuffer>) queue).put(buffer);
         } catch (InterruptedException e) {
             throw new IOException("interrupted");
         }
     }
 
-    protected CharBuffer get() throws IOException  {
+    protected CharBuffer get() throws IOException {
         try {
-            return ((BlockingQueue<CharBuffer>)queue).take();
+            return ((BlockingQueue<CharBuffer>) queue).take();
         } catch (InterruptedException e) {
             throw new IOException("interrupted");
         }

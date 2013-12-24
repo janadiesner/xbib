@@ -248,16 +248,16 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
             return;
         }
         try {
-            if (listener != null) {
-                listener.endRecord();
-            }
             if (contentHandler != null) {
                 contentHandler.endElement(nsUri, RECORD, RECORD);
             }
             if (listener != null) {
+                listener.endRecord();
+            }
+            /*if (listener != null) {
                 // emit trailer event, drives record output segmentation
                 listener.trailer(null);
-            }
+            }*/
             this.recordOpen = false;
         } catch (Exception ex) {
             if (fatalerrors) {
@@ -289,11 +289,6 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                 logger.warn(designator + ": " + ex.getMessage(), ex);
             }
         }
-    }
-    
-    @Override
-    public void trailer(String trailer) {
-        // do nothing, MARC reading defines no trailer
     }
 
     @Override

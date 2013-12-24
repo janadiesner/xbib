@@ -31,8 +31,7 @@
  */
 package org.xbib.common.io.stream;
 
-import org.joda.time.ReadableInstant;
-import org.xbib.common.bytes.BytesReference;
+import org.xbib.common.io.BytesReference;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -303,9 +302,6 @@ public abstract class StreamOutput extends OutputStream {
         } else if (type == Date.class) {
             writeByte((byte) 12);
             writeLong(((Date) value).getTime());
-        } else if (value instanceof ReadableInstant) {
-            writeByte((byte) 13);
-            writeLong(((ReadableInstant) value).getMillis());
         } else if (value instanceof BytesReference) {
             writeByte((byte) 14);
             writeBytesReference((BytesReference) value);

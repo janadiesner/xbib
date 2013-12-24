@@ -52,6 +52,11 @@ public class CSVParser {
         this.curState = STATE_LITERAL;
     }
 
+    public CSVParser(CSVTokenizer tokenizer) {
+        this.lexer = tokenizer;
+        this.curState = STATE_LITERAL;
+    }
+
     /**
      * Reads next token from tokenizer
      *

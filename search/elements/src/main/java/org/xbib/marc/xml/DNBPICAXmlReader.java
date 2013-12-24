@@ -41,7 +41,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.marc.dialects.DNBPICA;
+import org.xbib.marc.dialects.DNBPICAConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -50,14 +50,20 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class DNBPICAXmlReader
-        extends DefaultHandler implements DNBPICA, MarcXchangeListener {
+        extends DefaultHandler implements DNBPICAConstants, MarcXchangeListener {
 
     private static final Logger logger = LoggerFactory.getLogger(DNBPICAXmlReader.class.getName());
+
     private static final SAXParserFactory factory = SAXParserFactory.newInstance();
+
     private ContentHandler contentHandler;
+
     private MarcXchangeListener listener;
+
     private InputSource source;
+
     private FieldCollection fields = new FieldCollection();
+
     private StringBuilder content = new StringBuilder();
 
     public DNBPICAXmlReader(final InputSource source) {
@@ -144,13 +150,6 @@ public class DNBPICAXmlReader
     }
 
     @Override
-    public void trailer(String trailer) {
-        if (listener != null) {
-            listener.trailer(trailer);
-        }
-    }
-
-    @Override
     public void setDocumentLocator(Locator locator) {
         // not needed
     }
@@ -163,7 +162,6 @@ public class DNBPICAXmlReader
 
     @Override
     public void endDocument() throws SAXException {
-        trailer(null);
     }
 
     @Override

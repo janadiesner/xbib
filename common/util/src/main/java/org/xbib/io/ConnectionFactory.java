@@ -35,8 +35,7 @@ import java.io.IOException;
 import java.net.URI;
 
 /**
- *  A connection factory interface
- *
+ * A connection factory interface
  */
 public interface ConnectionFactory<S extends Session> {
 
@@ -44,9 +43,7 @@ public interface ConnectionFactory<S extends Session> {
      * Creates a new connection
      *
      * @param uri the URI for the connection
-     *
      * @return the connection
-     *
      * @throws IOException if the connection can not be established
      */
     Connection<S> getConnection(URI uri) throws IOException;
@@ -55,7 +52,6 @@ public interface ConnectionFactory<S extends Session> {
      * Checks if this connection factory can open this URI.
      *
      * @param uri the URI to check
-     *
      * @return true if the URI can be opened, otherwise false
      */
     boolean canOpen(URI uri);

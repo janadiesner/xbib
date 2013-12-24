@@ -31,8 +31,7 @@
  */
 package org.xbib.oai;
 
-import org.xbib.date.DateUtil;
-import org.xbib.io.http.netty.NettyHttpRequest;
+import org.xbib.util.DateUtil;
 import org.xbib.io.http.netty.NettyHttpRequest;
 import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.util.ResumptionToken;

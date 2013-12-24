@@ -31,10 +31,6 @@
  */
 package org.xbib.options;
 
-import static org.xbib.options.ParserRules.isLongOptionToken;
-import static org.xbib.options.ParserRules.isOptionTerminator;
-import static org.xbib.options.ParserRules.isShortOptionToken;
-
 /**
  * <p>Abstraction of parser state; mostly serves to model how a parser behaves depending
  * on whether end-of-options has been detected.</p>

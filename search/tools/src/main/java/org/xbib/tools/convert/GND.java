@@ -31,14 +31,15 @@
  */
 package org.xbib.tools.convert;
 
-import org.xbib.importer.AbstractImporter;
-import org.xbib.importer.ImportService;
-import org.xbib.importer.Importer;
-import org.xbib.importer.ImporterFactory;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.pipeline.AbstractPipeline;
+import org.xbib.pipeline.SimplePipelineExecutor;
+import org.xbib.pipeline.Pipeline;
 import org.xbib.io.InputService;
 import org.xbib.io.file.Finder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.element.CounterElement;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.rdfxml.RdfXmlReader;
 import org.xbib.rdf.io.turtle.TurtleWriter;
@@ -65,13 +66,13 @@ import static org.xbib.util.FormatUtil.formatMillis;
  * Convert GND from RDF/XML to Turtle or Ntriples
  *
  */
-public class GND extends AbstractImporter<Long, AtomicLong> {
+public class GND extends AbstractPipeline<CounterElement> {
 
     private final static Logger logger = LoggerFactory.getLogger(GND.class.getName());
 
     private final static String lf = System.getProperty("line.separator");
 
-    private final static AtomicLong fileCounter = new AtomicLong(0L);
+    private final static CounterElement fileCounter = new CounterElement().set(new AtomicLong(0L));
 
     private final static AtomicLong docCounter = new AtomicLong(0L);
 
@@ -110,13 +111,16 @@ public class GND extends AbstractImporter<Long, AtomicLong> {
             input = new Finder(options.valueOf("pattern").toString()).find(options.valueOf("path").toString()).getURIs();
 
             long t0 = System.currentTimeMillis();
-            ImportService service = new ImportService().threads(1).factory(
-                    new ImporterFactory() {
+            SimplePipelineExecutor service = new SimplePipelineExecutor()
+                    .concurrency(1)
+                    .provider(new PipelineProvider() {
                         @Override
-                        public Importer newImporter() {
+                        public Pipeline get() {
                             return new GND();
                         }
-                    }).execute();
+                    })
+                    .execute()
+                    .waitFor();
 
             long t1 = System.currentTimeMillis();
             long docs = docCounter.get();
@@ -158,7 +162,7 @@ public class GND extends AbstractImporter<Long, AtomicLong> {
     }
 
     @Override
-    public AtomicLong next() {
+    public CounterElement next() {
         URI uri = input.poll();
         done = uri == null;
         if (done) {
@@ -167,7 +171,7 @@ public class GND extends AbstractImporter<Long, AtomicLong> {
         try {
             InputStream in = InputService.getInputStream(uri);
             String outName = options.valueOf("output") + ".gz";
-            if (fileCounter.get() > 0) {
+            if (fileCounter.get().get() > 0) {
                 outName += "." + fileCounter.get();
             }
             OutputStream out = new FileOutputStream(outName);
@@ -202,7 +206,7 @@ public class GND extends AbstractImporter<Long, AtomicLong> {
                 out.close();
                 charCounter.getAndAdd(ntriples.getByteCounter());
             }
-            fileCounter.incrementAndGet();
+            fileCounter.get().incrementAndGet();
         } catch (Exception ex) {
             logger.error("error while getting next document: " + ex.getMessage(), ex);
         }

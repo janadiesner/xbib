@@ -40,8 +40,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.xbib.options.ParserRules.DOUBLE_HYPHEN;
-import static org.xbib.options.ParserRules.HYPHEN;
 import static org.xbib.util.Classes.shortNameOf;
 import static org.xbib.util.Strings.surround;
 

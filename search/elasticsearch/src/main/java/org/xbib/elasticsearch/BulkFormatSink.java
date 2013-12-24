@@ -31,7 +31,7 @@
  */
 package org.xbib.elasticsearch;
 
-import org.xbib.elements.ElementOutput;
+import org.xbib.elements.CountableElementOutput;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
@@ -40,7 +40,6 @@ import org.xbib.rdf.xcontent.ContentBuilder;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Write RDF resources as Elasticsearch bulk format
@@ -50,34 +49,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @param <R>
  */
 public class BulkFormatSink<C extends ResourceContext, R extends Resource>
-        implements ElementOutput<C, R> {
+        extends CountableElementOutput<C, R> {
 
     private final Logger logger = LoggerFactory.getLogger(BulkFormatSink.class.getName());
 
-    private final AtomicInteger resourceCounter = new AtomicInteger(0);
-
     private Writer writer;
-
-    private boolean enabled;
 
     public BulkFormatSink(Writer writer) {
         this.writer = writer;
-    }
-
-    @Override
-    public boolean enabled() {
-        this.enabled = Boolean.parseBoolean(System.getProperty(getClass().getName())) || enabled;
-        return enabled;
-    }
-    
-    @Override
-    public void enabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    @Override
-    public long getCounter() {
-        return resourceCounter.longValue();
     }
 
     final ResourceIndexer<R> resourceIndexer = new ResourceIndexer<R>() {
@@ -141,7 +120,7 @@ public class BulkFormatSink<C extends ResourceContext, R extends Resource>
         } else {
             resourceIndexer.index(resource, contentBuilder.build(context, resource));
         }
-        resourceCounter.incrementAndGet();
+        counter.incrementAndGet();
     }
 
     public void flush() {

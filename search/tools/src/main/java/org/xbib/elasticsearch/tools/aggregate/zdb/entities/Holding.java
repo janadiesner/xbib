@@ -35,6 +35,7 @@ import org.xbib.map.MapBasedAnyObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,13 +60,7 @@ public class Holding extends MapBasedAnyObject {
 
     protected boolean deleted;
 
-    private String printID;
-
-    private String onlineID;
-
-    private Manifestation printManifestation;
-
-    private Manifestation onlineManifestation;
+    private Manifestation manifestation;
 
     public Holding(Map<String, Object> m) {
         super(m);
@@ -74,7 +69,7 @@ public class Holding extends MapBasedAnyObject {
 
     protected void build() {
         this.id = getString("identifierRecord");
-        this.parent = getString("identifierParent"); // DNB-ID
+        this.parent = getString("identifierParent").toLowerCase(); // DNB-ID, turn 'X' to lower case
         Object leader = map().get("leader");
         if (!(leader instanceof List)) {
             leader = Arrays.asList(leader);
@@ -90,19 +85,17 @@ public class Holding extends MapBasedAnyObject {
             o = Arrays.asList(o);
         }
         List<Map<String, Object>> list = (List<Map<String, Object>>) o;
-        if (list != null) {
-            for (Map<String, Object> map : list) {
-                if (map == null) {
-                    continue;
-                }
-                if (map.containsKey("marcorg")) {
-                    this.serviceisil = (String) map.get("marcorg");
-                    if (serviceisil != null) {
-                        // cut from last '-' if there is more than one '-'
-                        int firstpos = serviceisil.indexOf('-');
-                        int lastpos = serviceisil.lastIndexOf('-');
-                        this.isil = lastpos > firstpos ? serviceisil.substring(0, lastpos) : serviceisil;
-                    }
+        for (Map<String, Object> map : list) {
+            if (map == null) {
+                continue;
+            }
+            if (map.containsKey("marcorg")) {
+                this.serviceisil = (String) map.get("marcorg");
+                if (serviceisil != null) {
+                    // cut from last '-' if there is more than one '-'
+                    int firstpos = serviceisil.indexOf('-');
+                    int lastpos = serviceisil.lastIndexOf('-');
+                    this.isil = lastpos > firstpos ? serviceisil.substring(0, lastpos) : serviceisil;
                 }
             }
         }
@@ -131,42 +124,17 @@ public class Holding extends MapBasedAnyObject {
         return isil;
     }
 
-    public void setPrintManifestation(Manifestation printManifestation) {
-        this.printManifestation = printManifestation;
+    public void setManifestation(Manifestation manifestation) {
+
+        this.manifestation = manifestation;
     }
 
-    public Manifestation getPrintManifestation() {
-        return printManifestation;
-    }
-
-    public void setOnlineManifestation(Manifestation onlineManifestation) {
-        this.onlineManifestation = onlineManifestation;
-    }
-
-    public Manifestation getOnlineManifestation() {
-        return onlineManifestation;
+    public Manifestation getManifestation() {
+        return manifestation;
     }
 
     public boolean isDeleted() {
         return deleted;
-    }
-
-    public Holding setPrintID(String printID) {
-        this.printID = printID;
-        return this;
-    }
-
-    public Holding setOnlineID(String onlineID) {
-        this.onlineID = onlineID;
-        return this;
-    }
-
-    public String getPrintID() {
-        return printID;
-    }
-
-    public String getOnlineID() {
-        return onlineID;
     }
 
     public String getServiceISIL() {
@@ -261,5 +229,50 @@ public class Holding extends MapBasedAnyObject {
         }
         m.put("service", service); // servicetype, servicemode, servicedistribution
         return m;
+    }
+
+    protected Character findRegionKey() {
+        String region = getString("service.region");
+        switch (region) {
+            case "NRW": return '1';
+            case "BAY": return '2';
+            case "NIE": return '3';
+            case "HAM": return '3';
+            case "SAA": return '3';
+            case "SAX": return '3';
+            case "THU": return '3';
+            case "BAW": return '4';
+            case "HES": return '5';
+            case "BER": return '6';
+            default: return '9';
+        }
+    }
+
+    protected Character findCarrierTypeKey() {
+        switch (carrierType) {
+            case "online resource" : return '1';
+            case "volume": return '2';
+            case "computer disc" : return '4';
+            case "computer tape cassette" : return '4';
+            case "computer chip cartridge" : return '4';
+            case "microform" : return '5';
+            case "other" : return '6';
+            case "multicolored" : return '6';
+            default: throw new IllegalArgumentException("unknown carrier: " + carrierType());
+        }
+    }
+
+    public String getRoutingKey() {
+        return new StringBuilder().append(findRegionKey()).append(findCarrierTypeKey()).toString();
+    }
+
+    public Comparator<Holding> getRoutingComparator() {
+        return new Comparator<Holding>() {
+
+            @Override
+            public int compare(Holding h1, Holding h2) {
+                return h1.getRoutingKey().compareTo(h2.getRoutingKey());
+            }
+        };
     }
 }

@@ -145,13 +145,6 @@ public class MarcXmlReader
     }
 
     @Override
-    public void trailer(String trailer) {
-        if (listener != null) {
-            listener.trailer(trailer);
-        }
-    }
-
-    @Override
     public void setDocumentLocator(Locator locator) {
         // not used yet
     }
@@ -164,7 +157,7 @@ public class MarcXmlReader
 
     @Override
     public void endDocument() throws SAXException {
-        trailer(null);
+
     }
 
     @Override
@@ -232,7 +225,7 @@ public class MarcXmlReader
                     if (TAG.equals(name)) {
                         tag = atts.getValue(i);
                     }
-                    if (name.startsWith("ind")) {
+                    if (name.startsWith(IND)) {
                         int pos = Integer.parseInt(name.substring(3));
                         indicators[pos] = atts.getValue(i).charAt(0);
                     }

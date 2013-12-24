@@ -43,8 +43,8 @@ import org.xbib.marc.FieldCollection;
  *
  */
 public class MARCElementBuilder
-    extends AbstractElementBuilder<FieldCollection, String, MARCElement, MARCContext>
-    implements DublinCoreProperties {
+       extends AbstractElementBuilder<FieldCollection, String, MARCElement, MARCContext>
+       implements DublinCoreProperties {
 
     private final ResourceContextFactory<MARCContext> contextFactory = new ResourceContextFactory<MARCContext>() {
 

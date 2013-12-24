@@ -51,11 +51,10 @@ import java.util.jar.Manifest;
  * The JarFileClassLoader that loads classes and resources from a list of JarFiles.  This method is simmilar to URLClassLoader
  * except it properly closes JarFiles when the classloader is destroyed so that the file read lock will be released, and
  * the jar file can be modified and deleted.
- * <p>
+ * <p/>
  * Note: This implementation currently does not work reliably on windows, since the jar URL handler included with the Sun JavaVM
  * holds a read lock on the JarFile, and this lock is not released when the jar url is dereferenced.  To fix this a
  * replacement for the jar url handler must be written.
- *
  */
 public class JarFileClassLoader extends URLClassLoader {
     private static final URL[] EMPTY_URLS = new URL[0];
@@ -94,8 +93,9 @@ public class JarFileClassLoader extends URLClassLoader {
 
     /**
      * Creates a named class loader as a child of the specified parents.
-     * @param id the name of this class loader
-     * @param urls the urls from which this class loader will classes and resources
+     *
+     * @param id      the name of this class loader
+     * @param urls    the urls from which this class loader will classes and resources
      * @param parents the parents of this class loader
      */
     /*public JarFileClassLoader(Artifact id, URL[] urls, ClassLoader[] parents) {
@@ -109,7 +109,6 @@ public class JarFileClassLoader extends URLClassLoader {
         this.acc = AccessController.getContext();
         addURLs(urls);
     }*/
-
     public JarFileClassLoader(URL[] urls) {
         super(urls);
         this.acc = AccessController.getContext();
@@ -124,7 +123,7 @@ public class JarFileClassLoader extends URLClassLoader {
         if (source instanceof JarFileClassLoader) {
             return new JarFileClassLoader((JarFileClassLoader) source);
         } else if (source instanceof URLClassLoader) {
-            return new URLClassLoader(((URLClassLoader)source).getURLs(), source.getParent());
+            return new URLClassLoader(((URLClassLoader) source).getURLs(), source.getParent());
         } else {
             return new URLClassLoader(new URL[0], source);
         }
@@ -155,6 +154,7 @@ public class JarFileClassLoader extends URLClassLoader {
 
     /**
      * Adds an array of urls to the end of this class loader.
+     *
      * @param urls the URLs to add
      */
     protected void addURLs(final URL[] urls) {
@@ -205,9 +205,8 @@ public class JarFileClassLoader extends URLClassLoader {
         return resources;
     }
 */
-
     protected Enumeration<URL> internalfindResources(final String name) throws IOException {
-        return  AccessController.doPrivileged(new PrivilegedAction<Enumeration<URL>>() {
+        return AccessController.doPrivileged(new PrivilegedAction<Enumeration<URL>>() {
             public Enumeration<URL> run() {
                 return resourceFinder.findResources(name);
             }

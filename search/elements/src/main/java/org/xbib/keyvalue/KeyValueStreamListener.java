@@ -34,25 +34,20 @@ package org.xbib.keyvalue;
 public interface KeyValueStreamListener<K,V> {
 
     /**
-     * Begin a key/value stream
+     * Begin a key/value sequence
      */
     void begin();
     
     /**
      * Propagate key/value to listener
-     * @param key
-     * @param value 
+     * @param key the key
+     * @param value the value
      */
     void keyValue(K key, V value);
     
     /**
-     * End a key/value stream
+     * End a key/value sequence
      */
     void end();
-    
-    /**
-     * End a key/value stream with an information object
-     * @param info 
-     */
-    void end(Object info);
+
 }

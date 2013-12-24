@@ -31,14 +31,15 @@
  */
 package org.xbib.elements.marc;
 
-import org.xbib.elements.BasicElementMapper;
+import org.xbib.elements.AbstractElementMapper;
 import org.xbib.elements.KeyValuePipeline;
+import org.xbib.marc.FieldCollection;
 
 /**
  * A MARC element mapper. It provides MARC pipelines.
  *
  */
-public class MARCElementMapper extends BasicElementMapper {
+public class MARCElementMapper extends AbstractElementMapper<FieldCollection, String, MARCElement, MARCContext> {
 
     /**
      * Instantiate a MARC element mapper.

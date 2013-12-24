@@ -31,15 +31,16 @@
  */
 package org.xbib.tools.convert;
 
-import org.xbib.date.DateUtil;
-import org.xbib.importer.AbstractImporter;
-import org.xbib.importer.ImportService;
-import org.xbib.importer.Importer;
-import org.xbib.importer.ImporterFactory;
+import org.xbib.util.DateUtil;
+import org.xbib.pipeline.AbstractPipeline;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.pipeline.SimplePipelineExecutor;
+import org.xbib.pipeline.Pipeline;
 import org.xbib.io.InputService;
 import org.xbib.io.file.Finder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.element.CounterElement;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.rdfxml.RdfXmlReader;
 import org.xbib.rdf.io.turtle.TurtleWriter;
@@ -72,13 +73,13 @@ import java.util.zip.GZIPOutputStream;
  * VIAF converter. The original VIAF files are one RDF/XML per line.
  * This converion generates NTriples or Turtle format.
  */
-public class VIAF extends AbstractImporter<Long, AtomicLong> {
+public class VIAF extends AbstractPipeline<CounterElement> {
 
     private final static Logger logger = LoggerFactory.getLogger(VIAF.class.getName());
 
     private final static String lf = System.getProperty("line.separator");
 
-    private final static AtomicLong fileCounter = new AtomicLong(0L);
+    private final static CounterElement fileCounter = new CounterElement().set(new AtomicLong(0L));
 
     private final static AtomicLong docCounter = new AtomicLong(0L);
 
@@ -131,13 +132,16 @@ public class VIAF extends AbstractImporter<Long, AtomicLong> {
             final Integer threads = (Integer) options.valueOf("threads");
 
             long t0 = System.currentTimeMillis();
-            ImportService service = new ImportService().threads(threads).factory(
-                    new ImporterFactory() {
+            SimplePipelineExecutor service = new SimplePipelineExecutor()
+                    .concurrency(threads)
+                    .provider(new PipelineProvider() {
                         @Override
-                        public Importer newImporter() {
+                        public Pipeline get() {
                             return new VIAF();
                         }
-                    }).execute();
+                    })
+                    .execute()
+                    .waitFor();
 
             long t1 = System.currentTimeMillis();
             long docs = docCounter.get();
@@ -188,7 +192,7 @@ public class VIAF extends AbstractImporter<Long, AtomicLong> {
     }
 
     @Override
-    public AtomicLong next() {
+    public CounterElement next() {
         URI uri = input.poll();
         done = uri == null;
         if (done) {
@@ -213,7 +217,7 @@ public class VIAF extends AbstractImporter<Long, AtomicLong> {
             for (int i = 0; i < numPumps; i++) {
                 pump.put("|");
             }
-            fileCounter.incrementAndGet();
+            fileCounter.get().incrementAndGet();
         } catch (Exception ex) {
             logger.error("error while getting next document: " + ex.getMessage(), ex);
         } finally {

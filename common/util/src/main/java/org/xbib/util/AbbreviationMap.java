@@ -88,7 +88,7 @@ public class AbbreviationMap<V> {
      *
      * @param aKey key to look up
      * @return the value associated with {@code aKey}; or {@code null} if there is no
-     *         such value or {@code aKey} is not a unique abbreviation of a key in the map
+     * such value or {@code aKey} is not a unique abbreviation of a key in the map
      * @throws NullPointerException if {@code aKey} is {@code null}
      */
     public V get(String aKey) {

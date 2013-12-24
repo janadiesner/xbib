@@ -293,7 +293,7 @@ public class UriResourceFinder implements ResourceFinder {
             // the class-path attribute is space delimited
             URL codeSource = resourceLocation.getCodeSource();
             LinkedList<URI> classPathUrls = new LinkedList<URI>();
-            for (StringTokenizer tokenizer = new StringTokenizer(manifestClassPath, " "); tokenizer.hasMoreTokens();) {
+            for (StringTokenizer tokenizer = new StringTokenizer(manifestClassPath, " "); tokenizer.hasMoreTokens(); ) {
                 String entry = tokenizer.nextToken();
                 try {
                     // the class path entry is relative to the resource location code source

@@ -37,7 +37,6 @@ import java.util.jar.Manifest;
 
 /**
  * This is a location which is searched by
- *
  */
 public interface ResourceLocation {
 
