@@ -31,6 +31,10 @@
  */
 package org.xbib.elasticsearch.tools.aggregate.zdb;
 
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URI;
 import java.util.Date;
 import java.util.Map;
@@ -46,6 +50,7 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
+import org.xbib.common.settings.Settings;
 import org.xbib.util.DateUtil;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elasticsearch.support.client.IngestClient;
@@ -59,24 +64,26 @@ import org.xbib.util.URIUtil;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.elasticsearch.tools.aggregate.WrappedSearchHit;
-import org.xbib.options.OptionParser;
-import org.xbib.options.OptionSet;
 import org.xbib.util.ExceptionFormatter;
 
 import static com.google.common.collect.Sets.newSetFromMap;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 
 /**
  * Merge ZDB title and holdings and EZB licenses
- *
  */
 public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean, Manifestation, MergeHoldingsLicensesPipeline, WrappedSearchHit> {
 
     private final static Logger logger = LoggerFactory.getLogger(MergeHoldingsLicenses.class.getSimpleName());
 
-    private final static String lf = System.getProperty("line.separator");
+    private final static Set<String> docs = newSetFromMap(new ConcurrentHashMap<String,Boolean>());
 
-    private final MergeHoldingsLicenses service;
+    private final static Set<String> clusters = newSetFromMap(new ConcurrentHashMap<String,Boolean>());
+
+    private final static Set<String> manifestations = newSetFromMap(new ConcurrentHashMap<String,Boolean>());
+
+    private MergeHoldingsLicenses service;
 
     private Client client;
 
@@ -96,175 +103,45 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
 
     private String identifier;
 
-    private Set<String> docs;
+    private Reader reader;
 
-    private Set<String> clusters;
+    private Writer writer;
 
-    private Set<String> manifestations;
+    private static Settings settings;
 
     public static void main(String[] args) {
         try {
-            OptionParser parser = new OptionParser() {
-                {
-                    accepts("source").withRequiredArg().ofType(String.class).required();
-                    accepts("target").withRequiredArg().ofType(String.class).required();
-                    accepts("shards").withOptionalArg().ofType(Integer.class).defaultsTo(3);
-                    accepts("replica").withOptionalArg().ofType(Integer.class).defaultsTo(0);
-                    accepts("mock").withOptionalArg().ofType(Boolean.class).defaultsTo(Boolean.FALSE);
-                    accepts("maxbulkactions").withRequiredArg().ofType(Integer.class).defaultsTo(100);
-                    accepts("maxconcurrentbulkrequests").withRequiredArg().ofType(Integer.class).defaultsTo(Runtime.getRuntime().availableProcessors() * 4);
-                    accepts("concurrency").withRequiredArg().ofType(Integer.class).defaultsTo(Runtime.getRuntime().availableProcessors() * 4);
-                    accepts("scansize").withRequiredArg().ofType(Integer.class).defaultsTo(10);
-                    accepts("scanmillis").withRequiredArg().ofType(Long.class).defaultsTo(3600L * 1000L);
-                    accepts("id").withOptionalArg().ofType(String.class);
-                }
-            };
-            OptionSet options = parser.parse(args);
-            if (options.hasArgument("help")) {
-                System.err.println("Help for " + MergeHoldingsLicenses.class.getCanonicalName() + lf
-                        + " --help                 print this help message" + lf
-                        + " --source <uri>         URI for connecting to the Elasticsearch source" + lf
-                        + " --target <uri>         URI for connecting to Elasticsearch target" + lf
-                        + " --shards <n>           number of shards" + lf
-                        + " --replica <n>          number of replica" + lf
-                        + " --mock <bool>          dry run of indexing (optional, default: false)"
-                        + " --maxbulkactions <n>   the number of bulk actions per request (optional, default: 1000)"
-                        + " --maxconcurrentbulkrequests <n>the number of concurrent bulk requests (optional, default: number of cpu core * 4)"
-                        + " --concurrency <n>      merge thread concurrency (optional, default: number of cpu cores * 4)"
-                        + " --scansize <n>         size for scan query result (optional, default: 1000)"
-                        + " --scanmillis <ms>      life time in milliseconds for scan query (optional, default: 60000)"
-                        + " --id <n>               ZDB ID (optional, default is all ZDB IDs)"
-                );
-                System.exit(1);
-            }
-
-            URI sourceURI = URI.create((String)options.valueOf("source"));
-            URI targetURI = URI.create((String)options.valueOf("target"));
-            Integer maxBulkActions = (Integer) options.valueOf("maxbulkactions");
-            Integer maxConcurrentBulkRequests = (Integer) options.valueOf("maxconcurrentbulkrequests");
-            Integer shards = (Integer)options.valueOf("shards");
-            Integer replica = (Integer)options.valueOf("replica");
-            Integer concurrency = (Integer) options.valueOf("concurrency");
-            if (concurrency < 1) {
-                concurrency = 1;
-            }
-            if (concurrency > 256) {
-                concurrency = 256;
-            }
-            Integer size = (Integer) options.valueOf("scansize");
-            Long millis = (Long) options.valueOf("scanmillis");
-            String identifier = (String) options.valueOf("id");
-
-            logger.info("connecting to search source {}...", sourceURI);
-
-            SearchClient search = new SearchClient()
-                    .newClient(sourceURI);
-
-            logger.info("connecting to target index {} ...", targetURI);
-
-            Ingest ingest = new IngestClient()
-                    .maxActionsPerBulkRequest(maxBulkActions)
-                    .maxConcurrentBulkRequests(maxConcurrentBulkRequests)
-                    .setIndex(URIUtil.parseQueryString(targetURI).get("index"))
-                    .setting(MergeHoldingsLicenses.class.getResourceAsStream("transport-client-settings.json"))
-                    .newClient(targetURI)
-                    .waitForCluster()
-                    //.setting(MergeWithLicenses.class.getResourceAsStream("index-settings.json"))
-                            //.mapping("works", MergeWithLicenses.class.getResourceAsStream("works.json"))
-                            //.mapping("manifestations", MergeWithLicenses.class.getResourceAsStream("manifestations.json"))
-                            //.mapping("volumes", MergeWithLicenses.class.getResourceAsStream("volumes.json"))
-                    .newIndex()
-                    .refresh()
-                    .shards(shards)
-                    .replica(replica)
-                    .startBulk();
-
-            MergeHoldingsLicenses merge = new MergeHoldingsLicenses(search, ingest)
-                    .sourceURI(sourceURI)
-                    .targetURI(targetURI)
-                    .provider()
-                    .concurrency(concurrency)
-                    .size(size)
-                    .millis(millis)
-                    .identifier(identifier)
-                    .prepare()
-                    .execute();
-
-            logger.info("merge shutdown in progress");
-            merge.shutdown(new WrappedSearchHit().set(null));
-
-            for (Pipeline p : merge.getPipelines()) {
-                logger.info("pipeline {}, started {}, ended {}, took {}",
-                        p,
-                        DateUtil.formatDateISO(new Date(p.startedAt())),
-                        DateUtil.formatDateISO(new Date(p.stoppedAt())),
-                        TimeValue.timeValueMillis(p.took()).format());
-            }
-
-            /*long d = writeCounter.get(); //number of documents written
-            long bytes = ingest.getVolumeInBytes();
-            double dps = d * 1000.0 / (double)(t1 - t0);
-            double avg = bytes / (d + 1.0); // avoid div by zero
-            double mbps = (bytes * 1000.0 / (double)(t1 - t0)) / (1024.0 * 1024.0) ;
-            String t = TimeValue.timeValueMillis(t1 - t0).format();
-            String byteSize = FormatUtil.convertFileSize(bytes);
-            String avgSize = FormatUtil.convertFileSize(avg);
-            NumberFormat formatter = NumberFormat.getNumberInstance();
-            logger.info("Merging complete. {} docs written, {} = {} ms, {} = {} bytes, {} = {} avg size, {} dps, {} MB/s",
-                    d,
-                    t,
-                    (t1-t0),
-                    byteSize,
-                    bytes,
-                    avgSize,
-                    formatter.format(avg),
-                    formatter.format(dps),
-                    formatter.format(mbps));
-
-            double qps = queryCounter.get() * 1000.0 / (double)(t1 - t0);
-            logger.info("queries={} qps={} hits={} manifestations={} holdings={} licenses={}",
-                    queryCounter.get(),
-                    formatter.format(qps),
-                    hitCounter.get(),
-                    manifestationCounter.get(),
-                    holdingCounter.get(),
-                    indicatorCounter.get());*/
-
-
-            logger.info("ingest shutdown in progress");
-            ingest.shutdown();
-
-            logger.info("search shutdown in progress");
-            search.shutdown();
-
+            new MergeHoldingsLicenses()
+                    .reader(new InputStreamReader(System.in, "UTF-8"))
+                    .writer(new OutputStreamWriter(System.out, "UTF-8"))
+                    .run();
         } catch (Exception e) {
             e.printStackTrace();
-            logger.warn("exit with error");
             System.exit(1);
         }
-        logger.info("exit with success");
         System.exit(0);
     }
 
-    private MergeHoldingsLicenses(SearchClient search, Ingest ingest) {
-        this.docs = newSetFromMap(new ConcurrentHashMap<String,Boolean>());
-        this.clusters = newSetFromMap(new ConcurrentHashMap<String,Boolean>());
-        this.manifestations = newSetFromMap(new ConcurrentHashMap<String,Boolean>());
-        this.service = this;
-        this.client = search.client();
-        this.ingest = ingest;
+    private MergeHoldingsLicenses() {}
+
+    public MergeHoldingsLicenses reader(Reader reader) {
+        this.reader = reader;
+        settings = settingsBuilder().loadFromReader(reader).build();
+        return this;
     }
 
-    public Client client() {
-        return client;
+    public MergeHoldingsLicenses settings(Settings newSettings) {
+        settings = newSettings;
+        return this;
     }
 
-    public Ingest ingest() {
-        return ingest;
+    public MergeHoldingsLicenses writer(Writer writer) {
+        this.writer = writer;
+        return this;
     }
 
-    public MergeHoldingsLicenses sourceURI(URI sourceURI) {
-        this.sourceURI = sourceURI;
+    public MergeHoldingsLicenses run() throws Exception {
+        this.sourceURI = URI.create(settings.get("source"));
         Map<String,String> params = URIUtil.parseQueryString(sourceURI);
         this.sourceTitleIndex = params.get("bibIndex");
         this.sourceTitleType = params.get("bibType");
@@ -274,52 +151,34 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
         if (Strings.isNullOrEmpty(sourceTitleType)) {
             throw new IllegalArgumentException("no bibType parameter given");
         }
-        return this;
-    }
 
-    public URI sourceURI() {
-        return sourceURI;
-    }
+        this.targetURI = URI.create(settings.get("target"));
 
-    public URI targetURI() {
-        return targetURI;
-    }
+        SearchClient search = new SearchClient().newClient(sourceURI);
+        this.service = this;
+        this.client = search.client();
+        this.size = settings.getAsInt("scansize", 10);
+        this.millis = settings.getAsLong("scanmillis", 3600000L);
+        this.identifier = settings.get("identifier");
 
-    public MergeHoldingsLicenses targetURI(URI targetURI) {
-        this.targetURI = targetURI;
-        return this;
-    }
+        this.ingest = new IngestClient()
+                .maxActionsPerBulkRequest(settings.getAsInt("maxbulkactions", 100))
+                .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests", 16))
+                .setIndex(URIUtil.parseQueryString(targetURI).get("index"))
+                .setting(MergeHoldingsLicenses.class.getResourceAsStream("transport-client-settings.json"))
+                .newClient(targetURI)
+                .waitForCluster()
+                        //.setting(MergeWithLicenses.class.getResourceAsStream("index-settings.json"))
+                        //.mapping("works", MergeWithLicenses.class.getResourceAsStream("works.json"))
+                        //.mapping("manifestations", MergeWithLicenses.class.getResourceAsStream("manifestations.json"))
+                        //.mapping("volumes", MergeWithLicenses.class.getResourceAsStream("volumes.json"))
+                .newIndex()
+                .refresh()
+                .shards(settings.getAsInt("shards",1))
+                .replica(settings.getAsInt("replica",0))
+                .startBulk();
 
-    public MergeHoldingsLicenses size(int size) {
-        this.size = size;
-        return this;
-    }
-
-    public int size() {
-        return size;
-    }
-
-    public MergeHoldingsLicenses millis(long millis) {
-        this.millis = millis;
-        return this;
-    }
-
-    public long millis() {
-        return millis;
-    }
-
-    @Override
-    public MergeHoldingsLicenses concurrency(int concurrency) {
-        super.concurrency(concurrency);
-        return this;
-    }
-
-    public MergeHoldingsLicenses identifier(String identifier) {
-        this.identifier = identifier;
-        return this;
-    }
-
-    public MergeHoldingsLicenses provider() {
+        super.prepare();
         super.provider(new PipelineProvider<MergeHoldingsLicensesPipeline>() {
             int i = 0;
 
@@ -328,12 +187,25 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
                 return new MergeHoldingsLicensesPipeline(service, i++);
             }
         });
-        return this;
-    }
+        super.concurrency(settings.getAsInt("concurrency", 1));
+        this.execute();
 
-    @Override
-    public MergeHoldingsLicenses prepare() {
-        super.prepare();
+        logger.info("merge shutdown in progress");
+        shutdown(new WrappedSearchHit().set(null));
+
+        for (Pipeline p : getPipelines()) {
+            logger.info("pipeline {}, started {}, ended {}, took {}",
+                    p,
+                    DateUtil.formatDateISO(new Date(p.startedAt())),
+                    DateUtil.formatDateISO(new Date(p.stoppedAt())),
+                    TimeValue.timeValueMillis(p.took()).format());
+        }
+        logger.info("ingest shutdown in progress");
+        ingest.shutdown();
+
+        logger.info("search shutdown in progress");
+        search.shutdown();
+
         return this;
     }
 
@@ -416,4 +288,29 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
     public Set<String> manifestations() {
         return manifestations;
     }
+
+    public Client client() {
+        return client;
+    }
+
+    public Ingest ingest() {
+        return ingest;
+    }
+
+    public URI sourceURI() {
+        return sourceURI;
+    }
+
+    public URI targetURI() {
+        return targetURI;
+    }
+
+    public int size() {
+        return size;
+    }
+
+    public long millis() {
+        return millis;
+    }
+
 }

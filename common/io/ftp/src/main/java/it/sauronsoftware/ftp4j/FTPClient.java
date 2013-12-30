@@ -1231,6 +1231,7 @@ public class FTPClient {
 				// Password is not required, but account is required.
 				passwordRequired = false;
 				accountRequired = true;
+                break;
 			default:
 				// User validation failed.
 				throw new FTPException(r);

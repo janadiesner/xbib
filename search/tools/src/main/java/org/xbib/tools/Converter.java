@@ -69,7 +69,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
 
     protected static Queue<URI> input;
 
-    protected static MetricPipelineExecutor executor;
+    protected MetricPipelineExecutor<T,R,P> executor;
 
     private boolean done = false;
 
@@ -84,20 +84,10 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
         return this;
     }
 
-    protected Converter prepare(Settings settings) {
-        try {
-            input = new Finder(settings.get("pattern")).find(settings.get("path")).getURIs();
-            logger.info("input = {}", input);
-        } catch (IOException e) {
-            logger.error("no input found", e);
-        }
-        return this;
-    }
-
     public Converter<T,R,P> run() throws Exception {
         try {
             logger.info("preparing");
-            prepare(settings);
+            prepare();
             logger.info("executing");
             executor = new MetricPipelineExecutor<T,R,P>()
                     .concurrency(settings.getAsInt("concurrency", 1))
@@ -107,11 +97,30 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
                     .waitFor();
             logger.info("execution completed");
         } finally {
+            cleanup();
             if (executor != null) {
                 executor.shutdown();
                 writeMetrics(writer);
             }
         }
+        return this;
+    }
+
+    protected Converter<T,R,P> prepare() {
+        try {
+            input = new Finder(settings.get("pattern"))
+                    .find(settings.get("path"))
+                    .pathSorted(settings.getAsBoolean("isPathSorted", false))
+                    .chronologicallySorted(settings.getAsBoolean("isChronologicallySorted", false))
+                    .getURIs();
+            logger.info("input = {}", input);
+        } catch (IOException e) {
+            logger.error("no input found", e);
+        }
+        return this;
+    }
+
+    protected Converter<T,R,P> cleanup() {
         return this;
     }
 
@@ -150,10 +159,9 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
         double avg = bytes / (docs + 1); // avoid div by zero
         double mbps = (bytes * 1000 / elapsed) / (1024 * 1024) ;
         NumberFormat formatter = NumberFormat.getNumberInstance();
-        logger.info("Indexing complete. {} inputs, {} docs, {} = {} ms, {} = {} bytes, {} = {} avg size, {} dps, {} MB/s",
+        logger.info("Converter complete. {} inputs, {} docs, {} = {} ms, {} = {} bytes, {} = {} avg size, {} dps, {} MB/s",
                 input.size(),
                 docs,
-                //TimeValue.timeValueMillis(elapsed).format(),
                 DurationFormatUtil.formatDurationWords(elapsed, true, true),
                 elapsed,
                 bytes,
@@ -163,10 +171,9 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
                 formatter.format(dps),
                 formatter.format(mbps));
         if (writer != null) {
-            String metrics = String.format("Indexing complete. %d inputs, %d docs, %s = %d ms, %d = %s bytes, %s = %s avg size, %s dps, %s MB/s",
+            String metrics = String.format("Converter complete. %d inputs, %d docs, %s = %d ms, %d = %s bytes, %s = %s avg size, %s dps, %s MB/s",
                     input.size(),
                     docs,
-                    //TimeValue.timeValueMillis(elapsed).format(),
                     DurationFormatUtil.formatDurationWords(elapsed, true, true),
                     elapsed,
                     bytes,

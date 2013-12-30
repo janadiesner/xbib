@@ -37,7 +37,7 @@ import java.io.StringReader;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.elements.CountableElementOutput;
-import org.xbib.keyvalue.KeyValueReader;
+import org.xbib.io.keyvalue.KeyValueReader;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;

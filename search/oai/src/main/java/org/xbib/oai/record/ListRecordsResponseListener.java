@@ -41,7 +41,7 @@ import org.xbib.io.http.HttpResponse;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.DefaultOAIResponseListener;
-import org.xbib.oai.util.MetadataHandler;
+import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.oai.OAIConstants;
 import org.xbib.oai.util.RecordHeader;
 import org.xbib.oai.util.ResumptionToken;
@@ -112,6 +112,8 @@ public class ListRecordsResponseListener extends DefaultOAIResponseListener {
             XMLFilterReader reader = new ListRecordsFilterReader(response);
             InputSource source = new InputSource(getBodyReader());
             response.getTransformer().setSource(reader, source);
+        } else {
+            throw new IOException("no XML content type in response");
         }
     }
 
@@ -155,6 +157,10 @@ public class ListRecordsResponseListener extends DefaultOAIResponseListener {
             super.startElement(uri, localname, qname, atts);
             if (OAIConstants.NS_URI.equals(uri)) {
                 switch (localname) {
+                    case "header": {
+                        header = new RecordHeader();
+                        break;
+                    }
                     case "error": {
                         response.setError(atts.getValue("code"));
                         break;
@@ -185,10 +191,6 @@ public class ListRecordsResponseListener extends DefaultOAIResponseListener {
                         }
                         break;
                     }
-                    case "header": {
-                        header = new RecordHeader();
-                        break;
-                    }
                 }
                 return;
             }
@@ -204,6 +206,13 @@ public class ListRecordsResponseListener extends DefaultOAIResponseListener {
             super.endElement(nsURI, localname, qname);
             if (OAIConstants.NS_URI.equals(nsURI)) {
                 switch (localname) {
+                    case "header": {
+                        for (MetadataHandler mh : metadataHandlers) {
+                            mh.setHeader(header);
+                        }
+                        header = new RecordHeader();
+                        break;
+                    }
                     case "metadata": {
                         for (MetadataHandler mh : metadataHandlers) {
                             mh.endDocument();
@@ -226,13 +235,6 @@ public class ListRecordsResponseListener extends DefaultOAIResponseListener {
                             token = null;
                             request.setResumptionToken(null);
                         }
-                        break;
-                    }
-                    case "header": {
-                        for (MetadataHandler mh : metadataHandlers) {
-                            mh.setHeader(header);
-                        }
-                        header = new RecordHeader();
                         break;
                     }
                     case "identifier": {

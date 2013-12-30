@@ -40,23 +40,23 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.Set;
 
 public class InputService {
 
-    public static int DEFAULT_BUFFER_SIZE = 8192;
+    public final static int DEFAULT_BUFFER_SIZE = 8192;
+
+    private final static Charset UTF8 = Charset.forName("UTF-8");
 
     private InputService() {
     }
 
     public static InputStream getInputStream(URI uri) throws IOException {
-        InputStreamFactory factory;
-        ServiceLoader<InputStreamFactory> loader = ServiceLoader.load(InputStreamFactory.class);
-        Iterator<InputStreamFactory> it = loader.iterator();
-        while (it.hasNext()) {
-            factory = it.next();
+        InputStreamProvider factory;
+        ServiceLoader<InputStreamProvider> loader = ServiceLoader.load(InputStreamProvider.class);
+        for (InputStreamProvider aLoader : loader) {
+            factory = aLoader;
             if (uri.getScheme() != null && factory.canOpen(uri)) {
                 return factory.open(uri);
             }
@@ -79,10 +79,10 @@ public class InputService {
     }
 
     public static Set<String> getTextLinesFromInputStream(String name) {
-        Set<String> set = new HashSet();
+        Set<String> set = new HashSet<String>();
         try {
             InputStream in = InputService.class.getResourceAsStream(name);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, Charset.forName("UTF-8")));
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, UTF8));
             String line;
             while ((line = br.readLine()) != null) {
                 set.add(line);

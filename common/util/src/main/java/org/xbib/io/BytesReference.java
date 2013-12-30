@@ -31,6 +31,8 @@
  */
 package org.xbib.io;
 
+import org.xbib.io.stream.StreamInput;
+
 import java.io.IOException;
 import java.io.OutputStream;
 

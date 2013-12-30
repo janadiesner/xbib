@@ -34,7 +34,7 @@ package org.xbib.elements.marc;
 import org.xbib.elements.AbstractSpecification;
 import org.xbib.elements.ElementBuilderFactory;
 import org.xbib.elements.KeyValuePipeline;
-import org.xbib.keyvalue.KeyValue;
+import org.xbib.io.keyvalue.KeyValue;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;

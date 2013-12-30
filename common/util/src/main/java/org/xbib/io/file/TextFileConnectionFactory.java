@@ -33,7 +33,7 @@ package org.xbib.io.file;
 
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionFactory;
-import org.xbib.io.InputStreamFactory;
+import org.xbib.io.InputStreamProvider;
 import org.xbib.io.StreamCodecService;
 
 import java.io.FileInputStream;
@@ -42,12 +42,14 @@ import java.io.InputStream;
 import java.net.URI;
 
 /**
- * A file connection service
+ * A file connection and input provider service
  */
 public final class TextFileConnectionFactory
-        implements ConnectionFactory<TextFileSession>, InputStreamFactory<InputStream> {
+        implements ConnectionFactory<TextFileSession>, InputStreamProvider<InputStream> {
 
-    private StreamCodecService service = StreamCodecService.getInstance();
+    private final static StreamCodecService service = StreamCodecService.getInstance();
+
+    public TextFileConnectionFactory() {}
 
     @Override
     public Connection<TextFileSession> getConnection(URI uri) throws IOException {

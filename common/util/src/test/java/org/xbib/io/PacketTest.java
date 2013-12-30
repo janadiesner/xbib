@@ -45,7 +45,7 @@ public class PacketTest extends Assert {
 
     @Test
     public void testPacketWrite() throws Exception {
-        URI uri = URI.create("filegz:target/packetdemo");
+        URI uri = URI.create("file:target/packetdemo.gz");
         Connection<Session<StringPacket>> c = ConnectionService.getInstance()
                 .getFactory(uri)
                 .getConnection(uri);

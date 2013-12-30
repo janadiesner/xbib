@@ -197,8 +197,8 @@ public strictfp class MersenneTwisterFast implements Cloneable {
     public Object clone() {
         try {
             MersenneTwisterFast f = (MersenneTwisterFast) (super.clone());
-            f.mt = (int[]) (mt.clone());
-            f.mag01 = (int[]) (mag01.clone());
+            f.mt = mt.clone();
+            f.mag01 = mag01.clone();
             return f;
         } catch (CloneNotSupportedException e) {
             throw new InternalError();
@@ -311,7 +311,7 @@ public strictfp class MersenneTwisterFast implements Cloneable {
         mag01[0] = 0x0;
         mag01[1] = MATRIX_A;
 
-        mt[0] = (int) (seed & 0xffffffff);
+        mt[0] = (int)seed;
         for (mti = 1; mti < N; mti++) {
             mt[mti] =
                     (1812433253 * (mt[mti - 1] ^ (mt[mti - 1] >>> 30)) + mti);
@@ -495,7 +495,7 @@ public strictfp class MersenneTwisterFast implements Cloneable {
         y ^= (y << 15) & TEMPERING_MASK_C;      // TEMPERING_SHIFT_T(y)
         y ^= (y >>> 18);                        // TEMPERING_SHIFT_L(y)
 
-        return (boolean) ((y >>> 31) != 0);
+        return (y >>> 31) != 0;
     }
 
 

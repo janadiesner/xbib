@@ -40,7 +40,7 @@ import org.xbib.elements.marc.dialects.mab.MABElementBuilder;
 import org.xbib.elements.marc.dialects.mab.MABContext;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilderFactory;
 import org.xbib.elements.marc.dialects.mab.MABElementMapper;
-import org.xbib.keyvalue.KeyValueStreamAdapter;
+import org.xbib.io.keyvalue.KeyValueStreamAdapter;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.rdf.Resource;
@@ -63,12 +63,12 @@ public class AlephPublishingReaderTest {
                 counter.incrementAndGet();
             }
         };
-        final MABElementBuilderFactory builderFactory = new MABElementBuilderFactory() {
-            public MABElementBuilder newBuilder() {
-                return new MABElementBuilder().addOutput(output);
-            }
-        };
-        final MABElementMapper mapper = new MABElementMapper("mab").start(builderFactory);
+        final MABElementMapper mapper = new MABElementMapper("mab/hbz/tit")
+                .start(new MABElementBuilderFactory() {
+                    public MABElementBuilder newBuilder() {
+                        return new MABElementBuilder().addOutput(output);
+                    }
+                });
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                 .addListener(mapper)
                 .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
@@ -101,7 +101,7 @@ public class AlephPublishingReaderTest {
                 .setSetName(setName)
                 .setURI(URI.create(uriStr))) {
             while (reader.hasNext()) {
-                logger.info(reader.next().toString());
+                logger.info("reader info: {}", reader.next().toString());
             }
         } finally {
             mapper.close();

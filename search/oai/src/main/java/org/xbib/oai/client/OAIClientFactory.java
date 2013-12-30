@@ -61,11 +61,11 @@ public class OAIClientFactory {
             } catch (IOException ex) {
                 logger.error(ex.getMessage(), ex);
             }
-            PropertiesOAIClient client = new PropertiesOAIClient(properties);
+            DefaultOAIClient client = new DefaultOAIClient();
             client.setURL(URI.create(properties.getProperty("uri")));
             return client;
         } else {
-            PropertiesOAIClient client = new PropertiesOAIClient(properties);
+            DefaultOAIClient client = new DefaultOAIClient();
             client.setURL(URI.create(spec));
             return client;
         }

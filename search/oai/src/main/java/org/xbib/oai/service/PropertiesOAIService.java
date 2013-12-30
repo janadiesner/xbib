@@ -39,11 +39,11 @@ import java.util.Properties;
 
 import org.xbib.oai.OAISession;
 import org.xbib.oai.identify.ListIdentifiersResponse;
-import org.xbib.oai.metadata.ListMetadataFormatsResponse;
+import org.xbib.oai.formats.ListMetadataFormatsResponse;
 import org.xbib.oai.record.GetRecordRequest;
 import org.xbib.oai.identify.IdentifyResponse;
 import org.xbib.oai.identify.ListIdentifiersRequest;
-import org.xbib.oai.metadata.ListMetadataFormatsRequest;
+import org.xbib.oai.formats.ListMetadataFormatsRequest;
 import org.xbib.oai.record.GetRecordResponse;
 import org.xbib.oai.record.ListRecordsResponse;
 import org.xbib.oai.identify.IdentifyServerRequest;

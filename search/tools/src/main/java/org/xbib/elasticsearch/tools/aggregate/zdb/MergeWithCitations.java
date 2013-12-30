@@ -42,6 +42,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
+import org.xbib.common.settings.Settings;
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.elasticsearch.support.client.IngestClient;
 import org.xbib.elasticsearch.support.client.SearchClient;
@@ -51,14 +52,15 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.elasticsearch.tools.aggregate.WrappedSearchHit;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Manifestation;
-import org.xbib.options.OptionParser;
-import org.xbib.options.OptionSet;
 import org.xbib.util.ExceptionFormatter;
 import org.xbib.util.FormatUtil;
 import org.xbib.util.Strings;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URI;
 import java.text.NumberFormat;
 import java.util.Arrays;
@@ -81,17 +83,21 @@ import static org.elasticsearch.index.query.QueryBuilders.matchPhrasePrefixQuery
 import static org.elasticsearch.index.query.QueryBuilders.matchPhraseQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Merge ZDB with citation database
- *
  */
 public class MergeWithCitations {
 
     private final static Logger logger = LoggerFactory.getLogger(MergeWithCitations.class.getName());
 
-    private final static String lf = System.getProperty("line.separator");
+    private Reader reader;
+
+    private Writer writer;
+
+    private static Settings settings;
 
     // the pump
     private int numPumps;
@@ -126,69 +132,12 @@ public class MergeWithCitations {
     private long countHits;
     private long countWrites;
 
-
     public static void main(String[] args) {
         try {
-            OptionParser parser = new OptionParser() {
-                {
-                    accepts("source").withRequiredArg().ofType(String.class).required();
-                    accepts("target").withRequiredArg().ofType(String.class).required();
-                    accepts("shards").withOptionalArg().ofType(Integer.class).defaultsTo(1);
-                    accepts("replica").withOptionalArg().ofType(Integer.class).defaultsTo(0);
-                    accepts("mock").withOptionalArg().ofType(Boolean.class).defaultsTo(Boolean.FALSE);
-                    accepts("maxbulkactions").withRequiredArg().ofType(Integer.class).defaultsTo(1000);
-                    accepts("maxconcurrentbulkrequests").withRequiredArg().ofType(Integer.class).defaultsTo(Runtime.getRuntime().availableProcessors() * 4);
-                    accepts("pumps").withRequiredArg().ofType(Integer.class).defaultsTo(Runtime.getRuntime().availableProcessors() * 4);
-                    accepts("size").withRequiredArg().ofType(Integer.class).defaultsTo(1000);
-                    accepts("millis").withRequiredArg().ofType(Long.class).defaultsTo(60000L);
-                    accepts("id").withOptionalArg().ofType(String.class);
-                    accepts("mock").withOptionalArg().ofType(Boolean.class).defaultsTo(Boolean.FALSE);
-                }
-            };
-            OptionSet options = parser.parse(args);
-            if (options.hasArgument("help")) {
-                System.err.println("Help for " + MergeHoldingsLicenses.class.getCanonicalName() + lf
-                        + " --help                 print this help message" + lf
-                        + " --source <uri>         URI for connecting to the Elasticsearch source" + lf
-                        + " --target <uri>         URI for connecting to Elasticsearch target" + lf
-                        + " --shards <n>           number of shards" + lf
-                        + " --replica <n>          number of replica" + lf
-                        + " --maxbulkactions <n>   the number of bulk actions per request (optional, default: 1000)"
-                        + " --maxconcurrentbulkrequests <n>the number of concurrent bulk requests (optional, default: number of cpu core * 4)"
-                        + " --pumps <n>            number of pumps (optional, default: number of cpu cores * 4)"
-                        + " --size <n>             size for scan query result (optional, default: 1000)"
-                        + " --millis <ms>          life time in milliseconds for scan query (optional, default: 60000)"
-                        + " --id <n>               ZDB ID (optional, default is all ZDB IDs)"
-                        + " --mock <bool>          dry run of indexing (optional, default: false)"
-                );
-                System.exit(1);
-            }
-
-            URI sourceURI = URI.create(options.valueOf("source").toString());
-            URI targetURI = URI.create(options.valueOf("target").toString());
-            Integer maxBulkActions = (Integer) options.valueOf("maxbulkactions");
-            Integer maxConcurrentBulkRequests = (Integer) options.valueOf("maxconcurrentbulkrequests");
-            Integer pumps = (Integer) options.valueOf("pumps");
-            Integer size = (Integer) options.valueOf("size");
-            Long millis = (Long) options.valueOf("millis");
-            String identifier = (String) options.valueOf("id");
-            boolean mock = (boolean) options.valueOf("mock");
-
-            SearchClient search = new SearchClient()
-                    .newClient(sourceURI);
-
-            IngestClient ingest = new IngestClient()
-                    .maxActionsPerBulkRequest(maxBulkActions)
-                    .maxConcurrentBulkRequests(maxConcurrentBulkRequests)
-                    .newClient(targetURI);
-
-            new MergeWithCitations(search, ingest, sourceURI, targetURI, pumps, size, millis, identifier)
-                    .execute();
-
-            search.shutdown();
-
-            ingest.shutdown();
-
+            new MergeWithCitations()
+                    .reader(new InputStreamReader(System.in, "UTF-8"))
+                    .writer(new OutputStreamWriter(System.out, "UTF-8"))
+                    .run();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -196,12 +145,29 @@ public class MergeWithCitations {
         System.exit(0);
     }
 
-    private MergeWithCitations(SearchClient search, IngestClient ingest,
-                             URI sourceURI, URI targetURI,
-                             int numPumps, int size, long millis, String identifier)
-            throws UnsupportedEncodingException {
+    public MergeWithCitations reader(Reader reader) {
+        this.reader = reader;
+        settings = settingsBuilder().loadFromReader(reader).build();
+        return this;
+    }
+
+    public MergeWithCitations settings(Settings newSettings) {
+        settings = newSettings;
+        return this;
+    }
+
+    public MergeWithCitations writer(Writer writer) {
+        this.writer = writer;
+        return this;
+    }
+
+    public MergeWithCitations run() throws Exception {
+
+        URI sourceURI = URI.create(settings.get("source"));
+
+        SearchClient search = new SearchClient()
+                .newClient(sourceURI);
         this.client = search.client();
-        this.ingest = ingest;
 
         Map<String,String> params = URIUtil.parseQueryString(sourceURI);
 
@@ -212,6 +178,14 @@ public class MergeWithCitations {
         this.sourceCitationIndex = params.get("citationIndex");
         this.sourceCitationType = params.get("citationType");
 
+        URI targetURI = URI.create(settings.get("target"));
+        Integer maxBulkActions = settings.getAsInt("maxBulkActions", 100);
+        Integer maxConcurrentBulkRequests = settings.getAsInt("maxConcurrentBulkRequests", 16);
+
+        this.ingest = new IngestClient()
+                .maxActionsPerBulkRequest(maxBulkActions)
+                .maxConcurrentBulkRequests(maxConcurrentBulkRequests)
+                .newClient(targetURI);
         params = URIUtil.parseQueryString(targetURI);
 
         this.targetCitationIndex = params.get("citationIndex");
@@ -223,18 +197,26 @@ public class MergeWithCitations {
             this.targetCitationType = "citations";
         }
 
-        this.size = size;
-        this.millis = millis;
+        this.size = settings.getAsInt("size", 10);
+        this.millis = settings.getAsLong("millis", 3600000L);
+        this.identifier = settings.get("identifier");
 
         this.docs = Collections.synchronizedSet(new HashSet());
 
-        this.numPumps = numPumps;
+        this.numPumps = settings.getAsInt("numPumps", 10);
         this.pumps = new HashSet();
         this.pumpQueue = new SynchronousQueue(true);
         this.pumpService = Executors.newFixedThreadPool(numPumps);
         this.pumpLatch = new CountDownLatch(numPumps);
 
         this.identifier = identifier;
+
+        execute();
+
+        search.shutdown();
+
+        ingest.shutdown();
+        return this;
     }
 
     private MergeWithCitations execute() {
@@ -348,7 +330,7 @@ public class MergeWithCitations {
         return this;
     }
 
-    class MergePump implements Callable<Boolean> {
+    private class MergePump implements Callable<Boolean> {
 
         private final Logger logger;
         private final ObjectMapper mapper;

@@ -39,7 +39,7 @@ import java.io.Writer;
 
 public final class StreamUtil {
 
-    public static int BUFSIZE = 8192;
+    public final static int BUFSIZE = 8192;
 
     public static void copy(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[BUFSIZE];

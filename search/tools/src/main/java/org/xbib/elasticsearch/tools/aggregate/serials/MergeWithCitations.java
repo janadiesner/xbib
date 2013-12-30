@@ -41,25 +41,25 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.xbib.common.settings.Settings;
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.elasticsearch.support.client.IngestClient;
-import org.xbib.elasticsearch.support.client.MockIngestClient;
 import org.xbib.elasticsearch.support.client.SearchClient;
-import org.xbib.elasticsearch.tools.aggregate.zdb.MergeHoldingsLicenses;
 import org.xbib.util.URIUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.elasticsearch.tools.aggregate.WrappedSearchHit;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Manifestation;
-import org.xbib.options.OptionParser;
-import org.xbib.options.OptionSet;
 import org.xbib.util.ExceptionFormatter;
 import org.xbib.util.FormatUtil;
 import org.xbib.util.Strings;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URI;
 import java.text.NumberFormat;
 import java.util.Arrays;
@@ -80,6 +80,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchPhraseQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
@@ -89,7 +90,11 @@ public class MergeWithCitations {
 
     private final static Logger logger = LoggerFactory.getLogger(MergeWithCitations.class.getName());
 
-    private final static String lf = System.getProperty("line.separator");
+    private Reader reader;
+
+    private Writer writer;
+
+    private static Settings settings;
 
     // the pump
     private int numPumps;
@@ -125,7 +130,7 @@ public class MergeWithCitations {
     private long countWrites;
 
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         try {
             OptionParser parser = new OptionParser() {
                 {
@@ -187,14 +192,43 @@ public class MergeWithCitations {
             System.exit(1);
         }
         System.exit(0);
+    }*/
+
+    public static void main(String[] args) {
+        try {
+            new MergeWithCitations()
+                    .reader(new InputStreamReader(System.in, "UTF-8"))
+                    .writer(new OutputStreamWriter(System.out, "UTF-8"))
+                    .run();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        System.exit(0);
     }
 
-    private MergeWithCitations(SearchClient search, IngestClient ingest,
-                               URI sourceURI, URI targetURI,
-                               int numPumps, int size, long millis, String identifier)
-            throws UnsupportedEncodingException {
+    public MergeWithCitations reader(Reader reader) {
+        this.reader = reader;
+        settings = settingsBuilder().loadFromReader(reader).build();
+        return this;
+    }
+
+    public MergeWithCitations settings(Settings newSettings) {
+        settings = newSettings;
+        return this;
+    }
+
+    public MergeWithCitations writer(Writer writer) {
+        this.writer = writer;
+        return this;
+    }
+
+    public MergeWithCitations run() throws Exception {
+        URI sourceURI = URI.create(settings.get("source"));
+        SearchClient search = new SearchClient()
+                .newClient(sourceURI);
+
         this.client = search.client();
-        this.ingest = ingest;
 
         Map<String,String> params = URIUtil.parseQueryString(sourceURI);
 
@@ -205,6 +239,9 @@ public class MergeWithCitations {
         this.sourceCitationIndex = params.get("citationIndex");
         this.sourceCitationType = params.get("citationType");
 
+        URI targetURI = URI.create(settings.get("target"));
+        Integer maxBulkActions = settings.getAsInt("maxBulkActions", 100);
+        Integer maxConcurrentBulkRequests = settings.getAsInt("maxConcurrentBulkRequests", 16);
         params = URIUtil.parseQueryString(targetURI);
 
         this.targetCitationIndex = params.get("citationIndex");
@@ -216,18 +253,26 @@ public class MergeWithCitations {
             this.targetCitationType = "citations";
         }
 
-        this.size = size;
-        this.millis = millis;
+        this.ingest = new IngestClient()
+                .maxActionsPerBulkRequest(maxBulkActions)
+                .maxConcurrentBulkRequests(maxConcurrentBulkRequests)
+                .newClient(targetURI);
+
+        this.size = settings.getAsInt("size", 10);
+        this.millis = settings.getAsLong("millis", 3600000L);
+        this.identifier = settings.get("identifier");
 
         this.docs = Collections.synchronizedSet(new HashSet());
 
-        this.numPumps = numPumps;
+        this.numPumps = settings.getAsInt("numPumps", 1);;
         this.pumps = new HashSet();
         this.pumpQueue = new SynchronousQueue(true);
         this.pumpService = Executors.newFixedThreadPool(numPumps);
         this.pumpLatch = new CountDownLatch(numPumps);
 
-        this.identifier = identifier;
+        execute();
+
+        return this;
     }
 
     private MergeWithCitations execute() {

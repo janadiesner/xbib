@@ -283,6 +283,12 @@ public class TarSession implements Session {
 
     @Override
     public void write(Packet packet) throws IOException {
+        if (!isOpen()) {
+            throw new IOException("not open");
+        }
+        if (getOutputStream() == null) {
+            throw new IOException("no tar output stream");
+        }
         if (packet == null || packet.toString() == null) {
             throw new IOException("no packet to write");
         }

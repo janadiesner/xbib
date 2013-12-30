@@ -32,7 +32,7 @@
 
 package org.xbib.elements;
 
-import org.xbib.keyvalue.KeyValue;
+import org.xbib.io.keyvalue.KeyValue;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.context.ResourceContext;

@@ -39,12 +39,6 @@
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>charset</artifactId>
-            <type>jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
             <type>jar</type>
         </dependency>
@@ -55,8 +49,19 @@
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>content</artifactId>
+            <artifactId>iso2709</artifactId>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.xbib</groupId>
+            <artifactId>rdf</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.xbib</groupId>
+            <artifactId>charset</artifactId>
+            <type>jar</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>

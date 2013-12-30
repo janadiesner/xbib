@@ -58,7 +58,7 @@ public class NettyHttpRequest extends HttpPacket implements HttpRequest {
 
     private URI uri;
 
-    private RequestBuilder builder;
+    private RequestBuilder requestBuilder;
 
     private Realm.RealmBuilder realmBuilder;
 
@@ -77,7 +77,8 @@ public class NettyHttpRequest extends HttpPacket implements HttpRequest {
         }
         String authority = uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "");
         try {
-            this.uri = new URI(uri.getScheme(), authority, uri.getPath(), uri.getQuery(), uri.getFragment());
+            // add authority, drop all query parameters (use the RequestBuilder for that)
+            this.uri = new URI(uri.getScheme(), authority, uri.getPath(), null, uri.getFragment());
         } catch (URISyntaxException ex) {
             // ignore
         }
@@ -92,7 +93,7 @@ public class NettyHttpRequest extends HttpPacket implements HttpRequest {
     @Override
     public NettyHttpRequest setMethod(String method) {
         this.method = method;
-        this.builder = new RequestBuilder(method);
+        this.requestBuilder = new RequestBuilder(method);
         return this;
     }
 
@@ -102,23 +103,23 @@ public class NettyHttpRequest extends HttpPacket implements HttpRequest {
 
     @Override
     public NettyHttpRequest addParameter(String name, String value) {
-        if (value != null && value.length() > 0 && builder != null) {
-            builder.addQueryParameter(name, value);
+        if (value != null && value.length() > 0 && requestBuilder != null) {
+            requestBuilder.addQueryParameter(name, value);
         }
         return this;
     }
 
     @Override
     public NettyHttpRequest addHeader(String name, String value) {
-        if (value != null && value.length() > 0 && builder != null) {
-            builder.addHeader(name, value);
+        if (value != null && value.length() > 0 && requestBuilder != null) {
+            requestBuilder.addHeader(name, value);
         }
         return this;
     }
 
     public NettyHttpRequest setBody(String body) {
-        if (builder != null) {
-            builder.setBody(body);
+        if (requestBuilder != null) {
+            requestBuilder.setBody(body);
         }
         return this;
     }
@@ -139,7 +140,7 @@ public class NettyHttpRequest extends HttpPacket implements HttpRequest {
             throw new IOException("no URL set");
         }
         if (request == null) {
-            this.request = builder
+            this.request = requestBuilder
                     .setUrl(uri.toASCIIString())
                     .setRealm(realmBuilder.build())
                     .build();
@@ -156,7 +157,7 @@ public class NettyHttpRequest extends HttpPacket implements HttpRequest {
         StringBuilder sb = new StringBuilder();
         sb.append("[method=").append(method).append("]")
                 .append("[uri=").append(uri).append("]")
-                .append("[parameter=").append(builder
+                .append("[parameter=").append(requestBuilder
                 .setUrl(uri.toASCIIString())
                 .setRealm(realmBuilder.build())
                 .build()).append("]");

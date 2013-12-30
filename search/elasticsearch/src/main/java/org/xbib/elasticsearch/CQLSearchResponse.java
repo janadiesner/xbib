@@ -39,7 +39,7 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.json.JsonXContent;
 
 import org.xbib.elasticsearch.xml.ES;
-import org.xbib.io.chunk.ChunkedStream;
+import org.xbib.io.stream.ChunkedStream;
 import org.xbib.io.OutputFormat;
 import org.xbib.io.StreamUtil;
 import org.xbib.json.JsonXmlStreamer;

@@ -98,20 +98,17 @@ public class MARCElementsTest extends Assert {
                 StringWriter sw = new StringWriter();
                 TurtleWriter tw = new TurtleWriter().output(sw);
                 tw.write(context.resource());
-                logger.debug("out={}", sw.toString());
+                //logger.debug("out={}", sw.toString());
             }
 
         };
-        MARCElementBuilderFactory factory = new MARCElementBuilderFactory() {
-            public MARCElementBuilder newBuilder() {
-                MARCElementBuilder builder = new MARCElementBuilder();
-                builder.addOutput(output);
-                return builder;
-            }
-        };
         MARCElementMapper mapper = new MARCElementMapper("marc/bib")
                 .detectUnknownKeys(true)
-                .start(factory);
+                .start(new MARCElementBuilderFactory() {
+                    public MARCElementBuilder newBuilder() {
+                        return new MARCElementBuilder().addOutput(output);
+                    }
+                });
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
         Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);
         reader.setProperty(Iso2709Reader.FORMAT, "MARC");
@@ -125,8 +122,8 @@ public class MARCElementsTest extends Assert {
         transformer.transform(new SAXSource(reader, source), target);
         mapper.close();
         // check if increment works
-        assertEquals(output.getCounter(), 8676);
         logger.info("unknown elements = {}", mapper.unknownKeys());
+        assertEquals(8676, output.getCounter());
     }
 
 }

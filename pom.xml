@@ -305,12 +305,42 @@
         <dependencies>
             <dependency>
                 <groupId>org.xbib</groupId>
+                <artifactId>logging</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xbib</groupId>
                 <artifactId>charset</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.xbib</groupId>
+                <artifactId>compress</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xbib</groupId>
+                <artifactId>util</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xbib</groupId>
                 <artifactId>content</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xbib</groupId>
+                <artifactId>iso2709</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xbib</groupId>
+                <artifactId>jacc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xbib</groupId>
+                <artifactId>rdf</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -335,11 +365,6 @@
             </dependency>
             <dependency>
                 <groupId>org.xbib</groupId>
-                <artifactId>logging</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.xbib</groupId>
                 <artifactId>elements</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -360,27 +385,12 @@
             </dependency>
             <dependency>
                 <groupId>org.xbib</groupId>
-                <artifactId>jacc</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.xbib</groupId>
-                <artifactId>compress</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.xbib</groupId>
                 <artifactId>oai</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.xbib</groupId>
                 <artifactId>query</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.xbib</groupId>
-                <artifactId>util</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -586,7 +596,7 @@
 
     <profiles>
         <profile>
-            <id>elasticsearch-019</id>
+            <id>es-019</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
@@ -601,9 +611,9 @@
             </dependencyManagement>
         </profile>
         <profile>
-            <id>elasticsearch-090</id>
+            <id>es-090</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <dependencyManagement>
                 <dependencies>
@@ -616,16 +626,16 @@
             </dependencyManagement>
         </profile>
         <profile>
-            <id>elasticsearch-100</id>
+            <id>es-100</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <dependencyManagement>
                 <dependencies>
                     <dependency>
                         <groupId>org.xbib.elasticsearch.plugin</groupId>
                         <artifactId>elasticsearch-support</artifactId>
-                        <version>1.0.0.Beta2.3</version>
+                        <version>1.0.0.Beta2.4</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -637,6 +647,8 @@
         <module>common/charset</module>
         <module>common/compress</module>
         <module>common/util</module>
+        <module>common/content</module>
+        <module>common/iso2709</module>
         <module>common/jacc</module>
         <module>common/io</module>
         <module>common/dict</module>
@@ -646,7 +658,7 @@
 
         <module>search/grouping</module>
         <module>search/standardnumber</module>
-        <module>search/content</module>
+        <module>search/rdf</module>
         <module>search/elements</module>
         <module>search/query</module>
         <module>search/elasticsearch</module>

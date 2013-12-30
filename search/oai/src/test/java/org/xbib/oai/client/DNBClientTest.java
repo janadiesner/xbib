@@ -43,7 +43,7 @@ import org.xbib.oai.identify.IdentifyRequest;
 import org.xbib.oai.identify.IdentifyResponseListener;
 import org.xbib.oai.record.ListRecordsRequest;
 import org.xbib.oai.record.ListRecordsResponseListener;
-import org.xbib.oai.util.MetadataHandler;
+import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.xml.XmlReader;
@@ -57,7 +57,6 @@ public class DNBClientTest {
 
     @Test
     public void testIdentify() throws Exception {
-        logger.info("trying to newSession to DNB for Identify request");
         OAIClient client = OAIClientFactory.newClient("http://services.dnb.de/oai/repository");
         IdentifyRequest request = client.newIdentifyRequest();
         request.prepare().execute(new IdentifyResponseListener() {}).waitFor();
@@ -65,16 +64,13 @@ public class DNBClientTest {
 
     @Test
     public void testListRecordsDNB() throws Exception {
-        logger.info("trying to newSession to DNB");
 
         OAIClient client = OAIClientFactory.newClient("http://services.dnb.de/oai/repository");
-
         ListRecordsRequest request =  client.newListRecordsRequest()
                 .setFrom(DateUtil.parseDateISO("2013-01-01T00:00:00Z"))
                 .setUntil(DateUtil.parseDateISO("2013-01-10T00:00:00Z"))
                 .setSet("bib")
                 .setMetadataPrefix("PicaPlus-xml");
-
         final XmlTriplifier reader = new XmlReader();
         final TripleListener triples = new TripleListener() {
 
@@ -132,21 +128,26 @@ public class DNBClientTest {
             }
         };
         FileWriter sw = new FileWriter("target/dnb-pica.xml");
-        try {
-            do {
+        do {
+            try {
                 ListRecordsResponseListener listener = new ListRecordsResponseListener(request)
-                    .register(metadataHandler);
+                        .register(metadataHandler);
                 request.prepare().execute(listener).waitFor();
-                if (listener.getResponse() != null) {
-                    listener.getResponse().to(sw);
+                if (listener.isFailure()) {
+                    request = null;
+                } else {
+                    if (listener.getResponse() != null) {
+                        listener.getResponse().to(sw);
+                    }
+                    request = client.resume(request, listener.getResumptionToken());
                 }
-                request = listener.isFailure() ? null :
-                        client.resume(request, listener.getResumptionToken());
-            } while (request != null);
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+                request  = null;
+            }
+        } while (request != null);
         sw.close();
+        client.close();
     }
 
 }

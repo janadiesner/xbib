@@ -59,9 +59,9 @@ public class ZClientTest {
                 int size = 10;
                 ZClient client = ZClientFactory.newZClient(serviceName);
                 try {
-                File tmp = File.createTempFile(serviceName, "xml");
-                FileOutputStream out = new FileOutputStream(tmp);
-                try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
+                    File tmp = File.createTempFile(serviceName, "xml");
+                    FileOutputStream out = new FileOutputStream(tmp);
+                    try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
                         ZSearchRetrieveRequest request = client.newCQLSearchRetrieveRequest()
                                 .setQuery(query)
                                 .setFrom(from)
@@ -70,8 +70,8 @@ public class ZClientTest {
                         StylesheetTransformer transformer = new StylesheetTransformer("src/main/resources/xsl");
                         response.setStylesheetTransformer(transformer)
                                 .to(w);
-                }
-                tmp.delete();
+                    }
+                    tmp.delete();
                 } finally {
                     client.close();
                 }

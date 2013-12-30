@@ -31,16 +31,19 @@
  */
 package org.xbib.elasticsearch.tools;
 
-import org.xbib.common.settings.Settings;
 import org.xbib.elasticsearch.ResourceSink;
+import org.xbib.elasticsearch.support.client.BulkClient;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elasticsearch.support.client.IngestClient;
 import org.xbib.elasticsearch.support.client.MockIngestClient;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineRequest;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.tools.Converter;
+import org.xbib.util.DateUtil;
 import org.xbib.util.DurationFormatUtil;
 import org.xbib.util.FormatUtil;
 
@@ -49,8 +52,10 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
 import java.text.NumberFormat;
+import java.util.Date;
 
-public abstract class Feeder extends Converter {
+public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,R>>
+        extends Converter<T,R,P> {
 
     private final static Logger logger = LoggerFactory.getLogger(Feeder.class.getSimpleName());
 
@@ -59,24 +64,28 @@ public abstract class Feeder extends Converter {
     protected static ResourceSink<ResourceContext, Resource> sink;
 
     @Override
-    public Feeder reader(Reader reader) {
+    public Feeder<T,R,P> reader(Reader reader) {
         super.reader(reader);
         return this;
     }
 
     @Override
-    public Feeder writer(Writer writer) {
+    public Feeder<T,R,P> writer(Writer writer) {
         super.writer(writer);
         return this;
     }
 
     protected Ingest createIngest() {
-        return settings.getAsBoolean("mock", false) ? new MockIngestClient() : new IngestClient();
+        return settings.getAsBoolean("mock", false) ?
+                new MockIngestClient() :
+                "bulk".equals(settings.get("client")) ?
+                        new BulkClient() :
+                        new IngestClient();
     }
 
     @Override
-    protected Feeder prepare(Settings settings) {
-        super.prepare(settings);
+    protected Feeder<T,R,P> prepare() {
+        super.prepare();
         try {
             URI esURI = URI.create(settings.get("elasticsearch"));
             String index = settings.get("index");
@@ -106,9 +115,8 @@ public abstract class Feeder extends Converter {
     }
 
     @Override
-    public Feeder run() throws Exception {
-        logger.info("running");
-        super.run();
+    protected Feeder<T,R,P> cleanup() {
+        super.cleanup();
         logger.info("running complete, flushing sink");
         sink.flush();
         logger.info("shutdown of output");
@@ -117,8 +125,9 @@ public abstract class Feeder extends Converter {
         return this;
     }
 
+    @Override
     protected void writeMetrics(Writer writer) throws Exception {
-        // TODO write output metrics
+        // TODO write output metrics, index output metrics
         long docs = executor.getTotalCount();
         long bytes = executor.getTotalSize();
         long elapsed = executor.metric().elapsed() / 1000000;
@@ -129,7 +138,6 @@ public abstract class Feeder extends Converter {
         logger.info("Indexing complete. {} inputs, {} docs, {} = {} ms, {} = {} bytes, {} = {} avg size, {} dps, {} MB/s",
                 input.size(),
                 docs,
-                //TimeValue.timeValueMillis(elapsed).format(),
                 DurationFormatUtil.formatDurationWords(elapsed, true, true),
                 elapsed,
                 bytes,
@@ -138,6 +146,15 @@ public abstract class Feeder extends Converter {
                 formatter.format(avg),
                 formatter.format(dps),
                 formatter.format(mbps));
+
+        for (Pipeline p : executor.getPipelines()) {
+            logger.info("pipeline {}, started {}, ended {}, took {}",
+                    p,
+                    DateUtil.formatDateISO(new Date(p.startedAt())),
+                    DateUtil.formatDateISO(new Date(p.stoppedAt())),
+                    DurationFormatUtil.formatDurationWords(p.took(), true, true));
+        }
+
         if (writer != null) {
             String metrics = String.format("Indexing complete. %d inputs, %d docs, %s = %d ms, %d = %s bytes, %s = %s avg size, %s dps, %s MB/s",
                     input.size(),

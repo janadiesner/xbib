@@ -41,7 +41,7 @@ import org.xbib.oai.OAIConstants;
 import org.xbib.oai.record.GetRecordRequest;
 import org.xbib.oai.identify.IdentifyRequest;
 import org.xbib.oai.identify.ListIdentifiersRequest;
-import org.xbib.oai.metadata.ListMetadataFormatsRequest;
+import org.xbib.oai.formats.ListMetadataFormatsRequest;
 import org.xbib.oai.record.ListRecordsRequest;
 import org.xbib.oai.set.ListSetsRequest;
 import org.xbib.oai.util.ResumptionToken;

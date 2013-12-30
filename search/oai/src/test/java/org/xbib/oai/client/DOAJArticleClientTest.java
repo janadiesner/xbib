@@ -38,9 +38,9 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.record.ListRecordsRequest;
 import org.xbib.oai.record.ListRecordsResponseListener;
-import org.xbib.oai.util.rdf.RdfMetadataHandler;
-import org.xbib.oai.util.rdf.RdfOutput;
-import org.xbib.oai.util.rdf.RdfResourceHandler;
+import org.xbib.oai.rdf.RdfMetadataHandler;
+import org.xbib.oai.rdf.RdfOutput;
+import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
@@ -86,22 +86,28 @@ public class DOAJArticleClientTest {
                 .setUntil(DateUtil.parseDateISO("2013-01-02T00:00:00Z"))
                 .setMetadataPrefix("doajArticle");
 
-        try {
-            do {
+        do {
+            try {
                 ListRecordsResponseListener listener = new ListRecordsResponseListener(request)
                         .register(metadataHandler);
                 request.prepare().execute(listener).waitFor();
-                if (listener.getResponse() != null) {
-                    StringWriter sw = new StringWriter();
-                    listener.getResponse().to(sw);
-                    logger.info("response from DOAJ article = {}", sw);
+                if (listener.isFailure()) {
+                    request = null;
+                } else {
+                    if (listener.getResponse() != null) {
+                        StringWriter sw = new StringWriter();
+                        listener.getResponse().to(sw);
+                        logger.info("response = {}", sw);
+                    }
+                    request = client.resume(request, listener.getResumptionToken());
                 }
-                request = listener.isFailure() ? null :
-                        client.resume(request, listener.getResumptionToken());
-            } while (request != null);
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+                request = null;
+            }
+        } while (request != null);
+
+        client.close();
     }
 
     private final IRI ISSN = IRI.create("urn:ISSN");

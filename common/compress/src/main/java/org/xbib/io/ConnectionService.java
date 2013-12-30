@@ -57,12 +57,9 @@ public final class ConnectionService<F extends ConnectionFactory> {
         if (scheme == null) {
             throw new IllegalArgumentException("no connection scheme given");
         }
-        ConnectionFactory factory;
         ServiceLoader<ConnectionFactory> loader = ServiceLoader.load(ConnectionFactory.class);
-        Iterator<ConnectionFactory> it = loader.iterator();
-        while (it.hasNext()) {
-            factory = it.next();
-            if (scheme != null && factory.canOpen(uri)) {
+        for (ConnectionFactory factory : loader) {
+            if (factory.canOpen(uri)) {
                 return (F) factory;
             }
         }

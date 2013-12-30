@@ -31,13 +31,15 @@
  */
 package org.xbib.io;
 
+import org.xbib.io.stream.BytesStream;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 /**
- * Similar to {@link java.io.ByteArrayOutputStream} just not synced.
+ * Similar to {@link java.io.ByteArrayOutputStream}, but not synchronized
  */
 public class FastByteArrayOutputStream extends OutputStream implements BytesStream {
 

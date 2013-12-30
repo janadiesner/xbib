@@ -31,6 +31,9 @@
  */
 package org.xbib.io;
 
+import org.xbib.io.stream.BytesStreamInput;
+import org.xbib.io.stream.StreamInput;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;

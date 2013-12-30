@@ -39,7 +39,7 @@ import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
 import org.xbib.iri.IRI;
-import org.xbib.keyvalue.KeyValueStreamAdapter;
+import org.xbib.io.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
@@ -72,16 +72,14 @@ public class ZDBBibTest extends Assert {
         InputStream in = getClass().getResourceAsStream("zdbtitutf8.mrc");
         //new GZIPInputStream(new FileInputStream(System.getProperty("user.home") + "/Daten/zdb/1302zdbtitgesamt.mrc.gz"));
         try (BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591))) {
-            InputSource source = new InputSource(br);
-            MARCElementBuilderFactory factory = new MARCElementBuilderFactory() {
-                public MARCElementBuilder newBuilder() {
-                    return new MARCElementBuilder().addOutput(out);
-                }
-            };
             MARCElementMapper mapper = new MARCElementMapper("marc/zdb/bib")
                     .pipelines(Runtime.getRuntime().availableProcessors() * 2)
                     .detectUnknownKeys(true)
-                    .start(factory);
+                    .start(new MARCElementBuilderFactory() {
+                        public MARCElementBuilder newBuilder() {
+                            return new MARCElementBuilder().addOutput(out);
+                        }
+                    });
             MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                     .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
                         @Override
@@ -109,6 +107,7 @@ public class ZDBBibTest extends Assert {
             Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);
             reader.setProperty(Iso2709Reader.FORMAT, "MARC");
             reader.setProperty(Iso2709Reader.TYPE, "Bibliographic");
+            InputSource source = new InputSource(br);
             reader.parse(source);
             mapper.close();
             logger.info("zdb title counter = {}", out.getCounter());
@@ -121,19 +120,17 @@ public class ZDBBibTest extends Assert {
 
         @Override
         public void output(ResourceContext context, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
-            if (!context.resource().isEmpty()) {
-                Resource r = context.resource();
-                r.id(IRI.builder()
-                        .scheme("http")
-                        .host("zdb")
-                        .query("title")
-                        .fragment(counter.toString()).build());
-                StringWriter sw = new StringWriter();
-                TurtleWriter tw = new TurtleWriter().output(sw);
-                tw.write(r);
-                logger.debug("out={}", sw.toString());
-                counter.incrementAndGet();
-            }
+            Resource r = context.resource();
+            r.id(IRI.builder()
+                    .scheme("http")
+                    .host("zdb")
+                    .query("title")
+                    .fragment(counter.toString()).build());
+            StringWriter sw = new StringWriter();
+            TurtleWriter tw = new TurtleWriter().output(sw);
+            tw.write(r);
+            logger.debug("out={}", sw.toString());
+            counter.incrementAndGet();
         }
 
     }

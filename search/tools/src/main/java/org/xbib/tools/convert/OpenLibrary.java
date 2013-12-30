@@ -31,132 +31,40 @@
  */
 package org.xbib.tools.convert;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.AbstractPipeline;
-import org.xbib.pipeline.SimplePipelineExecutor;
-import org.xbib.pipeline.Pipeline;
-import org.xbib.io.InputService;
-import org.xbib.io.file.Finder;
-import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.options.OptionParser;
-import org.xbib.options.OptionSet;
-import org.xbib.pipeline.element.CounterElement;
-import org.xbib.util.FormatUtil;
-
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URI;
-import java.text.NumberFormat;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.io.InputService;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.tools.Converter;
 
 /**
  * OpenLibrary converter from couchdb JSON.
  * This conversion generates NTriples or Turtle format.
- *
  */
-public class OpenLibrary extends AbstractPipeline<CounterElement> {
+public class OpenLibrary extends Converter {
 
-    private final static Logger logger = LoggerFactory.getLogger(OpenLibrary.class.getName());
-
-    private final static String lf = System.getProperty("line.separator");
-
-    private final static CounterElement fileCounter = new CounterElement().set(new AtomicLong(0L));
-
-    private final static AtomicLong docCounter = new AtomicLong(0L);
-
-    private final static AtomicLong charCounter = new AtomicLong(0L);
-
-    private static Queue<URI> input;
-
-    private static OptionSet options;
-
-    private boolean done = false;
+    private final static Logger logger = LoggerFactory.getLogger(OpenLibrary.class.getSimpleName());
 
     public static void main(String[] args) {
         try {
-            OptionParser parser = new OptionParser() {
-                {
-                    accepts("path").withRequiredArg().ofType(String.class).required();
-                    accepts("pattern").withRequiredArg().ofType(String.class).required().defaultsTo("*.xml");
-                    accepts("threads").withRequiredArg().ofType(Integer.class).defaultsTo(1);
-                    accepts("format").withOptionalArg().ofType(String.class).defaultsTo("turtle");
-                    accepts("output").withOptionalArg().ofType(String.class).defaultsTo("output.ttl");
-                    accepts("base").withRequiredArg().ofType(String.class).required().defaultsTo("http://freebase.com/");
-                }
-            };
-            options = parser.parse(args);
-            if (options.hasArgument("help")) {
-                System.err.println("Help for " + OpenLibrary.class.getCanonicalName() + lf
-                        + " --help                 print this help message" + lf
-                        + " --path <path>          a file path from where the input files are recursively collected (required)" + lf
-                        + " --pattern <pattern>    a regex for selecting matching file names for input (default: *.xml)" + lf
-                        + " --threads <n>          the number of threads (optional, default: 1)"
-                        + " --format 'turtle'|'ntriples'             the output format (default: turtle)"
-                        + " --output <name>                          the output filename (default: output.ttl)"
-                        + " --base <IRI>           a base IRI for Turtle to resolve against (required, default: http://freebase.com/)" + lf
-                );
-                System.exit(1);
-            }
-
-            input = new Finder(options.valueOf("pattern").toString())
-                    .find(options.valueOf("path")
-                    .toString())
-                    .getURIs();
-            final Integer threads = (Integer) options.valueOf("threads");
-
-            IRI base = IRI.create((String) options.valueOf("base"));
-
-            long t0 = System.currentTimeMillis();
-
-            SimplePipelineExecutor service = new SimplePipelineExecutor()
-                    .concurrency(threads)
-                    .provider(new PipelineProvider() {
-                        @Override
-                        public Pipeline get() {
-                            return new OpenLibrary();
-                        }
-                    })
-                    .execute()
-                    .waitFor();
-
-            long t1 = System.currentTimeMillis();
-
-            long docs = docCounter.get();
-            long bytes = charCounter.get();
-            double dps = docs * 1000.0 / (double)(t1 - t0);
-            double avg = bytes / (docs + 1); // avoid div by zero
-            double mbps = (bytes * 1000.0 / (double)(t1 - t0)) / (1024.0 * 1024.0) ;
-            String t = FormatUtil.formatMillis(t1 - t0);
-            String byteSize = FormatUtil.convertFileSize(bytes);
-            String avgSize = FormatUtil.convertFileSize(avg);
-            NumberFormat formatter = NumberFormat.getNumberInstance();
-            logger.info("Converting complete. {} files, {} docs, {} = {} ms, {} = {} chars, {} = {} avg size, {} dps, {} MB/s",
-                    fileCounter,
-                    docs,
-                    t,
-                    (t1-t0),
-                    bytes,
-                    byteSize,
-                    avgSize,
-                    formatter.format(avg),
-                    formatter.format(dps),
-                    formatter.format(mbps));
-
-            service.shutdown();
-
-        } catch (IOException | InterruptedException | ExecutionException e) {
+            new OpenLibrary()
+                    .reader(new InputStreamReader(System.in, "UTF-8"))
+                    .writer(new OutputStreamWriter(System.out, "UTF-8"))
+                    .run();
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
@@ -167,67 +75,43 @@ public class OpenLibrary extends AbstractPipeline<CounterElement> {
     }
 
     @Override
-    public void close() throws IOException {
-        input.clear();
+    protected PipelineProvider<Pipeline> pipelineProvider() {
+        return new PipelineProvider<Pipeline>() {
+            @Override
+            public Pipeline get() {
+                return new OpenLibrary();
+            }
+        };
     }
 
     @Override
-    public boolean hasNext() {
-        return !done && !input.isEmpty();
-    }
-
-    @Override
-    public CounterElement next() {
-        URI uri = input.poll();
-        done = uri == null;
-        if (done) {
-            return fileCounter;
+    public void process(URI uri) throws Exception {
+        InputStream in = InputService.getInputStream(uri);
+        String output = settings.get("output");
+        if (!output.endsWith(".gz")) {
+            output = output + ".gz";
         }
-        try {
-            InputStream in = InputService.getInputStream(uri);
-            String output = (String)options.valueOf("output");
-            if (fileCounter.get().get() > 0) {
-                output += "." + fileCounter.get();
+        OutputStream out =  new GZIPOutputStream(new FileOutputStream(output)) {
+            {
+                def.setLevel(Deflater.BEST_COMPRESSION);
             }
-            if (!output.endsWith(".gz")) {
-                output = output + ".gz";
-            }
-            OutputStream out =  new GZIPOutputStream(new FileOutputStream(output)) {
-                {
-                    def.setLevel(Deflater.BEST_COMPRESSION);
-                }
-            };
-            //NTripleWriter writer = new NTripleWriter()
-            //        .output(out);
-
-
-            //new TurtleReader(base)
-            //        .setTripleListener(writer)
-            //        .parse(in);
-
-            in.close();
-            out.close();
-            fileCounter.get().incrementAndGet();
-        } catch (Exception ex) {
-            logger.error("error while parsing from stream: " + ex.getMessage(), ex);
-        }
-        return fileCounter;
-    }
-
-    class OpenLibraryParser {
-
+        };
         ObjectMapper mapper = new ObjectMapper();
-
-        public void parse(InputStream in) throws IOException {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            String line;
-            while ((line = reader.readLine()) != null ) {
-                String[] l = line.split("\t"); // type, unique key, revision, last modified, JSON
-                Map<String,Object> m = mapper.readValue(l[4], Map.class);
-                logger.info("{}", m);
-            }
-            reader.close();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        String line;
+        while ((line = reader.readLine()) != null ) {
+            String[] l = line.split("\t"); // type, unique key, revision, last modified, JSON
+            Map<String,Object> m = mapper.readValue(l[4], Map.class);
+            logger.info("{}", m);
         }
+        reader.close();
+        //NTripleWriter writer = new NTripleWriter()
+        //        .output(out);
+        //new TurtleReader(base)
+        //        .setTripleListener(writer)
+        //        .parse(in);
+        in.close();
+        out.close();
     }
 
 }

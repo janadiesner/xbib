@@ -41,7 +41,7 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.record.ListRecordsRequest;
 import org.xbib.oai.record.ListRecordsResponseListener;
-import org.xbib.oai.util.xml.XmlMetadataHandler;
+import org.xbib.oai.xml.XmlMetadataHandler;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -74,8 +74,8 @@ public class NatLizClientTest {
         final XmlMetadataHandler metadataHandler = new NatLizHandler()
                 .setWriter(new StringWriter());
 
-        try {
-            do {
+        do {
+            try {
                 ListRecordsResponseListener listener = new ListRecordsResponseListener(request)
                         .register(metadataHandler);
                 request.prepare().execute(listener).waitFor();
@@ -86,12 +86,12 @@ public class NatLizClientTest {
                 }
                 request = listener.isFailure() ? null :
                         client.resume(request, listener.getResumptionToken());
-            } while (request != null);
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            session.close();
-        }
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
+        } while (request != null);
+        session.close();
+        client.close();
     }
 
     class NatLizHandler extends XmlMetadataHandler {

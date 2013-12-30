@@ -31,21 +31,20 @@
  */
 package org.xbib.io;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.WeakHashMap;
 
 public class StreamCodecService {
 
-    private final static Map<String, StreamCodec> codecs = new WeakHashMap();
+    // the order is important, first codecs, then instance
+    private final static Map<String, StreamCodec> codecs = new WeakHashMap<String, StreamCodec>();
+
     private final static StreamCodecService instance = new StreamCodecService();
 
     private StreamCodecService() {
         ServiceLoader<StreamCodec> loader = ServiceLoader.load(StreamCodec.class);
-        Iterator<StreamCodec> iterator = loader.iterator();
-        while (iterator.hasNext()) {
-            StreamCodec codec = iterator.next();
+        for (StreamCodec codec : loader) {
             if (!codecs.containsKey(codec.getName())) {
                 codecs.put(codec.getName(), codec);
             }

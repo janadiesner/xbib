@@ -31,137 +31,42 @@
  */
 package org.xbib.tools.convert;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.net.URI;
+
 import org.xbib.elements.CountableElementOutput;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilder;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilderFactory;
 import org.xbib.elements.marc.dialects.mab.MABElementMapper;
-import org.xbib.pipeline.AbstractPipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.SimplePipelineExecutor;
 import org.xbib.pipeline.Pipeline;
-import org.xbib.io.file.Finder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.dialects.MarcXmlTarReader;
-import org.xbib.pipeline.element.CounterElement;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.xcontent.ContentBuilder;
-import org.xbib.options.OptionParser;
-import org.xbib.options.OptionSet;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.Collections;
-import java.util.Queue;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicLong;
+import org.xbib.tools.Converter;
 
 /**
  * Converter tool for Hochschulbibliothekszentrum (HBZ) MAB data in MarcXml TAR clobs
- *
  */
-public final class HBZ extends AbstractPipeline<CounterElement> {
+public final class HBZ extends Converter {
 
     private final static Logger logger = LoggerFactory.getLogger(HBZ.class.getSimpleName());
 
-    private final static String lf = System.getProperty("line.separator");
-
-    private final static CounterElement fileCounter = new CounterElement().set(new AtomicLong(0L));
-
-    private static Queue<URI> input;
-
-    private static String elements;
-
-    private static int pipelines;
-
-    private static boolean detect;
-
-    private boolean done;
-
-    private final static Set<String> unknownKeys = Collections.synchronizedSet(new TreeSet());
-
     public static void main(String[] args) {
         try {
-            OptionParser parser = new OptionParser() {
-                {
-                    accepts("path").withRequiredArg().ofType(String.class).required();
-                    accepts("pattern").withRequiredArg().ofType(String.class).required();
-                    accepts("threads").withRequiredArg().ofType(Integer.class).defaultsTo(1);
-                    accepts("overwrite").withRequiredArg().ofType(Boolean.class).defaultsTo(Boolean.FALSE);
-                    accepts("elements").withRequiredArg().ofType(String.class).required().defaultsTo("mab/hbz/dialect");
-                    accepts("pipelines").withRequiredArg().ofType(Integer.class).defaultsTo(Runtime.getRuntime().availableProcessors());
-                    accepts("detect").withOptionalArg().ofType(Boolean.class).defaultsTo(Boolean.FALSE);
-                }
-            };
-            OptionSet options = parser.parse(args);
-            if (options.hasArgument("help")) {
-                System.err.println("Help for " + HBZ.class.getCanonicalName() + lf
-                        + " --help                 print this help message" + lf
-                        + " --path <path>          a file path from where the input files are recursively collected (required)" + lf
-                        + " --pattern <pattern>    a regex for selecting matching file names for input (default: *.xml)" + lf
-                        + " --threads <n>          the number of threads for import (optional, default: 1)"
-                        + " --elements <name>      element set (optional, default: marc)"
-                        + " --pipelines <n>        number of pipelines (optional, default: number of cpu cores)"
-                        + " --detect <bool>        detect unknown keys (optional, default: false)"
-                );
-                System.exit(1);
-            }
-
-            input = new Finder(options.valueOf("pattern").toString())
-                    .find(options.valueOf("path").toString())
-                    .getURIs();
-            final Integer threads = (Integer) options.valueOf("threads");
-
-            logger.info("number of input files = {}, worker threads = {}", input.size(), threads);
-
-            // configure element processing
-            pipelines = (Integer)options.valueOf("pipelines");
-            elements = options.valueOf("elements").toString();
-            detect = (Boolean)options.valueOf("detect");
-
-            long t0 = System.currentTimeMillis();
-
-            SimplePipelineExecutor service = new SimplePipelineExecutor()
-                    .concurrency(threads)
-                    .provider(new PipelineProvider() {
-                        @Override
-                        public Pipeline get() {
-                            return new HBZ();
-                        }
-                    })
-                    .execute()
-                    .waitFor();
-
-            long t1 = System.currentTimeMillis();
-
-            long docs = out.getCounter();
-            logger.info("Indexing complete. {} files, {} docs, {} ms",
-                    fileCounter,
-                    docs,
-                    (t1-t0));
-
-            service.shutdown();
-
-            // output of mapper analysis
-
-            if (detect) {
-                StringBuilder sb = new StringBuilder();
-                for (String key :  unknownKeys) {
-                    if (sb.length() > 0) {
-                        sb.append(",");
-                    }
-                    sb.append("\n").append("\"").append(key).append("\"");
-                }
-                logger.info("detected unknown keys={}", sb.toString());
-            }
-
-        } catch (IOException | InterruptedException | ExecutionException e) {
+            new HBZ()
+                    .reader(new InputStreamReader(System.in, "UTF-8"))
+                    .writer(new OutputStreamWriter(System.out, "UTF-8"))
+                    .run();
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
@@ -169,66 +74,49 @@ public final class HBZ extends AbstractPipeline<CounterElement> {
     }
 
     private HBZ() {
-        this.done = false;
     }
 
     @Override
-    public void close() throws IOException {
-        input.clear();
-    }
-
-    @Override
-    public boolean hasNext() {
-        return !done && !input.isEmpty();
-    }
-
-    @Override
-    public CounterElement next() {
-        final URI uri = input.poll();
-        done = uri == null;
-        if (done) {
-            return fileCounter;
-        }
-        try {
-            logger.info("starting {} elements '{}'", uri, elements);
-            final MABElementMapper mapper = new MABElementMapper(elements)
-                    .pipelines(pipelines)
-                    .detectUnknownKeys(detect)
-                    .start(buildFactory);
-            final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                    .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
-                        @Override
-                        public String transform(String value) {
-                            return value;
-                        }
-                    })
-                    .addListener(mapper);
-            // set up TAR reader
-            final MarcXmlTarReader reader = new MarcXmlTarReader()
-                            .setURI(uri)
-                            .setListener(kv);
-            while (reader.hasNext()) {
-                reader.next();
+    protected PipelineProvider<Pipeline> pipelineProvider() {
+        return new PipelineProvider<Pipeline>() {
+            @Override
+            public Pipeline get() {
+                return new HBZ();
             }
-            reader.close();
-            if (detect) {
-                unknownKeys.addAll(mapper.unknownKeys());
-            }
-            mapper.close();
-            fileCounter.get().incrementAndGet();
-        } catch (Exception ex) {
-            logger.error("error while reading document: " + ex.getMessage(), ex);
-            done = true;
-        }
-        return fileCounter;
+        };
     }
 
-    final MABElementBuilderFactory buildFactory = new MABElementBuilderFactory() {
-        public MABElementBuilder newBuilder() {
-            return new MABElementBuilder()
-                    .addOutput(out);
+    @Override
+    public void process(URI uri) throws Exception {
+        final MABElementMapper mapper = new MABElementMapper(settings.get("elements"))
+                .pipelines(settings.getAsInt("pipelines", 1))
+                .detectUnknownKeys(settings.getAsBoolean("detect", true))
+                .start(new MABElementBuilderFactory() {
+                    public MABElementBuilder newBuilder() {
+                        return new MABElementBuilder()
+                                .addOutput(out);
+                    }
+                });
+        final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
+                .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
+                    @Override
+                    public String transform(String value) {
+                        return value;
+                    }
+                })
+                .addListener(mapper);
+        final MarcXmlTarReader reader = new MarcXmlTarReader()
+                .setURI(uri)
+                .setListener(kv);
+        while (reader.hasNext()) {
+            reader.next();
         }
-    };
+        reader.close();
+        if (settings.getAsBoolean("detect", true)) {
+            logger.info("{}", mapper.unknownKeys());
+        }
+        mapper.close();
+    }
 
     private final static OurElementOutput out = new OurElementOutput();
 
@@ -236,22 +124,10 @@ public final class HBZ extends AbstractPipeline<CounterElement> {
 
         @Override
         public void output(ResourceContext context, ContentBuilder contentBuilder) throws IOException {
-            if (context.resource().id() != null) {
-                if (logger.isDebugEnabled()) {
-                    try {
-                        StringWriter sw = new StringWriter();
-                        new TurtleWriter().output(sw).write(context.resource());
-                        counter.incrementAndGet();
-                        //logger.info(sw.toString());
-                    } catch (IOException ex) {
-                        logger.error(ex.getMessage(), ex);
-                    }
-                }
-            } else {
-                logger.warn("no resource ID found");
-            }
+            StringWriter sw = new StringWriter();
+            new TurtleWriter().output(sw).write(context.resource());
+            counter.incrementAndGet();
         }
-
     }
 
 }

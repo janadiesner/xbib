@@ -31,9 +31,9 @@
  */
 package org.xbib.elements;
 
-import org.xbib.classloader.URIClassLoader;
-import org.xbib.keyvalue.KeyValue;
-import org.xbib.keyvalue.KeyValueStreamListener;
+import org.xbib.classloader.uri.URIClassLoader;
+import org.xbib.io.keyvalue.KeyValue;
+import org.xbib.io.keyvalue.KeyValueStreamListener;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.context.ResourceContext;
@@ -174,22 +174,6 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
             logger.error(e.getMessage(), e);
         }
     }
-
-/*    @Override
-    public void end(Object info) {
-        try {
-            // add marker element
-            if (keyvalues != null) {
-                keyvalues.add(new KeyValue(null, info));
-                // move shallow copy of key/values to pipeline, this ensures thread safety
-                queue.put((List<KeyValue>) keyvalues.clone());
-                keyvalues.clear();
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
-    */
 
     /**
      * Helper method for diagnosing unknown keys.

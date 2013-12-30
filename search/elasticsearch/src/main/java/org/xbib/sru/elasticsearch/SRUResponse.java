@@ -47,7 +47,7 @@ import org.xbib.elasticsearch.xml.ES;
 import org.xbib.elasticsearch.support.facet.FacetSupport;
 import org.xbib.facet.Facet;
 import org.xbib.facet.FacetListener;
-import org.xbib.io.chunk.ChunkedStream;
+import org.xbib.io.stream.ChunkedStream;
 import org.xbib.io.OutputFormat;
 import org.xbib.io.StreamUtil;
 import org.xbib.json.transform.JsonStylesheet;
