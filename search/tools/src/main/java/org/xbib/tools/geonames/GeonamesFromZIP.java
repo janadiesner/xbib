@@ -39,6 +39,7 @@ import org.xbib.pipeline.PipelineProvider;
 import org.xbib.tools.Converter;
 import org.xbib.util.Strings;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -71,7 +72,7 @@ public class GeonamesFromZIP extends Converter {
     }
 
     @Override
-    protected Converter prepare() {
+    protected Converter prepare() throws IOException {
         super.prepare();
         return this;
     }

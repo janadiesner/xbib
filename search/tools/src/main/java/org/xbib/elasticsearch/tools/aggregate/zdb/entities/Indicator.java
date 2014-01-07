@@ -53,6 +53,7 @@ public class Indicator extends License {
     @Override
     protected void build() {
         this.parent = getString("xbib:identifier");
+        this.id = getString("dc:identifier");
         this.isil = getString("xbib:isil");
         this.dates = buildDateArray();
         this.info = buildInfo();
@@ -99,48 +100,48 @@ public class Indicator extends License {
                 // 4,5 mio
                 case "kxn" : // 1.061.340
                 {
-                    servicetype = "interlibraryloan";
+                    servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = "transmission-domestic-only";
+                    servicedistribution = "distribution-domestic-only";
                     break;
                 }
                 case "kxx" : // 1.376.538
                 {
-                    servicetype = "interlibraryloan";
+                    servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = "transmission";
+                    servicedistribution = "distribution-unrestricted";
                     break;
                 }
                 case "kpn" : // 1.684.164
                 {
-                    servicetype = "interlibraryloan";
+                    servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = "postal-domestic-only";
+                    servicedistribution = "distribution-postal-domestic-only";
                     break;
                 }
                 case "kpx" : // 104.579
                 {
-                    servicetype = "interlibraryloan";
+                    servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = "postal";
+                    servicedistribution = "distribution-postal-unrestricted";
                     break;
                 }
                 case "exn" : // 172.778
                 {
-                    servicetype = "interlibraryloan";
+                    servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = "electronic-domestic-only";
+                    servicedistribution = "distribution-electronic-domestic-only";
                     break;
                 }
                 case "exx" : // 116.673
                 {
-                    servicetype = "interlibraryloan";
+                    servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = "electronic";
+                    servicedistribution = "distribution-electronic-unrestricted";
                     break;
                 }
                 default: {
-                    servicetype = "none";
+                    servicetype = "interlibrary";
                     servicemode = "none";
                     servicedistribution = "none";
                     break;

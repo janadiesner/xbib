@@ -1,21 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package org.xbib.io.archivers.ar;
 
 import org.xbib.io.archivers.ArchiveEntry;
@@ -26,10 +9,10 @@ import java.util.Date;
 
 /**
  * Represents an archive entry in the "ar" format.
- * 
+ * <p/>
  * Each AR archive starts with "!<arch>" followed by a LF. After these 8 bytes
  * the archive entries are listed. The format of an entry header is as it follows:
- * 
+ * <p/>
  * <pre>
  * START BYTE   END BYTE    NAME                    FORMAT      LENGTH
  * 0            15          File name               ASCII       16
@@ -40,61 +23,72 @@ import java.util.Date;
  * 48           57          File size (bytes)       Decimal     10
  * 58           59          File magic              \140\012    2
  * </pre>
- * 
+ * <p/>
  * This specifies that an ar archive entry header contains 60 bytes.
- * 
+ * <p/>
  * Due to the limitation of the file name length to 16 bytes GNU and
- * BSD has their own variants of this format. Currently Commons
- * Compress can read but not write the GNU variant and doesn't support
+ * BSD has their own variants of this format. Currently this code
+ * can read but not write the GNU variant and doesn't support
  * the BSD variant at all.
- * 
- * @see <a href="http://www.freebsd.org/cgi/man.cgi?query=ar&sektion=5">ar man page</a>
  *
- * @Immutable
+ * @see <a href="http://www.freebsd.org/cgi/man.cgi?query=ar&sektion=5">ar man page</a>
  */
 public class ArArchiveEntry implements ArchiveEntry {
 
-    /** The header for each entry */
+    /**
+     * The header for each entry
+     */
     public static final String HEADER = "!<arch>\n";
 
-    /** The trailer for each entry */
+    /**
+     * The trailer for each entry
+     */
     public static final String TRAILER = "`\012";
+
+    private static final int DEFAULT_MODE = 33188; // = (octal) 0100644
 
     /**
      * SVR4/GNU adds a trailing / to names; BSD does not.
      * They also vary in how names longer than 16 characters are represented.
      * (Not yet fully supported by this implementation)
      */
-    private final String name;
-    private final int userId;
-    private final int groupId;
-    private final int mode;
-    private static final int DEFAULT_MODE = 33188; // = (octal) 0100644 
-    private final long lastModified;
-    private final long length;
+    private String name;
+
+    private int userId;
+
+    private int groupId;
+
+    private int mode;
+
+    private long lastModified;
+
+    private long length;
+
+    public ArArchiveEntry() {
+    }
 
     /**
      * Create a new instance using a couple of default values.
-     *
+     * <p/>
      * <p>Sets userId and groupId to 0, the octal file mode to 644 and
      * the last modified time to the current time.</p>
      *
-     * @param name name of the entry
+     * @param name   name of the entry
      * @param length length of the entry in bytes
      */
     public ArArchiveEntry(String name, long length) {
         this(name, length, 0, 0, DEFAULT_MODE,
-             System.currentTimeMillis() / 1000);
+                System.currentTimeMillis() / 1000);
     }
 
     /**
      * Create a new instance.
      *
-     * @param name name of the entry
-     * @param length length of the entry in bytes
-     * @param userId numeric user id
-     * @param groupId numeric group id
-     * @param mode file mode
+     * @param name         name of the entry
+     * @param length       length of the entry in bytes
+     * @param userId       numeric user id
+     * @param groupId      numeric group id
+     * @param mode         file mode
      * @param lastModified last modified time in seconds since the epoch
      */
     public ArArchiveEntry(String name, long length, int userId, int groupId,
@@ -113,15 +107,23 @@ public class ArArchiveEntry implements ArchiveEntry {
     public ArArchiveEntry(File inputFile, String entryName) {
         // TODO sort out mode
         this(entryName, inputFile.isFile() ? inputFile.length() : 0,
-             0, 0, DEFAULT_MODE, inputFile.lastModified() / 1000);
+                0, 0, DEFAULT_MODE, inputFile.lastModified() / 1000);
     }
 
-    /** {@inheritDoc} */
-    public long getSize() {
+    public ArArchiveEntry setEntrySize(long size) {
+        this.length = size;
+        return this;
+    }
+
+    public long getEntrySize() {
         return this.getLength();
     }
 
-    /** {@inheritDoc} */
+    public ArArchiveEntry setName(String name) {
+        this.name = name;
+        return this;
+    }
+
     public String getName() {
         return name;
     }
@@ -138,28 +140,26 @@ public class ArArchiveEntry implements ArchiveEntry {
         return mode;
     }
 
+    public ArArchiveEntry setLastModified(Date date) {
+        this.lastModified = date.getTime() / 1000;
+        return this;
+    }
+
     /**
      * Last modified time in seconds since the epoch.
      */
-    public long getLastModified() {
-        return lastModified;
-    }
-
-    /** {@inheritDoc} */
-    public Date getLastModifiedDate() {
-        return new Date(1000 * getLastModified());
+    public Date getLastModified() {
+        return new Date(1000 * lastModified);
     }
 
     public long getLength() {
         return length;
     }
 
-    /** {@inheritDoc} */
     public boolean isDirectory() {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -168,7 +168,6 @@ public class ArArchiveEntry implements ArchiveEntry {
         return result;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

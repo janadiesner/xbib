@@ -52,7 +52,7 @@ public class WorkAuthor implements IdentifiableEndeavor {
     private final WordBoundaryEntropyEncoder encoder = new WordBoundaryEntropyEncoder();
 
     private final static Set<String> blacklist =
-            InputService.getTextLinesFromInputStream(
+            InputService.asLinesFromResource(
                     "/org/xbib/grouping/bibliographic/endeavor/work-blacklist.txt");
 
     public WorkAuthor() {

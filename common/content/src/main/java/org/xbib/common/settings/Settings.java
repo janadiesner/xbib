@@ -32,6 +32,8 @@
 package org.xbib.common.settings;
 
 import com.google.common.collect.ImmutableMap;
+import org.xbib.common.unit.TimeValue;
+
 import java.util.Map;
 
 /**
@@ -145,6 +147,12 @@ public interface Settings {
      * @throws SettingsException Failure to parse the setting
      */
     Boolean getAsBoolean(String setting, Boolean defaultValue) throws SettingsException;
+
+    /**
+     * Returns the setting value (as time) associated with the setting key. If it does not exists,
+     * returns the default value provided.
+     */
+    TimeValue getAsTime(String setting, TimeValue defaultValue);
 
     /**
      * The values associated with a setting prefix as an array. The settings array is in the format of:

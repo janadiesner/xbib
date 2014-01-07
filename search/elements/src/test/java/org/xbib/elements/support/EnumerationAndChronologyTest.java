@@ -1,15 +1,21 @@
 package org.xbib.elements.support;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 import org.xbib.util.DateUtil;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.simple.SimpleResource;
 
 public class EnumerationAndChronologyTest extends Assert {
+
+    private final Logger logger = LoggerFactory.getLogger(EnumerationAndChronologyTest.class.getName());
 
     @Test
     public void test() {
@@ -62,8 +68,8 @@ public class EnumerationAndChronologyTest extends Assert {
             "[1970, 1971]",
             "[1938, 1940, 1942]",
             "[1996, 1997]",
-            "[1971, 1972, 1973, 1974, 1975, 1976, 1977, 1978, 1979, 1980, 1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013]",
-            "[1971, 1972, 1973, 1974, 1975, 1976, 1977, 1978, 1979, 1980, 1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013]",
+            "",
+            "",
             "[1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1972]",
             "[1961, 1962, 1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970]",
             "[1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1972]",
@@ -76,18 +82,27 @@ public class EnumerationAndChronologyTest extends Assert {
             "[1948, 1949]",
             "[1858, 1859, 1860, 1861, 1862, 1863, 1864, 1865, 1866, 1867, 1868, 1869, 1870, 1871, 1872, 1873, 1874, 1875, 1876, 1877, 1878, 1879, 1880, 1881]",
             "[1970, 1972, 1973]",
-            "[1960, 1961, 1962, 1963, 1964, 1971, 1972, 1973, 1974, 1975, 1976, 1977, 1978, 1979, 1980, 1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013]",
+            "",
             "[1970]",
             "[1961]",
             "[1971]",
-            "[1947, 1948, 1949, 1950, 1951, 1952, 1953, 1954, 1955, 1956, 1957, 1958, 1959, 1960, 1961, 1962, 1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1972, 1973, 1974, 1975, 1976, 1977, 1978, 1979, 1980, 1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013]",
-            "[1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1972, 1973, 1974, 1975, 1976, 1977, 1978, 1979, 1980, 1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013]",
+            "",
+            "",
             "[1981, 1982, 1983]"
         };
+        // set dynamic years
+        int year =  Calendar.getInstance().get(Calendar.YEAR);
+        dates[12] = "[" + createYearList(1971, year) + "]";
+        dates[13] = "[" + createYearList(1971, year) + "]";
+        dates[26] = "[1960, 1961, 1962, 1963, 1964, " + createYearList(1971, year) + "]";
+        dates[30] = "[" + createYearList(1947, year) + "]";
+        dates[31] = "[" + createYearList(1963, year) + "]";
+
         for (int i = 0; i < specs.length; i++) {
             String s = specs[i];
             Resource r = EnumerationAndChronology.parse(s);
             Set<Integer> d = EnumerationAndChronology.dates(r);
+            logger.info("{} {}", d.toString(), dates[i]);
             assertEquals(d.toString(), dates[i]);
         }
     }
@@ -104,5 +119,17 @@ public class EnumerationAndChronologyTest extends Assert {
             set.add(DateUtil.getYear() - i);
         }
         assertEquals(d.toString(), set.toString());
+    }
+
+
+    private String createYearList(int from, int to) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = from; i <= to; i++) {
+            if (sb.length() > 1) {
+                sb.append(", ");
+            }
+            sb.append(Integer.toString(i));
+        }
+        return sb.toString();
     }
 }

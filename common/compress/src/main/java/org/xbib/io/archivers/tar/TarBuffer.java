@@ -1,21 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package org.xbib.io.archivers.tar;
 
 import java.io.IOException;
@@ -30,33 +13,37 @@ import java.util.Arrays;
  * Java universe, the only real function that this class
  * performs is to ensure that files have the correct "block"
  * size, or other tars will complain.
- * <p>
+ * <p/>
  * You should never have a need to access this class directly.
  * TarBuffers are created by Tar IO Streams.
- * @NotThreadSafe
  */
 
-class TarBuffer { // Not public, because only needed by the Tar IO streams
+class TarBuffer {
 
-    /** Default record size */
+    /**
+     * Default record size
+     */
     public static final int DEFAULT_RCDSIZE = (512);
 
-    /** Default block size */
+    /**
+     * Default block size
+     */
     public static final int DEFAULT_BLKSIZE = (DEFAULT_RCDSIZE * 20);
 
     // TODO make these final? (would need to change close() method)
-    private InputStream     inStream;
-    private OutputStream    outStream;
-    private final int             blockSize;
-    private final int             recordSize;
-    private final int             recsPerBlock;
-    private final byte[]          blockBuffer;
+    private InputStream inStream;
+    private OutputStream outStream;
+    private final int blockSize;
+    private final int recordSize;
+    private final int recsPerBlock;
+    private final byte[] blockBuffer;
 
-    private int             currBlkIdx;
-    private int             currRecIdx;
+    private int currBlkIdx;
+    private int currRecIdx;
 
     /**
      * Constructor for a TarBuffer on an input stream.
+     *
      * @param inStream the input stream to use
      */
     public TarBuffer(InputStream inStream) {
@@ -65,7 +52,8 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
 
     /**
      * Constructor for a TarBuffer on an input stream.
-     * @param inStream the input stream to use
+     *
+     * @param inStream  the input stream to use
      * @param blockSize the block size to use
      */
     public TarBuffer(InputStream inStream, int blockSize) {
@@ -74,8 +62,9 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
 
     /**
      * Constructor for a TarBuffer on an input stream.
-     * @param inStream the input stream to use
-     * @param blockSize the block size to use
+     *
+     * @param inStream   the input stream to use
+     * @param blockSize  the block size to use
      * @param recordSize the record size to use
      */
     public TarBuffer(InputStream inStream, int blockSize, int recordSize) {
@@ -84,6 +73,7 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
 
     /**
      * Constructor for a TarBuffer on an output stream.
+     *
      * @param outStream the output stream to use
      */
     public TarBuffer(OutputStream outStream) {
@@ -92,6 +82,7 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
 
     /**
      * Constructor for a TarBuffer on an output stream.
+     *
      * @param outStream the output stream to use
      * @param blockSize the block size to use
      */
@@ -101,8 +92,9 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
 
     /**
      * Constructor for a TarBuffer on an output stream.
-     * @param outStream the output stream to use
-     * @param blockSize the block size to use
+     *
+     * @param outStream  the output stream to use
+     * @param blockSize  the block size to use
      * @param recordSize the record size to use
      */
     public TarBuffer(OutputStream outStream, int blockSize, int recordSize) {
@@ -131,6 +123,7 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
 
     /**
      * Get the TAR Buffer's block size. Blocks consist of multiple records.
+     *
      * @return the block size
      */
     public int getBlockSize() {
@@ -139,6 +132,7 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
 
     /**
      * Get the TAR Buffer's record size.
+     *
      * @return the record size
      */
     public int getRecordSize() {
@@ -164,6 +158,7 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
 
     /**
      * Skip over a record on the input stream.
+     *
      * @throws java.io.IOException on error
      */
     public void skipRecord() throws IOException {
@@ -199,8 +194,8 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
         byte[] result = new byte[recordSize];
 
         System.arraycopy(blockBuffer,
-                         (currRecIdx * recordSize), result, 0,
-                         recordSize);
+                (currRecIdx * recordSize), result, 0,
+                recordSize);
 
         currRecIdx++;
 
@@ -222,36 +217,12 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
 
         while (bytesNeeded > 0) {
             long numBytes = inStream.read(blockBuffer, offset,
-                                               bytesNeeded);
-
-            //
-            // NOTE
-            // We have fit EOF, and the block is not full!
-            //
-            // This is a broken archive. It does not follow the standard
-            // blocking algorithm. However, because we are generous, and
-            // it requires little effort, we will simply ignore the error
-            // and continue as if the entire block were read. This does
-            // not appear to break anything upstream. We used to return
-            // false in this case.
-            //
-            // Thanks to 'Yohann.Roussel@alcatel.fr' for this fix.
-            //
+                    bytesNeeded);
             if (numBytes == -1) {
                 if (offset == 0) {
-                    // Ensure that we do not read gigabytes of zeros
-                    // for a corrupt tar file.
-                    // See http://issues.apache.org/bugzilla/show_bug.cgi?id=39924
                     return false;
                 }
-                // However, just leaving the unread portion of the buffer dirty does
-                // cause problems in some cases.  This problem is described in
-                // http://issues.apache.org/bugzilla/show_bug.cgi?id=29877
-                //
-                // The solution is to fill the unused portion of the buffer with zeros.
-
                 Arrays.fill(blockBuffer, offset, offset + bytesNeeded, (byte) 0);
-
                 break;
             }
 
@@ -295,7 +266,7 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
      */
     public void writeRecord(byte[] record) throws IOException {
         if (outStream == null) {
-            if (inStream == null){
+            if (inStream == null) {
                 throw new IOException("Output buffer is closed");
             }
             throw new IOException("writing to an input buffer");
@@ -303,9 +274,9 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
 
         if (record.length != recordSize) {
             throw new IOException("record to write has length '"
-                                  + record.length
-                                  + "' which is not the record size of '"
-                                  + recordSize + "'");
+                    + record.length
+                    + "' which is not the record size of '"
+                    + recordSize + "'");
         }
 
         if (currRecIdx >= recsPerBlock) {
@@ -313,8 +284,8 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
         }
 
         System.arraycopy(record, 0, blockBuffer,
-                         (currRecIdx * recordSize),
-                         recordSize);
+                (currRecIdx * recordSize),
+                recordSize);
 
         currRecIdx++;
     }
@@ -324,13 +295,13 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
      * inside of a larger array buffer. The buffer must be "offset plus
      * record size" long.
      *
-     * @param buf The buffer containing the record data to write.
+     * @param buf    The buffer containing the record data to write.
      * @param offset The offset of the record data within buf.
      * @throws java.io.IOException on error
      */
     public void writeRecord(byte[] buf, int offset) throws IOException {
         if (outStream == null) {
-            if (inStream == null){
+            if (inStream == null) {
                 throw new IOException("Output buffer is closed");
             }
             throw new IOException("writing to an input buffer");
@@ -338,9 +309,9 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
 
         if ((offset + recordSize) > buf.length) {
             throw new IOException("record has length '" + buf.length
-                                  + "' with offset '" + offset
-                                  + "' which is less than the record size of '"
-                                  + recordSize + "'");
+                    + "' with offset '" + offset
+                    + "' which is less than the record size of '"
+                    + recordSize + "'");
         }
 
         if (currRecIdx >= recsPerBlock) {
@@ -348,8 +319,8 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
         }
 
         System.arraycopy(buf, offset, blockBuffer,
-                         (currRecIdx * recordSize),
-                         recordSize);
+                (currRecIdx * recordSize),
+                recordSize);
 
         currRecIdx++;
     }
@@ -386,6 +357,7 @@ class TarBuffer { // Not public, because only needed by the Tar IO streams
     /**
      * Close the TarBuffer. If this is an output buffer, also flush the
      * current block before closing.
+     *
      * @throws java.io.IOException on error
      */
     public void close() throws IOException {

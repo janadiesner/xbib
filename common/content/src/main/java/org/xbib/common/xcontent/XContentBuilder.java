@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collection;
 import java.util.Map;
 
 import org.xbib.io.BytesArray;
@@ -30,8 +31,6 @@ public final class XContentBuilder implements BytesStream {
          */
         CAMELCASE
     }
-
-    //public final static DateTimeFormatter defaultDatePrinter = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
 
     protected static FieldCaseConversion globalFieldCaseConversion = FieldCaseConversion.NONE;
 
@@ -130,6 +129,15 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder array(String name, Collection values) throws IOException {
+        startArray(name);
+        for (Object value : values) {
+            value(value);
+        }
+        endArray();
+        return this;
+    }
+
     public XContentBuilder array(String name, String... values) throws IOException {
         startArray(name);
         for (String value : values) {
@@ -147,7 +155,6 @@ public final class XContentBuilder implements BytesStream {
         endArray();
         return this;
     }
-
 
     public XContentBuilder startArray(String name, FieldCaseConversion conversion) throws IOException {
         field(name, conversion);

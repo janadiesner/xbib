@@ -1,20 +1,4 @@
-/*
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
+
 package org.xbib.io.archivers.zip;
 
 import java.util.ArrayList;
@@ -25,9 +9,7 @@ import java.util.zip.ZipException;
 
 /**
  * ZipExtraField related methods
- * @NotThreadSafe because the HashMap is not synch.
  */
-// CheckStyle:HideUtilityClassConstructorCheck OFF (bc)
 public class ExtraFieldUtils {
 
     private static final int WORD = 4;
@@ -48,9 +30,10 @@ public class ExtraFieldUtils {
 
     /**
      * Register a ZipExtraField implementation.
-     *
+     * <p/>
      * <p>The given class must have a no-arg constructor and implement
      * the {@link ZipExtraField ZipExtraField interface}.</p>
+     *
      * @param c the class to register
      */
     public static void register(Class<?> c) {
@@ -69,13 +52,14 @@ public class ExtraFieldUtils {
     /**
      * Create an instance of the approriate ExtraField, falls back to
      * {@link UnrecognizedExtraField UnrecognizedExtraField}.
+     *
      * @param headerId the header identifier
      * @return an instance of the appropiate ExtraField
-     * @exception InstantiationException if unable to instantiate the class
-     * @exception IllegalAccessException if not allowed to instatiate the class
+     * @throws InstantiationException if unable to instantiate the class
+     * @throws IllegalAccessException if not allowed to instatiate the class
      */
     public static ZipExtraField createExtraField(ZipShort headerId)
-        throws InstantiationException, IllegalAccessException {
+            throws InstantiationException, IllegalAccessException {
         Class<?> c = implementations.get(headerId);
         if (c != null) {
             return (ZipExtraField) c.newInstance();
@@ -89,6 +73,7 @@ public class ExtraFieldUtils {
      * Split the array into ExtraFields and populate them with the
      * given data as local file data, throwing an exception if the
      * data cannot be parsed.
+     *
      * @param data an array of bytes as it appears in local file data
      * @return an array of ExtraFields
      * @throws java.util.zip.ZipException on error
@@ -100,33 +85,33 @@ public class ExtraFieldUtils {
     /**
      * Split the array into ExtraFields and populate them with the
      * given data, throwing an exception if the data cannot be parsed.
-     * @param data an array of bytes
+     *
+     * @param data  an array of bytes
      * @param local whether data originates from the local file data
-     * or the central directory
+     *              or the central directory
      * @return an array of ExtraFields
      * @throws java.util.zip.ZipException on error
      */
     public static ZipExtraField[] parse(byte[] data, boolean local)
-        throws ZipException {
+            throws ZipException {
         return parse(data, local, UnparseableExtraField.THROW);
     }
 
     /**
      * Split the array into ExtraFields and populate them with the
      * given data.
-     * @param data an array of bytes
-     * @param local whether data originates from the local file data
-     * or the central directory
+     *
+     * @param data              an array of bytes
+     * @param local             whether data originates from the local file data
+     *                          or the central directory
      * @param onUnparseableData what to do if the extra field data
-     * cannot be parsed.
+     *                          cannot be parsed.
      * @return an array of ExtraFields
      * @throws java.util.zip.ZipException on error
-     *
-     * @since 1.1
      */
     public static ZipExtraField[] parse(byte[] data, boolean local,
                                         UnparseableExtraField onUnparseableData)
-        throws ZipException {
+            throws ZipException {
         List<ZipExtraField> v = new ArrayList<ZipExtraField>();
         int start = 0;
         LOOP:
@@ -134,34 +119,34 @@ public class ExtraFieldUtils {
             ZipShort headerId = new ZipShort(data, start);
             int length = (new ZipShort(data, start + 2)).getValue();
             if (start + WORD + length > data.length) {
-                switch(onUnparseableData.getKey()) {
-                case UnparseableExtraField.THROW_KEY:
-                    throw new ZipException("bad extra field starting at "
-                                           + start + ".  Block length of "
-                                           + length + " bytes exceeds remaining"
-                                           + " data of "
-                                           + (data.length - start - WORD)
-                                           + " bytes.");
-                case UnparseableExtraField.READ_KEY:
-                    UnparseableExtraFieldData field =
-                        new UnparseableExtraFieldData();
-                    if (local) {
-                        field.parseFromLocalFileData(data, start,
-                                                     data.length - start);
-                    } else {
-                        field.parseFromCentralDirectoryData(data, start,
-                                                            data.length - start);
-                    }
-                    v.add(field);
-                    //$FALL-THROUGH$
-                case UnparseableExtraField.SKIP_KEY:
-                    // since we cannot parse the data we must assume
-                    // the extra field consumes the whole rest of the
-                    // available data
-                    break LOOP;
-                default:
-                    throw new ZipException("unknown UnparseableExtraField key: "
-                                           + onUnparseableData.getKey());
+                switch (onUnparseableData.getKey()) {
+                    case UnparseableExtraField.THROW_KEY:
+                        throw new ZipException("bad extra field starting at "
+                                + start + ".  Block length of "
+                                + length + " bytes exceeds remaining"
+                                + " data of "
+                                + (data.length - start - WORD)
+                                + " bytes.");
+                    case UnparseableExtraField.READ_KEY:
+                        UnparseableExtraFieldData field =
+                                new UnparseableExtraFieldData();
+                        if (local) {
+                            field.parseFromLocalFileData(data, start,
+                                    data.length - start);
+                        } else {
+                            field.parseFromCentralDirectoryData(data, start,
+                                    data.length - start);
+                        }
+                        v.add(field);
+                        //$FALL-THROUGH$
+                    case UnparseableExtraField.SKIP_KEY:
+                        // since we cannot parse the data we must assume
+                        // the extra field consumes the whole rest of the
+                        // available data
+                        break LOOP;
+                    default:
+                        throw new ZipException("unknown UnparseableExtraField key: "
+                                + onUnparseableData.getKey());
                 }
             }
             try {
@@ -170,7 +155,7 @@ public class ExtraFieldUtils {
                     ze.parseFromLocalFileData(data, start + WORD, length);
                 } else {
                     ze.parseFromCentralDirectoryData(data, start + WORD,
-                                                     length);
+                            length);
                 }
                 v.add(ze);
             } catch (InstantiationException ie) {
@@ -187,14 +172,15 @@ public class ExtraFieldUtils {
 
     /**
      * Merges the local file data fields of the given ZipExtraFields.
+     *
      * @param data an array of ExtraFiles
      * @return an array of bytes
      */
     public static byte[] mergeLocalFileDataData(ZipExtraField[] data) {
         final boolean lastIsUnparseableHolder = data.length > 0
-            && data[data.length - 1] instanceof UnparseableExtraFieldData;
+                && data[data.length - 1] instanceof UnparseableExtraFieldData;
         int regularExtraFieldCount =
-            lastIsUnparseableHolder ? data.length - 1 : data.length;
+                lastIsUnparseableHolder ? data.length - 1 : data.length;
 
         int sum = WORD * regularExtraFieldCount;
         for (ZipExtraField element : data) {
@@ -205,9 +191,9 @@ public class ExtraFieldUtils {
         int start = 0;
         for (int i = 0; i < regularExtraFieldCount; i++) {
             System.arraycopy(data[i].getHeaderId().getBytes(),
-                             0, result, start, 2);
+                    0, result, start, 2);
             System.arraycopy(data[i].getLocalFileDataLength().getBytes(),
-                             0, result, start + 2, 2);
+                    0, result, start + 2, 2);
             byte[] local = data[i].getLocalFileDataData();
             System.arraycopy(local, 0, result, start + WORD, local.length);
             start += (local.length + WORD);
@@ -221,14 +207,15 @@ public class ExtraFieldUtils {
 
     /**
      * Merges the central directory fields of the given ZipExtraFields.
+     *
      * @param data an array of ExtraFields
      * @return an array of bytes
      */
     public static byte[] mergeCentralDirectoryData(ZipExtraField[] data) {
         final boolean lastIsUnparseableHolder = data.length > 0
-            && data[data.length - 1] instanceof UnparseableExtraFieldData;
+                && data[data.length - 1] instanceof UnparseableExtraFieldData;
         int regularExtraFieldCount =
-            lastIsUnparseableHolder ? data.length - 1 : data.length;
+                lastIsUnparseableHolder ? data.length - 1 : data.length;
 
         int sum = WORD * regularExtraFieldCount;
         for (ZipExtraField element : data) {
@@ -238,9 +225,9 @@ public class ExtraFieldUtils {
         int start = 0;
         for (int i = 0; i < regularExtraFieldCount; i++) {
             System.arraycopy(data[i].getHeaderId().getBytes(),
-                             0, result, start, 2);
+                    0, result, start, 2);
             System.arraycopy(data[i].getCentralDirectoryLength().getBytes(),
-                             0, result, start + 2, 2);
+                    0, result, start + 2, 2);
             byte[] local = data[i].getCentralDirectoryData();
             System.arraycopy(local, 0, result, start + WORD, local.length);
             start += (local.length + WORD);
@@ -255,8 +242,6 @@ public class ExtraFieldUtils {
     /**
      * "enum" for the possible actions to take if the extra field
      * cannot be parsed.
-     *
-     * @since 1.1
      */
     public static final class UnparseableExtraField {
         /**
@@ -276,21 +261,21 @@ public class ExtraFieldUtils {
          * Throw an exception if field cannot be parsed.
          */
         public static final UnparseableExtraField THROW
-            = new UnparseableExtraField(THROW_KEY);
+                = new UnparseableExtraField(THROW_KEY);
 
         /**
          * Skip the extra field entirely and don't make its data
          * available - effectively removing the extra field data.
          */
         public static final UnparseableExtraField SKIP
-            = new UnparseableExtraField(SKIP_KEY);
+                = new UnparseableExtraField(SKIP_KEY);
 
         /**
          * Read the extra field data into an instance of {@link
          * UnparseableExtraFieldData UnparseableExtraFieldData}.
          */
         public static final UnparseableExtraField READ
-            = new UnparseableExtraField(READ_KEY);
+                = new UnparseableExtraField(READ_KEY);
 
         private final int key;
 
@@ -301,6 +286,8 @@ public class ExtraFieldUtils {
         /**
          * Key of the action to take.
          */
-        public int getKey() { return key; }
+        public int getKey() {
+            return key;
+        }
     }
 }

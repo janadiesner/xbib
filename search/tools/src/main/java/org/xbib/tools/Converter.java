@@ -32,7 +32,7 @@
 package org.xbib.tools;
 
 import org.xbib.common.settings.Settings;
-import org.xbib.io.file.Finder;
+import org.xbib.io.archivers.file.Finder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.AbstractPipeline;
@@ -106,17 +106,13 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
         return this;
     }
 
-    protected Converter<T,R,P> prepare() {
-        try {
-            input = new Finder(settings.get("pattern"))
+    protected Converter<T,R,P> prepare() throws IOException {
+        input = new Finder(settings.get("pattern"))
                     .find(settings.get("path"))
                     .pathSorted(settings.getAsBoolean("isPathSorted", false))
                     .chronologicallySorted(settings.getAsBoolean("isChronologicallySorted", false))
                     .getURIs();
-            logger.info("input = {}", input);
-        } catch (IOException e) {
-            logger.error("no input found", e);
-        }
+        logger.info("input = {}", input);
         return this;
     }
 

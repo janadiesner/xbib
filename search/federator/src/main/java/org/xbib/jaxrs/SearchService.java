@@ -39,7 +39,7 @@ public class SearchService {
             @Override
             public void write(OutputStream output) throws IOException, WebApplicationException {
                 try {
-                    ZClient client = ZClientFactory.newZClient(service);
+                    ZClient client = ZClientFactory.getInstance().newZClient(service);
                     ZSearchRetrieveRequest request = client.newCQLSearchRetrieveRequest()
                             .setQuery(query)
                             .setFrom(from)

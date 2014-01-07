@@ -57,7 +57,7 @@ public class ZClientTest {
                 String query = "dc.title = Linux";
                 int from = 1;
                 int size = 10;
-                ZClient client = ZClientFactory.newZClient(serviceName);
+                ZClient client = ZClientFactory.getInstance().newZClient(serviceName);
                 try {
                     File tmp = File.createTempFile(serviceName, "xml");
                     FileOutputStream out = new FileOutputStream(tmp);

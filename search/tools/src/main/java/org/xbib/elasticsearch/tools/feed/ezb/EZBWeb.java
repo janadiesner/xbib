@@ -181,6 +181,19 @@ public class EZBWeb extends Feeder {
                     if ("AAAAA".equals(sigel)) {
                         continue;
                     }
+                    // fixings
+                    if ("0".equals(firstVolume)) {
+                        firstVolume = null;
+                    }
+                    if ("0".equals(firstIssue)) {
+                        firstIssue = null;
+                    }
+                    if ("0".equals(lastVolume)) {
+                        lastVolume = null;
+                    }
+                    if ("0".equals(lastIssue)) {
+                        lastIssue = null;
+                    }
                     String key = zdbid + "_" + isil + "_" + firstDate + "_" + lastDate + "_" + (movingWall.isEmpty()? "0" : movingWall) ;
                     IRI id = IRI.builder()
                             .scheme("iri")

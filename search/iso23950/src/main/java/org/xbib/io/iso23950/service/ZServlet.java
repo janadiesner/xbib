@@ -60,6 +60,8 @@ public class ZServlet extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(ZServlet.class.getName());
 
+    private final ConnectionService<ZSession> service = ConnectionService.getInstance();
+
     private final Map<String, String> mediaTypes = new HashMap<>();
 
     private final ContentTypeNegotiator ctn = new ZContentTypeNegotiator();
@@ -75,10 +77,6 @@ public class ZServlet extends HttpServlet {
     private String elementSetName;
 
     private String preferredRecordSyntax;
-
-    private int from = 1;
-
-    private int size = 10;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -100,18 +98,19 @@ public class ZServlet extends HttpServlet {
         query = request.getParameter("query");
         elementSetName = request.getParameter("elementSetName") != null
                 ? request.getParameter("elementSetName") : "F";
-        from = Integer.parseInt(
+        int from = Integer.parseInt(
                 request.getParameter("from") != null
                         ? request.getParameter("from") : "1");
-        size = Integer.parseInt(
+        int size = Integer.parseInt(
                 request.getParameter("size") != null
                         ? request.getParameter("size") : "10");
 
         URI uri = URI.create(address);
-        Connection<Session> connection = ConnectionService.getInstance()
-                .getFactory(uri)
+
+        Connection<ZSession> connection = service
+                .getConnectionFactory(uri)
                 .getConnection(uri);
-        ZSession session = (ZSession) connection.createSession();
+        ZSession session = connection.createSession();
         ZClient client = session.newZClient();
         try {
             ZSearchRetrieveRequest searchRetrieve = client.newPQFSearchRetrieveRequest();

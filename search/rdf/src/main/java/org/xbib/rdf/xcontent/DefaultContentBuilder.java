@@ -34,10 +34,9 @@ package org.xbib.rdf.xcontent;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.xbib.common.xcontent.XContentBuilder;
@@ -98,9 +97,7 @@ public class DefaultContentBuilder<C extends ResourceContext, R extends Resource
             throws IOException {
         CompactingNamespaceContext context = resourceContext.namespaceContext();
         // iterate over properties
-        Iterator<P> it = resource.predicateSet(resource.subject()).iterator();
-        while (it.hasNext()) {
-            P predicate = it.next();
+        for (P predicate : resource.predicateSet(resource.subject())) {
             Collection<O> values = resource.objects(predicate);
             if (values == null) {
                 throw new IllegalArgumentException("can't build property value set for predicate URI " + predicate);
@@ -110,19 +107,25 @@ public class DefaultContentBuilder<C extends ResourceContext, R extends Resource
                 // single value
                 O object = values.iterator().next();
                 if (object instanceof Identifier) {
-                    Identifier id = (Identifier)object;
+                    Identifier id = (Identifier) object;
                     if (id.isBlank()) {
                         continue;
                     }
                 }
-                builder.field(context.compact(predicate.id()), object.nativeValue());
+                // drop null value
+                if (object.nativeValue() != null) {
+                    builder.field(context.compact(predicate.id()), object.nativeValue());
+                }
             } else if (values.size() > 1) {
                 // array of values
                 Collection<O> properties = filterBlankNodes(values);
                 if (!properties.isEmpty()) {
                     builder.startArray(context.compact(predicate.id()));
                     for (O object : properties) {
-                        builder.value(object.nativeValue());
+                        // drop null values
+                        if (object.nativeValue() != null) {
+                            builder.value(object.nativeValue());
+                        }
                     }
                     builder.endArray();
                 }
@@ -130,9 +133,7 @@ public class DefaultContentBuilder<C extends ResourceContext, R extends Resource
         }
         // then, iterate over resources
         Map<P, Collection<Resource<S, P, O>>> m = resource.resources();
-        Iterator<P> resIt = m.keySet().iterator();
-        while (resIt.hasNext()) {
-            P predicate = resIt.next();
+        for (P predicate : m.keySet()) {
             Collection<Resource<S, P, O>> resources = m.get(predicate);
             // drop resources with size 0 silently
             if (resources.size() == 1) {
@@ -154,7 +155,7 @@ public class DefaultContentBuilder<C extends ResourceContext, R extends Resource
     }
 
     private <O extends Node> Collection<O> filterBlankNodes(Collection<O> objects) {
-        Collection<O> nodes = new ArrayList();
+        Collection<O> nodes = new LinkedList();
         for (O object : objects) {
             if (object instanceof Identifier) {
                 Identifier id = (Identifier)object;
@@ -162,7 +163,10 @@ public class DefaultContentBuilder<C extends ResourceContext, R extends Resource
                     continue;
                 }
             }
-            nodes.add(object);
+            // drop null values
+            if (object != null) {
+                nodes.add(object);
+            }
         }
         return nodes;
     }

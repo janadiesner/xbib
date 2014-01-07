@@ -77,7 +77,7 @@ public class MARCPipeline
         try {
             element = (MARCElement) specification.getElement(key, map());
         } catch (ClassCastException e) {
-            logger.error("not a MARCElement instance for key {}", key);
+            logger.error("not a MARCElement instance for key" + key);
         }
         if (element != null) {
             // element-based processing
@@ -220,7 +220,7 @@ public class MARCPipeline
             if (detectUnknownKeys) {
                 unknownKeys.add(key);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("unknown key detected: {} {}", fields, value);
+                    logger.debug("unknown key detected: {}", fields);
                 }
             }
         }

@@ -54,6 +54,8 @@ public class ZSRUClient extends DefaultSRUClient {
 
     private final ZSRUService service;
 
+    private final ConnectionService<ZSession> connectionService = ConnectionService.getInstance();
+
     protected ZSRUClient(ZSRUService service) throws IOException {
         super(service.getURI());
         this.service = service;
@@ -80,10 +82,10 @@ public class ZSRUClient extends DefaultSRUClient {
             throws IOException, InterruptedException, ExecutionException, TimeoutException {
         // connect to Z service
         URI uri = request.getURI();
-        Connection<Session> connection = ConnectionService.getInstance()
-                .getFactory(uri)
+        Connection<ZSession> connection = connectionService
+                .getConnectionFactory(uri)
                 .getConnection(uri);
-        ZSession session = (ZSession) connection.createSession();
+        ZSession session = connection.createSession();
         ZClient client = session.newZClient();
         try {
             // search with CQL

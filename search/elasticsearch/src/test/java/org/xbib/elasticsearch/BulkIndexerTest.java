@@ -3,7 +3,7 @@ package org.xbib.elasticsearch;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.IngestClient;
+import org.xbib.elasticsearch.support.client.ingest.IngestClient;
 import org.xbib.elasticsearch.xml.ES;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;

@@ -1,29 +1,13 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package org.xbib.io.archivers.dump;
+
+import org.xbib.io.archivers.ArchiveEntry;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
-import org.xbib.io.archivers.ArchiveEntry;
 
 /**
  * This class represents an entry in a Dump archive. It consists
@@ -42,7 +26,7 @@ import org.xbib.io.archivers.ArchiveEntry;
  * the archive, and the header information is constructed from
  * other information. In this case the header fields are set to
  * defaults and the File is set to null.
- *
+ * <p/>
  * <p>
  * The C structure for a Dump Entry's header is:
  * <pre>
@@ -117,7 +101,7 @@ import org.xbib.io.archivers.ArchiveEntry;
  * The fields in <b>bold</b> are the same for all blocks. (This permitted
  * multiple dumps to be written to a single tape.)
  * </p>
- *
+ * <p/>
  * <p>
  * The C structure for the inode (file) information is:
  * <pre>
@@ -159,7 +143,7 @@ import org.xbib.io.archivers.ArchiveEntry;
  * for a single physical file. You must read the contents of the directory
  * entries to learn the mapping(s) from filename to inode.
  * </p>
- *
+ * <p/>
  * <p>
  * The C structure that indicates if a specific block is a real block
  * that contains data or is a sparse block that is not persisted to the
@@ -173,18 +157,25 @@ import org.xbib.io.archivers.ArchiveEntry;
  *   int32_t s_inos[TP_NINOS];   // table of first inode on each volume
  * } u_data;
  * </pre></p>
- *
- * @NotThreadSafe
  */
 public class DumpArchiveEntry implements ArchiveEntry {
+
     private String name;
+
     private TYPE type = TYPE.UNKNOWN;
+
     private int mode;
+
     private Set<PERMISSION> permissions = Collections.emptySet();
+
     private long size;
+
     private long atime;
+
     private long mtime;
+
     private int uid;
+
     private int gid;
 
     /**
@@ -194,16 +185,24 @@ public class DumpArchiveEntry implements ArchiveEntry {
 
     // this information is available from standard index.
     private TapeSegmentHeader header = new TapeSegmentHeader();
+
     private String simpleName;
+
     private String originalName;
 
     // this information is available from QFA index
     private int volume;
+
     private long offset;
+
     private int ino;
+
     private int nlink;
+
     private long ctime;
+
     private int generation;
+
     private boolean isDeleted;
 
     /**
@@ -214,7 +213,8 @@ public class DumpArchiveEntry implements ArchiveEntry {
 
     /**
      * Constructor taking only filename.
-     * @param name pathname
+     *
+     * @param name       pathname
      * @param simpleName actual filename.
      */
     public DumpArchiveEntry(String name, String simpleName) {
@@ -247,6 +247,7 @@ public class DumpArchiveEntry implements ArchiveEntry {
 
     /**
      * Returns the path of the entry.
+     *
      * @return the path of the entry.
      */
     public String getSimpleName() {
@@ -409,7 +410,7 @@ public class DumpArchiveEntry implements ArchiveEntry {
         }
 
         if ((summary == null && rhs.summary != null)
-            || (summary != null && !summary.equals(rhs.summary))) {
+                || (summary != null && !summary.equals(rhs.summary))) {
             return false;
         }
 
@@ -436,7 +437,7 @@ public class DumpArchiveEntry implements ArchiveEntry {
         TapeSegmentHeader header = entry.header;
 
         header.type = DumpArchiveConstants.SEGMENT_TYPE.find(DumpArchiveUtil.convert32(
-                    buffer, 0));
+                buffer, 0));
 
         //header.dumpDate = new Date(1000L * DumpArchiveUtil.convert32(buffer, 4));
         //header.previousDumpDate = new Date(1000L * DumpArchiveUtil.convert32(
@@ -457,16 +458,16 @@ public class DumpArchiveEntry implements ArchiveEntry {
 
         entry.nlink = DumpArchiveUtil.convert16(buffer, 34);
         // inumber, oldids?
-        entry.setSize(DumpArchiveUtil.convert64(buffer, 40));
+        entry.setEntrySize(DumpArchiveUtil.convert64(buffer, 40));
 
         long t = (1000L * DumpArchiveUtil.convert32(buffer, 48)) +
-            (DumpArchiveUtil.convert32(buffer, 52) / 1000);
+                (DumpArchiveUtil.convert32(buffer, 52) / 1000);
         entry.setAccessTime(new Date(t));
         t = (1000L * DumpArchiveUtil.convert32(buffer, 56)) +
-            (DumpArchiveUtil.convert32(buffer, 60) / 1000);
-        entry.setLastModifiedDate(new Date(t));
+                (DumpArchiveUtil.convert32(buffer, 60) / 1000);
+        entry.setLastModified(new Date(t));
         t = (1000L * DumpArchiveUtil.convert32(buffer, 64)) +
-            (DumpArchiveUtil.convert32(buffer, 68) / 1000);
+                (DumpArchiveUtil.convert32(buffer, 68) / 1000);
         entry.ctime = t;
 
         // db: 72-119 - direct blocks
@@ -556,6 +557,7 @@ public class DumpArchiveEntry implements ArchiveEntry {
 
     /**
      * Returns the name of the entry.
+     *
      * @return the name of the entry.
      */
     public String getName() {
@@ -564,6 +566,7 @@ public class DumpArchiveEntry implements ArchiveEntry {
 
     /**
      * Returns the unmodified name of the entry.
+     *
      * @return the name of the entry.
      */
     String getOriginalName() {
@@ -573,7 +576,7 @@ public class DumpArchiveEntry implements ArchiveEntry {
     /**
      * Sets the name of the entry.
      */
-    public final void setName(String name) {
+    public DumpArchiveEntry setName(String name) {
         this.originalName = name;
         if (name != null) {
             if (isDirectory() && !name.endsWith("/")) {
@@ -584,9 +587,9 @@ public class DumpArchiveEntry implements ArchiveEntry {
             }
         }
         this.name = name;
+        return this;
     }
 
-    /** {@inheritDoc} */
     public Date getLastModifiedDate() {
         return new Date(mtime);
     }
@@ -670,31 +673,30 @@ public class DumpArchiveEntry implements ArchiveEntry {
     }
 
     /**
-     * Returns the size of the entry.
-     */
-    public long getSize() {
-        return isDirectory() ? SIZE_UNKNOWN : size;
-    }
-
-    /**
      * Returns the size of the entry as read from the archive.
      */
-    long getEntrySize() {
-        return size;
+    public long getEntrySize() {
+        return isDirectory() ? SIZE_UNKNOWN : size;
     }
 
     /**
      * Set the size of the entry.
      */
-    public void setSize(long size) {
+    public DumpArchiveEntry setEntrySize(long size) {
         this.size = size;
+        return this;
     }
 
     /**
      * Set the time the file was last modified.
      */
-    public void setLastModifiedDate(Date mtime) {
+    public DumpArchiveEntry setLastModified(Date mtime) {
         this.mtime = mtime.getTime();
+        return this;
+    }
+
+    public Date getLastModified() {
+        return new Date(mtime);
     }
 
     /**

@@ -69,7 +69,7 @@ public class ElementQueuePipelineExecutor<T, R extends PipelineRequest, P extend
     }
 
     @Override
-    public ElementQueuePipelineExecutor prepare() {
+    public ElementQueuePipelineExecutor prepare() throws IOException {
         if (provider == null) {
             throw new IllegalArgumentException("no provider set");
         }
@@ -100,7 +100,7 @@ public class ElementQueuePipelineExecutor<T, R extends PipelineRequest, P extend
      * @return this executor
      */
     @Override
-    public ElementQueuePipelineExecutor execute() {
+    public ElementQueuePipelineExecutor execute() throws IOException {
         futures = new LinkedList();
         for (P pipeline : pipelines) {
             futures.add(executorService.submit(pipeline));

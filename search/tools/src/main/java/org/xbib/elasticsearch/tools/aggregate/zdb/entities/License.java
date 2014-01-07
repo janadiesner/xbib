@@ -51,6 +51,8 @@ public class License extends Holding {
 
     protected String servicedistribution;
 
+    private String region;
+
     public License(Map<String, Object> m) {
         super(m);
         build();
@@ -120,13 +122,14 @@ public class License extends Holding {
 
         Map<String, Object> service = newHashMap();
         service.put("organization", getString("ezb:isil") );
+        service.put("region", region);
         String s = getString("ezb:ill_relevance.ezb:ill_code");
         if (s != null) {
             switch(s) {
                 case "n":
                 case "nein":
                 {
-                    servicetype = "none";
+                    servicetype = "interlibrary";
                     servicemode = "none";
                     servicedistribution = "none";
                     break;
@@ -134,48 +137,48 @@ public class License extends Holding {
                 case "l":
                 case "ja, Leihe und Kopie":
                 {
-                    servicetype = "interlibraryloan";
+                    servicetype = "interlibrary";
                     servicemode = "copy-loan";
-                    servicedistribution = "transmission";
+                    servicedistribution = "distribution-unrestricted";
                     break;
                 }
                 case "ja, Leihe und Kopie (nur Inland)":
                 {
-                    servicetype = "interlibraryloan";
+                    servicetype = "interlibrary";
                     servicemode = "copy-loan";
-                    servicedistribution = "transmission-domestic-only";
+                    servicedistribution = "distribution-domestic-only";
                     break;
                 }
                 case "k":
                 case "ja, nur Kopie":
                 {
-                    servicetype = "interlibraryloan";
+                    servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = "transmission";
+                    servicedistribution = "distribution-unrestricted";
                     break;
                 }
                 case "kn":
                 case "ja, nur Kopie (nur Inland)":
                 {
-                    servicetype = "interlibraryloan";
+                    servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = "transmission-domestic-only";
+                    servicedistribution = "distribution-domestic-only";
                     break;
                 }
                 case "e":
                 case "ja, auch elektronischer Versand an Nutzer":
                 {
-                    servicetype = "interlibraryloan";
+                    servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = "electronic";
+                    servicedistribution = "distribution-electronic";
                     break;
                 }
                 case "en":
                 case "ja, auch elektronischer Versand an Nutzer (nur Inland)":
                 {
-                    servicetype = "interlibraryloan";
+                    servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = "electronic-domestic-only";
+                    servicedistribution = "distribution-electronic-domestic-only";
                     break;
                 }
             }
@@ -184,11 +187,11 @@ public class License extends Holding {
         String q = getString("ezb:ill_relevance.ezb:inland_only");
         String r = getString("ezb:ill_relevance.ezb:il_electronic_forbidden");
         if ("true".equals(q) && "true".equals(r)) {
-            servicedistribution = "postal-domestic-only";
+            servicedistribution = "distribution-postal-domestic-only";
         } else if ("true".equals(q)) {
-            servicedistribution = "domestic-only";
+            servicedistribution = "distribution-domestic-only";
         } else if ("true".equals(r)) {
-            servicedistribution = "postal";
+            servicedistribution = "distribution-postal";
         }
         service.put("servicecomment", getString("ezb:ill_relevance.ezb:comment"));
 
@@ -241,4 +244,10 @@ public class License extends Holding {
     public String getRoutingKey() {
         return String.valueOf(findRegionKey()) + findCarrierTypeKey();
     }
+
+    public License setRegion(String region) {
+        this.region = region;
+        return this;
+    }
+
 }

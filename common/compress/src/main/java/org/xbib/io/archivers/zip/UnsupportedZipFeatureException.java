@@ -1,20 +1,3 @@
-/*
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
 
 package org.xbib.io.archivers.zip;
 
@@ -23,23 +6,23 @@ import java.util.zip.ZipException;
 /**
  * Exception thrown when attempting to read or write data for a zip
  * entry that uses ZIP features not supported by this library.
- * @since Commons Compress 1.1
  */
 public class UnsupportedZipFeatureException extends ZipException {
 
     private final Feature reason;
+
     private final ZipArchiveEntry entry;
-    private static final long serialVersionUID = 4430521921766595597L;
 
     /**
      * Creates an exception.
+     *
      * @param reason the feature that is not supported
-     * @param entry the entry using the feature
+     * @param entry  the entry using the feature
      */
     public UnsupportedZipFeatureException(Feature reason,
                                           ZipArchiveEntry entry) {
-        super("unsupported feature " + reason +  " used in entry "
-              + entry.getName());
+        super("unsupported feature " + reason + " used in entry "
+                + entry.getName());
         this.reason = reason;
         this.entry = entry;
     }
@@ -60,7 +43,6 @@ public class UnsupportedZipFeatureException extends ZipException {
 
     /**
      * ZIP Features that may or may not be supported.
-     * @since Commons Compress 1.1
      */
     public static class Feature {
         /**

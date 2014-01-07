@@ -189,7 +189,6 @@ public class VIAF extends Feeder {
 
         public void close() throws IOException {
             flush();
-            sink.flush();
         }
 
         private void flush() {

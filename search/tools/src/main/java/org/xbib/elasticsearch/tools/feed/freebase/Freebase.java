@@ -102,7 +102,6 @@ public class Freebase extends Feeder {
 
         public void close() throws IOException {
             flush();
-            sink.flush();
         }
 
         @Override

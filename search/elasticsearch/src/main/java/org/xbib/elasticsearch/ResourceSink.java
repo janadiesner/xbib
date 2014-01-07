@@ -33,7 +33,8 @@ package org.xbib.elasticsearch;
 
 import java.io.IOException;
 
-import org.xbib.elasticsearch.support.client.DocumentIngest;
+import org.elasticsearch.common.bytes.BytesArray;
+import org.xbib.elasticsearch.support.client.Feeder;
 import org.xbib.elements.CountableElementOutput;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
@@ -48,10 +49,10 @@ import org.xbib.rdf.xcontent.ContentBuilder;
 public class ResourceSink<C extends ResourceContext, R extends Resource>
         extends CountableElementOutput<C, R> {
 
-    private final DocumentIngest ingester;
+    private final Feeder feeder;
 
-    public ResourceSink(final DocumentIngest ingester) {
-        this.ingester = ingester;
+    public ResourceSink(final Feeder feeder) {
+        this.feeder = feeder;
     }
 
     final ResourceIndexer<R> resourceIndexer = new ResourceIndexer<R>() {
@@ -69,7 +70,7 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
             if (id == null) {
                 throw new IOException("id must not be null, no fragment set in IRI?");
             }
-            ingester.indexDocument(index, type, id, source);
+            feeder.index(index, type, id, new BytesArray(source));
         }
 
         @Override
@@ -86,7 +87,7 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
             if (id == null) {
                 throw new IOException("id must not be null, no fragment set in IRI?");
             }
-            ingester.deleteDocument(index, type, id);
+            feeder.delete(index, type, id);
         }
     };
 
@@ -105,10 +106,6 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
             resourceIndexer.index(resource, contentBuilder.build(context, resource));
         }
         counter.incrementAndGet();
-    }
-
-    public void flush() {
-        ingester.flush();
     }
 
     /**

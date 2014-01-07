@@ -14,9 +14,10 @@
             <includes>
                 <include>org.xbib:util</include>
                 <include>org.xbib:logging</include>
-                <include>org.xbib:content</include>
-                <include>org.xbib:grouping</include>
                 <include>org.xbib:compress</include>
+                <include>org.xbib:content</include>
+                <include>org.xbib:iso2709</include>
+                <include>org.xbib:grouping</include>
                 <include>org.xbib:rdf</include>
                 <include>org.xbib:elements</include>
                 <include>org.xbib:oai</include>

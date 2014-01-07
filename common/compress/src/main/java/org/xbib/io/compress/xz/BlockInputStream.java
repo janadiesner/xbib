@@ -1,43 +1,14 @@
-/*
- * Licensed to Jörg Prante and xbib under one or more contributor
- * license agreements. See the NOTICE.txt file distributed with this work
- * for additional information regarding copyright ownership.
- *
- * Copyright (C) 2012 Jörg Prante and xbib
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program; if not, see http://www.gnu.org/licenses
- * or write to the Free Software Foundation, Inc., 51 Franklin Street,
- * Fifth Floor, Boston, MA 02110-1301 USA.
- *
- * The interactive user interfaces in modified source and object code
- * versions of this program must display Appropriate Legal Notices,
- * as required under Section 5 of the GNU Affero General Public License.
- *
- * In accordance with Section 7(b) of the GNU Affero General Public
- * License, these Appropriate Legal Notices must retain the display of the
- * "Powered by xbib" logo. If the display of the logo is not reasonably
- * feasible for technical reasons, the Appropriate Legal Notices must display
- * the words "Powered by xbib".
- */
+
 package org.xbib.io.compress.xz;
 
-import java.io.InputStream;
-import java.io.DataInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Arrays;
-import org.xbib.io.compress.xz.common.DecoderUtil;
 import org.xbib.io.compress.xz.check.Check;
+import org.xbib.io.compress.xz.common.DecoderUtil;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 
 class BlockInputStream extends InputStream {
     private final InputStream in;
@@ -67,21 +38,24 @@ class BlockInputStream extends InputStream {
         inData.readFully(buf, 0, 1);
 
         // See if this begins the Index field.
-        if (buf[0] == 0x00)
+        if (buf[0] == 0x00) {
             throw new IndexIndicatorException();
+        }
 
         // Read the rest of the Block Header.
         headerSize = 4 * ((buf[0] & 0xFF) + 1);
         inData.readFully(buf, 1, headerSize - 1);
 
         // Validate the CRC32.
-        if (!DecoderUtil.isCRC32Valid(buf, 0, headerSize - 4, headerSize - 4))
+        if (!DecoderUtil.isCRC32Valid(buf, 0, headerSize - 4, headerSize - 4)) {
             throw new CorruptedInputException("XZ Block Header is corrupt");
+        }
 
         // Check for reserved bits in Block Flags.
-        if ((buf[1] & 0x3C) != 0)
+        if ((buf[1] & 0x3C) != 0) {
             throw new UnsupportedOptionsException(
                     "Unsupported options in XZ Block Header");
+        }
 
         // Memory for the Filter Flags field
         int filterCount = (buf[1] & 0x03) + 1;
@@ -97,7 +71,7 @@ class BlockInputStream extends InputStream {
             // Set the maximum valid compressed size. This is overriden
             // by the value from the Compressed Size field if it is present.
             compressedSizeLimit = (DecoderUtil.VLI_MAX & ~3)
-                                  - headerSize - check.getSize();
+                    - headerSize - check.getSize();
 
             // Decode and validate Compressed Size if the relevant flag
             // is set in Block Flags.
@@ -105,26 +79,29 @@ class BlockInputStream extends InputStream {
                 compressedSizeInHeader = DecoderUtil.decodeVLI(bufStream);
 
                 if (compressedSizeInHeader == 0
-                        || compressedSizeInHeader > compressedSizeLimit)
+                        || compressedSizeInHeader > compressedSizeLimit) {
                     throw new CorruptedInputException();
+                }
 
                 compressedSizeLimit = compressedSizeInHeader;
             }
 
             // Decode Uncompressed Size if the relevant flag is set
             // in Block Flags.
-            if ((buf[1] & 0x80) != 0x00)
+            if ((buf[1] & 0x80) != 0x00) {
                 uncompressedSizeInHeader = DecoderUtil.decodeVLI(bufStream);
+            }
 
             // Decode Filter Flags.
             for (int i = 0; i < filterCount; ++i) {
                 filterIDs[i] = DecoderUtil.decodeVLI(bufStream);
 
                 long filterPropsSize = DecoderUtil.decodeVLI(bufStream);
-                if (filterPropsSize > bufStream.available())
+                if (filterPropsSize > bufStream.available()) {
                     throw new CorruptedInputException();
+                }
 
-                filterProps[i] = new byte[(int)filterPropsSize];
+                filterProps[i] = new byte[(int) filterPropsSize];
                 bufStream.read(filterProps[i]);
             }
 
@@ -133,10 +110,12 @@ class BlockInputStream extends InputStream {
         }
 
         // Check that the remaining bytes are zero.
-        for (int i = bufStream.available(); i > 0; --i)
-            if (bufStream.read() != 0x00)
+        for (int i = bufStream.available(); i > 0; --i) {
+            if (bufStream.read() != 0x00) {
                 throw new UnsupportedOptionsException(
                         "Unsupported options in XZ Block Header");
+            }
+        }
 
         // Validate the Blcok Header against the Index when doing
         // random access reading.
@@ -145,9 +124,10 @@ class BlockInputStream extends InputStream {
             // and Check alone take as much or more space than the size
             // stored in the Index, the file is corrupt.
             int headerAndCheckSize = headerSize + check.getSize();
-            if (headerAndCheckSize >= unpaddedSizeInIndex)
+            if (headerAndCheckSize >= unpaddedSizeInIndex) {
                 throw new CorruptedInputException(
                         "XZ Index does not match a Block Header");
+            }
 
             // The compressed size calculated from Unpadded Size must
             // match the value stored in the Compressed Size field in
@@ -156,17 +136,19 @@ class BlockInputStream extends InputStream {
                     = unpaddedSizeInIndex - headerAndCheckSize;
             if (compressedSizeFromIndex > compressedSizeLimit
                     || (compressedSizeInHeader != -1
-                        && compressedSizeInHeader != compressedSizeFromIndex))
+                    && compressedSizeInHeader != compressedSizeFromIndex)) {
                 throw new CorruptedInputException(
                         "XZ Index does not match a Block Header");
+            }
 
             // The uncompressed size stored in the Index must match
             // the value stored in the Uncompressed Size field in
             // the Block Header.
             if (uncompressedSizeInHeader != -1
-                    && uncompressedSizeInHeader != uncompressedSizeInIndex)
+                    && uncompressedSizeInHeader != uncompressedSizeInIndex) {
                 throw new CorruptedInputException(
                         "XZ Index does not match a Block Header");
+            }
 
             // For further validation, pretend that the values from the Index
             // were stored in the Block Header.
@@ -181,18 +163,16 @@ class BlockInputStream extends InputStream {
         FilterDecoder[] filters = new FilterDecoder[filterIDs.length];
 
         for (int i = 0; i < filters.length; ++i) {
-            if (filterIDs[i] == LZMA2Coder.FILTER_ID)
+            if (filterIDs[i] == LZMA2Coder.FILTER_ID) {
                 filters[i] = new LZMA2Decoder(filterProps[i]);
-
-            else if (filterIDs[i] == DeltaCoder.FILTER_ID)
+            } else if (filterIDs[i] == DeltaCoder.FILTER_ID) {
                 filters[i] = new DeltaDecoder(filterProps[i]);
-
-            else if (BCJDecoder.isBCJFilterID(filterIDs[i]))
+            } else if (BCJDecoder.isBCJFilterID(filterIDs[i])) {
                 filters[i] = new BCJDecoder(filterIDs[i], filterProps[i]);
-
-            else
+            } else {
                 throw new UnsupportedOptionsException(
                         "Unknown Filter ID " + filterIDs[i]);
+            }
         }
 
         RawCoder.validate(filters);
@@ -200,11 +180,13 @@ class BlockInputStream extends InputStream {
         // Check the memory usage limit.
         if (memoryLimit >= 0) {
             int memoryNeeded = 0;
-            for (int i = 0; i < filters.length; ++i)
+            for (int i = 0; i < filters.length; ++i) {
                 memoryNeeded += filters[i].getMemoryUsage();
+            }
 
-            if (memoryNeeded > memoryLimit)
+            if (memoryNeeded > memoryLimit) {
                 throw new MemoryLimitException(memoryNeeded, memoryLimit);
+            }
         }
 
         // Use an input size counter to calculate
@@ -213,8 +195,9 @@ class BlockInputStream extends InputStream {
 
         // Initialize the filter chain.
         filterChain = inCounted;
-        for (int i = filters.length - 1; i >= 0; --i)
+        for (int i = filters.length - 1; i >= 0; --i) {
             filterChain = filters[i].getInputStream(filterChain);
+        }
     }
 
     public int read() throws IOException {
@@ -223,8 +206,9 @@ class BlockInputStream extends InputStream {
     }
 
     public int read(byte[] buf, int off, int len) throws IOException {
-        if (endReached)
+        if (endReached) {
             return -1;
+        }
 
         int ret = filterChain.read(buf, off, len);
 
@@ -238,8 +222,9 @@ class BlockInputStream extends InputStream {
                     || compressedSize > compressedSizeLimit
                     || uncompressedSize < 0
                     || (uncompressedSizeInHeader != -1
-                        && uncompressedSize > uncompressedSizeInHeader))
+                    && uncompressedSize > uncompressedSizeInHeader)) {
                 throw new CorruptedInputException();
+            }
 
             // Check the Block integrity as soon as possible:
             //   - The filter chain shouldn't return less than requested
@@ -249,8 +234,9 @@ class BlockInputStream extends InputStream {
             //     one byte to let the filter chain catch errors and to
             //     let it read end of payload marker(s).
             if (ret < len || uncompressedSize == uncompressedSizeInHeader) {
-                if (filterChain.read() != -1)
+                if (filterChain.read() != -1) {
                     throw new CorruptedInputException();
+                }
 
                 validate();
                 endReached = true;
@@ -269,22 +255,26 @@ class BlockInputStream extends InputStream {
         // Validate Compressed Size and Uncompressed Size if they were
         // present in Block Header.
         if ((compressedSizeInHeader != -1
-                    && compressedSizeInHeader != compressedSize)
+                && compressedSizeInHeader != compressedSize)
                 || (uncompressedSizeInHeader != -1
-                    && uncompressedSizeInHeader != uncompressedSize))
+                && uncompressedSizeInHeader != uncompressedSize)) {
             throw new CorruptedInputException();
+        }
 
         // Block Padding bytes must be zeros.
-        while ((compressedSize++ & 3) != 0)
-            if (inData.readUnsignedByte() != 0x00)
+        while ((compressedSize++ & 3) != 0) {
+            if (inData.readUnsignedByte() != 0x00) {
                 throw new CorruptedInputException();
+            }
+        }
 
         // Validate the integrity check.
         byte[] storedCheck = new byte[check.getSize()];
         inData.readFully(storedCheck);
-        if (!Arrays.equals(check.finish(), storedCheck))
+        if (!Arrays.equals(check.finish(), storedCheck)) {
             throw new CorruptedInputException("Integrity check ("
                     + check.getName() + ") does not match");
+        }
     }
 
     public int available() throws IOException {

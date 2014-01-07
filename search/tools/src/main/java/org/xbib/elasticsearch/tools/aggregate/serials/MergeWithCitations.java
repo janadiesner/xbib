@@ -36,6 +36,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -43,8 +44,8 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.xbib.common.settings.Settings;
 import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.elasticsearch.support.client.IngestClient;
-import org.xbib.elasticsearch.support.client.SearchClient;
+import org.xbib.elasticsearch.support.client.ingest.IngestClient;
+import org.xbib.elasticsearch.support.client.search.SearchClient;
 import org.xbib.util.URIUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
@@ -601,10 +602,10 @@ public class MergeWithCitations {
                     .scheme("http")
                     .host("xbib.info")
                     .path("/works/doi").fragment(doiPart).build();
-            ingest.indexDocument(targetCitationIndex,
+            ingest.index(targetCitationIndex,
                     targetCitationType,
                     id.toString(),
-                    builder.string());
+                    new BytesArray(builder.string()));
         }
 
     }

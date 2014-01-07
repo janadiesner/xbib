@@ -78,10 +78,22 @@
         <repository>
             <id>github-release-repo</id>
             <url>https://github.com/xbib/maven-repo/raw/master/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
             <id>github-snapshot-repo</id>
             <url>https://github.com/xbib/maven-repo/raw/master/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
@@ -620,7 +632,7 @@
                     <dependency>
                         <groupId>org.xbib.elasticsearch.plugin</groupId>
                         <artifactId>elasticsearch-support</artifactId>
-                        <version>0.90.7.3</version>
+                        <version>0.90.9.2</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -635,7 +647,7 @@
                     <dependency>
                         <groupId>org.xbib.elasticsearch.plugin</groupId>
                         <artifactId>elasticsearch-support</artifactId>
-                        <version>1.0.0.Beta2.4</version>
+                        <version>1.0.0.Beta2.6</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>

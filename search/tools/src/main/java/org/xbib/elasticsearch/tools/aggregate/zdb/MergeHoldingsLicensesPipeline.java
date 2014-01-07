@@ -50,12 +50,14 @@ import com.google.common.collect.SetMultimap;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
-import org.xbib.common.xcontent.XContentBuilder;
+import org.xbib.common.settings.Settings;
 import org.xbib.elasticsearch.tools.aggregate.WrappedSearchHit;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.TimeLine;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Cluster;
@@ -69,7 +71,6 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineExecutor;
 import org.xbib.pipeline.PipelineListener;
 import org.xbib.util.ExceptionFormatter;
-import org.xbib.util.URIUtil;
 
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -78,7 +79,7 @@ import static com.google.common.collect.Sets.newTreeSet;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
-import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifestation> {
 
@@ -91,8 +92,6 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
     private final ObjectMapper mapper;
 
     private final Queue<ClusterBuildContinuation> buildQueue;
-
-    private PipelineExecutor<Pipeline<Boolean, Manifestation>> executor;
 
     private Map<String, PipelineListener> listeners;
 
@@ -112,10 +111,11 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
     private String sourceIndicatorIndex;
     private String sourceIndicatorType;
 
-    private String targetIndex;
-    private String targetClusterType;
-    private String targetManifestationsType;
-    private String targetVolumesType;
+    private final String targetIndex;
+    private final String targetClusterType;
+    private final String targetManifestationsType;
+    private final String targetVolumesType;
+    private final String targetHoldingsType;
 
     private Long count;
 
@@ -133,26 +133,26 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
         this.count = 0L;
         this.volumeCount = 0L;
         this.listeners = newHashMap();
-        this.buildQueue = new ConcurrentLinkedQueue(); // guava?
+        this.buildQueue = new ConcurrentLinkedQueue();
         this.logger = LoggerFactory.getLogger(MergeHoldingsLicenses.class.getName() + "-pipeline-" + number);
         this.mapper = new ObjectMapper();
-        Map<String,String> params = URIUtil.parseQueryString(service.sourceURI());
-        this.sourceTitleIndex = params.get("bibIndex");
-        this.sourceTitleType = params.get("bibType");
-        this.sourceHoldingsIndex = params.get("holIndex");
-        this.sourceHoldingsType = params.get("holType");
-        this.sourceLicenseIndex = params.get("licenseIndex");
-        this.sourceLicenseType = params.get("licenseType");
-        this.sourceIndicatorIndex = params.get("indicatorIndex");
-        this.sourceIndicatorType = params.get("indicatorType");
-        params = URIUtil.parseQueryString(service.targetURI());
-        this.targetIndex = params.get("index");
+        Settings settings = service.settings();
+        this.sourceTitleIndex = settings.get("bibIndex");
+        this.sourceTitleType = settings.get("bibType");
+        this.sourceHoldingsIndex = settings.get("holIndex");
+        this.sourceHoldingsType = settings.get("holType");
+        this.sourceLicenseIndex = settings.get("licenseIndex");
+        this.sourceLicenseType = settings.get("licenseType");
+        this.sourceIndicatorIndex = settings.get("indicatorIndex");
+        this.sourceIndicatorType = settings.get("indicatorType");
+        this.targetIndex = settings.get("index");
         if (targetIndex == null) {
-            targetIndex = params.get("bibIndex") + "merge";
+            throw new IllegalArgumentException("no index given");
         }
         this.targetClusterType = "works";
         this.targetManifestationsType = "manifestations";
         this.targetVolumesType = "volumes";
+        this.targetHoldingsType = "holdings";
     }
 
     public Queue<ClusterBuildContinuation> getBuildQueue() {
@@ -237,7 +237,6 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
 
     @Override
     public Pipeline<Boolean, Manifestation> executor(PipelineExecutor<Pipeline<Boolean, Manifestation>> executor) {
-        this.executor = executor;
         return this;
     }
 
@@ -296,7 +295,7 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
             setAllRelationsBetween(m, c2);
         }
         // build cluster
-        Cluster c = new Cluster(candidates);
+        Cluster c = new Cluster(ImmutableSet.copyOf(candidates));
         List<TimeLine> timeLines = c.timeLines();
         for (TimeLine timeLine : timeLines) {
             String id = timeLine.first().externalID();
@@ -313,61 +312,66 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
             // index time line summary
             XContentBuilder builder = jsonBuilder();
             timeLine.build(builder);
-            String s =  builder.string();
-            volumeCount += s.length();
-            service.ingest().indexDocument(targetIndex, targetClusterType, id, s);
+            BytesReference b =  builder.bytes();
+            volumeCount += b.length();
+            service.ingest().index(targetIndex, targetClusterType, id, b);
             builder.close();
             // make evidences and services in the timeline
             timeLine.makeServices();
             // index everything
             Set<Manifestation> visited = newHashSet();
-            long volumes = 0L;
             for (Manifestation m : timeLine) {
-                volumes = indexManifestation(m, volumes, visited);
+                indexManifestation(m, visited);
             }
-            logger.debug("timeline {}/{}/{} size {}: indexed {} manifestations and {} volumes",
+            logger.debug("timeline {}/{}/{} size {}: indexed {} manifestations",
                     targetIndex, targetClusterType,
                     timeLine.first().externalID(),
                     timeLine.size(),
-                    visited.size(),
-                    volumes
+                    visited.size()
             );
         }
     }
 
-    private long indexManifestation(Manifestation m, long volumes, Set<Manifestation> visited) throws IOException {
+    private void indexManifestation(Manifestation m, Set<Manifestation> visited) throws IOException {
         if (visited.contains(m)) {
-            return volumes;
+            return;
         }
         visited.add(m);
         String id = m.externalID();
         if (service.manifestations().contains(id)) {
-            return volumes;
+            return;
         }
         service.manifestations().add(id);
         ImmutableSet<Manifestation> related = ImmutableSet.copyOf(m.getRelatedManifestations().values());
         for (Manifestation mm : related) {
-            volumes = indexManifestation(mm, volumes, visited);
+            indexManifestation(mm, visited);
         }
         XContentBuilder builder = jsonBuilder();
         m.build(builder);
-        String s = builder.string();
-        volumeCount += s.length();
-        service.ingest().indexDocument(targetIndex, targetManifestationsType, id, s);
+        BytesReference b = builder.bytes();
+        volumeCount += b.length();
+        service.ingest().index(targetIndex, targetManifestationsType, id, b);
         builder.close();
-        SetMultimap<Integer,Holding> set = m.getEvidenceByDate();
+        SetMultimap<Integer,Holding> evidenceByDate = m.getEvidenceByDate();
         // index volumes
-        for (Integer date : set.keySet()) {
+        for (Integer date : evidenceByDate.keySet()) {
             XContentBuilder datebuilder = jsonBuilder();
-            m.buildService(datebuilder, date, set.get(date));
-            id =  m.externalID() + "_" + (date != null ? date : "");
-            s = datebuilder.string();
-            volumeCount += s.length();
-            service.ingest().indexDocument(targetIndex, targetVolumesType, id, s);
+            m.buildVolume(datebuilder, date, evidenceByDate.get(date));
+            id = m.externalID() + "_" + (date != null ? date : "");
+            b = datebuilder.bytes();
+            volumeCount += b.length();
+            service.ingest().index(targetIndex, targetVolumesType, id, b);
             builder.close();
-            volumes++;
         }
-        return volumes;
+        SetMultimap<String,Holding> holdings = m.getEvidenceByHolder();
+        for (String holder : holdings.keySet()) {
+            XContentBuilder holdingsBuilder = jsonBuilder();
+            m.buildHolding(holdingsBuilder, holder, holdings.get(holder));
+            id = m.externalID() + "_" + holder;
+            b = holdingsBuilder.bytes();
+            service.ingest().index(targetIndex, targetHoldingsType, id, b);
+            builder.close();
+        }
     }
 
     private void retrieveCluster(Collection<Manifestation> cluster,
@@ -623,6 +627,8 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
                     if (!license.getISIL().startsWith("DE-")) {
                         continue;
                     }
+                    String region = service.bibdatLookup().lookup().get(license.getISIL());
+                    license.setRegion(region);
                     Manifestation m = manifestations.get(license.parent());
                     if (m == null) {
                         continue;

@@ -1,31 +1,13 @@
-/*
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
+
 package org.xbib.io.archivers.zip;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 
 /**
  * Utility class for handling DOS and Java time conversions.
- * @Immutable
  */
 public abstract class ZipUtil {
     /**
@@ -35,17 +17,9 @@ public abstract class ZipUtil {
 
     /**
      * Convert a Date object to a DOS date/time field.
-     * @param time the <code>Date</code> to convert
-     * @return the date as a <code>ZipLong</code>
-     */
-    public static ZipLong toDosTime(Date time) {
-        return new ZipLong(toDosTime(time.getTime()));
-    }
-
-    /**
-     * Convert a Date object to a DOS date/time field.
-     *
+     * <p/>
      * <p>Stolen from InfoZip's <code>fileio.c</code></p>
+     *
      * @param t number of milliseconds since the epoch
      * @return the date as a byte array
      */
@@ -58,43 +32,15 @@ public abstract class ZipUtil {
             return copy(DOS_TIME_MIN); // stop callers from changing the array
         }
         int month = c.get(Calendar.MONTH) + 1;
-        long value =  ((year - 1980) << 25)
-            |         (month << 21)
-            |         (c.get(Calendar.DAY_OF_MONTH) << 16)
-            |         (c.get(Calendar.HOUR_OF_DAY) << 11)
-            |         (c.get(Calendar.MINUTE) << 5)
-            |         (c.get(Calendar.SECOND) >> 1);
+        long value = ((year - 1980) << 25)
+                | (month << 21)
+                | (c.get(Calendar.DAY_OF_MONTH) << 16)
+                | (c.get(Calendar.HOUR_OF_DAY) << 11)
+                | (c.get(Calendar.MINUTE) << 5)
+                | (c.get(Calendar.SECOND) >> 1);
         return ZipLong.getBytes(value);
     }
 
-    /**
-     * Assumes a negative integer really is a positive integer that
-     * has wrapped around and re-creates the original value.
-     *
-     * <p>This methods is no longer used as of Apache Commons Compress
-     * 1.3</p>
-     *
-     * @param i the value to treat as unsigned int.
-     * @return the unsigned int as a long.
-     */
-    public static long adjustToLong(int i) {
-        if (i < 0) {
-            return 2 * ((long) Integer.MAX_VALUE) + 2 + i;
-        } else {
-            return i;
-        }
-    }
-
-    /**
-     * Convert a DOS date/time field to a Date object.
-     *
-     * @param zipDosTime contains the stored DOS time.
-     * @return a Date instance corresponding to the given time.
-     */
-    public static Date fromDosTime(ZipLong zipDosTime) {
-        long dosTime = zipDosTime.getValue();
-        return new Date(dosToJavaTime(dosTime));
-    }
 
     /**
      * Converts DOS time to Java time (number of milliseconds since
@@ -122,19 +68,19 @@ public abstract class ZipUtil {
                                                  byte[] originalNameBytes,
                                                  byte[] commentBytes) {
         UnicodePathExtraField name = (UnicodePathExtraField)
-            ze.getExtraField(UnicodePathExtraField.UPATH_ID);
+                ze.getExtraField(UnicodePathExtraField.UPATH_ID);
         String originalName = ze.getName();
         String newName = getUnicodeStringIfOriginalMatches(name,
-                                                           originalNameBytes);
+                originalNameBytes);
         if (newName != null && !originalName.equals(newName)) {
             ze.setName(newName);
         }
 
         if (commentBytes != null && commentBytes.length > 0) {
             UnicodeCommentExtraField cmt = (UnicodeCommentExtraField)
-                ze.getExtraField(UnicodeCommentExtraField.UCOM_ID);
+                    ze.getExtraField(UnicodeCommentExtraField.UCOM_ID);
             String newComment =
-                getUnicodeStringIfOriginalMatches(cmt, commentBytes);
+                    getUnicodeStringIfOriginalMatches(cmt, commentBytes);
             if (newComment != null) {
                 ze.setComment(newComment);
             }
@@ -144,13 +90,12 @@ public abstract class ZipUtil {
     /**
      * If the stored CRC matches the one of the given name, return the
      * Unicode name of the given field.
-     *
+     * <p/>
      * <p>If the field is null or the CRCs don't match, return null
      * instead.</p>
      */
-    private static 
-        String getUnicodeStringIfOriginalMatches(AbstractUnicodeExtraField f,
-                                                 byte[] orig) {
+    private static String getUnicodeStringIfOriginalMatches(AbstractUnicodeExtraField f,
+                                                            byte[] orig) {
         if (f != null) {
             CRC32 crc32 = new CRC32();
             crc32.update(orig);
@@ -159,7 +104,7 @@ public abstract class ZipUtil {
             if (origCRC32 == f.getNameCRC32()) {
                 try {
                     return ZipEncodingHelper
-                        .UTF8_ZIP_ENCODING.decode(f.getUnicodeName());
+                            .UTF8_ZIP_ENCODING.decode(f.getUnicodeName());
                 } catch (IOException ex) {
                     // UTF-8 unsupported?  should be impossible the
                     // Unicode*ExtraField must contain some bad bytes
@@ -210,7 +155,7 @@ public abstract class ZipUtil {
      */
     private static boolean supportsMethodOf(ZipArchiveEntry entry) {
         return entry.getMethod() == ZipEntry.STORED
-            || entry.getMethod() == ZipEntry.DEFLATED;
+                || entry.getMethod() == ZipEntry.DEFLATED;
     }
 
     /**
@@ -218,16 +163,16 @@ public abstract class ZipUtil {
      * by the library and throws an exception if it does.
      */
     static void checkRequestedFeatures(ZipArchiveEntry ze)
-        throws UnsupportedZipFeatureException {
+            throws UnsupportedZipFeatureException {
         if (!supportsEncryptionOf(ze)) {
             throw
-                new UnsupportedZipFeatureException(UnsupportedZipFeatureException
-                                                   .Feature.ENCRYPTION, ze);
+                    new UnsupportedZipFeatureException(UnsupportedZipFeatureException
+                            .Feature.ENCRYPTION, ze);
         }
         if (!supportsMethodOf(ze)) {
             throw
-                new UnsupportedZipFeatureException(UnsupportedZipFeatureException
-                                                   .Feature.METHOD, ze);
+                    new UnsupportedZipFeatureException(UnsupportedZipFeatureException
+                            .Feature.METHOD, ze);
         }
     }
 }

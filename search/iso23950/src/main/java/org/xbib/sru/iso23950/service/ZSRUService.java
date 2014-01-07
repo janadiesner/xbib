@@ -67,12 +67,12 @@ public class ZSRUService extends PropertiesSRUService implements ZService, ZCons
 
     @Override
     public ZClient newZClient() {
-        return ZClientFactory.newZClient(properties);
+        return ZClientFactory.getInstance().newZClient(properties);
     }
 
     @Override
     public SRUClient newClient() throws IOException {
-        return ZSRUClientFactory.newClient(properties);
+        return ZSRUClientFactory.getInstance().newClient(properties);
     }
 
     @Override

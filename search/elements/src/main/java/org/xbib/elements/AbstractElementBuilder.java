@@ -69,7 +69,7 @@ public abstract class AbstractElementBuilder<K, V, E extends Element, C extends 
 
     @Override
     public void end() {
-       C context = contexts.get();
+        C context = contexts.get();
         context.prepareForOutput();
         for (ElementOutput output : outputs) {
             try {

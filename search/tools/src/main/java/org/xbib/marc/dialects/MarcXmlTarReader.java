@@ -55,7 +55,7 @@ import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
 import org.xbib.io.Packet;
 import org.xbib.io.Session;
-import org.xbib.io.archivers.TarSession;
+import org.xbib.io.archivers.tar.TarSession;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
@@ -68,13 +68,15 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
 
     private final Logger logger = LoggerFactory.getLogger(MarcXmlTarReader.class.getName());
 
-    private XMLInputFactory factory = XMLInputFactory.newInstance();
+    private final XMLInputFactory factory = XMLInputFactory.newInstance();
+
+    private final ConnectionService<TarSession> service = ConnectionService.getInstance();
+
+    private final CounterElement counter = new CounterElement().set(new AtomicLong(0L));
 
     private URI uri;
 
     private Iterator<Long> iterator;
-
-    private CounterElement counter = new CounterElement().set(new AtomicLong(0L));
 
     private Connection<TarSession> connection;
 
@@ -232,8 +234,8 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
             return null;
         }
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("{}", clob);
+            if (logger.isTraceEnabled()) {
+                logger.trace("{}", clob);
             }
             try (StringReader sr = new StringReader(clob)) {
                 XMLEventReader xmlReader = factory.createXMLEventReader(sr);
@@ -357,8 +359,8 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
     }
 
     private void createSession() throws IOException {
-        this.connection = ConnectionService.getInstance()
-                .getFactory(uri)
+        this.connection = service
+                .getConnectionFactory(uri)
                 .getConnection(uri);
         this.session = connection.createSession();
         session.open(Session.Mode.READ);

@@ -35,7 +35,7 @@ import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
 import org.xbib.io.Packet;
 import org.xbib.io.Session;
-import org.xbib.io.archivers.TarSession;
+import org.xbib.io.archivers.tar.TarSession;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
@@ -68,13 +68,15 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Coun
 
     private final Logger logger = LoggerFactory.getLogger(DNBPICAXmlTarReader.class.getName());
 
-    private XMLInputFactory factory = XMLInputFactory.newInstance();
+    private final ConnectionService<TarSession> service = ConnectionService.getInstance();
+
+    private final XMLInputFactory factory = XMLInputFactory.newInstance();
+
+    private final CounterElement counter = new CounterElement().set(new AtomicLong(0L));
 
     private URI uri;
 
     private Iterator<Long> iterator;
-
-    private CounterElement counter = new CounterElement().set(new AtomicLong(0L));
 
     private Connection<TarSession> connection;
 
@@ -347,8 +349,8 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Coun
     }
 
     private void createSession() throws IOException {
-        this.connection = ConnectionService.getInstance()
-                .getFactory(uri)
+        this.connection =  service
+                .getConnectionFactory(uri)
                 .getConnection(uri);
         this.session = connection.createSession();
         session.open(Session.Mode.READ);

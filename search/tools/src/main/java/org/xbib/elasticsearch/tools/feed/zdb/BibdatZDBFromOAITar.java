@@ -93,7 +93,7 @@ public final class BibdatZDBFromOAITar extends Feeder {
     }
 
     @Override
-    protected BibdatZDBFromOAITar prepare() {
+    protected BibdatZDBFromOAITar prepare() throws IOException {
         super.prepare();
         logger.info("got settings {}", settings.getAsMap());
         out.setIndex(settings.get("index"));

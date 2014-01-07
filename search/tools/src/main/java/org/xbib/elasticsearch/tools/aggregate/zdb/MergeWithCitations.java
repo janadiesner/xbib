@@ -37,15 +37,15 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 import org.xbib.common.settings.Settings;
-import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.elasticsearch.support.client.IngestClient;
-import org.xbib.elasticsearch.support.client.SearchClient;
+import org.xbib.elasticsearch.support.client.ingest.IngestClient;
+import org.xbib.elasticsearch.support.client.search.SearchClient;
 import org.xbib.util.URIUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
@@ -83,8 +83,8 @@ import static org.elasticsearch.index.query.QueryBuilders.matchPhrasePrefixQuery
 import static org.elasticsearch.index.query.QueryBuilders.matchPhraseQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
-import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Merge ZDB with citation database
@@ -545,10 +545,10 @@ public class MergeWithCitations {
                     .scheme("http")
                     .host("xbib.info")
                     .path("/works/doi").fragment(doiPart).build();
-            ingest.indexDocument(targetCitationIndex,
+            ingest.index(targetCitationIndex,
                     targetCitationType,
                     id.toString(),
-                    builder.string());
+                    builder.bytes());
         }
 
     }

@@ -1,33 +1,13 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package org.xbib.io.archivers.zip;
 
 /**
  * Wrapper for extra field data that doesn't conform to the recommended format of header-tag + size + data.
- *
+ * <p/>
  * <p>The header-id is artificial (and not listed as a known ID in
  * {@link <a href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">
  * APPNOTE.TXT</a>}).  Since it isn't used anywhere except to satisfy the
  * ZipExtraField contract it shouldn't matter anyway.</p>
- *
- * @since 1.1
- * @NotThreadSafe
  */
 public final class UnparseableExtraFieldData implements ZipExtraField {
     private static final ZipShort HEADER_ID = new ZipShort(0xACC1);
@@ -60,8 +40,8 @@ public final class UnparseableExtraFieldData implements ZipExtraField {
      */
     public ZipShort getCentralDirectoryLength() {
         return centralDirectoryData == null
-            ? getLocalFileDataLength()
-            : new ZipShort(centralDirectoryData.length);
+                ? getLocalFileDataLength()
+                : new ZipShort(centralDirectoryData.length);
     }
 
     /**
@@ -80,7 +60,7 @@ public final class UnparseableExtraFieldData implements ZipExtraField {
      */
     public byte[] getCentralDirectoryData() {
         return centralDirectoryData == null
-            ? getLocalFileDataData() : ZipUtil.copy(centralDirectoryData);
+                ? getLocalFileDataData() : ZipUtil.copy(centralDirectoryData);
     }
 
     /**

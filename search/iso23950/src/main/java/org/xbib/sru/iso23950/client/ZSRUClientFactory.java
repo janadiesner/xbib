@@ -41,19 +41,23 @@ import java.util.Properties;
 /**
  *  A factory for an SRU client on a Z service
  */
-public class ZSRUClientFactory {
+public final class ZSRUClientFactory {
 
     private final static ZSRUClientFactory instance = new ZSRUClientFactory();
 
     private ZSRUClientFactory() {
     }
 
-    public static SRUClient newClient(String name) throws IOException {
+    public static ZSRUClientFactory getInstance() {
+        return instance;
+    }
+
+    public SRUClient newClient(String name) throws IOException {
         ZSRUService service = ZSRUServiceFactory.getService(name);
         return new ZSRUClient(service);
     }
 
-    public static SRUClient newClient(Properties properties) throws IOException {
+    public SRUClient newClient(Properties properties) throws IOException {
         ZSRUService service = ZSRUServiceFactory.getService(properties);
         return new ZSRUClient(service);
     }

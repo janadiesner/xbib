@@ -45,15 +45,6 @@ public class ZPacket implements Packet {
         return this;
     }
 
-    @Override
-    public long number() {
-        return 0;
-    }
-
-    @Override
-    public Packet number(long number) {
-        return this;
-    }
 
     @Override
     public Object packet() {

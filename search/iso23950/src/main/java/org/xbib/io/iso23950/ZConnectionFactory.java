@@ -41,6 +41,11 @@ import org.xbib.io.ConnectionFactory;
  */
 public final class ZConnectionFactory implements ConnectionFactory<ZSession> {
 
+    @Override
+    public String getName() {
+        return "z3950";
+    }
+
     /**
      * A new connection
      *

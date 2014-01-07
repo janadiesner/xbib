@@ -33,6 +33,7 @@ package org.xbib.elasticsearch.tools.aggregate.zdb.entities;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
@@ -48,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.xbib.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.xbib.grouping.bibliographic.endeavor.PublishedJournal;
 import org.xbib.map.MapBasedAnyObject;
 import org.xbib.pipeline.PipelineRequest;
@@ -743,6 +744,10 @@ public class Manifestation extends MapBasedAnyObject
         return relatedManifestations;
     }
 
+    public SetMultimap<String, Holding> getEvidenceByHolder() {
+        return relatedHoldings;
+    }
+
     public SetMultimap<Integer, Holding> getEvidenceByDate() {
         return evidenceByDate;
     }
@@ -755,10 +760,16 @@ public class Manifestation extends MapBasedAnyObject
             builder.startObject(relation);
         }
         builder.field("id", externalID())
-                .field("title", cleanTitle())
-                .field("corporateName", corporateName())
-                .field("meetingName", meetingName())
-                .field("country", country())
+                .field("title", cleanTitle());
+        String s = corporateName();
+        if (s != null) {
+            builder.field("corporateName", s);
+        }
+        s = meetingName();
+        if (s != null) {
+            builder.field("meetingName", s);
+        }
+        builder.field("country", country())
                 .field("language", language())
                 .field("publisherPlace", publisherPlace())
                 .field("publisher", publisher())
@@ -767,9 +778,13 @@ public class Manifestation extends MapBasedAnyObject
                 .field("lastDate", lastDate())
                 .field("contentType", contentType())
                 .field("mediaType", mediaType())
-                .field("carrierType", carrierType())
-                .field("isPartial", isPartial())
-                .field("isSupplement", isSupplement());
+                .field("carrierType", carrierType());
+        if (isPartial()) {
+            builder.field("isPartial", isPartial());
+        }
+        if (isSupplement()) {
+            builder.field("isSupplement", isSupplement());
+        }
         if (hasOnline()) {
             builder.field("hasOnline", getOnlineExternalID());
         }
@@ -787,7 +802,8 @@ public class Manifestation extends MapBasedAnyObject
         for (String rel : relations) {
             if (Manifestation.carrierEditions().contains(rel)
                     || "hasPart".equals(rel) || "hasSupplement".equals(rel)) {
-                for (Manifestation mm : getRelatedManifestations().get(rel)) {
+                Set<Manifestation> snippets = ImmutableSet.copyOf(getRelatedManifestations().get(rel));
+                for (Manifestation mm : snippets) {
                     mm.buildSnippet(builder, indent + 1, rel, visited);
                 }
             }
@@ -798,10 +814,16 @@ public class Manifestation extends MapBasedAnyObject
     public void build(XContentBuilder builder) throws IOException {
         builder.startObject();
         builder.field("id", externalID())
-                .field("title", cleanTitle())
-                .field("corporateName", corporateName())
-                .field("meetingName", meetingName())
-                .field("country", country())
+                .field("title", cleanTitle());
+        String s = corporateName();
+        if (s != null) {
+            builder.field("corporateName", s);
+        }
+        s = meetingName();
+        if (s != null) {
+            builder.field("meetingName", s);
+        }
+        builder.field("country", country())
                 .field("language", language())
                 .field("publisherPlace", publisherPlace())
                 .field("publisher", publisher())
@@ -810,9 +832,13 @@ public class Manifestation extends MapBasedAnyObject
                 .field("lastDate", lastDate())
                 .field("contentType", contentType())
                 .field("mediaType", mediaType())
-                .field("carrierType", carrierType())
-                .field("isPartial", isPartial())
-                .field("isSupplement", isSupplement());
+                .field("carrierType", carrierType());
+        if (isPartial()) {
+            builder.field("isPartial", isPartial());
+        }
+        if (isSupplement()) {
+            builder.field("isSupplement", isSupplement());
+        }
         if (hasOnline()) {
             builder.field("hasOnline", getOnlineExternalID());
         }
@@ -833,7 +859,7 @@ public class Manifestation extends MapBasedAnyObject
         builder.endObject();
     }
 
-    public void buildService(XContentBuilder builder, Integer date, Set<Holding> holdings)
+    public void buildVolume(XContentBuilder builder, Integer date, Set<Holding> holdings)
             throws IOException {
         if (holdings == null || holdings.isEmpty()) {
             return;
@@ -842,7 +868,6 @@ public class Manifestation extends MapBasedAnyObject
                 .field("id", externalID())
                 .field("date", date)
                 .field("contentType", contentType())
-                .field("key", getUniqueIdentifier())
                 .field("identifiers", getIdentifiers());
         if (hasOnline()) {
             builder.field("hasOnline", getOnlineExternalID());
@@ -851,12 +876,11 @@ public class Manifestation extends MapBasedAnyObject
             builder.field("hasPrint", getPrintExternalID());
         }
         builder.field("links", getLinks());
-
         SetMultimap<String,Holding> libraries = HashMultimap.create();
         for (Holding holding : holdings) {
             libraries.put(holding.getISIL(), holding);
         }
-        builder.field("libraryCount", libraries.size())
+        builder.field("librariesCount", libraries.size())
                 .startArray("libraries");
         for (String library : libraries.keySet()) {
             Set<Holding> services = libraries.get(library);
@@ -875,8 +899,38 @@ public class Manifestation extends MapBasedAnyObject
             }
             builder.endArray().endObject();
         }
-        builder.endArray();
-        builder.endObject();
+        builder.endArray().endObject();
+    }
+
+    public void buildHolding(XContentBuilder builder, String holder, Set<Holding> holdings)
+        throws IOException {
+        if (holdings == null || holdings.isEmpty()) {
+            return;
+        }
+        builder.startObject()
+                .field("id", externalID())
+                .field("holder", holder)
+                .field("contentType", contentType())
+                .field("identifiers", getIdentifiers());
+        if (hasOnline()) {
+            builder.field("hasOnline", getOnlineExternalID());
+        }
+        if (hasPrint()) {
+            builder.field("hasPrint", getPrintExternalID());
+        }
+        builder.field("links", getLinks());
+        builder.field("holdingsCount", holdings.size())
+                .startArray("holdings");
+        for (Holding holding : holdings) {
+            builder.startObject()
+                    .field("id", holding.id())
+                    .field("mediaType", holding.mediaType())
+                    .field("carrierType", holding.carrierType())
+                    .field("serviceisil", holding.getServiceISIL())
+                    .field("info", holding.holdingInfo())
+                    .endObject();
+        }
+        builder.endArray().endObject();
     }
 
     public String getKey() {

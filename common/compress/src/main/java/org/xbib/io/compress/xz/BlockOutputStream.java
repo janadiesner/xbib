@@ -1,41 +1,12 @@
-/*
- * Licensed to Jörg Prante and xbib under one or more contributor
- * license agreements. See the NOTICE.txt file distributed with this work
- * for additional information regarding copyright ownership.
- *
- * Copyright (C) 2012 Jörg Prante and xbib
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program; if not, see http://www.gnu.org/licenses
- * or write to the Free Software Foundation, Inc., 51 Franklin Street,
- * Fifth Floor, Boston, MA 02110-1301 USA.
- *
- * The interactive user interfaces in modified source and object code
- * versions of this program must display Appropriate Legal Notices,
- * as required under Section 5 of the GNU Affero General Public License.
- *
- * In accordance with Section 7(b) of the GNU Affero General Public
- * License, these Appropriate Legal Notices must retain the display of the
- * "Powered by xbib" logo. If the display of the logo is not reasonably
- * feasible for technical reasons, the Appropriate Legal Notices must display
- * the words "Powered by xbib".
- */
+
 package org.xbib.io.compress.xz;
 
-import java.io.OutputStream;
+import org.xbib.io.compress.xz.check.Check;
+import org.xbib.io.compress.xz.common.EncoderUtil;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import org.xbib.io.compress.xz.common.EncoderUtil;
-import org.xbib.io.compress.xz.check.Check;
+import java.io.OutputStream;
 
 class BlockOutputStream extends FinishableOutputStream {
     private final OutputStream out;
@@ -55,8 +26,9 @@ class BlockOutputStream extends FinishableOutputStream {
         // Initialize the filter chain.
         outCounted = new CountingOutputStream(out);
         filterChain = outCounted;
-        for (int i = filters.length - 1; i >= 0; --i)
+        for (int i = filters.length - 1; i >= 0; --i) {
             filterChain = filters[i].getOutputStream(filterChain);
+        }
 
         // Prepare to encode the Block Header field.
         ByteArrayOutputStream bufStream = new ByteArrayOutputStream();
@@ -78,8 +50,9 @@ class BlockOutputStream extends FinishableOutputStream {
         }
 
         // Header Padding
-        while ((bufStream.size() & 3) != 0)
+        while ((bufStream.size() & 3) != 0) {
             bufStream.write(0x00);
+        }
 
         byte[] buf = bufStream.toByteArray();
 
@@ -88,11 +61,12 @@ class BlockOutputStream extends FinishableOutputStream {
         headerSize = buf.length + 4;
 
         // This is just a sanity check.
-        if (headerSize > EncoderUtil.BLOCK_HEADER_SIZE_MAX)
+        if (headerSize > EncoderUtil.BLOCK_HEADER_SIZE_MAX) {
             throw new UnsupportedOptionsException();
+        }
 
         // Block Header Size
-        buf[0] = (byte)(buf.length / 4);
+        buf[0] = (byte) (buf.length / 4);
 
         // Write the Block Header field to the output stream.
         out.write(buf);
@@ -101,12 +75,12 @@ class BlockOutputStream extends FinishableOutputStream {
         // Calculate the maximum allowed size of the Compressed Data field.
         // It is hard to exceed it so this is mostly to be pedantic.
         compressedSizeLimit = (EncoderUtil.VLI_MAX & ~3)
-                              - headerSize - check.getSize();
+                - headerSize - check.getSize();
     }
 
     public void write(int b) throws IOException {
         byte[] buf = new byte[1];
-        buf[0] = (byte)b;
+        buf[0] = (byte) b;
         write(buf, 0, 1);
     }
 
@@ -128,8 +102,9 @@ class BlockOutputStream extends FinishableOutputStream {
         validate();
 
         // Block Padding
-        for (long i = outCounted.getSize(); (i & 3) != 0; ++i)
+        for (long i = outCounted.getSize(); (i & 3) != 0; ++i) {
             out.write(0x00);
+        }
 
         // Check
         out.write(check.finish());
@@ -141,8 +116,9 @@ class BlockOutputStream extends FinishableOutputStream {
         // It is very hard to trigger this exception.
         // This is just to be pedantic.
         if (compressedSize < 0 || compressedSize > compressedSizeLimit
-                || uncompressedSize < 0)
+                || uncompressedSize < 0) {
             throw new XZIOException("XZ Stream has grown too big");
+        }
     }
 
     public long getUnpaddedSize() {

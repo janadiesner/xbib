@@ -32,7 +32,7 @@
 package org.xbib.elasticsearch;
 
 import org.testng.annotations.Test;
-import org.xbib.elasticsearch.support.client.MockBulkClient;
+import org.xbib.elasticsearch.support.client.bulk.MockBulkClient;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Property;

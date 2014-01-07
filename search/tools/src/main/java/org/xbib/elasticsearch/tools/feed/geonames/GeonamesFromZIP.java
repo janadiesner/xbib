@@ -31,8 +31,9 @@
  */
 package org.xbib.elasticsearch.tools.feed.geonames;
 
-import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.elasticsearch.support.client.BulkClient;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+
+import org.xbib.elasticsearch.support.client.bulk.BulkClient;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elasticsearch.tools.Feeder;
 import org.xbib.io.InputService;
@@ -51,7 +52,7 @@ import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Import geonames, UTF-8 tab-separated in ZIP
@@ -151,7 +152,7 @@ public class GeonamesFromZIP extends Feeder {
                         .field("dem", dem)
                         .field("timezone", timezone)
                         .endObject();
-                output.indexDocument(settings.get("index"), settings.get("type"), geonameid, builder.string());
+                output.index(settings.get("index"), settings.get("type"), geonameid, builder.bytes());
             }
         }
         zin.close();

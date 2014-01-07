@@ -42,13 +42,13 @@ public interface PipelineExecutor<P extends Pipeline> {
      * Prepare the pipeline execution.
      * @return this executor
      */
-    PipelineExecutor prepare();
+    PipelineExecutor prepare() throws IOException;
 
     /**
      * Execute the pipelines.
      * @return this executor
      */
-    PipelineExecutor execute();
+    PipelineExecutor execute() throws IOException;
 
     /**
      * Execute the pipelines.

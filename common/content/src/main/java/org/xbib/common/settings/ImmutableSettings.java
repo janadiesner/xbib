@@ -50,10 +50,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.xbib.common.unit.TimeValue;
 import org.xbib.io.stream.StreamInput;
 import org.xbib.io.stream.StreamOutput;
 import org.xbib.common.settings.loader.SettingsLoader;
 import org.xbib.common.settings.loader.SettingsLoaderFactory;
+
+import static org.xbib.common.unit.TimeValue.parseTimeValue;
 
 /**
  * An immutable implementation of {@link Settings}.
@@ -180,6 +183,11 @@ public class ImmutableSettings implements Settings {
             return defaultValue;
         }
         return !(value.equals("false") || value.equals("0") || value.equals("off") || value.equals("no"));
+    }
+
+    @Override
+    public TimeValue getAsTime(String setting, TimeValue defaultValue) {
+        return parseTimeValue(get(setting), defaultValue);
     }
 
     @Override

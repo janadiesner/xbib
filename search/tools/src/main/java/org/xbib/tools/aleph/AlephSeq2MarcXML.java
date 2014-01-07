@@ -105,7 +105,7 @@ public class AlephSeq2MarcXML extends Converter {
     }
 
     @Override
-    protected Converter prepare() {
+    protected Converter prepare() throws IOException {
         super.prepare();
         watcher = new BytesProgressWatcher(BUFFER_SIZE);
         return this;

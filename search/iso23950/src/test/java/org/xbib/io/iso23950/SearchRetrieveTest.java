@@ -49,6 +49,8 @@ public class SearchRetrieveTest {
 
     private final Logger logger = LoggerFactory.getLogger(SearchRetrieveTest.class.getName());
 
+    private final static ConnectionService<ZSession> service = ConnectionService.getInstance();
+
     @Test
     public void testSearchRetrieve() {
         String address = "z3950://z3950.copac.ac.uk:210";
@@ -61,10 +63,10 @@ public class SearchRetrieveTest {
         int length = 10;
         try {
             URI uri = URI.create(address);
-            Connection<Session> connection = ConnectionService.getInstance()
-                    .getFactory(uri)
+            Connection<ZSession> connection = service
+                    .getConnectionFactory(uri)
                     .getConnection(uri);
-            ZSession session = (ZSession) connection.createSession();
+            ZSession session = connection.createSession();
             ZClient client = session.newZClient();
             ZSearchRetrieveRequest searchRetrieve = client.newPQFSearchRetrieveRequest();
             searchRetrieve.setDatabase(Arrays.asList(database))

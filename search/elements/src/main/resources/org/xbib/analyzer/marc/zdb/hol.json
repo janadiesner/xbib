@@ -638,7 +638,7 @@
             "z" : "funding" /* Finanzierung des Bestandes */
         },
         "servicetype" : {
-                "a" : "interlibraryloan",
+                "a" : "interlibrary",
                 "b" : "none",
                 "c" : "unknown",
                 "m" : "loancode",
@@ -650,11 +650,11 @@
                 "b" : "copy",
                 "c" : "copy-loan",
                 "d" : "none",
-                "e" : "electronic"
+                "e" : "distribution-electronic"
         },
         "servicedistribution" : {
-                "a" : "domestic-only",
-                "b" : "postal-only"
+                "a" : "distribution-domestic-only",
+                "b" : "distribution-postal"
         },
         "funding" : {
                 "a" : "dfg",

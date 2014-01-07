@@ -54,7 +54,7 @@ import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
 import org.xbib.io.InputService;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.Pipeline;
-import org.xbib.io.file.Finder;
+import org.xbib.io.archivers.file.Finder;
 import org.xbib.tools.articles.SerialsDB;
 import org.xbib.util.URIUtil;
 import org.xbib.iri.IRI;

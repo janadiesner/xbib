@@ -1,0 +1,6 @@
+org.xbib.io.archivers.ar.ArConnectionFactory
+org.xbib.io.archivers.cpio.CpioConnectionFactory
+org.xbib.io.archivers.tar.TarConnectionFactory
+org.xbib.io.archivers.zip.ZipConnectionFactory
+org.xbib.io.archivers.jar.JarConnectionFactory
+org.xbib.io.archivers.file.FileConnectionFactory

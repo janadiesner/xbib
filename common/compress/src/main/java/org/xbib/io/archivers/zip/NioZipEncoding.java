@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
 package org.xbib.io.archivers.zip;
 
@@ -30,13 +12,12 @@ import java.nio.charset.CodingErrorAction;
 /**
  * A ZipEncoding, which uses a java.nio {@link
  * java.nio.charset.Charset Charset} to encode names.
- *
+ * <p/>
  * <p>This implementation works for all cases under java-1.5 or
  * later. However, in java-1.4, some charsets don't have a java.nio
  * implementation, most notably the default ZIP encoding Cp437.</p>
- * 
+ * <p/>
  * <p>The methods of this class are reentrant.</p>
- * @Immutable
  */
 class NioZipEncoding implements ZipEncoding {
     private final Charset charset;
@@ -44,7 +25,7 @@ class NioZipEncoding implements ZipEncoding {
     /**
      * Construct an NIO based zip encoding, which wraps the given
      * charset.
-     * 
+     *
      * @param charset The NIO charset to wrap.
      */
     public NioZipEncoding(Charset charset) {
@@ -67,10 +48,10 @@ class NioZipEncoding implements ZipEncoding {
 
         CharBuffer cb = CharBuffer.wrap(name);
         ByteBuffer out = ByteBuffer.allocate(name.length()
-                                             + (name.length() + 1) / 2);
+                + (name.length() + 1) / 2);
 
         while (cb.remaining() > 0) {
-            CoderResult res = enc.encode(cb, out,true);
+            CoderResult res = enc.encode(cb, out, true);
 
             if (res.isUnmappable() || res.isMalformed()) {
 
@@ -78,11 +59,11 @@ class NioZipEncoding implements ZipEncoding {
                 // pseudo-URL encoding style to ByteBuffer.
                 if (res.length() * 6 > out.remaining()) {
                     out = ZipEncodingHelper.growBuffer(out, out.position()
-                                                       + res.length() * 6);
+                            + res.length() * 6);
                 }
 
-                for (int i=0; i<res.length(); ++i) {
-                    ZipEncodingHelper.appendSurrogate(out,cb.get());
+                for (int i = 0; i < res.length(); ++i) {
+                    ZipEncodingHelper.appendSurrogate(out, cb.get());
                 }
 
             } else if (res.isOverflow()) {
@@ -104,8 +85,8 @@ class NioZipEncoding implements ZipEncoding {
 
     public String decode(byte[] data) throws IOException {
         return this.charset.newDecoder()
-            .onMalformedInput(CodingErrorAction.REPORT)
-            .onUnmappableCharacter(CodingErrorAction.REPORT)
-            .decode(ByteBuffer.wrap(data)).toString();
+                .onMalformedInput(CodingErrorAction.REPORT)
+                .onUnmappableCharacter(CodingErrorAction.REPORT)
+                .decode(ByteBuffer.wrap(data)).toString();
     }
 }

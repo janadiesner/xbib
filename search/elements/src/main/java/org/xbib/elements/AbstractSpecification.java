@@ -84,6 +84,7 @@ public abstract class AbstractSpecification {
             throws IOException, ClassNotFoundException, InstantiationException,
             IllegalAccessException, NoSuchMethodException, IllegalArgumentException,
             InvocationTargetException {
+        logger.info("initializing spec from {}", path + format + ".json");
         InputStream resource = loadResource(cl, path + format + ".json");
         if (resource == null) {
             String msg = "format " + format + " not found: " + path + format + ".json";
@@ -142,13 +143,21 @@ public abstract class AbstractSpecification {
                     }
                     if (clazz != null) {
                         Method factoryMethod = clazz.getDeclaredMethod("getInstance");
-                        try {
-                            element = (Element) factoryMethod.invoke(null);
-                        } catch (ClassCastException e) {
-                            logger.error("not an org.xbib.elements.Element class: " + clazz.getName());
+                        if (factoryMethod == null) {
+                            logger.error("no 'getInstance' method declared in {}" + clazz.getName());
+                        } else {
+                            try {
+                                element = (Element) factoryMethod.invoke(null);
+                            } catch (NullPointerException e) {
+                                logger.error("'getInstance' method declared not static in {}" + clazz.getName());
+                            } catch (ClassCastException e) {
+                                logger.error("not an org.xbib.elements.Element class: " + clazz.getName());
+                            }
                         }
-                        // set settings
-                        element.setSettings(struct);
+                        if (element != null) {
+                            // set settings
+                            element.setSettings(struct);
+                        }
                     }
                 }
             }
@@ -166,8 +175,7 @@ public abstract class AbstractSpecification {
         int pos = value != null ? value.indexOf('$') : 0;
         String h = pos > 0 ? value.substring(0,pos) : null;
         String t = pos > 0 ? value.substring(pos+1) : value;
-        Element e = getElement(h, t, map);
-        return e;
+        return getElement(h, t, map);
     }
 
     private Element getElement(String head, String tail, Map map) {

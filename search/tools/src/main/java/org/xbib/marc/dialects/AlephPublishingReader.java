@@ -57,6 +57,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.xbib.io.ConnectionFactory;
 import org.xbib.pipeline.AbstractPipeline;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
@@ -74,17 +75,20 @@ public class AlephPublishingReader extends AbstractPipeline<CounterElement>
         implements MarcXchangeListener {
 
     private final static Logger logger = LoggerFactory.getLogger(AlephPublishingReader.class.getName());
-    private XMLInputFactory factory = XMLInputFactory.newInstance();
+
+    private final XMLInputFactory factory = XMLInputFactory.newInstance();
+
+    private final ConnectionService<SQLSession> service = ConnectionService.getInstance();
 
     private final DecimalFormat df = new DecimalFormat("000000000");
+
+    private final CounterElement sysNumber = new CounterElement().set(new AtomicLong(0L));
 
     private final static int CLOB_BUF_SIZE = 8192;
 
     private URI uri;
 
     private Iterator<Long> iterator;
-
-    private CounterElement sysNumber = new CounterElement().set(new AtomicLong(0L));
 
     private String library;
 
@@ -439,8 +443,8 @@ public class AlephPublishingReader extends AbstractPipeline<CounterElement>
     }
 
     private void createSession() throws IOException {
-        this.connection = ConnectionService.getInstance()
-                .getFactory(uri)
+        this.connection = service
+                .getConnectionFactory(uri)
                 .getConnection(uri);
         this.session = connection.createSession();
         session.open(Session.Mode.READ);

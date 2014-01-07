@@ -432,7 +432,7 @@ public class SequentialCharStream extends Reader implements CharStream {
             }
             for (int charPos = pos; charPos < count; charPos++) {
                 char ch = buf[charPos];
-                if (isSeperator(ch)) {
+                if (isSeparator(ch)) {
                     String res = new String(buf, pos, charPos - pos);
                     if (listener != null) {
                         if (res.length() > 0) {
@@ -450,7 +450,7 @@ public class SequentialCharStream extends Reader implements CharStream {
             pos = count;
             while (true) {
                 if (pos >= count) {
-                    if (isSeperator(eod)) {
+                    if (isSeparator(eod)) {
                         String s = result.toString();
                         if (listener != null) {
                             listener.data(s);
@@ -471,7 +471,7 @@ public class SequentialCharStream extends Reader implements CharStream {
                 }
                 for (int charPos = pos; charPos < count; charPos++) {
                     if (eod == '\0') {
-                        if (isSeperator(buf[charPos])) {
+                        if (isSeparator(buf[charPos])) {
                             eod = buf[charPos];
                         }
                     } else {
@@ -536,7 +536,7 @@ public class SequentialCharStream extends Reader implements CharStream {
         return buf == null;
     }
 
-    private boolean isSeperator(char ch) {
+    private boolean isSeparator(char ch) {
         return ch == Separator.FS || ch == Separator.GS || ch == Separator.RS || ch == Separator.US;
     }
 

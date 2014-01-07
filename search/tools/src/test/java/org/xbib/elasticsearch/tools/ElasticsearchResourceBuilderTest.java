@@ -2,7 +2,7 @@ package org.xbib.elasticsearch.tools;
 
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.xbib.elasticsearch.ResourceSink;
-import org.xbib.elasticsearch.support.client.MockBulkClient;
+import org.xbib.elasticsearch.support.client.bulk.MockBulkClient;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilder;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilderFactory;
 import org.xbib.elements.marc.dialects.mab.MABElementMapper;

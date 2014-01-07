@@ -1,30 +1,13 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-package org.xbib.io.archivers.cpio;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
+package org.xbib.io.archivers.cpio;
 
 import org.xbib.io.archivers.ArchiveEntry;
 import org.xbib.io.archivers.ArchiveInputStream;
 import org.xbib.io.archivers.ArchiveUtils;
+
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * CPIOArchiveInputStream is a stream for reading cpio streams. All formats of
@@ -44,7 +27,7 @@ import org.xbib.io.archivers.ArchiveUtils;
  * while ((cpioEntry = cpioIn.getNextEntry()) != null) {
  *     System.out.println(cpioEntry.getName());
  *     int tmp;
- *     StringBuffer buf = new StringBuffer();
+ *     StringBuilder buf = new StringBuilder();
  *     while ((tmp = cpIn.read()) != -1) {
  *         buf.append((char) tmp);
  *     }
@@ -54,10 +37,6 @@ import org.xbib.io.archivers.ArchiveUtils;
  * </pre></code>
  * <p/>
  * Note: This implementation should be compatible to cpio 2.5
- * 
- * This class uses mutable fields and is not considered to be threadsafe.
- * 
- * Based on code from the jRPM project (jrpm.sourceforge.net)
  */
 
 public class CpioArchiveInputStream extends ArchiveInputStream implements
@@ -79,9 +58,8 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
 
     /**
      * Construct the cpio input stream
-     * 
-     * @param in
-     *            The cpio stream
+     *
+     * @param in The cpio stream
      */
     public CpioArchiveInputStream(final InputStream in) {
         this.in = in;
@@ -93,11 +71,10 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
      * <p/>
      * Programs should not count on this method to return the actual number of
      * bytes that could be read without blocking.
-     * 
+     *
      * @return 1 before EOF and 0 after EOF has reached for current entry.
-     * @throws java.io.IOException
-     *             if an I/O error has occurred or if a CPIO file error has
-     *             occurred
+     * @throws java.io.IOException if an I/O error has occurred or if a CPIO file error has
+     *                             occurred
      */
     @Override
     public int available() throws IOException {
@@ -110,9 +87,8 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
 
     /**
      * Closes the CPIO input stream.
-     * 
-     * @throws java.io.IOException
-     *             if an I/O error has occurred
+     *
+     * @throws java.io.IOException if an I/O error has occurred
      */
     @Override
     public void close() throws IOException {
@@ -125,14 +101,13 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
     /**
      * Closes the current CPIO entry and positions the stream for reading the
      * next entry.
-     * 
-     * @throws java.io.IOException
-     *             if an I/O error has occurred or if a CPIO file error has
-     *             occurred
+     *
+     * @throws java.io.IOException if an I/O error has occurred or if a CPIO file error has
+     *                             occurred
      */
     private void closeEntry() throws IOException {
         ensureOpen();
-        while (read(this.tmpbuf, 0, this.tmpbuf.length) != -1) { // NOPMD
+        while (read(this.tmpbuf, 0, this.tmpbuf.length) != -1) {
             // do nothing
         }
 
@@ -141,24 +116,22 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
 
     /**
      * Check to make sure that this stream has not been closed
-     * 
-     * @throws java.io.IOException
-     *             if the stream is already closed
+     *
+     * @throws java.io.IOException if the stream is already closed
      */
     private void ensureOpen() throws IOException {
         if (this.closed) {
-            throw new IOException("Stream closed");
+            throw new IOException("stream closed");
         }
     }
 
     /**
      * Reads the next CPIO file entry and positions stream at the beginning of
      * the entry data.
-     * 
+     *
      * @return the CPIOArchiveEntry just read
-     * @throws java.io.IOException
-     *             if an I/O error has occurred or if a CPIO file error has
-     *             occurred
+     * @throws java.io.IOException if an I/O error has occurred or if a CPIO file error has
+     *                             occurred
      */
     public CpioArchiveEntry getNextCPIOEntry() throws IOException {
         ensureOpen();
@@ -201,7 +174,7 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         return this.entry;
     }
 
-    private void skip(int bytes) throws IOException{
+    private void skip(int bytes) throws IOException {
         final byte[] buff = new byte[4]; // Cannot be more than 3 bytes
         if (bytes > 0) {
             readFully(buff, 0, bytes);
@@ -211,18 +184,14 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
     /**
      * Reads from the current CPIO entry into an array of bytes. Blocks until
      * some input is available.
-     * 
-     * @param b
-     *            the buffer into which the data is read
-     * @param off
-     *            the start offset of the data
-     * @param len
-     *            the maximum number of bytes read
+     *
+     * @param b   the buffer into which the data is read
+     * @param off the start offset of the data
+     * @param len the maximum number of bytes read
      * @return the actual number of bytes read, or -1 if the end of the entry is
-     *         reached
-     * @throws java.io.IOException
-     *             if an I/O error has occurred or if a CPIO file error has
-     *             occurred
+     * reached
+     * @throws java.io.IOException if an I/O error has occurred or if a CPIO file error has
+     *                             occurred
      */
     @Override
     public int read(final byte[] b, final int off, final int len)
@@ -237,17 +206,17 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         if (this.entry == null || this.entryEOF) {
             return -1;
         }
-        if (this.entryBytesRead == this.entry.getSize()) {
+        if (this.entryBytesRead == this.entry.getEntrySize()) {
             skip(entry.getDataPadCount());
             this.entryEOF = true;
             if (this.entry.getFormat() == FORMAT_NEW_CRC
-                && this.crc != this.entry.getChksum()) {
+                    && this.crc != this.entry.getChksum()) {
                 throw new IOException("CRC Error. Occured at byte: "
-                                      + getBytesRead());
+                        + getBytesRead());
             }
             return -1; // EOF for this entry
         }
-        int tmplength = (int) Math.min(len, this.entry.getSize()
+        int tmplength = (int) Math.min(len, this.entry.getEntrySize()
                 - this.entryBytesRead);
         if (tmplength < 0) {
             return -1;
@@ -264,7 +233,7 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         return tmpread;
     }
 
-    private final int readFully(final byte[] b, final int off, final int len)
+    private int readFully(final byte[] b, final int off, final int len)
             throws IOException {
         if (len < 0) {
             throw new IndexOutOfBoundsException();
@@ -306,14 +275,14 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
 
         ret.setInode(readAsciiLong(8, 16));
         long mode = readAsciiLong(8, 16);
-        if (mode != 0){ // mode is initialised to 0
+        if (mode != 0) { // mode is initialised to 0
             ret.setMode(mode);
         }
         ret.setUID(readAsciiLong(8, 16));
         ret.setGID(readAsciiLong(8, 16));
         ret.setNumberOfLinks(readAsciiLong(8, 16));
         ret.setTime(readAsciiLong(8, 16));
-        ret.setSize(readAsciiLong(8, 16));
+        ret.setEntrySize(readAsciiLong(8, 16));
         ret.setDeviceMaj(readAsciiLong(8, 16));
         ret.setDeviceMin(readAsciiLong(8, 16));
         ret.setRemoteDeviceMaj(readAsciiLong(8, 16));
@@ -322,8 +291,8 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         ret.setChksum(readAsciiLong(8, 16));
         String name = readCString((int) namesize);
         ret.setName(name);
-        if (mode == 0 && !name.equals(CPIO_TRAILER)){
-            throw new IOException("Mode 0 only allowed in the trailer. Found entry name: "+name + " Occured at byte: " + getBytesRead());
+        if (mode == 0 && !name.equals(CPIO_TRAILER)) {
+            throw new IOException("Mode 0 only allowed in the trailer. Found entry name: " + name + " Occured at byte: " + getBytesRead());
         }
         skip(ret.getHeaderPadCount());
 
@@ -345,11 +314,11 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         ret.setRemoteDevice(readAsciiLong(6, 8));
         ret.setTime(readAsciiLong(11, 8));
         long namesize = readAsciiLong(6, 8);
-        ret.setSize(readAsciiLong(11, 8));
+        ret.setEntrySize(readAsciiLong(11, 8));
         final String name = readCString((int) namesize);
         ret.setName(name);
-        if (mode == 0 && !name.equals(CPIO_TRAILER)){
-            throw new IOException("Mode 0 only allowed in the trailer. Found entry: "+ name + " Occured at byte: " + getBytesRead());
+        if (mode == 0 && !name.equals(CPIO_TRAILER)) {
+            throw new IOException("Mode 0 only allowed in the trailer. Found entry: " + name + " Occured at byte: " + getBytesRead());
         }
 
         return ret;
@@ -362,7 +331,7 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         ret.setDevice(readBinaryLong(2, swapHalfWord));
         ret.setInode(readBinaryLong(2, swapHalfWord));
         final long mode = readBinaryLong(2, swapHalfWord);
-        if (mode != 0){
+        if (mode != 0) {
             ret.setMode(mode);
         }
         ret.setUID(readBinaryLong(2, swapHalfWord));
@@ -371,11 +340,11 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         ret.setRemoteDevice(readBinaryLong(2, swapHalfWord));
         ret.setTime(readBinaryLong(4, swapHalfWord));
         long namesize = readBinaryLong(2, swapHalfWord);
-        ret.setSize(readBinaryLong(4, swapHalfWord));
+        ret.setEntrySize(readBinaryLong(4, swapHalfWord));
         final String name = readCString((int) namesize);
         ret.setName(name);
-        if (mode == 0 && !name.equals(CPIO_TRAILER)){
-            throw new IOException("Mode 0 only allowed in the trailer. Found entry: "+name + "Occured at byte: " + getBytesRead());
+        if (mode == 0 && !name.equals(CPIO_TRAILER)) {
+            throw new IOException("Mode 0 only allowed in the trailer. Found entry: " + name + "Occured at byte: " + getBytesRead());
         }
         skip(ret.getHeaderPadCount());
 
@@ -390,14 +359,11 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
 
     /**
      * Skips specified number of bytes in the current CPIO entry.
-     * 
-     * @param n
-     *            the number of bytes to skip
+     *
+     * @param n the number of bytes to skip
      * @return the actual number of bytes skipped
-     * @throws java.io.IOException
-     *             if an I/O error has occurred
-     * @throws IllegalArgumentException
-     *             if n < 0
+     * @throws java.io.IOException      if an I/O error has occurred
+     * @throws IllegalArgumentException if n < 0
      */
     @Override
     public long skip(final long n) throws IOException {
@@ -423,7 +389,6 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         return total;
     }
 
-    /** {@inheritDoc} */
     @Override
     public ArchiveEntry getNextEntry() throws IOException {
         return getNextCPIOEntry();
@@ -431,15 +396,15 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
 
     /**
      * Checks if the signature matches one of the following magic values:
-     * 
+     * <p/>
      * Strings:
-     *
+     * <p/>
      * "070701" - MAGIC_NEW
      * "070702" - MAGIC_NEW_CRC
      * "070707" - MAGIC_OLD_ASCII
-     * 
+     * <p/>
      * Octal Binary value:
-     * 
+     * <p/>
      * 070707 - MAGIC_OLD_BINARY (held as a short) = 0x71C7 or 0xC771
      */
     public static boolean matches(byte[] signature, int length) {

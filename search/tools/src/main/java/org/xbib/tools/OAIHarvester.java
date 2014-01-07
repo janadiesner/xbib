@@ -35,8 +35,8 @@ import org.xbib.io.Connection;
 import org.xbib.io.NullWriter;
 import org.xbib.io.Packet;
 import org.xbib.io.Session;
-import org.xbib.io.archivers.TarConnectionFactory;
-import org.xbib.io.archivers.TarSession;
+import org.xbib.io.archivers.tar.TarConnectionFactory;
+import org.xbib.io.archivers.tar.TarSession;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.OAIClient;
@@ -83,9 +83,9 @@ public abstract class OAIHarvester extends Converter {
         if (inputs == null) {
             throw new IllegalArgumentException("no input given");
         }
-        this.input = newConcurrentLinkedQueue();
+        input = newConcurrentLinkedQueue();
         for (String uri : inputs) {
-            this.input.offer(URI.create(uri));
+            input.offer(URI.create(uri));
         }
         String output = settings.get("output");
         try {
@@ -101,6 +101,7 @@ public abstract class OAIHarvester extends Converter {
 
     public OAIHarvester run() throws Exception {
         super.run();
+        logger.info("closing output");
         session.close();
         return this;
     }

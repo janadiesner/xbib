@@ -1,27 +1,9 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package org.xbib.io.archivers.dump;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.Arrays;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -29,9 +11,7 @@ import java.util.zip.Inflater;
 
 /**
  * Filter stream that mimics a physical tape drive capable of compressing
- * the data stream.
- *
- * @NotThreadSafe
+ * the data stream
  */
 class TapeInputStream extends FilterInputStream {
     private byte[] blockBuffer = new byte[DumpArchiveConstants.TP_SIZE];
@@ -54,17 +34,13 @@ class TapeInputStream extends FilterInputStream {
      * dump archive's actual block size since compression is handled at the
      * block level.
      *
-     * @param recsPerBlock
-     *            records per block
-     * @param isCompressed
-     *            true if the archive is compressed
-     * @throws java.io.IOException
-     *             more than one block has been read
-     * @throws java.io.IOException
-     *             there was an error reading additional blocks.
+     * @param recsPerBlock records per block
+     * @param isCompressed true if the archive is compressed
+     * @throws java.io.IOException more than one block has been read
+     * @throws java.io.IOException there was an error reading additional blocks.
      */
     public void resetBlockSize(int recsPerBlock, boolean isCompressed)
-        throws IOException {
+            throws IOException {
         this.isCompressed = isCompressed;
 
         blockSize = recordSize * recsPerBlock;
@@ -99,24 +75,22 @@ class TapeInputStream extends FilterInputStream {
     @Override
     public int read() throws IOException {
         throw new IllegalArgumentException(
-            "all reads must be multiple of record size (" + recordSize +
-            " bytes.");
+                "all reads must be multiple of record size (" + recordSize +
+                        " bytes.");
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * <p>reads the full given length unless EOF is reached.</p> 
+     * <p>reads the full given length unless EOF is reached.</p>
      *
      * @param len length to read, must be a multiple of the stream's
-     * record size
+     *            record size
      */
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         if ((len % recordSize) != 0) {
             throw new IllegalArgumentException(
-                "all reads must be multiple of record size (" + recordSize +
-                " bytes.");
+                    "all reads must be multiple of record size (" + recordSize +
+                            " bytes.");
         }
 
         int bytes = 0;
@@ -151,18 +125,18 @@ class TapeInputStream extends FilterInputStream {
 
     /**
      * Skip bytes. Same as read but without the arraycopy.
-     *
-     * <p>skips the full given length unless EOF is reached.</p> 
+     * <p/>
+     * <p>skips the full given length unless EOF is reached.</p>
      *
      * @param len length to read, must be a multiple of the stream's
-     * record size
+     *            record size
      */
     @Override
     public long skip(long len) throws IOException {
         if ((len % recordSize) != 0) {
             throw new IllegalArgumentException(
-                "all reads must be multiple of record size (" + recordSize +
-                " bytes.");
+                    "all reads must be multiple of record size (" + recordSize +
+                            " bytes.");
         }
 
         long bytes = 0;
@@ -248,7 +222,7 @@ class TapeInputStream extends FilterInputStream {
      * Read next block. All decompression is handled here.
      *
      * @param decompress if false the buffer will not be decompressed.
-     *        This is an optimization for longer seeks.
+     *                   This is an optimization for longer seeks.
      * @return false if End-Of-File, else true
      */
     private boolean readBlock(boolean decompress) throws IOException {
@@ -288,35 +262,35 @@ class TapeInputStream extends FilterInputStream {
                     Arrays.fill(blockBuffer, (byte) 0);
                 } else {
                     switch (DumpArchiveConstants.COMPRESSION_TYPE.find(flags &
-                        0x03)) {
-                    case ZLIB:
+                            0x03)) {
+                        case ZLIB:
 
-                        try {
-                            Inflater inflator = new Inflater();
-                            inflator.setInput(compBuffer, 0, compBuffer.length);
-                            length = inflator.inflate(blockBuffer);
+                            try {
+                                Inflater inflator = new Inflater();
+                                inflator.setInput(compBuffer, 0, compBuffer.length);
+                                length = inflator.inflate(blockBuffer);
 
-                            if (length != blockSize) {
-                                throw new ShortFileException();
+                                if (length != blockSize) {
+                                    throw new ShortFileException();
+                                }
+
+                                inflator.end();
+                            } catch (DataFormatException e) {
+                                throw new DumpArchiveException("bad data", e);
                             }
 
-                            inflator.end();
-                        } catch (DataFormatException e) {
-                            throw new DumpArchiveException("bad data", e);
-                        }
+                            break;
 
-                        break;
+                        case BZLIB:
+                            throw new UnsupportedCompressionAlgorithmException(
+                                    "BZLIB2");
 
-                    case BZLIB:
-                        throw new UnsupportedCompressionAlgorithmException(
-                            "BZLIB2");
+                        case LZO:
+                            throw new UnsupportedCompressionAlgorithmException(
+                                    "LZO");
 
-                    case LZO:
-                        throw new UnsupportedCompressionAlgorithmException(
-                            "LZO");
-
-                    default:
-                        throw new UnsupportedCompressionAlgorithmException();
+                        default:
+                            throw new UnsupportedCompressionAlgorithmException();
                     }
                 }
             }
@@ -332,7 +306,7 @@ class TapeInputStream extends FilterInputStream {
      * Read buffer
      */
     private boolean readFully(byte[] b, int off, int len)
-        throws IOException {
+            throws IOException {
         int count = 0;
 
         while (count < len) {

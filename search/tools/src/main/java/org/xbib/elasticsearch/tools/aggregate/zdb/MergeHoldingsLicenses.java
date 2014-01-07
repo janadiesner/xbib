@@ -31,13 +31,13 @@
  */
 package org.xbib.elasticsearch.tools.aggregate.zdb;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
 import java.util.Date;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -51,16 +51,16 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 import org.xbib.common.settings.Settings;
+import org.xbib.elasticsearch.tools.aggregate.zdb.entities.BibdatLookup;
 import org.xbib.util.DateUtil;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.IngestClient;
-import org.xbib.elasticsearch.support.client.SearchClient;
+import org.xbib.elasticsearch.support.client.ingest.IngestClient;
+import org.xbib.elasticsearch.support.client.search.SearchClient;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Manifestation;
 import org.xbib.pipeline.ElementQueuePipelineExecutor;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.util.Strings;
-import org.xbib.util.URIUtil;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.elasticsearch.tools.aggregate.WrappedSearchHit;
@@ -89,10 +89,6 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
 
     private Ingest ingest;
 
-    private URI sourceURI;
-
-    private URI targetURI;
-
     private String sourceTitleIndex;
 
     private String sourceTitleType;
@@ -103,11 +99,9 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
 
     private String identifier;
 
-    private Reader reader;
-
-    private Writer writer;
-
     private static Settings settings;
+
+    private static BibdatLookup bibdatLookup;
 
     public static void main(String[] args) {
         try {
@@ -125,7 +119,6 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
     private MergeHoldingsLicenses() {}
 
     public MergeHoldingsLicenses reader(Reader reader) {
-        this.reader = reader;
         settings = settingsBuilder().loadFromReader(reader).build();
         return this;
     }
@@ -136,15 +129,14 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
     }
 
     public MergeHoldingsLicenses writer(Writer writer) {
-        this.writer = writer;
         return this;
     }
 
     public MergeHoldingsLicenses run() throws Exception {
-        this.sourceURI = URI.create(settings.get("source"));
-        Map<String,String> params = URIUtil.parseQueryString(sourceURI);
-        this.sourceTitleIndex = params.get("bibIndex");
-        this.sourceTitleType = params.get("bibType");
+
+        URI sourceURI = URI.create(settings.get("source"));
+        this.sourceTitleIndex = settings.get("bibIndex");
+        this.sourceTitleType = settings.get("bibType");
         if (Strings.isNullOrEmpty(sourceTitleIndex)) {
             throw new IllegalArgumentException("no bibIndex parameter given");
         }
@@ -152,22 +144,23 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
             throw new IllegalArgumentException("no bibType parameter given");
         }
 
-        this.targetURI = URI.create(settings.get("target"));
+        URI targetURI = URI.create(settings.get("target"));
 
         SearchClient search = new SearchClient().newClient(sourceURI);
         this.service = this;
         this.client = search.client();
-        this.size = settings.getAsInt("scansize", 10);
-        this.millis = settings.getAsLong("scanmillis", 3600000L);
+        this.size = settings.getAsInt("scrollSize", 10);
+        this.millis = settings.getAsTime("scrollTimeout", org.xbib.common.unit.TimeValue.timeValueSeconds(60)).millis();
         this.identifier = settings.get("identifier");
 
         this.ingest = new IngestClient()
-                .maxActionsPerBulkRequest(settings.getAsInt("maxbulkactions", 100))
+                .maxActionsPerBulkRequest(settings.getAsInt("maxBulkActions", 100))
                 .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests", 16))
-                .setIndex(URIUtil.parseQueryString(targetURI).get("index"))
+                .setIndex(settings.get("index"))
                 .setting(MergeHoldingsLicenses.class.getResourceAsStream("transport-client-settings.json"))
                 .newClient(targetURI)
                 .waitForCluster()
+                        // TODO create settings/mappings
                         //.setting(MergeWithLicenses.class.getResourceAsStream("index-settings.json"))
                         //.mapping("works", MergeWithLicenses.class.getResourceAsStream("works.json"))
                         //.mapping("manifestations", MergeWithLicenses.class.getResourceAsStream("manifestations.json"))
@@ -178,7 +171,6 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
                 .replica(settings.getAsInt("replica",0))
                 .startBulk();
 
-        super.prepare();
         super.provider(new PipelineProvider<MergeHoldingsLicensesPipeline>() {
             int i = 0;
 
@@ -188,6 +180,8 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
             }
         });
         super.concurrency(settings.getAsInt("concurrency", 1));
+
+        this.prepare();
         this.execute();
 
         logger.info("merge shutdown in progress");
@@ -210,7 +204,17 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
     }
 
     @Override
-    public MergeHoldingsLicenses execute() {
+    public MergeHoldingsLicenses prepare() throws IOException {
+        super.prepare();
+        logger.info("preparing bibdat lookup...");
+        bibdatLookup = new BibdatLookup();
+        bibdatLookup.buildLookup(client, "bibdat");
+        logger.info("bibdat prepared");
+        return this;
+    }
+
+    @Override
+    public MergeHoldingsLicenses execute() throws IOException {
         // execute merge pipelines
         super.execute();
         if (logger.isDebugEnabled()) {
@@ -289,6 +293,10 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
         return manifestations;
     }
 
+    public BibdatLookup bibdatLookup() {
+        return bibdatLookup;
+    }
+
     public Client client() {
         return client;
     }
@@ -297,12 +305,8 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
         return ingest;
     }
 
-    public URI sourceURI() {
-        return sourceURI;
-    }
-
-    public URI targetURI() {
-        return targetURI;
+    public Settings settings() {
+        return settings;
     }
 
     public int size() {

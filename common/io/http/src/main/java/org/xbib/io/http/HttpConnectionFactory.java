@@ -42,6 +42,10 @@ import java.net.URI;
  */
 public final class HttpConnectionFactory implements ConnectionFactory<HttpSession> {
 
+    public String getName() {
+        return "http";
+    }
+
     /**
      * Get HTTP connection
      *

@@ -52,7 +52,7 @@ import java.util.zip.GZIPOutputStream;
 
 import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
 import org.xbib.io.InputService;
-import org.xbib.io.file.Finder;
+import org.xbib.io.archivers.file.Finder;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -130,66 +130,61 @@ public class ArticleDB extends Converter {
     }
 
     @Override
-    protected Converter prepare() {
+    protected Converter prepare() throws IOException {
         super.prepare();
+        Queue<URI> input = new Finder(settings.get("serials"))
+                .find(settings.get("path"))
+                .getURIs();
+        logger.info("parsing initial set of serials...");
+        SerialsDB serialsdb = new SerialsDB();
+        serialsdb.settings(settings);
+        serialsdb.input(input);
         try {
-            Queue<URI> input = new Finder(settings.get("serials"))
-                    .find(settings.get("path"))
-                    .getURIs();
-            logger.info("parsing initial set of serials...");
-            SerialsDB serialsdb = new SerialsDB();
-            serialsdb.settings(settings);
-            serialsdb.input(input);
-            try {
-                serialsdb.run();
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
-            serials = serialsdb.getMap();
-            logger.info("serials done, size = {}", serials.size());
-            String outputFilename = settings.get("output");
-            FileOutputStream fout = new FileOutputStream(outputFilename + ".ttl.gz");
-            gzout = new GZIPOutputStream(fout){
-                {
-                    def.setLevel(Deflater.BEST_COMPRESSION);
-                }
-            };
-            final TurtleWriter writer = new TurtleWriter()
-                    .setContext(context)
-                    .output(gzout);
-            writer.writeNamespaces();
-            serializer = writer;
-
-            FileOutputStream errorfout = new FileOutputStream(outputFilename + "-errors.ttl.gz");
-            errorgzout = new GZIPOutputStream(errorfout){
-                {
-                    def.setLevel(Deflater.BEST_COMPRESSION);
-                }
-            };
-            final TurtleWriter errorWriter = new TurtleWriter()
-                    .setContext(context)
-                    .output(errorgzout);
-            errorWriter.writeNamespaces();
-            errorSerializer = errorWriter;
-
-            FileOutputStream noserialfout = new FileOutputStream(outputFilename + "-without-serial.ttl.gz");
-            noserialgzout = new GZIPOutputStream(noserialfout){
-                {
-                    def.setLevel(Deflater.BEST_COMPRESSION);
-                }
-            };
-            final TurtleWriter noserialWriter = new TurtleWriter()
-                    .setContext(context)
-                    .output(noserialgzout);
-            noserialWriter.writeNamespaces();
-            missingSerializer = noserialWriter;
-
-            // extra text file for missing serials
-            missingserials = new FileWriter("missingserials.txt");
-
-        } catch (IOException e) {
+            serialsdb.run();
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+        serials = serialsdb.getMap();
+        logger.info("serials done, size = {}", serials.size());
+        String outputFilename = settings.get("output");
+        FileOutputStream fout = new FileOutputStream(outputFilename + ".ttl.gz");
+        gzout = new GZIPOutputStream(fout){
+            {
+                def.setLevel(Deflater.BEST_COMPRESSION);
+            }
+        };
+        final TurtleWriter writer = new TurtleWriter()
+                .setContext(context)
+                .output(gzout);
+        writer.writeNamespaces();
+        serializer = writer;
+
+        FileOutputStream errorfout = new FileOutputStream(outputFilename + "-errors.ttl.gz");
+        errorgzout = new GZIPOutputStream(errorfout){
+            {
+                def.setLevel(Deflater.BEST_COMPRESSION);
+            }
+        };
+        final TurtleWriter errorWriter = new TurtleWriter()
+                .setContext(context)
+                .output(errorgzout);
+        errorWriter.writeNamespaces();
+        errorSerializer = errorWriter;
+
+        FileOutputStream noserialfout = new FileOutputStream(outputFilename + "-without-serial.ttl.gz");
+        noserialgzout = new GZIPOutputStream(noserialfout){
+            {
+                def.setLevel(Deflater.BEST_COMPRESSION);
+            }
+        };
+        final TurtleWriter noserialWriter = new TurtleWriter()
+                .setContext(context)
+                .output(noserialgzout);
+        noserialWriter.writeNamespaces();
+        missingSerializer = noserialWriter;
+
+        // extra text file for missing serials
+        missingserials = new FileWriter("missingserials.txt");
         return this;
     }
 

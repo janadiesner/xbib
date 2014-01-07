@@ -92,13 +92,9 @@ public final class BibdatZDB extends Converter {
         };
     }
 
-    protected BibdatZDB prepare() {
+    protected BibdatZDB prepare() throws IOException {
         super.prepare();
-        try {
-            out.init(settings.get("output", "bibdat.nt"));
-        } catch (IOException e) {
-            logger.error("error while setting output", e);
-        }
+        out.init(settings.get("output", "bibdat.nt"));
         return this;
     }
 

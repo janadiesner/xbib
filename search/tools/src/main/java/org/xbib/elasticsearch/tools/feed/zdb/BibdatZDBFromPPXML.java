@@ -99,7 +99,7 @@ public final class BibdatZDBFromPPXML extends Feeder {
     }
 
     @Override
-    protected BibdatZDBFromPPXML prepare() {
+    protected BibdatZDBFromPPXML prepare() throws IOException {
         super.prepare();
         logger.info("got settings {}", settings.getAsMap());
         out.setIndex(settings.get("index"));

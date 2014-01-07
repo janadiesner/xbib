@@ -31,13 +31,11 @@
  */
 package org.xbib.util;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -65,16 +63,15 @@ public final class URIUtil {
      * This method adds a single key/value parameter to the query
      * string of a given URI. Existing keys will be overwritten.
      *
-     * @param uri
-     * @param key
-     * @param value
-     * @param encoding
-     * @return uri
-     * @throws UnsupportedEncodingException
+     * @param uri the URI
+     * @param key the key
+     * @param value the value
+     * @param encoding the encoding
+     * @return the URI
      * @throws URISyntaxException
      */
     public static URI addParameter(URI uri, String key, String value, Charset encoding)
-            throws UnsupportedEncodingException, URISyntaxException {
+            throws URISyntaxException {
         Map<String, String> m = parseQueryString(uri, encoding);
         m.put(key, value);
         String query = renderQueryString(m);
@@ -85,28 +82,27 @@ public final class URIUtil {
      * This method adds a map of key/value parameters to the query
      * string of a given URI. Existing keys will be overwritten.
      *
-     * @param uri
-     * @param m
-     * @param encoding
+     * @param uri the URI
+     * @param map the map
+     * @param encoding the encoding
      * @return the URI
-     * @throws UnsupportedEncodingException
      * @throws URISyntaxException
      */
-    public static URI addParameter(URI uri, Map<String, String> m, Charset encoding)
+    public static URI addParameter(URI uri, Map<String, String> map, Charset encoding)
             throws URISyntaxException {
         Map<String, String> oldMap = parseQueryString(uri, encoding);
-        oldMap.putAll(m);
+        oldMap.putAll(map);
         String query = renderQueryString(oldMap);
         return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), query, uri.getFragment());
     }
 
     private static String concat(Collection<String> c) {
         StringBuilder sb = new StringBuilder();
-        for (Iterator<String> it = c.iterator(); it.hasNext(); ) {
+        for (String s : c) {
             if (sb.length() > 0) {
                 sb.append(",");
             }
-            sb.append(it.next());
+            sb.append(s);
         }
         return sb.toString();
     }
@@ -118,15 +114,15 @@ public final class URIUtil {
      * fragment identifier. This method will translate any escaped characters
      * back to the original.
      *
-     * @param s        The URI to decode.
-     * @param encoding The encoding to decode into.
+     * @param uri the URI to decode
+     * @param encoding the encoding to decode into
      * @return The decoded URI
      */
-    public static String decode(String s, Charset encoding) {
+    public static String decode(String uri, Charset encoding) {
         StringBuilder sb = new StringBuilder();
         boolean fragment = false;
-        for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
+        for (int i = 0; i < uri.length(); i++) {
+            char ch = uri.charAt(i);
             switch (ch) {
                 case '+':
                     sb.append(' ');
@@ -138,8 +134,8 @@ public final class URIUtil {
                 case '%':
                     if (!fragment) {
                         // fast hex decode
-                        sb.append((char) ((Character.digit(s.charAt(++i), 16) << 4)
-                                | Character.digit(s.charAt(++i), 16)));
+                        sb.append((char) ((Character.digit(uri.charAt(++i), 16) << 4)
+                                | Character.digit(uri.charAt(++i), 16)));
                     } else {
                         sb.append(ch);
                     }
@@ -176,11 +172,9 @@ public final class URIUtil {
      * <p>The character encoding used as the basis for determining the
      * octets depends on the setting of the second argument.</p>
      *
-     * @param s        The String to convert
+     * @param s the String to convert
      * @param encoding The encoding to use for unsafe characters
      * @return The converted String
-     * @throws UnsupportedEncodingException If the named encoding is not
-     *                                      supported
      */
     public static String encode(String s, Charset encoding) {
         int length = s.length();
@@ -209,11 +203,10 @@ public final class URIUtil {
                 // Convert them to %XY encoded strings
                 String unsafe = s.substring(start, i);
                 byte[] bytes = unsafe.getBytes(encoding);
-                for (int j = 0; j < bytes.length; j++) {
+                for (byte aByte : bytes) {
                     result.append('%');
-                    int val = bytes[j];
-                    result.append(hex.charAt((val & 0xf0) >> 4));
-                    result.append(hex.charAt(val & 0x0f));
+                    result.append(hex.charAt(((int) aByte & 0xf0) >> 4));
+                    result.append(hex.charAt((int) aByte & 0x0f));
                 }
             }
             start = i;
@@ -227,7 +220,6 @@ public final class URIUtil {
      *
      * @param s the URI string
      * @return a string with the URL encoded data.
-     * @throws UnsupportedEncodingException
      * @throws URISyntaxException
      */
     public static URI encodeQueryString(String s) throws URISyntaxException {
@@ -260,7 +252,6 @@ public final class URIUtil {
      *
      * @param uri the URI
      * @return the properties
-     * @throws UnsupportedEncodingException
      */
     public static Properties getPropertiesFromURI(URI uri) {
         if (uri == null) {
@@ -272,13 +263,11 @@ public final class URIUtil {
         // ensure scheme is not null
         scheme = scheme != null ? scheme : "";
         properties.setProperty("scheme", scheme);
-        String type = "default";
+        String type;
         if (scheme.startsWith("jdbc:")) {
             int pos = scheme.substring(5).indexOf(':');
             type = (pos > 0) ? scheme.substring(5).substring(0, pos) : "default";
-            if (type != null) {
-                properties.setProperty("type", type);
-            }
+            properties.setProperty("type", type);
         }
         String host = uri.getHost();
         host = (host != null) ? host : "";
@@ -297,9 +286,7 @@ public final class URIUtil {
             properties.setProperty("requestquery", renderQueryString(m));
             properties.putAll(m);
         }
-        if (host != null) {
-            properties.setProperty("host", host);
-        }
+        properties.setProperty("host", host);
         if (port != 0) {
             properties.setProperty("port", Integer.toString(port));
         }
@@ -326,7 +313,7 @@ public final class URIUtil {
      * froim '0' till '9', or one of the characters '-', '_', '.' or ''. Such
      * 'safe' character don't have to be url encoded.
      *
-     * @param c
+     * @param c the character
      * @return true or false
      */
     private static boolean isSafe(char c) {
@@ -341,7 +328,6 @@ public final class URIUtil {
      *
      * @param uri the URI to examine for request parameters
      * @return a map
-     * @throws UnsupportedEncodingException
      */
     public static Map<String, String> parseQueryString(URI uri) {
         return parseQueryString(uri, UTF8);
@@ -355,8 +341,6 @@ public final class URIUtil {
      * @param uri      the URI to examine for request parameters
      * @param encoding the encoding
      * @return a Map
-     * @throws UnsupportedEncodingException
-     * @throws IllegalArgumentException
      */
     public static Map<String, String> parseQueryString(URI uri, Charset encoding) {
         return parseQueryString(uri, encoding, null);
@@ -371,10 +355,9 @@ public final class URIUtil {
      * @param encoding the encoding
      * @param listener a listner for processing the URI parameters in order, or null
      * @return a Map of parameters
-     * @throws UnsupportedEncodingException
      */
     public static Map<String, String> parseQueryString(URI uri, Charset encoding, ParameterListener listener) {
-        Map<String, String> m = new HashMap();
+        Map<String, String> m = new HashMap<String,String>();
         if (uri == null) {
             throw new IllegalArgumentException();
         }
@@ -407,17 +390,15 @@ public final class URIUtil {
      * This method takes a Map of key/value elements and converts it
      * into a URL encoded querystring format.
      *
-     * @param m a map of key/value arrays.
-     * @return a string with the URL encoded data.
-     * @throws UnsupportedEncodingException
+     * @param m a map of key/value arrays
+     * @return a string with the URL encoded data
      */
     public static String renderQueryString(Map<String, String> m) {
-        String key = null;
-        String value = null;
+        String key;
+        String value;
         StringBuilder out = new StringBuilder();
         Charset encoding = m.containsKey("encoding") ? Charset.forName(m.get("encoding")) : UTF8;
-        for (Iterator<Map.Entry<String, String>> iter = m.entrySet().iterator(); iter.hasNext(); ) {
-            Map.Entry<String, String> me = iter.next();
+        for (Map.Entry<String, String> me : m.entrySet()) {
             key = me.getKey();
             String o = me.getValue();
             value = o != null ? encode(o, encoding) : null;
@@ -445,8 +426,7 @@ public final class URIUtil {
         String key;
         String value;
         StringBuilder out = new StringBuilder();
-        for (Iterator<Map.Entry<String, String>> iter = m.entrySet().iterator(); iter.hasNext(); ) {
-            Map.Entry<String, String> me = iter.next();
+        for (Map.Entry<String, String> me : m.entrySet()) {
             key = me.getKey();
             value = me.getValue();
             if ((key != null) && (value != null) && (value.length() > 0)) {

@@ -29,6 +29,11 @@
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
+            <artifactId>compress</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
             <type>jar</type>
             <optional>true</optional>
@@ -36,12 +41,6 @@
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>charset</artifactId>
-            <type>jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
-            <artifactId>compress</artifactId>
             <type>jar</type>
             <scope>test</scope>
         </dependency>

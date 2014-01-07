@@ -85,17 +85,17 @@ public abstract class AbstractPipeline<R extends PipelineRequest>
 
     @Override
     public Long startedAt() {
-        return metric.started();
+        return metric.started() / 1000000 ;
     }
 
     @Override
     public Long stoppedAt() {
-        return metric.stopped();
+        return metric.stopped() / 1000000;
     }
 
     @Override
     public Long took() {
-        return metric.elapsed();
+        return metric.elapsed() / 1000000;
     }
 
     public Throwable lastException() {

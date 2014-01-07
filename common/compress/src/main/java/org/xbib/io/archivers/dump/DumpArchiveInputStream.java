@@ -1,30 +1,11 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package org.xbib.io.archivers.dump;
 
-import org.xbib.io.archivers.ArchiveException;
 import org.xbib.io.archivers.ArchiveInputStream;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -38,21 +19,31 @@ import java.util.Stack;
  * Methods are provided to position at each successive entry in
  * the archive, and the read each entry as a normal input stream
  * using read().
- *
- * @NotThreadSafe
  */
 public class DumpArchiveInputStream extends ArchiveInputStream {
+
     private DumpArchiveSummary summary;
+
     private DumpArchiveEntry active;
+
     private boolean isClosed;
+
     private boolean hasHitEOF;
+
     private long entrySize;
+
     private long entryOffset;
+
     private int readIdx;
+
     private byte[] readBuf = new byte[DumpArchiveConstants.TP_SIZE];
+
     private byte[] blockBuffer;
+
     private int recordOffset;
+
     private long filepos;
+
     protected TapeInputStream raw;
 
     // map of ino -> dirent entry. We can use this to reconstruct full paths.
@@ -68,35 +59,30 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
      * Constructor.
      *
      * @param is
-     * @throws ArchiveException
      */
-    public DumpArchiveInputStream(InputStream is) throws ArchiveException {
+    public DumpArchiveInputStream(InputStream is) throws IOException {
         this.raw = new TapeInputStream(is);
         this.hasHitEOF = false;
 
-        try {
-            // read header, verify it's a dump archive.
-            byte[] headerBytes = raw.readRecord();
+        // read header, verify it's a dump archive.
+        byte[] headerBytes = raw.readRecord();
 
-            if (!DumpArchiveUtil.verify(headerBytes)) {
-                throw new UnrecognizedFormatException();
-            }
-
-            // get summary information
-            summary = new DumpArchiveSummary(headerBytes);
-
-            // reset buffer with actual block size.
-            raw.resetBlockSize(summary.getNTRec(), summary.isCompressed());
-
-            // allocate our read buffer.
-            blockBuffer = new byte[4 * DumpArchiveConstants.TP_SIZE];
-
-            // skip past CLRI and BITS segments since we don't handle them yet.
-            readCLRI();
-            readBITS();
-        } catch (IOException ex) {
-            throw new ArchiveException(ex.getMessage(), ex);
+        if (!DumpArchiveUtil.verify(headerBytes)) {
+            throw new UnrecognizedFormatException();
         }
+
+        // get summary information
+        summary = new DumpArchiveSummary(headerBytes);
+
+        // reset buffer with actual block size.
+        raw.resetBlockSize(summary.getNTRec(), summary.isCompressed());
+
+        // allocate our read buffer.
+        blockBuffer = new byte[4 * DumpArchiveConstants.TP_SIZE];
+
+        // skip past CLRI and BITS segments since we don't handle them yet.
+        readCLRI();
+        readBITS();
 
         // put in a dummy record for the root node.
         Dirent root = new Dirent(2, 2, 4, ".");
@@ -116,11 +102,6 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
                 });
     }
 
-    @Deprecated
-    @Override
-    public int getCount() {
-        return (int) getBytesRead();
-    }
 
     @Override
     public long getBytesRead() {
@@ -152,7 +133,7 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
 
         // we don't do anything with this yet.
         if (raw.skip(DumpArchiveConstants.TP_SIZE * active.getHeaderCount())
-            == -1) {
+                == -1) {
             throw new EOFException();
         }
         readIdx = active.getHeaderCount();
@@ -176,7 +157,7 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
 
         // we don't do anything with this yet.
         if (raw.skip(DumpArchiveConstants.TP_SIZE * active.getHeaderCount())
-            == -1) {
+                == -1) {
             throw new EOFException();
         }
         readIdx = active.getHeaderCount();
@@ -213,7 +194,7 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
             // the unnecessary decompression time adds up.
             while (readIdx < active.getHeaderCount()) {
                 if (!active.isSparseRecord(readIdx++)
-                    && raw.skip(DumpArchiveConstants.TP_SIZE) == -1) {
+                        && raw.skip(DumpArchiveConstants.TP_SIZE) == -1) {
                     throw new EOFException();
                 }
             }
@@ -232,8 +213,8 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
             // skip any remaining segments for prior file.
             while (DumpArchiveConstants.SEGMENT_TYPE.ADDR == active.getHeaderType()) {
                 if (raw.skip(DumpArchiveConstants.TP_SIZE
-                             * (active.getHeaderCount()
-                                - active.getHeaderHoles())) == -1) {
+                        * (active.getHeaderCount()
+                        - active.getHeaderHoles())) == -1) {
                     throw new EOFException();
                 }
 
@@ -291,7 +272,7 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
      * Read directory entry.
      */
     private void readDirectoryEntry(DumpArchiveEntry entry)
-        throws IOException {
+            throws IOException {
         long size = entry.getEntrySize();
         boolean first = true;
 
@@ -320,7 +301,7 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
             int reclen = 0;
 
             for (int i = 0; (i < (datalen - 8)) && (i < (size - 8));
-                    i += reclen) {
+                 i += reclen) {
                 int ino = DumpArchiveUtil.convert32(blockBuffer, i);
                 reclen = DumpArchiveUtil.convert16(blockBuffer, i + 4);
 
@@ -335,12 +316,6 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
 
                 Dirent d = new Dirent(ino, entry.getIno(), type, name);
 
-                /*
-                if ((type == 4) && names.containsKey(ino)) {
-                    System.out.println("we already have ino: " +
-                                       names.get(ino));
-                }
-                */
 
                 names.put(Integer.valueOf(ino), d);
 
@@ -351,7 +326,7 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
                     if (path != null) {
                         e.getValue().setName(path);
                         e.getValue()
-                         .setSimpleName(names.get(e.getKey()).getName());
+                                .setSimpleName(names.get(e.getKey()).getName());
                         queue.add(e.getValue());
                     }
                 }
@@ -379,7 +354,7 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
      * Get full path for specified archive entry, or null if there's a gap.
      *
      * @param entry
-     * @return  full path for specified archive entry, or null if there's a gap.
+     * @return full path for specified archive entry, or null if there's a gap.
      */
     private String getPath(DumpArchiveEntry entry) {
         // build the stack of elements. It's possible that we're 
@@ -387,7 +362,7 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
         Stack<String> elements = new Stack<String>();
         Dirent dirent = null;
 
-        for (int i = entry.getIno();; i = dirent.getParentIno()) {
+        for (int i = entry.getIno(); ; i = dirent.getParentIno()) {
             if (!names.containsKey(Integer.valueOf(i))) {
                 elements.clear();
                 break;
@@ -421,7 +396,7 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
 
     /**
      * Reads bytes from the current dump archive entry.
-     *
+     * <p/>
      * This method is aware of the boundaries of the current
      * entry in the archive and will deal with them as if they
      * were this stream's start and EOF.
@@ -446,7 +421,7 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
 
         while (len > 0) {
             int sz = (len > (readBuf.length - recordOffset))
-                ? (readBuf.length - recordOffset) : len;
+                    ? (readBuf.length - recordOffset) : len;
 
             // copy any data we have
             if ((recordOffset + sz) <= readBuf.length) {
@@ -517,7 +492,7 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
 
         // this will work in a pinch.
         return DumpArchiveConstants.NFS_MAGIC == DumpArchiveUtil.convert32(buffer,
-            24);
+                24);
     }
 
 }

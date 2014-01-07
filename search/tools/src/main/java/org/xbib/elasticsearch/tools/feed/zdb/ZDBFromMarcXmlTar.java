@@ -93,7 +93,7 @@ public final class ZDBFromMarcXmlTar extends Feeder {
     }
 
     @Override
-    protected ZDBFromMarcXmlTar prepare() {
+    protected ZDBFromMarcXmlTar prepare() throws IOException {
         super.prepare();
         logger.info("got settings {}", settings.getAsMap());
         out.setIndex(settings.get("index"));
@@ -150,16 +150,13 @@ public final class ZDBFromMarcXmlTar extends Feeder {
 
         @Override
         public void output(ResourceContext context, ContentBuilder contentBuilder) throws IOException {
-            if (!context.resource().isEmpty()) {
-                IRI id = IRI.builder().scheme("http")
+            IRI id = IRI.builder().scheme("http")
                         .host(index)
                         .query(type)
                         .fragment(Long.toString(counter.incrementAndGet())).build();
-                context.resource().id(id);
-                sink.output(context, contentBuilder);
-            }
+            context.resource().id(id);
+            sink.output(context, contentBuilder);
         }
     }
-
 
 }

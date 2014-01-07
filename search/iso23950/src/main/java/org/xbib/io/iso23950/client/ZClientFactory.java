@@ -45,20 +45,28 @@ import java.util.Properties;
  *  Factory for Z client
  *
  */
-public class ZClientFactory implements ZConstants {
+public final class ZClientFactory implements ZConstants {
+
+    private final ConnectionService<ZSession> connectionService;
 
     private final static ZClientFactory instance = new ZClientFactory();
 
     private ZClientFactory() {
+        connectionService = ConnectionService.getInstance();
     }
 
-    public static Properties getProperties(String name) {
+    public static ZClientFactory getInstance() {
+        return instance;
+    }
+
+    public Properties getProperties(String name) {
         Properties properties = new Properties();
         InputStream in = instance.getClass().getResourceAsStream("/org/xbib/io/iso23950/service/" + name + ".properties");
         if (in != null) {
             try {
                 properties.load(in);
             } catch (IOException ex) {
+                // ignore
             }
         }
         if (in == null || properties.isEmpty()) {
@@ -67,15 +75,15 @@ public class ZClientFactory implements ZConstants {
         return properties;
     }
 
-    public static ZClient newZClient(String name) {
+    public ZClient newZClient(String name) {
         return newZClient(getProperties(name));
     }
 
-    public static ZClient newZClient(Properties properties ) {
+    public ZClient newZClient(Properties properties ) {
         try {
             URI uri = URI.create(properties.getProperty(ADDRESS_PROPERTY));
-            Connection<ZSession> connection = ConnectionService.getInstance()
-                    .getFactory(uri)
+            Connection<ZSession> connection = connectionService
+                    .getConnectionFactory(uri)
                     .getConnection(uri);
             ZSession session = connection.createSession();
             return session.newZClient(properties);

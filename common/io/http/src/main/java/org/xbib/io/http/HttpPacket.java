@@ -49,16 +49,6 @@ public class HttpPacket implements Packet {
     }
 
     @Override
-    public long number() {
-        return 0;
-    }
-
-    @Override
-    public Packet number(long number) {
-        return null;
-    }
-
-    @Override
     public Object packet() {
         return null;
     }

@@ -1,51 +1,31 @@
-/*
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
-
-/*
- * This package is based on the work done by Timothy Gerard Endres
- * (time@ice.com) to whom the Ant project is very grateful for his great code.
- */
 
 package org.xbib.io.archivers.tar;
+
+import org.xbib.io.archivers.ArchiveEntry;
+import org.xbib.io.archivers.ArchiveInputStream;
+import org.xbib.io.archivers.ArchiveUtils;
+import org.xbib.io.archivers.zip.ZipEncoding;
+import org.xbib.io.archivers.zip.ZipEncodingHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.xbib.io.archivers.ArchiveEntry;
-import org.xbib.io.archivers.ArchiveInputStream;
-import org.xbib.io.archivers.zip.ZipEncoding;
-import org.xbib.io.archivers.zip.ZipEncodingHelper;
-import org.xbib.io.archivers.ArchiveUtils;
 
 /**
  * The TarInputStream reads a UNIX tar archive as an InputStream.
  * methods are provided to position at each successive entry in
  * the archive, and the read each entry as a normal input stream
  * using read().
- * @NotThreadSafe
  */
 public class TarArchiveInputStream extends ArchiveInputStream {
+
     private static final int SMALL_BUFFER_SIZE = 256;
+
     private static final int BUFFER_SIZE = 8 * 1024;
 
     private boolean hasHitEOF;
@@ -58,6 +38,7 @@ public class TarArchiveInputStream extends ArchiveInputStream {
 
     /**
      * Constructor for TarInputStream.
+     *
      * @param is the input stream to use
      */
     public TarArchiveInputStream(InputStream is) {
@@ -66,9 +47,9 @@ public class TarArchiveInputStream extends ArchiveInputStream {
 
     /**
      * Constructor for TarInputStream.
-     * @param is the input stream to use
+     *
+     * @param is       the input stream to use
      * @param encoding name of the encoding to use for file names
-     * @since Commons Compress 1.4
      */
     public TarArchiveInputStream(InputStream is, String encoding) {
         this(is, TarBuffer.DEFAULT_BLKSIZE, TarBuffer.DEFAULT_RCDSIZE, encoding);
@@ -76,7 +57,8 @@ public class TarArchiveInputStream extends ArchiveInputStream {
 
     /**
      * Constructor for TarInputStream.
-     * @param is the input stream to use
+     *
+     * @param is        the input stream to use
      * @param blockSize the block size to use
      */
     public TarArchiveInputStream(InputStream is, int blockSize) {
@@ -85,10 +67,10 @@ public class TarArchiveInputStream extends ArchiveInputStream {
 
     /**
      * Constructor for TarInputStream.
-     * @param is the input stream to use
+     *
+     * @param is        the input stream to use
      * @param blockSize the block size to use
-     * @param encoding name of the encoding to use for file names
-     * @since Commons Compress 1.4
+     * @param encoding  name of the encoding to use for file names
      */
     public TarArchiveInputStream(InputStream is, int blockSize,
                                  String encoding) {
@@ -97,8 +79,9 @@ public class TarArchiveInputStream extends ArchiveInputStream {
 
     /**
      * Constructor for TarInputStream.
-     * @param is the input stream to use
-     * @param blockSize the block size to use
+     *
+     * @param is         the input stream to use
+     * @param blockSize  the block size to use
      * @param recordSize the record size to use
      */
     public TarArchiveInputStream(InputStream is, int blockSize, int recordSize) {
@@ -107,11 +90,11 @@ public class TarArchiveInputStream extends ArchiveInputStream {
 
     /**
      * Constructor for TarInputStream.
-     * @param is the input stream to use
-     * @param blockSize the block size to use
+     *
+     * @param is         the input stream to use
+     * @param blockSize  the block size to use
      * @param recordSize the record size to use
-     * @param encoding name of the encoding to use for file names
-     * @since Commons Compress 1.4
+     * @param encoding   name of the encoding to use for file names
      */
     public TarArchiveInputStream(InputStream is, int blockSize, int recordSize,
                                  String encoding) {
@@ -123,6 +106,7 @@ public class TarArchiveInputStream extends ArchiveInputStream {
 
     /**
      * Closes this stream. Calls the TarBuffer's close() method.
+     *
      * @throws java.io.IOException on error
      */
     @Override
@@ -208,7 +192,7 @@ public class TarArchiveInputStream extends ArchiveInputStream {
      * @return The next TarEntry in the archive, or null.
      * @throws java.io.IOException on error
      */
-    public TarArchiveEntry getNextTarEntry() throws IOException {
+    public synchronized TarArchiveEntry getNextTarEntry() throws IOException {
         if (hasHitEOF) {
             return null;
         }
@@ -242,11 +226,11 @@ public class TarArchiveInputStream extends ArchiveInputStream {
             throw ioe;
         }
         entryOffset = 0;
-        entrySize = currEntry.getSize();
+        entrySize = currEntry.getEntrySize();
 
         if (currEntry.isGNULongNameEntry()) {
             // read in the name
-            StringBuffer longName = new StringBuffer();
+            StringBuilder longName = new StringBuilder();
             byte[] buf = new byte[SMALL_BUFFER_SIZE];
             int length = 0;
             while ((length = read(buf)) >= 0) {
@@ -260,17 +244,17 @@ public class TarArchiveInputStream extends ArchiveInputStream {
             }
             // remove trailing null terminator
             if (longName.length() > 0
-                && longName.charAt(longName.length() - 1) == 0) {
+                    && longName.charAt(longName.length() - 1) == 0) {
                 longName.deleteCharAt(longName.length() - 1);
             }
             currEntry.setName(longName.toString());
         }
 
-        if (currEntry.isPaxHeader()){ // Process Pax headers
+        if (currEntry.isPaxHeader()) { // Process Pax headers
             paxHeaders();
         }
 
-        if (currEntry.isGNUSparse()){ // Process sparse files
+        if (currEntry.isGNUSparse()) { // Process sparse files
             readGNUSparse();
         }
 
@@ -278,7 +262,7 @@ public class TarArchiveInputStream extends ArchiveInputStream {
         // due to a new size being reported in the posix header
         // information, we update entrySize here so that it contains
         // the correct value.
-        entrySize = currEntry.getSize();
+        entrySize = currEntry.getEntrySize();
         return currEntry;
     }
 
@@ -310,41 +294,41 @@ public class TarArchiveInputStream extends ArchiveInputStream {
         return hasHitEOF ? null : headerBuf;
     }
 
-    private void paxHeaders() throws IOException{
+    private void paxHeaders() throws IOException {
         Map<String, String> headers = parsePaxHeaders(this);
         getNextEntry(); // Get the actual file entry
         applyPaxHeadersToCurrentEntry(headers);
     }
 
-    Map<String, String> parsePaxHeaders(InputStream i) throws IOException {
+    private Map<String, String> parsePaxHeaders(InputStream i) throws IOException {
         Map<String, String> headers = new HashMap<String, String>();
         // Format is "length keyword=value\n";
-        while(true){ // get length
+        while (true) { // get length
             int ch;
             int len = 0;
             int read = 0;
-            while((ch = i.read()) != -1) {
+            while ((ch = i.read()) != -1) {
                 read++;
-                if (ch == ' '){ // End of length string
+                if (ch == ' ') { // End of length string
                     // Get keyword
                     ByteArrayOutputStream coll = new ByteArrayOutputStream();
-                    while((ch = i.read()) != -1) {
+                    while ((ch = i.read()) != -1) {
                         read++;
-                        if (ch == '='){ // end of keyword
+                        if (ch == '=') { // end of keyword
                             String keyword = coll.toString("UTF-8");
                             // Get rest of entry
                             byte[] rest = new byte[len - read];
                             int got = i.read(rest);
-                            if (got != len - read){
+                            if (got != len - read) {
                                 throw new IOException("Failed to read "
-                                                      + "Paxheader. Expected "
-                                                      + (len - read)
-                                                      + " bytes, read "
-                                                      + got);
+                                        + "Paxheader. Expected "
+                                        + (len - read)
+                                        + " bytes, read "
+                                        + got);
                             }
                             // Drop trailing NL
                             String value = new String(rest, 0,
-                                                      len - read - 1, Charset.forName("UTF-8"));
+                                    len - read - 1, Charset.forName("UTF-8"));
                             headers.put(keyword, value);
                             break;
                         }
@@ -355,7 +339,7 @@ public class TarArchiveInputStream extends ArchiveInputStream {
                 len *= 10;
                 len += ch - '0';
             }
-            if (ch == -1){ // EOF
+            if (ch == -1) { // EOF
                 break;
             }
         }
@@ -374,28 +358,29 @@ public class TarArchiveInputStream extends ArchiveInputStream {
          * uid,uname
          * SCHILY.devminor, SCHILY.devmajor: don't have setters/getters for those
          */
-        for (Entry<String, String> ent : headers.entrySet()){
+        for (Entry<String, String> ent : headers.entrySet()) {
             String key = ent.getKey();
             String val = ent.getValue();
-            if ("path".equals(key)){
+            if ("path".equals(key)) {
                 currEntry.setName(val);
-            } else if ("linkpath".equals(key)){
+            } else if ("linkpath".equals(key)) {
                 currEntry.setLinkName(val);
-            } else if ("gid".equals(key)){
+            } else if ("gid".equals(key)) {
                 currEntry.setGroupId(Integer.parseInt(val));
-            } else if ("gname".equals(key)){
+            } else if ("gname".equals(key)) {
                 currEntry.setGroupName(val);
-            } else if ("uid".equals(key)){
+            } else if ("uid".equals(key)) {
                 currEntry.setUserId(Integer.parseInt(val));
-            } else if ("uname".equals(key)){
+            } else if ("uname".equals(key)) {
                 currEntry.setUserName(val);
-            } else if ("size".equals(key)){
-                currEntry.setSize(Long.parseLong(val));
-            } else if ("mtime".equals(key)){
-                currEntry.setModTime((long) (Double.parseDouble(val) * 1000));
-            } else if ("SCHILY.devminor".equals(key)){
+            } else if ("size".equals(key)) {
+                currEntry.setEntrySize(Long.parseLong(val));
+            } else if ("mtime".equals(key)) {
+                long mtime = (long) (Double.parseDouble(val) * 1000);
+                currEntry.setLastModified(new Date(mtime));
+            } else if ("SCHILY.devminor".equals(key)) {
                 currEntry.setDevMinor(Integer.parseInt(val));
-            } else if ("SCHILY.devmajor".equals(key)){
+            } else if ("SCHILY.devmajor".equals(key)) {
                 currEntry.setDevMajor(Integer.parseInt(val));
             }
         }
@@ -404,10 +389,9 @@ public class TarArchiveInputStream extends ArchiveInputStream {
     /**
      * Adds the sparse chunks from the current entry to the sparse chunks,
      * including any additional sparse entries following the current entry.
-     * 
+     *
      * @throws java.io.IOException on error
-     * 
-     * @todo Sparse files get not yet really processed. 
+     * @todo Sparse files get not yet really processed.
      */
     private void readGNUSparse() throws IOException {
         /* we do not really process sparse files yet
@@ -437,13 +421,13 @@ public class TarArchiveInputStream extends ArchiveInputStream {
 
     /**
      * Reads bytes from the current tar archive entry.
-     *
+     * <p/>
      * This method is aware of the boundaries of the current
      * entry in the archive and will deal with them as if they
      * were this stream's start and EOF.
      *
-     * @param buf The buffer into which to place bytes read.
-     * @param offset The offset at which to place bytes read.
+     * @param buf       The buffer into which to place bytes read.
+     * @param offset    The offset at which to place bytes read.
      * @param numToRead The number of bytes to read.
      * @return The number of bytes read, or -1 at EOF.
      * @throws java.io.IOException on error
@@ -462,7 +446,7 @@ public class TarArchiveInputStream extends ArchiveInputStream {
 
         if (readBuf != null) {
             int sz = (numToRead > readBuf.length) ? readBuf.length
-                : numToRead;
+                    : numToRead;
 
             System.arraycopy(readBuf, 0, buf, offset, sz);
 
@@ -488,7 +472,7 @@ public class TarArchiveInputStream extends ArchiveInputStream {
             if (rec == null) {
                 // Unexpected EOF!
                 throw new IOException("unexpected EOF with " + numToRead
-                                      + " bytes unread. Occured at byte: " + getBytesRead());
+                        + " bytes unread. Occured at byte: " + getBytesRead());
             }
             count(rec.length);
             int sz = numToRead;
@@ -516,20 +500,6 @@ public class TarArchiveInputStream extends ArchiveInputStream {
         return totalRead;
     }
 
-    /**
-     * Whether this class is able to read the given entry.
-     *
-     * <p>May return false if the current entry is a sparse file.</p>
-     */
-    @Override
-    public boolean canReadEntryData(ArchiveEntry ae) {
-        if (ae instanceof TarArchiveEntry) {
-            TarArchiveEntry te = (TarArchiveEntry) ae;
-            return !te.isGNUSparse();
-        }
-        return false;
-    }
-
     protected final TarArchiveEntry getCurrentEntry() {
         return currEntry;
     }
@@ -548,46 +518,43 @@ public class TarArchiveInputStream extends ArchiveInputStream {
 
     /**
      * Checks if the signature matches what is expected for a tar file.
-     * 
-     * @param signature
-     *            the bytes to check
-     * @param length
-     *            the number of bytes to check
+     *
+     * @param signature the bytes to check
+     * @param length    the number of bytes to check
      * @return true, if this stream is a tar archive stream, false otherwise
      */
     public static boolean matches(byte[] signature, int length) {
-        if (length < TarConstants.VERSION_OFFSET+TarConstants.VERSIONLEN) {
+        if (length < TarConstants.VERSION_OFFSET + TarConstants.VERSIONLEN) {
             return false;
         }
 
         if (ArchiveUtils.matchAsciiBuffer(TarConstants.MAGIC_POSIX,
                 signature, TarConstants.MAGIC_OFFSET, TarConstants.MAGICLEN)
-            &&
-            ArchiveUtils.matchAsciiBuffer(TarConstants.VERSION_POSIX,
-                signature, TarConstants.VERSION_OFFSET, TarConstants.VERSIONLEN)
-                ){
+                &&
+                ArchiveUtils.matchAsciiBuffer(TarConstants.VERSION_POSIX,
+                        signature, TarConstants.VERSION_OFFSET, TarConstants.VERSIONLEN)
+                ) {
             return true;
         }
         if (ArchiveUtils.matchAsciiBuffer(TarConstants.MAGIC_GNU,
                 signature, TarConstants.MAGIC_OFFSET, TarConstants.MAGICLEN)
-            &&
-            (
-             ArchiveUtils.matchAsciiBuffer(TarConstants.VERSION_GNU_SPACE,
-                signature, TarConstants.VERSION_OFFSET, TarConstants.VERSIONLEN)
-            ||
-            ArchiveUtils.matchAsciiBuffer(TarConstants.VERSION_GNU_ZERO,
-                signature, TarConstants.VERSION_OFFSET, TarConstants.VERSIONLEN)
-            )
-                ){
+                &&
+                (
+                        ArchiveUtils.matchAsciiBuffer(TarConstants.VERSION_GNU_SPACE,
+                                signature, TarConstants.VERSION_OFFSET, TarConstants.VERSIONLEN)
+                                ||
+                                ArchiveUtils.matchAsciiBuffer(TarConstants.VERSION_GNU_ZERO,
+                                        signature, TarConstants.VERSION_OFFSET, TarConstants.VERSIONLEN)
+                )
+                ) {
             return true;
         }
-        // COMPRESS-107 - recognise Ant tar files
         if (ArchiveUtils.matchAsciiBuffer(TarConstants.MAGIC_ANT,
                 signature, TarConstants.MAGIC_OFFSET, TarConstants.MAGICLEN)
-            &&
-            ArchiveUtils.matchAsciiBuffer(TarConstants.VERSION_ANT,
-                signature, TarConstants.VERSION_OFFSET, TarConstants.VERSIONLEN)
-                ){
+                &&
+                ArchiveUtils.matchAsciiBuffer(TarConstants.VERSION_ANT,
+                        signature, TarConstants.VERSION_OFFSET, TarConstants.VERSIONLEN)
+                ) {
             return true;
         }
         return false;

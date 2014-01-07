@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.xbib.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 

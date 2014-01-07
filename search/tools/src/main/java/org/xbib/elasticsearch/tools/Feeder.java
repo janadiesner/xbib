@@ -32,10 +32,10 @@
 package org.xbib.elasticsearch.tools;
 
 import org.xbib.elasticsearch.ResourceSink;
-import org.xbib.elasticsearch.support.client.BulkClient;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.IngestClient;
-import org.xbib.elasticsearch.support.client.MockIngestClient;
+import org.xbib.elasticsearch.support.client.bulk.BulkClient;
+import org.xbib.elasticsearch.support.client.ingest.IngestClient;
+import org.xbib.elasticsearch.support.client.ingest.MockIngestClient;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
@@ -78,49 +78,45 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
     protected Ingest createIngest() {
         return settings.getAsBoolean("mock", false) ?
                 new MockIngestClient() :
-                "bulk".equals(settings.get("client")) ?
-                        new BulkClient() :
-                        new IngestClient();
+                "ingest".equals(settings.get("client")) ?
+                        new IngestClient() :
+                        new BulkClient();
     }
 
     @Override
-    protected Feeder<T,R,P> prepare() {
+    protected Feeder<T,R,P> prepare() throws IOException {
         super.prepare();
-        try {
-            URI esURI = URI.create(settings.get("elasticsearch"));
-            String index = settings.get("index");
-            String type = settings.get("type");
-            Integer shards = settings.getAsInt("shards", 1);
-            Integer replica = settings.getAsInt("replica", 0);
-            Integer maxbulkactions = settings.getAsInt("maxbulkactions", 100);
-            Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
-                    Runtime.getRuntime().availableProcessors());
-            output = createIngest();
-            prepare(output);
-            output.maxActionsPerBulkRequest(maxbulkactions)
-                    .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
-                    .newClient(esURI)
-                    .waitForCluster()
-                    .setIndex(index)
-                    .setType(type)
-                    .dateDetection(false)
-                    .shards(shards)
-                    .replica(replica)
-                    .newIndex();
-            sink = new ResourceSink(output);
-        } catch (IOException e) {
-            logger.error("error while preparing", e);
-        }
+        URI esURI = URI.create(settings.get("elasticsearch"));
+        String index = settings.get("index");
+        String type = settings.get("type");
+        Integer shards = settings.getAsInt("shards", 1);
+        Integer replica = settings.getAsInt("replica", 0);
+        Integer maxbulkactions = settings.getAsInt("maxbulkactions", 100);
+        Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
+                Runtime.getRuntime().availableProcessors());
+        output = createIngest();
+        prepare(output);
+        output.maxActionsPerBulkRequest(maxbulkactions)
+                .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
+                .newClient(esURI);
+        output.waitForCluster()
+                .setIndex(index)
+                .setType(type)
+                .dateDetection(false)
+                .shards(shards)
+                .replica(replica)
+                .newIndex();
+        sink = new ResourceSink(output);
         return this;
     }
 
     @Override
     protected Feeder<T,R,P> cleanup() {
         super.cleanup();
-        logger.info("running complete, flushing sink");
-        sink.flush();
-        logger.info("shutdown of output");
-        output.shutdown();
+        if (output != null) {
+            logger.info("shutdown");
+            output.shutdown();
+        }
         logger.info("done with run");
         return this;
     }

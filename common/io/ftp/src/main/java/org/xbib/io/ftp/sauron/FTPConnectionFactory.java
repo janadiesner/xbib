@@ -39,6 +39,11 @@ import org.xbib.io.ConnectionFactory;
 public final class FTPConnectionFactory  implements ConnectionFactory<FTPSession> {
 
     @Override
+    public String getName() {
+        return "ftp-sauron";
+    }
+
+    @Override
     public FTPConnection getConnection(URI uri) throws IOException {
         return canOpen(uri) ? new FTPConnection().setURI(uri) : null;
     }

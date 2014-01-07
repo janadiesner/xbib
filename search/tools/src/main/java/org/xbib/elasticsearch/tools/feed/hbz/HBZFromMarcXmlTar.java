@@ -95,7 +95,7 @@ public final class HBZFromMarcXmlTar extends Feeder {
     }
 
     @Override
-    protected HBZFromMarcXmlTar prepare() {
+    protected HBZFromMarcXmlTar prepare() throws IOException {
         super.prepare();
         logger.info("got settings {}", settings.getAsMap());
         out.setIndex(settings.get("index"));

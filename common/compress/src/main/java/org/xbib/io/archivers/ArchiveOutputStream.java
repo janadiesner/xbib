@@ -1,21 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package org.xbib.io.archivers;
 
 import java.io.File;
@@ -27,20 +10,20 @@ import java.io.OutputStream;
  * {@link #write(byte[], int, int)} method to improve performance.
  * They should also override {@link #close()} to ensure that any necessary
  * trailers are added.
- * 
+ * <p/>
  * <p>
  * The normal sequence of calls for working with ArchiveOutputStreams is:
  * + create ArchiveOutputStream object
  * + write SFX header (optional, Zip only)
  * + repeat as needed:
- *      - putArchiveEntry() (writes entry header)
- *      - write() (writes entry data)
- *      - closeArchiveEntry() (closes entry)
+ * - putArchiveEntry() (writes entry header)
+ * - write() (writes entry data)
+ * - closeArchiveEntry() (closes entry)
  * + finish() (ends the addition of entries)
  * + write additional data if format supports it (optional)
  * + close()
  * </p>
- * 
+ * <p/>
  * <p>
  * Example usage:<br/>
  * TBA
@@ -48,11 +31,15 @@ import java.io.OutputStream;
  */
 public abstract class ArchiveOutputStream extends OutputStream {
 
-    /** Temporary buffer used for the {@link #write(int)} method */
+    /**
+     * Temporary buffer used for the {@link #write(int)} method
+     */
     private final byte[] oneByte = new byte[1];
     static final int BYTE_MASK = 0xFF;
 
-    /** holds the number of bytes written to this stream */
+    /**
+     * holds the number of bytes written to this stream
+     */
     private long bytesWritten = 0;
     // Methods specific to ArchiveOutputStream
 
@@ -60,7 +47,7 @@ public abstract class ArchiveOutputStream extends OutputStream {
      * Writes the headers for an archive entry to the output stream.
      * The caller must then write the content to the stream and call
      * {@link #closeArchiveEntry()} to complete the process.
-     * 
+     *
      * @param entry describes the entry
      * @throws java.io.IOException
      */
@@ -69,6 +56,7 @@ public abstract class ArchiveOutputStream extends OutputStream {
     /**
      * Closes the archive entry, writing any trailer information that may
      * be required.
+     *
      * @throws java.io.IOException
      */
     public abstract void closeArchiveEntry() throws IOException;
@@ -76,20 +64,20 @@ public abstract class ArchiveOutputStream extends OutputStream {
     /**
      * Finishes the addition of entries to this stream, without closing it.
      * Additional data can be written, if the format supports it.
-     * 
+     * <p/>
      * The finish() method throws an Exception if the user forgets to close the entry
      * .
+     *
      * @throws java.io.IOException
      */
     public abstract void finish() throws IOException;
 
     /**
      * Create an archive entry using the inputFile and entryName provided.
-     * 
+     *
      * @param inputFile
-     * @param entryName 
+     * @param entryName
      * @return the ArchiveEntry set up with details from the file
-     * 
      * @throws java.io.IOException
      */
     public abstract ArchiveEntry createArchiveEntry(File inputFile, String entryName) throws IOException;
@@ -98,12 +86,12 @@ public abstract class ArchiveOutputStream extends OutputStream {
 
     /**
      * Writes a byte to the current archive entry.
-     *
+     * <p/>
      * This method simply calls write( byte[], 0, 1 ).
-     *
+     * <p/>
      * MUST be overridden if the {@link #write(byte[], int, int)} method
      * is not overridden; may be overridden otherwise.
-     * 
+     *
      * @param b The byte to be written.
      * @throws java.io.IOException on error
      */
@@ -116,7 +104,7 @@ public abstract class ArchiveOutputStream extends OutputStream {
     /**
      * Increments the counter of already written bytes.
      * Doesn't increment if the EOF has been hit (read == -1)
-     * 
+     *
      * @param written the number of bytes written
      */
     protected void count(int written) {
@@ -126,7 +114,7 @@ public abstract class ArchiveOutputStream extends OutputStream {
     /**
      * Increments the counter of already written bytes.
      * Doesn't increment if the EOF has been hit (read == -1)
-     * 
+     *
      * @param written the number of bytes written
      */
     protected void count(long written) {
@@ -137,21 +125,11 @@ public abstract class ArchiveOutputStream extends OutputStream {
 
     /**
      * Returns the current number of bytes written to this stream.
+     *
      * @return the number of written bytes
      */
     public long getBytesWritten() {
         return bytesWritten;
     }
 
-    /**
-     * Whether this stream is able to write the given entry.
-     *
-     * <p>Some archive formats support variants or details that are
-     * not supported (yet).</p>
-     *
-     * <p>This implementation always returns true.
-     */
-    public boolean canWriteEntryData(ArchiveEntry ae) {
-        return true;
-    }
 }

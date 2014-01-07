@@ -1,3 +1,1 @@
-org.xbib.io.file.TextFileConnectionFactory
-org.xbib.io.http.netty.HTTPConnectionFactory
-org.xbib.io.tar.TarConnectionFactory
+org.xbib.io.archivers.file.FileConnectionFactory

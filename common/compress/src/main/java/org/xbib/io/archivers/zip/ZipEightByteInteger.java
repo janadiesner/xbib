@@ -1,20 +1,4 @@
-/*
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
+
 package org.xbib.io.archivers.zip;
 
 import java.math.BigInteger;
@@ -24,9 +8,6 @@ import static org.xbib.io.archivers.zip.ZipConstants.BYTE_MASK;
 /**
  * Utility class that represents an eight byte integer with conversion
  * rules for the big endian byte order of ZIP files.
- * @Immutable
- *
- * @since 1.2
  */
 public final class ZipEightByteInteger {
 
@@ -67,6 +48,7 @@ public final class ZipEightByteInteger {
 
     /**
      * Create instance from a number.
+     *
      * @param value the long to store as a ZipEightByteInteger
      */
     public ZipEightByteInteger(long value) {
@@ -75,6 +57,7 @@ public final class ZipEightByteInteger {
 
     /**
      * Create instance from a number.
+     *
      * @param value the BigInteger to store as a ZipEightByteInteger
      */
     public ZipEightByteInteger(BigInteger value) {
@@ -83,23 +66,26 @@ public final class ZipEightByteInteger {
 
     /**
      * Create instance from bytes.
+     *
      * @param bytes the bytes to store as a ZipEightByteInteger
      */
-    public ZipEightByteInteger (byte[] bytes) {
+    public ZipEightByteInteger(byte[] bytes) {
         this(bytes, 0);
     }
 
     /**
      * Create instance from the eight bytes starting at offset.
-     * @param bytes the bytes to store as a ZipEightByteInteger
+     *
+     * @param bytes  the bytes to store as a ZipEightByteInteger
      * @param offset the offset to start
      */
-    public ZipEightByteInteger (byte[] bytes, int offset) {
+    public ZipEightByteInteger(byte[] bytes, int offset) {
         value = ZipEightByteInteger.getValue(bytes, offset);
     }
 
     /**
      * Get value as eight bytes in big endian byte order.
+     *
      * @return value as eight bytes in big endian order
      */
     public byte[] getBytes() {
@@ -108,6 +94,7 @@ public final class ZipEightByteInteger {
 
     /**
      * Get value as Java long.
+     *
      * @return value as a long
      */
     public long getLongValue() {
@@ -116,6 +103,7 @@ public final class ZipEightByteInteger {
 
     /**
      * Get value as Java long.
+     *
      * @return value as a long
      */
     public BigInteger getValue() {
@@ -124,6 +112,7 @@ public final class ZipEightByteInteger {
 
     /**
      * Get value as eight bytes in big endian byte order.
+     *
      * @param value the value to convert
      * @return value as eight bytes in big endian byte order
      */
@@ -133,6 +122,7 @@ public final class ZipEightByteInteger {
 
     /**
      * Get value as eight bytes in big endian byte order.
+     *
      * @param value the value to convert
      * @return value as eight bytes in big endian byte order
      */
@@ -156,7 +146,8 @@ public final class ZipEightByteInteger {
     /**
      * Helper method to get the value as a Java long from eight bytes
      * starting at given array offset
-     * @param bytes the array of bytes
+     *
+     * @param bytes  the array of bytes
      * @param offset the offset to start
      * @return the corresponding Java long value
      */
@@ -167,7 +158,8 @@ public final class ZipEightByteInteger {
     /**
      * Helper method to get the value as a Java BigInteger from eight
      * bytes starting at given array offset
-     * @param bytes the array of bytes
+     *
+     * @param bytes  the array of bytes
      * @param offset the offset to start
      * @return the corresponding Java BigInteger value
      */
@@ -182,11 +174,12 @@ public final class ZipEightByteInteger {
         value += ((long) bytes[offset] & BYTE_MASK);
         BigInteger val = BigInteger.valueOf(value);
         return (bytes[offset + BYTE_7] & LEFTMOST_BIT) == LEFTMOST_BIT
-            ? val.setBit(LEFTMOST_BIT_SHIFT) : val;
+                ? val.setBit(LEFTMOST_BIT_SHIFT) : val;
     }
 
     /**
      * Helper method to get the value as a Java long from an eight-byte array
+     *
      * @param bytes the array of bytes
      * @return the corresponding Java long value
      */
@@ -196,6 +189,7 @@ public final class ZipEightByteInteger {
 
     /**
      * Helper method to get the value as a Java long from an eight-byte array
+     *
      * @param bytes the array of bytes
      * @return the corresponding Java BigInteger value
      */
@@ -205,19 +199,19 @@ public final class ZipEightByteInteger {
 
     /**
      * Override to make two instances with same value equal.
+     *
      * @param o an object to compare
      * @return true if the objects are equal
      */
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof ZipEightByteInteger)) {
-            return false;
-        }
-        return value.equals(((ZipEightByteInteger) o).getValue());
+        return !(o == null || !(o instanceof ZipEightByteInteger))
+                && value.equals(((ZipEightByteInteger) o).getValue());
     }
 
     /**
      * Override to make two instances with same value equal.
+     *
      * @return the hashCode of the value stored in the ZipEightByteInteger
      */
     @Override

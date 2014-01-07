@@ -1,21 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+
 package org.xbib.io.archivers.ar;
 
 import org.xbib.io.archivers.ArchiveEntry;
@@ -28,9 +11,6 @@ import java.io.InputStream;
 
 /**
  * Implements the "ar" archive format as an input stream.
- * 
- * @NotThreadSafe
- * 
  */
 public class ArArchiveInputStream extends ArchiveInputStream {
 
@@ -55,9 +35,8 @@ public class ArArchiveInputStream extends ArchiveInputStream {
 
     /**
      * Constructs an Ar input stream with the referenced stream
-     * 
-     * @param pInput
-     *            the ar input stream
+     *
+     * @param pInput the ar input stream
      */
     public ArArchiveInputStream(final InputStream pInput) {
         input = pInput;
@@ -66,10 +45,9 @@ public class ArArchiveInputStream extends ArchiveInputStream {
 
     /**
      * Returns the next AR entry in this stream.
-     * 
+     *
      * @return the next AR entry.
-     * @throws java.io.IOException
-     *             if the entry could not be read
+     * @throws java.io.IOException if the entry could not be read
      */
     public ArArchiveEntry getNextArEntry() throws IOException {
         if (currentEntry != null) {
@@ -163,32 +141,33 @@ public class ArArchiveInputStream extends ArchiveInputStream {
         }
 
         currentEntry = new ArArchiveEntry(temp, len, asInt(userid, true),
-                                          asInt(groupid, true), asInt(filemode, 8),
-                                          asLong(lastmodified));
+                asInt(groupid, true), asInt(filemode, 8),
+                asLong(lastmodified));
         return currentEntry;
     }
 
     /**
      * Get an extended name from the GNU extended name buffer.
-     * 
+     *
      * @param offset pointer to entry within the buffer
      * @return the extended file name; without trailing "/" if present.
      * @throws java.io.IOException if name not found or buffer not set up
      */
-    private String getExtendedName(int offset) throws IOException{
+    private String getExtendedName(int offset) throws IOException {
         if (namebuffer == null) {
             throw new IOException("Cannot process GNU long filename as no // record was found");
         }
-        for(int i=offset; i < namebuffer.length; i++){
-            if (namebuffer[i]=='\012'){
-                if (namebuffer[i-1]=='/') {
+        for (int i = offset; i < namebuffer.length; i++) {
+            if (namebuffer[i] == '\012') {
+                if (namebuffer[i - 1] == '/') {
                     i--; // drop trailing /
                 }
-                return ArchiveUtils.toAsciiString(namebuffer, offset, i-offset);
+                return ArchiveUtils.toAsciiString(namebuffer, offset, i - offset);
             }
         }
-        throw new IOException("Failed to read entry: "+offset);
+        throw new IOException("Failed to read entry: " + offset);
     }
+
     private long asLong(byte[] input) {
         return Long.parseLong(ArchiveUtils.toAsciiString(input).trim());
     }
@@ -213,22 +192,11 @@ public class ArArchiveInputStream extends ArchiveInputStream {
         return Integer.parseInt(string, base);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.apache.commons.compress.archivers.ArchiveInputStream#getNextEntry()
-     */
     @Override
     public ArchiveEntry getNextEntry() throws IOException {
         return getNextArEntry();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.io.InputStream#close()
-     */
     @Override
     public void close() throws IOException {
         if (!closed) {
@@ -238,11 +206,6 @@ public class ArArchiveInputStream extends ArchiveInputStream {
         currentEntry = null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.io.InputStream#read(byte[], int, int)
-     */
     @Override
     public int read(byte[] b, final int off, final int len) throws IOException {
         int toRead = len;
@@ -263,11 +226,9 @@ public class ArArchiveInputStream extends ArchiveInputStream {
     /**
      * Checks if the signature matches ASCII "!<arch>" followed by a single LF
      * control character
-     * 
-     * @param signature
-     *            the bytes to check
-     * @param length
-     *            the number of bytes to check
+     *
+     * @param signature the bytes to check
+     * @param length    the number of bytes to check
      * @return true, if this stream is an Ar archive stream, false otherwise
      */
     public static boolean matches(byte[] signature, int length) {
@@ -306,14 +267,14 @@ public class ArArchiveInputStream extends ArchiveInputStream {
 
     static final String BSD_LONGNAME_PREFIX = "#1/";
     private static final int BSD_LONGNAME_PREFIX_LEN =
-        BSD_LONGNAME_PREFIX.length();
+            BSD_LONGNAME_PREFIX.length();
     private static final String BSD_LONGNAME_PATTERN =
-        "^" + BSD_LONGNAME_PREFIX + "\\d+";
+            "^" + BSD_LONGNAME_PREFIX + "\\d+";
 
     /**
      * Does the name look like it is a long name (or a name containing
      * spaces) as encoded by BSD ar?
-     *
+     * <p/>
      * <p>From the FreeBSD ar(5) man page:</p>
      * <pre>
      * BSD   In the BSD variant, names that are shorter than 16
@@ -329,8 +290,6 @@ public class ArArchiveInputStream extends ArchiveInputStream {
      *       sum of the size of the file name and the size of
      *       the member.
      * </pre>
-     *
-     * @since 1.3
      */
     private static boolean isBSDLongName(String name) {
         return name != null && name.matches(BSD_LONGNAME_PATTERN);
@@ -341,12 +300,10 @@ public class ArArchiveInputStream extends ArchiveInputStream {
      * first bytes to be read are the real file name.
      *
      * @see #isBSDLongName
-     *
-     * @since 1.3
      */
     private String getBSDLongName(String bsdLongName) throws IOException {
         int nameLen =
-            Integer.parseInt(bsdLongName.substring(BSD_LONGNAME_PREFIX_LEN));
+                Integer.parseInt(bsdLongName.substring(BSD_LONGNAME_PREFIX_LEN));
         byte[] name = new byte[nameLen];
         int read = 0, readNow = 0;
         while ((readNow = input.read(name, read, nameLen - read)) >= 0) {
@@ -367,15 +324,15 @@ public class ArArchiveInputStream extends ArchiveInputStream {
     /**
      * Is this the name of the "Archive String Table" as used by
      * SVR4/GNU to store long file names?
-     *
+     * <p/>
      * <p>GNU ar stores multiple extended filenames in the data section
      * of a file with the name "//", this record is referred to by
      * future headers.</p>
-     *
+     * <p/>
      * <p>A header references an extended filename by storing a "/"
      * followed by a decimal offset to the start of the filename in
      * the extended filename data section.</p>
-     * 
+     * <p/>
      * <p>The format of the "//" file itself is simply a list of the
      * long filenames, each separated by one or more LF
      * characters. Note that the decimal offsets are number of
@@ -394,9 +351,9 @@ public class ArArchiveInputStream extends ArchiveInputStream {
         int bufflen = asInt(length); // Assume length will fit in an int
         namebuffer = new byte[bufflen];
         int read = read(namebuffer, 0, bufflen);
-        if (read != bufflen){
+        if (read != bufflen) {
             throw new IOException("Failed to read complete // record: expected="
-                                  + bufflen + " read=" + read);
+                    + bufflen + " read=" + read);
         }
         return new ArArchiveEntry(GNU_STRING_TABLE_NAME, bufflen);
     }

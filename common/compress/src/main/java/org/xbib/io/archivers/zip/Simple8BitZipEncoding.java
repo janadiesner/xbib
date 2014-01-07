@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 
 package org.xbib.io.archivers.zip;
 
@@ -28,21 +10,20 @@ import java.util.List;
 /**
  * This ZipEncoding implementation implements a simple 8bit character
  * set, which mets the following restrictions:
- * 
+ * <p/>
  * <ul>
  * <li>Characters 0x0000 to 0x007f are encoded as the corresponding
- *        byte values 0x00 to 0x7f.</li>
+ * byte values 0x00 to 0x7f.</li>
  * <li>All byte codes from 0x80 to 0xff are mapped to a unique unicode
- *       character in the range 0x0080 to 0x7fff. (No support for
- *       UTF-16 surrogates)
+ * character in the range 0x0080 to 0x7fff. (No support for
+ * UTF-16 surrogates)
  * </ul>
- * 
+ * <p/>
  * <p>These restrictions most notably apply to the most prominent
  * omissions of java-1.4's {@link java.nio.charset.Charset Charset}
  * implementation, Cp437 and Cp850.</p>
- * 
+ * <p/>
  * <p>The methods of this class are reentrant.</p>
- * @Immutable
  */
 class Simple8BitZipEncoding implements ZipEncoding {
 
@@ -66,7 +47,7 @@ class Simple8BitZipEncoding implements ZipEncoding {
         @Override
         public String toString() {
             return "0x" + Integer.toHexString(0xffff & unicode)
-                + "->0x" + Integer.toHexString(0xff & code);
+                    + "->0x" + Integer.toHexString(0xff & code);
         }
 
         @Override
@@ -99,12 +80,12 @@ class Simple8BitZipEncoding implements ZipEncoding {
 
     /**
      * @param highChars The characters for byte values of 128 to 255
-     * stored as an array of 128 chars.
+     *                  stored as an array of 128 chars.
      */
     public Simple8BitZipEncoding(char[] highChars) {
         this.highChars = highChars.clone();
         List<Simple8BitChar> temp =
-            new ArrayList<Simple8BitChar>(this.highChars.length);
+                new ArrayList<Simple8BitChar>(this.highChars.length);
 
         byte code = 127;
 
@@ -118,7 +99,7 @@ class Simple8BitZipEncoding implements ZipEncoding {
 
     /**
      * Return the character code for a given encoded byte.
-     * 
+     *
      * @param b The byte to decode.
      * @return The associated character value.
      */
@@ -148,12 +129,12 @@ class Simple8BitZipEncoding implements ZipEncoding {
 
     /**
      * Pushes the encoded form of the given character to the given byte buffer.
-     * 
+     *
      * @param bb The byte buffer to write to.
-     * @param c The character to encode.
+     * @param c  The character to encode.
      * @return Whether the given unicode character is covered by this encoding.
-     *         If {@code false} is returned, nothing is pushed to the
-     *         byte buffer. 
+     * If {@code false} is returned, nothing is pushed to the
+     * byte buffer.
      */
     public boolean pushEncodedChar(ByteBuffer bb, char c) {
 
@@ -173,8 +154,8 @@ class Simple8BitZipEncoding implements ZipEncoding {
     /**
      * @param c A unicode character in the range from 0x0080 to 0x7f00
      * @return A Simple8BitChar, if this character is covered by this encoding.
-     *         A {@code null} value is returned, if this character is not
-     *         covered by this encoding.
+     * A {@code null} value is returned, if this character is not
+     * covered by this encoding.
      */
     private Simple8BitChar encodeHighChar(char c) {
         // for performance an simplicity, yet another reincarnation of
@@ -214,7 +195,7 @@ class Simple8BitZipEncoding implements ZipEncoding {
 
     public boolean canEncode(String name) {
 
-        for (int i=0;i<name.length();++i) {
+        for (int i = 0; i < name.length(); ++i) {
 
             char c = name.charAt(i);
 
@@ -228,19 +209,19 @@ class Simple8BitZipEncoding implements ZipEncoding {
 
     public ByteBuffer encode(String name) {
         ByteBuffer out = ByteBuffer.allocate(name.length()
-                                             + 6 + (name.length() + 1) / 2);
+                + 6 + (name.length() + 1) / 2);
 
-        for (int i=0;i<name.length();++i) {
+        for (int i = 0; i < name.length(); ++i) {
 
             char c = name.charAt(i);
 
             if (out.remaining() < 6) {
-                out = ZipEncodingHelper.growBuffer(out,out.position() + 6);
+                out = ZipEncodingHelper.growBuffer(out, out.position() + 6);
             }
 
-            if (!this.pushEncodedChar(out,c)) {
+            if (!this.pushEncodedChar(out, c)) {
 
-                ZipEncodingHelper.appendSurrogate(out,c);
+                ZipEncodingHelper.appendSurrogate(out, c);
             }
         }
 
@@ -250,9 +231,9 @@ class Simple8BitZipEncoding implements ZipEncoding {
     }
 
     public String decode(byte[] data) throws IOException {
-        char [] ret = new char[data.length];
+        char[] ret = new char[data.length];
 
-        for (int i=0;i<data.length;++i) {
+        for (int i = 0; i < data.length; ++i) {
             ret[i] = this.decodeByte(data[i]);
         }
 

@@ -58,8 +58,15 @@ public final class SQLConnectionFactory implements ConnectionFactory<SQLSession>
      * the logger
      */
     private static final Logger logger = LoggerFactory.getLogger(SQLConnectionFactory.class.getName());
+
     private Properties properties;
+
     private String jndiName;
+
+    @Override
+    public String getName() {
+        return "jdbc";
+    }
 
     /**
      * Get connection

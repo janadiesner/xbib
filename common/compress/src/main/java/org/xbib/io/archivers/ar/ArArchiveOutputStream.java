@@ -1,53 +1,44 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-package org.xbib.io.archivers.ar;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+package org.xbib.io.archivers.ar;
 
 import org.xbib.io.archivers.ArchiveEntry;
 import org.xbib.io.archivers.ArchiveOutputStream;
 import org.xbib.io.archivers.ArchiveUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+
 /**
  * Implements the "ar" archive format as an output stream.
- * 
- * @NotThreadSafe
  */
 public class ArArchiveOutputStream extends ArchiveOutputStream {
-    /** Fail if a long file name is required in the archive. */
+    /**
+     * Fail if a long file name is required in the archive.
+     */
     public static final int LONGFILE_ERROR = 0;
 
-    /** BSD ar extensions are used to store long file names in the archive. */
+    /**
+     * BSD ar extensions are used to store long file names in the archive.
+     */
     public static final int LONGFILE_BSD = 1;
 
     private final OutputStream out;
+
     private long entryOffset = 0;
+
     private ArArchiveEntry prevEntry;
+
     private boolean haveUnclosedEntry = false;
+
     private int longFileMode = LONGFILE_ERROR;
 
-    /** indicates if this archive is finished */
+    /**
+     * indicates if this archive is finished
+     */
     private boolean finished = false;
 
-    public ArArchiveOutputStream( final OutputStream pOut ) {
+    public ArArchiveOutputStream(final OutputStream pOut) {
         this.out = pOut;
     }
 
@@ -56,26 +47,25 @@ public class ArArchiveOutputStream extends ArchiveOutputStream {
      * This can be LONGFILE_ERROR(0) or LONGFILE_BSD(1).
      * This specifies the treatment of long file names (names >= 16).
      * Default is LONGFILE_ERROR.
+     *
      * @param longFileMode the mode to use
-     * @since 1.3
      */
     public void setLongFileMode(int longFileMode) {
         this.longFileMode = longFileMode;
     }
 
     private long writeArchiveHeader() throws IOException {
-        byte [] header = ArchiveUtils.toAsciiBytes(ArArchiveEntry.HEADER);
+        byte[] header = ArchiveUtils.toAsciiBytes(ArArchiveEntry.HEADER);
         out.write(header);
         return header.length;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void closeArchiveEntry() throws IOException {
-        if(finished) {
+        if (finished) {
             throw new IOException("Stream has already been finished");
         }
-        if (prevEntry == null || !haveUnclosedEntry){
+        if (prevEntry == null || !haveUnclosedEntry) {
             throw new IOException("No current entry to close");
         }
         if ((entryOffset % 2) != 0) {
@@ -84,14 +74,13 @@ public class ArArchiveOutputStream extends ArchiveOutputStream {
         haveUnclosedEntry = false;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public void putArchiveEntry( final ArchiveEntry pEntry ) throws IOException {
-        if(finished) {
+    public void putArchiveEntry(final ArchiveEntry pEntry) throws IOException {
+        if (finished) {
             throw new IOException("Stream has already been finished");
         }
 
-        ArArchiveEntry pArEntry = (ArArchiveEntry)pEntry;
+        ArArchiveEntry pArEntry = (ArArchiveEntry) pEntry;
         if (prevEntry == null) {
             writeArchiveHeader();
         } else {
@@ -112,7 +101,7 @@ public class ArArchiveOutputStream extends ArchiveOutputStream {
         haveUnclosedEntry = true;
     }
 
-    private long fill( final long pOffset, final long pNewOffset, final char pFill ) throws IOException { 
+    private long fill(final long pOffset, final long pNewOffset, final char pFill) throws IOException {
         final long diff = pNewOffset - pOffset;
 
         if (diff > 0) {
@@ -124,26 +113,26 @@ public class ArArchiveOutputStream extends ArchiveOutputStream {
         return pNewOffset;
     }
 
-    private long write( final String data ) throws IOException {
+    private long write(final String data) throws IOException {
         final byte[] bytes = data.getBytes("ascii");
         write(bytes);
         return bytes.length;
     }
 
-    private long writeEntryHeader( final ArArchiveEntry pEntry ) throws IOException {
+    private long writeEntryHeader(final ArArchiveEntry pEntry) throws IOException {
 
         long offset = 0;
         boolean mustAppendName = false;
 
         final String n = pEntry.getName();
         if (LONGFILE_ERROR == longFileMode && n.length() > 16) {
-            throw new IOException("filename too long, > 16 chars: "+n);
+            throw new IOException("filename too long, > 16 chars: " + n);
         }
-        if (LONGFILE_BSD == longFileMode && 
-            (n.length() > 16 || n.indexOf(" ") > -1)) {
+        if (LONGFILE_BSD == longFileMode &&
+                (n.length() > 16 || n.indexOf(" ") > -1)) {
             mustAppendName = true;
             offset += write(ArArchiveInputStream.BSD_LONGNAME_PREFIX
-                            + String.valueOf(n.length()));
+                    + String.valueOf(n.length()));
         } else {
             offset += write(n);
         }
@@ -178,8 +167,8 @@ public class ArArchiveOutputStream extends ArchiveOutputStream {
 
         offset = fill(offset, 48, ' ');
         final String s =
-            String.valueOf(pEntry.getLength()
-                           + (mustAppendName ? n.length() : 0));
+                String.valueOf(pEntry.getLength()
+                        + (mustAppendName ? n.length() : 0));
         if (s.length() > 10) {
             throw new IOException("size too long");
         }
@@ -208,29 +197,27 @@ public class ArArchiveOutputStream extends ArchiveOutputStream {
      */
     @Override
     public void close() throws IOException {
-        if(!finished) {
+        if (!finished) {
             finish();
         }
         out.close();
         prevEntry = null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public ArchiveEntry createArchiveEntry(File inputFile, String entryName)
             throws IOException {
-        if(finished) {
+        if (finished) {
             throw new IOException("Stream has already been finished");
         }
         return new ArArchiveEntry(inputFile, entryName);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void finish() throws IOException {
-        if(haveUnclosedEntry) {
+        if (haveUnclosedEntry) {
             throw new IOException("This archive contains unclosed entries.");
-        } else if(finished) {
+        } else if (finished) {
             throw new IOException("This archive has already been finished");
         }
         finished = true;

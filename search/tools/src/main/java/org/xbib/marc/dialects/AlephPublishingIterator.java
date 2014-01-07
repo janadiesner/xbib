@@ -54,6 +54,8 @@ public class AlephPublishingIterator implements Closeable, Iterator<Integer> {
 
     private final static Logger logger = LoggerFactory.getLogger(AlephPublishingIterator.class.getName());
 
+    private final ConnectionService<SQLSession> service = ConnectionService.getInstance();
+
     private Connection<SQLSession> connection;
 
     private SQLSession session;
@@ -177,8 +179,8 @@ public class AlephPublishingIterator implements Closeable, Iterator<Integer> {
         this.count = 0;
         NotclosedSQLResultSetListener p = new NotclosedSQLResultSetListener();
         try {
-            this.connection = ConnectionService.getInstance()
-                    .getFactory(uri)
+            this.connection = service
+                    .getConnectionFactory(uri)
                     .getConnection(uri);
             this.session = connection.createSession();
             session.open(Session.Mode.READ);
