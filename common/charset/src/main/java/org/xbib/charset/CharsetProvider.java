@@ -57,6 +57,8 @@ public class CharsetProvider extends AbstractCharsetProvider {
             new String[] { "Pica", "pica"} );
         charset("x-PICA", "PicaCharset",
             new String[] { "x-pica" } );
+        charset("ISO_5428", "ISO_5428",
+            new String[]{ "ISO-5428", "ISO-5428:1984", "iso-ir-55" });
         instance = new SoftReference(this);
     }
 

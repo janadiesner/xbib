@@ -31,6 +31,9 @@
  */
 package org.xbib.elasticsearch.tools.aggregate.zdb.entities;
 
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -43,6 +46,7 @@ import static com.google.common.collect.Maps.newHashMap;
 
 public class License extends Holding {
 
+
     private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 
     protected String servicetype;
@@ -50,8 +54,6 @@ public class License extends Holding {
     protected String servicemode;
 
     protected String servicedistribution;
-
-    private String region;
 
     public License(Map<String, Object> m) {
         super(m);
@@ -67,11 +69,6 @@ public class License extends Holding {
         this.dates = buildDateArray();
         this.info = buildInfo();
         this.findContentType();
-    }
-
-    @Override
-    public Map<String, Object> holdingInfo() {
-        return info;
     }
 
     protected void findContentType() {
@@ -117,12 +114,10 @@ public class License extends Holding {
 
     private final static Pattern movingWallPattern = Pattern.compile("^[+-](\\d+)Y$");
 
-    private Map<String, Object> buildInfo() {
+    protected Map<String, Object> buildInfo() {
         Map<String, Object> m = newHashMap();
-
-        Map<String, Object> service = newHashMap();
+        this.service = newHashMap();
         service.put("organization", getString("ezb:isil") );
-        service.put("region", region);
         String s = getString("ezb:ill_relevance.ezb:ill_code");
         if (s != null) {
             switch(s) {
@@ -194,14 +189,12 @@ public class License extends Holding {
             servicedistribution = "distribution-postal";
         }
         service.put("servicecomment", getString("ezb:ill_relevance.ezb:comment"));
-
         service.put("servicetype", servicetype);
         service.put("servicemode", servicemode);
         service.put("servicedistribution", servicedistribution);
         m.put("service", service);
 
         // no textualholdings
-
         Map<String, Object> holdings = newHashMap();
         holdings.put("firstvolume", getString("ezb:license_period.ezb:first_volume"));
         holdings.put("firstdate", getString("ezb:license_period.ezb:first_date"));
@@ -218,7 +211,7 @@ public class License extends Holding {
         link.put("nonpublicnote", "Verlagsangebot"); // ZDB = "Volltext"
         m.put("links", Arrays.asList(link));
 
-        Map<String, Object> license = newHashMap();
+        this.license = newHashMap();
         license.put("type", map().get("ezb:type_id"));
         license.put("licensetype", map().get("ezb:license_type_id"));
         license.put("pricetype", map().get("ezb:price_type_id"));
@@ -230,7 +223,8 @@ public class License extends Holding {
 
     protected Character findCarrierTypeKey() {
         switch (carrierType) {
-            case "online resource" : return servicedistribution.startsWith("postal") ? '3' : '1';
+            case "online resource" : return servicedistribution != null
+                    && servicedistribution.contains("postal") ? '3' : '1';
             case "volume": return '2';
             case "computer disc" : return '4';
             case "computer tape cassette" : return '4';
@@ -243,11 +237,6 @@ public class License extends Holding {
 
     public String getRoutingKey() {
         return String.valueOf(findRegionKey()) + findCarrierTypeKey();
-    }
-
-    public License setRegion(String region) {
-        this.region = region;
-        return this;
     }
 
 }

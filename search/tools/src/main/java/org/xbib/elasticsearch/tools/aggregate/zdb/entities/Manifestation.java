@@ -51,6 +51,8 @@ import java.util.Set;
 
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.xbib.grouping.bibliographic.endeavor.PublishedJournal;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 import org.xbib.map.MapBasedAnyObject;
 import org.xbib.pipeline.PipelineRequest;
 import org.xbib.util.Strings;
@@ -60,6 +62,7 @@ import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.google.common.collect.Sets.newLinkedHashSet;
+import static com.google.common.collect.Sets.newTreeSet;
 
 public class Manifestation extends MapBasedAnyObject
         implements Comparable<Manifestation>, PipelineRequest {
@@ -122,7 +125,7 @@ public class Manifestation extends MapBasedAnyObject
 
     private String unique;
 
-    private List links;
+    private List<Map<String,Object>> links;
 
     private final Map<String,Object> identifiers;
 
@@ -327,10 +330,6 @@ public class Manifestation extends MapBasedAnyObject
         return printID;
     }
 
-    public String getOnlineID() {
-        return onlineID;
-    }
-
     public String getPrintExternalID() {
         return printExternalID;
     }
@@ -339,12 +338,16 @@ public class Manifestation extends MapBasedAnyObject
         return onlineExternalID;
     }
 
-    public Map<String,Object> getIdentifiers() {
-        return identifiers.isEmpty() ? null : identifiers;
+    public boolean hasIdentifiers() {
+        return identifiers != null && !identifiers.isEmpty();
     }
 
-    public void setLinks(List<Map<String,Object>> links) {
-        this.links = links;
+    public Map<String,Object> getIdentifiers() {
+        return identifiers;
+    }
+
+    public boolean hasLinks() {
+        return links != null && !links.isEmpty();
     }
 
     public List<Map<String,Object>> getLinks() {
@@ -368,17 +371,6 @@ public class Manifestation extends MapBasedAnyObject
         return false;
     }
 
-    public boolean isInRange(Integer date) {
-        if (firstDate() == null) {
-            return true; // no date
-        }
-        if (date < firstDate()) {
-            return false;
-        }
-        return lastDate() == null || lastDate() < date;
-    }
-
-
     public String getUniqueIdentifier() {
         return unique;
     }
@@ -399,6 +391,7 @@ public class Manifestation extends MapBasedAnyObject
                 map().remove("AdditionalPhysicalFormNote");
                 map().remove("otherCodes");
                 return secondary;
+                // TODO adjust holdings
             }
         }
         return null;
@@ -772,13 +765,15 @@ public class Manifestation extends MapBasedAnyObject
         builder.field("country", country())
                 .field("language", language())
                 .field("publisherPlace", publisherPlace())
-                .field("publisher", publisher())
-                .field("identifiers", getIdentifiers())
-                .field("firstDate", firstDate())
+                .field("publisher", publisher());
+        builder.field("firstDate", firstDate())
                 .field("lastDate", lastDate())
                 .field("contentType", contentType())
                 .field("mediaType", mediaType())
                 .field("carrierType", carrierType());
+        if (hasIdentifiers()) {
+            builder.field("identifiers", getIdentifiers());
+        }
         if (isPartial()) {
             builder.field("isPartial", isPartial());
         }
@@ -845,17 +840,21 @@ public class Manifestation extends MapBasedAnyObject
         if (hasPrint()) {
             builder.field("hasPrint", getPrintExternalID());
         }
-        builder.startArray("relations");
-        for (String rel : getRelatedManifestations().keySet()) {
-            for (Manifestation mm : getRelatedManifestations().get(rel)) {
-                builder.startObject()
-                    .field("relation", rel)
-                    .field("id", mm.externalID)
-                    .endObject();
+        if (!getRelatedManifestations().isEmpty()) {
+            builder.startArray("relations");
+            for (String rel : getRelatedManifestations().keySet()) {
+                for (Manifestation mm : getRelatedManifestations().get(rel)) {
+                    builder.startObject()
+                            .field("relation", rel)
+                            .field("id", mm.externalID)
+                            .endObject();
+                }
             }
+            builder.endArray();
         }
-        builder.endArray();
-        builder.array("links", getLinks());
+        if (hasLinks()) {
+            builder.array("links", getLinks());
+        }
         builder.endObject();
     }
 
@@ -867,15 +866,10 @@ public class Manifestation extends MapBasedAnyObject
         builder.startObject()
                 .field("id", externalID())
                 .field("date", date)
-                .field("contentType", contentType())
-                .field("identifiers", getIdentifiers());
-        if (hasOnline()) {
-            builder.field("hasOnline", getOnlineExternalID());
+                .field("contentType", contentType());
+        if (hasLinks()) {
+            builder.field("links", getLinks());
         }
-        if (hasPrint()) {
-            builder.field("hasPrint", getPrintExternalID());
-        }
-        builder.field("links", getLinks());
         SetMultimap<String,Holding> libraries = HashMultimap.create();
         for (Holding holding : holdings) {
             libraries.put(holding.getISIL(), holding);
@@ -883,18 +877,19 @@ public class Manifestation extends MapBasedAnyObject
         builder.field("librariesCount", libraries.size())
                 .startArray("libraries");
         for (String library : libraries.keySet()) {
-            Set<Holding> services = libraries.get(library);
+            //Set<Holding> holdingsPerLibrary = merge(libraries.get(library));
+            Set<Holding> holdingsPerLibrary = libraries.get(library);
             builder.startObject()
                     .field("isil", library)
-                    .field("serviceCount", services.size())
+                    .field("serviceCount", holdingsPerLibrary.size())
                     .startArray("service");
-            for (Holding service : services) {
+            for (Holding holding : holdingsPerLibrary) {
                 builder.startObject()
-                        .field("id", service.id())
-                        .field("mediaType", service.mediaType())
-                        .field("carrierType", service.carrierType())
-                        .field("serviceisil", service.getServiceISIL())
-                        .field("info", service.holdingInfo())
+                        .field("id", holding.id())
+                        .field("mediaType", holding.mediaType())
+                        .field("carrierType", holding.carrierType())
+                        .field("serviceisil", holding.getServiceISIL())
+                        .field("info", holding.getInfo())
                         .endObject();
             }
             builder.endArray().endObject();
@@ -902,36 +897,60 @@ public class Manifestation extends MapBasedAnyObject
         builder.endArray().endObject();
     }
 
-    public void buildHolding(XContentBuilder builder, String holder, Set<Holding> holdings)
+    public void buildHolding(XContentBuilder builder, String isil, Set<Holding> holdings)
         throws IOException {
         if (holdings == null || holdings.isEmpty()) {
             return;
         }
         builder.startObject()
                 .field("id", externalID())
-                .field("holder", holder)
-                .field("contentType", contentType())
-                .field("identifiers", getIdentifiers());
-        if (hasOnline()) {
-            builder.field("hasOnline", getOnlineExternalID());
+                .field("isil", isil)
+                .field("contentType", contentType());
+        if (hasLinks()) {
+            builder.field("links", getLinks());
         }
-        if (hasPrint()) {
-            builder.field("hasPrint", getPrintExternalID());
-        }
-        builder.field("links", getLinks());
-        builder.field("holdingsCount", holdings.size())
-                .startArray("holdings");
+        //Set<Holding> merged = merge(holdings);
+        builder.field("serviceCount", holdings)
+                .startArray("service");
         for (Holding holding : holdings) {
             builder.startObject()
                     .field("id", holding.id())
                     .field("mediaType", holding.mediaType())
                     .field("carrierType", holding.carrierType())
                     .field("serviceisil", holding.getServiceISIL())
-                    .field("info", holding.holdingInfo())
+                    .field("info", holding.getInfo())
                     .endObject();
         }
         builder.endArray().endObject();
     }
+
+    /**
+     * Iterate through holdings and build a new list that contains
+     * only merged holdings. Merge holdings, licenses, indicators
+     * at best effort.
+     * @param holdings unmerged holdings
+     * @return new, merged holdings
+     */
+    private Set<Holding> merge(Set<Holding> holdings) {
+        Set<Holding> newHoldings = newTreeSet(Holding.getRoutingComparator());
+        for (Holding holding : holdings) {
+            if (holding instanceof Indicator) {
+                // we do not merge into indicator holdings
+                continue;
+            }
+            Holding similar = holding.getSimilar(holdings);
+            if (similar == null) {
+               newHoldings.add(holding);
+            } else if (similar instanceof Indicator) {
+                holding.addService(similar);
+            } else if (similar instanceof License) {
+                holding.addService(similar);
+                holding.addLicense(similar);
+            }
+        }
+        return newHoldings;
+    }
+
 
     public String getKey() {
         return key;

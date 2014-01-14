@@ -794,9 +794,9 @@
             "a" : "value"
         }
     },
-    "IdentifierIAN" : {
+    "IdentifierEAN" : {
         "values" : [
-        "024$3$ $a","024$3$ $ab" /* IAN */
+        "024$3$ $a","024$3$ $ab" /* EAN */
         ],
         "subfields" : {
             "a" : "value"

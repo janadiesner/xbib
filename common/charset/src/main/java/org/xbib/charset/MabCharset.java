@@ -91,8 +91,11 @@ public class MabCharset extends Charset {
      * <code>TEILFELDTRENNZEICHEN</code>
      */
     public static final char TEILFELDTRENNZEICHEN = '\u2021';
+
     public final static char[] byteToCharTable = newMabCharsetMap();
+
     public final static Map<Character, Byte> charToByteTable = newMabByteToCharMap();
+
     private boolean isNFCOutput;
 
     public MabCharset() {

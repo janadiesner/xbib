@@ -98,6 +98,8 @@ public class Iso2709Reader implements XMLReader {
      * MarcXchange listener
      */
     private MarcXchangeListener listener;
+
+    private ValueNormalizer normalizer;
     /**
      * Properties for this reader
      */
@@ -184,6 +186,15 @@ public class Iso2709Reader implements XMLReader {
     public MarcXchangeListener getMarcXchangeListener() {
         return listener;
     }
+
+    public Iso2709Reader setValueNormalizer(ValueNormalizer normalizer) {
+        this.normalizer = normalizer;
+        return this;
+    }
+
+    public ValueNormalizer getValueNormalizer() {
+        return normalizer;
+    }
     
     /**
      * Get the MarcXchange Sax service. Useful for inserting MarcXchange data
@@ -201,6 +212,7 @@ public class Iso2709Reader implements XMLReader {
                 .inputSource(input)
                 .setContentHandler(contentHandler)
                 .setListener(listener)
+                .setValueNormalizer(normalizer)
                 .setSchema((String) properties.get(SCHEMA))
                 .setFormat((String) properties.get(FORMAT))
                 .setType((String) properties.get(TYPE))

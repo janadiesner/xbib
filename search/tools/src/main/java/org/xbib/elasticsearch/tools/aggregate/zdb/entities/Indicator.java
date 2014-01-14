@@ -36,7 +36,6 @@ import org.xbib.util.Strings;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -58,11 +57,7 @@ public class Indicator extends License {
         this.dates = buildDateArray();
         this.info = buildInfo();
         this.findContentType();
-    }
 
-    @Override
-    public Map<String, Object> holdingInfo() {
-        return info;
     }
 
     protected void findContentType() {
@@ -89,11 +84,9 @@ public class Indicator extends License {
         return dates;
     }
 
-    private final static Pattern movingWallPattern = Pattern.compile("^[+-](\\d+)Y$");
-
-    private Map<String, Object> buildInfo() {
+    protected Map<String, Object> buildInfo() {
         Map<String, Object> m = newLinkedHashMap();
-        Map<String, Object> service = newLinkedHashMap();
+        this.service = newLinkedHashMap();
         String s = getString("xbib:interlibraryloanCode");
         if (s != null) {
             switch(s) {
@@ -123,7 +116,7 @@ public class Indicator extends License {
                 {
                     servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = "distribution-postal-unrestricted";
+                    servicedistribution = "distribution-postal";
                     break;
                 }
                 case "exn" : // 172.778
@@ -137,7 +130,7 @@ public class Indicator extends License {
                 {
                     servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = "distribution-electronic-unrestricted";
+                    servicedistribution = "distribution-electronic";
                     break;
                 }
                 default: {
@@ -147,12 +140,12 @@ public class Indicator extends License {
                     break;
                 }
             }
+            service.put("servicecomment", getString("xbib:comment"));
+            service.put("servicetype", servicetype);
+            service.put("servicemode", servicemode);
+            service.put("servicedistribution", servicedistribution);
+            m.put("service", service);
         }
-        service.put("servicecomment", getString("xbib:comment"));
-        service.put("servicetype", servicetype);
-        service.put("servicemode", servicemode);
-        service.put("servicedistribution", servicedistribution);
-        m.put("service", service);
         Map<String, Object> holdings = newHashMap();
         holdings.put("firstvolume", getString("xbib:firstVolume"));
         holdings.put("firstissue", getString("xbib:firstIssue"));

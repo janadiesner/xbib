@@ -49,12 +49,5 @@ public class CharsetTest extends Assert {
         String output = cbuf.toString();
         assertEquals(output, "£");
     }
- 
-    public void testISO() throws Exception {
-        byte[] b = new byte[]{(byte)0xc4};
-        String s = new String(b, "ISO-8859-1");
-        
-        
-    }
 
 }

@@ -67,7 +67,7 @@ public class MARCSpecification extends AbstractSpecification {
         String h = pos > 0 ? tail.substring(0, pos) : null;
         String t = pos > 0 ? tail.substring(pos+1) : tail;
         Object o = map.get(head);
-        if (o != null) {
+        if (o instanceof Map) {
             addSpec(h, t, element, (Map) o);
             return map;
         } else {

@@ -279,28 +279,38 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
         if (service.docs().contains(manifestation.externalID())) {
             return;
         }
-        // While we process, there may be other thread stealing our clusters, children etc.
-        // So we work with immutable copies.
+        // skip supplements and partials here. We pull them in while cluster construction.
+        if (manifestation.isSupplement() || manifestation.isPartial()) {
+            return;
+        }
+        service.docs().add(manifestation.externalID());
+
+        // create new candidate set. candidates are unstructured, no timeline organization,
+        // no relationship analysis
         this.candidates = newTreeSet(Manifestation.getIdComparator());
         candidates.add(manifestation);
-        // skip the clustering of supplements and partials
-        if (!manifestation.isSupplement() && !manifestation.isPartial()) {
-            service.docs().add(manifestation.externalID());
-            retrieveCluster(candidates, manifestation);
-        }
+        // retrieve all docs into candidate set that are connected by relationships
+        retrieveCluster(candidates, manifestation);
+
+        // Ensure direct relationships in the cluster.
+        // while we process, there may be other thread stealing our clusters, children etc.
+        // So we work with immutable copies.
         Set<Manifestation> c1 = ImmutableSet.copyOf(candidates);
         candidates.addAll(makeChildrenEditions(c1));
         Set<Manifestation> c2 = ImmutableSet.copyOf(candidates);
         for (Manifestation m : c2) {
             setAllRelationsBetween(m, c2);
         }
-        // build cluster
+
+        // Create timelines, and process each timeline for services (holdings, licenses, indicators)
         Cluster c = new Cluster(ImmutableSet.copyOf(candidates));
         List<TimeLine> timeLines = c.timeLines();
         for (TimeLine timeLine : timeLines) {
             String id = timeLine.first().externalID();
             if (service.clusters().contains(id)) {
-                logger.debug("not processing cluster {} twice (manifestation {})", id, manifestation);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("not processing cluster {} twice (manifestation {})", id, manifestation);
+                }
                 continue;
             }
             service.clusters().add(id);
@@ -308,7 +318,9 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
             timeLine.setHoldings(searchHoldings(timeLine));
             timeLine.setLicenses(searchLicenses(timeLine));
             timeLine.setIndicators(searchIndicators(timeLine));
-            logger.debug("{}/{}/{}", targetIndex, targetClusterType, id);
+            if (logger.isDebugEnabled()) {
+                logger.debug("{}/{}/{}", targetIndex, targetClusterType, id);
+            }
             // index time line summary
             XContentBuilder builder = jsonBuilder();
             timeLine.build(builder);
@@ -318,17 +330,20 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
             builder.close();
             // make evidences and services in the timeline
             timeLine.makeServices();
+            Map<Integer,Map<String,List<Holding>>> servicesByDate = timeLine.getServicesByDate();
             // index everything
             Set<Manifestation> visited = newHashSet();
             for (Manifestation m : timeLine) {
                 indexManifestation(m, visited);
             }
-            logger.debug("timeline {}/{}/{} size {}: indexed {} manifestations",
+            if (logger.isDebugEnabled()) {
+                logger.debug("timeline {}/{}/{} of size {}: indexed {} manifestations",
                     targetIndex, targetClusterType,
                     timeLine.first().externalID(),
                     timeLine.size(),
                     visited.size()
-            );
+                );
+            }
         }
     }
 
@@ -697,6 +712,9 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
                     if (!indicator.getISIL().startsWith("DE-")) {
                         continue;
                     }
+                    String region = service.bibdatLookup().lookup().get(indicator.getISIL());
+                    indicator.setRegion(region);
+                    logger.debug("resolved region for {}: {}", indicator.getISIL(), region);
                     Manifestation m = manifestations.get(indicator.parent());
                     if (m == null) {
                         continue;
@@ -708,8 +726,8 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
             }
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("found {} indicators for manifestations {}",
-                    indicators.size(), manifestations);
+            logger.debug("found {} indicators for manifestations {}: {}",
+                    indicators.size(), manifestations, indicators);
         }
         return indicators;
     }

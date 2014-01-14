@@ -189,7 +189,6 @@ public class BytesArray implements BytesReference {
      * @param minTargetSize   Minimum required value to be returned.
      * @param bytesPerElement Bytes used by each element of
      *                        the array.
-     * @lucene.internal
      */
 
     public static int oversize(int minTargetSize, int bytesPerElement) {

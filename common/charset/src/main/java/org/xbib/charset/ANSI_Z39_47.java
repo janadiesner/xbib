@@ -50,9 +50,6 @@ public class ANSI_Z39_47 extends Charset {
 
     private final static HashMap encodeMap = new HashMap();
     private final static HashMap decodeMap = new HashMap();
-    private final static HashMap decomposeMap = new HashMap();
-    private final static HashMap c2decodeMap = new HashMap();
-    private final static HashMap c3decodeMap = new HashMap();
     private Charset encodeCharset;
 
     public ANSI_Z39_47() {
@@ -80,14 +77,6 @@ public class ANSI_Z39_47 extends Charset {
             String value = mappings[i + 1];
             if (key.length() < 2) {
                 continue;
-            }
-            char key1 = key.charAt(0);
-            char value1 = value.charAt(0);
-            if (key.length() == 2) {
-                decomposeMap.put(Character.valueOf(key1), EXISTS);
-                c2decodeMap.put(key, value);
-            } else {
-                c3decodeMap.put(key, value);
             }
         }
     }

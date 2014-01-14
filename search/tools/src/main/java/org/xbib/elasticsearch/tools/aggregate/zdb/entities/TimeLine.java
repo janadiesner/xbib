@@ -365,17 +365,8 @@ public class TimeLine extends TreeSet<Manifestation> {
         }
     }
 
-    public double makeBoost() {
-        double boost = 1.0;
-        boost += dates.size();
-        for (Integer d : dates) {
-            boost += 0.1 * d * (1 +
-                    (holdingsByDate.containsKey(d) ? holdingsByDate.get(d).size() : 0)
-                    + (licensesByDate.containsKey(d) ? licensesByDate.get(d).size() : 0)
-                    + (indicatorsByDate.containsKey(d) ? indicatorsByDate.get(d).size() : 0)
-            );
-        }
-        return boost;
+    public Map<Integer,Map<String,List<Holding>>> getServicesByDate() {
+        return servicesByDate;
     }
 
     private Set<String> makeISILs() {
@@ -408,7 +399,6 @@ public class TimeLine extends TreeSet<Manifestation> {
         makeDates();
         Set<String> isils = makeISILs();
         builder.startObject()
-                .field("_boost", makeBoost())
                 .field("id", first().externalID())
                 .field("title", first().title())
                 .field("firstDate", firstDate)

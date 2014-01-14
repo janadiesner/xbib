@@ -66,6 +66,8 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
 
     private final CharStreamListener streamListener = new Iso2709StreamListener();
 
+    private ValueNormalizer normalizer = new DefaultValueNormalizer();
+
     private CharStream stream;
 
     private char mark = '\u0000';
@@ -162,6 +164,13 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
         return this;
     }
 
+    public MarcXchangeSaxAdapter setValueNormalizer(ValueNormalizer normalizer) {
+        if (normalizer != null) {
+            this.normalizer = normalizer;
+        }
+        return this;
+    }
+
     public String getIdentifier() {
         return id;
     }
@@ -255,10 +264,6 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
             if (listener != null) {
                 listener.endRecord();
             }
-            /*if (listener != null) {
-                // emit trailer event, drives record output segmentation
-                listener.trailer(null);
-            }*/
             this.recordOpen = false;
         } catch (Exception ex) {
             if (fatalerrors) {
@@ -408,13 +413,10 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
             if (!datafieldOpen) {
                 return;
             }
-            if (listener != null) {
-                listener.endDataField(designator);
-            }
             if (designator != null) {
                 String value = designator.data();
                 if (value != null && !value.isEmpty()) {
-                    value = normalizeValue(value);
+                    value = normalizer.normalize(value);
                     // write data field per default into a subfield with code 'a'
                     AttributesImpl attrs = new AttributesImpl();
                     attrs.addAttribute(nsUri, CODE, CODE, "CDATA", "a");
@@ -423,7 +425,11 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                         contentHandler.characters(value.toCharArray(), 0, value.length());
                         contentHandler.endElement(nsUri, SUBFIELD, SUBFIELD);
                     }
+                    designator.data(value);
                 }
+            }
+            if (listener != null) {
+                listener.endDataField(designator);
             }
             if (contentHandler != null) {
                 contentHandler.endElement(NS_URI, DATAFIELD, DATAFIELD);
@@ -471,17 +477,16 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
             return;
         }
         try {
+            if (contentHandler != null) {
+                String value = designator.data();
+                if (!value.isEmpty()) {
+                    value = normalizer.normalize(value);
+                    contentHandler.characters(value.toCharArray(), 0, value.length());
+                }
+                designator.data(value);
+            }
             if (listener != null) {
                 listener.endSubField(designator);
-            }
-            if (designator != null) {
-                if (contentHandler != null) {
-                    String value = designator.data();
-                    if (!value.isEmpty()) {
-                        value = normalizeValue(value);
-                        contentHandler.characters(value.toCharArray(), 0, value.length());
-                    }
-                }
             }
             if (contentHandler != null) {
                 contentHandler.endElement(NS_URI, SUBFIELD, SUBFIELD);
@@ -495,8 +500,12 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
         }
     }
 
-    protected String normalizeValue(String value) {
-        return XMLUtil.clean(Normalizer.normalize(value, Form.NFC));
+    private class DefaultValueNormalizer implements ValueNormalizer {
+
+        @Override
+        public String normalize(String value) {
+            return XMLUtil.clean(Normalizer.normalize(value, Form.NFC));
+        }
     }
 
     private class Iso2709StreamListener implements CharStreamListener {
