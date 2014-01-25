@@ -61,7 +61,8 @@ public class KeyValueElementMapperTest extends Assert {
         value = "200$0$2$abc";
         element = new NullElement();
         m = specification.addSpec(value, element, m);
-        assertEquals("{100={0={2={abc=<null>, def=<null>}, 1={abc=<null>}}}, 200={0={2={abc=<null>}}}}", m.toString());
+        // JDK 8 gives correct key order
+        assertEquals("{100={0={1={abc=<null>}, 2={abc=<null>, def=<null>}}}, 200={0={2={abc=<null>}}}}", m.toString());
         Element e = specification.getElement("100$0$1$abc", m);
         logger.info("e={}", e);
         e = specification.getElement("100$0$1$def", m);

@@ -76,6 +76,10 @@ public class MARCPipeline
         MARCElement element = null;
         try {
             element = (MARCElement) specification.getElement(key, map());
+            // if nothing was found, try tag only
+            if (element == null) {
+                element = (MARCElement) specification.getElementByTag(key, map());
+            }
         } catch (ClassCastException e) {
             logger.error("not a MARCElement instance for key" + key);
         }
@@ -84,7 +88,7 @@ public class MARCPipeline
             element.fields(builder(), fields, value);
             Map<String, Object> tags = (Map<String, Object>) element.getSettings().get("tags");
             Map<String, Object> subfields = (Map<String, Object>) element.getSettings().get("subfields");
-
+            // there must be subfields
             if (subfields != null) {
                 Map<String, Object> defaultSubfields = subfields;
                 // optional indicator configuration

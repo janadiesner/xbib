@@ -52,6 +52,7 @@ import java.text.NumberFormat;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.google.common.collect.Lists.newLinkedList;
 import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 
 public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline<T,R>>
@@ -89,6 +90,8 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
             logger.info("preparing");
             prepare();
             logger.info("executing");
+            //metric pipeline executor only usese concurrency over different URIs
+            // in the input queue, not with a single URI input
             executor = new MetricPipelineExecutor<T,R,P>()
                     .concurrency(settings.getAsInt("concurrency", 1))
                     .provider(pipelineProvider())
@@ -107,11 +110,16 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
     }
 
     protected Converter<T,R,P> prepare() throws IOException {
-        input = new Finder(settings.get("pattern"))
+        if (settings.get("uri") != null) {
+            input = newLinkedList();
+            input.add(URI.create(settings.get("uri")));
+        } else {
+            input = new Finder(settings.get("pattern"))
                     .find(settings.get("path"))
                     .pathSorted(settings.getAsBoolean("isPathSorted", false))
                     .chronologicallySorted(settings.getAsBoolean("isChronologicallySorted", false))
                     .getURIs();
+        }
         logger.info("input = {}", input);
         return this;
     }

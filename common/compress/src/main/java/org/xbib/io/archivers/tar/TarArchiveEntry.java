@@ -217,6 +217,7 @@ public class TarArchiveEntry implements TarConstants, ArchiveEntry {
         this.userName = user;
         this.groupName = "";
         this.file = null;
+        this.mode = DEFAULT_FILE_MODE;
     }
 
     /**
@@ -239,15 +240,13 @@ public class TarArchiveEntry implements TarConstants, ArchiveEntry {
      */
     public TarArchiveEntry(String name, boolean preserveLeadingSlashes) {
         this();
-
         name = normalizeFileName(name, preserveLeadingSlashes);
-        boolean isDir = name.endsWith("/");
-
-        this.devMajor = 0;
-        this.devMinor = 0;
         this.name = name;
+        boolean isDir = name.endsWith("/");
         this.mode = isDir ? DEFAULT_DIR_MODE : DEFAULT_FILE_MODE;
         this.linkFlag = isDir ? LF_DIR : LF_NORMAL;
+        this.devMajor = 0;
+        this.devMinor = 0;
         this.userId = 0;
         this.groupId = 0;
         this.size = 0;
@@ -410,6 +409,9 @@ public class TarArchiveEntry implements TarConstants, ArchiveEntry {
      */
     public TarArchiveEntry setName(String name) {
         this.name = normalizeFileName(name, false);
+        boolean isDir = name.endsWith("/");
+        this.mode = isDir ? DEFAULT_DIR_MODE : DEFAULT_FILE_MODE;
+        this.linkFlag = isDir ? LF_DIR : LF_NORMAL;
         return this;
     }
 

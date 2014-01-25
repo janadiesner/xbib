@@ -30,6 +30,7 @@
                     <descriptors>
                         <descriptor>${basedir}/src/main/assemblies/content.xml</descriptor>
                         <descriptor>${basedir}/src/main/assemblies/elasticsearch.xml</descriptor>
+                        <descriptor>${basedir}/src/main/assemblies/oracle.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>

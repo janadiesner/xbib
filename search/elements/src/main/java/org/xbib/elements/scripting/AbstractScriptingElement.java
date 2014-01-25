@@ -42,9 +42,13 @@ import org.xbib.elements.ElementBuilder;
 public abstract class AbstractScriptingElement implements Element {
 
     private final ScriptEngine engine;
+
     private final String invocable;
+
     private final String script;
+
     private Element element;
+
     private Map settings;
 
     public AbstractScriptingElement(String scriptEngineName, String script, String invocable) {

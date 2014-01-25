@@ -439,7 +439,7 @@ public abstract class RequestBuilderBase<T extends RequestBuilderBase<T>> {
     }
 
     public T setHeader(String name, String value) {
-        request.getHeaders().replace(name, value);
+        request.getHeaders().replace(name, Collections.singletonList(value));
         return derived.cast(this);
     }
 

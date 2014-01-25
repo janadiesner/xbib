@@ -65,10 +65,16 @@ public class TransformerURIResolver implements URIResolver {
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
+        return resolve(Thread.currentThread().getContextClassLoader(), href, base);
+    }
+
+    public Source resolve(ClassLoader cl, String href, String base) throws TransformerException {
         try {
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
             String systemId = href;
             URL url = cl.getResource(href);
+            if (url == null) {
+                throw new TransformerException("url is null for " + href);
+            }
             if (cl.getResource(href) != null) {
                 systemId = url.toExternalForm();
                 in = url.openStream();

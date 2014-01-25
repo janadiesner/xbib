@@ -34,24 +34,18 @@ package org.xbib.common.settings;
 import com.google.common.collect.ImmutableMap;
 import org.xbib.common.unit.TimeValue;
 
+import java.io.StringReader;
 import java.util.Map;
 
 /**
  * Immutable settings allowing to control the configuration.
- * <p/>
- * <p>Using {@link ImmutableSettings#settingsBuilder()} in order to create a builder
+ *
+ * Using {@link ImmutableSettings#settingsBuilder()} in order to create a builder
  * which in turn can create an immutable implementation of settings.
  *
  * @see ImmutableSettings
  */
 public interface Settings {
-
-    /**
-     * Component settings for a specific component. Returns all the settings for the given class, where the
-     * FQN of the class is used, without the <tt>org.elasticsearch<tt> prefix. If there is no <tt>org.elasticsearch</tt>
-     * prefix, then the prefix used is the first part of the package name (<tt>org</tt> / <tt>com</tt> / ...)
-     */
-    Settings getComponentSettings(Class component);
 
     /**
      * Component settings for a specific component. Returns all the settings for the given class, where the
@@ -64,11 +58,12 @@ public interface Settings {
      */
     Settings getByPrefix(String prefix);
 
-
     /**
      * The settings as a {@link java.util.Map}.
      */
     ImmutableMap<String, String> getAsMap();
+
+    StringReader getAsReader();
 
     /**
      * Returns the setting value associated with the setting key.

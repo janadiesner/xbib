@@ -43,7 +43,7 @@ import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.HashMap;
+//import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,6 +51,8 @@ import java.util.Map;
 import org.xbib.elements.scripting.ScriptElement;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+
+import static com.google.common.collect.Maps.newTreeMap;
 
 /**
  * Abstract specification
@@ -60,7 +62,7 @@ public abstract class AbstractSpecification {
 
     private final static Logger logger = LoggerFactory.getLogger(AbstractSpecification.class.getName());
 
-    private final static Map<String, Map> maps = new HashMap();
+    private final static Map<String, Map> maps = newTreeMap();
 
     private final static int DEFAULT_BUFFER_SIZE = 8192;
 
@@ -90,9 +92,9 @@ public abstract class AbstractSpecification {
             String msg = "format " + format + " not found: " + path + format + ".json";
             throw new IOException(msg);
         }
-        final Map elementMap = new HashMap();
-        HashMap<String, Map<String, Object>> defs =
-                new ObjectMapper().configure(Feature.ALLOW_COMMENTS, true).readValue(resource, HashMap.class);
+        final Map elementMap = newTreeMap();
+        Map<String, Map<String, Object>> defs =
+                new ObjectMapper().configure(Feature.ALLOW_COMMENTS, true).readValue(resource, Map.class);
         init(cl, path, format, elementMap, defs);
     }
 
@@ -129,8 +131,8 @@ public abstract class AbstractSpecification {
                 // sub resource in classpath?
                 InputStream in = loadResource(cl, path + key);
                 if (in != null) {
-                    HashMap<String, Map<String, Object>> children =
-                            new ObjectMapper().configure(Feature.ALLOW_COMMENTS, true).readValue(in, HashMap.class);
+                    Map<String, Map<String, Object>> children =
+                            new ObjectMapper().configure(Feature.ALLOW_COMMENTS, true).readValue(in, Map.class);
                     // recursive
                     init(cl, path + key, format, elementMap, children);
                 } else {
@@ -171,10 +173,10 @@ public abstract class AbstractSpecification {
         maps.put(format, elementMap);
     }
 
-    public Element getElement(String value, Map map) {
-        int pos = value != null ? value.indexOf('$') : 0;
-        String h = pos > 0 ? value.substring(0,pos) : null;
-        String t = pos > 0 ? value.substring(pos+1) : value;
+    public Element getElement(String spec, Map map) {
+        int pos = spec != null ? spec.indexOf('$') : 0;
+        String h = pos > 0 ? spec.substring(0, pos) : null;
+        String t = pos > 0 ? spec.substring(pos+1) : spec;
         return getElement(h, t, map);
     }
 
@@ -183,7 +185,7 @@ public abstract class AbstractSpecification {
             return (Element)map.get(tail);
         }
         int pos = tail != null ? tail.indexOf('$') : 0;
-        String h = pos > 0 ? tail.substring(0,pos) : null;
+        String h = pos > 0 ? tail.substring(0, pos) : null;
         String t = pos > 0 ? tail.substring(pos+1) : tail;
         Object o = map.get(head);
         if (o != null) {
@@ -192,6 +194,10 @@ public abstract class AbstractSpecification {
         } else {
             return null;
         }
+    }
+
+    public Element getElementByTag(String spec, Map map) {
+        return getElement(null, spec, map);
     }
 
     private String getPackageFromPath(String path) {
@@ -285,8 +291,6 @@ public abstract class AbstractSpecification {
                 }
                 l.add(kk);
                 elements.put(elemKey, l);
-            } else {
-                throw new IllegalArgumentException("unexpected class " + o.getClass() );
             }
         }
     }

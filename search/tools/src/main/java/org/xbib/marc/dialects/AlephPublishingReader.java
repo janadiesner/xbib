@@ -57,7 +57,6 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.xbib.io.ConnectionFactory;
 import org.xbib.pipeline.AbstractPipeline;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
@@ -269,7 +268,7 @@ public class AlephPublishingReader extends AbstractPipeline<CounterElement>
         do {
             skip = false;
             synchronized (lock) {
-                sysNumber.get().set(iterator.hasNext() ? iterator.next() : null);
+                sysNumber.get().set(iterator.hasNext() ? iterator.next() : (Long)null);
             }
             if (sysNumber == null) {
                 this.prepared = false;

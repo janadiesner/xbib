@@ -50,4 +50,8 @@ public interface XBIB {
     final SimpleFactory<Identifier,Property,Node> SIMPLE_FACTORY = SimpleFactory.getInstance();
 
     Property IDENTIFIER_AUTHORITY_ISIL = SIMPLE_FACTORY.asPredicate(NS_URI + "identifierAuthorityISIL");
+
+    Property BOOST = SIMPLE_FACTORY.asPredicate(NS_URI + "boost");
+
+    Property TYPE = SIMPLE_FACTORY.asPredicate(NS_URI + "type");
 }

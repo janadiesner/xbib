@@ -164,13 +164,13 @@ public class QueryGenerator implements Visitor {
                                             } else if (t.isBoundary()) {
                                                 builder.startObject("prefix").field(field, s).endObject();
                                             } else {
-                                                builder.startObject("text").startObject(field).field("query", s).endObject().endObject();
+                                                builder.startObject("match").startObject(field).field("query", s).endObject().endObject();
                                             }
                                             builder.endObject();
                                         }
                                         builder.endArray().endObject();
                                     } else {
-                                        builder.startObject("text").startObject(field).field("query", tok2.toString()).endObject().endObject();
+                                        builder.startObject("match").startObject(field).field("query", tok2.toString()).endObject().endObject();
                                     }
                                 } else if (tok2.isAll()) {
                                     builder.startObject("match_all").endObject();
@@ -179,7 +179,7 @@ public class QueryGenerator implements Visitor {
                                 } else if (tok2.isBoundary()) {
                                     builder.startObject("prefix").field(field, value).endObject();
                                 } else {
-                                    builder.startObject("text").startObject(field).field("query", value).endObject().endObject();
+                                    builder.startObject("match").startObject(field).field("query", value).endObject().endObject();
                                 }
                             }
                             break;
@@ -201,13 +201,13 @@ public class QueryGenerator implements Visitor {
                                         } else if (t.isBoundary()) {
                                             builder.startObject("prefix").field(field, s).endObject();
                                         } else {
-                                            builder.startObject("text").startObject(field).field("query", s).endObject().endObject();
+                                            builder.startObject("match").startObject(field).field("query", s).endObject().endObject();
                                         }
                                         builder.endObject();
                                     }
                                     builder.endArray().endObject();
                                 } else {
-                                    builder.startObject("text").startObject(field).field("query", tok2.toString()).endObject().endObject();
+                                    builder.startObject("match").startObject(field).field("query", tok2.toString()).endObject().endObject();
                                 }
                             } else if (tok2.isAll()) {
                                 builder.startObject("match_all").endObject();
@@ -216,7 +216,7 @@ public class QueryGenerator implements Visitor {
                             } else if (tok2.isBoundary()) {
                                 builder.startObject("prefix").field(field, value).endObject();
                             } else {
-                                builder.startObject("text").startObject(field).field("query", value).endObject().endObject();
+                                builder.startObject("match").startObject(field).field("query", value).endObject().endObject();
                             }
                             builder.endObject().endObject();
                             break;
@@ -237,13 +237,13 @@ public class QueryGenerator implements Visitor {
                                         } else if (t.isBoundary()) {
                                             builder.startObject("prefix").field(field, s).endObject();
                                         } else {
-                                            builder.startObject("text").startObject(field).field("query", s).endObject().endObject();
+                                            builder.startObject("match").startObject(field).field("query", s).endObject().endObject();
                                         }
                                         builder.endObject();
                                     }
                                     builder.endArray().endObject();
                                 } else {
-                                    builder.startObject("text").startObject(field).field("query", tok2.toString()).endObject().endObject();
+                                    builder.startObject("match").startObject(field).field("query", tok2.toString()).endObject().endObject();
                                 }
                             } else if (tok2.isAll()) {
                                 builder.startObject("match_all").endObject();
@@ -252,7 +252,7 @@ public class QueryGenerator implements Visitor {
                             } else if (tok2.isBoundary()) {
                                 builder.startObject("prefix").field(field, value).endObject();
                             } else {
-                                builder.startObject("text").startObject(field).field("query", value).endObject().endObject();
+                                builder.startObject("match").startObject(field).field("query", value).endObject().endObject();
                             }
                             break;
                         }
@@ -272,13 +272,13 @@ public class QueryGenerator implements Visitor {
                                         } else if (t.isBoundary()) {
                                             builder.startObject("prefix").field(field, s).endObject();
                                         } else {
-                                            builder.startObject("text").startObject(field).field("query", s).endObject().endObject();
+                                            builder.startObject("match").startObject(field).field("query", s).endObject().endObject();
                                         }
                                         builder.endObject();
                                     }
                                     builder.endArray().endObject();
                                 } else {
-                                    builder.startObject("text").startObject(field).field("query", tok2.toString()).endObject().endObject();
+                                    builder.startObject("match").startObject(field).field("query", tok2.toString()).endObject().endObject();
                                 }
                             } else if (tok2.isAll()) {
                                 builder.startObject("match_all").endObject();
@@ -287,7 +287,7 @@ public class QueryGenerator implements Visitor {
                             } else if (tok2.isBoundary()) {
                                 builder.startObject("prefix").field(field, value).endObject();
                             } else {
-                                builder.startObject("text").startObject(field).field("query", value).endObject().endObject();
+                                builder.startObject("match").startObject(field).field("query", value).endObject().endObject();
                             }
                             break;
                         }
@@ -295,7 +295,7 @@ public class QueryGenerator implements Visitor {
                             String field = arg1.toString();
                             String value = arg2.toString();
                             if (tok2.isProtected()) {
-                                builder.startObject("text_phrase")
+                                builder.startObject("match_phrase")
                                         .startObject(field)
                                         .field("query", tok2.getString())
                                         .field("slop", 0)
@@ -308,7 +308,7 @@ public class QueryGenerator implements Visitor {
                             } else if (tok2.isBoundary()) {
                                 builder.startObject("prefix").field(field, value).endObject();
                             } else {
-                                builder.startObject("text_phrase").startObject(field).field("query", value).field("slop", 0).endObject().endObject();
+                                builder.startObject("match_phrase").startObject(field).field("query", value).field("slop", 0).endObject().endObject();
                             }
                             break;
                         }
@@ -384,8 +384,8 @@ public class QueryGenerator implements Visitor {
                                     builder.startObject("bool");
                                     builder.startObject("must");
                                     if (arg1 instanceof Token) {
-                                        // "must" : { "text" : { "_all" : <token> } }
-                                        builder.startObject("text").field("_all");
+                                        // "must" : { "match" : { "_all" : <token> } }
+                                        builder.startObject("match").field("_all");
                                         arg1.accept(this);
                                         builder.endObject();
                                     } else {
@@ -394,8 +394,8 @@ public class QueryGenerator implements Visitor {
                                     builder.endObject();
                                     builder.startObject("must");
                                     if (arg2 instanceof Token) {
-                                        // "must" : { "text" : { "_all" : <token> } }
-                                        builder.startObject("text").field("_all");
+                                        // "must" : { "match" : { "_all" : <token> } }
+                                        builder.startObject("match").field("_all");
                                         arg2.accept(this);
                                         builder.endObject();
                                     } else {
@@ -426,8 +426,8 @@ public class QueryGenerator implements Visitor {
                                 if (arg1.isVisible()) {
                                     builder.startObject("should");
                                     if (arg1 instanceof Token) {
-                                        // "should" : { "text" : { "_all" : <token> } }
-                                        builder.startObject("text").field("_all");
+                                        // "should" : { "match" : { "_all" : <token> } }
+                                        builder.startObject("match").field("_all");
                                         arg1.accept(this);
                                         builder.endObject();
                                     } else {
@@ -438,8 +438,8 @@ public class QueryGenerator implements Visitor {
                                 if (arg2 != null && arg2.isVisible()) {
                                     builder.startObject("should");
                                     if (arg2 instanceof Token) {
-                                        // "should" : { "text" : { "_all" : <token> } }
-                                        builder.startObject("text").field("_all");
+                                        // "should" : { "match" : { "_all" : <token> } }
+                                        builder.startObject("match").field("_all");
                                         arg2.accept(this);
                                         builder.endObject();
                                     } else {
@@ -490,7 +490,10 @@ public class QueryGenerator implements Visitor {
         int pos = field.indexOf("|");
         String path = pos > 0 ? field.substring(0, pos) : field;
         String term = pos > 0 ? field.substring(pos + 1) : "UNKNOWN";
-        builder.startObject("nested").field("path", path).field("score_mode", "avg").startObject("query").startObject("bool").startArray("must").startObject().startObject("term").field(path + "." + termName, term).endObject().endObject().startObject().startObject("text").field(path + "." + textName, text).endObject().endObject().endArray().endObject().endObject().endObject();
+        builder.startObject("nested").field("path", path).field("score_mode", "avg").startObject("query")
+                .startObject("bool").startArray("must").startObject().startObject("term").field(path + "." + termName, term).endObject().endObject()
+                .startObject().startObject("match").field(path + "." + textName, text)
+                .endObject().endObject().endArray().endObject().endObject().endObject();
     }
 
     private Token checkType(Operator op, Node node, Token token) {

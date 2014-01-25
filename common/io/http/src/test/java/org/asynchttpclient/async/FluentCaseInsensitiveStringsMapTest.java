@@ -392,7 +392,7 @@ public class FluentCaseInsensitiveStringsMapTest {
         assertEquals(map.getJoinedValue("baz", ", "), "foo, bar");
         assertEquals(map.get("baz"), Arrays.asList("foo", "bar"));
 
-        map.replace("Foo", "blub", "bla");
+        map.replace("Foo", Arrays.asList("blub", "bla"));
 
         assertEquals(map.keySet(), new LinkedHashSet<String>(Arrays.asList("Foo", "baz")));
         assertEquals(map.getFirstValue("foo"), "blub");

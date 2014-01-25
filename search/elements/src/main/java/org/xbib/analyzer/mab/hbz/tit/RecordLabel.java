@@ -1,6 +1,7 @@
 package org.xbib.analyzer.mab.hbz.tit;
 
 import org.xbib.elements.ElementBuilder;
+import org.xbib.elements.bibliographic.XBIB;
 import org.xbib.elements.marc.dialects.mab.MABContext;
 import org.xbib.elements.marc.dialects.mab.MABElement;
 import org.xbib.marc.FieldCollection;
@@ -19,9 +20,9 @@ public class RecordLabel extends MABElement {
         builder.context().label(value.trim());
         if (value.length() == 24) {
             char satztyp = value.charAt(23);
-            builder.context().resource().add("_type", String.valueOf(satztyp));
+            builder.context().resource().add(XBIB.TYPE, String.valueOf(satztyp));
             if (satztyp == 'u') {
-                builder.context().resource().add("_boost", "0.1");
+                builder.context().resource().add(XBIB.BOOST, "0.1");
             }
         } else {
             logger.warn("record label length is {} characters: {}", value.length(), value);

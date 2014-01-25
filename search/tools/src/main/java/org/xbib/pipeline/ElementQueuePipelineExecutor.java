@@ -19,6 +19,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * An Element Queue Pipeline executor. This executor can execute pipelines in parallel
  * and manage a queue of elements that have to be processed by the pipelines.
+ *
+ * By doing this, the concurrency works on element level, not URI level.
+ *
  * Pipelines are created by a pipeline provider.
  * The maximum number of concurrent pipelines is 256.
  * Each pipeline can receive elements, which are put into a blocking queue by

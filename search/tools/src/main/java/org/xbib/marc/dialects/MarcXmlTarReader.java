@@ -378,7 +378,10 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
      */
     private String nextNumber() throws IOException {
         String name = packet.name();
-        int pos = name == null ? -1 : name.lastIndexOf('/');
+        int pos = name != null ? name.lastIndexOf('/') : -1;
+        if (pos < 0 && name != null) {
+            return name;
+        }
         String numberStr = pos >= 0 ? name.substring(pos + 1) : null;
         while ((pos < 0) || Strings.isNullOrEmpty(numberStr)) {
             logger.warn("skipping packet {}, number does not match", name);

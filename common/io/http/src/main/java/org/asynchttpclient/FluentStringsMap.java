@@ -127,17 +127,6 @@ public class FluentStringsMap implements Map<String, List<String>>, Iterable<Map
      * @param values The new values
      * @return This object
      */
-    public FluentStringsMap replace(final String key, final String... values) {
-        return replace(key, Arrays.asList(values));
-    }
-
-    /**
-     * Replaces the values for the given key with the given values.
-     *
-     * @param key    The key
-     * @param values The new values
-     * @return This object
-     */
     public FluentStringsMap replace(final String key, final Collection<String> values) {
         if (key != null) {
             if (values == null) {

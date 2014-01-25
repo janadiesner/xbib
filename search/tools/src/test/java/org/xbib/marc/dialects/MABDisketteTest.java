@@ -68,7 +68,7 @@ import org.xml.sax.SAXException;
 
 public class MABDisketteTest {
 
-    private final Logger logger = LoggerFactory.getLogger(AlephPublishingReaderTest.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(AlephPublishReaderTest.class.getName());
 
     public void testMAB() throws Exception {
         InputStream in = getClass().getResourceAsStream("/test/mgl.txt");

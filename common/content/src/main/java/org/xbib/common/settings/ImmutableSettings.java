@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
@@ -51,12 +52,14 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.xbib.common.unit.TimeValue;
+import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.io.stream.StreamInput;
 import org.xbib.io.stream.StreamOutput;
 import org.xbib.common.settings.loader.SettingsLoader;
 import org.xbib.common.settings.loader.SettingsLoaderFactory;
 
 import static org.xbib.common.unit.TimeValue.parseTimeValue;
+import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * An immutable implementation of {@link Settings}.
@@ -75,12 +78,19 @@ public class ImmutableSettings implements Settings {
     }
 
     @Override
-    public Settings getComponentSettings(Class component) {
-        if (component.getName().startsWith("org.xbib")) {
-            return getComponentSettings("org.xbib", component);
+    public StringReader getAsReader() {
+        try {
+            XContentBuilder builder = jsonBuilder();
+            builder.startObject();
+            for (Map.Entry<String, String> entry : getAsMap().entrySet()) {
+                builder.field(entry.getKey(), entry.getValue());
+            }
+            builder.endObject();
+            return new StringReader(builder.string());
+        } catch (IOException e) {
+            //
         }
-        // not starting with org.xbib, just remove the first package part (probably org/net/com)
-        return getComponentSettings(component.getName().substring(0, component.getName().indexOf('.')), component);
+        return null;
     }
 
     @Override

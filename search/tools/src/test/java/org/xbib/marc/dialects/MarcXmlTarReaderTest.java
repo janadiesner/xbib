@@ -23,7 +23,7 @@ import java.util.ResourceBundle;
 
 public class MarcXmlTarReaderTest {
 
-    private final Logger logger = LoggerFactory.getLogger(AlephPublishingReaderTest.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(AlephPublishReaderTest.class.getName());
 
     @Test
     public void testMABTarImport() throws Exception {

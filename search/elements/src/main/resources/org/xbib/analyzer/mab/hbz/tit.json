@@ -3856,9 +3856,6 @@
         ]
     }, 
     "Date": {
-        "subfields": {
-            "a": "date"
-        }, 
         "values": [
             "425$ $1$a", 
             "425$ $a", 
@@ -3873,12 +3870,13 @@
             "674$a$a", 
             "674$a$1$a", 
             "674$a$2$a"
-        ]
+        ],
+        "subfields": {
+            "a" : "date",
+            "p" : "date"
+        }
     }, 
     "DateUniform": {
-        "subfields": {
-            "a": "uniformDate"
-        }, 
         "values": [
             "425$a$a", 
             "425$a$1$a", 
@@ -3887,8 +3885,7 @@
             "425$b$1$a", 
             "425$p$a", 
             "425$p$1$a", 
-            "425$a$1$1", 
-            "425$a$1$ac", 
+            "425$a$1$ac",
             "425$a$2$a", 
             "425$a$3$a", 
             "425$a$4$a", 
@@ -3902,7 +3899,17 @@
             "425$p$2$a", 
             "619$a$a", 
             "619$a$1$a"
-        ]
+        ],
+        "indicators" : {
+            "a" : "PublicationDate",
+            "b" : "FirstDate",
+            "c" : "LastDate",
+            "p" : "PublicationDate"
+        },
+        "subfields": {
+            "a": "date",
+            "c": "date"
+        }
     }, 
     "Delete": {
         "subfields": {
@@ -3915,9 +3922,6 @@
         ]
     }, 
     "Description": {
-        "subfields": {
-            "a": "description"
-        }, 
         "values": [
             "405$ $", 
             "405$ $1$a", 
@@ -4650,7 +4654,12 @@
             "663$a$1$a", 
             "664$a$1$a", 
             "669$a$1$a"
-        ]
+        ],
+        "subfields": {
+            "a" : "description",
+            "p" : "prefix",
+            "9" : "identifier"
+        }
     }, 
     "DescriptionAbstract": {
         "subfields": {
@@ -5707,7 +5716,8 @@
             "b": "identifierOfTheRevisingInstitution"
         }, 
         "subfields": {
-            "a": "value"
+            "a" : "value",
+            "b" : "source"
         }, 
         "tags": {
             "070": "IdentifierForCataloging", 
@@ -14207,7 +14217,8 @@
             "d": "subjectDate", 
             "e": "subjectConference", 
             "f": "subjectGenre", 
-            "g": "subjectGeoName", 
+            "g": "subjectGeoName",
+            "h": "subjectGeoNameOtherName",
             "k": "subjectCorporateBodyName", 
             "m": "subjectMusic", 
             "n": "subjectNumbering", 
@@ -14870,7 +14881,8 @@
             "k": "rswkSubjectCorporateBody", 
             "p": "rswkSubjectPerson", 
             "s": "rswkSubjectTopic", 
-            "t": "rswkSubjectTitle", 
+            "t": "rswkSubjectTitle",
+            "x": "rswkSubjectAddendum",
             "z": "rswkSubjectTemporal"
         }, 
         "subfields": {
@@ -14883,6 +14895,7 @@
             "p": "rswkSubjectPerson", 
             "s": "rswkSubjectTopic", 
             "t": "rswkSubjectTitle", 
+            "x": "rswkSubjectAddendum",
             "z": "rswkSubjectTemporal"
         }, 
         "tags": {

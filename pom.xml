@@ -101,7 +101,7 @@
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>dd.MM.yyyy HH:mm</maven.build.timestamp.format>
-        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     </properties>
 
@@ -647,7 +647,7 @@
                     <dependency>
                         <groupId>org.xbib.elasticsearch.plugin</groupId>
                         <artifactId>elasticsearch-support</artifactId>
-                        <version>1.0.0.Beta2.6</version>
+                        <version>1.0.0.RC1.2</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -664,7 +664,6 @@
         <module>common/jacc</module>
         <module>common/io</module>
         <module>common/dict</module>
-        <module>common/graph</module>
         <module>common/stream</module>
         <module>common/mapdb</module>
 
