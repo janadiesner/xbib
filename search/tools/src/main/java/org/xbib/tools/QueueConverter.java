@@ -82,6 +82,11 @@ public abstract class QueueConverter<T, R extends PipelineRequest, P extends Pip
         }
 
         @Override
+        public void remove() {
+
+        }
+
+        @Override
         protected void process(DefaultPipelineRequest request) throws IOException {
             converter.process(request.object);
         }
