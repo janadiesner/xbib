@@ -51,8 +51,8 @@ public class Indicator extends License {
 
     @Override
     protected void build() {
+        this.identifier = getString("dc:identifier");
         this.parent = getString("xbib:identifier");
-        this.id = getString("dc:identifier");
         this.isil = getString("xbib:isil");
         this.dates = buildDateArray();
         this.info = buildInfo();
@@ -140,24 +140,38 @@ public class Indicator extends License {
                     break;
                 }
             }
-            service.put("servicecomment", getString("xbib:comment"));
-            service.put("servicetype", servicetype);
-            service.put("servicemode", servicemode);
-            service.put("servicedistribution", servicedistribution);
+            service.put("type", servicetype);
+            service.put("mode", servicemode);
+            service.put("distribution", servicedistribution);
+            String comment = getString("xbib:comment");
+            if (!Strings.isNullOrEmpty(comment)) {
+                service.put("comment", comment);
+            }
             m.put("service", service);
         }
         Map<String, Object> holdings = newHashMap();
-        holdings.put("firstvolume", getString("xbib:firstVolume"));
-        holdings.put("firstissue", getString("xbib:firstIssue"));
         holdings.put("firstdate", getString("xbib:firstDate"));
-        holdings.put("lastvolume", getString("xbib:lastVolume"));
-        holdings.put("lastissue", getString("xbib:lastIssue"));
-        holdings.put("lastdate", getString("xbib:lastDate"));
+        String lastDate = getString("xbib:lastDate");
+        holdings.put("lastdate", Strings.isNullOrEmpty(lastDate) ? currentYear : lastDate);
+        // optional, can be null
+        String firstVolume = getString("xbib:firstVolume");
+        if (!Strings.isNullOrEmpty(firstVolume)) {
+            holdings.put("firstvolume", firstVolume);
+        }
+        String lastVolume = getString("xbib:lastVolume");
+        if (!Strings.isNullOrEmpty(lastVolume)) {
+            holdings.put("lastvolume", lastVolume);
+        }
+        String firstIssue = getString("xbib:firstIssue");
+        if (!Strings.isNullOrEmpty(firstIssue)) {
+            holdings.put("firstissue", firstIssue);
+        }
+        String lastIssue = getString("xbib:lastIssue");
+        if (!Strings.isNullOrEmpty(lastIssue)) {
+            holdings.put("lastissue", lastIssue);
+        }
         m.put("holdings", holdings);
         return m;
     }
 
-    public String getRoutingKey() {
-        return new StringBuilder().append(findRegionKey()).append(findCarrierTypeKey()).toString();
-    }
 }

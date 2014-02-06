@@ -68,9 +68,9 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.pipeline.element.CounterElement;
+import org.xbib.pipeline.element.CounterPipelineElement;
 
-public class AlephPublishingReader extends AbstractPipeline<CounterElement>
+public class AlephPublishingReader extends AbstractPipeline<CounterPipelineElement>
         implements MarcXchangeListener {
 
     private final static Logger logger = LoggerFactory.getLogger(AlephPublishingReader.class.getName());
@@ -81,7 +81,7 @@ public class AlephPublishingReader extends AbstractPipeline<CounterElement>
 
     private final DecimalFormat df = new DecimalFormat("000000000");
 
-    private final CounterElement sysNumber = new CounterElement().set(new AtomicLong(0L));
+    private final CounterPipelineElement sysNumber = new CounterPipelineElement().set(new AtomicLong(0L));
 
     private final static int CLOB_BUF_SIZE = 8192;
 
@@ -148,7 +148,7 @@ public class AlephPublishingReader extends AbstractPipeline<CounterElement>
     }
 
     @Override
-    public CounterElement next() {
+    public CounterPipelineElement next() {
         return nextRead();
     }
 
@@ -308,7 +308,7 @@ public class AlephPublishingReader extends AbstractPipeline<CounterElement>
         return false;
     }
 
-    private CounterElement nextRead() {
+    private CounterPipelineElement nextRead() {
         if (clob == null) {
             return null;
         }

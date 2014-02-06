@@ -66,7 +66,7 @@ public class ConcurrentAlephPublishingReaderTest {
 
     private String setName;
 
-    public void testAlephPublishing() throws InterruptedException, ExecutionException {
+    public void testAlephPublishing() throws InterruptedException, ExecutionException, IOException {
         //System.setProperty("java.naming.factory.initial", "org.xbib.naming.SimpleContextFactory");
 
         ResourceBundle bundle = ResourceBundle.getBundle("org.xbib.marc.extensions.alephtest");
@@ -90,6 +90,8 @@ public class ConcurrentAlephPublishingReaderTest {
                     }
                 })
                 .execute();
+
+        // TODO
     }
 
     private Pipeline createPipeline() {

@@ -31,7 +31,6 @@
  */
 package org.xbib.sru;
 
-import org.xbib.io.OutputFormat;
 import org.xbib.xml.transform.StylesheetTransformer;
 
 import java.io.IOException;
@@ -42,7 +41,12 @@ import java.io.Writer;
  */
 public interface SRUResponse {
 
-    SRUResponse setOutputFormat(OutputFormat format);
+    /**
+     * Set output format
+     * @param format the format as suffix
+     * @return this SRU response
+     */
+    SRUResponse setOutputFormat(String format);
 
     SRUResponse setStylesheetTransformer(StylesheetTransformer transformer);
 

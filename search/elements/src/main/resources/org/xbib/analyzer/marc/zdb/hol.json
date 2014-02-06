@@ -885,13 +885,14 @@
         "852$ $1$9=z"
         ],
         "subfields" : {
-            "3" : "enumerationAndChronology",
-            "6" : "",
-            "9" : "name",
-            "a" : "marcorg",
+            "3" : "enumerationAndChronology", /* materialsSpecified ? */
+            "6" : "linkage",
+            "9" : "name", /* ZDB */
+            "a" : "location",
             "b" : "collection",
             "c" : "shelvinglocation",
-            "m" : "loancode",
+            "m" : "loancode", /* ZDB */
+            "x" : "nonPublicNote",
             "z" : "publicnote",
             "=" : "custom" /* ZDB Erweiterung für Fernleihindikator */
         },

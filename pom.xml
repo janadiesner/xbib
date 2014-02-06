@@ -5,7 +5,7 @@
 
     <groupId>org.xbib</groupId>
     <artifactId>xbib</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0.Beta1</version>
 
     <packaging>pom</packaging>
 
@@ -55,13 +55,10 @@
 
     <distributionManagement>
         <repository>
-            <id>github-release-repo</id>
-            <url>https://github.com/xbib/maven-repo/raw/master/releases</url>
+            <id>bintray-jprante-xbib</id>
+            <name>jprante-xbib</name>
+            <url>https://api.bintray.com/maven/xbib/xbib/xbib</url>
         </repository>
-        <snapshotRepository>
-            <id>github-snapshot-repo</id>
-            <url>https://github.com/xbib/maven-repo/raw/master/snapshots</url>
-        </snapshotRepository>
     </distributionManagement>
 
     <repositories>
@@ -76,8 +73,8 @@
             </snapshots>
         </repository>
         <repository>
-            <id>github-release-repo</id>
-            <url>https://github.com/xbib/maven-repo/raw/master/releases</url>
+            <id>bintray-xbib</id>
+            <url>http://dl.bintray.com/xbib/xbib</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -85,16 +82,7 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <repository>
-            <id>github-snapshot-repo</id>
-            <url>https://github.com/xbib/maven-repo/raw/master/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
+
     </repositories>
 
     <properties>
@@ -421,6 +409,16 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.xbib</groupId>
+                <artifactId>handlebars</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xbib.elasticsearch.plugin</groupId>
+                <artifactId>elasticsearch-support</artifactId>
+                <version>0.19.11.2</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>15.0</version>
@@ -543,7 +541,7 @@
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
-                <version>2.9.1</version>
+                <version>2.11.0</version>
             </dependency>
             <dependency>
                 <groupId>xalan</groupId>
@@ -606,54 +604,6 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>es-019</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.xbib.elasticsearch.plugin</groupId>
-                        <artifactId>elasticsearch-support</artifactId>
-                        <version>0.19.11.1</version>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-        </profile>
-        <profile>
-            <id>es-090</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.xbib.elasticsearch.plugin</groupId>
-                        <artifactId>elasticsearch-support</artifactId>
-                        <version>0.90.9.2</version>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-        </profile>
-        <profile>
-            <id>es-100</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.xbib.elasticsearch.plugin</groupId>
-                        <artifactId>elasticsearch-support</artifactId>
-                        <version>1.0.0.RC1.2</version>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-        </profile>
-    </profiles>
-
     <modules>
         <module>common/logging</module>
         <module>common/charset</module>
@@ -666,6 +616,7 @@
         <module>common/dict</module>
         <module>common/stream</module>
         <module>common/mapdb</module>
+        <module>common/handlebars</module>
 
         <module>search/grouping</module>
         <module>search/standardnumber</module>
@@ -678,6 +629,7 @@
         <module>search/iso23950</module>
         <module>search/opensearch</module>
         <module>search/federator</module>
+        <module>search/router</module>
         <module>search/tools</module>
 
     </modules>

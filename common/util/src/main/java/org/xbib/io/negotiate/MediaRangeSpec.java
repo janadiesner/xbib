@@ -33,7 +33,6 @@ package org.xbib.io.negotiate;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,8 +40,11 @@ import java.util.regex.Pattern;
 public class MediaRangeSpec {
 
     private final static Pattern tokenPattern;
+
     private final static Pattern parameterPattern;
+
     private final static Pattern mediaRangePattern;
+
     private final static Pattern qValuePattern;
 
     static {
@@ -94,8 +96,8 @@ public class MediaRangeSpec {
         if ("*".equals(type) && !"*".equals(subtype)) {
             return null;
         }
-        List parameterNames = new ArrayList();
-        List parameterValues = new ArrayList();
+        List<String> parameterNames = new ArrayList<String>();
+        List<String> parameterValues = new ArrayList<String>();
         while (m.find()) {
             String name = m.group(1).toLowerCase();
             String value = (m.group(3) == null) ? m.group(2) : unescape(m.group(3));
@@ -118,8 +120,8 @@ public class MediaRangeSpec {
      *
      * @return A List of MediaRangeSpecs
      */
-    public static List parseAccept(String s) {
-        List result = new ArrayList();
+    public static List<MediaRangeSpec> parseAccept(String s) {
+        List<MediaRangeSpec> result = new ArrayList<MediaRangeSpec>();
         Matcher m = mediaRangePattern.matcher(s);
         while (m.find()) {
             result.add(parseRange(m.group()));
@@ -239,12 +241,10 @@ public class MediaRangeSpec {
         return result;
     }
 
-    public MediaRangeSpec getBestMatch(List mediaRanges) {
+    public MediaRangeSpec getBestMatch(List<MediaRangeSpec> mediaRanges) {
         MediaRangeSpec result = null;
         int bestPrecedence = 0;
-        Iterator it = mediaRanges.iterator();
-        while (it.hasNext()) {
-            MediaRangeSpec range = (MediaRangeSpec) it.next();
+        for (MediaRangeSpec range : mediaRanges) {
             if (getPrecedence(range) > bestPrecedence) {
                 bestPrecedence = getPrecedence(range);
                 result = range;

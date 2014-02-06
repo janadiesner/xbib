@@ -145,6 +145,7 @@ public class SRUServiceTest {
                     client.searchRetrieve(request)
                             .setStylesheetTransformer(transformer)
                             .to(w);
+                    transformer.close();
                 } catch (Diagnostics d) {
                     logger.error(d.getMessage(), d);
                 } catch (IOException e) {

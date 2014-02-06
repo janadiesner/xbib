@@ -128,6 +128,7 @@ public class ZServlet extends HttpServlet {
             response.setHeader("X-Powered-By", getClass().getName());
             zResponse.setStylesheetTransformer(transformer)
                     .to(response.getWriter());
+            transformer.close();
         } finally {
             client.close();
             session.close();

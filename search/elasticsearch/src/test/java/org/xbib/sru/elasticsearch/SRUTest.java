@@ -35,7 +35,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.testng.annotations.Test;
-import org.xbib.io.OutputFormat;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.Diagnostics;
@@ -52,7 +51,7 @@ public class SRUTest {
 
     @Test
     public void testElasticsearchSearchRetrieve() throws Exception {
-        OutputFormat format = OutputFormat.MODS;
+        String format = "mods";
         SRUService service = SRUServiceFactory.getDefaultService();
         org.xbib.sru.client.SRUClient client = service.newClient();
         SearchRetrieveRequest request = client.newSearchRetrieveRequest();
@@ -65,7 +64,7 @@ public class SRUTest {
             .setRecordPacking("xml")
             .setRecordSchema("mods")
             .setPath("/sru/hbz/*");
-        FileWriter w = new FileWriter("target/es." + format.suffix());
+        FileWriter w = new FileWriter("target/es." + format);
         try {
             SearchRetrieveResponse response = client.searchRetrieve(request);
             StylesheetTransformer transformer = new StylesheetTransformer(
@@ -75,6 +74,7 @@ public class SRUTest {
                     .setStylesheetTransformer(transformer)
                     .setStylesheets(SRUVersion.VERSION_2_0, "es-searchretrieve-response.xsl")
                     .to(w);
+            transformer.close();
             w.close();
         } catch (Diagnostics d) {
             logger.warn("There were diagnostics", d);

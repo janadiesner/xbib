@@ -37,6 +37,7 @@ import org.xbib.oai.exceptions.BadArgumentException;
 import org.xbib.oai.exceptions.BadResumptionTokenException;
 import org.xbib.oai.exceptions.NoRecordsMatchException;
 import org.xbib.oai.exceptions.OAIException;
+import org.xbib.xml.transform.StylesheetTransformer;
 
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
@@ -58,9 +59,9 @@ public class ListRecordsResponse extends DefaultOAIResponse<ListRecordsResponse>
 
     @Override
     public ListRecordsResponse to(Writer writer) throws IOException {
-        try {
+        try (StylesheetTransformer transformer = new StylesheetTransformer("xsl")) {
             StreamResult streamResult = new StreamResult(writer);
-            getTransformer().setResult(streamResult).transform();
+            transformer.setResult(streamResult).transform();
         } catch (TransformerException e) {
             throw new IOException(e);
         }

@@ -32,8 +32,8 @@
 package org.xbib.oai.record;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.xbib.util.DateUtil;
@@ -47,6 +47,7 @@ import org.xbib.oai.util.RecordHeader;
 import org.xbib.oai.util.ResumptionToken;
 import org.xbib.xml.XMLFilterReader;
 
+import org.xbib.xml.transform.StylesheetTransformer;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -66,7 +67,7 @@ public class ListRecordsResponseListener extends DefaultOAIResponseListener {
     public ListRecordsResponseListener(ListRecordsRequest request) {
         super(request);
         this.request = request;
-        this.metadataHandlers = new ArrayList();
+        this.metadataHandlers = new LinkedList<MetadataHandler>();
     }
 
     public ListRecordsResponseListener register(MetadataHandler metadataHandler) {
@@ -105,13 +106,14 @@ public class ListRecordsResponseListener extends DefaultOAIResponseListener {
             return;
         }
         if (!result.ok()) {
-            throw new IOException(status + " " + result.getThrowable());
+            throw new IOException("Status " + status, result.getThrowable());
         }
         // activate XSLT only if XML content type
         if (result.getContentType().endsWith("xml")) {
+            StylesheetTransformer transformer = new StylesheetTransformer("xsl");
             XMLFilterReader reader = new ListRecordsFilterReader(response);
             InputSource source = new InputSource(getBodyReader());
-            response.getTransformer().setSource(reader, source);
+            transformer.setSource(reader, source);
         } else {
             throw new IOException("no XML content type in response");
         }

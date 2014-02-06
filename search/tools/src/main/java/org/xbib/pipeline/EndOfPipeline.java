@@ -1,3 +1,4 @@
+
 package org.xbib.pipeline;
 
 public class EndOfPipeline extends RuntimeException {

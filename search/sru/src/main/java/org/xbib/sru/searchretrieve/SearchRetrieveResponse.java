@@ -247,6 +247,7 @@ public class SearchRetrieveResponse extends DefaultSRUResponse
             throw new IOException(e);
         } finally {
             writer.flush();
+            getTransformer().close();
         }
         return this;
     }

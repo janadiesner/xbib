@@ -391,7 +391,7 @@ public class Manifestation extends MapBasedAnyObject
                 map().remove("AdditionalPhysicalFormNote");
                 map().remove("otherCodes");
                 return secondary;
-                // TODO adjust holdings
+                // TODO adjust holdings fro print to microform
             }
         }
         return null;
@@ -745,14 +745,17 @@ public class Manifestation extends MapBasedAnyObject
         return evidenceByDate;
     }
 
-    public void buildSnippet(XContentBuilder builder, int indent, String relation, Set<Manifestation> visited)
+    public void buildGroup(XContentBuilder builder) throws IOException {
+        builder.startArray("group");
+        buildGroupMember(builder);
+        builder.endArray();
+    }
+
+    private void buildGroupMember(XContentBuilder builder)
         throws IOException {
-        if (relation == null) {
-            builder.startObject();
-        } else {
-            builder.startObject(relation);
-        }
-        builder.field("id", externalID())
+        builder.startObject();
+        builder.field("@id", externalID())
+                .field("@type", "xbib:Work")
                 .field("title", cleanTitle());
         String s = corporateName();
         if (s != null) {
@@ -786,29 +789,23 @@ public class Manifestation extends MapBasedAnyObject
         if (hasPrint()) {
             builder.field("hasPrint", getPrintExternalID());
         }
-        if (visited.contains(this)) {
-            builder.endObject();
-            // loop detected
-            return;
-        }
-        visited.add(this);
-        // append other carriers, parts, supplements
+        builder.endObject();
+        // append related group members (carriers, parts, supplements)
         Set<String> relations = getRelatedManifestations().keySet();
-        for (String rel : relations) {
-            if (Manifestation.carrierEditions().contains(rel)
-                    || "hasPart".equals(rel) || "hasSupplement".equals(rel)) {
-                Set<Manifestation> snippets = ImmutableSet.copyOf(getRelatedManifestations().get(rel));
-                for (Manifestation mm : snippets) {
-                    mm.buildSnippet(builder, indent + 1, rel, visited);
+        for (String relation : relations) {
+            if (Manifestation.carrierEditions().contains(relation)
+                    || "hasPart".equals(relation) || "hasSupplement".equals(relation)) {
+                Set<Manifestation> rels = ImmutableSet.copyOf(getRelatedManifestations().get(relation));
+                for (Manifestation rel : rels) {
+                    rel.buildGroupMember(builder);
                 }
             }
         }
-        builder.endObject();
     }
 
     public void build(XContentBuilder builder) throws IOException {
         builder.startObject();
-        builder.field("id", externalID())
+        builder.field("@id", externalID())
                 .field("title", cleanTitle());
         String s = corporateName();
         if (s != null) {
@@ -845,8 +842,8 @@ public class Manifestation extends MapBasedAnyObject
             for (String rel : getRelatedManifestations().keySet()) {
                 for (Manifestation mm : getRelatedManifestations().get(rel)) {
                     builder.startObject()
-                            .field("relation", rel)
-                            .field("id", mm.externalID)
+                            .field("@type", "xbib:" + rel)
+                            .field("@id", mm.externalID)
                             .endObject();
                 }
             }
@@ -864,7 +861,8 @@ public class Manifestation extends MapBasedAnyObject
             return;
         }
         builder.startObject()
-                .field("id", externalID())
+                .field("@id", externalID())
+                .field("@type", "xbib:Volume")
                 .field("date", date)
                 .field("contentType", contentType());
         if (hasLinks()) {
@@ -885,10 +883,12 @@ public class Manifestation extends MapBasedAnyObject
                     .startArray("service");
             for (Holding holding : holdingsPerLibrary) {
                 builder.startObject()
-                        .field("id", holding.id())
+                        .field("@id", holding.identifier())
+                        .field("@type", "xbib:Service")
                         .field("mediaType", holding.mediaType())
                         .field("carrierType", holding.carrierType())
-                        .field("serviceisil", holding.getServiceISIL())
+                        .field("isil", holding.getServiceISIL())
+                        .field("organization", holding.getOrganization())
                         .field("info", holding.getInfo())
                         .endObject();
             }
@@ -903,21 +903,25 @@ public class Manifestation extends MapBasedAnyObject
             return;
         }
         builder.startObject()
-                .field("id", externalID())
+                .field("@id", externalID())
+                .field("@type", "xbib:Holding")
                 .field("isil", isil)
                 .field("contentType", contentType());
         if (hasLinks()) {
             builder.field("links", getLinks());
         }
+        // TODO
         //Set<Holding> merged = merge(holdings);
-        builder.field("serviceCount", holdings)
+        builder.field("serviceCount", holdings.size())
                 .startArray("service");
         for (Holding holding : holdings) {
             builder.startObject()
-                    .field("id", holding.id())
+                    .field("@id", holding.identifier())
+                    .field("@type", "xbib:Service")
                     .field("mediaType", holding.mediaType())
                     .field("carrierType", holding.carrierType())
-                    .field("serviceisil", holding.getServiceISIL())
+                    .field("isil", holding.getServiceISIL() )
+                    .field("organization", holding.getOrganization())
                     .field("info", holding.getInfo())
                     .endObject();
         }
@@ -926,26 +930,19 @@ public class Manifestation extends MapBasedAnyObject
 
     /**
      * Iterate through holdings and build a new list that contains
-     * only merged holdings. Merge holdings, licenses, indicators
-     * at best effort.
-     * @param holdings unmerged holdings
-     * @return new, merged holdings
+     * unique holdings.
+     *
+     * @param holdings the holdings
+     * @return unique holdings
      */
-    private Set<Holding> merge(Set<Holding> holdings) {
+    private Set<Holding> unique(Set<Holding> holdings) {
         Set<Holding> newHoldings = newTreeSet(Holding.getRoutingComparator());
         for (Holding holding : holdings) {
-            if (holding instanceof Indicator) {
-                // we do not merge into indicator holdings
-                continue;
-            }
-            Holding similar = holding.getSimilar(holdings);
-            if (similar == null) {
-               newHoldings.add(holding);
-            } else if (similar instanceof Indicator) {
-                holding.addService(similar);
-            } else if (similar instanceof License) {
-                holding.addService(similar);
-                holding.addLicense(similar);
+            if (holding instanceof License) {
+                Holding other = holding.getSame(holdings);
+                if (other != null) {
+                   newHoldings.add(holding);
+                }
             }
         }
         return newHoldings;

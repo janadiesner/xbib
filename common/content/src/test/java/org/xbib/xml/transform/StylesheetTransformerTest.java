@@ -43,5 +43,6 @@ public class StylesheetTransformerTest {
                 .setResult(out)
                 .transform();
         out.close();
+        transformer.close();
     }
 }

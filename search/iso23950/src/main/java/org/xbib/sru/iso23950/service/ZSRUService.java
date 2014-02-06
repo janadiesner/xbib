@@ -156,6 +156,7 @@ public class ZSRUService extends PropertiesSRUService implements ZService, ZCons
             zResponse.setStylesheetTransformer(transformer)
                     .setStylesheets(version, getStylesheet(version))
                     .to(writer);
+            transformer.close();
         } catch (org.xbib.io.iso23950.Diagnostics d) {
             throw new Diagnostics(1, d.getPlainText());
         }

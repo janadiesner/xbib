@@ -15,10 +15,6 @@ import org.xbib.rdf.context.ResourceContext;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
 
-import org.elasticsearch.client.transport.NoNodeAvailableException;
-import org.elasticsearch.cluster.block.ClusterBlockException;
-import org.elasticsearch.indices.IndexMissingException;
-
 public class BulkIndexerTest extends Assert {
 
     private static final Logger logger = LoggerFactory.getLogger(BulkIndexerTest.class.getName());
@@ -50,7 +46,7 @@ public class BulkIndexerTest extends Assert {
             logger.info("result = {}", output.toString());
             assertTrue(output.toString().length() > 0);
             //es.deleteIndex();
-        } catch (ClusterBlockException | NoNodeAvailableException | IndexMissingException e) {
+        } catch (Exception e) {
             logger.warn(e.getMessage());
         }
     }

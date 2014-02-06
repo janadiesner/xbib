@@ -31,11 +31,8 @@
  */
 package org.xbib.oai;
 
-import org.xbib.io.OutputFormat;
 import org.xbib.io.http.HttpResponse;
-import org.xbib.xml.transform.StylesheetTransformer;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -49,12 +46,6 @@ public interface OAIResponse<R extends OAIResponse> extends HttpResponse {
     OAIRequest getRequest();
 
     R setReader(Reader reader);
-
-    R setOutputFormat(OutputFormat format);
-
-    R setStylesheetTransformer(StylesheetTransformer transformer);
-
-    R setStylesheets(String... stylesheets);
 
     R to(Writer writer) throws IOException;
 }

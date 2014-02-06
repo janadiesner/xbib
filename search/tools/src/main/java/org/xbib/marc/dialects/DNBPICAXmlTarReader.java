@@ -41,7 +41,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.pipeline.AbstractPipeline;
-import org.xbib.pipeline.element.CounterElement;
+import org.xbib.pipeline.element.CounterPipelineElement;
 import org.xbib.util.Strings;
 
 import java.io.EOFException;
@@ -63,7 +63,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
 
-public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<CounterElement>
+public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<CounterPipelineElement>
         implements DNBPICAConstants, MarcXchangeListener {
 
     private final Logger logger = LoggerFactory.getLogger(DNBPICAXmlTarReader.class.getName());
@@ -72,7 +72,7 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Coun
 
     private final XMLInputFactory factory = XMLInputFactory.newInstance();
 
-    private final CounterElement counter = new CounterElement().set(new AtomicLong(0L));
+    private final CounterPipelineElement counter = new CounterPipelineElement().set(new AtomicLong(0L));
 
     private URI uri;
 
@@ -186,7 +186,7 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Coun
     }
 
     @Override
-    public CounterElement next() {
+    public CounterPipelineElement next() {
         return nextRead();
     }
 
@@ -228,7 +228,7 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Coun
         }
     }
 
-    private CounterElement nextRead() {
+    private CounterPipelineElement nextRead() {
         if (clob == null || clob.length() == 0) {
             // special case, message length 0 means deletion
             return null;

@@ -47,7 +47,7 @@ public class Holding extends MapBasedAnyObject {
 
     protected final static Logger logger = LoggerFactory.getLogger("holding");
 
-    protected String id;
+    protected String identifier;
 
     protected String parent;
 
@@ -67,11 +67,19 @@ public class Holding extends MapBasedAnyObject {
 
     protected boolean deleted;
 
+    protected String servicetype;
+
+    protected String servicemode;
+
+    protected String servicedistribution;
+
+    protected Integer priority;
+
     private Manifestation manifestation;
 
     private String serviceisil;
 
-    private String region;
+    private String organization;
 
     public Holding(Map<String, Object> m) {
         super(m);
@@ -79,7 +87,7 @@ public class Holding extends MapBasedAnyObject {
     }
 
     protected void build() {
-        this.id = getString("identifierRecord");
+        this.identifier = getString("identifierRecord");
         this.parent = getString("identifierParent").toLowerCase(); // DNB-ID, turn 'X' to lower case
         Object leader = map().get("leader");
         if (!(leader instanceof List)) {
@@ -100,10 +108,10 @@ public class Holding extends MapBasedAnyObject {
             if (map == null) {
                 continue;
             }
-            if (map.containsKey("marcorg")) {
-                this.serviceisil = (String) map.get("marcorg");
+            if (map.containsKey("location")) {
+                this.serviceisil = (String) map.get("location");
                 if (serviceisil != null) {
-                    // find main ISIL: cut from last '-' if there is more than one '-'
+                    // find base ISIL: cut from last '-' if there is more than one '-'
                     int firstpos = serviceisil.indexOf('-');
                     int lastpos = serviceisil.lastIndexOf('-');
                     this.isil = lastpos > firstpos ? serviceisil.substring(0, lastpos) : serviceisil;
@@ -119,13 +127,14 @@ public class Holding extends MapBasedAnyObject {
         if (isil != null) {
             findContentType();
             this.info = buildInfo();
+            //this.organization = getString("service.organization");
         }
-        this.region = getString("service.region");
         this.dates = buildDateArray();
+        this.priority = findPriority();
     }
 
-    public String id() {
-        return id;
+    public String identifier() {
+        return identifier;
     }
 
     public String parent() {
@@ -150,31 +159,20 @@ public class Holding extends MapBasedAnyObject {
     }
 
     public String getServiceISIL() {
-        return serviceisil;
+        return serviceisil != null ? serviceisil : isil;
+    }
+
+    public Holding setOrganization(String organization) {
+        this.organization = organization;
+        return this;
+    }
+
+    public String getOrganization() {
+        return organization;
     }
 
     public Map<String,Object> getInfo() {
         return info;
-    }
-
-    public void addService(Holding holding) {
-        if (info != null) {
-            Object o1 = info.get("service");
-            Object o2 = holding.map().get("service");
-            if (o2 != null) {
-                info.put("service", o1 != null ? Arrays.asList(o1,o2) : o2);
-            }
-        }
-    }
-
-    public void addLicense(Holding holding) {
-        if (info != null) {
-            Object o1 = info.get("license");
-            Object o2 = holding.map().get("license");
-            if (o2 != null) {
-                info.put("license", o1 != null ? Arrays.asList(o1,o2) : o2);
-            }
-        }
     }
 
     public List<Integer> dates() {
@@ -192,6 +190,10 @@ public class Holding extends MapBasedAnyObject {
 
     public String carrierType() {
         return carrierType;
+    }
+
+    public Integer getPriority() {
+        return priority;
     }
 
     protected void findContentType() {
@@ -230,19 +232,24 @@ public class Holding extends MapBasedAnyObject {
 
     private Map<String, Object> buildInfo() {
         Map<String, Object> m = new LinkedHashMap();
-        Object o = map().get("Location");
-        if (!(o instanceof List)) {
-            o = Arrays.asList(o);
-        }
         List l = new ArrayList();
-        l.addAll((List)o);
-        Object p = map().get("AdditionalLocation");
-        if (!(p instanceof List)) {
-            p = Arrays.asList(p);
+        Object o = map().get("Location");
+        if (o != null) {
+            if (!(o instanceof List)) {
+                o = Arrays.asList(o);
+            }
+            l.addAll((List)o);
         }
-        l.addAll((List)p);
-        m.put("location", l); // marcorg, shelf marks
+        Object p = map().get("AdditionalLocation");
+        if (p != null) {
+            if (!(p instanceof List)) {
+                p = Arrays.asList(p);
+            }
+            l.addAll((List)p);
+        }
+        m.put("location", l);
 
+        Object textualholdings =  map().get("textualholdings");
         m.put("textualholdings", map().get("textualholdings"));
         m.put("holdings", map().get("holdings"));
         m.put("links", map().get("ElectronicLocationAndAccess"));
@@ -256,52 +263,33 @@ public class Holding extends MapBasedAnyObject {
         }
         this.service = (Map<String, Object>)map().get("service");
         if (service != null) {
+            //setOrganization((String)service.remove("region"));
+            service.remove("organization"); // drop Sigel
+            service.remove("region"); // drop region marker here, we use bibdat
             service.remove("bik");
             service.remove("servicetypeSource");
             service.remove("servicemodeSource");
-            m.put("service", service); // servicetype, servicemode, servicedistribution
+            service.put("type", service.remove("servicetype")); // rename
+            service.put("mode", service.remove("servicemode")); // rename
+            service.put("distribution", service.remove("servicedistribution")); // rename
+            m.put("service", service); // type, mode, distribution
         }
         return m;
     }
 
-    protected Character findRegionKey() {
-        if (region == null) {
-            return '9';
+    protected Integer findPriority() {
+        if (carrierType ==null) {
+            return 9;
         }
-        switch (region) {
-            case "NRW": return '1';
-            case "BAY": return '2';
-            case "NIE": return '3';
-            case "HAM": return '3';
-            case "SAA": return '3';
-            case "SAX": return '3';
-            case "THU": return '3';
-            case "BAW": return '4';
-            case "HES": return '5';
-            case "BER": return '6';
-            default: return '9';
-        }
-    }
-
-    public Holding setRegion(String region) {
-        this.region = region;
-        if (info != null && info.containsKey("service")) {
-            Map<String,Object> service = (Map<String, Object>) info.get("service");
-            service.put("region", region);
-        }
-        return this;
-    }
-
-    protected Character findCarrierTypeKey() {
         switch (carrierType) {
-            case "online resource" : return '1';
-            case "volume": return '2';
-            case "computer disc" : return '4';
-            case "computer tape cassette" : return '4';
-            case "computer chip cartridge" : return '4';
-            case "microform" : return '5';
-            case "other" : return '6';
-            case "multicolored" : return '6';
+            case "online resource" : return (servicedistribution != null
+                    && servicedistribution.contains("postal")) ? 3 : 1;
+            case "volume": return 2;
+            case "computer disc" : return 4;
+            case "computer tape cassette" : return 4;
+            case "computer chip cartridge" : return 4;
+            case "microform" : return 5;
+            case "other" : return 6;
             default: throw new IllegalArgumentException("unknown carrier: " + carrierType());
         }
     }
@@ -312,7 +300,7 @@ public class Holding extends MapBasedAnyObject {
      * @param holdings the holdings to check for similarity against this holding
      * @return a holding which is similar, or null if no holding is similar
      */
-    protected Holding getSimilar(Collection<Holding> holdings) {
+    protected Holding getSame(Collection<Holding> holdings) {
         for (Holding holding : holdings) {
             if (this == holding) {
                 continue; // skip if we match against ourselves
@@ -322,7 +310,7 @@ public class Holding extends MapBasedAnyObject {
                 // check if begin date / end date are the same
                 // both no dates?
                 if (dates == null && holding.dates() == null) {
-                    // hit
+                    // hit, no dates at all
                     return holding;
                 } else if (dates != null && !dates.isEmpty() && holding.dates() != null && !holding.dates().isEmpty()) {
                     // compare first date and last date
@@ -340,7 +328,7 @@ public class Holding extends MapBasedAnyObject {
     }
 
     public String getRoutingKey() {
-        return new StringBuilder().append(findRegionKey()).append(findCarrierTypeKey()).toString();
+        return getOrganization() + getPriority();
     }
 
     public static Comparator<Holding> getRoutingComparator() {

@@ -31,25 +31,26 @@
  */
 package org.xbib.marc;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.io.sequential.CharStream;
-import org.xbib.io.sequential.CharStreamFactory;
-import org.xbib.io.sequential.CharStreamListener;
-import org.xbib.io.sequential.Separator;
-import org.xbib.xml.XMLNS;
-import org.xbib.xml.XMLUtil;
-import org.xbib.xml.XSI;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+
+import org.xbib.io.field.BufferedFieldStreamReader;
+import org.xbib.io.field.FieldListener;
+import org.xbib.io.field.FieldSeparator;
+import org.xbib.io.field.FieldStream;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.xml.XMLNS;
+import org.xbib.xml.XMLUtil;
+import org.xbib.xml.XSI;
+
+import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  *
@@ -62,13 +63,11 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
 
     private static final AttributesImpl EMPTY_ATTRIBUTES = new AttributesImpl();
 
-    private static final CharStreamFactory factory = CharStreamFactory.getInstance();
-
-    private final CharStreamListener streamListener = new Iso2709StreamListener();
+    private final FieldListener fieldListener = new Iso2709StreamListener();
 
     private ValueNormalizer normalizer = new DefaultValueNormalizer();
 
-    private CharStream stream;
+    private FieldStream stream;
 
     private char mark = '\u0000';
 
@@ -121,10 +120,10 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
         if (source.getByteStream() != null) {
             String encoding = source.getEncoding() != null ? source.getEncoding() : "ANSEL";
             Reader reader = new InputStreamReader(source.getByteStream(), encoding);
-            this.stream = factory.newStream(reader, buffersize, streamListener);
+            this.stream = new BufferedFieldStreamReader(reader, buffersize, fieldListener);
         } else {
             Reader reader = source.getCharacterStream();
-            this.stream = factory.newStream(reader, buffersize, streamListener);
+            this.stream = new BufferedFieldStreamReader(reader, buffersize, fieldListener);
         }
         return this;
     }
@@ -508,16 +507,16 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
         }
     }
 
-    private class Iso2709StreamListener implements CharStreamListener {
+    private class Iso2709StreamListener implements FieldListener {
 
         @Override
         public void data(String data) {
             String fieldContent = data;
             try {
                 switch (mark) {
-                    case Separator.FS: // start/end file
+                    case FieldSeparator.FS: // start/end file
                         break;
-                    case Separator.GS: // start/end of group within a stream
+                    case FieldSeparator.GS: // start/end of group within a stream
                         if (subfieldOpen) { // close subfield if open
                             subfieldOpen = false;
                             endDataField(null);
@@ -549,7 +548,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                             designator = new Field();
                         }
                         break;
-                    case Separator.RS:
+                    case FieldSeparator.RS:
                         if (subfieldOpen) {
                             subfieldOpen = false;
                             endDataField(null); // force data field close
@@ -568,7 +567,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                         }
                         beginDataField(designator);
                         break;
-                    case Separator.US:
+                    case FieldSeparator.US:
                         if (!subfieldOpen) {
                             subfieldOpen = true;
                             beginDataField(designator);
@@ -588,29 +587,14 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
         }
 
         @Override
-        public void markUnit() {
-            mark = Separator.US;
+        public void mark(char separator) {
+            mark = separator;
             position++;
+            if (mark == FieldSeparator.FS) {
+                endDataField(null); // close last data field if not closed already
+                endRecord();
+            }
         }
 
-        @Override
-        public void markRecord() {
-            mark = Separator.RS;
-            position++;
-        }
-
-        @Override
-        public void markGroup() {
-            mark = Separator.GS;
-            position++;
-        }
-
-        @Override
-        public void markFile() {
-            mark = Separator.FS;
-            position++;
-            endDataField(null);
-            endRecord();
-        }
     }
 }

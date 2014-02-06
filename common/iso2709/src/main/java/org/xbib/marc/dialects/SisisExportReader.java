@@ -31,7 +31,7 @@
  */
 package org.xbib.marc.dialects;
 
-import org.xbib.io.sequential.Separator;
+import org.xbib.io.field.FieldSeparator;
 
 import java.io.FilterReader;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class SisisExportReader extends FilterReader {
         if (ch == -1) {
             if (!ended) {
                 ended = true;
-                return Separator.GS;
+                return FieldSeparator.GS;
             } else {
                 return ch;
             }
@@ -93,7 +93,7 @@ public class SisisExportReader extends FilterReader {
                             }
                             if ("9999".equals(category)) {
                                 in.read(); // slurp ':'
-                                return Separator.GS;
+                                return FieldSeparator.GS;
                             }
                             pushback.addLast(ch2);
                             pushback.addLast(ch3);
@@ -133,7 +133,7 @@ public class SisisExportReader extends FilterReader {
                 ch = in.read();
             }
             pushback.addLast(ch);
-            ch = Separator.RS;
+            ch = FieldSeparator.RS;
         }
         return ch;
     }

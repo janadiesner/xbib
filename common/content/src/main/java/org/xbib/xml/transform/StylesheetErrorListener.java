@@ -42,16 +42,16 @@ import javax.xml.transform.TransformerException;
  */
 public final class StylesheetErrorListener implements ErrorListener {
 
-    private final static Logger logger = LoggerFactory.getLogger(StylesheetErrorListener.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(StylesheetErrorListener.class.getName());
 
     @Override
     public void warning(TransformerException e) throws TransformerException {
-        logger.warn("Warning (recoverable): {}", e.getMessage());
+        logger.warn("warning (recoverable): " + e.getMessage(), e);
     }
 
     @Override
     public void error(TransformerException e) throws TransformerException {
-        logger.warn("Error (recoverable): {}", e.getMessage());
+        logger.warn("error (recoverable): " + e.getMessage(), e);
     }
 
     /**
@@ -59,7 +59,7 @@ public final class StylesheetErrorListener implements ErrorListener {
      */
     @Override
     public void fatalError(TransformerException e) throws TransformerException {
-        logger.error("Fatal error: {}", e.getMessage());
+        logger.error("fatal error: " + e.getMessage(), e);
         throw e;
     }
 }

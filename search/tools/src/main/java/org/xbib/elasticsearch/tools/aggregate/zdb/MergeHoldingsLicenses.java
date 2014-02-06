@@ -51,13 +51,15 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 import org.xbib.common.settings.Settings;
+import org.xbib.elasticsearch.support.client.bulk.BulkClient;
+import org.xbib.elasticsearch.support.client.ingest.MockIngestClient;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.BibdatLookup;
+import org.xbib.pipeline.QueuePipelineExecutor;
 import org.xbib.util.DateUtil;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elasticsearch.support.client.ingest.IngestClient;
 import org.xbib.elasticsearch.support.client.search.SearchClient;
 import org.xbib.elasticsearch.tools.aggregate.zdb.entities.Manifestation;
-import org.xbib.pipeline.ElementQueuePipelineExecutor;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.util.Strings;
@@ -73,7 +75,8 @@ import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 /**
  * Merge ZDB title and holdings and EZB licenses
  */
-public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean, Manifestation, MergeHoldingsLicensesPipeline, WrappedSearchHit> {
+public class MergeHoldingsLicenses
+        extends QueuePipelineExecutor<Boolean, Manifestation, MergeHoldingsLicensesPipeline, WrappedSearchHit> {
 
     private final static Logger logger = LoggerFactory.getLogger(MergeHoldingsLicenses.class.getSimpleName());
 
@@ -153,19 +156,25 @@ public class MergeHoldingsLicenses extends ElementQueuePipelineExecutor<Boolean,
         this.millis = settings.getAsTime("scrollTimeout", org.xbib.common.unit.TimeValue.timeValueSeconds(60)).millis();
         this.identifier = settings.get("identifier");
 
-        this.ingest = new IngestClient()
-                .maxActionsPerBulkRequest(settings.getAsInt("maxBulkActions", 100))
-                .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests", 16))
+        this.ingest = settings.getAsBoolean("mock", false) ?
+                new MockIngestClient() :
+                "ingest".equals(settings.get("client")) ?
+                        new IngestClient() :
+                        new BulkClient();
+
+        ingest.maxActionsPerBulkRequest(settings.getAsInt("maxBulkActions", 100))
+                .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests",
+                        Runtime.getRuntime().availableProcessors()))
                 .setIndex(settings.get("index"))
                 .setting(MergeHoldingsLicenses.class.getResourceAsStream("transport-client-settings.json"))
-                .newClient(targetURI)
-                .waitForCluster()
+                .newClient(targetURI);
+        ingest.waitForCluster();
                         // TODO create settings/mappings
                         //.setting(MergeWithLicenses.class.getResourceAsStream("index-settings.json"))
                         //.mapping("works", MergeWithLicenses.class.getResourceAsStream("works.json"))
                         //.mapping("manifestations", MergeWithLicenses.class.getResourceAsStream("manifestations.json"))
                         //.mapping("volumes", MergeWithLicenses.class.getResourceAsStream("volumes.json"))
-                .newIndex()
+        ingest.newIndex()
                 .refresh()
                 .shards(settings.getAsInt("shards",1))
                 .replica(settings.getAsInt("replica",0))

@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
 
-import org.xbib.io.OutputFormat;
 import org.xbib.sru.DefaultSRUResponse;
 
 /**
@@ -51,7 +50,7 @@ public class ScanResponse extends DefaultSRUResponse {
     }
 
     @Override
-    public ScanResponse setOutputFormat(OutputFormat format) {
+    public ScanResponse setOutputFormat(String format) {
         return this;
     }
 

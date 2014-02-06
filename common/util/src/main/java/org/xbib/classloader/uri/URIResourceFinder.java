@@ -17,13 +17,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -32,19 +32,15 @@ public class URIResourceFinder implements ResourceFinder {
 
     private final Object lock = new Object();
 
-    private final LinkedHashSet<URI> uris = new LinkedHashSet<URI>();
+    private final Set<URI> uris = new LinkedHashSet<URI>();
 
-    private final LinkedHashMap<URI, ResourceLocation> classPath = new LinkedHashMap<URI, ResourceLocation>();
+    private final Map<URI, ResourceLocation> classPath = new LinkedHashMap<URI, ResourceLocation>();
 
-    private final LinkedHashSet<File> watchedFiles = new LinkedHashSet<File>();
+    private final Set<File> watchedFiles = new LinkedHashSet<File>();
 
     private boolean destroyed = false;
 
     public URIResourceFinder() {
-    }
-
-    public URIResourceFinder(URI[] uris) {
-        addURIs(uris);
     }
 
     public void destroy() {
@@ -66,7 +62,8 @@ public class URIResourceFinder implements ResourceFinder {
             if (destroyed) {
                 return null;
             }
-            for (Map.Entry<URI, ResourceLocation> entry : getClassPath().entrySet()) {
+            Map<URI, ResourceLocation> path = getClassPath();
+            for (Map.Entry<URI, ResourceLocation> entry : path.entrySet()) {
                 ResourceLocation resourceLocation = entry.getValue();
                 ResourceHandle resourceHandle = resourceLocation.getResourceHandle(resourceName);
                 if (resourceHandle != null && !resourceHandle.isDirectory()) {
@@ -100,7 +97,7 @@ public class URIResourceFinder implements ResourceFinder {
     }
 
     public void addURI(URI uri) {
-        addUris(Collections.singletonList(uri));
+        add(Arrays.asList(uri));
     }
 
     public URI[] getURIs() {
@@ -110,20 +107,11 @@ public class URIResourceFinder implements ResourceFinder {
     }
 
     /**
-     * Adds an array of uris to the end of this class loader.
-     *
-     * @param uris the URLs to add
-     */
-    protected void addURIs(URI[] uris) {
-        addUris(Arrays.asList(uris));
-    }
-
-    /**
      * Adds a list of uris to the end of this class loader.
      *
      * @param uris the URLs to add
      */
-    protected void addUris(List<URI> uris) {
+    protected void add(List<URI> uris) {
         synchronized (lock) {
             if (destroyed) {
                 throw new IllegalStateException("UriResourceFinder has been destroyed");
@@ -135,7 +123,7 @@ public class URIResourceFinder implements ResourceFinder {
         }
     }
 
-    private LinkedHashMap<URI, ResourceLocation> getClassPath() {
+    private Map<URI, ResourceLocation> getClassPath() {
         assert Thread.holdsLock(lock) : "This method can only be called while holding the lock";
         for (File file : watchedFiles) {
             if (file.canRead()) {
@@ -143,7 +131,6 @@ public class URIResourceFinder implements ResourceFinder {
                 break;
             }
         }
-
         return classPath;
     }
 
@@ -163,7 +150,6 @@ public class URIResourceFinder implements ResourceFinder {
         try {
             while (!locationStack.isEmpty()) {
                 URI uri = locationStack.removeFirst();
-                // Skip any duplicate uris in the classpath
                 if (classPath.containsKey(uri)) {
                     continue;
                 }
@@ -172,8 +158,7 @@ public class URIResourceFinder implements ResourceFinder {
                 // If not opened, cache the uri and wrap it with a resource location
                 if (resourceLocation == null) {
                     try {
-                        File file = cacheUri(uri);
-                        resourceLocation = createResourceLocation(uri.toURL(), file);
+                        resourceLocation = createResourceLocation(uri.toURL(), cacheUri(uri));
                     } catch (FileNotFoundException e) {
                         // if this is a file URL, the file doesn't exist yet... watch to see if it appears later
                         if ("file".equals(uri.getScheme())) {
@@ -195,7 +180,9 @@ public class URIResourceFinder implements ResourceFinder {
                 }
                 try {
                     // add the jar to our class path
-                    classPath.put(resourceLocation.getCodeSource().toURI(), resourceLocation);
+                    if (resourceLocation != null && resourceLocation.getCodeSource() != null) {
+                        classPath.put(resourceLocation.getCodeSource().toURI(), resourceLocation);
+                    }
                 } catch (URISyntaxException ex) {
                     // ignore
                 }
@@ -234,42 +221,36 @@ public class URIResourceFinder implements ResourceFinder {
         if (!cacheFile.canRead()) {
             throw new IOException("File is not readable: " + cacheFile.getAbsolutePath());
         }
-        ResourceLocation resourceLocation;
-        if (cacheFile.isDirectory()) {
+        return cacheFile.isDirectory() ?
             // DirectoryResourceLocation will only return "file" URLs within this directory
-            // do not user the DirectoryResourceLocation for non file based uris
-            resourceLocation = new DirectoryResourceLocation(cacheFile);
-        } else {
-            resourceLocation = new JarResourceLocation(codeSource, cacheFile);
-        }
-        return resourceLocation;
+            // do not use the DirectoryResourceLocation for non file based uris
+            new DirectoryResourceLocation(cacheFile) :
+            new JarResourceLocation(codeSource, cacheFile);
     }
 
     private List<URI> getManifestClassPath(ResourceLocation resourceLocation) {
+        List<URI> classPathUrls = new LinkedList<URI>();
         try {
             // get the manifest, if possible
             Manifest manifest = resourceLocation.getManifest();
             if (manifest == null) {
                 // some locations don't have a manifest
-                return Collections.EMPTY_LIST;
+                return classPathUrls;
             }
-
             // get the class-path attribute, if possible
             String manifestClassPath = manifest.getMainAttributes().getValue(Attributes.Name.CLASS_PATH);
             if (manifestClassPath == null) {
-                return Collections.EMPTY_LIST;
+                return classPathUrls;
             }
-
             // build the uris...
             // the class-path attribute is space delimited
             URL codeSource = resourceLocation.getCodeSource();
-            LinkedList<URI> classPathUrls = new LinkedList<URI>();
             for (StringTokenizer tokenizer = new StringTokenizer(manifestClassPath, " "); tokenizer.hasMoreTokens(); ) {
                 String entry = tokenizer.nextToken();
                 try {
                     // the class path entry is relative to the resource location code source
                     URL entryUrl = new URL(codeSource, entry);
-                    classPathUrls.addLast(entryUrl.toURI());
+                    classPathUrls.add(entryUrl.toURI());
                 } catch (MalformedURLException ignored) {
                     // most likely a poorly named entry
                 } catch (URISyntaxException ignored) {
@@ -279,7 +260,7 @@ public class URIResourceFinder implements ResourceFinder {
             return classPathUrls;
         } catch (IOException ignored) {
             // error opening the manifest
-            return Collections.EMPTY_LIST;
+            return classPathUrls;
         }
     }
 }

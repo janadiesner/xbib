@@ -34,6 +34,7 @@ package org.xbib.query.cql.elasticsearch;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.StringReader;
+import java.util.ResourceBundle;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -47,9 +48,11 @@ import org.xbib.query.cql.CQLParser;
 public class ESQueryGeneratorTest extends Assert {
 
     private final static Logger logger = LoggerFactory.getLogger(ESQueryGeneratorTest.class.getName());
-       
+
+
     @Test
     public void testValid() throws Exception {
+        final ResourceBundle bundle = ResourceBundle.getBundle("org.xbib.query.cql.elasticsearch.default");
         TextProcessor t = new TextProcessor();
         LineProcessor p = new LineProcessor() {
 
@@ -58,7 +61,7 @@ public class ESQueryGeneratorTest extends Assert {
                 String[] s = line.split("\\|");
                 CQLParser parser = new CQLParser(new StringReader(s[0]));
                 parser.parse();
-                ESQueryGenerator generator = new ESQueryGenerator();
+                ESQueryGenerator generator = new ESQueryGenerator(bundle);
                 parser.getCQLQuery().accept(generator);
                 String q = generator.getQueryResult();
                 //logger.info("{} --> {} --> {}", s[0], q, generator.getSourceResult() );

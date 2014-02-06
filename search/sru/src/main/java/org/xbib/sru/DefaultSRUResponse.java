@@ -31,7 +31,6 @@
  */
 package org.xbib.sru;
 
-import org.xbib.io.OutputFormat;
 import org.xbib.xml.transform.StylesheetTransformer;
 
 import java.io.IOException;
@@ -49,9 +48,7 @@ public class DefaultSRUResponse implements SRUResponse {
 
     private Map<SRUVersion, String[]> stylesheets;
 
-    private OutputFormat format;
-
-    private SRURequest request;
+    private String format;
 
     public DefaultSRUResponse() {
         this.stylesheets = new HashMap();
@@ -78,12 +75,12 @@ public class DefaultSRUResponse implements SRUResponse {
     }
 
     @Override
-    public DefaultSRUResponse setOutputFormat(OutputFormat format) {
+    public DefaultSRUResponse setOutputFormat(String format) {
         this.format = format;
         return this;
     }
 
-    public OutputFormat getOutputFormat() {
+    public String getOutputFormat() {
         return format;
     }
 

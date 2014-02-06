@@ -63,9 +63,10 @@ public class AlephPublish2Tar extends Converter {
 
     private static TarSession session;
 
-    private static Connection connection;
 
     private static AlephPublishIterator it;
+
+    private Connection connection;
 
     public static void main(String[] args) {
         try {
@@ -97,9 +98,14 @@ public class AlephPublish2Tar extends Converter {
     protected Converter prepare() throws IOException {
         super.prepare();
         try {
-            connection = DriverManager.getConnection(settings.get("uri"), settings.get("user"), settings.get("pass"));
+            connection = createConnection();
             it = new AlephPublishIterator();
-            it.configure(settings, connection);
+            if (settings.get("from") != null && settings.get("to") != null) {
+                it.configure(connection, settings);
+            } else {
+                // all data (max)
+                it.configure(settings);
+            }
         } catch (SQLException e) {
             throw new IOException(e);
         }
@@ -138,6 +144,8 @@ public class AlephPublish2Tar extends Converter {
     @Override
     public void process(URI uri) throws Exception {
         logger.debug("process starts, uri = {}", uri);
+        Connection connection = createConnection();
+        try {
         while (it.hasNext()) {
             Object object = it.next();
             Integer n = resolveDocNumber(connection, object);
@@ -157,12 +165,19 @@ public class AlephPublish2Tar extends Converter {
                 process(s);
             }
         }
-        it.close();
+        } finally {
+            it.close();
+            connection.close();
+        }
         logger.debug("process ends, uri = {}", uri);
     }
 
     protected void process(String s) {
 
+    }
+
+    private Connection createConnection() throws SQLException {
+        return DriverManager.getConnection(settings.get("uri"), settings.get("user"), settings.get("pass"));
     }
 
     private Reader getRecord(Connection connection, final String docNumber) {
@@ -237,8 +252,9 @@ public class AlephPublish2Tar extends Converter {
     }
 
     private String getClob(Reader reader) throws IOException {
-        if (reader == null)
+        if (reader == null){
             return null;
+        }
         char[] buffer = new char[8192];
         StringBuilder out = new StringBuilder();
         int read;

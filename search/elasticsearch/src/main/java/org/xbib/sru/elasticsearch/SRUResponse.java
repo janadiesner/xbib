@@ -47,9 +47,8 @@ import org.xbib.elasticsearch.xml.ES;
 import org.xbib.elasticsearch.support.facet.FacetSupport;
 import org.xbib.facet.Facet;
 import org.xbib.facet.FacetListener;
-import org.xbib.io.stream.ChunkedStream;
-import org.xbib.io.OutputFormat;
 import org.xbib.io.StreamUtil;
+import org.xbib.io.stream.StreamByteBuffer;
 import org.xbib.json.transform.JsonStylesheet;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -74,7 +73,7 @@ public class SRUResponse extends SearchRetrieveResponse {
 
     private SearchRetrieveRequest request;
 
-    private ChunkedStream buffer;
+    private StreamByteBuffer buffer;
 
     private Facets facets;
 
@@ -83,7 +82,7 @@ public class SRUResponse extends SearchRetrieveResponse {
         this.request = request;
     }
 
-    public SRUResponse setBuffer(ChunkedStream buffer) {
+    public SRUResponse setBuffer(StreamByteBuffer buffer) {
         this.buffer = buffer;
         return this;
     }
@@ -141,10 +140,10 @@ public class SRUResponse extends SearchRetrieveResponse {
             getTransformer().addParameter("recordSchema", request.getRecordSchema());
         }
 
-        OutputFormat format = getOutputFormat();
-        if (format == null || format.equals(OutputFormat.JSON)) {
+        String format = getOutputFormat();
+        if (format == null || "json".equals(format)) {
             StreamUtil.copy(new InputStreamReader(buffer.getInputStream(), "UTF-8"), writer);
-        } else if (format.equals(OutputFormat.XML)) {
+        } else if ("xml".equals(format)) {
             JsonStylesheet js = new JsonStylesheet().root(root);
             js.toXML(buffer.getInputStream(), writer);
         } else {

@@ -50,7 +50,7 @@ public class AlephXmlMABTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlephXmlMABTest.class.getName());
 
-    public void testAlephXML() throws InterruptedException, ExecutionException {
+    public void testAlephXML() throws InterruptedException, ExecutionException, IOException {
         final CountableElementOutput<MABContext,Resource> output = new CountableElementOutput<MABContext,Resource>() {
             @Override
             public void output(MABContext context, ContentBuilder contentBuilder) throws IOException {

@@ -60,10 +60,10 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.pipeline.element.CounterElement;
+import org.xbib.pipeline.element.CounterPipelineElement;
 import org.xbib.util.Strings;
 
-public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<CounterElement>
+public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<CounterPipelineElement>
         implements MarcXchangeConstants, MarcXchangeListener {
 
     private final Logger logger = LoggerFactory.getLogger(MarcXmlTarReader.class.getName());
@@ -72,7 +72,7 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
 
     private final ConnectionService<TarSession> service = ConnectionService.getInstance();
 
-    private final CounterElement counter = new CounterElement().set(new AtomicLong(0L));
+    private final CounterPipelineElement counter = new CounterPipelineElement().set(new AtomicLong(0L));
 
     private URI uri;
 
@@ -186,7 +186,7 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
     }
 
     @Override
-    public CounterElement next() {
+    public CounterPipelineElement next() {
         return nextRead();
     }
 
@@ -228,7 +228,7 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
         }
     }
 
-    private CounterElement nextRead() {
+    private CounterPipelineElement nextRead() {
         if (clob == null || clob.length() == 0) {
             // special case, message length 0 means deletion
             return null;

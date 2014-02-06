@@ -53,7 +53,7 @@ public class SimplePipelineExecutor<T, R extends PipelineRequest, P extends Pipe
     }
 
     @Override
-    public SimplePipelineExecutor prepare() {
+    public SimplePipelineExecutor prepare() throws IOException {
         if (provider == null) {
             throw new IllegalStateException("no provider set");
         }
@@ -73,7 +73,7 @@ public class SimplePipelineExecutor<T, R extends PipelineRequest, P extends Pipe
     }
 
     @Override
-    public SimplePipelineExecutor execute() {
+    public SimplePipelineExecutor execute() throws IOException {
         if (pipelines == null) {
             prepare();
         }

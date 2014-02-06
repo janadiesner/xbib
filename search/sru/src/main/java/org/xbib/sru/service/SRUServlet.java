@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.xbib.io.OutputFormat;
+import org.xbib.io.MimeUtil;
 import org.xbib.io.negotiate.ContentTypeNegotiator;
 import org.xbib.io.negotiate.MediaRangeSpec;
 import org.xbib.logging.Logger;
@@ -63,8 +63,6 @@ import org.xbib.xml.transform.StylesheetTransformer;
 public class SRUServlet extends HttpServlet implements SRUConstants {
 
     private final Logger logger = LoggerFactory.getLogger(SRUServlet.class.getName());
-
-    private final String responseEncoding = "UTF-8";
 
     private final SRURequestDumper requestDumper = new SRURequestDumper();
 
@@ -138,8 +136,7 @@ public class SRUServlet extends HttpServlet implements SRUConstants {
                 }
                 SearchRetrieveResponse sruResponse = client.searchRetrieve(sruRequest);
 
-                String contentType = version.equals(SRUVersion.VERSION_2_0) ?
-                        OutputFormat.SRU.mimeType() : OutputFormat.XML.mimeType();
+                String contentType = version.equals(SRUVersion.VERSION_2_0) ? "sru" : "xml";
 
                 response.setStatus(sruResponse.isEmpty() ? 404 : 200);
                 response.setContentType(contentType);
@@ -151,10 +148,12 @@ public class SRUServlet extends HttpServlet implements SRUConstants {
                 String s = config.getInitParameter(version.name().toLowerCase());
                 String[] stylesheets = s != null ? s.split(",") : null;
 
-                sruResponse.setOutputFormat(OutputFormat.SRU)
-                        .setStylesheetTransformer(new StylesheetTransformer("/xsl"))
+                StylesheetTransformer transformer = new StylesheetTransformer("/xsl");
+                sruResponse.setOutputFormat("sru")
+                        .setStylesheetTransformer(transformer)
                         .setStylesheets(version, stylesheets)
                         .to(response.getWriter());
+                transformer.close();
                 logger.debug("SRU servlet response sent");
             }
         } catch (Diagnostics diag) {
@@ -162,7 +161,8 @@ public class SRUServlet extends HttpServlet implements SRUConstants {
             //response.setStatus(500); SRU does not use 500 HTTP errors :(
             response.setStatus(200);
             response.setCharacterEncoding("UTF-8");
-            response.setContentType(OutputFormat.SRU.mimeType());
+            response.setContentType(MimeUtil.guessMimeTypeFromExtension("sru"));
+            String responseEncoding = "UTF-8";
             response.getOutputStream().write(diag.getXML().getBytes(responseEncoding));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

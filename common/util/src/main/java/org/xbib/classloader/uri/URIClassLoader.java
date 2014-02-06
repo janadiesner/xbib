@@ -295,4 +295,13 @@ public final class URIClassLoader extends URLClassLoader {
         CodeSource cs = new CodeSource(url, certs);
         return defineClass(name, b, 0, b.length, cs);
     }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("ClassLoader:");
+        for (URI uri : getURIs()) {
+            sb.append("[").append(uri).append("]");
+        }
+        return sb.toString();
+    }
 }

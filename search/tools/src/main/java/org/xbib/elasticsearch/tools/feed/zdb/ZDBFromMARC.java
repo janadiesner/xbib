@@ -103,8 +103,6 @@ public final class ZDBFromMARC extends Feeder {
     protected ZDBFromMARC prepare() throws IOException {
         super.prepare();
         logger.info("got settings {}", settings.getAsMap());
-        out.setIndex(settings.get("index"));
-        out.setType(settings.get("type"));
         return this;
     }
 
@@ -150,21 +148,10 @@ public final class ZDBFromMARC extends Feeder {
 
     private final static class OurElementOutput extends CountableElementOutput<ResourceContext, Resource> {
 
-        private String index;
-
-        private String type;
-
-        public void setIndex(String index) {
-            this.index = index;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
 
         @Override
         public void output(ResourceContext context, ContentBuilder contentBuilder) throws IOException {
-            IRI id = IRI.builder().scheme("http").host(index).query(type)
+            IRI id = IRI.builder().scheme("http").host(settings.get("index")).query(settings.get("type"))
                         .fragment(Long.toString(counter.incrementAndGet())).build();
             context.resource().id(id);
             sink.output(context, contentBuilder);

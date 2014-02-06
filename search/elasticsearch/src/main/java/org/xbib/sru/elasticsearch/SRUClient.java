@@ -110,8 +110,8 @@ public class SRUClient implements org.xbib.sru.client.SRUClient {
         boolean versionfound = false;
         String[] versions = getVersion().split(",");
         if (request.getVersion() != null) {
-            for (int i = 0; i < versions.length; i++) {
-                if (request.getVersion().equals(versions[i])) {
+            for (String version : versions) {
+                if (request.getVersion().equals(version)) {
                     versionfound = true;
                 }
             }

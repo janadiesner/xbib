@@ -31,7 +31,7 @@
  */
 package org.xbib.marc.dialects;
 
-import org.xbib.io.sequential.Separator;
+import org.xbib.io.field.FieldSeparator;
 
 import java.io.FilterReader;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class AlephSequentialReader extends FilterReader {
         if (ch == -1) {
             if (!ended) {
                 ended = true;
-                return Separator.GS; // close data
+                return FieldSeparator.GS; // close data
             } else {
                 return ch;
             }
@@ -90,7 +90,7 @@ public class AlephSequentialReader extends FilterReader {
                         in.read(); //skip 'L' (FMT value)
                         in.read(); //skip blank
                         if (ch == 'L' && ch2 == 'D' && ch3 == 'R') {
-                            return Separator.GS;
+                            return FieldSeparator.GS;
                         } else {
                             pushback.addLast(ch2);
                             pushback.addLast(ch3);
@@ -135,7 +135,7 @@ public class AlephSequentialReader extends FilterReader {
             if (ch == '$') {
                 int ch2 = in.read();
                 if (ch2 == '$') {
-                    return Separator.US;
+                    return FieldSeparator.US;
                 } else {
                     pushback.addLast(ch2);
                 }
@@ -150,7 +150,7 @@ public class AlephSequentialReader extends FilterReader {
                 ch = in.read();
             }
             pushback.addLast(ch);
-            ch = Separator.RS;
+            ch = FieldSeparator.RS;
         }
         return ch;
     }

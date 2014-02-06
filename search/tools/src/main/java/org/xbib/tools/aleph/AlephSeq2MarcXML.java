@@ -59,7 +59,7 @@ import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchangeAdapter;
 import org.xbib.marc.dialects.AlephSequentialReader;
-import org.xbib.pipeline.element.CounterElement;
+import org.xbib.pipeline.element.CounterPipelineElement;
 import org.xbib.tools.Converter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -68,7 +68,7 @@ public class AlephSeq2MarcXML extends Converter {
 
     private final static Logger logger = LoggerFactory.getLogger(AlephSeq2MarcXML.class.getName());
 
-    private final static CounterElement fileCounter = new CounterElement().set(new AtomicLong(0L));
+    private final static CounterPipelineElement fileCounter = new CounterPipelineElement().set(new AtomicLong(0L));
 
     private final int BUFFER_SIZE = 8192;
 

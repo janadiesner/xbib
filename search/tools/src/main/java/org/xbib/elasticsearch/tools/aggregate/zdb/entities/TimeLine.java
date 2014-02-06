@@ -291,7 +291,16 @@ public class TimeLine extends TreeSet<Manifestation> {
         dates.addAll(indicatorsByDate.keySet());
     }
 
+    /**
+     * Iterate through all dates and get the available services.
+     *
+     * Overlay services if required
+     *
+     */
     public void makeServices() {
+        if (dates == null) {
+            return;
+        }
         servicesByDate = newTreeMap();
         for (Integer date : dates) {
             Map<String,List<Holding>> services = newHashMap();
@@ -406,11 +415,10 @@ public class TimeLine extends TreeSet<Manifestation> {
                 .field("country", first().country())
                 .field("isilCount", isils.size())
                 .field("hasISIL", isils);
-        int indent = 0;
-        Set<Manifestation> visited = newHashSet();
-        builder.startArray("timeline");
+        builder.field("timelineSize", this.size())
+                .startArray("timeline");
         for (Manifestation m : this) {
-            m.buildSnippet(builder, indent, null, visited);
+            m.buildGroup(builder);
         }
         builder.endArray();
         builder.endObject();

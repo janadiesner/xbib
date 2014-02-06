@@ -82,7 +82,6 @@ public class ZSearchRetrieveResponse extends SearchRetrieveResponse
     }
 
     public ZSearchRetrieveResponse setErrors(byte[] errors) {
-        byte[] errors1 = errors;
         return this;
     }
 

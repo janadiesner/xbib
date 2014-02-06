@@ -1,3 +1,4 @@
+
 package org.xbib.pipeline;
 
 import java.io.Closeable;
@@ -39,5 +40,4 @@ public interface Pipeline<T,R extends PipelineRequest> extends Callable<T>, Clos
 
     Long took();
 
-    Throwable lastException();
 }

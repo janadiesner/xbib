@@ -119,19 +119,14 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
 
     private Long count;
 
-    private Long volumeCount;
-
     private Long t0;
 
     private Long t1;
-
-    private Throwable throwable;
 
     public MergeHoldingsLicensesPipeline(MergeHoldingsLicenses service, int number) {
         this.number = number;
         this.service = service;
         this.count = 0L;
-        this.volumeCount = 0L;
         this.listeners = newHashMap();
         this.buildQueue = new ConcurrentLinkedQueue();
         this.logger = LoggerFactory.getLogger(MergeHoldingsLicenses.class.getName() + "-pipeline-" + number);
@@ -179,7 +174,6 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
         } catch (Throwable e) {
             logger.error("exception while processing {}, exiting", m);
             logger.error(ExceptionFormatter.format(e));
-            this.throwable = e;
         } finally {
             service.countDown();
             t1 = System.currentTimeMillis();
@@ -247,7 +241,7 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
     }
 
     public Long size() {
-        return volumeCount;
+        return 0L;
     }
 
     @Override
@@ -263,11 +257,6 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
     @Override
     public Long took() {
         return t0 != null && t1 != null ? t1 - t0 : null;
-    }
-
-    @Override
-    public Throwable lastException() {
-        return throwable;
     }
 
     @Override
@@ -292,11 +281,14 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
         // retrieve all docs into candidate set that are connected by relationships
         retrieveCluster(candidates, manifestation);
 
-        // Ensure direct relationships in the cluster.
         // while we process, there may be other thread stealing our clusters, children etc.
         // So we work with immutable copies.
         Set<Manifestation> c1 = ImmutableSet.copyOf(candidates);
-        candidates.addAll(makeChildrenEditions(c1));
+
+        // microforms et al?
+        //candidates.addAll(extractOtherEditions(c1));
+
+        // Ensure direct relationships in the cluster.
         Set<Manifestation> c2 = ImmutableSet.copyOf(candidates);
         for (Manifestation m : c2) {
             setAllRelationsBetween(m, c2);
@@ -321,17 +313,23 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
             if (logger.isDebugEnabled()) {
                 logger.debug("{}/{}/{}", targetIndex, targetClusterType, id);
             }
-            // index time line summary
+
+            // index a summary of the time line
             XContentBuilder builder = jsonBuilder();
             timeLine.build(builder);
-            BytesReference b =  builder.bytes();
-            volumeCount += b.length();
+            BytesReference b = builder.bytes();
             service.ingest().index(targetIndex, targetClusterType, id, b);
             builder.close();
-            // make evidences and services in the timeline
+
+            // stratify services in the timeline
             timeLine.makeServices();
+
+            /*if (logger.isDebugEnabled()) {
             Map<Integer,Map<String,List<Holding>>> servicesByDate = timeLine.getServicesByDate();
-            // index everything
+                logger.debug("servicesByDate = {}", servicesByDate);
+            }*/
+
+            // index every manifestation in the timeline
             Set<Manifestation> visited = newHashSet();
             for (Manifestation m : timeLine) {
                 indexManifestation(m, visited);
@@ -364,9 +362,11 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
         XContentBuilder builder = jsonBuilder();
         m.build(builder);
         BytesReference b = builder.bytes();
-        volumeCount += b.length();
         service.ingest().index(targetIndex, targetManifestationsType, id, b);
         builder.close();
+
+        // get all the evidences, and index them twice: by date and by holder
+
         SetMultimap<Integer,Holding> evidenceByDate = m.getEvidenceByDate();
         // index volumes
         for (Integer date : evidenceByDate.keySet()) {
@@ -374,10 +374,10 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
             m.buildVolume(datebuilder, date, evidenceByDate.get(date));
             id = m.externalID() + "_" + (date != null ? date : "");
             b = datebuilder.bytes();
-            volumeCount += b.length();
             service.ingest().index(targetIndex, targetVolumesType, id, b);
             builder.close();
         }
+        // index by holders
         SetMultimap<String,Holding> holdings = m.getEvidenceByHolder();
         for (String holder : holdings.keySet()) {
             XContentBuilder holdingsBuilder = jsonBuilder();
@@ -564,18 +564,18 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
                     if (holding.isDeleted()) {
                         continue;
                     }
-                    if (holding.getISIL() == null) {
+                    String isil = holding.getISIL();
+                    if (isil == null || !isil.startsWith("DE-")) {
                         continue;
                     }
-                    if (!holding.getISIL().startsWith("DE-")) {
-                        continue;
-                    }
+                    String organization = service.bibdatLookup().lookup().get(isil);
+                    holding.setOrganization(organization);
                     Manifestation parent = manifestations.get(holding.parent());
                     if (parent == null) {
                         logger.warn("no parent for {}: {}", holding.parent(), holding);
                         continue;
                     }
-                    parent.addRelatedHolding(holding.getISIL(), holding);
+                    parent.addRelatedHolding(isil, holding);
                     holding.setManifestation(parent);
                     holdings.add(holding);
                 }
@@ -639,16 +639,17 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
                     if (license.isDeleted()) {
                         continue;
                     }
-                    if (!license.getISIL().startsWith("DE-")) {
+                    String isil = license.getISIL();
+                    if (isil == null || !isil.startsWith("DE-")) {
                         continue;
                     }
-                    String region = service.bibdatLookup().lookup().get(license.getISIL());
-                    license.setRegion(region);
+                    String organization = service.bibdatLookup().lookup().get(isil);
+                    license.setOrganization(organization);
                     Manifestation m = manifestations.get(license.parent());
                     if (m == null) {
                         continue;
                     }
-                    m.addRelatedHolding(license.getISIL(), license);
+                    m.addRelatedHolding(isil, license);
                     license.setManifestation(m);
                     licenses.add(license);
                 }
@@ -712,9 +713,9 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
                     if (!indicator.getISIL().startsWith("DE-")) {
                         continue;
                     }
-                    String region = service.bibdatLookup().lookup().get(indicator.getISIL());
-                    indicator.setRegion(region);
-                    logger.debug("resolved region for {}: {}", indicator.getISIL(), region);
+                    String organization = service.bibdatLookup().lookup().get(indicator.getISIL());
+                    indicator.setOrganization(organization);
+                    logger.debug("resolved organization for {}: {}", indicator.getISIL(), organization);
                     Manifestation m = manifestations.get(indicator.parent());
                     if (m == null) {
                         continue;
@@ -725,10 +726,10 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
                 }
             }
         }
-        if (logger.isDebugEnabled()) {
+        /*if (logger.isDebugEnabled()) {
             logger.debug("found {} indicators for manifestations {}: {}",
                     indicators.size(), manifestations, indicators);
-        }
+        }*/
         return indicators;
     }
 
@@ -796,14 +797,14 @@ public class MergeHoldingsLicensesPipeline implements Pipeline<Boolean, Manifest
         }
     }
 
-    private Collection<Manifestation> makeChildrenEditions(Collection<Manifestation> cluster) {
+    private Collection<Manifestation> extractOtherEditions(Collection<Manifestation> cluster) {
         Collection<Manifestation> children = newLinkedList();
-        for (Manifestation manifestation : cluster) {
+        /*for (Manifestation manifestation : cluster) {
             Manifestation microform = manifestation.cloneMicroformEdition();
             if (microform != null) {
                 children.add(microform);
             }
-        }
+        }*/
         return children;
     }
 

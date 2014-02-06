@@ -48,11 +48,13 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -61,15 +63,15 @@ import java.util.Map;
  * Style sheet transformer
  *
  */
-public class StylesheetTransformer {
+public class StylesheetTransformer implements Closeable {
 
     private final SAXTransformerFactory transformerFactory;
 
-    private final TransformerURIResolver resolver;
-
     private final static StylesheetPool pool = new StylesheetPool();
 
-    private final Map<String, Object> parameters = new HashMap();
+    private final Map<String, Object> parameters = new HashMap<String, Object>();
+
+    private TransformerURIResolver resolver;
 
     private Source source;
 
@@ -80,10 +82,15 @@ public class StylesheetTransformer {
     }
 
     public StylesheetTransformer(String... path) {
-        this.resolver = path == null ?  new TransformerURIResolver() : new TransformerURIResolver(path);
         transformerFactory = (SAXTransformerFactory) TransformerFactory.newInstance();
         transformerFactory.setErrorListener(new StylesheetErrorListener());
+        setResolver(path == null ? new TransformerURIResolver() : new TransformerURIResolver(path));
+    }
+
+    public StylesheetTransformer setResolver(TransformerURIResolver resolver) {
+        this.resolver = resolver;
         transformerFactory.setURIResolver(resolver);
+        return this;
     }
 
     public StylesheetTransformer addParameter(String name, Object value) {
@@ -153,10 +160,20 @@ public class StylesheetTransformer {
     /**
      * Transform through a sequence of XSL style sheets
      *
-     * @param xsl
+     * @param xsl sequence of XSL style sheets
      * @throws javax.xml.transform.TransformerException
      */
     public void transform(Iterable<String> xsl) throws TransformerException {
+        transform(null, xsl);
+    }
+
+    /**
+     * Transform through a sequence of XSL style sheets
+     *
+     * @param xsl sequence of XSL style sheets
+     * @throws javax.xml.transform.TransformerException
+     */
+    public void transform(String base, Iterable<String> xsl) throws TransformerException {
         if (source == null) {
             return;
         }
@@ -167,27 +184,30 @@ public class StylesheetTransformer {
             return;
         }
         Transformer transformer = transformerFactory.newTransformer();
-        try {
-            List<TransformerHandler> handlers = new ArrayList();
-            for (String s : xsl) {
-                Templates t = pool.newTemplates(transformerFactory, resolver.resolve(s, null));
-                TransformerHandler h = pool.newTransformerHandler(transformerFactory, t);
-                for (Map.Entry<String, Object> me : parameters.entrySet()) {
-                    if (me.getValue() != null) {
-                        h.getTransformer().setParameter(me.getKey(), me.getValue());
-                    }
+        List<TransformerHandler> handlers = new LinkedList<TransformerHandler>();
+        for (String s : xsl) {
+            Templates t = pool.newTemplates(transformerFactory, resolver.resolve(s, base));
+            TransformerHandler h = pool.newTransformerHandler(transformerFactory, t);
+            for (Map.Entry<String, Object> me : parameters.entrySet()) {
+                if (me.getValue() != null) {
+                    h.getTransformer().setParameter(me.getKey(), me.getValue());
                 }
-                handlers.add(h);
             }
-            Result r = result;
-            ListIterator<TransformerHandler> it = handlers.listIterator(handlers.size());
-            while (it.hasPrevious()) {
-                TransformerHandler h = it.previous();
-                h.setResult(r);
-                r = new SAXResult(h);
-            }
-            transformer.transform(source, r);
-        } finally {
+            handlers.add(h);
+        }
+        Result r = result;
+        ListIterator<TransformerHandler> it = handlers.listIterator(handlers.size());
+        while (it.hasPrevious()) {
+            TransformerHandler h = it.previous();
+            h.setResult(r);
+            r = new SAXResult(h);
+        }
+        transformer.transform(source, r);
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (resolver != null) {
             resolver.close();
         }
     }

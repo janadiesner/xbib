@@ -40,10 +40,11 @@ import java.util.regex.Pattern;
 
 public class ContentTypeNegotiator {
 
-    private List variantSpecs = new ArrayList();
-    private List defaultAcceptRanges =
-            Collections.singletonList(MediaRangeSpec.parseRange("*/*"));
-    private Collection userAgentOverrides = new ArrayList();
+    private List<VariantSpec> variantSpecs = new ArrayList<VariantSpec>();
+
+    private List<MediaRangeSpec> defaultAcceptRanges = Collections.singletonList(MediaRangeSpec.parseRange("*/*"));
+
+    private Collection<AcceptHeaderOverride> userAgentOverrides = new ArrayList<AcceptHeaderOverride>();
 
     public VariantSpec addVariant(String mediaType) {
         VariantSpec result = new VariantSpec(mediaType);
@@ -73,8 +74,7 @@ public class ContentTypeNegotiator {
      */
     public void addUserAgentOverride(Pattern userAgentString,
                                      String originalAcceptHeader, String newAcceptHeader) {
-        this.userAgentOverrides.add(new AcceptHeaderOverride(
-                userAgentString, originalAcceptHeader, newAcceptHeader));
+        this.userAgentOverrides.add(new AcceptHeaderOverride(userAgentString, originalAcceptHeader, newAcceptHeader));
     }
 
     public MediaRangeSpec getBestMatch(String accept) {
@@ -93,128 +93,18 @@ public class ContentTypeNegotiator {
                 overriddenAccept = override.getReplacement();
             }
         }
-        return new Negotiation(toAcceptRanges(overriddenAccept)).negotiate();
+        return new Negotiation(toAcceptRanges(overriddenAccept)).negotiate(variantSpecs);
     }
 
-    private List toAcceptRanges(String accept) {
+    private List<MediaRangeSpec> toAcceptRanges(String accept) {
         if (accept == null) {
             return defaultAcceptRanges;
         }
-        List result = MediaRangeSpec.parseAccept(accept);
+        List<MediaRangeSpec> result = MediaRangeSpec.parseAccept(accept);
         if (result.isEmpty()) {
             return defaultAcceptRanges;
         }
         return result;
     }
 
-    public class VariantSpec {
-
-        private MediaRangeSpec type;
-        private List aliases = new ArrayList();
-        private boolean isDefault = false;
-
-        public VariantSpec(String mediaType) {
-            type = MediaRangeSpec.parseType(mediaType);
-        }
-
-        public VariantSpec addAliasMediaType(String mediaType) {
-            aliases.add(MediaRangeSpec.parseType(mediaType));
-            return this;
-        }
-
-        public void makeDefault() {
-            isDefault = true;
-        }
-
-        public MediaRangeSpec getMediaType() {
-            return type;
-        }
-
-        public boolean isDefault() {
-            return isDefault;
-        }
-
-        public List getAliases() {
-            return aliases;
-        }
-    }
-
-    private class Negotiation {
-
-        private final List ranges;
-        private MediaRangeSpec bestMatchingVariant = null;
-        private MediaRangeSpec bestDefaultVariant = null;
-        private double bestMatchingQuality = 0;
-        private double bestDefaultQuality = 0;
-
-        Negotiation(List ranges) {
-            this.ranges = ranges;
-        }
-
-        MediaRangeSpec negotiate() {
-            Iterator it = variantSpecs.iterator();
-            while (it.hasNext()) {
-                VariantSpec variant = (VariantSpec) it.next();
-                if (variant.isDefault) {
-                    evaluateDefaultVariant(variant.getMediaType());
-                }
-                evaluateVariant(variant.getMediaType());
-                Iterator aliasIt = variant.getAliases().iterator();
-                while (aliasIt.hasNext()) {
-                    MediaRangeSpec alias = (MediaRangeSpec) aliasIt.next();
-                    evaluateVariantAlias(alias, variant.getMediaType());
-                }
-            }
-            return (bestMatchingVariant == null) ? bestDefaultVariant : bestMatchingVariant;
-        }
-
-        private void evaluateVariantAlias(MediaRangeSpec variant, MediaRangeSpec isAliasFor) {
-            if (variant.getBestMatch(ranges) == null) {
-                return;
-            }
-            double q = variant.getBestMatch(ranges).getQuality();
-            if (q * variant.getQuality() > bestMatchingQuality) {
-                bestMatchingVariant = isAliasFor;
-                bestMatchingQuality = q * variant.getQuality();
-            }
-        }
-
-        private void evaluateVariant(MediaRangeSpec variant) {
-            evaluateVariantAlias(variant, variant);
-        }
-
-        private void evaluateDefaultVariant(MediaRangeSpec variant) {
-            if (variant.getQuality() > bestDefaultQuality) {
-                bestDefaultVariant = variant;
-                bestDefaultQuality = 0.00001 * variant.getQuality();
-            }
-        }
-    }
-
-    private class AcceptHeaderOverride {
-
-        private Pattern userAgentPattern;
-        private String original;
-        private String replacement;
-
-        AcceptHeaderOverride(Pattern userAgentPattern, String original, String replacement) {
-            this.userAgentPattern = userAgentPattern;
-            this.original = original;
-            this.replacement = replacement;
-        }
-
-        boolean matches(String acceptHeader) {
-            return matches(acceptHeader, null);
-        }
-
-        boolean matches(String acceptHeader, String userAgentHeader) {
-            return (userAgentPattern == null
-                    || userAgentPattern.matcher(userAgentHeader).find())
-                    && (original == null || original.equals(acceptHeader));
-        }
-
-        String getReplacement() {
-            return replacement;
-        }
-    }
 }

@@ -123,9 +123,11 @@ public class ClientTest {
                 }
             };
             request.addListener(listener);
+            StylesheetTransformer transformer = new StylesheetTransformer("src/test/resources/xsl");
             client.searchRetrieve(request)
-                    .setStylesheetTransformer(new StylesheetTransformer("src/test/resources/xsl"))
+                    .setStylesheetTransformer(transformer)
                     .to(writer);
+            transformer.close();
             client.close();
         }
     }

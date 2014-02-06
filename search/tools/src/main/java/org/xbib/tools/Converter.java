@@ -36,11 +36,11 @@ import org.xbib.io.archivers.file.Finder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.AbstractPipeline;
-import org.xbib.pipeline.MetricPipelineExecutor;
+import org.xbib.pipeline.MetricSimplePipelineExecutor;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.PipelineRequest;
-import org.xbib.pipeline.element.CounterElement;
+import org.xbib.pipeline.element.CounterPipelineElement;
 import org.xbib.util.DurationFormatUtil;
 import org.xbib.util.FormatUtil;
 
@@ -50,17 +50,17 @@ import java.io.Writer;
 import java.net.URI;
 import java.text.NumberFormat;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.google.common.collect.Lists.newLinkedList;
 import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 
 public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline<T,R>>
-        extends AbstractPipeline<CounterElement> {
+        extends AbstractPipeline<CounterPipelineElement> {
 
     private final static Logger logger = LoggerFactory.getLogger(Converter.class.getSimpleName());
 
-    private final static CounterElement counter = new CounterElement().set(new AtomicLong(0L));
+    private final static CounterPipelineElement counter = new CounterPipelineElement().set(new AtomicLong(0L));
 
     protected Reader reader;
 
@@ -70,7 +70,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
 
     protected static Queue<URI> input;
 
-    protected MetricPipelineExecutor<T,R,P> executor;
+    protected MetricSimplePipelineExecutor<T,R,P> executor;
 
     private boolean done = false;
 
@@ -85,14 +85,35 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
         return this;
     }
 
+    protected Converter<T,R,P> prepare() throws IOException {
+        if (settings.get("uri") != null) {
+            input = new ConcurrentLinkedQueue<>();
+            input.add(URI.create(settings.get("uri")));
+            // parallel URI connection possible?
+            if (settings.getAsBoolean("parallel", false)) {
+                for (int i = 1; i < settings.getAsInt("concurrency", 1); i++) {
+                    input.add(URI.create(settings.get("uri")));
+                }
+            }
+        } else {
+            input = new Finder(settings.get("pattern"))
+                    .find(settings.get("path"))
+                    .pathSorted(settings.getAsBoolean("isPathSorted", false))
+                    .chronologicallySorted(settings.getAsBoolean("isChronologicallySorted", false))
+                    .getURIs();
+        }
+        logger.info("input = {}", input);
+        return this;
+    }
+
     public Converter<T,R,P> run() throws Exception {
         try {
-            logger.info("preparing");
+            logger.info("preparing with settings {}", settings.getAsMap());
             prepare();
             logger.info("executing");
-            //metric pipeline executor only usese concurrency over different URIs
+            //metric pipeline executor only uses concurrency over different URIs
             // in the input queue, not with a single URI input
-            executor = new MetricPipelineExecutor<T,R,P>()
+            executor = new MetricSimplePipelineExecutor<T,R,P>()
                     .concurrency(settings.getAsInt("concurrency", 1))
                     .provider(pipelineProvider())
                     .prepare()
@@ -106,21 +127,6 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
                 writeMetrics(writer);
             }
         }
-        return this;
-    }
-
-    protected Converter<T,R,P> prepare() throws IOException {
-        if (settings.get("uri") != null) {
-            input = newLinkedList();
-            input.add(URI.create(settings.get("uri")));
-        } else {
-            input = new Finder(settings.get("pattern"))
-                    .find(settings.get("path"))
-                    .pathSorted(settings.getAsBoolean("isPathSorted", false))
-                    .chronologicallySorted(settings.getAsBoolean("isChronologicallySorted", false))
-                    .getURIs();
-        }
-        logger.info("input = {}", input);
         return this;
     }
 
@@ -139,7 +145,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
     }
 
     @Override
-    public CounterElement next() {
+    public CounterPipelineElement next() {
         URI uri = input.poll();
         done = uri == null;
         if (done) {

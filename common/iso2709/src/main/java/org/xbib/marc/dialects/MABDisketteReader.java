@@ -31,7 +31,7 @@
  */
 package org.xbib.marc.dialects;
 
-import org.xbib.io.sequential.Separator;
+import org.xbib.io.field.FieldSeparator;
 
 import java.io.FilterReader;
 import java.io.IOException;
@@ -78,7 +78,7 @@ public class MABDisketteReader extends FilterReader {
                     leader = true;
                     in.read(); // skip blank after ###
                     if (!started) {
-                        return Separator.GS;
+                        return FieldSeparator.GS;
                     } else {
                         started = false;
                         return in.read();
@@ -101,14 +101,14 @@ public class MABDisketteReader extends FilterReader {
                 return ch;
             }
             pushback.addLast(ch);
-            ch = Separator.RS;
+            ch = FieldSeparator.RS;
             // no UNIT sep!
         }
         // insert a last GS if end of stream reached
         if (ch == -1 && !ended) {
             pushback.addLast(ch);
             ended = true;
-            return Separator.GS;
+            return FieldSeparator.GS;
         }
         return ch;
     }

@@ -31,11 +31,7 @@
  */
 package org.xbib.oai;
 
-import org.xbib.io.OutputFormat;
 import org.xbib.io.http.netty.NettyHttpResponse;
-import org.xbib.io.http.netty.NettyHttpResponse;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.xml.XMLFilterReader;
 import org.xbib.xml.transform.StylesheetTransformer;
 
@@ -47,8 +43,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Date;
-import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
@@ -63,9 +57,7 @@ public class DefaultOAIResponse<R extends DefaultOAIResponse>
         extends NettyHttpResponse
         implements OAIResponse<R>, XMLEventConsumer {
 
-    private final Logger logger = LoggerFactory.getLogger(DefaultOAIResponse.class.getName());
-
-    private static final XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+    //private static final XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 
     private OAIRequest request;
 
@@ -75,12 +67,12 @@ public class DefaultOAIResponse<R extends DefaultOAIResponse>
 
     private String errorCode;
 
-    private StylesheetTransformer transformer;
+    //private StylesheetTransformer transformer;
 
     public DefaultOAIResponse(OAIRequest request) {
         this.request = request;
         this.sb = new StringBuilder();
-        this.transformer = new StylesheetTransformer("/xsl");
+        //this.transformer = new StylesheetTransformer("/xsl");
     }
 
     public OAIRequest getRequest() {
@@ -90,28 +82,6 @@ public class DefaultOAIResponse<R extends DefaultOAIResponse>
     @Override
     public R setReader(Reader reader) {
         this.reader = reader;
-        return (R)this;
-    }
-
-    @Override
-    public R setStylesheetTransformer(StylesheetTransformer transformer) {
-        this.transformer = transformer;
-        return (R)this;
-    }
-
-    @Override
-    public R setStylesheets(String... stylesheets) {
-        String[] stylesheets1 = stylesheets;
-        return (R)this;
-    }
-
-    public StylesheetTransformer getTransformer() {
-        return transformer;
-    }
-
-    @Override
-    public R setOutputFormat(OutputFormat format) {
-        OutputFormat format1 = format;
         return (R)this;
     }
 
@@ -142,7 +112,9 @@ public class DefaultOAIResponse<R extends DefaultOAIResponse>
             XMLFilterReader filter = new OAIResponseFilterReader();
             InputSource source = new InputSource(reader);
             StreamResult streamResult = new StreamResult(writer);
+            StylesheetTransformer transformer = new StylesheetTransformer("/xsl");
             transformer.setSource(filter, source).setResult(streamResult).transform();
+            transformer.close();
         } catch (TransformerException e) {
             throw new IOException(e.getMessage(), e);
         }

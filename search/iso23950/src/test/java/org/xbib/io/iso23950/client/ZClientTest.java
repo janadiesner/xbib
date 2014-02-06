@@ -68,8 +68,8 @@ public class ZClientTest {
                                 .setSize(size);
                         ZSearchRetrieveResponse response = request.execute();
                         StylesheetTransformer transformer = new StylesheetTransformer("src/main/resources/xsl");
-                        response.setStylesheetTransformer(transformer)
-                                .to(w);
+                        response.setStylesheetTransformer(transformer).to(w);
+                        transformer.close();
                     }
                     tmp.delete();
                 } finally {

@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
 
-import org.xbib.io.OutputFormat;
 import org.xbib.sru.DefaultSRUResponse;
 import org.xbib.sru.SRUResponse;
 
@@ -45,17 +44,14 @@ import org.xbib.sru.SRUResponse;
  */
 public class ExplainResponse extends DefaultSRUResponse implements SRUResponse {
 
-    private final ExplainRequest request;
-
     public ExplainResponse(ExplainRequest request) {
-        this.request = request;
     }
 
     public void write() throws IOException {
     }
 
     @Override
-    public ExplainResponse setOutputFormat(OutputFormat format) {
+    public ExplainResponse setOutputFormat(String format) {
         return this;
     }
 

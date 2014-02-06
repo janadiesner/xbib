@@ -188,7 +188,7 @@ public class Field implements Comparable {
     /**
      * Get this designator's tag
      *
-     * @return
+     * @return tag
      */
     public String tag() {
         return tag;

@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Iterate over Aleph Z00P records
@@ -26,10 +27,21 @@ public class AlephPublishIterator implements Iterator<Integer>, Closeable {
 
     private String id;
 
+    private final AtomicInteger n = new AtomicInteger();
+
+    private Integer max;
+
     public AlephPublishIterator() {
     }
 
-    public void configure(Settings settings, Connection connection) {
+    public void configure(Settings settings) {
+        n.set(0);
+        this.max = settings.getAsInt("max", 1);
+    }
+
+    public void configure(Connection connection, Settings settings) {
+        n.set(-1);
+        this.max = 0;
         try {
             String query = "select /*+ index(z00p z00p_id5) */ z00p_doc_number from "
                     + settings.get("library")
@@ -46,6 +58,13 @@ public class AlephPublishIterator implements Iterator<Integer>, Closeable {
 
     @Override
     public boolean hasNext() {
+        if (n.get() >= 0) {
+            int i = n.incrementAndGet();
+            if (i > max) {
+                return false;
+            }
+            return true;
+        }
         if (results == null) {
             return false;
         }
@@ -76,6 +95,9 @@ public class AlephPublishIterator implements Iterator<Integer>, Closeable {
 
     @Override
     public Integer next() {
+        if (n.get() >= 0) {
+            return n.get();
+        }
         if (results == null) {
             return null;
         }

@@ -40,8 +40,8 @@ import org.elasticsearch.common.xcontent.json.JsonXContent;
 
 import org.xbib.elasticsearch.xml.ES;
 import org.xbib.io.stream.ChunkedStream;
-import org.xbib.io.OutputFormat;
 import org.xbib.io.StreamUtil;
+import org.xbib.io.stream.StreamByteBuffer;
 import org.xbib.json.JsonXmlStreamer;
 import org.xbib.json.transform.JsonStylesheet;
 import org.xbib.search.SearchError;
@@ -70,15 +70,15 @@ public class CQLSearchResponse {
 
     private String[] stylesheets;
 
-    private OutputFormat format;
+    private String mimeType;
 
-    public CQLSearchResponse setOutputFormat(OutputFormat format) {
-        this.format = format;
+    public CQLSearchResponse setOutputFormat(String mimeType) {
+        this.mimeType = mimeType;
         return this;
     }
 
-    public OutputFormat getOutputFormat() {
-        return format;
+    public String getOutputFormat() {
+        return mimeType;
     }
 
     public CQLSearchResponse setStylesheetTransformer(StylesheetTransformer transformer) {
@@ -156,18 +156,18 @@ public class CQLSearchResponse {
             return null;
         }
         checkResponseForError();
-        ChunkedStream buffer = new ChunkedStream();
+        StreamByteBuffer buffer = new StreamByteBuffer();
         toJSON(buffer.getOutputStream());
         buffer.getOutputStream().flush();
         return buffer.getInputStream();
     }
 
-    public ChunkedStream bytes() throws IOException {
+    public StreamByteBuffer bytes() throws IOException {
         if (searchResponse == null) {
             return null;
         }
         checkResponseForError();
-        ChunkedStream buffer = new ChunkedStream();
+        StreamByteBuffer buffer = new StreamByteBuffer();
         toJSON(buffer.getOutputStream());
         buffer.getOutputStream().flush();
         return buffer;
@@ -175,15 +175,12 @@ public class CQLSearchResponse {
 
     public void to(Writer writer) throws IOException, XMLStreamException {
         InputStream in = read();
-        if (format == null || format.equals(OutputFormat.JSON)) {
+        if (getStylesheets() == null || "application/json".equals(mimeType)) {
             StreamUtil.copy(new InputStreamReader(in, "UTF-8"), writer);
-        } else if (format.equals(OutputFormat.XML)) {
-            // method "JsonStyleSheet"
+        } else if ("application/xml".equals(mimeType)) {
             new JsonStylesheet().root(root)
                 .toXML(in, writer);
         } else {
-            // application/xhtml+xml
-            // application/mods+xml
             new JsonStylesheet().root(root)
                 .setTransformer(getTransformer())
                 .setStylesheets(getStylesheets())

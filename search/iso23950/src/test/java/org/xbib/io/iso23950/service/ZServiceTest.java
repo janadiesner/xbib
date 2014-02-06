@@ -70,6 +70,7 @@ public class ZServiceTest {
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 } finally {
+                    transformer.close();
                     service.close(client);
                 }
             }

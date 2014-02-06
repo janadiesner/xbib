@@ -31,6 +31,8 @@
  */
 package org.xbib.xml.transform;
 
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -44,7 +46,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.google.common.collect.Lists.newLinkedList;
 
 /**
  * URI resolver for Transformer
@@ -52,71 +61,112 @@ import java.net.URL;
  */
 public class TransformerURIResolver implements URIResolver {
 
-    private InputStream in;
-    private String[] bases;
+    private final Logger logger = LoggerFactory.getLogger(TransformerURIResolver.class.getName());
+
+    private List<InputStream> inputStreams = newLinkedList();
+
+    private List<String> bases = newLinkedList();
+
+    private ClassLoader classLoader;
 
     public TransformerURIResolver() {
-        this.bases = new String[0];
+        this.classLoader = Thread.currentThread().getContextClassLoader();
     }
 
     public TransformerURIResolver(String... bases) {
-        this.bases = bases;
+        this.classLoader = Thread.currentThread().getContextClassLoader();
+        this.bases.addAll(Arrays.asList(bases));
     }
 
+    public TransformerURIResolver setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+        return this;
+    }
+
+    /**
+     *
+     * @param href  An href attribute, which may be relative or absolute
+     * @param base The base URI against which the first argument will be made absolute if the absolute URI is required
+     * @return the souce
+     * @throws TransformerException
+     */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        return resolve(Thread.currentThread().getContextClassLoader(), href, base);
-    }
-
-    public Source resolve(ClassLoader cl, String href, String base) throws TransformerException {
+        InputStream in = null;
+        URL url = null;
         try {
-            String systemId = href;
-            URL url = cl.getResource(href);
-            if (url == null) {
-                throw new TransformerException("url is null for " + href);
+            URI uri = URI.create(href);
+            // relative href?
+            if (!uri.isAbsolute() && base != null) {
+                url = new URL(new URL(base), href);
+                href = url.toURI().getRawSchemeSpecificPart(); // drop scheme
             }
-            if (cl.getResource(href) != null) {
-                systemId = url.toExternalForm();
+        } catch (MalformedURLException | URISyntaxException e) {
+            throw new TransformerException(e);
+        }
+        String systemId = href;
+        if (url != null) {
+            try {
                 in = url.openStream();
-            } else {
-                in = cl.getResourceAsStream(href);
-                if (in == null && bases.length > 0) {
-                    for (String s : bases) {
-                        systemId = s + "/" + href;
-                        in = cl.getResourceAsStream(systemId);
-                        if (in == null) {
+            } catch (IOException e) {
+                logger.debug("error while opening stream", e);
+            }
+        }
+        if (in == null) {
+            try {
+                url = classLoader.getResource(href);
+                if (url != null) {
+                    systemId = url.toExternalForm();
+                    in = url.openStream();
+                } else {
+                    systemId = href;
+                    in = classLoader.getResourceAsStream(href);
+                    if (in == null) {
+                        if (bases.isEmpty()) {
                             try {
-                                in = new FileInputStream(systemId);
+                                systemId = href;
+                                in = new FileInputStream(href);
                             } catch (FileNotFoundException e) {
-                                // ignore
+                                logger.debug("file not found: " + href);
                             }
                         } else {
-                            break;
+                            for (String s : bases) {
+                                systemId = s + "/" + href;
+                                in = classLoader.getResourceAsStream(systemId);
+                                if (in == null) {
+                                    try {
+                                        in = new FileInputStream(systemId);
+                                    } catch (FileNotFoundException e) {
+                                        logger.debug("file not found: " + systemId);
+                                    }
+                                } else {
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
+            } catch (Exception e) {
+                throw new TransformerException("I/O error", e);
             }
-            if (in == null) {
-                throw new TransformerException("href could not be resolved: " + href);
-            }
+        }
+        if (in == null) {
+            throw new TransformerException("href could not be resolved: " + href);
+        }
+        try {
             XMLReader reader = XMLReaderFactory.createXMLReader();
+            inputStreams.add(in);
             SAXSource source = new SAXSource(reader, new InputSource(in));
             source.setSystemId(systemId);
             return source;
         } catch (SAXException e) {
             throw new TransformerException("no XML reader for SAX source in URI resolving for:" + href, e);
-        } catch (IOException e) {
-            throw new TransformerException("I/O error", e);
         }
     }
 
-    public void close() {
-        try {
-            if (in != null) {
-                in.close();
-            }
-        } catch (IOException e) {
-            // ignore
+    public void close() throws IOException {
+        for (InputStream in : inputStreams) {
+            in.close();
         }
     }
 }

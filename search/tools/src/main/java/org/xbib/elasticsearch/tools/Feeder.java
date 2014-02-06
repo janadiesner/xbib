@@ -99,8 +99,8 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
         output.maxActionsPerBulkRequest(maxbulkactions)
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
                 .newClient(esURI);
-        output.waitForCluster()
-                .setIndex(index)
+        output.waitForCluster();
+        output.setIndex(index)
                 .setType(type)
                 .dateDetection(false)
                 .shards(shards)

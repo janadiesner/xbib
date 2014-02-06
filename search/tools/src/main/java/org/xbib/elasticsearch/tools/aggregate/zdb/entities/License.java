@@ -31,8 +31,7 @@
  */
 package org.xbib.elasticsearch.tools.aggregate.zdb.entities;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.xbib.util.Strings;
 
 import java.util.Arrays;
 import java.util.GregorianCalendar;
@@ -46,14 +45,7 @@ import static com.google.common.collect.Maps.newHashMap;
 
 public class License extends Holding {
 
-
     private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
-
-    protected String servicetype;
-
-    protected String servicemode;
-
-    protected String servicedistribution;
 
     public License(Map<String, Object> m) {
         super(m);
@@ -62,7 +54,7 @@ public class License extends Holding {
 
     @Override
     protected void build() {
-        super.id = getString("ezb:license_entry_id");
+        this.identifier = getString("ezb:license_entry_id");
         this.parent = getString("ezb:zdbid");
         this.isil = getString("ezb:isil");
         this.deleted = "delete".equals(getString("ezb:action"));
@@ -117,11 +109,12 @@ public class License extends Holding {
     protected Map<String, Object> buildInfo() {
         Map<String, Object> m = newHashMap();
         this.service = newHashMap();
-        service.put("organization", getString("ezb:isil") );
         String s = getString("ezb:ill_relevance.ezb:ill_code");
         if (s != null) {
             switch(s) {
                 case "n":
+                case "no":
+                case "none":
                 case "nein":
                 {
                     servicetype = "interlibrary";
@@ -130,6 +123,7 @@ public class License extends Holding {
                     break;
                 }
                 case "l":
+                case "copy-loan":
                 case "ja, Leihe und Kopie":
                 {
                     servicetype = "interlibrary";
@@ -137,6 +131,7 @@ public class License extends Holding {
                     servicedistribution = "distribution-unrestricted";
                     break;
                 }
+                case "copy-loan-domestic":
                 case "ja, Leihe und Kopie (nur Inland)":
                 {
                     servicetype = "interlibrary";
@@ -145,6 +140,7 @@ public class License extends Holding {
                     break;
                 }
                 case "k":
+                case "copy":
                 case "ja, nur Kopie":
                 {
                     servicetype = "interlibrary";
@@ -153,6 +149,7 @@ public class License extends Holding {
                     break;
                 }
                 case "kn":
+                case "copy-domestic":
                 case "ja, nur Kopie (nur Inland)":
                 {
                     servicetype = "interlibrary";
@@ -161,6 +158,7 @@ public class License extends Holding {
                     break;
                 }
                 case "e":
+                case "copy-electronic":
                 case "ja, auch elektronischer Versand an Nutzer":
                 {
                     servicetype = "interlibrary";
@@ -169,6 +167,7 @@ public class License extends Holding {
                     break;
                 }
                 case "en":
+                case "copy-electronic-domestic":
                 case "ja, auch elektronischer Versand an Nutzer (nur Inland)":
                 {
                     servicetype = "interlibrary";
@@ -176,9 +175,13 @@ public class License extends Holding {
                     servicedistribution = "distribution-electronic-domestic-only";
                     break;
                 }
+                default: {
+                    throw new IllegalArgumentException("unknown service code: " + s);
+                }
             }
         }
 
+        // additional qualifiers for service distribution
         String q = getString("ezb:ill_relevance.ezb:inland_only");
         String r = getString("ezb:ill_relevance.ezb:il_electronic_forbidden");
         if ("true".equals(q) && "true".equals(r)) {
@@ -188,26 +191,43 @@ public class License extends Holding {
         } else if ("true".equals(r)) {
             servicedistribution = "distribution-postal";
         }
-        service.put("servicecomment", getString("ezb:ill_relevance.ezb:comment"));
-        service.put("servicetype", servicetype);
-        service.put("servicemode", servicemode);
-        service.put("servicedistribution", servicedistribution);
+        service.put("type", servicetype);
+        service.put("mode", servicemode);
+        service.put("distribution", servicedistribution);
+
+        String comment = getString("ezb:ill_relevance.ezb:comment");
+        if (!Strings.isNullOrEmpty(comment)){
+            service.put("comment", comment);
+        }
         m.put("service", service);
 
         // no textualholdings
         Map<String, Object> holdings = newHashMap();
-        holdings.put("firstvolume", getString("ezb:license_period.ezb:first_volume"));
+        // first date and last date is obligatory
         holdings.put("firstdate", getString("ezb:license_period.ezb:first_date"));
-        holdings.put("lastvolume", getString("ezb:license_period.ezb:last_volume"));
         holdings.put("lastdate", getString("ezb:license_period.ezb:last_date"));
-        // ezb:available is map or string?
-        Object o = getAnyObject("ezb:license_period.ezb:available");
-        String avail = o != null ? o.toString() : null;
-        holdings.put("available", avail);
+        // volume is optional
+        String firstVolume = getString("ezb:license_period.ezb:first_volume");
+        if (firstVolume != null) {
+            holdings.put("firstvolume", firstVolume);
+        }
+        String lastVolume = getString("ezb:license_period.ezb:last_volume");
+        if (lastVolume != null) {
+            holdings.put("lastvolume", lastVolume);
+        }
+        // issue is optional
+        String firstIssue = getString("ezb:license_period.ezb:first_issue");
+        if (firstIssue != null) {
+            holdings.put("firstissue", firstIssue);
+        }
+        String lastIssue = getString("ezb:license_period.ezb:last_issue");
+        if (lastIssue != null) {
+            holdings.put("lastissue", lastIssue);
+        }
         m.put("holdings", holdings);
 
         Map<String, Object> link = newHashMap();
-        link.put("uri", map().get("ezb:reference_url"));
+        link.put("url", map().get("ezb:reference_url"));
         link.put("nonpublicnote", "Verlagsangebot"); // ZDB = "Volltext"
         m.put("links", Arrays.asList(link));
 
@@ -221,22 +241,22 @@ public class License extends Holding {
         return m;
     }
 
-    protected Character findCarrierTypeKey() {
+    @Override
+    protected Integer findPriority() {
+        if (carrierType == null) {
+            return 9;
+        }
         switch (carrierType) {
-            case "online resource" : return servicedistribution != null
-                    && servicedistribution.contains("postal") ? '3' : '1';
-            case "volume": return '2';
-            case "computer disc" : return '4';
-            case "computer tape cassette" : return '4';
-            case "computer chip cartridge" : return '4';
-            case "microform" : return '5';
-            case "other" : return '6';
+            case "online resource" : return (servicedistribution != null
+                    && servicedistribution.contains("postal")) ? 3 : 1;
+            case "volume": return 2;
+            case "computer disc" : return 4;
+            case "computer tape cassette" : return 4;
+            case "computer chip cartridge" : return 4;
+            case "microform" : return 5;
+            case "other" : return 6;
             default: throw new IllegalArgumentException("unknown carrier: " + carrierType());
         }
-    }
-
-    public String getRoutingKey() {
-        return String.valueOf(findRegionKey()) + findCarrierTypeKey();
     }
 
 }

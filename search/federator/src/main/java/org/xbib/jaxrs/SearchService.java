@@ -1,6 +1,5 @@
 package org.xbib.jaxrs;
 
-import org.xbib.io.OutputFormat;
 import org.xbib.io.iso23950.Diagnostics;
 import org.xbib.io.iso23950.client.ZClient;
 import org.xbib.io.iso23950.client.ZClientFactory;
@@ -47,8 +46,9 @@ public class SearchService {
                     ZSearchRetrieveResponse response = request.execute();
                     StylesheetTransformer transformer = new StylesheetTransformer("xsl");
                     response.setStylesheetTransformer(transformer)
-                            .setOutputFormat(OutputFormat.XHTML)
+                            .setOutputFormat("html")
                             .to(new OutputStreamWriter(output, "UTF-8"));
+                    transformer.close();
                     client.close();
                 } catch (Diagnostics d) {
                     logger.error(d.getMessage(), d);

@@ -49,12 +49,6 @@ import java.util.Stack;
  */
 public class ESQueryGenerator implements Visitor {
 
-    /**
-     * the default resource bundle
-     */
-    private static final ResourceBundle DEFAULT_BUNDLE =
-            ResourceBundle.getBundle("org.xbib.query.cql.elasticsearch.default");
-
     private ResourceBundle bundle;
 
     private QueryModel model;
@@ -78,19 +72,13 @@ public class ESQueryGenerator implements Visitor {
     private XContentBuilder facets;
 
     /**
-     * Default constructor
-     */
-    public ESQueryGenerator() {
-        this(DEFAULT_BUNDLE);
-    }
-
-    /**
      * Constructor with custom resource bundle
      *
      * @param bundle
      */
     public ESQueryGenerator(ResourceBundle bundle) {
-        this.bundle = bundle;
+        this.bundle = bundle != null ? bundle :
+            ResourceBundle.getBundle("org.xbib.query.cql.elasticsearch.default");
         reset();
     }
 
@@ -110,34 +98,8 @@ public class ESQueryGenerator implements Visitor {
         return model;
     }
 
-    public ESQueryGenerator setFrom(String from) {
-        try {
-            if (from != null && from.length() > 0) {
-                int n = Integer.parseInt(from);
-                if (n >= 0) {
-                    this.from = n;
-                }
-            }
-        } catch (Exception e) {
-        }
-        return this;
-    }
-
     public ESQueryGenerator setFrom(int from) {
         this.from = from;
-        return this;
-    }
-    
-    public ESQueryGenerator setSize(String size) {
-        try {
-            if (size != null && size.length() > 0) {
-                int n = Integer.parseInt(size);
-                if (n >= 0) {
-                    this.size = n;
-                }
-            }
-        } catch (Exception e) {
-        }
         return this;
     }
 

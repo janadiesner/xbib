@@ -31,24 +31,29 @@
  */
 package org.xbib.xml.transform;
 
+import org.xbib.logging.Logger;
+import org.xbib.logging.Loggers;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamSource;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A pool of precompiled XSLT stylesheets ({@link javax.xml.transform.Templates}).
  */
 public final class StylesheetPool {
 
+    private final Logger logger = Loggers.getLogger(StylesheetPool.class);
+
     /**
      * A map of precompiled stylesheets ({@link javax.xml.transform.Templates} objects).
      */
-    private volatile Map<String, Templates> stylesheets = new HashMap<>();
+    private final Map<String, Templates> stylesheets = new ConcurrentHashMap<>();
 
     /**
      * @return returns the identity transformer handler.
@@ -73,14 +78,14 @@ public final class StylesheetPool {
      * Create a template, add to the pool if necessary. Addition is quite costly
      * as it replaces the internal {@link #stylesheets} {@link java.util.HashMap}.
      */
-    public Templates newTemplates(SAXTransformerFactory transformerFactory, Source source) throws TransformerConfigurationException {
+    public Templates newTemplates(SAXTransformerFactory transformerFactory, Source source)
+            throws TransformerConfigurationException {
         String systemId = source.getSystemId();
         Templates template = stylesheets.get(systemId);
         if (template == null) {
+            logger.debug("new source={} {}", source.getSystemId(), source.getClass().getName());
             template = transformerFactory.newTemplates(source);
-            final HashMap<String, Templates> newMap = new HashMap();
-            newMap.put(systemId, template);
-            stylesheets = newMap;
+            stylesheets.put(systemId, template);
         }
         return template;
     }

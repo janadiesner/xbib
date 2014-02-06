@@ -41,6 +41,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.util.XMLEventConsumer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,9 +99,8 @@ public class JsonStylesheet {
             JsonXmlReader reader = new JsonXmlReader().root(root).context(context);
             if (stylesheets == null) {
                 transformer.setSource(new SAXSource(reader, new InputSource(in)))
-                        .setResult(out)
-                        .transform();
-                return this;
+                    .setResult(out)
+                    .transform();
             } else {
                 transformer.setSource(new SAXSource(reader, new InputSource(in)))
                     .setResult(out)
@@ -109,6 +109,8 @@ public class JsonStylesheet {
             return this;
         } catch (TransformerException e) {
             throw new IOException(e);
+        } finally {
+            transformer.close();
         }
     }
 

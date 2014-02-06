@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -73,6 +74,8 @@ public class CQLSearchRequest extends BasicRequest {
 
     private String query;
 
+    private ResourceBundle resourceBundle;
+
     private ESQueryGenerator generator;
 
     private XContentBuilder filter;
@@ -81,9 +84,14 @@ public class CQLSearchRequest extends BasicRequest {
 
     private XContentBuilder facetfilter;
 
+    public CQLSearchRequest resourceBundle(ResourceBundle resourceBundle) {
+        this.resourceBundle = resourceBundle;
+        return this;
+    }
+
     public CQLSearchRequest newSearchRequest(SearchRequestBuilder searchRequestBuilder) {
         super.newSearchRequest(searchRequestBuilder);
-        this.generator = new ESQueryGenerator();
+        this.generator = new ESQueryGenerator(resourceBundle);
         return this;
     }
 
