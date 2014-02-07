@@ -94,7 +94,14 @@ public class SRUResponse extends SearchRetrieveResponse {
 
     @Override
     public SRUResponse to(Writer writer) throws IOException {
-
+        if (buffer == null) {
+            logger.warn("no buffer");
+            return this;
+        }
+        if (buffer.getInputStream() == null) {
+            logger.warn("no input stream");
+            return this;
+        }
         if (facets != null) {
             final FacetedResult facetedResult = new FacetedResult();
             // parse facets to XML string
@@ -153,20 +160,11 @@ public class SRUResponse extends SearchRetrieveResponse {
             SRUVersion version = request != null ?
                     SRUVersion.fromString(request.getVersion()) : SRUVersion.VERSION_2_0;
             String[] stylesheets = getStylesheets(version);
-            if (buffer == null) {
-                new JsonStylesheet()
-                        .root(root)
-                        .setTransformer(getTransformer())
-                        .setStylesheets(stylesheets)
-                        .transform(buffer.getInputStream(), writer);
-
-            }
-
             new JsonStylesheet()
                     .root(root)
-                .setTransformer(getTransformer())
-                .setStylesheets(stylesheets)
-                .transform(buffer.getInputStream(), writer);
+                    .setTransformer(getTransformer())
+                    .setStylesheets(stylesheets)
+                    .transform(buffer.getInputStream(), writer);
         }
         return this;
     }
