@@ -41,8 +41,8 @@ import java.util.ResourceBundle;
 
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.indices.IndexMissingException;
+import org.xbib.elasticsearch.SearchSupport;
 import org.xbib.util.DateUtil;
-import org.xbib.elasticsearch.CQLSearchSupport;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.DefaultOAIClient;
@@ -74,7 +74,7 @@ public class OAIService implements org.xbib.oai.service.OAIService {
 
     private static final ResourceBundle bundle = ResourceBundle.getBundle("org.xbib.oai.elasticsearch");
 
-    private CQLSearchSupport es = new CQLSearchSupport().newClient();
+    private SearchSupport es = new SearchSupport().newClient();
 
     @Override
     public URI getURI() {
@@ -110,10 +110,11 @@ public class OAIService implements org.xbib.oai.service.OAIService {
                     .index(getIndex(request))
                     .type(getType(request))
                     .from(request.getResumptionToken().getPosition())
-                    .size(1000) // TODO configure in the bundle?
+                    .size(1000) // TODO configure?
                     .query(query)
-                    .executeSearch(logger)
-                    .read();
+                    .execute(logger)
+                    .bytes()
+                    .getInputStream();
             response.setReader(new InputStreamReader(in, "UTF-8"));
         } catch (NoNodeAvailableException e) {
             logger.error("OAI " + getURI() + ": unresponsive", e);

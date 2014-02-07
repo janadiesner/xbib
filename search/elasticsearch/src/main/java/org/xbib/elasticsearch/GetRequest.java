@@ -31,37 +31,39 @@
  */
 package org.xbib.elasticsearch;
 
-import org.xbib.elasticsearch.support.client.search.SearchClient;
+import org.elasticsearch.action.get.GetRequestBuilder;
+import org.xbib.elasticsearch.action.search.support.BasicGetRequest;
+import org.xbib.logging.Logger;
 
-import java.net.URI;
+import java.io.IOException;
 
-/**
- * Some support stubs for Common Query Language with Elasticsearch
- *
- */
-public class CQLSearchSupport extends SearchClient {
+public class GetRequest extends BasicGetRequest {
 
     @Override
-    public CQLSearchSupport newClient() {
-        this.newClient(findURI());
+    public GetRequest newRequest(GetRequestBuilder getRequestBuilder) {
+        super.newRequest(getRequestBuilder);
         return this;
     }
 
-    public CQLSearchSupport newClient(URI uri) {
-        super.newClient(uri);
-        return this;
-    }
-
-    @Override
-    public CQLSearchRequest newSearchRequest() {
-        return new CQLSearchRequest()
-                .newSearchRequest(client.prepareSearch().setPreference("_primary_first"));
-    }
-
-    @Override
-    public CQLSearchRequest newGetRequest() {
-        return new CQLSearchRequest()
-                .newGetRequest(client.prepareGet());
+    public GetResponse execute(Logger queryLogger) throws IOException {
+        GetResponse response = new GetResponse();
+        if (getRequestBuilder() == null) {
+            queryLogger.debug("no get request");
+            return response;
+        }
+        queryLogger.info(" get request: {}/{}/{}",
+                getRequestBuilder().request().index(),
+                getRequestBuilder().request().type(),
+                getRequestBuilder().request().id());
+        long t0 = System.currentTimeMillis();
+        response.setResponse(getRequestBuilder().execute().actionGet());
+        long t1 = System.currentTimeMillis();
+        queryLogger.info(" get request complete: {}/{}/{} [{}ms] {}",
+                getRequestBuilder().request().index(),
+                getRequestBuilder().request().type(),
+                getRequestBuilder().request().id(),
+                (t1 - t0), response.exists());
+        return response;
     }
 
 }

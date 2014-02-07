@@ -33,18 +33,14 @@ public class BulkIndexerTest extends Assert {
             es.flush();
             Thread.sleep(2000);
             Logger queryLogger = LoggerFactory.getLogger("test", BulkIndexerTest.class.getName());
-            final ByteArrayOutputStream output = new ByteArrayOutputStream();
             // check if IRI path "document" worked
-            new CQLSearchSupport()
+            new SearchSupport()
                     .newClient(URI.create("es://localhost:9300?es.cluster.name=test"))
                     .newSearchRequest()
                     .from(0)
                     .size(10)
                     .cql("Hello")
-                    .executeSearch(queryLogger)
-                    .toJSON(output);
-            logger.info("result = {}", output.toString());
-            assertTrue(output.toString().length() > 0);
+                    .execute(queryLogger);
             //es.deleteIndex();
         } catch (Exception e) {
             logger.warn(e.getMessage());

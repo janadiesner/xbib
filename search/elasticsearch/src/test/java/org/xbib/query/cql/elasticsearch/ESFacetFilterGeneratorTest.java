@@ -33,8 +33,8 @@ package org.xbib.query.cql.elasticsearch;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.elasticsearch.CQLSearchRequest;
-import org.xbib.elasticsearch.CQLSearchSupport;
+import org.xbib.elasticsearch.CQLRequest;
+import org.xbib.elasticsearch.SearchSupport;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 
@@ -50,12 +50,12 @@ public class ESFacetFilterGeneratorTest extends Assert {
     @Test
     public void testFacetFilter() throws Exception {
 
-        CQLSearchSupport support = new CQLSearchSupport().newClient();
+        SearchSupport support = new SearchSupport().newClient();
         String cql = "Köln";
         String cqlFilter = "dc.format = online and dc.date = 2012";
 
         // creating CQL from SearchRetrieve request
-        CQLSearchRequest cqlRequest  = support.newSearchRequest()
+        CQLRequest cqlRequest  = support.newSearchRequest()
                 .index("*")
                 .type("*")
                 .from(0)

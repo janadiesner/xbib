@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ResourceBundle;
 
-import org.xbib.elasticsearch.CQLSearchSupport;
+import org.xbib.elasticsearch.SearchSupport;
 import org.xbib.sru.SRUConstants;
 
 /**
@@ -45,7 +45,7 @@ public class SRUService implements org.xbib.sru.service.SRUService {
 
     private static final ResourceBundle bundle = ResourceBundle.getBundle("org.xbib.sru.elasticsearch");
 
-    private final CQLSearchSupport support = new CQLSearchSupport();
+    private final SearchSupport support = new SearchSupport();
 
     @Override
     public URI getURI() {
