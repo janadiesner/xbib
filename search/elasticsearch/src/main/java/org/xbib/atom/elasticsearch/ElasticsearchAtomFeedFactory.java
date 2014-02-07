@@ -26,9 +26,9 @@ import org.apache.abdera.protocol.server.provider.managed.FeedConfiguration;
 import org.xbib.atom.AbderaFeedBuilder;
 import org.xbib.atom.AtomFeedFactory;
 import org.xbib.atom.AtomFeedProperties;
-import org.xbib.elasticsearch.CQLSearchRequest;
-import org.xbib.elasticsearch.CQLSearchResponse;
-import org.xbib.elasticsearch.CQLSearchSupport;
+import org.xbib.elasticsearch.CQLRequest;
+import org.xbib.elasticsearch.CQLResponse;
+import org.xbib.elasticsearch.SearchSupport;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 
@@ -59,7 +59,7 @@ public class ElasticsearchAtomFeedFactory implements AtomFeedFactory {
     
     private final static Logger logger = LoggerFactory.getLogger(ElasticsearchAtomFeedFactory.class.getName());
     protected AbderaFeedBuilder builder;
-    private CQLSearchSupport support = new CQLSearchSupport();
+    private SearchSupport support = new SearchSupport();
 
     public ElasticsearchAtomFeedFactory() {
     }
@@ -148,13 +148,13 @@ public class ElasticsearchAtomFeedFactory implements AtomFeedFactory {
             this.builder = new AbderaFeedBuilder(config, query);
             String mediaType = "application/xml";
             Logger logger = LoggerFactory.getLogger(mediaType, ElasticsearchAtomFeedFactory.class.getName());
-            CQLSearchRequest request = support.newSearchRequest();
-            CQLSearchResponse response =request.index(index)
+            CQLRequest request = support.newSearchRequest();
+            CQLResponse response =request.index(index)
                     .type(type)
                     .from(config.getFrom())
                     .size(config.getSize())
                     .cql(query)
-                    .executeSearch(logger);
+                    .execute(logger);
             response.to(builder);
             long t1 = System.currentTimeMillis();
             return builder.getFeed(query, t1 - t0,

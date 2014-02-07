@@ -33,9 +33,9 @@ package org.xbib.sru.elasticsearch;
 
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.indices.IndexMissingException;
-import org.xbib.elasticsearch.CQLSearchRequest;
-import org.xbib.elasticsearch.CQLSearchResponse;
-import org.xbib.elasticsearch.CQLSearchSupport;
+import org.xbib.elasticsearch.CQLRequest;
+import org.xbib.elasticsearch.CQLResponse;
+import org.xbib.elasticsearch.SearchSupport;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.query.cql.SyntaxException;
@@ -55,9 +55,9 @@ public class SRUClient implements org.xbib.sru.client.SRUClient {
 
     private final SRUService service;
 
-    private final CQLSearchSupport support;
+    private final SearchSupport support;
 
-    public SRUClient(SRUService service, CQLSearchSupport support) {
+    public SRUClient(SRUService service, SearchSupport support) {
         this.service = service;
         this.support = support;
     }
@@ -141,7 +141,7 @@ public class SRUClient implements org.xbib.sru.client.SRUClient {
                 size = 0;
             }
             // creating CQL from SearchRetrieve request
-            CQLSearchRequest cqlRequest = support.newSearchRequest()
+            CQLRequest cqlRequest = support.newSearchRequest()
                     .index(getIndex(request))
                     .from(from)
                     .size(size)
@@ -149,9 +149,9 @@ public class SRUClient implements org.xbib.sru.client.SRUClient {
                     .cqlFilter(request.getFilter())
                     .cqlFacetFilter(request.getFilter())
                     .facet(request.getFacetLimit(), request.getFacetSort(), null);
-            CQLSearchResponse cqlResponse = cqlRequest.executeSearch(logger);
+            CQLResponse cqlResponse = cqlRequest.execute(logger);
             response.setBuffer(cqlResponse.bytes());
-            response.setFacets(cqlResponse.getSearchResponse().getFacets());
+            response.setFacets(cqlResponse.getResponse().getFacets());
 
         } catch (SyntaxException e) {
             logger.error("SRU " + service.getURI() + ": database does not exist", e);
