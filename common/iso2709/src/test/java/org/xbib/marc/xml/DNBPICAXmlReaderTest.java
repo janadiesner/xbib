@@ -48,8 +48,7 @@ public class DNBPICAXmlReaderTest {
     @Test
     public void testZDBBIBFromOAI() throws Exception {
         InputStream in = getClass().getResourceAsStream("zdb-oai-bib.xml");
-        InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
-        DNBPICAXmlReader reader = new DNBPICAXmlReader(source);
+        DNBPICAXmlReader reader = new DNBPICAXmlReader();
         reader.setListener(new MarcXchangeListener() {
             @Override
             public void leader(String label) {
@@ -97,7 +96,8 @@ public class DNBPICAXmlReaderTest {
             }
 
         });
-        reader.parse();
+        InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
+        reader.parse(source);
     }
 
 }

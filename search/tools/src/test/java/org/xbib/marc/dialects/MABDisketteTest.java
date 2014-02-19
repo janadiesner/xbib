@@ -96,7 +96,7 @@ public class MABDisketteTest {
 
             @Override
             public void output(MABContext context, ContentBuilder contentBuilder) throws IOException {
-                logger.info("resource size={}", context.resource().size());
+                logger.info("resource getSize={}", context.resource().size());
                 counter.incrementAndGet();
             }
 
@@ -112,25 +112,32 @@ public class MABDisketteTest {
                 .addListener(mapper)
                 .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
                     @Override
-                    public void begin() {
-                        logger.debug("begin object");
+                    public KeyValueStreamAdapter<FieldCollection, String> begin() {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("begin object");
+                        }
+                        return this;
                     }
 
                     @Override
-                    public void keyValue(FieldCollection key, String value) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("begin");
+                    public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("begin");
                             for (Field f : key) {
-                                logger.debug("tag={} ind={} subf={} data={}",
+                                logger.trace("tag={} ind={} subf={} data={}",
                                         f.tag(), f.indicator(), f.subfieldId(), f.data());
                             }
-                            logger.debug("end");
+                            logger.trace("end");
                         }
+                        return this;
                     }
 
                     @Override
-                    public void end() {
-                        logger.debug("end object");
+                    public KeyValueStreamAdapter<FieldCollection, String> end() {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("end object");
+                        }
+                        return this;
                     }
 
                 });

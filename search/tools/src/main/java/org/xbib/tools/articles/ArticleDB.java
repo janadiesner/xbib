@@ -145,7 +145,7 @@ public class ArticleDB extends Converter {
             logger.error(e.getMessage(), e);
         }
         serials = serialsdb.getMap();
-        logger.info("serials done, size = {}", serials.size());
+        logger.info("serials done, getSize = {}", serials.size());
         String outputFilename = settings.get("output");
         FileOutputStream fout = new FileOutputStream(outputFilename + ".ttl.gz");
         gzout = new GZIPOutputStream(fout){

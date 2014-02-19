@@ -3,7 +3,8 @@ package org.xbib.tools;
 
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.pipeline.MetricQueuePipelineExecutor;
+import org.xbib.metrics.MeterMetric;
+import org.xbib.pipeline.queue.MetricQueuePipelineExecutor;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.PipelineRequest;
@@ -27,14 +28,15 @@ public abstract class QueueConverter<T, R extends PipelineRequest, P extends Pip
         return this;
     }
 
+
     public QueueConverter<T,R,P,E> run() throws Exception {
         try {
             logger.info("preparing");
             prepare();
             logger.info("executing");
             executor = new MetricQueuePipelineExecutor<T,R,P,E>()
-                    .concurrency(settings.getAsInt("concurrency", 1))
-                    .provider(pipelineProvider())
+                    .setConcurrency(settings.getAsInt("concurrency", 1))
+                    .setPipelineProvider(pipelineProvider())
                     .prepare()
                     .execute()
                     .waitFor();
@@ -90,6 +92,11 @@ public abstract class QueueConverter<T, R extends PipelineRequest, P extends Pip
         protected void process(DefaultPipelineRequest request) throws IOException {
             converter.process(request.object);
         }
+
+        @Override
+        public MeterMetric getMetric() {
+            return executor.getMetric();
+        }
     }
 
     public class DefaultPipelineRequest implements PipelineRequest {
@@ -104,10 +111,6 @@ public abstract class QueueConverter<T, R extends PipelineRequest, P extends Pip
             return object;
         }
 
-        @Override
-        public Long size() {
-            return null;
-        }
     }
 
     protected abstract E getPoisonElement();

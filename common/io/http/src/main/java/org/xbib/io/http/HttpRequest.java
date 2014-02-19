@@ -35,6 +35,7 @@ import org.xbib.io.Request;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
 
 /**
  * A HTTP request
@@ -52,6 +53,8 @@ public interface HttpRequest extends Request {
     HttpRequest setMethod(String method);
 
     HttpRequest addParameter(String name, String value);
+
+    HttpRequest addParameter(String name, String value, Charset charset);
 
     HttpRequest addHeader(String name, String value);
 

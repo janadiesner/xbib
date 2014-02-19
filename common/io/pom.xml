@@ -5,19 +5,13 @@
     <parent>
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
-        <version>1.0.0.Beta1</version>
+        <version>1.0.0.Beta2</version>
         <relativePath>../..</relativePath>
     </parent>
 
     <artifactId>io</artifactId>
     <name>io</name>
     <description>xbib - Input/Output</description>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
-    <modules>
-        <module>http</module>
-        <module>ftp</module>
-        <module>jdbc</module>
-        <module>rsync</module>
-    </modules>
 </project>

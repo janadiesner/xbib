@@ -6,71 +6,68 @@ import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 
 /**
- * The Pipeline Executor can execute provided pipelines in parallel.
+ * The Pipeline Executor can execute provided pipelines.
+ * If the concurrency level is set to higher than one, more than one pipeline is executed in parallel.
  *
+ * @param <T> the result type
+ * @param <R> the request type
  * @param <P> the pipeline type
  */
-public interface PipelineExecutor<P extends Pipeline> {
+public interface PipelineExecutor<T,R extends PipelineRequest,P extends Pipeline<T, R>> {
 
     /**
-     * Set the concurrency of this pipeline executor
+     * Set the concurrency of this pipeline setExecutor
      * @param concurrency the concurrency, must be a positive integer
-     * @return this executor
+     * @return this setExecutor
      */
-    PipelineExecutor concurrency(int concurrency);
+    PipelineExecutor<T,R,P> setConcurrency(int concurrency);
 
     /**
-     * Set the provider of this pipeline executor
+     * Set the provider of this pipeline setExecutor
      * @param provider the pipeline provider
-     * @return this executor
+     * @return this setExecutor
      */
-    PipelineExecutor provider(PipelineProvider<P> provider);
+    PipelineExecutor<T,R,P> setPipelineProvider(PipelineProvider<P> provider);
+
+    /**
+     * Set pipeline sink
+     * @param sink the pipeline sink
+     * @return this setExecutor
+     */
+    PipelineExecutor<T,R,P> setSink(PipelineSink<T> sink);
+
+    /**
+     * Prepare the pipeline execution.
+     * @return this setExecutor
+     */
+    PipelineExecutor<T,R,P> prepare();
+
+    /**
+     * Execute the pipelines.
+     * @return this setExecutor
+     */
+    PipelineExecutor<T,R,P> execute();
+
+    /**
+     * Execute the pipelines.
+     * @return this setExecutor
+     * @throws InterruptedException
+     * @throws java.util.concurrent.ExecutionException
+     * @throws java.io.IOException
+     */
+    PipelineExecutor<T,R,P> waitFor() throws InterruptedException, ExecutionException, IOException;
+
+    /**
+     * Shut down this pipeline executor.
+     * @throws InterruptedException
+     * @throws java.util.concurrent.ExecutionException
+     * @throws java.io.IOException
+     */
+    void shutdown() throws InterruptedException, ExecutionException, IOException;
 
     /**
      * Return pipelines
      * @return the pipelines
      */
     Collection<P> getPipelines();
-
-    /**
-     * Optional pipeline sink
-     * @param sink the pipeline sink
-     * @return this executor
-     */
-    PipelineExecutor sink(PipelineSink sink);
-
-    /**
-     * Prepare the pipeline execution.
-     * @return this executor
-     */
-    PipelineExecutor prepare() throws IOException;
-
-    /**
-     * Execute the pipelines.
-     * @return this executor
-     */
-    PipelineExecutor execute() throws IOException;
-
-    /**
-     * Execute the pipelines.
-     * @return this executor
-     * @throws InterruptedException
-     * @throws ExecutionException
-     */
-    PipelineExecutor waitFor() throws InterruptedException, ExecutionException;
-
-    /**
-     * Execute a single pipeline.
-     * @param pipeline the piepline
-     * @return this executor
-     * @throws InterruptedException
-     * @throws ExecutionException
-     */
-    PipelineExecutor execute(P pipeline) throws InterruptedException, ExecutionException;
-
-    /**
-     * Shut down this pipeline executor
-     * @throws InterruptedException
-     */
-    void shutdown() throws InterruptedException, ExecutionException, IOException;
 }

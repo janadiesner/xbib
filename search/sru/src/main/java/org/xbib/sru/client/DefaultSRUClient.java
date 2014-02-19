@@ -36,8 +36,6 @@ import org.xbib.io.http.HttpSession;
 import org.xbib.io.http.netty.NettyHttpSession;
 import org.xbib.io.http.HttpRequest;
 import org.xbib.util.URIUtil;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.query.cql.SyntaxException;
 import org.xbib.sru.SRUConstants;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
@@ -45,7 +43,7 @@ import org.xbib.sru.searchretrieve.SearchRetrieveResponse;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -54,11 +52,17 @@ import java.util.concurrent.TimeoutException;
  */
 public class DefaultSRUClient implements SRUClient {
 
-    private final Logger logger = LoggerFactory.getLogger(DefaultSRUClient.class.getName());
-
     private final HttpSession session;
 
     private final URI uri;
+
+    private final String recordSchema;
+
+    private final String recordPacking;
+
+    private final String version;
+
+    private final String encoding;
 
     public DefaultSRUClient() throws IOException {
         this(null);
@@ -68,6 +72,18 @@ public class DefaultSRUClient implements SRUClient {
         this.session = new NettyHttpSession();
         session.open(Session.Mode.READ);
         this.uri = uri;
+        if (uri != null) {
+            Map<String,String> param = URIUtil.parseQueryString(uri);
+            this.recordSchema = param.get("recordSchema");
+            this.recordPacking = param.get("recordPacking");
+            this.version = param.get("version");
+            this.encoding = param.get("encoding");
+        } else {
+            this.recordSchema = "mods";
+            this.recordPacking = "xml";
+            this.version = "2.0";
+            this.encoding = "UTF-8";
+        }
     }
 
     @Override
@@ -75,36 +91,36 @@ public class DefaultSRUClient implements SRUClient {
         session.close();
     }
 
-    public URI getClientIdentifier() {
-        return uri;
-    }
-
     @Override
     public String getRecordSchema() {
-        return "mods";
+        return recordSchema;
     }
 
     @Override
     public String getRecordPacking() {
-        return "xml";
+        return recordPacking;
     }
 
     @Override
     public String getEncoding() {
-        return "UTF-8";
+        return encoding;
     }
 
     @Override
     public String getVersion() {
-        return "2.0";
+        return version;
     }
 
     @Override
     public SearchRetrieveRequest newSearchRetrieveRequest() {
-        return new ClientSearchRetrieveRequest()
+        SearchRetrieveRequest request = new ClientSearchRetrieveRequest()
                 .setVersion(getVersion())
+                .setRecordSchema(getRecordSchema())
                 .setRecordPacking(getRecordPacking())
-                .setRecordSchema(getRecordSchema());
+                .setEncoding(getEncoding());
+        // override params by URI
+        request.setURI(uri);
+        return request;
     }
 
     public SearchRetrieveResponse searchRetrieve(SearchRetrieveRequest request)
@@ -122,9 +138,10 @@ public class DefaultSRUClient implements SRUClient {
                 .setURL(request.getURI())
                 .addParameter(SRUConstants.OPERATION_PARAMETER, "searchRetrieve")
                 .addParameter(SRUConstants.VERSION_PARAMETER, request.getVersion())
-                .addParameter(SRUConstants.QUERY_PARAMETER, URIUtil.encode(request.getQuery(), Charset.forName("UTF-8")))
+                .addParameter(SRUConstants.QUERY_PARAMETER, request.getQuery())
                 .addParameter(SRUConstants.START_RECORD_PARAMETER, Integer.toString(request.getStartRecord()))
                 .addParameter(SRUConstants.MAXIMUM_RECORDS_PARAMETER, Integer.toString(request.getMaximumRecords()));
+
         if (request.getRecordPacking() != null && !request.getRecordPacking().isEmpty()) {
             req.addParameter(SRUConstants.RECORD_PACKING_PARAMETER, request.getRecordPacking());
         }
@@ -135,24 +152,7 @@ public class DefaultSRUClient implements SRUClient {
         return response;
     }
 
-    /*
-    public ExplainResponse explain(Explain explain)
-            throws IOException, SyntaxException {
-        HttpRequest req = session.newRequest("GET")
-                .setURI(explain.getURI())
-                .addParameter(SRU.OPERATION_PARAMETER, "explain");
-        session.add(req);
-        ExplainListener listener = new ExplainListener();
-        session.addListener(listener);
-        session.execute();
-        // build explainresponse here
-        session.removeListener(listener);
-        session.close();
-        return null;
-    }*/
-
     class ClientSearchRetrieveRequest extends SearchRetrieveRequest {
-
     }
 
 }

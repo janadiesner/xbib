@@ -37,7 +37,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.xbib.elements.CountableElementOutput;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.SimplePipelineExecutor;
+import org.xbib.pipeline.simple.SimplePipelineExecutor;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -54,7 +54,7 @@ public class AlephXmlMABTest {
         final CountableElementOutput<MABContext,Resource> output = new CountableElementOutput<MABContext,Resource>() {
             @Override
             public void output(MABContext context, ContentBuilder contentBuilder) throws IOException {
-                logger.info("resource size = {}", context.resource().size());
+                logger.info("resource getSize = {}", context.resource().size());
                 counter.incrementAndGet();
             }
         };
@@ -77,8 +77,8 @@ public class AlephXmlMABTest {
             }
         };
         new SimplePipelineExecutor()
-                .concurrency(1)
-                .provider(provider)
+                .setConcurrency(1)
+                .setPipelineProvider(provider)
                 .execute();
         mapper.close();
     }

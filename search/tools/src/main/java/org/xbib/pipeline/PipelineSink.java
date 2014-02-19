@@ -1,7 +1,9 @@
 
 package org.xbib.pipeline;
 
+import java.io.IOException;
+
 public interface PipelineSink<T> {
 
-    void out(T t);
+    void write(T t) throws IOException;
 }

@@ -52,7 +52,6 @@ import org.xbib.sru.client.SRUClient;
 import org.xbib.sru.SRUConstants;
 import org.xbib.sru.service.SRUService;
 import org.xbib.sru.util.SRUContentTypeNegotiator;
-import org.xbib.sru.util.SRURequestDumper;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
 import org.xbib.xml.transform.StylesheetTransformer;
 
@@ -66,10 +65,6 @@ public class ZSRUServlet extends HttpServlet implements SRUConstants {
     private final Map<String, String> mediaTypes = new HashMap<>();
 
     private final ContentTypeNegotiator ctn = new SRUContentTypeNegotiator();
-
-    private final SRURequestDumper requestDumper = new SRURequestDumper();
-
-    private final String responseEncoding = "UTF-8";
 
     private SRUService service;
 
@@ -88,7 +83,6 @@ public class ZSRUServlet extends HttpServlet implements SRUConstants {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        logger.info(requestDumper.toString(request));
         String mediaType = getMediaType(request);
         SRUService service = createService(request);
         try {
@@ -142,18 +136,22 @@ public class ZSRUServlet extends HttpServlet implements SRUConstants {
         } catch (Diagnostics diag) {
             logger.warn(diag.getMessage(), diag);
             response.setStatus(500);
+            String responseEncoding = "UTF-8";
             response.getOutputStream().write(diag.getXML().getBytes(responseEncoding));
         } catch (InterruptedException e) {
             logger.error(e.getMessage(), e);
             response.setStatus(500);
+            String responseEncoding = "UTF-8";
             response.getOutputStream().write(e.getMessage().getBytes(responseEncoding));
         } catch (ExecutionException e) {
             logger.error(e.getMessage(), e);
             response.setStatus(500);
+            String responseEncoding = "UTF-8";
             response.getOutputStream().write(e.getMessage().getBytes(responseEncoding));
         } catch (TimeoutException e) {
             logger.error(e.getMessage(), e);
             response.setStatus(500);
+            String responseEncoding = "UTF-8";
             response.getOutputStream().write(e.getMessage().getBytes(responseEncoding));
         }
     }

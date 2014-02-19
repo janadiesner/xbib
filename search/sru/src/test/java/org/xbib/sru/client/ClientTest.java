@@ -34,8 +34,8 @@ package org.xbib.sru.client;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Collection;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.util.XMLEventConsumer;
+
 import org.testng.annotations.Test;
 import org.xbib.io.Request;
 import org.xbib.logging.Logger;
@@ -55,7 +55,7 @@ public class ClientTest {
 
         SearchRetrieveRequest request = client
                 .newSearchRetrieveRequest()
-                .setQuery("title = linux")
+                .setQuery("title=linux")
                 .setStartRecord(0)
                 .setMaximumRecords(10);
 
@@ -103,13 +103,15 @@ public class ClientTest {
                 }
 
                 @Override
-                public void recordData(Collection<XMLEvent> record) {
-                    logger.info("recordData = " + record.size() + " events");
+                public XMLEventConsumer recordData() {
+                    //logger.info("recordData = " + record.size() + " events");
+                    return null;
                 }
 
                 @Override
-                public void extraRecordData(Collection<XMLEvent> record) {
-                    logger.info("extraRecordData = " + record.size() + " events");
+                public XMLEventConsumer extraRecordData() {
+                    //logger.info("extraRecordData = " + record.size() + " events");
+                    return null;
                 }
 
                 @Override

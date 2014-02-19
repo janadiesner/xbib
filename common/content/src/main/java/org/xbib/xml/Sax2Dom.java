@@ -91,7 +91,7 @@ public class Sax2Dom implements XMLNS, ContentHandler, LexicalHandler {
         if (last != document) {
             String text = new String(ch, start, length);
             // do our escaping 
-            text = text.replaceAll("&","&amp;").replaceAll("<", "&lt;");
+            text = text.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
             if (lastSibling != null && lastSibling.getNodeType() == Node.TEXT_NODE) {
                 ((Text) lastSibling).appendData(text);
             } else if (last == root && nextSibling != null) {
@@ -114,7 +114,7 @@ public class Sax2Dom implements XMLNS, ContentHandler, LexicalHandler {
 
     @Override
     public void startElement(String namespace, String localName, String qName,
-            Attributes attrs) {
+                             Attributes attrs) {
         final Element tmp = document.createElementNS(namespace, qName);
 
         // Add namespace declarations first
@@ -175,7 +175,7 @@ public class Sax2Dom implements XMLNS, ContentHandler, LexicalHandler {
     }
 
     /**
-     * This class is only used internally so this method should never 
+     * This class is only used internally so this method should never
      * be called.
      */
     @Override
@@ -201,7 +201,7 @@ public class Sax2Dom implements XMLNS, ContentHandler, LexicalHandler {
     }
 
     /**
-     * This class is only used internally so this method should never 
+     * This class is only used internally so this method should never
      * be called.
      */
     @Override
@@ -209,7 +209,7 @@ public class Sax2Dom implements XMLNS, ContentHandler, LexicalHandler {
     }
 
     /**
-     * This class is only used internally so this method should never 
+     * This class is only used internally so this method should never
      * be called.
      */
     @Override

@@ -33,7 +33,6 @@ package org.xbib.sru.client;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.net.URI;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -48,8 +47,6 @@ import org.xbib.sru.searchretrieve.SearchRetrieveResponse;
  */
 public interface SRUClient
         extends SRUProfile, SRUConstants, Closeable {
-
-    URI getClientIdentifier();
 
     SearchRetrieveRequest newSearchRetrieveRequest();
 

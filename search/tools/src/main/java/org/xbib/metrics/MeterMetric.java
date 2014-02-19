@@ -4,6 +4,7 @@ package org.xbib.metrics;
 
 import io.netty.util.internal.chmv8.LongAdder;
 
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -25,6 +26,8 @@ public class MeterMetric implements Metric {
 
     private final LongAdder count;
 
+    private final long startDate;
+
     private final long startTime;
 
     private final TimeUnit rateUnit;
@@ -33,11 +36,14 @@ public class MeterMetric implements Metric {
 
     private final ScheduledFuture<?> future;
 
+    private long stopDate;
+
     private long stopTime;
 
     public MeterMetric(long intervalSeconds, TimeUnit rateUnit) {
         this.rateUnit = rateUnit;
         this.count = new LongAdder();
+        this.startDate = System.currentTimeMillis();
         this.startTime = System.nanoTime();
         this.future = service.scheduleAtFixedRate(new Runnable() {
             @Override
@@ -87,8 +93,16 @@ public class MeterMetric implements Metric {
         return startTime;
     }
 
+    public Date startedAt() {
+        return new Date(startDate);
+    }
+
     public long stopped() {
         return stopTime;
+    }
+
+    public Date stoppedAt() {
+        return new Date(stopDate);
     }
 
     public long elapsed() {
@@ -119,6 +133,7 @@ public class MeterMetric implements Metric {
 
     public void stop() {
         this.stopTime = System.nanoTime();
+        this.stopDate = System.currentTimeMillis();
         future.cancel(false);
     }
 

@@ -155,17 +155,31 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
     }
 
     @Override
-    public void begin() {
+    public AbstractElementMapper<K,V,E,C> begin() {
         keyvalues = new LinkedList();
+        return this;
     }
 
     @Override
-    public void keyValue(K key, V value) {
+    public AbstractElementMapper<K,V,E,C>  keyValue(K key, V value) {
         keyvalues.add(new KeyValue(key, value));
+        return this;
     }
 
     @Override
-    public void end() {
+    public AbstractElementMapper<K,V,E,C>  keys(List<K> keys) {
+        // unused
+        return this;
+    }
+
+    @Override
+    public AbstractElementMapper<K,V,E,C>  values(List<V> values) {
+        // unused
+        return this;
+    }
+
+    @Override
+    public AbstractElementMapper<K,V,E,C>  end() {
         try {
             // move shallow copy of key/values to pipeline, this ensures thread safety
             queue.put((List<KeyValue>) keyvalues.clone());
@@ -173,6 +187,7 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+        return this;
     }
 
     /**

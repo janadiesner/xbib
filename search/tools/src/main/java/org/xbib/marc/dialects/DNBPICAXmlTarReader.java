@@ -40,8 +40,11 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.metrics.MeterMetric;
 import org.xbib.pipeline.AbstractPipeline;
-import org.xbib.pipeline.element.CounterPipelineElement;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineException;
+import org.xbib.pipeline.element.LongPipelineElement;
 import org.xbib.util.Strings;
 
 import java.io.EOFException;
@@ -63,7 +66,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
 
-public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<CounterPipelineElement>
+public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<LongPipelineElement,PipelineException>
         implements DNBPICAConstants, MarcXchangeListener {
 
     private final Logger logger = LoggerFactory.getLogger(DNBPICAXmlTarReader.class.getName());
@@ -72,7 +75,7 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Coun
 
     private final XMLInputFactory factory = XMLInputFactory.newInstance();
 
-    private final CounterPipelineElement counter = new CounterPipelineElement().set(new AtomicLong(0L));
+    private final LongPipelineElement counter = new LongPipelineElement().set(new AtomicLong(0L));
 
     private URI uri;
 
@@ -85,8 +88,6 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Coun
     private P packet;
 
     private boolean prepared;
-
-    //private boolean inRecord = false;
 
     private String clob;
 
@@ -186,13 +187,38 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Coun
     }
 
     @Override
-    public CounterPipelineElement next() {
+    public LongPipelineElement next() {
         return nextRead();
     }
 
     @Override
     public void remove() {
         throw new UnsupportedOperationException("Not supported");
+    }
+
+    @Override
+    public void newRequest(Pipeline<MeterMetric, LongPipelineElement> pipeline, LongPipelineElement request) {
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("{}", clob);
+            }
+            try (StringReader sr = new StringReader(clob)) {
+                XMLEventReader xmlReader = factory.createXMLEventReader(sr);
+                Stack<Field> stack = new Stack();
+                while (xmlReader.hasNext()) {
+                    processEvent(stack, xmlReader.peek());
+                    xmlReader.nextEvent();
+                }
+            }
+        } catch (XMLStreamException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void error(Pipeline<MeterMetric, LongPipelineElement> pipeline, LongPipelineElement request, PipelineException error) {
+        logger.error(error.getMessage(), error);
+
     }
 
     @Override
@@ -228,25 +254,10 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Coun
         }
     }
 
-    private CounterPipelineElement nextRead() {
+    private LongPipelineElement nextRead() {
         if (clob == null || clob.length() == 0) {
             // special case, message length 0 means deletion
             return null;
-        }
-        try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("{}", clob);
-            }
-            try (StringReader sr = new StringReader(clob)) {
-                XMLEventReader xmlReader = factory.createXMLEventReader(sr);
-                Stack<Field> stack = new Stack();
-                while (xmlReader.hasNext()) {
-                    processEvent(stack, xmlReader.peek());
-                    xmlReader.nextEvent();
-                }
-            }
-        } catch (XMLStreamException e) {
-            logger.error(e.getMessage(), e);
         }
         prepared = false;
         return counter;

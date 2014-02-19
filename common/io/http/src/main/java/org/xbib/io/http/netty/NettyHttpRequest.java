@@ -40,10 +40,12 @@ import org.xbib.io.http.HttpRequest;
 import org.xbib.io.http.PreparedHttpRequest;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.util.URIUtil;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 
 /**
  * A default HTTP request
@@ -93,7 +95,7 @@ public class NettyHttpRequest extends HttpPacket implements HttpRequest {
     @Override
     public NettyHttpRequest setMethod(String method) {
         this.method = method;
-        this.requestBuilder = new RequestBuilder(method);
+        this.requestBuilder = new RequestBuilder(method, true); // true = use raw URL
         return this;
     }
 
@@ -105,6 +107,14 @@ public class NettyHttpRequest extends HttpPacket implements HttpRequest {
     public NettyHttpRequest addParameter(String name, String value) {
         if (value != null && value.length() > 0 && requestBuilder != null) {
             requestBuilder.addQueryParameter(name, value);
+        }
+        return this;
+    }
+
+    @Override
+    public NettyHttpRequest addParameter(String name, String value, Charset charset) {
+        if (value != null && value.length() > 0 && requestBuilder != null) {
+            requestBuilder.addQueryParameter(name, URIUtil.encode(value, charset));
         }
         return this;
     }
@@ -141,7 +151,7 @@ public class NettyHttpRequest extends HttpPacket implements HttpRequest {
         }
         if (request == null) {
             this.request = requestBuilder
-                    .setUrl(uri.toASCIIString())
+                    .setUrl(uri.toString())
                     .setRealm(realmBuilder.build())
                     .build();
             logger.debug("prepared " + toString());
@@ -158,7 +168,7 @@ public class NettyHttpRequest extends HttpPacket implements HttpRequest {
         sb.append("[method=").append(method).append("]")
                 .append("[uri=").append(uri).append("]")
                 .append("[parameter=").append(requestBuilder
-                .setUrl(uri.toASCIIString())
+                .setUrl(uri.toString())
                 .setRealm(realmBuilder.build())
                 .build()).append("]");
         return sb.toString();

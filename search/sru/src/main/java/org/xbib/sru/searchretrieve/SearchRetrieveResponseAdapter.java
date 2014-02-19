@@ -33,6 +33,8 @@ package org.xbib.sru.searchretrieve;
 
 import java.util.Collection;
 import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.util.XMLEventConsumer;
+
 import org.xbib.io.Request;
 import org.xbib.io.http.HttpResponse;
 
@@ -87,11 +89,13 @@ public class SearchRetrieveResponseAdapter implements SearchRetrieveListener {
     }
 
     @Override
-    public void recordData(Collection<XMLEvent> record) {
+    public XMLEventConsumer recordData() {
+        return null;
     }
 
     @Override
-    public void extraRecordData(Collection<XMLEvent> extra) {
+    public XMLEventConsumer extraRecordData() {
+        return null;
     }
 
     @Override

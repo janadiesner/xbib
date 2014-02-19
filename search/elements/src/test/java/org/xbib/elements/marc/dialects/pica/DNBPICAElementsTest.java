@@ -41,9 +41,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.elements.CountableElementOutput;
 import org.xbib.elements.ElementOutput;
-import org.xbib.elements.marc.dialects.pica.PicaElementBuilder;
-import org.xbib.elements.marc.dialects.pica.PicaElementBuilderFactory;
-import org.xbib.elements.marc.dialects.pica.PicaElementMapper;
 import org.xbib.iri.IRI;
 import org.xbib.io.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
@@ -87,7 +84,7 @@ public class DNBPICAElementsTest extends Assert {
                 .addListener(new OurAdapter());
         final InputStream in = getClass().getResourceAsStream("zdb-oai-bib.xml");
         final InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
-        new DNBPICAXmlReader(source).setListener(kv).parse();
+        new DNBPICAXmlReader().setListener(kv).parse(source);
         in.close();
         mapper.close();
 
@@ -108,12 +105,13 @@ public class DNBPICAElementsTest extends Assert {
 
     class OurAdapter extends KeyValueStreamAdapter<FieldCollection, String> {
         @Override
-        public void begin() {
+        public KeyValueStreamAdapter<FieldCollection, String> begin() {
             logger.debug("begin object");
+            return this;
         }
 
         @Override
-        public void keyValue(FieldCollection key, String value) {
+        public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
             if (logger.isDebugEnabled()) {
                 logger.debug("begin");
                 for (Field f : key) {
@@ -122,11 +120,13 @@ public class DNBPICAElementsTest extends Assert {
                 }
                 logger.debug("end");
             }
+            return this;
         }
 
         @Override
-        public void end() {
+        public KeyValueStreamAdapter<FieldCollection, String> end() {
             logger.debug("end object");
+            return this;
         }
     }
 

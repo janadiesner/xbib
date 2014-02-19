@@ -37,7 +37,6 @@ import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.io.Triplifier;
-import org.xbib.xml.XMLFilterReader;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -48,8 +47,6 @@ public interface XmlTriplifier<S extends Identifier, P extends Property, O exten
     XmlTriplifier parse(InputSource source) throws IOException, SAXException;
 
     XmlTriplifier parse(XMLReader reader, InputSource source) throws IOException, SAXException;
-
-    XmlTriplifier parse(XMLFilterReader reader, InputSource source) throws IOException, SAXException;
 
     XmlTriplifier<S,P,O> setHandler(XmlHandler handler);
 

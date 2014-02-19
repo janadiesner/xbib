@@ -22,6 +22,7 @@
                 <include>org.xbib:elements</include>
                 <include>org.xbib:http</include>
                 <include>org.xbib:oai</include>
+                <include>org.xbib:sru</include>
                 <include>org.xbib:tools</include>
                 <include>xerces:xercesImpl</include>
                 <include>xalan:xalan</include>

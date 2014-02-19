@@ -37,6 +37,8 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
 import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.util.XMLEventConsumer;
+
 import org.testng.annotations.Test;
 import org.xbib.io.Request;
 import org.xbib.logging.Logger;
@@ -55,7 +57,7 @@ public class AsyncClientTest {
     public void testMultiClient() throws Exception {
         for (String s : Arrays.asList("Bielefeld", "Gent", "Lund")) {
             SRUClient client = SRUClientFactory.newClient(s);
-            String query = "title = linux";
+            String query = "title=linux";
             int from = 0;
             int size = 10;
             SearchRetrieveRequest request = client
@@ -108,13 +110,15 @@ public class AsyncClientTest {
                 }
 
                 @Override
-                public void recordData(Collection<XMLEvent> record) {
-                    logger.info("recordData = " + record.size() + " events");
+                public XMLEventConsumer recordData() {
+                    //logger.info("recordData = " + record.size() + " events");
+                    return null;
                 }
 
                 @Override
-                public void extraRecordData(Collection<XMLEvent> record) {
-                    logger.info("extraRecordData = " + record.size() + " events");
+                public XMLEventConsumer extraRecordData() {
+                    //logger.info("extraRecordData = " + record.size() + " events");
+                    return null;
                 }
 
                 @Override

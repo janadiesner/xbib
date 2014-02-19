@@ -33,6 +33,7 @@ package org.xbib.marc;
 
 import org.xbib.io.keyvalue.KeyValueStreamListener;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,8 +41,7 @@ import java.util.List;
  * Convert a MarcXchange stream to a key/value stream. With optional value
  * string transformation.
  */
-public class MarcXchange2KeyValue implements
-        MarcXchangeListener,
+public class MarcXchange2KeyValue implements MarcXchangeListener,
         KeyValueStreamListener<FieldCollection, String> {
 
     public interface FieldDataTransformer {
@@ -51,7 +51,8 @@ public class MarcXchange2KeyValue implements
 
     private FieldCollection fields;
 
-    private List<KeyValueStreamListener<FieldCollection, String>> listeners = new LinkedList();
+    private List<KeyValueStreamListener<FieldCollection, String>> listeners =
+            new LinkedList<KeyValueStreamListener<FieldCollection, String>>();
 
     private FieldDataTransformer transformer;
 
@@ -66,44 +67,69 @@ public class MarcXchange2KeyValue implements
     }
 
     @Override
-    public void begin() {
+    public KeyValueStreamListener<FieldCollection, String> begin() throws IOException {
         for (KeyValueStreamListener<FieldCollection, String> listener : listeners) {
             listener.begin();
         }
+        return this;
     }
 
     @Override
-    public void keyValue(FieldCollection key, String value) {
+    public KeyValueStreamListener<FieldCollection, String> keyValue(FieldCollection key, String value) throws IOException {
         for (KeyValueStreamListener<FieldCollection, String> listener : listeners) {
             // we allow null value, but no null keys to be passed to the listeners
             if (key != null) {
                 listener.keyValue(key, value);
             }
         }
+        return this;
     }
 
     @Override
-    public void end() {
+    public KeyValueStreamListener<FieldCollection, String> keys(List<FieldCollection> keys) throws IOException {
+        return this;
+    }
+
+    @Override
+    public KeyValueStreamListener<FieldCollection, String> values(List<String> values) throws IOException {
+        return this;
+    }
+
+    @Override
+    public KeyValueStreamListener<FieldCollection, String> end() throws IOException {
         for (KeyValueStreamListener<FieldCollection, String> listener : listeners) {
             listener.end();
         }
+        return this;
     }
 
     @Override
     public void beginRecord(String format, String type) {
-        begin();
-        keyValue(FieldCollection.FORMAT_KEY, format);
-        keyValue(FieldCollection.TYPE_KEY, type);
+        try {
+            begin();
+            keyValue(FieldCollection.FORMAT_KEY, format);
+            keyValue(FieldCollection.TYPE_KEY, type);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void endRecord() {
-        end();
+        try {
+            end();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void leader(String label) {
-        keyValue(FieldCollection.LEADER_KEY, label);
+        try {
+            keyValue(FieldCollection.LEADER_KEY, label);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -119,7 +145,11 @@ public class MarcXchange2KeyValue implements
         if (transformer != null && data != null) {
             data = transformer.transform(data);
         }
-        keyValue(fields, data);
+        try {
+            keyValue(fields, data);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -140,7 +170,11 @@ public class MarcXchange2KeyValue implements
             data = transformer.transform(data);
         }
         // emit fields as key/value
-        keyValue(fields, data);
+        try {
+            keyValue(fields, data);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

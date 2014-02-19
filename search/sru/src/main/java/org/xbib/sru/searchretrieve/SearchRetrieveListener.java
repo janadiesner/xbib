@@ -33,6 +33,8 @@ package org.xbib.sru.searchretrieve;
 
 import java.util.Collection;
 import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.util.XMLEventConsumer;
+
 import org.xbib.sru.SRUResponseListener;
 
 /**
@@ -84,15 +86,13 @@ public interface SearchRetrieveListener extends SRUResponseListener {
 
     /**
      * SRU record data
-     * @param record 
      */
-    void recordData(Collection<XMLEvent> record);
+    XMLEventConsumer recordData();
     
     /**
      * SRU extra record data
-     * @param extra
      */
-    void extraRecordData(Collection<XMLEvent> extra);
+    XMLEventConsumer extraRecordData();
 
     /**
      * SRU facets

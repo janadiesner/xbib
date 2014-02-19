@@ -41,16 +41,15 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.events.ProcessingInstruction;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
-import java.util.Collection;
-import java.util.List;
-import java.util.ListIterator;
 
+/**
+ * SRU filter reader
+ */
 public class SRUFilterReader extends Iso2709Reader implements MarcXchangeListener {
 
     private final XMLEventFactory eventFactory = XMLEventFactory.newInstance();
@@ -89,118 +88,120 @@ public class SRUFilterReader extends Iso2709Reader implements MarcXchangeListene
         String recordPacking = "xml";
         response.recordPacking(recordPacking);
         response.recordPosition(recordPosition);
-        Collection<XMLEvent> events = response.getEvents();
-        if (events != null) {
-            events.add(eventFactory.createStartDocument());
+        try {
+            response.add(eventFactory.createStartDocument());
             // emit additional parameter values for federating
-            events.add(eventFactory.createProcessingInstruction("format", format));
-            events.add(eventFactory.createProcessingInstruction("type", type));
-            events.add(eventFactory.createProcessingInstruction("id", recordPosition + "_" + response.getOrigin().getHost()));
+            response.add(eventFactory.createProcessingInstruction("format", format));
+            response.add(eventFactory.createProcessingInstruction("type", type));
+            response.add(eventFactory.createProcessingInstruction("id", recordPosition + "_" + response.getOrigin().getHost()));
             // SRU
-            events.add(eventFactory.createProcessingInstruction("recordSchema", recordSchema));
-            events.add(eventFactory.createProcessingInstruction("recordPacking", recordPacking));
+            response.add(eventFactory.createProcessingInstruction("recordSchema", recordSchema));
+            response.add(eventFactory.createProcessingInstruction("recordPacking", recordPacking));
             // no recordIdentifier
-            events.add(eventFactory.createProcessingInstruction("recordPosition", Integer.toString(recordPosition)));
+            response.add(eventFactory.createProcessingInstruction("recordPosition", Integer.toString(recordPosition)));
+        } catch (XMLStreamException e) {
+            // ignore?
         }
         recordPosition++;
     }
 
     @Override
     public void endRecord() {
-        Collection<XMLEvent> events = response.getEvents();
-        if (events != null) {
-            response.recordData(events);
-        }
         response.endRecord();
-        if (events != null) {
-            events.add(eventFactory.createEndDocument());
+        try {
+            response.add(eventFactory.createEndDocument());
+        } catch (XMLStreamException e) {
+            // ignore?
         }
     }
 
     @Override
     public void leader(String label) {
-        Collection<XMLEvent> events = response.getEvents();
-        if (events != null) {
-            events.add(eventFactory.createStartElement(recordSchema, nsURI, "leader"));
-            events.add(eventFactory.createCharacters(label));
-            events.add(eventFactory.createEndElement(recordSchema, nsURI, "leader"));
+        try {
+            response.add(eventFactory.createStartElement(recordSchema, nsURI, "leader"));
+            response.add(eventFactory.createCharacters(label));
+            response.add(eventFactory.createEndElement(recordSchema, nsURI, "leader"));
+        } catch (XMLStreamException e) {
+            // ignore?
         }
     }
 
     @Override
     public void beginControlField(Field designator) {
-        Collection<XMLEvent> events = response.getEvents();
-        if (events != null) {
-            events.add(eventFactory.createStartElement(recordSchema, nsURI, "controlfield"));
+        try {
+            response.add(eventFactory.createStartElement(recordSchema, nsURI, "controlfield"));
             if (designator != null && designator.tag() != null) {
-                events.add(eventFactory.createAttribute("tag", designator.tag()));
+                response.add(eventFactory.createAttribute("tag", designator.tag()));
             }
+        } catch (XMLStreamException e) {
+            // ignore?
         }
     }
 
     @Override
     public void endControlField(Field designator) {
-        Collection<XMLEvent> events = response.getEvents();
-        if (events != null) {
+        try {
             if (designator != null && designator.data() != null) {
                 String s = decode(designator.data());
-                // check for 001 tag and put record identifier
-                if ("001".equals(designator.tag())) {
-                    plugRecordIdentifier(events, s);
-                }
-                events.add(eventFactory.createCharacters(s));
+                response.add(eventFactory.createCharacters(s));
             }
-            events.add(eventFactory.createEndElement(recordSchema, nsURI, "controlfield"));
+            response.add(eventFactory.createEndElement(recordSchema, nsURI, "controlfield"));
+        } catch (XMLStreamException e) {
+            // ignore?
         }
     }
 
     @Override
     public void beginDataField(Field designator) {
-        Collection<XMLEvent> events = response.getEvents();
-        if (events != null) {
-            events.add(eventFactory.createStartElement(recordSchema, nsURI, "datafield"));
+        try {
+            response.add(eventFactory.createStartElement(recordSchema, nsURI, "datafield"));
             if (designator != null && designator.tag() != null) {
-                events.add(eventFactory.createAttribute("tag", designator.tag()));
+                response.add(eventFactory.createAttribute("tag", designator.tag()));
                 if (designator.indicator() != null) {
                     for (int i = 0; i < designator.indicator().length(); i++) {
-                        events.add(eventFactory.createAttribute("ind" + (i + 1),
+                        response.add(eventFactory.createAttribute("ind" + (i + 1),
                                 designator.indicator().substring(i, i + 1)));
                     }
                 }
             }
+        } catch (XMLStreamException e) {
+            // ignore?
         }
     }
 
     @Override
     public void endDataField(Field designator) {
-        Collection<XMLEvent> events = response.getEvents();
-        if (events != null) {
+        try {
             if (designator != null && designator.data() != null) {
-                events.add(eventFactory.createCharacters(decode(designator.data())));
+                response.add(eventFactory.createCharacters(decode(designator.data())));
             }
-            events.add(eventFactory.createEndElement(recordSchema, nsURI, "datafield"));
+            response.add(eventFactory.createEndElement(recordSchema, nsURI, "datafield"));
+        } catch (XMLStreamException e) {
+            // ignore?
         }
     }
 
     @Override
     public void beginSubField(Field designator) {
-        Collection<XMLEvent> events = response.getEvents();
-        if (events != null) {
-            events.add(eventFactory.createStartElement(recordSchema, nsURI, "subfield"));
+        try {
+            response.add(eventFactory.createStartElement(recordSchema, nsURI, "subfield"));
             if (designator != null && designator.subfieldId() != null) {
-                events.add(eventFactory.createAttribute("code", designator.subfieldId()));
+                response.add(eventFactory.createAttribute("code", designator.subfieldId()));
             }
+        } catch (XMLStreamException e) {
+            // ignore?
         }
     }
 
     @Override
     public void endSubField(Field designator) {
-        Collection<XMLEvent> events = response.getEvents();
-        if (events != null) {
+        try {
             if (designator != null && designator.data() != null) {
-                events.add(eventFactory.createCharacters(decode(designator.data())));
+                response.add(eventFactory.createCharacters(decode(designator.data())));
             }
-            events.add(eventFactory.createEndElement(recordSchema, nsURI, "subfield"));
+            response.add(eventFactory.createEndElement(recordSchema, nsURI, "subfield"));
+        } catch (XMLStreamException e) {
+            // ignore?
         }
     }
 
@@ -215,19 +216,4 @@ public class SRUFilterReader extends Iso2709Reader implements MarcXchangeListene
         }
     }
 
-    private void plugRecordIdentifier(Collection<XMLEvent> events, String recordIdentifier) {
-        if (events instanceof List) {
-            ListIterator<XMLEvent> it = ((List) events).listIterator(events.size());
-            while (it.hasPrevious()) {
-                XMLEvent e = it.previous();
-                if (e.isProcessingInstruction()) {
-                    ProcessingInstruction pi = (ProcessingInstruction) e;
-                    if ("recordPosition".equals(pi.getTarget())) {
-                        it.add(eventFactory.createProcessingInstruction("recordIdentifier", recordIdentifier));
-                        return;
-                    }
-                }
-            }
-        }
-    }
 }

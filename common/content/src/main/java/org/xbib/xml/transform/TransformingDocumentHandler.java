@@ -59,9 +59,8 @@ import java.util.regex.Pattern;
 /**
  * A SAX handler that detects <code>xml-stylesheet</code> directive and delegates SAX
  * events to a declared transformer.
- *
+ * <p/>
  * URI resolving replaced by servlet real path method.
- *
  */
 public final class TransformingDocumentHandler implements ContentHandler {
 
@@ -69,7 +68,7 @@ public final class TransformingDocumentHandler implements ContentHandler {
     /**
      * A map of XSLT output methods and their corresponding MIME content types.
      */
-    private final static HashMap<String, String> METHOD_MAPPING;    
+    private final static HashMap<String, String> METHOD_MAPPING;
 
     static {
         METHOD_MAPPING = new HashMap();
@@ -78,6 +77,7 @@ public final class TransformingDocumentHandler implements ContentHandler {
         METHOD_MAPPING.put("html", "text/html");
         METHOD_MAPPING.put("mods", "application/x-mods");
     }
+
     /**
      * A regular expression for extracting <code>xml-stylesheet</code>'s
      * <code>type</code> pseudo-attribute.
@@ -96,10 +96,10 @@ public final class TransformingDocumentHandler implements ContentHandler {
      */
     private final Pattern resourcePattern = Pattern.compile(
             "(resource[ \\t]*=[ \\t]*\")([^\"]*)(\")", Pattern.CASE_INSENSITIVE);
-    
-    private final  SAXTransformerFactory transformerFactory = 
+
+    private final SAXTransformerFactory transformerFactory =
             (SAXTransformerFactory) TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl", null);
-    
+
     /**
      * The default handler used when no <code>xml-stylesheet</code> directive is
      * specified in the XML stream.
@@ -266,7 +266,7 @@ public final class TransformingDocumentHandler implements ContentHandler {
      */
     @Override
     public void startElement(String namespaceURI, String localName, String qName,
-            Attributes atts) throws SAXException {
+                             Attributes atts) throws SAXException {
         this.initContentHandler();
         contentHandler.startElement(namespaceURI, localName, qName, atts);
     }
@@ -279,8 +279,8 @@ public final class TransformingDocumentHandler implements ContentHandler {
         if (contentHandler != null) {
             throw new SAXException(
                     "Some input has been already processed. Cannot change the handler anymore. "
-                    + "Place xml-stylesheet "
-                    + "directive immediately at the top of the XML file.");
+                            + "Place xml-stylesheet "
+                            + "directive immediately at the top of the XML file.");
         }
 
         final Transformer transformer = handler.getTransformer();
@@ -288,7 +288,7 @@ public final class TransformingDocumentHandler implements ContentHandler {
          * Pass any stylesheet parameters to the transformer.
          */
         if (stylesheetParams != null) {
-            for (Iterator<Map.Entry<String, Object>> i = stylesheetParams.entrySet().iterator(); i.hasNext();) {
+            for (Iterator<Map.Entry<String, Object>> i = stylesheetParams.entrySet().iterator(); i.hasNext(); ) {
                 final Map.Entry<String, Object> entry = i.next();
                 transformer.setParameter(entry.getKey(), entry.getValue());
                 logger.info("setting transformer parameter {}", entry.getKey());
@@ -358,7 +358,7 @@ public final class TransformingDocumentHandler implements ContentHandler {
      * appropriately.
      */
     private void inspectProcessingInstruction(TransformingDocumentHandler handler,
-            String target, String data) throws SAXException {
+                                              String target, String data) throws SAXException {
         URI uri = processXmlStylesheet(target, data);
         if (uri == null) {
             return;
@@ -430,7 +430,7 @@ public final class TransformingDocumentHandler implements ContentHandler {
             if (defaultHandler == null) {
                 logger.info("Stylesheet not specified, using identity handler.");
                 try {
-                    this.defaultHandler = pool.getIdentityTransformerHandler(transformerFactory);                    
+                    this.defaultHandler = pool.getIdentityTransformerHandler(transformerFactory);
                 } catch (TransformerConfigurationException e) {
                     throw new SAXException(e);
                 }

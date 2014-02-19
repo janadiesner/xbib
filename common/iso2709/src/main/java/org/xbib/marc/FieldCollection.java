@@ -34,7 +34,8 @@ package org.xbib.marc;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.TreeMap;
+
+import static com.google.common.collect.Maps.newTreeMap;
 
 /**
  * A linked list of ISO 2709 fields
@@ -52,22 +53,13 @@ public class FieldCollection extends LinkedList<Field> {
     }
 
     private FieldCollection(String tag) {
-        this();
+        super();
         super.add(new Field(tag));
-    }
-
-    public void format() {
-        int s = size();
-        String[] tags = new String[s];
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0 ; i < s; i++) {
-            sb.append(tags[i]);
-        }
     }
 
     /**
      * Build a pattern of this field collection for matching
-     * @param map
+     * @param map the map
      */
     public void makePattern(Map<String, String[]> map) {
         StringBuilder pattern = new StringBuilder();
@@ -107,7 +99,7 @@ public class FieldCollection extends LinkedList<Field> {
                     }
                 }
                 // new subfield id?
-                if (sub != null && sub.indexOf(field.subfieldId()) < 0) {
+                if (sub != null && !sub.contains(field.subfieldId())) {
                     sub = sub + field.subfieldId();
                 }
             }
@@ -130,9 +122,7 @@ public class FieldCollection extends LinkedList<Field> {
             int l = ind != null ? ind.length : 0;
             String[] v = new String[l+1];
             if (ind != null) {
-                for (int i = 0; i < l; i++) {
-                    v[i] = ind[i];
-                }
+                System.arraycopy(ind, 0, v, 0, l);
             }
             if (sub != null) {
                 v[l] = sub;
@@ -146,7 +136,7 @@ public class FieldCollection extends LinkedList<Field> {
                     // melt indicators
                     if (ind != null) {
                         for (int i = 0; i < l; i++) {
-                            if (s[i].indexOf(ind[i]) < 0) {
+                            if (!s[i].contains(ind[i])) {
                                 s[i] += ind[i];
                             }
                         }
@@ -168,15 +158,14 @@ public class FieldCollection extends LinkedList<Field> {
     }
 
     public String toSpec() {
-        Map<String,String[]> m = new TreeMap();
+        Map<String,String[]> m = newTreeMap();
         makePattern(m);
         StringBuilder sb = new StringBuilder();
         for (String k : m.keySet()) {
             sb.append(k);
             String[] values = m.get(k);
             if (values != null) {
-                for (int i = 0; i < values.length; i++) {
-                    String v = values[i];
+                for (String v : values) {
                     sb.append('$');
                     if (v != null) {
                         // sort characters is slow

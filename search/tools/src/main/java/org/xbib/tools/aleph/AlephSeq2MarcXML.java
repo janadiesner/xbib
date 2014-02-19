@@ -59,7 +59,6 @@ import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchangeAdapter;
 import org.xbib.marc.dialects.AlephSequentialReader;
-import org.xbib.pipeline.element.CounterPipelineElement;
 import org.xbib.tools.Converter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -68,7 +67,7 @@ public class AlephSeq2MarcXML extends Converter {
 
     private final static Logger logger = LoggerFactory.getLogger(AlephSeq2MarcXML.class.getName());
 
-    private final static CounterPipelineElement fileCounter = new CounterPipelineElement().set(new AtomicLong(0L));
+    private final static AtomicLong fileCounter = new AtomicLong(0L);
 
     private final int BUFFER_SIZE = 8192;
 
@@ -177,7 +176,8 @@ public class AlephSeq2MarcXML extends Converter {
         if (!dir.isDirectory() && !dir.canWrite()) {
             throw new IOException("unable to write to directory " + settings.get("output"));
         }
-        String filename = dir + File.separator + settings.get("basename") + "_" + fileCounter.get().getAndIncrement() + ".xml";
+        String filename = dir + File.separator + settings.get("basename") + "_"
+                + fileCounter.getAndIncrement() + ".xml";
         OutputStream out = new ProgressMonitoredOutputStream(new FileOutputStream(filename), watcher);
         return new OutputStreamWriter(out, "UTF-8");
     }

@@ -95,13 +95,14 @@ public class ZDBHolTest extends Assert {
                     .addListener(mapper)
                     .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
                         @Override
-                        public void keyValue(FieldCollection key, String value) {
+                        public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
                             logger.debug("begin");
                             for (Field f : key) {
                                 logger.debug("tag={} ind={} subf={} data={}",
                                         f.tag(), f.indicator(), f.subfieldId(), f.data());
                             }
                             logger.debug("end");
+                            return this;
                         }
 
                     });

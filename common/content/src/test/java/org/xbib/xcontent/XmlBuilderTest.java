@@ -2,7 +2,6 @@ package org.xbib.xcontent;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.common.settings.ImmutableSettings;
 import org.xbib.common.settings.Settings;
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.common.xcontent.XContentHelper;

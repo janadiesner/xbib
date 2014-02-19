@@ -32,15 +32,19 @@
 package org.xbib.sru.searchretrieve;
 
 import org.xbib.sru.DefaultSRURequest;
+import org.xbib.sru.SRUConstants;
 import org.xbib.sru.SRURequest;
+import org.xbib.util.URIUtil;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static com.google.common.collect.Lists.newLinkedList;
 
 public class SearchRetrieveRequest
         extends DefaultSRURequest
-        implements SRURequest {
+        implements SRURequest, SRUConstants {
 
     private String version;
 
@@ -72,7 +76,7 @@ public class SearchRetrieveRequest
 
     private String path;
 
-    private List<SearchRetrieveListener> listeners = new ArrayList();
+    private List<SearchRetrieveListener> listeners = newLinkedList();
 
     /**
      * private extension, a query for filtering query results
@@ -84,7 +88,30 @@ public class SearchRetrieveRequest
 
     @Override
     public SearchRetrieveRequest setURI(URI uri) {
-        return (SearchRetrieveRequest)super.setURI(uri);
+        super.setURI(uri);
+        if (uri != null) {
+            final Map<String,String> params = URIUtil.parseQueryString(uri);
+            if (params.containsKey(VERSION_PARAMETER)) {
+                setVersion(params.get(VERSION_PARAMETER));
+            }
+            if (params.containsKey(RECORD_SCHEMA_PARAMETER)) {
+                setRecordSchema(params.get(RECORD_SCHEMA_PARAMETER));
+            }
+            if (params.containsKey(RECORD_PACKING_PARAMETER)) {
+                setRecordPacking(params.get(RECORD_PACKING_PARAMETER));
+            }
+            if (params.containsKey(QUERY_PARAMETER)) {
+                setQuery(params.get(QUERY_PARAMETER));
+            }
+            if (params.containsKey(START_RECORD_PARAMETER)) {
+                setStartRecord(Integer.parseInt(params.get(START_RECORD_PARAMETER)));
+            }
+            if (params.containsKey(MAXIMUM_RECORDS_PARAMETER)) {
+                setMaximumRecords(Integer.parseInt(params.get(MAXIMUM_RECORDS_PARAMETER)));
+            }
+            // TODO add more parameters
+        }
+        return this;
     }
 
     public SearchRetrieveRequest setPath(String path) {
@@ -148,7 +175,6 @@ public class SearchRetrieveRequest
         return maxRecords;
     }
 
- 
     public SearchRetrieveRequest setRecordPacking(String recordPacking) {
         this.recordPacking = recordPacking;
         return this;

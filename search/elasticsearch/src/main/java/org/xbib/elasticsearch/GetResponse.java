@@ -122,12 +122,9 @@ public class GetResponse extends BasicGetResponse {
     }
 
     private StreamByteBuffer bytes() throws IOException {
+        check();
         StreamByteBuffer buffer = new StreamByteBuffer();
         OutputStream out = buffer.getOutputStream();
-        if (out == null) {
-            return buffer;
-        }
-        check();
         XContentBuilder jsonBuilder = new XContentBuilder(JsonXContent.jsonXContent, out);
         getResponse().toXContent(jsonBuilder, ToXContent.EMPTY_PARAMS);
         jsonBuilder.close();

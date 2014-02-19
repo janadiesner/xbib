@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
-        <version>1.0.0.Beta1</version>
+        <version>1.0.0.Beta2</version>
         <relativePath>../..</relativePath>
     </parent>
 
@@ -77,10 +77,6 @@
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
-            <artifactId>mapdb</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

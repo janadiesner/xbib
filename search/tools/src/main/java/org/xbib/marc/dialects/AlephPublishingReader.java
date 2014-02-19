@@ -57,6 +57,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.xbib.metrics.MeterMetric;
 import org.xbib.pipeline.AbstractPipeline;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
@@ -68,9 +69,11 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.pipeline.element.CounterPipelineElement;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineException;
+import org.xbib.pipeline.element.LongPipelineElement;
 
-public class AlephPublishingReader extends AbstractPipeline<CounterPipelineElement>
+public class AlephPublishingReader extends AbstractPipeline<LongPipelineElement,PipelineException>
         implements MarcXchangeListener {
 
     private final static Logger logger = LoggerFactory.getLogger(AlephPublishingReader.class.getName());
@@ -81,13 +84,13 @@ public class AlephPublishingReader extends AbstractPipeline<CounterPipelineEleme
 
     private final DecimalFormat df = new DecimalFormat("000000000");
 
-    private final CounterPipelineElement sysNumber = new CounterPipelineElement().set(new AtomicLong(0L));
-
     private final static int CLOB_BUF_SIZE = 8192;
 
     private URI uri;
 
     private Iterator<Long> iterator;
+
+    private final LongPipelineElement element = new LongPipelineElement().set(new AtomicLong(0L));
 
     private String library;
 
@@ -106,8 +109,6 @@ public class AlephPublishingReader extends AbstractPipeline<CounterPipelineEleme
     private boolean prepared = false;
 
     private boolean inRecord = false;
-
-    private final Object lock = new Object();
 
     public AlephPublishingReader() {
     }
@@ -148,13 +149,34 @@ public class AlephPublishingReader extends AbstractPipeline<CounterPipelineEleme
     }
 
     @Override
-    public CounterPipelineElement next() {
+    public LongPipelineElement next() {
         return nextRead();
     }
 
     @Override
     public void remove() {
         throw new UnsupportedOperationException("Not supported");
+    }
+
+    @Override
+    public void newRequest(Pipeline<MeterMetric, LongPipelineElement> pipeline, LongPipelineElement request) {
+        try {
+            try (StringReader sr = new StringReader(clob)) {
+                XMLEventReader xmlReader = factory.createXMLEventReader(sr);
+                Stack<Field> stack = new Stack();
+                while (xmlReader.hasNext()) {
+                    processEvent(stack, xmlReader.peek());
+                    xmlReader.nextEvent();
+                }
+            }
+        } catch (XMLStreamException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void error(Pipeline<MeterMetric, LongPipelineElement> pipeline, LongPipelineElement request, PipelineException error) {
+        logger.error(error.getMessage(), error);
     }
 
     @Override
@@ -267,18 +289,17 @@ public class AlephPublishingReader extends AbstractPipeline<CounterPipelineEleme
         boolean skip;
         do {
             skip = false;
-            synchronized (lock) {
-                sysNumber.get().set(iterator.hasNext() ? iterator.next() : (Long)null);
-            }
-            if (sysNumber == null) {
+            Long l = iterator.hasNext() ? iterator.next() : (Long)null;
+            if (l == null) {
                 this.prepared = false;
                 return false;
             }
+            element.get().set(l);
             if (session == null) {
                 createSession();
             }
             final Map<String, String> params = new HashMap<>();
-            params.put("docNumber", df.format(sysNumber));
+            params.put("docNumber", df.format(l));
             final Query query = new Query("select z00p_str, z00p_ptr from "
                     + library + ".z00p where z00p_set = '" + name + "' and z00p_doc_number = ?",
                     new String[]{"docNumber"}, params);
@@ -294,7 +315,7 @@ public class AlephPublishingReader extends AbstractPipeline<CounterPipelineEleme
                     this.prepared = true;
                     return true;
                 } else {
-                    logger.warn("skipped {}", sysNumber);
+                    logger.warn("skipped {}", l);
                     skip = true;
                 }
             } catch (SQLException | IOException e) {
@@ -308,24 +329,12 @@ public class AlephPublishingReader extends AbstractPipeline<CounterPipelineEleme
         return false;
     }
 
-    private CounterPipelineElement nextRead() {
+    private LongPipelineElement nextRead() {
         if (clob == null) {
-            return null;
+            return element;
         }
-        try {
-            try (StringReader sr = new StringReader(clob)) {
-                XMLEventReader xmlReader = factory.createXMLEventReader(sr);
-                Stack<Field> stack = new Stack();
-                while (xmlReader.hasNext()) {
-                    processEvent(stack, xmlReader.peek());
-                    xmlReader.nextEvent();
-                }
-            }
-        } catch (XMLStreamException e) {
-            logger.error(e.getMessage(), e);
-        }
-        prepared = false;
-        return sysNumber;
+        this.prepared = false;
+        return element;
     }
 
     private void processEvent(Stack<Field> stack, XMLEvent event) {

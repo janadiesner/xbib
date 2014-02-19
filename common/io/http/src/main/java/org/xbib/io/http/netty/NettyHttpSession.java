@@ -85,8 +85,11 @@ public class NettyHttpSession implements HttpSession {
     public void open(Mode mode) throws IOException {
         if (!isOpen()) {
             this.config = new AsyncHttpClientConfig.Builder()
-                    .setRequestTimeoutInMs(30000)
                     .setAllowPoolingConnection(true)
+                    .setAllowSslConnectionPool(true)
+                    .setMaximumConnectionsPerHost(16)
+                    .setMaximumConnectionsTotal(16)
+                    .setRequestTimeoutInMs(30000)
                     .setFollowRedirects(true)
                     .setMaxRequestRetry(1)
                     .setCompressionEnabled(true);

@@ -119,7 +119,7 @@ public final class BibdatZDB extends Converter {
                 .addListener(mapper)
                 .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
                     @Override
-                    public void keyValue(FieldCollection key, String value) {
+                    public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
                         if (logger.isTraceEnabled()) {
                             logger.trace("begin");
                             for (Field f : key) {
@@ -128,12 +128,13 @@ public final class BibdatZDB extends Converter {
                             }
                             logger.trace("end");
                         }
+                        return this;
                     }
 
                 });
         InputStream in = InputService.getInputStream(uri);
         InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
-        new DNBPICAXmlReader(source).setListener(kv).parse();
+        new DNBPICAXmlReader().setListener(kv).parse(source);
         in.close();
         mapper.close();
         if (settings.getAsBoolean("detect", false)) {

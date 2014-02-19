@@ -33,9 +33,8 @@ package org.xbib.elements.marc.dialects.mab;
 
 import org.xbib.elements.AbstractSpecification;
 import org.xbib.elements.Element;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -45,9 +44,7 @@ import java.util.Map;
  */
 public class MABSpecification extends AbstractSpecification {
 
-    private final static Logger logger = LoggerFactory.getLogger(MABSpecification.class.getName());
-
-    protected Map addSpec(String value, Element element, Map map) {
+    public Map addSpec(String value, Element element, Map map) {
         int pos = value.indexOf('[');
         if (pos >= 0) {
             // list
@@ -76,6 +73,12 @@ public class MABSpecification extends AbstractSpecification {
     }
 
     private Map addSpec(Element element, Map map, String tag, String ind, String subf) {
+        if (subf != null) {
+            // sort subfields
+            char[] ch = subf.toCharArray();
+            Arrays.sort(ch);
+            subf = new String(ch);
+        }
         if (ind == null && subf == null) {
             if (!map.containsKey(tag)) {
                 map.put(tag, element);

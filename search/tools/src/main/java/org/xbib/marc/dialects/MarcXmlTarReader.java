@@ -50,6 +50,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
 import org.xbib.marc.MarcXchangeConstants;
+import org.xbib.metrics.MeterMetric;
 import org.xbib.pipeline.AbstractPipeline;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
@@ -60,10 +61,12 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.pipeline.element.CounterPipelineElement;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineException;
+import org.xbib.pipeline.element.LongPipelineElement;
 import org.xbib.util.Strings;
 
-public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<CounterPipelineElement>
+public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<LongPipelineElement, PipelineException>
         implements MarcXchangeConstants, MarcXchangeListener {
 
     private final Logger logger = LoggerFactory.getLogger(MarcXmlTarReader.class.getName());
@@ -72,7 +75,7 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
 
     private final ConnectionService<TarSession> service = ConnectionService.getInstance();
 
-    private final CounterPipelineElement counter = new CounterPipelineElement().set(new AtomicLong(0L));
+    private final LongPipelineElement counter = new LongPipelineElement().set(new AtomicLong(0L));
 
     private URI uri;
 
@@ -186,13 +189,38 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
     }
 
     @Override
-    public CounterPipelineElement next() {
+    public LongPipelineElement next() {
         return nextRead();
     }
 
     @Override
     public void remove() {
         throw new UnsupportedOperationException("Not supported");
+    }
+
+    @Override
+    public void newRequest(Pipeline<MeterMetric, LongPipelineElement> pipeline, LongPipelineElement request) {
+        try {
+            if (logger.isTraceEnabled()) {
+                logger.trace("{}", clob);
+            }
+            try (StringReader sr = new StringReader(clob)) {
+                XMLEventReader xmlReader = factory.createXMLEventReader(sr);
+                Stack<Field> stack = new Stack();
+                while (xmlReader.hasNext()) {
+                    processEvent(stack, xmlReader.peek());
+                    xmlReader.nextEvent();
+                }
+            }
+        } catch (XMLStreamException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void error(Pipeline<MeterMetric, LongPipelineElement> pipeline, LongPipelineElement request, PipelineException error) {
+        logger.error(error.getMessage(), error);
+
     }
 
     @Override
@@ -218,7 +246,7 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
             this.packet = (P)read(session);
             this.prepared = packet != null;
             if (prepared) {
-                nextNumber();
+                nextByNumber();
                 clob = packet.toString();
             }
             return prepared;
@@ -228,25 +256,10 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
         }
     }
 
-    private CounterPipelineElement nextRead() {
+    private LongPipelineElement nextRead() {
         if (clob == null || clob.length() == 0) {
             // special case, message length 0 means deletion
             return null;
-        }
-        try {
-            if (logger.isTraceEnabled()) {
-                logger.trace("{}", clob);
-            }
-            try (StringReader sr = new StringReader(clob)) {
-                XMLEventReader xmlReader = factory.createXMLEventReader(sr);
-                Stack<Field> stack = new Stack();
-                while (xmlReader.hasNext()) {
-                    processEvent(stack, xmlReader.peek());
-                    xmlReader.nextEvent();
-                }
-            }
-        } catch (XMLStreamException e) {
-            logger.error(e.getMessage(), e);
         }
         prepared = false;
         return counter;
@@ -318,7 +331,8 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
                 }
                 case RECORD:
                     if (!inRecord) {
-                        beginRecord(format != null ? format : "AlephPublish", type);
+                        beginRecord(format != null ? format : "MARC21",
+                                type != null ? type : "Bibliographic");
                         inRecord = true;
                     }
                     break;
@@ -373,10 +387,10 @@ public class MarcXmlTarReader<P extends Packet> extends AbstractPipeline<Counter
      * Like files on ancient magnetic tape. Move forward to the packet we want, compare the number
      * until the desired one.
      *
-     * @return
+     * @return the number string of the next record found
      * @throws IOException
      */
-    private String nextNumber() throws IOException {
+    protected String nextByNumber() throws IOException {
         String name = packet.name();
         int pos = name != null ? name.lastIndexOf('/') : -1;
         if (pos < 0 && name != null) {

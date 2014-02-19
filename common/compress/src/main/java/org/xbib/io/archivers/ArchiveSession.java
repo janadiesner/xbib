@@ -49,7 +49,7 @@ public abstract class ArchiveSession<I extends ArchiveInputStream, O extends Arc
             return;
         }
         final String suffix = getSuffix();
-        final String scheme = uri.getScheme();
+        final String scheme = uri.getScheme() != null ? uri.getScheme() : "file";
         final String part = uri.getSchemeSpecificPart();
         switch (mode) {
             case READ: {

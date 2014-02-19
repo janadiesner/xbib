@@ -50,15 +50,16 @@ public class MarcXmlTarReaderTest {
                 .addListener(mapper)
                 .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
                     @Override
-                    public void keyValue(FieldCollection key, String value) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("begin");
+                    public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("begin");
                             for (Field f : key) {
-                                logger.debug("tag={} ind={} subf={} data={}",
+                                logger.trace("tag={} ind={} subf={} data={}",
                                         f.tag(), f.indicator(), f.subfieldId(), f.data());
                             }
-                            logger.debug("end");
+                            logger.trace("end");
                         }
+                        return this;
                     }
 
                 });
@@ -67,6 +68,8 @@ public class MarcXmlTarReaderTest {
                 .setIterator(new IntervalIterator(from, to))
                 .setURI(URI.create(uriStr))
                 .setListener(kv);
+
+        // TODO assert
     }
     
 }

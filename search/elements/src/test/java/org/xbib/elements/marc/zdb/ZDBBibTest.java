@@ -92,7 +92,7 @@ public class ZDBBibTest extends Assert {
                     .addListener(mapper)
                     .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
                         @Override
-                        public void keyValue(FieldCollection key, String value) {
+                        public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
                             if (logger.isDebugEnabled()) {
                                 logger.debug("begin");
                                 for (Field f : key) {
@@ -101,6 +101,7 @@ public class ZDBBibTest extends Assert {
                                 }
                                 logger.debug("end");
                             }
+                            return this;
                         }
 
                     });

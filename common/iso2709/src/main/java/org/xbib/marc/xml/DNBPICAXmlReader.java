@@ -31,12 +31,11 @@
  */
 package org.xbib.marc.xml;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.dialects.DNBPICAConstants;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -49,12 +48,13 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 
+/**
+ * PICA XML parser
+ */
 public class DNBPICAXmlReader
         extends DefaultHandler implements DNBPICAConstants, MarcXchangeListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(DNBPICAXmlReader.class.getName());
-
-    private static final SAXParserFactory factory = SAXParserFactory.newInstance();
+    private final SAXParser parser;
 
     private ContentHandler contentHandler;
 
@@ -66,9 +66,13 @@ public class DNBPICAXmlReader
 
     private StringBuilder content = new StringBuilder();
 
-    public DNBPICAXmlReader(final InputSource source) {
-        this.source = source;
+    public DNBPICAXmlReader() throws ParserConfigurationException, SAXException {
+        this(SAXParserFactory.newInstance());
+    }
+
+    public DNBPICAXmlReader(SAXParserFactory factory) throws ParserConfigurationException, SAXException {
         factory.setNamespaceAware(true);
+        this.parser = factory.newSAXParser();
     }
 
     public DNBPICAXmlReader setContentHandler(ContentHandler handler) {
@@ -81,8 +85,7 @@ public class DNBPICAXmlReader
         return this;
     }
 
-    public void parse() throws ParserConfigurationException, SAXException, IOException {
-        SAXParser parser = factory.newSAXParser();
+    public void parse(InputSource source) throws SAXException, IOException {
         parser.parse(source, this);
     }
 
@@ -201,8 +204,8 @@ public class DNBPICAXmlReader
                     String name = atts.getLocalName(i);
                     String value = atts.getValue(i);
                     if (ID.equals(name)) {
-                        tag = atts.getValue(i).substring(0, 3);
-                        indicator = atts.getValue(i).substring(3);
+                        tag = value.substring(0, 3);
+                        indicator = value.substring(3);
                     }
                 }
                 Field field = new Field().tag(tag).indicator(indicator);
@@ -231,8 +234,8 @@ public class DNBPICAXmlReader
                 break;
             }
             default : {
-                logger.error("unknown element {}", localName);
-                throw new IllegalArgumentException("unknown begin element: " + uri + " " + localName + " " + qName + " atts=" + atts.toString());
+                throw new IllegalArgumentException("unknown begin element: " +
+                        uri + " " + localName + " " + qName + " atts=" + atts.toString());
             }
         }
         if (contentHandler != null) {
@@ -268,7 +271,6 @@ public class DNBPICAXmlReader
                 break;
             }
             default : {
-                logger.error("unknown element {}", localName);
                 // stop processing, this is fatal
                 throw new IllegalArgumentException("unknown end element: " + uri + " " + localName + " " + qName);
             }
@@ -282,9 +284,7 @@ public class DNBPICAXmlReader
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
         String s = new String(ch, start, length);
-        if (!s.trim().isEmpty()) {
-            content.append(s);
-        }
+        content.append(s);
         if (contentHandler != null) {
             contentHandler.characters(ch, start, length);
         }

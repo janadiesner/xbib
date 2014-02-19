@@ -9,8 +9,8 @@ import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.JsonLdContext;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.simple.SimpleResourceContext;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
@@ -48,7 +48,7 @@ public class BulkIndexerTest extends Assert {
     }
 
     private ResourceContext createContext() {
-        ResourceContext context = new JsonLdContext()
+        ResourceContext context = new SimpleResourceContext()
                 .newNamespaceContext();
         context.namespaceContext().addNamespace(ES.NS_PREFIX, ES.NS_URI);
         context.namespaceContext().addNamespace("urn", "http://urn");

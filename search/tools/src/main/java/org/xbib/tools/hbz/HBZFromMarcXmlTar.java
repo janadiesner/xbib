@@ -126,14 +126,15 @@ public final class HBZFromMarcXmlTar extends Converter {
                 .addListener(mapper)
                 .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
                     @Override
-                    public void begin() {
+                    public KeyValueStreamAdapter<FieldCollection, String> begin() {
                         if (logger.isTraceEnabled()) {
                             logger.trace("begin object");
                         }
+                        return this;
                     }
 
                     @Override
-                    public void keyValue(FieldCollection key, String value) {
+                    public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
                         if (logger.isTraceEnabled()) {
                             logger.trace("begin");
                             for (Field f : key) {
@@ -142,13 +143,15 @@ public final class HBZFromMarcXmlTar extends Converter {
                             }
                             logger.trace("end");
                         }
+                        return this;
                     }
 
                     @Override
-                    public void end() {
+                    public KeyValueStreamAdapter<FieldCollection, String> end() {
                         if (logger.isTraceEnabled()) {
                             logger.trace("end object");
                         }
+                        return this;
                     }
 
                 });

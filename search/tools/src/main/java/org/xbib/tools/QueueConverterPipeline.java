@@ -1,12 +1,11 @@
 
 package org.xbib.tools;
 
-import org.xbib.elasticsearch.tools.QueueFeeder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.metrics.MeterMetric;
 import org.xbib.pipeline.Pipeline;
-import org.xbib.pipeline.PipelineExecutor;
-import org.xbib.pipeline.PipelineListener;
+import org.xbib.pipeline.PipelineRequestListener;
 import org.xbib.pipeline.PipelineRequest;
 import org.xbib.pipeline.element.PipelineElement;
 import org.xbib.util.ExceptionFormatter;
@@ -24,19 +23,13 @@ public abstract class QueueConverterPipeline<T, R extends PipelineRequest, P ext
 
     private QueueConverter<T, R, P, E> converter;
 
-    private Long t0;
-
-    private Long t1;
-
-    private Long count;
-
-    private Long volumeCount;
-
-    private Map<String, PipelineListener<Boolean,R>> listeners;
+    private MeterMetric metric;
 
     private R request;
 
     private E element;
+
+    private Map<String, PipelineRequestListener<Boolean,R>> listeners;
 
     public QueueConverterPipeline(QueueConverter<T, R, P, E> converter, int num) {
         this.converter = converter;
@@ -44,62 +37,35 @@ public abstract class QueueConverterPipeline<T, R extends PipelineRequest, P ext
         this.logger = LoggerFactory.getLogger(QueueConverterPipeline.class.getSimpleName() + "-pipeline-" + num);
     }
 
-    @Override
-    public Pipeline<Boolean, R> addLast(String name, PipelineListener<Boolean, R> listener) {
+    public Pipeline<Boolean, R> add(String name, PipelineRequestListener<Boolean, R> listener) {
         listeners.put(name, listener);
         return this;
     }
 
     @Override
-    public Pipeline<Boolean, R> executor(PipelineExecutor<Pipeline<Boolean, R>> executor) {
-        // unused, we use the converter
-        return this;
-    }
-
-    @Override
-    public Long count() {
-        return count;
-    }
-
-    @Override
-    public Long size() {
-        return volumeCount;
-    }
-
-    @Override
-    public Long startedAt() {
-        return t0;
-    }
-
-    @Override
-    public Long stoppedAt() {
-        return t1;
-    }
-
-    @Override
-    public Long took() {
-        return t0 != null && t1 != null ? t1 - t0 : null;
+    public MeterMetric getMetric() {
+        return metric;
     }
 
     @Override
     public Boolean call() throws Exception {
         logger.info("pipeline starting");
         try {
-            t0 = System.currentTimeMillis();
+            metric = new MeterMetric(5L, TimeUnit.SECONDS);
             while (hasNext()) {
                 request = next();
                 process(request);
-                for (PipelineListener<Boolean,R> listener : listeners.values()) {
-                    listener.listen((PipelineExecutor<Pipeline<Boolean,R>>) converter, this, request);
+                for (PipelineRequestListener<Boolean,R> listener : listeners.values()) {
+                    listener.newRequest(this, request);
                 }
-                count++;
+                metric.mark();
             }
         } catch (Throwable e) {
             logger.error("exception while processing {}, exiting", request);
             logger.error(ExceptionFormatter.format(e));
         } finally {
             converter.countDown();
-            t1 = System.currentTimeMillis();
+            metric.stop();
         }
         logger.info("pipeline terminating");
         return true;

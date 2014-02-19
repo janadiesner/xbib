@@ -41,7 +41,6 @@ import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.io.TripleListener;
-import org.xbib.xml.XMLFilterReader;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -121,21 +120,6 @@ public class XmlReader<S extends Identifier, P extends Property, O extends Node>
 
     @Override
     public XmlReader parse(XMLReader reader, InputSource source) throws IOException, SAXException {
-        this.source = source;
-        if (handler != null) {
-            if (listener != null) {
-                handler.setListener(listener);
-            }
-            reader.setContentHandler(handler);
-        }
-        reader.setFeature("http://xml.org/sax/features/namespaces", namespaces);
-        reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", validate);
-        reader.parse(source);
-        return this;
-    }
-
-    @Override
-    public XmlReader parse(XMLFilterReader reader, InputSource source) throws IOException, SAXException {
         this.source = source;
         if (handler != null) {
             if (listener != null) {

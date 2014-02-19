@@ -43,7 +43,7 @@ public class DublinCoreSpecification extends AbstractSpecification {
 
     private final static Logger logger = LoggerFactory.getLogger(DublinCoreSpecification.class.getName());
 
-    protected Map addSpec(String value, Element element, Map map) {
+    public Map addSpec(String value, Element element, Map map) {
         int pos = value.indexOf('$');
         String h = pos > 0 ? value.substring(0,pos) : null;
         String t = pos > 0 ? value.substring(pos+1) : value;

@@ -45,7 +45,7 @@ import org.xbib.elements.marc.dialects.mab.MABContext;
 import org.xbib.elements.marc.dialects.mab.MABElementBuilderFactory;
 import org.xbib.elements.marc.dialects.mab.MABElementMapper;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.SimplePipelineExecutor;
+import org.xbib.pipeline.simple.SimplePipelineExecutor;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.xcontent.ContentBuilder;
@@ -74,15 +74,14 @@ public class ConcurrentAlephPublishingReaderTest {
         setName = bundle.getString("setname");
         String uriStr = bundle.getString("uri");
 
-
         Queue<URI> uris = new LinkedList();
 
         for (int i = 0; i < threads; i++) {
             uris.add(URI.create(uriStr));
         }
         SimplePipelineExecutor service = new SimplePipelineExecutor()
-                .concurrency(threads)
-                .provider(new PipelineProvider() {
+                .setConcurrency(threads)
+                .setPipelineProvider(new PipelineProvider() {
 
                     @Override
                     public Pipeline get() {

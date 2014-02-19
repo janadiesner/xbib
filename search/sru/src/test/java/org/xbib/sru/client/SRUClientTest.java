@@ -34,17 +34,24 @@ package org.xbib.sru.client;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.text.Normalizer;
 import java.util.Arrays;
-import java.util.Collection;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.util.XMLEventConsumer;
+
 import org.testng.annotations.Test;
 import org.xbib.io.Request;
+import org.xbib.io.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.Field;
+import org.xbib.marc.FieldCollection;
+import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.xml.MarcXchangeContentHandler;
 import org.xbib.sru.searchretrieve.SearchRetrieveListener;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
 import org.xbib.sru.searchretrieve.SearchRetrieveResponseAdapter;
 import org.xbib.sru.searchretrieve.SearchRetrieveResponse;
+import org.xbib.xml.stream.SaxEventConsumer;
 
 public class SRUClientTest {
 
@@ -52,12 +59,52 @@ public class SRUClientTest {
 
     @Test
     public void testServiceSearchRetrieve() throws Exception {
+
+        final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
+                .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
+                    @Override
+                    public String transform(String value) {
+                        return Normalizer.normalize(value, Normalizer.Form.NFC);
+                    }
+                })
+                .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
+                    @Override
+                    public KeyValueStreamAdapter<FieldCollection, String> begin() {
+                        logger.debug("begin object");
+                        return this;
+                    }
+
+                    @Override
+                    public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("begin");
+                            for (Field f : key) {
+                                logger.debug("tag={} ind={} subf={} data={}",
+                                        f.tag(), f.indicator(), f.subfieldId(), f.data());
+                            }
+                            if (value != null) {
+                                logger.debug("value={}", value);
+
+                            }
+                            logger.debug("end");
+                        }
+                        return this;
+                    }
+
+                    @Override
+                    public KeyValueStreamAdapter<FieldCollection, String> end() {
+                        logger.debug("end object");
+                        return this;
+                    }
+                });
+
+        final MarcXchangeContentHandler marcXmlHandler = new MarcXchangeContentHandler()
+                .addListener("Bibliographic", kv);
+
         for (String clientName : Arrays.asList("Gent", "Lund", "Bielefeld")) {
-            String query = "title = linux";
+            String query = "title=linux";
             int from = 1;
             int size = 10;
-            final SRUClient client
-                    = SRUClientFactory.newClient(clientName);
             FileOutputStream out = new FileOutputStream("target/sru-service-"
                     + clientName + ".xml");
             try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
@@ -103,11 +150,13 @@ public class SRUClientTest {
                     }
 
                     @Override
-                    public void recordData(Collection<XMLEvent> record) {
+                    public XMLEventConsumer recordData() {
+                        return new SaxEventConsumer(marcXmlHandler);
                     }
 
                     @Override
-                    public void extraRecordData(Collection<XMLEvent> record) {
+                    public XMLEventConsumer extraRecordData() {
+                        return null;
                     }
 
                     @Override
@@ -120,7 +169,7 @@ public class SRUClientTest {
                         logger.info("disconnect, request = " + request);
                     }
                 };
-                try {
+                try (SRUClient client = SRUClientFactory.newClient(clientName)) {
                     SearchRetrieveRequest request = client.newSearchRetrieveRequest()
                             .addListener(listener)
                             .setQuery(query)
@@ -130,8 +179,6 @@ public class SRUClientTest {
                     logger.info("http status = {}", response.httpStatus());
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
-                } finally {
-                    client.close();
                 }
             }
         }

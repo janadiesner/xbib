@@ -61,7 +61,6 @@ import java.util.Map;
 
 /**
  * Style sheet transformer
- *
  */
 public class StylesheetTransformer implements Closeable {
 
@@ -78,7 +77,7 @@ public class StylesheetTransformer implements Closeable {
     private Result result;
 
     public StylesheetTransformer() {
-        this((String[])null);
+        this((String[]) null);
     }
 
     public StylesheetTransformer(String... path) {
@@ -146,7 +145,7 @@ public class StylesheetTransformer implements Closeable {
         return this;
     }
 
-    public void transform()  throws TransformerException {
+    public void transform() throws TransformerException {
         if (source == null) {
             return;
         }

@@ -57,7 +57,6 @@ import static com.google.common.collect.Lists.newLinkedList;
 
 /**
  * URI resolver for Transformer
- *
  */
 public class TransformerURIResolver implements URIResolver {
 
@@ -84,8 +83,7 @@ public class TransformerURIResolver implements URIResolver {
     }
 
     /**
-     *
-     * @param href  An href attribute, which may be relative or absolute
+     * @param href An href attribute, which may be relative or absolute
      * @param base The base URI against which the first argument will be made absolute if the absolute URI is required
      * @return the souce
      * @throws TransformerException

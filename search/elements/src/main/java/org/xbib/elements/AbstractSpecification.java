@@ -261,7 +261,7 @@ public abstract class AbstractSpecification {
         return clazz;
     }
 
-    protected abstract Map addSpec(String value, Element element, Map map);
+    public abstract Map addSpec(String value, Element element, Map map);
 
     private Map<String,List<String>> elements;
 

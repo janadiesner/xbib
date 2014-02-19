@@ -35,12 +35,14 @@ import org.xbib.common.settings.Settings;
 import org.xbib.io.archivers.file.Finder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.metrics.MeterMetric;
 import org.xbib.pipeline.AbstractPipeline;
-import org.xbib.pipeline.MetricSimplePipelineExecutor;
+import org.xbib.pipeline.PipelineException;
+import org.xbib.pipeline.element.URIPipelineElement;
+import org.xbib.pipeline.simple.MetricSimplePipelineExecutor;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.PipelineRequest;
-import org.xbib.pipeline.element.CounterPipelineElement;
 import org.xbib.util.DurationFormatUtil;
 import org.xbib.util.FormatUtil;
 
@@ -51,16 +53,15 @@ import java.net.URI;
 import java.text.NumberFormat;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 
 public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline<T,R>>
-        extends AbstractPipeline<CounterPipelineElement> {
+        extends AbstractPipeline<URIPipelineElement, PipelineException> {
 
     private final static Logger logger = LoggerFactory.getLogger(Converter.class.getSimpleName());
 
-    private final static CounterPipelineElement counter = new CounterPipelineElement().set(new AtomicLong(0L));
+    private final static URIPipelineElement uriPipelineElement = new URIPipelineElement();
 
     protected Reader reader;
 
@@ -111,11 +112,11 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
             logger.info("preparing with settings {}", settings.getAsMap());
             prepare();
             logger.info("executing");
-            //metric pipeline executor only uses concurrency over different URIs
+            //metric pipeline setExecutor only uses concurrency over different URIs
             // in the input queue, not with a single URI input
             executor = new MetricSimplePipelineExecutor<T,R,P>()
-                    .concurrency(settings.getAsInt("concurrency", 1))
-                    .provider(pipelineProvider())
+                    .setConcurrency(settings.getAsInt("concurrency", 1))
+                    .setPipelineProvider(pipelineProvider())
                     .prepare()
                     .execute()
                     .waitFor();
@@ -145,31 +146,40 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
     }
 
     @Override
-    public CounterPipelineElement next() {
+    public URIPipelineElement next() {
         URI uri = input.poll();
         done = uri == null;
+        uriPipelineElement.set(uri);
         if (done) {
             logger.info("done is true");
-            return counter;
+            return uriPipelineElement;
         }
+        return uriPipelineElement;
+    }
+
+    @Override
+    public void newRequest(Pipeline<MeterMetric, URIPipelineElement> pipeline, URIPipelineElement request) {
         try {
-            process(uri);
-            counter.get().incrementAndGet();
+            process(request.get());
         } catch (Exception ex) {
             logger.error("error while getting next input: " + ex.getMessage(), ex);
         }
-        return counter;
+    }
+
+    @Override
+    public void error(Pipeline<MeterMetric, URIPipelineElement> pipeline, URIPipelineElement request, PipelineException error) {
+        logger.error(error.getMessage(), error);
     }
 
     protected void writeMetrics(Writer writer) throws Exception {
-        long docs = executor.getTotalCount();
-        long bytes = executor.getTotalSize();
+        long docs = executor.metric().count();
+        long bytes = 0L;
         long elapsed = executor.metric().elapsed() / 1000000;
         double dps = docs * 1000 / elapsed;
         double avg = bytes / (docs + 1); // avoid div by zero
         double mbps = (bytes * 1000 / elapsed) / (1024 * 1024) ;
         NumberFormat formatter = NumberFormat.getNumberInstance();
-        logger.info("Converter complete. {} inputs, {} docs, {} = {} ms, {} = {} bytes, {} = {} avg size, {} dps, {} MB/s",
+        logger.info("Converter complete. {} inputs, {} docs, {} = {} ms, {} = {} bytes, {} = {} avg getSize, {} dps, {} MB/s",
                 input.size(),
                 docs,
                 DurationFormatUtil.formatDurationWords(elapsed, true, true),
@@ -181,7 +191,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
                 formatter.format(dps),
                 formatter.format(mbps));
         if (writer != null) {
-            String metrics = String.format("Converter complete. %d inputs, %d docs, %s = %d ms, %d = %s bytes, %s = %s avg size, %s dps, %s MB/s",
+            String metrics = String.format("Converter complete. %d inputs, %d docs, %s = %d ms, %d = %s bytes, %s = %s avg getSize, %s dps, %s MB/s",
                     input.size(),
                     docs,
                     DurationFormatUtil.formatDurationWords(elapsed, true, true),

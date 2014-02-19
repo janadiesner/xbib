@@ -1,6 +1,8 @@
 
 package org.xbib.pipeline;
 
+import org.xbib.metrics.MeterMetric;
+
 import java.io.Closeable;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
@@ -8,36 +10,17 @@ import java.util.concurrent.Callable;
 /**
  * A pipeline.
  *
- * @param <T> the result parameter
- * @param <R> the request parameter
+ * @param <T> the pipeline result type
+ * @param <R> the pipeline request type
  */
-public interface Pipeline<T,R extends PipelineRequest> extends Callable<T>, Closeable, Iterator<R>  {
+public interface Pipeline<T,R extends PipelineRequest>
+        extends Callable<T>, Closeable, Iterator<R> {
 
     /**
-     * Add a listener to the pipeline. The listener is called each time
-     * this pipeline processes a new request.
-     * @param name the listener name
-     * @param listener the listener
-     * @return this pipeline
-     */
-    Pipeline<T,R> addLast(String name, PipelineListener<T,R> listener);
-
-    /**
-     * Set the executor of this pipeline.
+     * Return the pipeline metric.
      *
-     * @param executor the executor
-     * @return this pipeline
+     * @return the pipeline metric
      */
-    Pipeline<T,R> executor(PipelineExecutor<Pipeline<T,R>> executor);
-
-    Long count();
-
-    Long size();
-
-    Long startedAt();
-
-    Long stoppedAt();
-
-    Long took();
+    MeterMetric getMetric();
 
 }

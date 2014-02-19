@@ -45,7 +45,7 @@ public class MARCSpecification extends AbstractSpecification {
 
     private String value;
 
-    protected Map addSpec(String value, Element element, Map map) {
+    public Map addSpec(String value, Element element, Map map) {
         this.value = value;
         int pos = value.indexOf('$');
         String h = pos > 0 ? value.substring(0,pos) : null;

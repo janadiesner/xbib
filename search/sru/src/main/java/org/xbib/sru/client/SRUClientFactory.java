@@ -38,10 +38,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
-import java.util.WeakHashMap;
 
 /**
  *  A factory for SRU clients
@@ -52,39 +50,19 @@ public final class SRUClientFactory {
 
     private final static Logger logger = LoggerFactory.getLogger(SRUClientFactory.class.getName());
 
-    private final static Map<URI, SRUClient> clients = new WeakHashMap();
-
     private SRUClientFactory() {
-        ServiceLoader<SRUClient> loader = ServiceLoader.load(SRUClient.class);
-        Iterator<SRUClient> iterator = loader.iterator();
-        while (iterator.hasNext()) {
-            SRUClient client = iterator.next();
-            if (!clients.containsKey(client.getClientIdentifier())) {
-                clients.put(client.getClientIdentifier(), client);
-            }
-        }
     }
 
     public static SRUClientFactory getInstance() {
         return instance;
     }
 
-    public static SRUClient getDefaultClient() {
-        return clients.isEmpty() ? null : clients.entrySet().iterator().next().getValue();
-    }
-
-    public static SRUClient newClient(URI uri) {
-        if (clients.containsKey(uri)) {
-            return clients.get(uri);
-        } else {
-            try {
-                SRUClient client = new DefaultSRUClient(uri);
-                clients.put(uri, client);
-                return client;
-            } catch (IOException ex) {
-                logger.error(ex.getMessage(), ex);
-                return null;
-            }
+    public static SRUClient newClient() {
+        try {
+            return new DefaultSRUClient();
+        } catch (IOException ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
         }
     }
 
@@ -98,24 +76,11 @@ public final class SRUClientFactory {
             if (in == null || properties.isEmpty()) {
                 throw new IllegalArgumentException("SRU client " + name + " properties not found");
             }
-            PropertiesSRUClient client = new PropertiesSRUClient(properties);
-            clients.put(client.getClientIdentifier(), client);
-            return client;
+            return new PropertiesSRUClient(properties);
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
             return null;
         }
-    }
-
-    public static void shutdown() {
-        for (SRUClient client : clients.values()) {
-            try {
-                client.close();
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-
     }
 
 }

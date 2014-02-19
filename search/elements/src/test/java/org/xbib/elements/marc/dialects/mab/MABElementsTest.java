@@ -76,7 +76,7 @@ public class MABElementsTest {
         mapper.close();
     }
 
-    @Test
+
     public void testZDBMABElements() throws Exception {
         InputStream in =  InputService.getInputStream(URI.create("file:src/test/resources/org/xbib/elements/marc/dialects/mab/1217zdbtit.dat"));
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "x-MAB"));

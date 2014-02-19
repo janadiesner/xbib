@@ -9,7 +9,7 @@ import org.xbib.elements.marc.dialects.mab.MABElementBuilderFactory;
 import org.xbib.elements.marc.dialects.mab.MABElementMapper;
 import org.xbib.elements.ElementOutput;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.SimplePipelineExecutor;
+import org.xbib.pipeline.simple.SimplePipelineExecutor;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.rdf.Resource;
@@ -27,8 +27,8 @@ public class ConcurrentMABTarReaderTest {
      */
     public void testMABTarImport() throws Exception {
         new SimplePipelineExecutor()
-                .concurrency(Runtime.getRuntime().availableProcessors())
-                .provider(new PipelineProvider() {
+                .setConcurrency(Runtime.getRuntime().availableProcessors())
+                .setPipelineProvider(new PipelineProvider() {
 
                     @Override
                     public Pipeline get() {

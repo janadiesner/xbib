@@ -3897,11 +3897,11 @@
     "Skip" : {
         "values" : [
         /*  Control Number Identifier */
-        "003$",
+        "003",
         /* Date and Time of Latest Transaction */
-        "005$",
+        "005",
         /*Fixed-Length Data Elements - Additional Material Characteristics  */
-        "006$",
+        "006",
         /* ??? */
         "012$5$3$",
         /* 040 = cataloging source */

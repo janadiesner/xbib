@@ -37,7 +37,9 @@ import java.io.Writer;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.util.XMLEventConsumer;
 import javax.xml.transform.TransformerException;
 
 import org.xbib.io.Request;
@@ -49,24 +51,23 @@ import org.xbib.sru.DefaultSRUResponse;
 import org.xbib.sru.SRUResponse;
 import org.xbib.sru.SRUVersion;
 import org.xbib.text.Normalizer;
-import org.xbib.xml.XMLFilterReader;
 import org.xbib.xml.transform.StylesheetTransformer;
 import org.xml.sax.InputSource;
+
+import static com.google.common.collect.Lists.newLinkedList;
 
 /**
  * SearchRetrieve response
  *
  */
 public class SearchRetrieveResponse extends DefaultSRUResponse
-        implements SRUResponse, SearchRetrieveListener, HttpResponseListener {
+        implements SRUResponse, SearchRetrieveListener, HttpResponseListener, XMLEventConsumer {
 
     private final Logger logger = LoggerFactory.getLogger(SearchRetrieveResponse.class.getName());
 
     private final SearchRetrieveRequest request;
 
     private URI origin;
-
-    private Collection<XMLEvent> events;
 
     private HttpResponse httpResponse;
 
@@ -164,10 +165,14 @@ public class SearchRetrieveResponse extends DefaultSRUResponse
     }
 
     @Override
-    public void recordData(Collection<XMLEvent> record) {
-        for (SearchRetrieveListener listener : this.request.getListeners()) {
-            listener.recordData(record);
-        }
+    public XMLEventConsumer recordData() {
+        return null;
+    }
+
+
+    @Override
+    public XMLEventConsumer extraRecordData() {
+        return null;
     }
 
     @Override
@@ -178,16 +183,19 @@ public class SearchRetrieveResponse extends DefaultSRUResponse
     }
 
     @Override
-    public void extraRecordData(Collection<XMLEvent> record) {
+    public void endRecord() {
         for (SearchRetrieveListener listener : this.request.getListeners()) {
-            listener.extraRecordData(record);
+            listener.endRecord();
         }
     }
 
     @Override
-    public void endRecord() {
+    public void add(XMLEvent event) throws XMLStreamException {
         for (SearchRetrieveListener listener : this.request.getListeners()) {
-            listener.endRecord();
+            XMLEventConsumer consumer = listener.recordData();
+            if (consumer != null) {
+                consumer.add(event);
+            }
         }
     }
     
@@ -202,14 +210,6 @@ public class SearchRetrieveResponse extends DefaultSRUResponse
 
     public boolean isEmpty() {
         return httpResponse != null && httpResponse.notfound();
-    }
-    
-    public void setEvents(Collection<XMLEvent> events) {
-        this.events = events;
-    }
-    
-    public Collection<XMLEvent> getEvents() {
-        return events;
     }
 
     @Override
@@ -230,7 +230,11 @@ public class SearchRetrieveResponse extends DefaultSRUResponse
         getTransformer().addParameter("recordSchema", request.getRecordSchema());
 
         try {
-            XMLFilterReader reader = new SearchRetrieveFilterReader(request);
+            SearchRetrieveFilterReader reader = new SearchRetrieveFilterReader(request);
+            for (SearchRetrieveListener listener : this.request.getListeners()) {
+                reader.addRecordDataConsumer(listener.recordData());
+                reader.addExtraRecordDataConsumer(listener.extraRecordData());
+            }
             // TODO normalization should be configurable
             String s = sb.toString();
             InputSource source = new InputSource(new StringReader(Normalizer.normalize(s, Normalizer.Form.C)));
@@ -251,5 +255,6 @@ public class SearchRetrieveResponse extends DefaultSRUResponse
         }
         return this;
     }
+
 }
 

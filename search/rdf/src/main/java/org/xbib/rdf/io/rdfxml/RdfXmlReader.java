@@ -42,8 +42,6 @@ import java.util.Map;
 import java.util.Stack;
 import org.xbib.iri.IRI;
 import org.xbib.iri.IRISyntaxException;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
@@ -58,7 +56,6 @@ import org.xbib.rdf.io.xml.XmlTriplifier;
 import org.xbib.rdf.IdentifiableNode;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleTriple;
-import org.xbib.xml.XMLFilterReader;
 import org.xbib.xml.XMLUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -80,8 +77,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class RdfXmlReader<S extends Identifier, P extends Property, O extends Node>
         implements RDF, XmlTriplifier<S,P,O> {
-
-    private final Logger logger = LoggerFactory.getLogger(RdfXmlReader.class.getName());
 
     private final SimpleFactory<S,P,O> simpleFactory = SimpleFactory.getInstance();
 
@@ -115,14 +110,6 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
 
     @Override
     public RdfXmlReader parse(XMLReader reader, InputSource source) throws IOException, SAXException {
-        xmlHandler.setListener(listener);
-        reader.setContentHandler(xmlHandler);
-        reader.parse(source);
-        return this;
-    }
-
-    @Override
-    public RdfXmlReader parse(XMLFilterReader reader, InputSource source) throws IOException, SAXException {
         xmlHandler.setListener(listener);
         reader.setContentHandler(xmlHandler);
         reader.parse(source);

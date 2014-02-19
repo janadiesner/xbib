@@ -33,7 +33,6 @@ package org.xbib.elasticsearch;
 
 import java.io.IOException;
 
-import org.elasticsearch.common.bytes.BytesArray;
 import org.xbib.elasticsearch.support.client.Feeder;
 import org.xbib.elements.CountableElementOutput;
 import org.xbib.rdf.Resource;
@@ -70,7 +69,7 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
             if (id == null) {
                 throw new IOException("id must not be null, no fragment set in IRI?");
             }
-            feeder.index(index, type, id, new BytesArray(source));
+            feeder.index(index, type, id, source);
         }
 
         @Override

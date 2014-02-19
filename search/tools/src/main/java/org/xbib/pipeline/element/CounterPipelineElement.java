@@ -1,31 +1,25 @@
 package org.xbib.pipeline.element;
 
+import org.xbib.metrics.CounterMetric;
 import org.xbib.pipeline.PipelineRequest;
 
-import java.util.concurrent.atomic.AtomicLong;
+public class CounterPipelineElement implements PipelineElement<CounterMetric>, PipelineRequest {
 
-public class CounterPipelineElement implements PipelineElement<AtomicLong>, PipelineRequest {
-
-    private AtomicLong l;
+    private CounterMetric metric;
 
     @Override
-    public AtomicLong get() {
-        return l;
+    public CounterMetric get() {
+        return metric;
     }
 
     @Override
-    public CounterPipelineElement set(AtomicLong atomicLong) {
-        this.l = atomicLong;
+    public CounterPipelineElement set(CounterMetric metric) {
+        this.metric = metric;
         return this;
     }
 
     @Override
-    public Long size() {
-        return l.longValue();
-    }
-
-    @Override
     public String toString() {
-        return l.toString();
+        return metric.toString();
     }
 }

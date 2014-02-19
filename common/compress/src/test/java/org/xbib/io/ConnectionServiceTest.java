@@ -12,12 +12,6 @@ import org.testng.annotations.Test;
  */
 public class ConnectionServiceTest {
 
-    public void testNullFile() throws URISyntaxException, IOException {
-        ConnectionService.getInstance()
-                .getConnectionFactory(URI.create("file:dummy"))
-                .getConnection((URI) null);
-    }
-
     @Test
     public void testFileTmp() throws Exception {
         ConnectionService.getInstance()

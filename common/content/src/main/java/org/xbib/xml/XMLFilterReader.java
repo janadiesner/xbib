@@ -31,8 +31,6 @@
  */
 package org.xbib.xml;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
@@ -46,13 +44,10 @@ import java.io.IOException;
 
 /**
  * A XML reader which is also a filter.
- *
+ * <p/>
  * Does evaluate namespaces and does not validate or import external entities or document type definitions.
- *
  */
 public class XMLFilterReader extends XMLFilterImpl {
-
-    private final Logger logger = LoggerFactory.getLogger(XMLFilterReader.class.getName());
 
     private final static String PARSERFACTORY = "org.apache.xerces.jaxp.SAXParserFactoryImpl";
 
@@ -60,8 +55,6 @@ public class XMLFilterReader extends XMLFilterImpl {
             SAXParserFactory.newInstance(PARSERFACTORY, null);
 
     private SAXParser parser;
-
-    private XMLFilterBridge bridge;
 
     public XMLFilterReader() {
         try {
@@ -73,29 +66,28 @@ public class XMLFilterReader extends XMLFilterImpl {
             parserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
             parserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             parser = parserFactory.newSAXParser();
-        } catch (ParserConfigurationException | SAXException  e) {
-            logger.warn(e.getMessage(), e);
+        } catch (ParserConfigurationException | SAXException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
     /**
      * Saxon uses setFeature, so we override it here, otherwise XmlFilterImpl will bark.
      *
-     * @param name
-     * @param value
+     * @param name the name
+     * @param value the value
      * @throws org.xml.sax.SAXNotRecognizedException
      * @throws org.xml.sax.SAXNotSupportedException
      */
     @Override
-    public void setFeature (String name, boolean value)
+    public void setFeature(String name, boolean value)
             throws SAXNotRecognizedException, SAXNotSupportedException {
         // accept all setFeature calls, but do nothing
     }
 
     @Override
     public void parse(InputSource input) throws SAXException, IOException {
-        this.bridge = getBridge();
-        parser.parse(input, bridge);
+        parser.parse(input, getBridge());
     }
 
     protected XMLFilterBridge getBridge() {

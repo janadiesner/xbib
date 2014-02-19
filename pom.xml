@@ -5,7 +5,7 @@
 
     <groupId>org.xbib</groupId>
     <artifactId>xbib</artifactId>
-    <version>1.0.0.Beta1</version>
+    <version>1.0.0.Beta2</version>
 
     <packaging>pom</packaging>
 
@@ -127,7 +127,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.15</version>
+                    <version>2.16</version>
                     <configuration>
                         <skip>false</skip>
                         <systemPropertyVariables>
@@ -135,7 +135,8 @@
                         </systemPropertyVariables>
                         <reportFormat>plain</reportFormat>
                         <disableXmlReport>false</disableXmlReport>
-                        <forkMode>once</forkMode>
+                        <forkCount>1</forkCount>
+                        <reuseForks>false</reuseForks>
                         <useSystemClassLoader>false</useSystemClassLoader>
                         <argLine>-Dfile.encoding=UTF-8</argLine>
                     </configuration>
@@ -210,7 +211,18 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.1.1</version>
+                    <version>2.3</version>
+                    <configuration>
+                        <failOnMissingWebXml>false</failOnMissingWebXml>
+                        <webResources>
+                            <resource>
+                                <directory>${basedir}/src/main/webapp/WEB-INF</directory>
+                                <filtering>true</filtering>
+                                <include>jboss-web.xml</include>
+                                <targetPath>/WEB-INF</targetPath>
+                            </resource>
+                        </webResources>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
@@ -238,7 +250,12 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>javacc-maven-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>2.6</version>                    
+                </plugin>
+                <plugin>
+                    <groupId>org.wildfly.plugins</groupId>
+                    <artifactId>wildfly-maven-plugin</artifactId>
+                    <version>1.0.0.Beta1</version>                
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -405,18 +422,18 @@
             </dependency>
             <dependency>
                 <groupId>org.xbib</groupId>
-                <artifactId>mapdb</artifactId>
+                <artifactId>handlebars</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.xbib</groupId>
-                <artifactId>handlebars</artifactId>
+                <artifactId>io</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.xbib.elasticsearch.plugin</groupId>
                 <artifactId>elasticsearch-support</artifactId>
-                <version>1.0.0.RC2.2</version>
+                <version>1.0.0.1</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -426,42 +443,42 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.2.0</version>
+                <version>2.3.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.2.0</version>
+                <version>2.3.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.2.0</version>
+                <version>2.3.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-smile</artifactId>
-                <version>2.2.0</version>
+                <version>2.3.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-yaml</artifactId>
-                <version>2.2.0</version>
+                <version>2.3.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-xml</artifactId>
-                <version>2.2.0</version>
+                <version>2.3.1</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
                 <artifactId>woodstox-core-asl</artifactId>
-                <version>4.1.4</version>
+                <version>4.2.0</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
-                <version>4.0.13.Final</version>
+                <version>4.0.15.Final</version>
             </dependency>
             <dependency>
                 <groupId>joda-time</groupId>
@@ -612,11 +629,14 @@
         <module>common/content</module>
         <module>common/iso2709</module>
         <module>common/jacc</module>
-        <module>common/io</module>
         <module>common/dict</module>
-        <module>common/stream</module>
-        <module>common/mapdb</module>
         <module>common/handlebars</module>
+
+        <module>common/io</module>
+        <module>common/io/http</module>
+        <module>common/io/ftp</module>
+        <module>common/io/rsync</module>
+        <module>common/io/jdbc</module>
 
         <module>search/grouping</module>
         <module>search/standardnumber</module>
@@ -628,11 +648,13 @@
         <module>search/oai</module>
         <module>search/iso23950</module>
         <module>search/opensearch</module>
-        <module>search/federator</module>
-        <module>search/router</module>
         <module>search/tools</module>
 
-    </modules>
+        <module>search/web/federator</module>
+        <module>search/web/router</module>
+        <module>search/web/sru</module>
+        <module>search/web/oai</module>
 
+    </modules>
 
 </project>

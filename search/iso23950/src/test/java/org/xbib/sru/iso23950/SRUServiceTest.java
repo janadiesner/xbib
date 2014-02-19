@@ -36,9 +36,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.util.XMLEventConsumer;
 
 import org.testng.annotations.Test;
 
@@ -108,19 +106,13 @@ public class SRUServiceTest {
                             logger.info("got recordPosition=" + recordPosition);
                         }
                         @Override
-                        public void recordData(Collection<XMLEvent> record) {
-                            Iterator iterator = record.iterator();
-                            while (iterator.hasNext()) {
-                                logger.info("recordData = " + iterator.next());
-                            }
+                        public XMLEventConsumer recordData() {
+                            return null;
                         }
 
                         @Override
-                        public void extraRecordData(Collection<XMLEvent> record) {
-                            Iterator iterator = record.iterator();
-                            while (iterator.hasNext()) {
-                                logger.info("extraRecordData = " + iterator.next());
-                            }
+                        public XMLEventConsumer extraRecordData() {
+                            return null;
                         }
 
                         @Override
