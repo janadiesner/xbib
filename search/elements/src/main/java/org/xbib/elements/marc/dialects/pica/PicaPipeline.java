@@ -31,7 +31,7 @@
  */
 package org.xbib.elements.marc.dialects.pica;
 
-import org.xbib.elements.AbstractSpecification;
+import org.xbib.elements.Specification;
 import org.xbib.elements.marc.SubfieldValueMapper;
 import org.xbib.elements.ElementBuilderFactory;
 import org.xbib.elements.KeyValuePipeline;
@@ -51,7 +51,7 @@ public class PicaPipeline extends KeyValuePipeline<FieldCollection, String, Pica
     private final Logger logger = LoggerFactory.getLogger(PicaPipeline.class.getName());
 
     public PicaPipeline(int i,
-                        AbstractSpecification specification,
+                        Specification specification,
                         BlockingQueue<List<KeyValue>> queue,
                         Map map,
                         ElementBuilderFactory<FieldCollection, String, PicaElement, PicaContext> factory) {

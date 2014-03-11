@@ -1,8 +1,6 @@
 
 package org.xbib.io.compress.lzf;
 
-import org.xbib.io.compress.BufferRecycler;
-
 import java.io.IOException;
 import java.io.InputStream;
 

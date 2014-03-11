@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.io.BytesReference;
 import org.xbib.common.xcontent.XContentGenerator;
 import org.xbib.common.xcontent.XContentHelper;
@@ -177,6 +179,11 @@ public class JsonXContentGenerator implements XContentGenerator {
         generator.writeRaw("\" : ");
         flush();
         copy(content, bos);
+    }
+
+    public void copy(XContentBuilder builder, OutputStream bos) throws IOException {
+        flush();
+        builder.bytes().writeTo(bos);
     }
 
     public static final int BUFFER_SIZE = 1024 * 8;

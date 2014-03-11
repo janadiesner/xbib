@@ -31,7 +31,9 @@
             "008$H$ad",
             "008$H$adef",
             "008$H$bdef",
-            "008$H$def"
+            "008$H$def",
+            "008$H$cde",
+            "008$H$ce"
         ],
         "subfields" : {
             "a" : "identifierAuthorityBIK",
@@ -170,7 +172,28 @@
             "032$P$2bdepz",
             "032$P$2bdfgp",
             "032$P$2befgp",
-            "032$P$abdef"
+            "032$P$abdef",
+            "032$P$23abdefinopz",
+            "032$P$23abdehip",
+            "032$P$23abeip",
+            "032$P$2abdefhijklnop",
+            "032$P$2abdefhijnop",
+            "032$P$2abdefhiklnop",
+            "032$P$2abdefhinop",
+            "032$P$2abdefhklp",
+            "032$P$2abdefijklnop",
+            "032$P$2abdefijklnopz",
+            "032$P$2abdefijnop",
+            "032$P$2abdefiklnop",
+            "032$P$2abdefinop",
+            "032$P$2abdefinopz",
+            "032$P$2abdefiop",
+            "032$P$2abdefjnop",
+            "032$P$2abdefklpz",
+            "032$P$2abdefnop",
+            "032$P$2abdehpz",
+            "032$P$2bdefghpz",
+            "032$P$2bdefgnp"
         ],
         "_predicate" : "LocationTypeResidence",
         "subfields" : {
@@ -214,7 +237,11 @@
             "035$I$abcdefg",
             "035$I$abde",
             "035$I$abe",
-            "035$I$ade"
+            "035$I$ade",
+            "035$I$acd",
+            "035$I$ad",
+            "035$I$aef",
+            "035$I$d"
         ],
         "subfields" : {
             "a" : "libraryServiceRegion",
@@ -252,7 +279,8 @@
         "values" : [
             "035$L$ab",
             "035$L$abcd",
-            "035$L$abd"
+            "035$L$abd",
+            "035$L$ad"
         ],
         "subfields" : {
             "a" : "libraryServiceExtensionCode",
@@ -337,7 +365,10 @@
     },
     "MediaTransport" : {
         "values" : [
-            "035$O$abcd"
+            "035$O$abcd",
+            "035$O$abd",
+            "035$O$acd",
+            "035$O$bd"
         ],
         "subfields" : {
             "a" : "mediaTransportType",
@@ -380,7 +411,15 @@
             "035$B$acghi",
             "035$B$acghik",
             "035$B$ackl",
-            "035$B$acdefkl"
+            "035$B$acdefkl",
+            "035$B$abcdefghijk",
+            "035$B$abcdefghijkl",
+            "035$B$abcdefghikl",
+            "035$B$abcdefl",
+            "035$B$abcghik",
+            "035$B$acdefgk",
+            "035$B$acdefhi",
+            "035$B$acdfk"
         ],
         "_predicate" : "code",
         "subfields" : {
@@ -475,7 +514,15 @@
             "035$E$afghi",
             "035$E$afghk",
             "035$E$afgk",
-            "035$E$ak"
+            "035$E$ak",
+            "035$E$abcdf",
+            "035$E$abcefk",
+            "035$E$abcf",
+            "035$E$abefghi",
+            "035$E$abfgi",
+            "035$E$adfgh",
+            "035$E$adfghi",
+            "035$E$afk"
         ],
         "subfields" : {
             "a" : "organizationState",
@@ -566,7 +613,8 @@
             "035$P$acdegi",
             "035$P$acdghi",
             "035$P$acdgi",
-            "035$P$adei"
+            "035$P$adei",
+            "035$P$adfgi"
          ],
          "subfields" : {
             "a" : "productContent",

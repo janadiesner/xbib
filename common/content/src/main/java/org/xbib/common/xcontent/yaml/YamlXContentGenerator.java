@@ -25,7 +25,7 @@ public class YamlXContentGenerator extends JsonXContentGenerator {
     
     public void writeRawField(String fieldName, InputStream content, OutputStream bos) throws IOException {
         writeFieldName(fieldName);
-        YAMLParser parser = YamlXContent.yamlFactory.createJsonParser(content);
+        YAMLParser parser = YamlXContent.yamlFactory.createParser(content);
         try {
             parser.nextToken();
             generator.copyCurrentStructure(parser);
@@ -37,7 +37,7 @@ public class YamlXContentGenerator extends JsonXContentGenerator {
     
     public void writeRawField(String fieldName, byte[] content, OutputStream bos) throws IOException {
         writeFieldName(fieldName);
-        YAMLParser parser = YamlXContent.yamlFactory.createJsonParser(content);
+        YAMLParser parser = YamlXContent.yamlFactory.createParser(content);
         try {
             parser.nextToken();
             generator.copyCurrentStructure(parser);
@@ -51,9 +51,9 @@ public class YamlXContentGenerator extends JsonXContentGenerator {
         writeFieldName(fieldName);
         YAMLParser parser;
         if (content.hasArray()) {
-            parser = YamlXContent.yamlFactory.createJsonParser(content.array(), content.arrayOffset(), content.length());
+            parser = YamlXContent.yamlFactory.createParser(content.array(), content.arrayOffset(), content.length());
         } else {
-            parser = YamlXContent.yamlFactory.createJsonParser(content.streamInput());
+            parser = YamlXContent.yamlFactory.createParser(content.streamInput());
         }
         try {
             parser.nextToken();
@@ -66,7 +66,7 @@ public class YamlXContentGenerator extends JsonXContentGenerator {
     
     public void writeRawField(String fieldName, byte[] content, int offset, int length, OutputStream bos) throws IOException {
         writeFieldName(fieldName);
-        YAMLParser parser = YamlXContent.yamlFactory.createJsonParser(content, offset, length);
+        YAMLParser parser = YamlXContent.yamlFactory.createParser(content, offset, length);
         try {
             parser.nextToken();
             generator.copyCurrentStructure(parser);

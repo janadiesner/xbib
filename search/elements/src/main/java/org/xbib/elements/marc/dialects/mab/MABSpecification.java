@@ -33,18 +33,70 @@ package org.xbib.elements.marc.dialects.mab;
 
 import org.xbib.elements.AbstractSpecification;
 import org.xbib.elements.Element;
+import org.xbib.elements.marc.MARCSpecification;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * MAB specification for field collection descriptions.
  *
+ * There are specific fields with periodic specifications.
+ *
+ * 100-199 Personenname, Periode 4, Anzahl 25
+ * 200-299 Körperschaftsname, Periode 4, Anzahl 25
+ * 340-355 Parallelsachtitel in Ansetzungsform, Periode 4, Anzahl 4
+ * 410-419 Verlag, Periode 5, Anzahl 2
+ * 451-500 Gesamttitel, Periode 10, Anzahl 5
+ * 621-632 Gesamttitel Sekundärform, Periode 6, Anzahl 2
+ * 800-829 NE Periode 6, Anzahl 5
+ * 900-949 SW-Ketten Periode 5, Anzahl 10
  */
-public class MABSpecification extends AbstractSpecification {
+public class MABSpecification extends MARCSpecification {
+
+    private Periodic[] periodicfields = new Periodic[] {
+            new Periodic(100, 4, 25),
+            new Periodic(200, 4, 25),
+            new Periodic(340, 4, 4),
+            new Periodic(410, 5, 2),
+            new Periodic(451, 10, 5),
+            new Periodic(621, 6, 2),
+            new Periodic(800, 6, 5),
+            new Periodic(900, 5, 10),
+            new Periodic(950, 5, 10, -50) // custom subject forms in 950-999 should be treated like 900-949
+    };
 
     public Map addSpec(String value, Element element, Map map) {
+        this.value = value;
+        int pos = value.indexOf('$');
+        String h = pos > 0 ? value.substring(0,pos) : null;
+        String t = pos > 0 ? value.substring(pos+1) : value;
+        if (h == null) {
+            addSpec(null, t, element, map);
+            return map;
+        }
+        // Periodic fields are expanded here. Just the base fields needs to be specified.
+        char[] ch = h.toCharArray();
+        if (ch.length == 3 && ch[0] >= '0' && ch[0] <= '9' && ch[1] >= '0' && ch[1] <= '9' && ch[2] >= '0' && ch[2] <= '9') {
+            Integer i = Integer.parseInt(h); // safe!
+            for (Periodic p : periodicfields) {
+                if (p.inPeriod(i)) {
+                    List<Integer> list = p.spanPeriods(i);
+                    for (Integer j : list) {
+                        addSpec(Integer.toString(j), t, element, map);
+                    }
+                }
+            }
+        } else {
+            addSpec(h, t, element, map);
+        }
+        return map;
+    }
+
+
+    /*public Map addSpec(String value, Element element, Map map) {
         int pos = value.indexOf('[');
         if (pos >= 0) {
             // list
@@ -92,6 +144,6 @@ public class MABSpecification extends AbstractSpecification {
             }
         }
         return map;
-    }
+    }*/
 
 }

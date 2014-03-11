@@ -66,7 +66,7 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
 
     private final Logger logger = LoggerFactory.getLogger(AbstractElementMapper.class.getName());
 
-    protected AbstractSpecification specification;
+    protected Specification specification;
 
     protected final BlockingQueue<List<KeyValue>> queue;
 
@@ -193,12 +193,14 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
     /**
      * Helper method for diagnosing unknown keys.
      *
-     * @return
+     * @return a printable set of unknown keys
      */
     public Set<String> unknownKeys() {
-        Set<String> unknownKeys = new TreeSet();
+        Set<String> unknownKeys = new TreeSet<String>();
         for (KeyValuePipeline p : pipelines()) {
-            unknownKeys.addAll(p.unknownKeys);
+            for (Object s : p.unknownKeys) {
+                unknownKeys.add("\"" + s + "\"");
+            }
         }
         return unknownKeys;
     }

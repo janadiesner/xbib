@@ -52,5 +52,7 @@ public class RecordIdentifier extends MARCElement {
             predicate = (String) getSettings().get("_predicate");
         }
         builder.context().resource().add(predicate, value);
+        builder.context().recordNumber(value);
     }
+
 }

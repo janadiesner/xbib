@@ -74,7 +74,6 @@ public class PQFZAction extends AbstractAction {
                     //.setElementSetName(elementSetName)
                     .setFrom(from)
                     .setSize(size);
-            response.setOrigin(service.getURI());
             /*service.setRecordIdentifierSetter(new RecordIdentifierSetter() {
 
                 @Override

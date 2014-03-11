@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class IdentifyResponse extends DefaultOAIResponse<IdentifyResponse> {
+public class IdentifyResponse extends DefaultOAIResponse {
 
     private IdentifyRequest request;
 
@@ -73,7 +73,6 @@ public class IdentifyResponse extends DefaultOAIResponse<IdentifyResponse> {
     public IdentifyResponse to(Writer writer) throws IOException {
         return this;
     }
-
 
     public void setRepositoryName(String repositoryName) {
         this.repositoryName = repositoryName;

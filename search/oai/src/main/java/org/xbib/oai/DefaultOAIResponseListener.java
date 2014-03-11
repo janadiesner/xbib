@@ -42,7 +42,7 @@ import java.io.Reader;
 import java.io.StringReader;
 
 public class DefaultOAIResponseListener<Response extends OAIResponse>
-        extends NettyHttpResponseListener implements OAIResponseListener<Response> {
+        extends NettyHttpResponseListener implements OAIResponseListener {
 
     private final Logger logger = LoggerFactory.getLogger(DefaultOAIResponseListener.class.getName());
 
@@ -88,11 +88,15 @@ public class DefaultOAIResponseListener<Response extends OAIResponse>
         if (result.getThrowable() != null) {
             throw new IOException(result.getThrowable());
         }
-        logger.info("got status = {}, content type = {}", result.getStatusCode(), result.getContentType());
+        logger.debug("got response: status = {}, headers = {}, body = {}",
+                result.getStatusCode(),
+                result.getHeaders(),
+                sb.toString()
+        );
         if (!result.getContentType().endsWith("xml")) {
             logger.warn("got non-XML body {}", result);
         }
-        response.setReader(getBodyReader());
+        //response.setReader(getBodyReader());
     }
 
     @Override
@@ -112,11 +116,6 @@ public class DefaultOAIResponseListener<Response extends OAIResponse>
     public void onError(Request request, CharSequence errorMessage) throws IOException {
         logger.error("received error {}", errorMessage);
         this.failure = true;
-        this.response.setThrowable(new IOException(errorMessage.toString()));
-    }
-
-    protected Reader getBodyReader() {
-        return new StringReader(sb.toString());
     }
 
 }

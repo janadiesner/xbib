@@ -33,7 +33,7 @@ package org.xbib.oai.formats;
 
 import org.xbib.oai.DefaultOAIResponse;
 
-public class ListMetadataFormatsResponse extends DefaultOAIResponse<ListMetadataFormatsResponse> {
+public class ListMetadataFormatsResponse extends DefaultOAIResponse {
 
     public ListMetadataFormatsResponse(ListMetadataFormatsRequest request) {
         super(request);

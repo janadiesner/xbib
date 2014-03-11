@@ -35,12 +35,12 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import org.testng.annotations.Test;
+import org.xbib.oai.listrecords.ListRecordsListener;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.oai.record.ListRecordsRequest;
-import org.xbib.oai.record.ListRecordsResponseListener;
+import org.xbib.oai.listrecords.ListRecordsRequest;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
@@ -151,19 +151,15 @@ public class DNBOAITest {
                 }
             };
             StringWriter sw = new StringWriter();
-            ListRecordsResponseListener listener = new ListRecordsResponseListener(request);
-            listener.register(metadataHandler);
+            request.addHandler(metadataHandler);
+            ListRecordsListener listener = new ListRecordsListener(request);
             try {
                 request.prepare().execute(listener).waitFor();
-                if (listener.isFailure()) {
-                    request = null;
-                } else {
-                    if (listener.getResponse() != null) {
-                        listener.getResponse().to(sw);
-                        logger.info("response = {}", sw);
-                    }
-                    request = client.resume(request, listener.getResumptionToken());
+                if (listener.getResponse() != null) {
+                    listener.getResponse().to(sw);
+                    logger.info("response = {}", sw);
                 }
+                request = client.resume(request, listener.getResumptionToken());
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 request = null;

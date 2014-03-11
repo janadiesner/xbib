@@ -40,9 +40,6 @@ public class Country extends MABElement {
 
     private final static MABElement element = new Country();
 
-    Country() {
-    }
-
     public static MABElement getInstance() {
         return element;
     }

@@ -49,7 +49,7 @@ import org.testng.annotations.Test;
 import org.xbib.elements.CountableElementOutput;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
-import org.xbib.marc.dialects.MABDisketteReader;
+import org.xbib.marc.dialects.mab.MABDisketteReader;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.xcontent.ContentBuilder;
 import org.xml.sax.InputSource;

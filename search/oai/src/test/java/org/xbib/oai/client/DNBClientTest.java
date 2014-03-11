@@ -33,16 +33,17 @@ package org.xbib.oai.client;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.testng.annotations.Test;
+import org.xbib.oai.listrecords.ListRecordsListener;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.identify.IdentifyRequest;
 import org.xbib.oai.identify.IdentifyResponseListener;
-import org.xbib.oai.record.ListRecordsRequest;
-import org.xbib.oai.record.ListRecordsResponseListener;
+import org.xbib.oai.listrecords.ListRecordsRequest;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.io.TripleListener;
@@ -95,16 +96,17 @@ public class DNBClientTest {
             }
         };
         reader.setTripleListener(triples);
+        final AtomicLong count = new AtomicLong(0L);
         MetadataHandler metadataHandler = new MetadataHandler() {
-
             @Override
             public void startDocument() throws SAXException {
-                logger.info("startDocument");
+                logger.debug("startDocument");
             }
 
             @Override
             public void endDocument() throws SAXException {
-                logger.info("endDocument");
+                count.incrementAndGet();
+                logger.debug("endDocument");
             }
 
             @Override
@@ -126,21 +128,20 @@ public class DNBClientTest {
             @Override
             public void characters(char[] chars, int pos, int len) throws SAXException {
             }
+
         };
-        FileWriter sw = new FileWriter("target/dnb-pica.xml");
+        FileWriter sw = new FileWriter("target/dnb-bib-pica.xml");
         do {
             try {
-                ListRecordsResponseListener listener = new ListRecordsResponseListener(request)
-                        .register(metadataHandler);
+                request.addHandler(metadataHandler);
+                ListRecordsListener listener = new ListRecordsListener(request);                        ;
                 request.prepare().execute(listener).waitFor();
-                if (listener.isFailure()) {
-                    request = null;
+                if (listener.getResponse() != null) {
+                    listener.getResponse().to(sw);
                 } else {
-                    if (listener.getResponse() != null) {
-                        listener.getResponse().to(sw);
-                    }
-                    request = client.resume(request, listener.getResumptionToken());
+                    logger.warn("no response in listener");
                 }
+                request = client.resume(request, listener.getResumptionToken());
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 request  = null;
@@ -148,6 +149,8 @@ public class DNBClientTest {
         } while (request != null);
         sw.close();
         client.close();
+
+        logger.info("count={}", count.get());
     }
 
 }

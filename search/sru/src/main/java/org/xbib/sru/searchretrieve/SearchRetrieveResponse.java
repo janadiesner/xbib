@@ -34,7 +34,6 @@ package org.xbib.sru.searchretrieve;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import javax.xml.stream.XMLStreamException;
@@ -54,8 +53,6 @@ import org.xbib.text.Normalizer;
 import org.xbib.xml.transform.StylesheetTransformer;
 import org.xml.sax.InputSource;
 
-import static com.google.common.collect.Lists.newLinkedList;
-
 /**
  * SearchRetrieve response
  *
@@ -66,8 +63,6 @@ public class SearchRetrieveResponse extends DefaultSRUResponse
     private final Logger logger = LoggerFactory.getLogger(SearchRetrieveResponse.class.getName());
 
     private final SearchRetrieveRequest request;
-
-    private URI origin;
 
     private HttpResponse httpResponse;
 
@@ -197,15 +192,6 @@ public class SearchRetrieveResponse extends DefaultSRUResponse
                 consumer.add(event);
             }
         }
-    }
-    
-    public SearchRetrieveResponse setOrigin(URI origin) {
-        this.origin = origin;
-        return this;
-    }
-
-    public URI getOrigin() {
-        return origin;
     }
 
     public boolean isEmpty() {

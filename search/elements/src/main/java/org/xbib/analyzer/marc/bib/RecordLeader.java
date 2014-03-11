@@ -61,6 +61,7 @@ public class RecordLeader extends MARCElement {
     @Override
     public void fields(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
                        FieldCollection fields, String value) {
+        builder.context().label(value);
         if (codes == null) {
             return;
         }

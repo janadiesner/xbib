@@ -38,12 +38,12 @@ import org.xbib.io.http.netty.NettyHttpSession;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIConstants;
-import org.xbib.oai.record.GetRecordRequest;
+import org.xbib.oai.getrecord.GetRecordRequest;
 import org.xbib.oai.identify.IdentifyRequest;
 import org.xbib.oai.identify.ListIdentifiersRequest;
 import org.xbib.oai.formats.ListMetadataFormatsRequest;
-import org.xbib.oai.record.ListRecordsRequest;
-import org.xbib.oai.set.ListSetsRequest;
+import org.xbib.oai.listrecords.ListRecordsRequest;
+import org.xbib.oai.listsets.ListSetsRequest;
 import org.xbib.oai.util.ResumptionToken;
 
 /**

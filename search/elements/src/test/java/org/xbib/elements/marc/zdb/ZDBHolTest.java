@@ -34,7 +34,6 @@ package org.xbib.elements.marc.zdb;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.elements.CountableElementOutput;
-import org.xbib.elements.ElementOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -66,7 +65,7 @@ public class ZDBHolTest extends Assert {
 
     @Test
     public void testZDBElements() throws Exception {
-        final ElementOutput out = new OurElementOutput();
+        final CountableElementOutput out = new OurElementOutput();
         final Charset UTF8 = Charset.forName("UTF-8");
         final Charset ISO88591 = Charset.forName("ISO-8859-1");
         final InputStream in =
@@ -80,7 +79,7 @@ public class ZDBHolTest extends Assert {
                     return builder;
                 }
             };
-            MARCElementMapper mapper = new MARCElementMapper("marc/hol")
+            MARCElementMapper mapper = new MARCElementMapper("marc/zdb/hol")
                     .detectUnknownKeys(true)
                     .start(factory);
             MarcXchange2KeyValue kv = new MarcXchange2KeyValue()

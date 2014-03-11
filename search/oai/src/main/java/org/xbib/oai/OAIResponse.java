@@ -31,21 +31,21 @@
  */
 package org.xbib.oai;
 
-import org.xbib.io.http.HttpResponse;
+import org.xbib.xml.transform.StylesheetTransformer;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 
 /**
  *  OAI response
- *
  */
-public interface OAIResponse<R extends OAIResponse> extends HttpResponse {
+public interface OAIResponse {
 
-    OAIRequest getRequest();
+    OAIResponse setOutputFormat(String format);
 
-    R setReader(Reader reader);
+    OAIResponse setStylesheetTransformer(StylesheetTransformer transformer);
 
-    R to(Writer writer) throws IOException;
+    OAIResponse setStylesheets(String... stylesheets);
+
+    OAIResponse to(Writer writer) throws IOException;
 }

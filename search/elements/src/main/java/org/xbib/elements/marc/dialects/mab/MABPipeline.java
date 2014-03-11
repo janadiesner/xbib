@@ -34,6 +34,7 @@ package org.xbib.elements.marc.dialects.mab;
 import org.xbib.elements.AbstractSpecification;
 import org.xbib.elements.ElementBuilderFactory;
 import org.xbib.elements.KeyValuePipeline;
+import org.xbib.elements.Specification;
 import org.xbib.elements.marc.SubfieldValueMapper;
 import org.xbib.elements.marc.TagValueMapper;
 import org.xbib.io.keyvalue.KeyValue;
@@ -55,7 +56,7 @@ public class MABPipeline extends KeyValuePipeline<FieldCollection, String, MABEl
     private final Logger logger = LoggerFactory.getLogger(MABPipeline.class.getName());
 
     public MABPipeline(int i,
-                       AbstractSpecification specification,
+                       Specification specification,
                        BlockingQueue<List<KeyValue>> queue,
                        Map map,
                        ElementBuilderFactory<FieldCollection, String, MABElement, MABContext> factory) {

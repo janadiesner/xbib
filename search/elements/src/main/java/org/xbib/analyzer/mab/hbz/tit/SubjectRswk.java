@@ -2,11 +2,11 @@ package org.xbib.analyzer.mab.hbz.tit;
 
 import org.xbib.elements.marc.dialects.mab.MABElement;
 
-public class SubjectRswk extends MABElement {
+public class SubjectRSWK extends MABElement {
 
-    private final static MABElement element = new SubjectRswk();
+    private final static MABElement element = new SubjectRSWK();
 
-    private SubjectRswk() {
+    private SubjectRSWK() {
     }
     
     public static MABElement getInstance() {

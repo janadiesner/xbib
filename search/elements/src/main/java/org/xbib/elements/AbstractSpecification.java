@@ -43,7 +43,6 @@ import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
-//import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,9 +55,8 @@ import static com.google.common.collect.Maps.newTreeMap;
 
 /**
  * Abstract specification
- *
  */
-public abstract class AbstractSpecification {
+public abstract class AbstractSpecification implements Specification {
 
     private final static Logger logger = LoggerFactory.getLogger(AbstractSpecification.class.getName());
 
@@ -180,6 +178,10 @@ public abstract class AbstractSpecification {
         return getElement(h, t, map);
     }
 
+    public Element getElementBySpec(String spec, Map map) {
+        return getElement(null, spec, map);
+    }
+
     private Element getElement(String head, String tail, Map map) {
         if (head == null) {
             return (Element)map.get(tail);
@@ -196,10 +198,6 @@ public abstract class AbstractSpecification {
         }
     }
 
-    public Element getElementByTag(String spec, Map map) {
-        return getElement(null, spec, map);
-    }
-
     private String getPackageFromPath(String path) {
         // some hackery ahead
         String packageName = path.replace('/', '.');
@@ -212,11 +210,11 @@ public abstract class AbstractSpecification {
         return packageName;
     }
 
-    public String getString(InputStream input, String encoding) throws IOException {
+    /*public String getString(InputStream input, String encoding) throws IOException {
         return getString(new InputStreamReader(input, encoding));
-    }
+    }*/
 
-    public String getString(Reader input) throws IOException {
+    private String getString(Reader input) throws IOException {
         StringWriter sw = new StringWriter();
         char[] buffer = new char[DEFAULT_BUFFER_SIZE];
         int n;
@@ -226,7 +224,7 @@ public abstract class AbstractSpecification {
         return sw.toString();
     }
 
-    public InputStream loadResource(ClassLoader cl, String resourcePath) {
+    private InputStream loadResource(ClassLoader cl, String resourcePath) {
         // load from root of jar
         InputStream in = cl.getResourceAsStream(resourcePath);
         if (in == null) {
@@ -240,7 +238,7 @@ public abstract class AbstractSpecification {
         return in;
     }
 
-    public Class loadClass(ClassLoader cl, String className) {
+    private Class loadClass(ClassLoader cl, String className) {
         Class clazz = null;
         try {
             // load from custom class loader        
@@ -260,10 +258,9 @@ public abstract class AbstractSpecification {
         }
         return clazz;
     }
+    private Map<String,List<String>> elements;
 
     public abstract Map addSpec(String value, Element element, Map map);
-
-    private Map<String,List<String>> elements;
 
     public void dump(String format, Writer writer) throws IOException {
         Map<String,Object> m = map().get(format);

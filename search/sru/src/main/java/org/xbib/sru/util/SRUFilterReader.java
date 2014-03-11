@@ -93,7 +93,7 @@ public class SRUFilterReader extends Iso2709Reader implements MarcXchangeListene
             // emit additional parameter values for federating
             response.add(eventFactory.createProcessingInstruction("format", format));
             response.add(eventFactory.createProcessingInstruction("type", type));
-            response.add(eventFactory.createProcessingInstruction("id", recordPosition + "_" + response.getOrigin().getHost()));
+            response.add(eventFactory.createProcessingInstruction("id", Integer.toString(recordPosition)));
             // SRU
             response.add(eventFactory.createProcessingInstruction("recordSchema", recordSchema));
             response.add(eventFactory.createProcessingInstruction("recordPacking", recordPacking));

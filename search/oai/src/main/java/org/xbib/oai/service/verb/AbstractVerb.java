@@ -50,8 +50,11 @@ import org.xbib.oai.service.ServerOAIRequest;
 import org.xbib.xml.XSI;
 
 public abstract class AbstractVerb {
+
     private final XMLEventFactory eventFactory = XMLEventFactory.newInstance();
+
     protected final ServerOAIRequest request;
+
     protected final DefaultOAIResponse response;
     
     public AbstractVerb(ServerOAIRequest request, DefaultOAIResponse response) {
@@ -62,57 +65,56 @@ public abstract class AbstractVerb {
     public abstract void execute(OAIService adapter) throws OAIException;
     
     protected void beginDocument() throws XMLStreamException {
-        response.add(eventFactory.createStartDocument());
+        response.getConsumer().add(eventFactory.createStartDocument());
     }
     
     protected void endDocument() throws XMLStreamException, IOException {
-        response.add(eventFactory.createEndDocument());
-        response.flush();
+        response.getConsumer().add(eventFactory.createEndDocument());
     }
     
     protected void beginElement(String name) throws XMLStreamException {
-        response.add(eventFactory.createStartElement(toQName(OAIConstants.NS_URI, name), null, null));
+        response.getConsumer().add(eventFactory.createStartElement(toQName(OAIConstants.NS_URI, name), null, null));
     }
     
     protected void endElement(String name) throws XMLStreamException {
-        response.add(eventFactory.createEndElement(toQName(OAIConstants.NS_URI, name), null));
+        response.getConsumer().add(eventFactory.createEndElement(toQName(OAIConstants.NS_URI, name), null));
     }
    
     protected void element(String name, String value) throws XMLStreamException {
-        response.add(eventFactory.createStartElement(toQName(OAIConstants.NS_URI, name), null, null));
-        response.add(eventFactory.createCharacters(value));
-        response.add(eventFactory.createEndElement(toQName(OAIConstants.NS_URI, name), null));
+        response.getConsumer().add(eventFactory.createStartElement(toQName(OAIConstants.NS_URI, name), null, null));
+        response.getConsumer().add(eventFactory.createCharacters(value));
+        response.getConsumer().add(eventFactory.createEndElement(toQName(OAIConstants.NS_URI, name), null));
     }
 
     protected void element(String name, Date value) throws XMLStreamException {
-        response.add(eventFactory.createStartElement(toQName(OAIConstants.NS_URI, name), null, null));
-        response.add(eventFactory.createCharacters(formatDate(value)));
-        response.add(eventFactory.createEndElement(toQName(OAIConstants.NS_URI, name), null));
+        response.getConsumer().add(eventFactory.createStartElement(toQName(OAIConstants.NS_URI, name), null, null));
+        response.getConsumer().add(eventFactory.createCharacters(formatDate(value)));
+        response.getConsumer().add(eventFactory.createEndElement(toQName(OAIConstants.NS_URI, name), null));
     }
 
     protected void beginOAIPMH(URL baseURL) throws XMLStreamException {
-        response.add(eventFactory.createStartElement(toQName(OAIConstants.NS_URI, "OAI-PMH"), null, null));
-        response.add(eventFactory.createNamespace(OAIConstants.NS_URI));
-        response.add(eventFactory.createNamespace(XSI.NS_PREFIX, XSI.NS_URI));
-        response.add(eventFactory.createAttribute(XSI.NS_PREFIX, XSI.NS_URI, 
+        response.getConsumer().add(eventFactory.createStartElement(toQName(OAIConstants.NS_URI, "OAI-PMH"), null, null));
+        response.getConsumer().add(eventFactory.createNamespace(OAIConstants.NS_URI));
+        response.getConsumer().add(eventFactory.createNamespace(XSI.NS_PREFIX, XSI.NS_URI));
+        response.getConsumer().add(eventFactory.createAttribute(XSI.NS_PREFIX, XSI.NS_URI,
                 "schemaLocation", "http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"));
         element("responseDate", new Date());
         request(request.getParameterMap(), baseURL);
     }
 
     protected void endOAIPMH() throws XMLStreamException {
-        response.add(eventFactory.createEndElement(toQName(OAIConstants.NS_URI, "OAI-PMH"), null));
+        response.getConsumer().add(eventFactory.createEndElement(toQName(OAIConstants.NS_URI, "OAI-PMH"), null));
     }
     
     protected void request(Map<String,List<String>> attrs, URL baseURL) throws XMLStreamException {
-        response.add(eventFactory.createStartElement(toQName(OAIConstants.NS_URI, OAIConstants.REQUEST), null, null));
+        response.getConsumer().add(eventFactory.createStartElement(toQName(OAIConstants.NS_URI, OAIConstants.REQUEST), null, null));
         for (Map.Entry<String,List<String>> me : attrs.entrySet()) {
             for (String value : me.getValue()) {
-                response.add(eventFactory.createAttribute(me.getKey(),value));
+                response.getConsumer().add(eventFactory.createAttribute(me.getKey(),value));
             }
         }
-        response.add(eventFactory.createCharacters(baseURL.toExternalForm()));
-        response.add(eventFactory.createEndElement(toQName(OAIConstants.NS_URI, OAIConstants.REQUEST), null));
+        response.getConsumer().add(eventFactory.createCharacters(baseURL.toExternalForm()));
+        response.getConsumer().add(eventFactory.createEndElement(toQName(OAIConstants.NS_URI, OAIConstants.REQUEST), null));
     }
 
     private QName toQName(String namespaceUri, String qname) {

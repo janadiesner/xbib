@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.xbib.io.BytesArray;
@@ -588,6 +589,21 @@ public final class XContentBuilder implements BytesStream {
 
     public XContentBuilder rawField(String fieldName, BytesReference content) throws IOException {
         generator.writeRawField(fieldName, content, bos);
+        return this;
+    }
+
+    public XContentBuilder copy(XContentBuilder builder) throws IOException {
+        generator.copy(builder, bos);
+        return this;
+    }
+
+    public XContentBuilder copy(List<XContentBuilder> builder) throws IOException {
+        for (int i = 0; i < builder.size(); i++) {
+            if (i > 0) {
+                bos.write(',');
+            }
+            generator.copy(builder.get(i), bos);
+        }
         return this;
     }
 

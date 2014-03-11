@@ -34,6 +34,7 @@ package org.xbib.common.xcontent.xml;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 
+import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.io.BytesReference;
 import org.xbib.common.xcontent.XContentGenerator;
 import org.xbib.common.xcontent.XContentHelper;
@@ -260,6 +261,11 @@ public class XmlXContentGenerator implements XContentGenerator {
         } finally {
             parser.close();
         }
+    }
+
+    public void copy(XContentBuilder builder, OutputStream bos) throws IOException {
+        flush();
+        builder.bytes().writeTo(bos);
     }
 
     public void copyCurrentStructure(XContentParser parser) throws IOException {

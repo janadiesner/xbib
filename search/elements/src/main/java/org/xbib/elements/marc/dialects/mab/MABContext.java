@@ -32,7 +32,6 @@
 package org.xbib.elements.marc.dialects.mab;
 
 import org.xbib.analyzer.dublincore.DublinCoreProperties;
-import org.xbib.elements.bibliographic.XBIB;
 import org.xbib.elements.items.LiaContext;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Resource;
@@ -84,8 +83,8 @@ public class MABContext extends LiaContext implements DublinCoreProperties {
         IRI id = IRI.builder().fragment(identifier).build();
         resource().id(id);
 
-        resource().add(XBIB.NS_URI + "format", format);
-        resource().add(XBIB.NS_URI + "label", label);
+        resource().add("xbib:format", format);
+        resource().add("xbib:label", label);
 
         contentBuilder.timestamp(new Date());
         contentBuilder.message(id.toString());

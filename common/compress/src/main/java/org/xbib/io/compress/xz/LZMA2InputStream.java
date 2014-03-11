@@ -147,7 +147,6 @@ public class LZMA2InputStream extends InputStream {
      * to indicate the end of the compressed stream
      * @throws CorruptedInputException
      * @throws XZIOException           if the stream has been closed
-     * @throws EOFException            compressed input is truncated or corrupt
      * @throws java.io.IOException     may be thrown by <code>in</code>
      */
     public int read() throws IOException {
@@ -170,7 +169,6 @@ public class LZMA2InputStream extends InputStream {
      * the end of the compressed stream
      * @throws CorruptedInputException
      * @throws XZIOException           if the stream has been closed
-     * @throws EOFException            compressed input is truncated or corrupt
      * @throws java.io.IOException     may be thrown by <code>in</code>
      */
     public int read(byte[] buf, int off, int len) throws IOException {

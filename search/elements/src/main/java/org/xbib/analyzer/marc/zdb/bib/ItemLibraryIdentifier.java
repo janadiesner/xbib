@@ -1,7 +1,6 @@
 package org.xbib.analyzer.marc.zdb.bib;
 
 import org.xbib.elements.ValueMapFactory;
-import org.xbib.elements.bibliographic.XBIB;
 import org.xbib.elements.items.Access;
 import org.xbib.elements.items.Authority;
 import org.xbib.elements.items.DeliveryMethod;
@@ -69,7 +68,7 @@ public class ItemLibraryIdentifier extends MARCElement {
 
     private void createISIL(MARCElementBuilder b, String isil, String provider) {
         b.context().resource().newResource(IDENTIFIER)
-                .add(XBIB.IDENTIFIER_AUTHORITY_ISIL, isil);
+                .add("xbib:identifierAuthorityISIL", isil);
         if (provider == null) {
             provider = defaultProvider;
         }

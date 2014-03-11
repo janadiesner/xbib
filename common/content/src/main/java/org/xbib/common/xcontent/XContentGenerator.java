@@ -76,6 +76,8 @@ public interface XContentGenerator {
 
     void writeRawField(String fieldName, BytesReference content, OutputStream bos) throws IOException;
 
+    void copy(XContentBuilder builder, OutputStream bos) throws IOException;
+
     void copyCurrentStructure(XContentParser parser) throws IOException;
 
     void flush() throws IOException;

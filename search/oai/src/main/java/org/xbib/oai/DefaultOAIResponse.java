@@ -31,128 +31,73 @@
  */
 package org.xbib.oai;
 
-import org.xbib.io.http.netty.NettyHttpResponse;
-import org.xbib.xml.XMLFilterReader;
 import org.xbib.xml.transform.StylesheetTransformer;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.Date;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Default OAI response
- *
  */
-public class DefaultOAIResponse<R extends DefaultOAIResponse>
-        extends NettyHttpResponse
-        implements OAIResponse<R>, XMLEventConsumer {
-
-    //private static final XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+public class DefaultOAIResponse implements OAIResponse {
 
     private OAIRequest request;
 
-    private Reader reader;
+    private StylesheetTransformer transformer;
 
-    private StringBuilder sb;
+    private String[] stylesheets;
 
-    private String errorCode;
+    private String format;
 
-    //private StylesheetTransformer transformer;
+    private XMLEventConsumer consumer;
+
+    @Override
+    public DefaultOAIResponse setStylesheetTransformer(StylesheetTransformer transformer) {
+        this.transformer = transformer;
+        return this;
+    }
+
+    protected StylesheetTransformer getTransformer() {
+        return transformer;
+    }
+
+    @Override
+    public DefaultOAIResponse setStylesheets(String... stylesheets) {
+        this.stylesheets = stylesheets;
+        return this;
+    }
+
+    @Override
+    public DefaultOAIResponse setOutputFormat(String format) {
+        this.format = format;
+        return this;
+    }
+
+    public String getOutputFormat() {
+        return format;
+    }
+
+    @Override
+    public DefaultOAIResponse to(Writer writer) throws IOException {
+        return this;
+    }
 
     public DefaultOAIResponse(OAIRequest request) {
         this.request = request;
-        this.sb = new StringBuilder();
-        //this.transformer = new StylesheetTransformer("/xsl");
     }
 
     public OAIRequest getRequest() {
         return request;
     }
 
-    @Override
-    public R setReader(Reader reader) {
-        this.reader = reader;
-        return (R)this;
+    public DefaultOAIResponse setConsumer(XMLEventConsumer consumer) {
+        this.consumer = consumer;
+        return this;
     }
 
-    public void flush() throws IOException {
+    public XMLEventConsumer getConsumer() {
+        return consumer;
     }
 
-    @Override
-    public void add(XMLEvent xmle) throws XMLStreamException {
-    }
-
-    public void setError(String errorCode) {
-        this.errorCode = errorCode;
-    }
-
-    public String getError() {
-        return errorCode;
-    }
-
-    public void setResponseDate(Date date) {
-    }
-
-    public void setExpire(long millis) {
-    }
-
-    @Override
-    public R to(Writer writer) throws IOException {
-        try {
-            XMLFilterReader filter = new OAIResponseFilterReader();
-            InputSource source = new InputSource(reader);
-            StreamResult streamResult = new StreamResult(writer);
-            StylesheetTransformer transformer = new StylesheetTransformer("/xsl");
-            transformer.setSource(filter, source).setResult(streamResult).transform();
-            transformer.close();
-        } catch (TransformerException e) {
-            throw new IOException(e.getMessage(), e);
-        }
-        return (R)this;
-    }
-
-    class OAIResponseFilterReader extends XMLFilterReader {
-
-        OAIResponseFilterReader() {
-            super();
-        }
-
-        @Override
-        public void startDocument() throws SAXException {
-        }
-
-        @Override
-        public void endDocument() throws SAXException {
-        }
-
-        @Override
-        public void startElement(String uri, String localname, String qname, Attributes atts) throws SAXException {
-        }
-
-        @Override
-        public void endElement(String uri, String localname, String qname) throws SAXException {
-        }
-
-        @Override
-        public void characters(char[] chars, int start, int length) throws SAXException {
-        }
-
-        @Override
-        public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        }
-
-        @Override
-        public void endPrefixMapping(String prefix) throws SAXException {
-        }
-    }
 }

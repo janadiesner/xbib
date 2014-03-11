@@ -31,6 +31,7 @@
  */
 package org.xbib.oai.client;
 
+import org.xbib.oai.listrecords.ListRecordsListener;
 import org.xbib.util.DateUtil;
 import org.xbib.io.Connection;
 import org.xbib.io.Packet;
@@ -39,8 +40,7 @@ import org.xbib.io.archivers.tar.TarConnectionFactory;
 import org.xbib.io.archivers.tar.TarSession;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.oai.record.ListRecordsRequest;
-import org.xbib.oai.record.ListRecordsResponseListener;
+import org.xbib.oai.listrecords.ListRecordsRequest;
 import org.xbib.oai.xml.XmlMetadataHandler;
 import org.xml.sax.SAXException;
 
@@ -76,16 +76,17 @@ public class NatLizClientTest {
 
         do {
             try {
-                ListRecordsResponseListener listener = new ListRecordsResponseListener(request)
-                        .register(metadataHandler);
+                ListRecordsListener listener = new ListRecordsListener(request);
+                request.addHandler(metadataHandler);
                 request.prepare().execute(listener).waitFor();
                 if (listener.getResponse() != null) {
                     StringWriter sw = new StringWriter();
                     listener.getResponse().to(sw);
                     //logger.info("response from NatLiz = {}", sw);
+                } else {
+                    logger.warn("no response");
                 }
-                request = listener.isFailure() ? null :
-                        client.resume(request, listener.getResumptionToken());
+                request = client.resume(request, listener.getResumptionToken());
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }

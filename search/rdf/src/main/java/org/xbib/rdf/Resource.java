@@ -313,7 +313,7 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
      * blank node can be removed and the single value can be promoted to the
      * predicate.
      *
-     * @param predicate
+     * @param predicate the predicate
      */
     void compactPredicate(P predicate);
 

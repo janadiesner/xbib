@@ -47,32 +47,11 @@ import java.io.IOException;
  */
 public class NettyHttpSession implements HttpSession {
 
-    private AsyncHttpClientConfig.Builder config;
+    private AsyncHttpClientConfig.Builder config = new AsyncHttpClientConfig.Builder();
 
     private AsyncHttpClient client;
 
     private boolean isOpen;
-
-    @Override
-    public HttpSession setProxy(String host, int port) {
-        if (host != null) {
-            config.setProxyServer(new ProxyServer(host, port));
-        }
-        return this;
-    }
-
-    @Override
-    public HttpSession setTimeout(int millis) {
-        if (millis > 0) {
-            config.setRequestTimeoutInMs(millis);
-        }
-        return this;
-    }
-
-    @Override
-    public HttpRequest newRequest() {
-        return new NettyHttpRequest(this);
-    }
 
     protected PreparedHttpRequest prepare(NettyHttpRequest request) throws IOException {
         if (!isOpen()) {
@@ -82,14 +61,36 @@ public class NettyHttpSession implements HttpSession {
     }
 
     @Override
+    public HttpSession setProxy(String host, int port) {
+        if (host == null) {
+            return this;
+        }
+        config.setProxyServer(new ProxyServer(host, port));
+        return this;
+    }
+
+    @Override
+    public HttpSession setTimeout(int millis) {
+        if (millis <= 0) {
+            return this;
+        }
+        config.setRequestTimeoutInMs(millis);
+        return this;
+    }
+
+    @Override
+    public HttpRequest newRequest() {
+        return new NettyHttpRequest(this);
+    }
+
+    @Override
     public void open(Mode mode) throws IOException {
         if (!isOpen()) {
-            this.config = new AsyncHttpClientConfig.Builder()
-                    .setAllowPoolingConnection(true)
+            // some reasonable defaults...
+            config.setAllowPoolingConnection(true)
                     .setAllowSslConnectionPool(true)
                     .setMaximumConnectionsPerHost(16)
                     .setMaximumConnectionsTotal(16)
-                    .setRequestTimeoutInMs(30000)
                     .setFollowRedirects(true)
                     .setMaxRequestRetry(1)
                     .setCompressionEnabled(true);

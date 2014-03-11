@@ -43,6 +43,8 @@ import org.xbib.oai.OAISession;
 import org.xbib.oai.identify.IdentifyResponse;
 import org.xbib.oai.identify.IdentifyServerRequest;
 
+import javax.xml.stream.XMLOutputFactory;
+
 public class SimpleServiceTest {
 
     private final Logger logger = LoggerFactory.getLogger(SimpleServiceTest.class.getName());
@@ -52,8 +54,10 @@ public class SimpleServiceTest {
         OAIService service = OAIServiceFactory.getDefaultService();
         OAISession session = service.newSession();
         StringWriter sw = new StringWriter();
+        XMLOutputFactory factory  = XMLOutputFactory.newInstance();
         MyIdentifyRequest request = new MyIdentifyRequest(session);
         IdentifyResponse response = new IdentifyResponse(request);
+        response.setConsumer(factory.createXMLEventWriter(sw));
         service.identify(request, response);
         response.to(sw);
         session.close();

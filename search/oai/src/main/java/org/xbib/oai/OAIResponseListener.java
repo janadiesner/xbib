@@ -37,7 +37,7 @@ import org.xbib.io.http.HttpResponseListener;
  *  OAI response listener
  *
  */
-public interface OAIResponseListener<Response extends OAIResponse> extends HttpResponseListener {
+public interface OAIResponseListener extends HttpResponseListener {
 
-    Response getResponse();
+    OAIResponse getResponse();
 }

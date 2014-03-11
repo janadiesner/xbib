@@ -20,9 +20,9 @@ public class RecordLabel extends MABElement {
         builder.context().label(value.trim());
         if (value.length() == 24) {
             char satztyp = value.charAt(23);
-            builder.context().resource().add(XBIB.TYPE, String.valueOf(satztyp));
+            builder.context().resource().add("xbib:type", String.valueOf(satztyp));
             if (satztyp == 'u') {
-                builder.context().resource().add(XBIB.BOOST, "0.1");
+                builder.context().resource().add("xbib:boost", "0.1");
             }
         } else {
             logger.warn("record label length is {} characters: {}", value.length(), value);

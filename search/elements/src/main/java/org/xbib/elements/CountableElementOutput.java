@@ -41,7 +41,6 @@ public abstract class CountableElementOutput<C extends ResourceContext, R extend
 
     protected final AtomicLong counter = new AtomicLong(0L);
 
-    @Override
     public long getCounter() {
         return counter.get();
     }

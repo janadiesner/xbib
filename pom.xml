@@ -387,6 +387,11 @@
             </dependency>
             <dependency>
                 <groupId>org.xbib</groupId>
+                <artifactId>pipeline</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xbib</groupId>
                 <artifactId>http</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -631,6 +636,7 @@
         <module>common/jacc</module>
         <module>common/dict</module>
         <module>common/handlebars</module>
+        <module>common/pipeline</module>
 
         <module>common/io</module>
         <module>common/io/http</module>
@@ -648,12 +654,13 @@
         <module>search/oai</module>
         <module>search/iso23950</module>
         <module>search/opensearch</module>
-        <module>search/tools</module>
 
         <module>search/web/federator</module>
-        <module>search/web/router</module>
+        <module>search/web/dispatcher</module>
         <module>search/web/sru</module>
         <module>search/web/oai</module>
+        
+        <module>tools</module>
 
     </modules>
 

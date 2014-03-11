@@ -46,6 +46,4 @@ public interface ElementOutput<C extends ResourceContext, R extends Resource> {
 
     void output(C context, ContentBuilder<C,R> builder) throws IOException;
 
-    long getCounter();
-
 }

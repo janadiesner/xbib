@@ -40,7 +40,6 @@ import java.text.Normalizer;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.elements.CountableElementOutput;
-import org.xbib.elements.ElementOutput;
 import org.xbib.iri.IRI;
 import org.xbib.io.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
@@ -48,7 +47,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchange2KeyValue;
-import org.xbib.marc.xml.DNBPICAXmlReader;
+import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
@@ -69,7 +68,7 @@ public class DNBPICAElementsTest extends Assert {
     @Test
     public void testZdbBib() throws Exception {
 
-        final ElementOutput output = new OurElementOutput();
+        final CountableElementOutput output = new OurElementOutput();
         final PicaElementBuilderFactory factory = new PicaElementBuilderFactory() {
             public PicaElementBuilder newBuilder() {
                 return new PicaElementBuilder().addOutput(output);

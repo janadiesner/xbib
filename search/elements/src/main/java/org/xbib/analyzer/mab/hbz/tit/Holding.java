@@ -127,7 +127,7 @@ public class Holding extends MABElement {
 
     private void createISIL(ElementBuilder<FieldCollection, String, MABElement, MABContext> builder, String isil, String provider) {
         builder.context().resource()
-                .add(XBIB.IDENTIFIER_AUTHORITY_ISIL, isil);
+                .add("xbib:identifierAuthorityISIL", isil);
         if (provider == null) {
             provider = defaultProvider;
         }

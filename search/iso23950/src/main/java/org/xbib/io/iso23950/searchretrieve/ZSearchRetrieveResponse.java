@@ -102,7 +102,6 @@ public class ZSearchRetrieveResponse extends SearchRetrieveResponse
 
     @Override
     public ZSearchRetrieveResponse to(Writer writer) throws IOException {
-        setOrigin(session.getConnection().getURI());
         // get result count for caller and for stylesheet
         numberOfRecords(resultCount);
         if (getTransformer() == null) {

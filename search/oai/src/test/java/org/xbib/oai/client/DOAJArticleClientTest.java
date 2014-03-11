@@ -32,12 +32,12 @@
 package org.xbib.oai.client;
 
 import org.testng.annotations.Test;
+import org.xbib.oai.listrecords.ListRecordsListener;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.oai.record.ListRecordsRequest;
-import org.xbib.oai.record.ListRecordsResponseListener;
+import org.xbib.oai.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfOutput;
 import org.xbib.oai.rdf.RdfResourceHandler;
@@ -88,19 +88,15 @@ public class DOAJArticleClientTest {
 
         do {
             try {
-                ListRecordsResponseListener listener = new ListRecordsResponseListener(request)
-                        .register(metadataHandler);
+                ListRecordsListener listener = new ListRecordsListener(request);
+                request.addHandler(metadataHandler);
                 request.prepare().execute(listener).waitFor();
-                if (listener.isFailure()) {
-                    request = null;
-                } else {
-                    if (listener.getResponse() != null) {
-                        StringWriter sw = new StringWriter();
-                        listener.getResponse().to(sw);
-                        logger.info("response = {}", sw);
-                    }
-                    request = client.resume(request, listener.getResumptionToken());
+                if (listener.getResponse() != null) {
+                    StringWriter sw = new StringWriter();
+                    listener.getResponse().to(sw);
+                    logger.info("response = {}", sw);
                 }
+                request = client.resume(request, listener.getResumptionToken());
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 request = null;

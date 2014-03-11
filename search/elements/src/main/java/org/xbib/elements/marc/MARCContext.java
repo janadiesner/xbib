@@ -31,23 +31,27 @@
  */
 package org.xbib.elements.marc;
 
-import org.xbib.elements.bibliographic.XBIB;
 import org.xbib.elements.items.LiaContext;
+import org.xbib.iri.IRI;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleResource;
 import org.xbib.rdf.xcontent.ContentBuilder;
 import org.xbib.rdf.xcontent.DefaultContentBuilder;
+import org.xbib.util.DateUtil;
+
+import java.util.Date;
 
 /**
  * A MARC builder builds Elements from MARC field collections. It uses a MARC context.
- *
  */
 public class MARCContext extends LiaContext {
 
     private final ContentBuilder contentBuilder = new DefaultContentBuilder();
 
     private String label;
+
+    private String recordNumber;
 
     @Override
     public Resource newResource() {
@@ -59,17 +63,36 @@ public class MARCContext extends LiaContext {
         return contentBuilder;
     }
 
-    public ResourceContext<Resource> label(String label) {
+    public MARCContext label(String label) {
         this.label = label;
         return this;
     }
 
+    public MARCContext recordNumber(String recordNumber) {
+        this.recordNumber = recordNumber;
+        return this;
+    }
+
+    /**
+     * Prepare the output of the MARC resource.
+     * Add the current timestamp, the MARC record label, and the MARC record ID
+     * to the resource.
+     * Set the ID fragment to the record number if exists.
+     * This can be used later for addressing the record to a target document ID.
+     *
+     * @return this context
+     */
     @Override
     public ResourceContext<Resource> prepareForOutput() {
         if (resource() == null) {
             return this;
         }
-        resource().add(XBIB.NS_URI + "label", label);
+        resource().add("xbib:timestamp", DateUtil.formatDateISO(new Date()));
+        resource().add("xbib:label", label);
+        if (recordNumber != null) {
+            resource().add("xbib:id", recordNumber);
+            resource().id(IRI.builder().fragment(recordNumber).build());
+        }
         return this;
     }
 }

@@ -38,17 +38,17 @@ import java.util.Date;
 import org.xbib.oai.OAISession;
 import org.xbib.oai.identify.ListIdentifiersResponse;
 import org.xbib.oai.formats.ListMetadataFormatsResponse;
-import org.xbib.oai.record.GetRecordRequest;
+import org.xbib.oai.getrecord.GetRecordRequest;
 import org.xbib.oai.identify.IdentifyResponse;
 import org.xbib.oai.identify.ListIdentifiersRequest;
 import org.xbib.oai.formats.ListMetadataFormatsRequest;
-import org.xbib.oai.record.GetRecordResponse;
-import org.xbib.oai.record.ListRecordsResponse;
+import org.xbib.oai.getrecord.GetRecordResponse;
+import org.xbib.oai.listrecords.ListRecordsResponse;
 import org.xbib.oai.identify.IdentifyServerRequest;
-import org.xbib.oai.record.ListRecordsServerRequest;
-import org.xbib.oai.set.ListSetsRequest;
+import org.xbib.oai.listrecords.ListRecordsServerRequest;
+import org.xbib.oai.listsets.ListSetsRequest;
 import org.xbib.oai.exceptions.OAIException;
-import org.xbib.oai.set.ListSetsResponse;
+import org.xbib.oai.listsets.ListSetsResponse;
 
 /**
  *  OAI service
