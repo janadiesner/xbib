@@ -1,0 +1,27 @@
+
+java="/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/bin/java"
+#java="/usr/java/jdk1.8.0/bin/java"
+
+echo '
+{
+    "path" : "'${HOME}'/import/hbz/vk/",
+    "pattern" : "clob*.tar.gz",
+    "elements" : "mab/hbz/tit",
+    "concurrency" : 1,
+    "pipelines" : 16,
+    "elasticsearch" : "es://zephyros:19300?es.cluster.name=zbn-1.0",
+    "index" : "hbztitle",
+    "type" : "title",
+    "indexHoldings" : "hbzholdings",
+    "typeHoldings" : "holdings",
+    "shards" : 3,
+    "replica" : 1,
+    "maxbulkactions" : 1000,
+    "maxconcurrentbulkrequests" : 36,
+    "mock" : false,
+    "detect" : true,
+    "client" : "ingest"
+}
+' | ${java} \
+    -cp $(pwd)/bin:$(pwd)/lib/tools-1.0.0.Beta2-feeder.jar \
+    org.xbib.tools.Runner org.xbib.tools.feed.elasticsearch.hbz.FromMarcXmlTar

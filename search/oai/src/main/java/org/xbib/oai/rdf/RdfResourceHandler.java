@@ -39,7 +39,7 @@ import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
 import javax.xml.namespace.QName;
 
 /**
- * A default RDF resource handler for OAI.
+ * A default RDF getResource handler for OAI.
  */
 public class RdfResourceHandler extends AbstractXmlResourceHandler implements OAIConstants {
 

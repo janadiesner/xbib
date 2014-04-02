@@ -53,6 +53,6 @@ public class ArrayTest extends AbstractTest {
         Object[] array = {"1", 2, "3"};
         assertEquals(
                 "3", compile("{{this.length}}").apply(
-                Context.newBuilder(array).resolver(FieldValueResolver.INSTANCE).build()));
+                HandlebarsContext.newBuilder(array).resolver(FieldValueResolver.INSTANCE).build()));
     }
 }

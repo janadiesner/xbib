@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * A hook interface for resolving values from the {@link Context context stack}.
+ * A hook interface for resolving values from the {@link HandlebarsContext context stack}.
  */
 public interface ValueResolver {
 
@@ -25,12 +25,12 @@ public interface ValueResolver {
 
     /**
      * Resolve the attribute's name in the context object. If a {@link #UNRESOLVED} is returned, the
-     * {@link Context context stack} will
+     * {@link HandlebarsContext context stack} will
      * continue with the next value resolver in the chain.
      *
      * @param context The context object. Not null.
      * @param name    The attribute's name. Not null.
-     * @return A {@link #UNRESOLVED} is returned, the {@link Context context
+     * @return A {@link #UNRESOLVED} is returned, the {@link HandlebarsContext context
      * stack} will continue with the next value resolver in the chain.
      * Otherwise, it returns the associated value.
      */

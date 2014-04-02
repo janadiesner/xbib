@@ -109,12 +109,12 @@ public class SimpleResourceTest<S extends Identifier, P extends Property, O exte
                 .add("urn:valueURI", "Hello World")
                 .add("urn:name", "Smith")
                 .add("urn:name", "Jones");
-        // the first resource adds a resource value
+        // the first getResource adds a getResource value
         Resource<S, P, O> r1 = r.newResource("urn:res1");
-        r1.add("urn:has", "a first resource value");
-        // the second resource adds another resource value
+        r1.add("urn:has", "a first getResource value");
+        // the second getResource adds another getResource value
         Resource<S, P, O> r2 = r.newResource("urn:res1");
-        r2.add("urn:has", "a second resource value");
+        r2.add("urn:has", "a second getResource value");
         
         assertEquals(r.nodeMap().size(), 3);
         
@@ -143,8 +143,8 @@ public class SimpleResourceTest<S extends Identifier, P extends Property, O exte
          * val=Hello World
          * val=Smith
          * val=Jones
-         * val=_:a2 urn:has a first resource value
-         * val=_:a3 urn:has a second resource value
+         * val=_:a2 urn:has a first getResource value
+         * val=_:a3 urn:has a second getResource value
          */
         assertEquals(objCounter, 5);
         /**
@@ -203,12 +203,12 @@ public class SimpleResourceTest<S extends Identifier, P extends Property, O exte
         t.id(IRI.create("urn:t"))
                 .add("urn:value", "Hello T");
 
-        // a blank node resource ID
+        // a blank node getResource ID
         IRI blank1 = new IdentifiableNode().blank().id();
         Resource<S, P, O> u = new SimpleResource<>();
         u.id(blank1).add("urn:value", "Hello U");
 
-        // another blank node resource ID
+        // another blank node getResource ID
         IRI blank2 = new IdentifiableNode().blank().id();
         Resource<S, P, O> v = new SimpleResource<>();
         v.id(blank2).add("urn:value", "Hello V");

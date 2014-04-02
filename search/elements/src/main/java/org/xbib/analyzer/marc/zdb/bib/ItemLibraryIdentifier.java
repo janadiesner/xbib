@@ -1,14 +1,6 @@
 package org.xbib.analyzer.marc.zdb.bib;
 
 import org.xbib.elements.ValueMapFactory;
-import org.xbib.elements.items.Access;
-import org.xbib.elements.items.Authority;
-import org.xbib.elements.items.DeliveryMethod;
-import org.xbib.elements.items.ItemType;
-import org.xbib.elements.items.LiaContext;
-import org.xbib.elements.items.Library;
-import org.xbib.elements.items.Service;
-import org.xbib.elements.items.TransportMethod;
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.marc.Field;
@@ -17,11 +9,15 @@ import org.xbib.marc.FieldCollection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * TODO replace by library service onotology
+ */
 public class ItemLibraryIdentifier extends MARCElement {
 
     private final static MARCElement element = new ItemLibraryIdentifier();
     private final String defaultProvider = "DE-605";
-    private final static Map<String, String> sigel2isil = ValueMapFactory.getAssocStringMap("sigel2isil");
+    private final static Map<String, String> sigel2isil =
+            ValueMapFactory.getAssocStringMap("sigel2isil");
     private final static Map<String, Map<String, List<String>>> product2isil =
             ValueMapFactory.getMap("product2isil");
 
@@ -67,9 +63,9 @@ public class ItemLibraryIdentifier extends MARCElement {
     }
 
     private void createISIL(MARCElementBuilder b, String isil, String provider) {
-        b.context().resource().newResource(IDENTIFIER)
+        b.context().getResource().newResource(IDENTIFIER)
                 .add("xbib:identifierAuthorityISIL", isil);
-        if (provider == null) {
+        /*if (provider == null) {
             provider = defaultProvider;
         }
         Authority authority = Authority.hbz;
@@ -77,10 +73,11 @@ public class ItemLibraryIdentifier extends MARCElement {
             authority = Authority.ISIL;
         }
         b.context().access(new Access().name(provider, authority).library(new Library().library(isil, Authority.ISIL)));
+        */
     }
 
     private void createItemService(MARCElementBuilder b, String itemStatus) {
-        LiaContext lia = b.context();
+        /*LiaContext lia = b.context();
         String format = "marc";
         boolean continuing = true;
         if (itemStatus == null) {
@@ -130,6 +127,6 @@ public class ItemLibraryIdentifier extends MARCElement {
             lia.getAccess().getItems().getLast().type(ItemType.AUDIO_VISUAL);
         } else if (format.matches(".*video.*")) {
             lia.getAccess().getItems().getLast().type(ItemType.VIDEO);
-        }
+        }*/
     }
 }

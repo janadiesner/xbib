@@ -26,12 +26,12 @@ public interface Template {
         }
 
         @Override
-        public String apply(final Context context) throws IOException {
+        public String apply(final HandlebarsContext context) throws IOException {
             return "";
         }
 
         @Override
-        public void apply(final Context context, final Writer writer)
+        public void apply(final HandlebarsContext context, final Writer writer)
                 throws IOException {
         }
 
@@ -94,7 +94,7 @@ public interface Template {
      * @param writer  The writer object. Required.
      * @throws java.io.IOException If a resource cannot be loaded.
      */
-    void apply(Context context, Writer writer) throws IOException;
+    void apply(HandlebarsContext context, Writer writer) throws IOException;
 
     /**
      * Merge the template tree using the given context.
@@ -103,7 +103,7 @@ public interface Template {
      * @return The resulting template.
      * @throws java.io.IOException If a resource cannot be loaded.
      */
-    String apply(Context context) throws IOException;
+    String apply(HandlebarsContext context) throws IOException;
 
     /**
      * Provide the raw text.

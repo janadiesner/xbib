@@ -137,11 +137,6 @@ public class SimpleResource<S extends Identifier, P extends Property, O extends 
     }
     
     @Override
-    public Set<P> predicateSet(String subject) {
-        return predicateSet(simpleFactory.asSubject(subject));
-    }
-
-    @Override
     public Collection<O> objects(String predicate) {
         return objects(simpleFactory.asPredicate(predicate));
     }

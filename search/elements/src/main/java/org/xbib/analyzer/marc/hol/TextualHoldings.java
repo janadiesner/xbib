@@ -32,7 +32,9 @@
 package org.xbib.analyzer.marc.hol;
 
 import org.xbib.elements.ElementBuilder;
+import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
+import org.xbib.elements.marc.MARCPipeline;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.rdf.Resource;
@@ -76,20 +78,22 @@ public class TextualHoldings extends MARCElement {
     }
 
     @Override
-    public void fields(ElementBuilder builder, FieldCollection fields, String value) {
+    public boolean fields(MARCPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
+                          FieldCollection fields, String value) {
         for (Field field : fields) {
-            builder.context().resource().add("textualholdings", field.data());
+            builder.context().getResource().add("textualholdings", field.data());
             if (field.subfieldId().equals("a")) {
-                Resource r = builder.context().resource().newResource("holdings");
+                Resource r = builder.context().getResource().newResource("holdings");
                 Resource parsedHoldings = EnumerationAndChronology.parse(field.data(), r, getMovingwallPatterns());
                 if (!parsedHoldings.isEmpty()) {
                     Set<Integer> dates = EnumerationAndChronology.dates(parsedHoldings);
-                    builder.context().resource().add("dates", dates);
+                    builder.context().getResource().add("dates", dates);
                 } else {
                     logger.debug("no dates found in field " + field);
                 }
             }
         }
+        return false;
     }
 
 }

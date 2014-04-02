@@ -36,7 +36,7 @@ import java.io.StringReader;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.elements.CountableElementOutput;
+import org.xbib.elements.CountableContextResourceOutput;
 import org.xbib.io.keyvalue.KeyValueReader;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -50,11 +50,11 @@ public class DublinCoreBuilderTest extends Assert {
     @Test
     public void testDublinCoreBuilder() throws Exception {
         StringReader sr = new StringReader("100=John Doe\n200=Hello Word\n300=2012\n400=1");
-        CountableElementOutput<DublinCoreContext,Resource> output = new CountableElementOutput<DublinCoreContext, Resource>() {
+        CountableContextResourceOutput<DublinCoreContext,Resource> output = new CountableContextResourceOutput<DublinCoreContext, Resource>() {
 
             @Override
-            public void output(DublinCoreContext context, ContentBuilder builder) throws IOException {
-                logger.info("resource = {}", context.resource());
+            public void output(DublinCoreContext context, Resource resource, ContentBuilder builder) throws IOException {
+                logger.info("resource = {}", context.getResource());
                 counter.incrementAndGet();
             }
 

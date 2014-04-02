@@ -36,7 +36,7 @@ import org.xbib.rdf.Resource;
 /**
  * An abstract resource context.
  *
- * @param <R>
+ * @param <R> the resource type
  */
 public abstract class AbstractResourceContext<R extends Resource> implements ResourceContext<R> {
 
@@ -49,12 +49,12 @@ public abstract class AbstractResourceContext<R extends Resource> implements Res
         return this;
     }
 
-    public ResourceContext<R> newNamespaceContext(IRINamespaceContext namespaces) {
+    public ResourceContext<R> setNamespaceContext(IRINamespaceContext namespaces) {
         this.namespaces = namespaces;
         return this;
     }
 
-    public IRINamespaceContext namespaceContext() {
+    public IRINamespaceContext getNamespaceContext() {
         if (namespaces == null) {
             this.namespaces = IRINamespaceContext.newInstance();
         }
@@ -68,19 +68,11 @@ public abstract class AbstractResourceContext<R extends Resource> implements Res
     }
 
     @Override
-    public R resource() {
+    public R getResource() {
         return resource;
     }
 
-    @Override
-    public ResourceContext<R> reset() {
-        resource = null;
-        return this;
-    }
-
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(resource.toString()).append("\n");
-        return sb.toString();
+        return resource.toString() + "\n";
     }
 }

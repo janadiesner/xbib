@@ -34,6 +34,7 @@ package org.xbib.analyzer.marc.hol;
 import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
+import org.xbib.elements.marc.MARCPipeline;
 import org.xbib.marc.FieldCollection;
 
 public class ParentRecordIdentifier extends org.xbib.analyzer.marc.bib.Identifier {
@@ -45,12 +46,13 @@ public class ParentRecordIdentifier extends org.xbib.analyzer.marc.bib.Identifie
     }
 
     @Override
-    public void fields(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
-                       FieldCollection fields, String value) {
+    public boolean fields(MARCPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
+                          FieldCollection fields, String value) {
         String predicate = getClass().getSimpleName();
         if (getSettings().containsKey("_predicate")) {
             predicate = (String) getSettings().get("_predicate");
         }
-        builder.context().resource().add(predicate, value);
+        builder.context().getResource().add(predicate, value);
+        return false;
     }
 }

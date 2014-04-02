@@ -39,7 +39,7 @@ import java.text.Normalizer;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.elements.CountableElementOutput;
+import org.xbib.elements.CountableContextResourceOutput;
 import org.xbib.iri.IRI;
 import org.xbib.io.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
@@ -68,7 +68,7 @@ public class DNBPICAElementsTest extends Assert {
     @Test
     public void testZdbBib() throws Exception {
 
-        final CountableElementOutput output = new OurElementOutput();
+        final CountableContextResourceOutput output = new OurContextResourceOutput();
         final PicaElementBuilderFactory factory = new PicaElementBuilderFactory() {
             public PicaElementBuilder newBuilder() {
                 return new PicaElementBuilder().addOutput(output);
@@ -129,12 +129,12 @@ public class DNBPICAElementsTest extends Assert {
         }
     }
 
-    class OurElementOutput extends CountableElementOutput<ResourceContext, Resource> {
+    class OurContextResourceOutput extends CountableContextResourceOutput<ResourceContext, Resource> {
 
         @Override
-        public void output(ResourceContext context, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
+        public void output(ResourceContext context, Resource resource, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
             if (context != null) {
-                Resource r = context.resource();
+                Resource r = context.getResource();
                 IRI id = IRI.builder()
                         .scheme("http")
                         .host("xbib.org")

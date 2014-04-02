@@ -1,7 +1,7 @@
 
 package org.xbib.template.handlebars.internal;
 
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 import org.xbib.template.handlebars.EscapingStrategy;
 import org.xbib.template.handlebars.Handlebars;
 import org.xbib.template.handlebars.Helper;
@@ -128,7 +128,7 @@ class Variable extends HelperResolver {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void merge(final Context scope, final Writer writer)
+    protected void merge(final HandlebarsContext scope, final Writer writer)
             throws IOException {
         Helper<Object> helper = helper(name);
         if (helper != null) {
@@ -136,7 +136,7 @@ class Variable extends HelperResolver {
                     .setParams(params(scope))
                     .setHash(hash(scope))
                     .build();
-            options.data(Context.PARAM_SIZE, this.params.size());
+            options.data(HandlebarsContext.PARAM_SIZE, this.params.size());
             CharSequence result = helper.apply(determineContext(scope), options);
             if (escape(result)) {
                 writer.append(escapingStrategy.escape(result));

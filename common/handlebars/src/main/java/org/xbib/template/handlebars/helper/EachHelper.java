@@ -1,12 +1,14 @@
 
 package org.xbib.template.handlebars.helper;
 
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 import org.xbib.template.handlebars.Helper;
 import org.xbib.template.handlebars.Options;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -37,6 +39,9 @@ public class EachHelper implements Helper<Object> {
         if (context instanceof Iterable) {
             return iterableContext((Iterable) context, options);
         }
+        if (context instanceof String) {
+            return iterableContext(Collections.singleton(context), options);
+        }
         return hashContext(context, options);
     }
 
@@ -52,9 +57,9 @@ public class EachHelper implements Helper<Object> {
             throws IOException {
         Set<Entry<String, Object>> propertySet = options.propertySet(context);
         StringBuilder buffer = new StringBuilder();
-        Context parent = options.context;
+        HandlebarsContext parent = options.context;
         for (Entry<String, Object> entry : propertySet) {
-            Context current = Context.newContext(parent, entry.getValue())
+            HandlebarsContext current = HandlebarsContext.newContext(parent, entry.getValue())
                     .data("key", entry.getKey());
             buffer.append(options.fn(current));
         }
@@ -77,14 +82,14 @@ public class EachHelper implements Helper<Object> {
         } else {
             Iterator<Object> iterator = context.iterator();
             int index = -1;
-            Context parent = options.context;
+            HandlebarsContext parent = options.context;
             while (iterator.hasNext()) {
                 index += 1;
                 Object element = iterator.next();
                 boolean first = index == 0;
                 boolean even = index % 2 == 0;
                 boolean last = !iterator.hasNext();
-                Context current = Context.newBuilder(parent, element)
+                HandlebarsContext current = HandlebarsContext.newBuilder(parent, element)
                         .combine("@index", index)
                         .combine("@first", first ? "first" : "")
                         .combine("@last", last ? "last" : "")

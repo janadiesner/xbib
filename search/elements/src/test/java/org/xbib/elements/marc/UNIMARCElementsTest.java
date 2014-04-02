@@ -33,7 +33,7 @@ package org.xbib.elements.marc;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.elements.CountableElementOutput;
+import org.xbib.elements.CountableContextResourceOutput;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -98,18 +98,18 @@ public class UNIMARCElementsTest extends Assert {
         }) {
             InputStream in = getClass().getResourceAsStream(s);
             try (InputStreamReader r = new InputStreamReader(in, ISO88591)) {
-                final CountableElementOutput output = new CountableElementOutput<ResourceContext, Resource>() {
+                final CountableContextResourceOutput output = new CountableContextResourceOutput<ResourceContext, Resource>() {
 
                     @Override
-                    public void output(ResourceContext context, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
+                    public void output(ResourceContext context, Resource resource, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
                         IRI iri = IRI.builder().scheme("http")
                                 .host("dummyindex")
                                 .query("dummytype")
                                 .fragment(Long.toString(counter.getAndIncrement())).build();
-                        context.resource().id(iri);
+                        context.getResource().id(iri);
                         StringWriter sw = new StringWriter();
                         TurtleWriter tw = new TurtleWriter().output(sw);
-                        tw.write(context.resource());
+                        tw.write(context.getResource());
                         //logger.debug("out={}", sw.toString());
                     }
 

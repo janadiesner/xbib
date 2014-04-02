@@ -79,13 +79,6 @@ public class XContentFactory {
     }
 
     /**
-     * Constructs a new xml builder that will output the result into the provided output stream.
-     */
-    public static XContentBuilder xmlBuilder(OutputStream os, XmlXParams params) throws IOException {
-        return new XContentBuilder(XmlXContent.xmlXContent(), os, params);
-    }
-
-    /**
      * Constructs a xcontent builder that will output the result into the provided output stream.
      */
     public static XContentBuilder contentBuilder(XContentType type, OutputStream outputStream) throws IOException {

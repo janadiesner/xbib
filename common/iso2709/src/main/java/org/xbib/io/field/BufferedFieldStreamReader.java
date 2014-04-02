@@ -34,6 +34,13 @@ package org.xbib.io.field;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UncheckedIOException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * This class is a buffered character input reader on a stream with separator charatcers.
@@ -574,5 +581,38 @@ public class BufferedFieldStreamReader extends Reader implements FieldStream {
      */
     protected boolean isSeparator(char ch) {
         return ch == FieldSeparator.FS || ch == FieldSeparator.GS || ch == FieldSeparator.RS || ch == FieldSeparator.US;
+    }
+
+    public Stream<String> fields() {
+        Iterator<String> iter = new Iterator<String>() {
+            String nextData = null;
+
+            @Override
+            public boolean hasNext() {
+                if (nextData != null) {
+                    return true;
+                } else {
+                    try {
+                        nextData = readData();
+                        return (nextData != null);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }
+            }
+
+            @Override
+            public String next() {
+                if (nextData != null || hasNext()) {
+                    String data = nextData;
+                    nextData = null;
+                    return data;
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+        };
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+                iter, Spliterator.ORDERED | Spliterator.NONNULL), false);
     }
 }

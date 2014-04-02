@@ -52,7 +52,6 @@ import java.io.Writer;
 
 /**
  * A XML based content implementation using Jackson XML dataformat
- *
  */
 public class XmlXContent implements XContent {
 
@@ -74,7 +73,6 @@ public class XmlXContent implements XContent {
         xmlXContent = new XmlXContent();
     }
 
-
     public static XContentBuilder contentBuilder() throws IOException {
         XContentBuilder builder = XContentBuilder.builder(xmlXContent);
         if (builder.generator() instanceof XmlXContentGenerator) {
@@ -84,7 +82,7 @@ public class XmlXContent implements XContent {
     }
 
     public static XContentBuilder contentBuilder(XmlXParams params) throws IOException {
-        XContentBuilder builder = XContentBuilder.builder(xmlXContent, params); // payload
+        XContentBuilder builder = XContentBuilder.builder(xmlXContent);
         if (builder.generator() instanceof XmlXContentGenerator) {
             ((XmlXContentGenerator) builder.generator()).setParams(params);
         }
@@ -94,7 +92,6 @@ public class XmlXContent implements XContent {
     private final static XmlFactory xmlFactory;
 
     private final static XmlXContent xmlXContent;
-
 
     private XmlXContent() {
     }

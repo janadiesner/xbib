@@ -144,14 +144,14 @@ public class RDFDatasetUtils implements Constants {
 
     /**
      * Converts a JSON-LD value object to an RDF literal or a JSON-LD string or
-     * node object to an RDF resource.
+     * node object to an RDF getResource.
      * 
      * @param item
      *            the JSON-LD value or node object.
      * @param namer
      *            the UniqueNamer to use to assign blank node names.
      * 
-     * @return the RDF literal or RDF resource.
+     * @return the RDF literal or RDF getResource.
      */
     private static Object objectToRDF(Object item, UniqueNamer namer) {
         final Map<String, Object> object = new LinkedHashMap<String, Object>();

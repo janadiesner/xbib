@@ -117,7 +117,7 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
     }
 
     @Override
-    public NTripleWriter newIdentifier(IRI iri) {
+    public NTripleWriter<S,P,O> newIdentifier(IRI iri) {
         if (!iri.equals(resource.id())) {
             try {
                 write(resource);
@@ -132,14 +132,23 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
     }
 
     @Override
-    public NTripleWriter triple(Triple triple) {
+    public TripleListener<S, P, O> begin() {
+        return this;
+    }
+
+    @Override
+    public NTripleWriter<S,P,O> triple(Triple triple) {
         resource.add(triple);
         return this;
     }
 
+    @Override
+    public TripleListener<S, P, O> end() {
+        return this;
+    }
 
     @Override
-    public NTripleWriter startPrefixMapping(String prefix, String uri) {
+    public NTripleWriter<S,P,O> startPrefixMapping(String prefix, String uri) {
         context.addNamespace(prefix, uri);
         return this;
     }

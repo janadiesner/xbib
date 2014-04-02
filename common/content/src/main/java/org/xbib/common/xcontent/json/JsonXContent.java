@@ -5,11 +5,13 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+
 import org.xbib.io.BytesReference;
 import org.xbib.io.FastStringReader;
 import org.xbib.common.xcontent.XContent;

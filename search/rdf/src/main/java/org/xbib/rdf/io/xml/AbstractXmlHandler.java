@@ -79,7 +79,7 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
     public AbstractXmlHandler setDefaultNamespace(String prefix, String namespaceURI) {
         this.defaultPrefix = prefix;
         this.defaultNamespace = namespaceURI;
-        resourceContext.namespaceContext().addNamespace(prefix, namespaceURI);
+        resourceContext.getNamespaceContext().addNamespace(prefix, namespaceURI);
         return this;
     }
 
@@ -146,7 +146,7 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
             }
             int level = parents.size();
             parents.pop();
-            identify(name, content(), resourceContext.resource().id());
+            identify(name, content(), resourceContext.getResource().id());
             if (!isResourceDelimiter(name)) {
                 closePredicate(parents.peek(), name, level - lastlevel);
             }
@@ -165,13 +165,13 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
 
     @Override
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        resourceContext.namespaceContext().addNamespace(makePrefix(prefix), uri);
+        resourceContext.getNamespaceContext().addNamespace(makePrefix(prefix), uri);
     }
 
     @Override
     public void endPrefixMapping(String prefix) throws SAXException {
         // we do not remove namespaces, or you will get trouble in RDF serializations...
-        //resourceContext.namespaceContext().removeNamespace(prefix);
+        //resourceContext.getNamespaceContext().removeNamespace(prefix);
     }
 
     protected String makePrefix(String name) {
@@ -179,7 +179,7 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
     }
 
     protected QName makeQName(String nsURI, String localname, String qname) {
-        String prefix = resourceContext.namespaceContext().getPrefix(nsURI);
+        String prefix = resourceContext.getNamespaceContext().getPrefix(nsURI);
         return new QName(!isEmpty(nsURI) ? nsURI : defaultNamespace,
                 !isEmpty(localname) ? localname : qname,
                 !isEmpty(prefix) ? prefix : defaultPrefix);
@@ -195,13 +195,13 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
     }
 
     protected void closeResource() {
-        boolean empty = resourceContext.resource().isEmpty();
+        boolean empty = resourceContext.getResource().isEmpty();
         if (empty) {
             return;
         }
         if (listener != null) {
-            listener.newIdentifier(resourceContext.resource().id());
-            Iterator<Triple> it = resourceContext.resource().iterator();
+            listener.newIdentifier(resourceContext.getResource().id());
+            Iterator<Triple> it = resourceContext.getResource().iterator();
             while (it.hasNext()) {
                 listener.triple(it.next());
             }

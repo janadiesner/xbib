@@ -33,11 +33,7 @@ public class EachKeyTest extends AbstractTest {
 
     @Test
     public void eachKeyWithString() throws IOException {
-        String result = compile("{{#each this}}{{@key}} {{/each}}").apply("String");
-
-        String expected1 = "empty bytes ";
-        String expected2 = "bytes empty ";
-        assertTrue(result.equals(expected1) || result.equals(expected2));
+        shouldCompileTo("{{#each this}}{{@key}} {{/each}}", "String", " ");
     }
 
     @Test

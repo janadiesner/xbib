@@ -1,7 +1,7 @@
 
 package org.xbib.template.handlebars.internal;
 
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 import org.xbib.template.handlebars.HandlebarsError;
 import org.xbib.template.handlebars.HandlebarsException;
 import org.xbib.template.handlebars.util.StringUtil;
@@ -59,7 +59,7 @@ abstract class BaseTemplate implements Template {
     }
 
     @Override
-    public String apply(final Context context) throws IOException {
+    public String apply(final HandlebarsContext context) throws IOException {
         FastStringWriter writer = new FastStringWriter();
         try {
             apply(context, writer);
@@ -70,10 +70,10 @@ abstract class BaseTemplate implements Template {
     }
 
     @Override
-    public void apply(final Context context, final Writer writer)
+    public void apply(final HandlebarsContext context, final Writer writer)
             throws IOException {
         notNull(writer, "A writer is required.");
-        Context wrapped = wrap(context);
+        HandlebarsContext wrapped = wrap(context);
         try {
             merge(wrapped, writer);
         } catch (HandlebarsException ex) {
@@ -105,11 +105,11 @@ abstract class BaseTemplate implements Template {
      * @param candidate The candidate object.
      * @return A context.
      */
-    private static Context wrap(final Object candidate) {
-        if (candidate instanceof Context) {
-            return (Context) candidate;
+    private static HandlebarsContext wrap(final Object candidate) {
+        if (candidate instanceof HandlebarsContext) {
+            return (HandlebarsContext) candidate;
         }
-        return Context.newContext(candidate);
+        return HandlebarsContext.newContext(candidate);
     }
 
     /**
@@ -119,7 +119,7 @@ abstract class BaseTemplate implements Template {
      * @param writer  The writer.
      * @throws java.io.IOException If a resource cannot be loaded.
      */
-    protected abstract void merge(final Context context, Writer writer)
+    protected abstract void merge(final HandlebarsContext context, Writer writer)
             throws IOException;
 
     @Override
@@ -185,7 +185,7 @@ abstract class BaseTemplate implements Template {
                             throws IOException {
                         String methodName = method.getName();
                         if ("apply".equals(methodName)) {
-                            Context context = Context.newBuilder(args[0])
+                            HandlebarsContext context = HandlebarsContext.newBuilder(args[0])
                                     .combine(attributes)
                                     .build();
                             attributes.clear();

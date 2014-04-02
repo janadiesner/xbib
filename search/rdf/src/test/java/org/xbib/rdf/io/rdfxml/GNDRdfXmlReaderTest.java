@@ -32,9 +32,17 @@
 package org.xbib.rdf.io.rdfxml;
 
 import org.testng.annotations.Test;
+import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.Resource;
+import org.xbib.rdf.Triple;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.turtle.TurtleWriter;
+import org.xbib.rdf.simple.SimpleResource;
+import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.xcontent.DefaultContentBuilder;
 import org.xml.sax.InputSource;
 
 import java.io.IOException;
@@ -46,24 +54,101 @@ public class GNDRdfXmlReaderTest {
     private final Logger logger = LoggerFactory.getLogger(GNDRdfXmlReaderTest.class.getName());
 
     @Test
-    public void testGND() throws Exception {
+    public void testGNDfromRdfXmltoTurtle() throws Exception {
         String filename = "/org/xbib/rdf/io/rdfxml/GND.rdf";
         InputStream in = getClass().getResourceAsStream(filename);
         if (in == null) {
             throw new IOException("file " + filename + " not found");
         }
-
         StringWriter sw = new StringWriter();
-
         TurtleWriter writer  = new TurtleWriter()
                 .output(sw);
-
         RdfXmlReader reader = new RdfXmlReader();
         reader.setTripleListener(writer);
         reader.parse(new InputSource(in));
         writer.close();
-
-        logger.info(sw.toString());
-
+        logger.info("gnd = {}", sw.toString());
     }
+
+    @Test
+    public void testGNDContentBuilder() throws Exception {
+        String filename = "/org/xbib/rdf/io/rdfxml/GND.rdf";
+        InputStream in = getClass().getResourceAsStream(filename);
+        if (in == null) {
+            throw new IOException("file " + filename + " not found");
+        }
+        TripleContentBuilder tripleContentBuilder = new TripleContentBuilder();
+        RdfXmlReader reader = new RdfXmlReader();
+        reader.setTripleListener(tripleContentBuilder);
+        reader.parse(new InputSource(in));
+    }
+
+    class TripleContentBuilder implements TripleListener {
+
+        Resource resource;
+
+        @Override
+        public TripleListener begin() {
+            return this;
+        }
+
+        @Override
+        public TripleListener startPrefixMapping(String prefix, String uri) {
+            return this;
+        }
+
+        @Override
+        public TripleListener endPrefixMapping(String prefix) {
+            return this;
+        }
+
+        @Override
+        public TripleListener newIdentifier(IRI identifier) {
+            try {
+                if (resource != null) {
+                    output(resource);
+                }
+            } catch (IOException e) {
+                //
+            }
+            resource = new SimpleResource();
+            resource.id(identifier);
+            return this;
+        }
+
+        @Override
+        public TripleListener triple(Triple triple) {
+            logger.info("{} {} {} -> {} {} {}",
+                    triple.subject().getClass(),
+                    triple.predicate().getClass(),
+                    triple.object().getClass(),
+                    triple.subject(),
+                    triple.predicate(),
+                    triple.object()
+                    );
+            resource.add(triple);
+            return this;
+        }
+
+        @Override
+        public TripleListener end() {
+            try {
+                if (resource != null) {
+                    output(resource);
+                }
+            } catch (IOException e) {
+                //
+            }
+            return this;
+        }
+
+        private void output(Resource resource) throws IOException {
+            ResourceContext context = new SimpleResourceContext();
+
+            DefaultContentBuilder contentBuilder = new DefaultContentBuilder();
+            String s = contentBuilder.build(context, resource);
+            logger.info("{}", s);
+        }
+    }
+
 }

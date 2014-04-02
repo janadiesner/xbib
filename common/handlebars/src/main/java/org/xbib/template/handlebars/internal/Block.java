@@ -1,7 +1,7 @@
 
 package org.xbib.template.handlebars.internal;
 
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 import org.xbib.template.handlebars.Handlebars;
 import org.xbib.template.handlebars.Helper;
 import org.xbib.template.handlebars.Lambda;
@@ -97,14 +97,14 @@ class Block extends HelperResolver {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void merge(final Context context, final Writer writer) throws IOException {
+    protected void merge(final HandlebarsContext context, final Writer writer) throws IOException {
         if (body == null) {
             return;
         }
         Helper<Object> helper = helper(name);
         Template template = body;
         final Object childContext;
-        Context currentScope = context;
+        HandlebarsContext currentScope = context;
         if (helper == null) {
             childContext = transform(context.get(name));
             final String hname;
@@ -123,7 +123,7 @@ class Block extends HelperResolver {
                                 startDelimiter, endDelimiter);
             } else {
                 hname = WithHelper.NAME;
-                currentScope = Context.newContext(context, childContext);
+                currentScope = HandlebarsContext.newContext(context, childContext);
             }
             // A built-in helper might be override it.
             helper = handlebars.helper(hname);
@@ -135,7 +135,7 @@ class Block extends HelperResolver {
                 .setParams(params(currentScope))
                 .setHash(hash(context))
                 .build();
-        options.data(Context.PARAM_SIZE, this.params.size());
+        options.data(HandlebarsContext.PARAM_SIZE, this.params.size());
 
         CharSequence result = helper.apply(childContext, options);
         if (result != null && result.length() > 0) {

@@ -47,7 +47,6 @@ import java.util.TreeMap;
 
 /**
  * Contains a simple context for XML namespaces
- *
  */
 public class XmlNamespaceContext implements NamespaceContext {
 

@@ -3,6 +3,8 @@ package org.xbib.common.xcontent;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map;
 
 public interface XContentParser extends Closeable {
@@ -83,7 +85,7 @@ public interface XContentParser extends Closeable {
     }
 
     enum NumberType {
-        INT, LONG, FLOAT, DOUBLE
+        INT, LONG, FLOAT, DOUBLE, BIG_DECIMAL, BIG_INTEGER
     }
 
     XContentType contentType();
@@ -135,6 +137,16 @@ public interface XContentParser extends Closeable {
     float floatValue() throws IOException;
 
     double doubleValue() throws IOException;
+
+    XContentParser losslessDecimals(boolean b);
+
+    boolean isLosslessDecimals();
+
+    BigInteger bigIntegerValue() throws IOException;
+
+    BigDecimal bigDecimalValue() throws IOException;
+
+    boolean isBooleanValue() throws IOException;
 
     boolean booleanValue() throws IOException;
 

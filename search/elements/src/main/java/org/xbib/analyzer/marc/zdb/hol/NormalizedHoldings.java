@@ -33,12 +33,9 @@ package org.xbib.analyzer.marc.zdb.hol;
 
 import org.xbib.elements.marc.MARCElement;
 
-import java.util.regex.Pattern;
-
 public class NormalizedHoldings extends MARCElement {
 
     private final static NormalizedHoldings instance = new NormalizedHoldings();
-    private Pattern[] movingwallPatterns;
 
     public static NormalizedHoldings getInstance() {
         return instance;

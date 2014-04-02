@@ -68,7 +68,7 @@ public class JsonReaderTest extends Assert {
         context.addNamespace("xbib", "http://xbib.org/");
         context.addNamespace("lia", "http://xbib.org/lia/");
 
-        resourceContext.newNamespaceContext(context);
+        resourceContext.setNamespaceContext(context);
 
         JsonResourceHandler jsonHandler = new JsonResourceHandler(resourceContext) {
 
@@ -90,7 +90,7 @@ public class JsonReaderTest extends Assert {
                 if (identifier == null) {
                     // make sure we can build an opaque IRI, whatever is out there
                    // String s = UrlEncoding.encode(value, CharUtils.Profile.SCHEMESPECIFICPART.filter());
-                    resourceContext.resource().id(IRI.create("id:doc1"));
+                    resourceContext.getResource().id(IRI.create("id:doc1"));
                 }
             }
 
@@ -102,7 +102,7 @@ public class JsonReaderTest extends Assert {
                 .setHandler(jsonHandler)
                 .root(new QName("http://purl.org/dc/elements/1.1/", "root", "dc"))
                 .parse(in);
-        logger.info("resource={}", sw.toString());
+        logger.info("getResource={}", sw.toString());
     }
 
 }

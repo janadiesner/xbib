@@ -39,115 +39,104 @@ import org.xbib.common.xcontent.XContentType;
 import org.xbib.common.xcontent.support.AbstractXContentParser;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 public class XmlXContentParser extends AbstractXContentParser {
 
-    final JsonParser parser;
+    protected final JsonParser parser;
 
     public XmlXContentParser(JsonParser parser) {
         this.parser = parser;
     }
 
-
     public XContentType contentType() {
         return XContentType.XML;
     }
-
 
     public XContentParser.Token nextToken() throws IOException {
         return convertToken(parser.nextToken());
     }
 
-
     public void skipChildren() throws IOException {
         parser.skipChildren();
     }
-
 
     public XContentParser.Token currentToken() {
         return convertToken(parser.getCurrentToken());
     }
 
-
     public XContentParser.NumberType numberType() throws IOException {
         return convertNumberType(parser.getNumberType());
     }
-
 
     public boolean estimatedNumberType() {
         return true;
     }
 
-
     public String currentName() throws IOException {
         return parser.getCurrentName();
     }
-
 
     protected boolean doBooleanValue() throws IOException {
         return parser.getBooleanValue();
     }
 
-
     public String text() throws IOException {
         return parser.getText();
     }
-
 
     public boolean hasTextCharacters() {
         return parser.hasTextCharacters();
     }
 
-
     public char[] textCharacters() throws IOException {
         return parser.getTextCharacters();
     }
-
 
     public int textLength() throws IOException {
         return parser.getTextLength();
     }
 
-
     public int textOffset() throws IOException {
         return parser.getTextOffset();
     }
-
 
     public Number numberValue() throws IOException {
         return parser.getNumberValue();
     }
 
+    public BigInteger bigIntegerValue() throws IOException {
+        return parser.getBigIntegerValue();
+    }
+
+    public BigDecimal bigDecimalValue() throws IOException {
+        return parser.getDecimalValue();
+    }
 
     public short doShortValue() throws IOException {
         return parser.getShortValue();
     }
 
-
     public int doIntValue() throws IOException {
         return parser.getIntValue();
     }
-
 
     public long doLongValue() throws IOException {
         return parser.getLongValue();
     }
 
-
     public float doFloatValue() throws IOException {
         return parser.getFloatValue();
     }
-
 
     public double doDoubleValue() throws IOException {
         return parser.getDoubleValue();
     }
 
-
     public byte[] binaryValue() throws IOException {
         return parser.getBinaryValue();
     }
-
 
     public void close() {
         try {
@@ -167,6 +156,10 @@ public class XmlXContentParser extends AbstractXContentParser {
                 return NumberType.FLOAT;
             case DOUBLE:
                 return NumberType.DOUBLE;
+            case BIG_INTEGER:
+                return NumberType.BIG_INTEGER;
+            case BIG_DECIMAL:
+                return NumberType.BIG_DECIMAL;
         }
         throw new IllegalStateException("No matching token for number_type [" + numberType + "]");
     }

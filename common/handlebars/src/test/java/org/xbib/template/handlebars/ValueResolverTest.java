@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNotNull;
 
 
 /**
- * Unit test for {@link Context}.
+ * Unit test for {@link HandlebarsContext}.
  */
 public class ValueResolverTest {
 
@@ -44,7 +44,7 @@ public class ValueResolverTest {
 
     @Test
     public void javaBeanResolver() {
-        Context context = Context
+        HandlebarsContext context = HandlebarsContext
                 .newBuilder(new Base("a", "b"))
                 .resolver(JavaBeanValueResolver.INSTANCE)
                 .build();
@@ -55,7 +55,7 @@ public class ValueResolverTest {
 
     @Test
     public void methodResolver() {
-        Context context = Context
+        HandlebarsContext context = HandlebarsContext
                 .newBuilder(new Base("a", "b"))
                 .resolver(MethodValueResolver.INSTANCE)
                 .build();
@@ -66,7 +66,7 @@ public class ValueResolverTest {
 
     @Test
     public void fieldResolver() {
-        Context context = Context
+        HandlebarsContext context = HandlebarsContext
                 .newBuilder(new Base("a", "b"))
                 .resolver(FieldValueResolver.INSTANCE)
                 .build();
@@ -81,7 +81,7 @@ public class ValueResolverTest {
         map.put("base", "a");
         map.put("child", "b");
 
-        Context context = Context
+        HandlebarsContext context = HandlebarsContext
                 .newBuilder(map)
                 .resolver(MapValueResolver.INSTANCE)
                 .build();
@@ -96,8 +96,8 @@ public class ValueResolverTest {
         map.put("base", "a");
         map.put("child", "b");
 
-        Context context =
-                Context
+        HandlebarsContext context =
+                HandlebarsContext
                         .newBuilder(new Base("a", "b"))
                         .combine("map", map)
                         .resolver(
@@ -145,7 +145,7 @@ public class ValueResolverTest {
         Template template =
                 new Handlebars().compileInline("{{#each users}}{{name}}, {{/each}}");
 
-        Context context = Context.newBuilder(users)
+        HandlebarsContext context = HandlebarsContext.newBuilder(users)
                 .resolver(
                         FieldValueResolver.INSTANCE,
                         JavaBeanValueResolver.INSTANCE
@@ -184,7 +184,7 @@ public class ValueResolverTest {
         Template template =
                 new Handlebars().compileInline("{{#each users}}{{name}}-{{extended.role}}, {{/each}}");
 
-        Context context = Context.newBuilder(users)
+        HandlebarsContext context = HandlebarsContext.newBuilder(users)
                 .combine("extended", extended)
                 .resolver(
                         MapValueResolver.INSTANCE,

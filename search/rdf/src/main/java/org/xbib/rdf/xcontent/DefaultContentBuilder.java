@@ -31,12 +31,13 @@
  */
 package org.xbib.rdf.xcontent;
 
+import static com.google.common.collect.Lists.newLinkedList;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.xbib.common.xcontent.XContentBuilder;
@@ -50,8 +51,8 @@ import org.xbib.iri.CompactingNamespaceContext;
 /**
  * A Builder for building XContent from a resource
  *
- * @param <C>
- * @param <R>
+ * @param <C> context type
+ * @param <R> resource type
  */
 public class DefaultContentBuilder<C extends ResourceContext, R extends Resource>
     implements ContentBuilder<C,R> {
@@ -95,7 +96,10 @@ public class DefaultContentBuilder<C extends ResourceContext, R extends Resource
 
     protected <S extends Identifier, P extends Property, O extends Node> void build(XContentBuilder builder, C resourceContext, Resource<S, P, O> resource)
             throws IOException {
-        CompactingNamespaceContext context = resourceContext.namespaceContext();
+        if (resource == null) {
+            return;
+        }
+        CompactingNamespaceContext context = resourceContext.getNamespaceContext();
         // iterate over properties
         for (P predicate : resource.predicateSet(resource.subject())) {
             Collection<O> values = resource.objects(predicate);
@@ -108,24 +112,28 @@ public class DefaultContentBuilder<C extends ResourceContext, R extends Resource
                 O object = values.iterator().next();
                 if (object instanceof Identifier) {
                     Identifier id = (Identifier) object;
-                    if (id.isBlank()) {
-                        continue;
+                    if (!id.isBlank()) {
+                        builder.field(context.compact(predicate.id()), id.id().toString()); // ID -> string
                     }
-                }
-                // drop null value
-                if (object.nativeValue() != null) {
+                } else if (object.nativeValue() != null) {
                     builder.field(context.compact(predicate.id()), object.nativeValue());
                 }
+                // drop null value
             } else if (values.size() > 1) {
                 // array of values
                 Collection<O> properties = filterBlankNodes(values);
                 if (!properties.isEmpty()) {
                     builder.startArray(context.compact(predicate.id()));
                     for (O object : properties) {
-                        // drop null values
-                        if (object.nativeValue() != null) {
+                        if (object instanceof Identifier) {
+                            Identifier id = (Identifier) object;
+                            if (!id.isBlank()) {
+                                builder.value(id.id().toString()); // IRI -> string
+                            }
+                        } else if (object.nativeValue() != null) {
                             builder.value(object.nativeValue());
                         }
+                        // drop null values
                     }
                     builder.endArray();
                 }
@@ -137,25 +145,36 @@ public class DefaultContentBuilder<C extends ResourceContext, R extends Resource
             Collection<Resource<S, P, O>> resources = m.get(predicate);
             // drop resources with size 0 silently
             if (resources.size() == 1) {
-                // single resource
-                builder.startObject(context.compact(predicate.id()));
-                build(builder, resourceContext, resources.iterator().next());
-                builder.endObject();
-            } else if (resources.size() > 1) {
-                // array of resources
-                builder.startArray(context.compact(predicate.id()));
-                for (Resource<S, P, O> child : resources) {
-                    builder.startObject();
-                    build(builder, resourceContext, child);
+                // single resource, check if resource is embedded
+                Resource<S, P, O> res = resources.iterator().next();
+                if (res.isBlank()) {
+                    builder.startObject(context.compact(predicate.id()));
+                    build(builder, resourceContext, res);
                     builder.endObject();
                 }
-                builder.endArray();
+            } else if (resources.size() > 1) {
+                // build array of resources
+                List<XContentBuilder> list = newLinkedList();
+                for (Resource<S, P, O> child : resources) {
+                    if (child.isBlank()) {
+                        XContentBuilder resBuilder = jsonBuilder();
+                        resBuilder.startObject();
+                        build(resBuilder, resourceContext, child);
+                        resBuilder.endObject();
+                        list.add(resBuilder);
+                    }
+                }
+                if (!list.isEmpty()) {
+                    builder.startArray(context.compact(predicate.id()));
+                    builder.copy(list);
+                    builder.endArray();
+                }
             }
         }
     }
 
     private <O extends Node> Collection<O> filterBlankNodes(Collection<O> objects) {
-        Collection<O> nodes = new LinkedList();
+        Collection<O> nodes = newLinkedList();
         for (O object : objects) {
             if (object instanceof Identifier) {
                 Identifier id = (Identifier)object;

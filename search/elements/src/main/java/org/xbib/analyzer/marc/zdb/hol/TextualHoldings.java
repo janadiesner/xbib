@@ -32,7 +32,9 @@
 package org.xbib.analyzer.marc.zdb.hol;
 
 import org.xbib.elements.ElementBuilder;
+import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
+import org.xbib.elements.marc.MARCPipeline;
 import org.xbib.elements.support.EnumerationAndChronology;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
@@ -46,6 +48,7 @@ import java.util.regex.Pattern;
 public class TextualHoldings extends MARCElement {
 
     private final static TextualHoldings instance = new TextualHoldings();
+
     private Pattern[] movingwallPatterns;
 
     public static TextualHoldings getInstance() {
@@ -75,15 +78,16 @@ public class TextualHoldings extends MARCElement {
     }
 
     @Override
-    public void fields(ElementBuilder builder, FieldCollection fields, String value) {
+    public boolean fields(MARCPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
+                          FieldCollection fields, String value) {
         for (Field field : fields) {
-            builder.context().resource().add("textualholdings", field.data());
+            builder.context().getResource().add("textualholdings", field.data());
             if (field.subfieldId().equals("a")) {
-                Resource r = builder.context().resource().newResource("holdings");
+                Resource r = builder.context().getResource().newResource("holdings");
                 Resource parsedHoldings = EnumerationAndChronology.parse(field.data(), r, getMovingwallPatterns());
                 if (!parsedHoldings.isEmpty()) {
                     Set<Integer> dates = EnumerationAndChronology.dates(parsedHoldings);
-                    builder.context().resource().add("dates", dates);
+                    builder.context().getResource().add("dates", dates);
                 } else {
                     if (logger.isTraceEnabled()) {
                         logger.trace("no dates found in field " + field);
@@ -91,6 +95,7 @@ public class TextualHoldings extends MARCElement {
                 }
             }
         }
+        return false;
     }
 
 }

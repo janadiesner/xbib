@@ -42,7 +42,7 @@ import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleFactory;
 
 /**
- * The XML resource handler can create nested RDF resources from arbitrary XML.
+ * The XML getResource handler can create nested RDF resources from arbitrary XML.
  *
  */
 public abstract class AbstractXmlResourceHandler
@@ -59,7 +59,7 @@ public abstract class AbstractXmlResourceHandler
     @Override
     public void openResource() {
         super.openResource();
-        stack.push(resourceContext().resource());
+        stack.push(resourceContext().getResource());
     }
 
     @Override
@@ -69,7 +69,7 @@ public abstract class AbstractXmlResourceHandler
     }
 
     /**
-     *  Open a predicate. Create new resource, even if there will be only a single literal.
+     *  Open a predicate. Create new getResource, even if there will be only a single literal.
      *  It will be compacted later.
      *
      * @param parent

@@ -106,7 +106,7 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
      */
     private boolean eof;
     /**
-     * Stack for resource statements
+     * Stack for getResource statements
      */
     private Stack<Triple> triples;
     /**
@@ -165,6 +165,9 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
         this.sb = new StringBuilder();
         this.eof = false;
         this.triples = new Stack();
+        if (listener != null) {
+            listener.begin();
+        }
         try {
             while (!eof) {
                 char ch = skipWhitespace();
@@ -180,6 +183,9 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
             }
         } finally {
             this.reader.close();
+            if (listener != null) {
+                listener.end();
+            }
         }
         return this;
     }
@@ -335,9 +341,9 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
         Triple stmt = new SimpleTriple(subject, predicate, object);
         if (subject instanceof Identifier) {
             // Push triples with blank node subjects on stack.
-            // The idea for having ordered resource properties is:
-            // All resource property triples should be serialized
-            // after the resource parent triple.
+            // The idea for having ordered getResource properties is:
+            // All getResource property triples should be serialized
+            // after the getResource parent triple.
             triples.add(0, stmt);
         } else {
             // Send record events. A record is grouped by a sequence of same non-blank subjects
@@ -504,7 +510,7 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
     /**
      * Parse a collection
      *
-     * @return the collection as a resource
+     * @return the collection as a getResource
      * @throws IOException
      */
     private Resource<S, P, O> parseCollection() throws IOException {

@@ -1,7 +1,7 @@
 
 package org.xbib.template.handlebars.internal;
 
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 import org.xbib.template.handlebars.TagType;
 import org.xbib.template.handlebars.Template;
 
@@ -36,7 +36,7 @@ class TemplateList extends BaseTemplate implements Iterable<Template> {
     }
 
     @Override
-    protected void merge(final Context context, final Writer writer)
+    protected void merge(final HandlebarsContext context, final Writer writer)
             throws IOException {
         for (Template node : nodes) {
             node.apply(context, writer);

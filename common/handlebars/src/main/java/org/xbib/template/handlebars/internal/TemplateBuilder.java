@@ -1,7 +1,7 @@
 
 package org.xbib.template.handlebars.internal;
 
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 import org.xbib.template.handlebars.Handlebars;
 import org.xbib.template.handlebars.Helper;
 import org.xbib.template.handlebars.HelperRegistry;
@@ -296,14 +296,14 @@ abstract class TemplateBuilder extends HbsParserBaseVisitor<Object> {
     private static Template infiniteLoop(final TemplateSource source, final BaseTemplate template) {
         return new ForwardingTemplate(template) {
             @Override
-            protected void beforeApply(final Context context) {
-                LinkedList<TemplateSource> invocationStack = context.data(Context.INVOCATION_STACK);
+            protected void beforeApply(final HandlebarsContext context) {
+                LinkedList<TemplateSource> invocationStack = context.data(HandlebarsContext.INVOCATION_STACK);
                 invocationStack.addLast(source);
             }
 
             @Override
-            protected void afterApply(final Context context) {
-                LinkedList<TemplateSource> invocationStack = context.data(Context.INVOCATION_STACK);
+            protected void afterApply(final HandlebarsContext context) {
+                LinkedList<TemplateSource> invocationStack = context.data(HandlebarsContext.INVOCATION_STACK);
                 if (!invocationStack.isEmpty()) {
                     invocationStack.removeLast();
                 }

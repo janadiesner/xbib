@@ -1,7 +1,6 @@
 package org.xbib.elements.support;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -53,7 +52,8 @@ public class EnumerationAndChronologyTest extends Assert {
             "3.1971,Jan./Febr.",
             "2.1947,15.Mai -",
             "1963,21(22.Mai) -",
-            "[19]81/82 - [19]83"
+            "[19]81/82 - [19]83",
+            "1981,31 - 25.1997"
         };
         String[] dates = {
             "[1961]",
@@ -88,7 +88,8 @@ public class EnumerationAndChronologyTest extends Assert {
             "[1971]",
             "",
             "",
-            "[1981, 1982, 1983]"
+            "[1981, 1982, 1983]",
+            "[1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997]"
         };
         // set dynamic years
         int year =  Calendar.getInstance().get(Calendar.YEAR);

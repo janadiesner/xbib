@@ -34,7 +34,7 @@ package org.xbib.elements.marc;
 import org.xbib.elements.AbstractElementBuilder;
 import org.xbib.elements.ResourceContextFactory;
 import org.xbib.analyzer.dublincore.DublinCoreProperties;
-import org.xbib.elements.ElementOutput;
+import org.xbib.elements.ContextResourceOutput;
 import org.xbib.marc.FieldCollection;
 
 /**
@@ -60,7 +60,7 @@ public class MARCElementBuilder
     }
 
     @Override
-    public MARCElementBuilder addOutput(ElementOutput output) {
+    public MARCElementBuilder addOutput(ContextResourceOutput output) {
         super.addOutput(output);
         return this;
     }

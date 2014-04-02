@@ -36,10 +36,7 @@ import org.xbib.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.util.Iterator;
 import java.util.Properties;
-import java.util.ServiceLoader;
 
 /**
  *  A factory for SRU clients
@@ -66,15 +63,15 @@ public final class SRUClientFactory {
         }
     }
 
-    public static SRUClient newClient(String name) {
+    public static SRUClient newClient(String spec) {
         try {
             Properties properties = new Properties();
-            InputStream in = instance.getClass().getResourceAsStream("/org/xbib/sru/client/" + name + ".properties");
+            InputStream in = instance.getClass().getResourceAsStream("/org/xbib/sru/client/" + spec + ".properties");
             if (in != null) {
                 properties.load(in);
             }
             if (in == null || properties.isEmpty()) {
-                throw new IllegalArgumentException("SRU client " + name + " properties not found");
+                throw new IllegalArgumentException("SRU client " + spec + " properties not found");
             }
             return new PropertiesSRUClient(properties);
         } catch (IOException ex) {

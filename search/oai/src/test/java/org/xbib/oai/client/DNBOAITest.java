@@ -80,6 +80,11 @@ public class DNBOAITest {
             final TripleListener stmt = new TripleListener() {
 
                 @Override
+                public TripleListener begin() {
+                    return this;
+                }
+
+                @Override
                 public TripleListener startPrefixMapping(String prefix, String uri) {
                     return this;
                 }
@@ -98,6 +103,11 @@ public class DNBOAITest {
                 @Override
                 public TripleListener triple(Triple statement) {
                     getResource().add(statement);
+                    return this;
+                }
+
+                @Override
+                public TripleListener end() {
                     return this;
                 }
             };

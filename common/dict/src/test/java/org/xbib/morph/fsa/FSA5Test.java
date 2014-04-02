@@ -1,5 +1,6 @@
 package org.xbib.morph.fsa;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.morph.fsa.io.FSAUtils;
 
@@ -10,16 +11,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.xbib.morph.fsa.FSAFlags.NEXTBIT;
 
 
 /**
  * Additional tests for {@link FSA5}.
  */
-public final class FSA5Test {
+public final class FSA5Test extends Assert {
     public ArrayList<String> expected = new ArrayList<String>(Arrays.asList(
             "a", "aba", "ac", "b", "ba", "c"));
 

@@ -70,7 +70,7 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
     public RdfMetadataHandler(IRINamespaceContext context) {
         this.context = context;
         this.resourceContext = new SimpleResourceContext();
-        resourceContext.newNamespaceContext(context);
+        resourceContext.setNamespaceContext(context);
         resourceContext.newResource();
         // set up our default handler
         this.handler = new RdfResourceHandler(resourceContext);
@@ -116,8 +116,8 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
     }
 
     /**
-     * At the end of each OAI metadata, the resource context receives the identifier from
-     * the metadata header. The resource context is pushed to the RDF output.
+     * At the end of each OAI metadata, the getResource context receives the identifier from
+     * the metadata header. The getResource context is pushed to the RDF output.
      * Any IOException is converted to a SAXException.
      *
      * @throws SAXException
@@ -127,7 +127,7 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
         String id = getHeader().getIdentifier().trim();
         if (handler != null) {
             handler.identify(null, id, null);
-            resourceContext.resource().id(IRI.create(id));
+            resourceContext.getResource().id(IRI.create(id));
             handler.endDocument();
             try {
                 rdfOutput.output(resourceContext);

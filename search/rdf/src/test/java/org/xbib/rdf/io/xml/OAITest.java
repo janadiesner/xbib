@@ -34,7 +34,7 @@ public class OAITest extends Assert {
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
 
         final SimpleResourceContext resourceContext = new SimpleResourceContext();
-        resourceContext.newNamespaceContext(context);
+        resourceContext.setNamespaceContext(context);
 
         XmlHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {
 
@@ -48,7 +48,7 @@ public class OAITest extends Assert {
                 if ("identifier".equals(name.getLocalPart()) && identifier == null) {
                     // make sure we can build an opaque IRI, whatever is out there
                     String s = UrlEncoding.encode(value, CharUtils.Profile.SCHEMESPECIFICPART.filter());
-                    resourceContext.resource().id(IRI.create("id:" + s));
+                    resourceContext.getResource().id(IRI.create("id:" + s));
                 }
             }
 

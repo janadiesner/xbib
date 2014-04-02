@@ -73,29 +73,6 @@ public class DNBClientTest {
                 .setSet("bib")
                 .setMetadataPrefix("PicaPlus-xml");
         final XmlTriplifier reader = new XmlReader();
-        final TripleListener triples = new TripleListener() {
-
-            @Override
-            public TripleListener startPrefixMapping(String prefix, String uri) {
-                return this;
-            }
-
-            @Override
-            public TripleListener endPrefixMapping(String prefix) {
-                return this;
-            }
-
-            @Override
-            public TripleListener newIdentifier(IRI uri) {
-                return this;
-            }
-
-            @Override
-            public TripleListener triple(Triple statement) {
-                return this;
-            }
-        };
-        reader.setTripleListener(triples);
         final AtomicLong count = new AtomicLong(0L);
         MetadataHandler metadataHandler = new MetadataHandler() {
             @Override

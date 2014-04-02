@@ -31,8 +31,10 @@
  */
 package org.xbib.analyzer.marc.hol;
 
+import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.elements.ElementBuilder;
+import org.xbib.elements.marc.MARCPipeline;
 import org.xbib.marc.FieldCollection;
 
 public class Ignore extends MARCElement {
@@ -44,6 +46,8 @@ public class Ignore extends MARCElement {
     }
 
     @Override
-    public void fields(ElementBuilder builder, FieldCollection fields, String value) {
+    public boolean fields(MARCPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
+                          FieldCollection fields, String value) {
+        return true;
     }
 }

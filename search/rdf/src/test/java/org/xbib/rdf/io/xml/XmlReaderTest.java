@@ -66,7 +66,7 @@ public class XmlReaderTest extends Assert {
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
 
         final SimpleResourceContext resourceContext = new SimpleResourceContext();
-        resourceContext.newNamespaceContext(context);
+        resourceContext.setNamespaceContext(context);
 
         XmlHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {
 
@@ -80,7 +80,7 @@ public class XmlReaderTest extends Assert {
                 if ("identifier".equals(name.getLocalPart()) && identifier == null) {
                     // make sure we can build an opaque IRI, whatever is out there
                     String s = UrlEncoding.encode(value, Profile.SCHEMESPECIFICPART.filter());
-                    resourceContext.resource().id(IRI.create("id:" + s));
+                    resourceContext.getResource().id(IRI.create("id:" + s));
                 }
             }
             
@@ -115,19 +115,19 @@ public class XmlReaderTest extends Assert {
         }
         IRINamespaceContext context = IRINamespaceContext.newInstance();
         final SimpleResourceContext resourceContext = new SimpleResourceContext();
-        resourceContext.newNamespaceContext(context);
+        resourceContext.setNamespaceContext(context);
         AbstractXmlHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {
 
             @Override
             public boolean isResourceDelimiter(QName name) {
-                return false; // only one resource
+                return false; // only one getResource
                 //return "oai_dc".equals(name.getLocalPart());
             }
 
             @Override
             public void identify(QName name, String value, IRI identifier) {
                 if (identifier == null) {
-                    resourceContext.resource().id("id:1");
+                    resourceContext.getResource().id("id:1");
                 }
             }
 
@@ -141,6 +141,11 @@ public class XmlReaderTest extends Assert {
         };
         xmlHandler.setDefaultNamespace("xml", "http://xmltest")
                 .setListener(new TripleListener() {
+                    @Override
+                    public TripleListener begin() {
+                        return this;
+                    }
+
                     @Override
                     public TripleListener startPrefixMapping(String prefix, String uri) {
                         return this;
@@ -161,6 +166,11 @@ public class XmlReaderTest extends Assert {
                         logger.info("triple = {}", triple);
                         return this;
                     }
+
+                    @Override
+                    public TripleListener end() {
+                        return this;
+                    }
                 });
         new XmlReader()
                 .setHandler(xmlHandler)
@@ -176,7 +186,7 @@ public class XmlReaderTest extends Assert {
         }
         IRINamespaceContext context = IRINamespaceContext.newInstance();
         final SimpleResourceContext resourceContext = new SimpleResourceContext();
-        resourceContext.newNamespaceContext(context);
+        resourceContext.setNamespaceContext(context);
         AbstractXmlResourceHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {
 
             @Override
@@ -187,7 +197,7 @@ public class XmlReaderTest extends Assert {
             @Override
             public void identify(QName name, String value, IRI identifier) {
                 if (identifier ==null) {
-                    resourceContext.resource().id("id:1");
+                    resourceContext.getResource().id("id:1");
                 }
             }
 
@@ -199,27 +209,37 @@ public class XmlReaderTest extends Assert {
         };
         xmlHandler.setDefaultNamespace("xml", "http://localhost")
                 .setListener(new TripleListener() {
-            @Override
-            public TripleListener startPrefixMapping(String prefix, String uri) {
-                return this;
-            }
+                    @Override
+                    public TripleListener begin() {
+                        return this;
+                    }
 
-            @Override
-            public TripleListener endPrefixMapping(String prefix) {
-                return this;
-            }
+                    @Override
+                    public TripleListener startPrefixMapping(String prefix, String uri) {
+                        return this;
+                    }
 
-            @Override
-            public TripleListener newIdentifier(IRI identifier) {
-                return this;
-            }
+                    @Override
+                    public TripleListener endPrefixMapping(String prefix) {
+                        return this;
+                    }
 
-            @Override
-            public TripleListener triple(Triple triple) {
-                logger.info("triple = {}", triple);
-                return this;
-            }
-        });
+                    @Override
+                    public TripleListener newIdentifier(IRI identifier) {
+                        return this;
+                    }
+
+                    @Override
+                    public TripleListener triple(Triple triple) {
+                        logger.info("triple = {}", triple);
+                        return this;
+                    }
+
+                    @Override
+                    public TripleListener end() {
+                        return this;
+                    }
+                });
         new XmlReader()
                 .setHandler(xmlHandler)
                 .parse(new InputSource(in));

@@ -166,7 +166,7 @@ public class DOAJArticleClientTest {
 
         @Override
         public RdfOutput output(ResourceContext resourceContext) throws IOException {
-            writer.write(resourceContext.resource());
+            writer.write(resourceContext.getResource());
             logger.info("out = {}", sw);
             sw = new StringWriter();
             writer.output(sw);

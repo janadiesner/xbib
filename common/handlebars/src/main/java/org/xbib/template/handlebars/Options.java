@@ -42,7 +42,7 @@ public class Options {
         /**
          * The current context. Not null.
          */
-        private Context context;
+        private HandlebarsContext context;
 
         /**
          * The current template. Not null.
@@ -77,12 +77,19 @@ public class Options {
          * @param context    A context object. Required.
          * @param fn         A template object. Required.
          */
-        public Builder(final Handlebars handlebars, final TagType tagType, final Context context,
+        public Builder(final Handlebars handlebars, final TagType tagType, final HandlebarsContext context,
                        final Template fn) {
             this.handlebars = Validate.notNull(handlebars, "The handlebars is required.");
             this.tagType = Validate.notNull(tagType, "The tag type is required.");
             this.context = Validate.notNull(context, "The context is required.");
             this.fn = Validate.notNull(fn, "The fn template is required.");
+        }
+
+        public Builder(Options options) {
+            this.handlebars = options.handlebars;
+            this.tagType = options.tagType;
+            this.context = options.context;
+            this.fn = options.fn;
         }
 
         /**
@@ -145,7 +152,7 @@ public class Options {
     /**
      * The current context. Not null.
      */
-    public final Context context;
+    public final HandlebarsContext context;
 
     /**
      * The current template. Not null.
@@ -183,7 +190,7 @@ public class Options {
      * @param params     The parameters. Required.
      * @param hash       The optional hash. Required.
      */
-    public Options(final Handlebars handlebars, final TagType tagType, final Context context,
+    public Options(final Handlebars handlebars, final TagType tagType, final HandlebarsContext context,
                    final Template fn, final Template inverse, final Object[] params,
                    final Map<String, Object> hash) {
         this.handlebars = Validate.notNull(handlebars, "The handlebars is required.");
@@ -421,24 +428,24 @@ public class Options {
     }
 
     /**
-     * Creates a {@link Context} from the given model. If the object is a context
+     * Creates a {@link HandlebarsContext} from the given model. If the object is a context
      * already the same object will be returned.
      *
      * @param model The model object.
      * @return A context representing the model or the same model if it's a
      * context already.
      */
-    public Context wrap(final Object model) {
+    public HandlebarsContext wrap(final Object model) {
         if (model == context) {
             return context;
         }
         if (model == context.model()) {
             return context;
         }
-        if (model instanceof Context) {
-            return (Context) model;
+        if (model instanceof HandlebarsContext) {
+            return (HandlebarsContext) model;
         }
-        return Context.newContext(context, model);
+        return HandlebarsContext.newContext(context, model);
     }
 
     /**
@@ -469,8 +476,8 @@ public class Options {
      * @return All the properties and their values for the given object.
      */
     public Set<Entry<String, Object>> propertySet(final Object context) {
-        return this.context.propertySet(context instanceof Context
-                ? ((Context) context).model()
+        return this.context.propertySet(context instanceof HandlebarsContext
+                ? ((HandlebarsContext) context).model()
                 : context);
     }
 
@@ -481,7 +488,7 @@ public class Options {
      */
     @SuppressWarnings("unchecked")
     private Map<String, Template> partials() {
-        return (Map<String, Template>) data(Context.PARTIALS);
+        return (Map<String, Template>) data(HandlebarsContext.PARTIALS);
     }
 
 }

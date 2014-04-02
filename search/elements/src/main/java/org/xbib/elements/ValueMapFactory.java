@@ -41,11 +41,13 @@ import java.util.Map;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 
+import static com.google.common.collect.Maps.newHashMap;
+
 public class ValueMapFactory {
 
     private final static Logger logger = LoggerFactory.getLogger(ValueMapFactory.class.getName());
 
-    private final static Map<String, Object> maps = new HashMap();
+    private final static Map<String, Object> maps = newHashMap();
 
     private ValueMapFactory() {
     }
@@ -86,7 +88,7 @@ public class ValueMapFactory {
                 Collection<String> c = (Collection<String>) values;
                 if (c != null) {
                     // assoc map
-                    final Map<String, String> map = new HashMap();
+                    final Map<String, String> map = newHashMap();
                     Iterator<String> it = c.iterator();
                     for (int i = 0; i < c.size(); i += 2) {
                         map.put(it.next(), it.next());

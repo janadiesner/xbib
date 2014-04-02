@@ -1,7 +1,7 @@
 
 package org.xbib.template.handlebars.internal;
 
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 import org.xbib.template.handlebars.Handlebars;
 import org.xbib.template.handlebars.Lambda;
 import org.xbib.template.handlebars.TagType;
@@ -31,7 +31,7 @@ final class Lambdas {
      * @throws java.io.IOException If the resource cannot be loaded.
      */
     public static CharSequence merge(final Handlebars handlebars,
-                                     final Lambda<Object, Object> lambda, final Context scope,
+                                     final Lambda<Object, Object> lambda, final HandlebarsContext scope,
                                      final Template template) throws IOException {
         Template result = compile(handlebars, lambda, scope, template);
         return result.apply(scope);
@@ -48,7 +48,7 @@ final class Lambdas {
      * @throws java.io.IOException If the resource cannot be loaded.
      */
     public static Template compile(final Handlebars handlebars,
-                                   final Lambda<Object, Object> lambda, final Context scope,
+                                   final Lambda<Object, Object> lambda, final HandlebarsContext scope,
                                    final Template template)
             throws IOException {
         return compile(handlebars, lambda, scope, template, "{{", "}}");
@@ -67,7 +67,7 @@ final class Lambdas {
      * @throws java.io.IOException If the resource cannot be loaded.
      */
     public static Template compile(final Handlebars handlebars,
-                                   final Lambda<Object, Object> lambda, final Context scope,
+                                   final Lambda<Object, Object> lambda, final HandlebarsContext scope,
                                    final Template template, final String startDelimiter,
                                    final String endDelimiter)
             throws IOException {

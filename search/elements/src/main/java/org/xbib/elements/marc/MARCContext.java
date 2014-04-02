@@ -31,13 +31,11 @@
  */
 package org.xbib.elements.marc;
 
-import org.xbib.elements.items.LiaContext;
+import org.xbib.analyzer.dublincore.DublinCoreContext;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleResource;
-import org.xbib.rdf.xcontent.ContentBuilder;
-import org.xbib.rdf.xcontent.DefaultContentBuilder;
 import org.xbib.util.DateUtil;
 
 import java.util.Date;
@@ -45,9 +43,7 @@ import java.util.Date;
 /**
  * A MARC builder builds Elements from MARC field collections. It uses a MARC context.
  */
-public class MARCContext extends LiaContext {
-
-    private final ContentBuilder contentBuilder = new DefaultContentBuilder();
+public class MARCContext extends DublinCoreContext {
 
     private String label;
 
@@ -56,11 +52,6 @@ public class MARCContext extends LiaContext {
     @Override
     public Resource newResource() {
         return new SimpleResource();
-    }
-
-    @Override
-    public ContentBuilder contentBuilder() {
-        return contentBuilder;
     }
 
     public MARCContext label(String label) {
@@ -83,15 +74,15 @@ public class MARCContext extends LiaContext {
      * @return this context
      */
     @Override
-    public ResourceContext<Resource> prepareForOutput() {
-        if (resource() == null) {
+    public ResourceContext<Resource> beforeOutput() {
+        if (getResource() == null) {
             return this;
         }
-        resource().add("xbib:timestamp", DateUtil.formatDateISO(new Date()));
-        resource().add("xbib:label", label);
+        getResource().add("xbib:timestamp", DateUtil.formatDateISO(new Date()));
+        getResource().add("xbib:label", label);
         if (recordNumber != null) {
-            resource().add("xbib:id", recordNumber);
-            resource().id(IRI.builder().fragment(recordNumber).build());
+            getResource().add("xbib:id", recordNumber);
+            getResource().id(IRI.builder().fragment(recordNumber).build());
         }
         return this;
     }

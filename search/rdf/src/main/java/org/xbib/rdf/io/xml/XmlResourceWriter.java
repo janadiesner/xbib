@@ -51,7 +51,7 @@ import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.IRINamespaceContext;
 
 /**
- * Write resource to XML stream
+ * Write getResource to XML stream
  *
  */
 public class XmlResourceWriter<S extends Identifier, P extends Property, O extends Node> {
@@ -74,7 +74,7 @@ public class XmlResourceWriter<S extends Identifier, P extends Property, O exten
             throws XMLStreamException {
         XMLEventWriter xew = outputFactory.createXMLEventWriter(w);
         IRI resourceURI = resource.id();
-        // dump resource as XML
+        // dump getResource as XML
         String nsPrefix = resourceURI.getScheme();
         String name = resourceURI.getSchemeSpecificPart();
         String nsURI = context.getNamespaceURI(nsPrefix);
@@ -83,7 +83,7 @@ public class XmlResourceWriter<S extends Identifier, P extends Property, O exten
     }
 
     /**
-     * Write resource to XML event consumer
+     * Write getResource to XML event consumer
      *
      * @param consumer
      * @param resource

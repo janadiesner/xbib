@@ -5,18 +5,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.math.BigInteger;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.xbib.common.Strings;
+import org.xbib.common.geo.GeoPoint;
 import org.xbib.io.BytesArray;
 import org.xbib.io.BytesReference;
 import org.xbib.io.stream.BytesStream;
 import org.xbib.io.FastByteArrayOutputStream;
-import org.xbib.common.xcontent.support.XContentMapConverter;
 
-public final class XContentBuilder implements BytesStream {
+public final class XContentBuilder implements BytesStream, ToXContent {
+
+    @Override
+    public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
+        return builder.copy(this);
+    }
 
     public static enum FieldCaseConversion {
         /**
@@ -33,6 +44,10 @@ public final class XContentBuilder implements BytesStream {
         CAMELCASE
     }
 
+    public final static DateTimeFormatter defaultDatePrinter =
+            DateTimeFormatter.BASIC_ISO_DATE;
+            //ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
+
     protected static FieldCaseConversion globalFieldCaseConversion = FieldCaseConversion.NONE;
 
     public static void globalFieldCaseConversion(FieldCaseConversion globalFieldCaseConversion) {
@@ -46,15 +61,9 @@ public final class XContentBuilder implements BytesStream {
         return new XContentBuilder(xContent, new FastByteArrayOutputStream());
     }
 
-    public static XContentBuilder builder(XContent xContent, Object payload) throws IOException {
-        return new XContentBuilder(xContent, new FastByteArrayOutputStream(), payload);
-    }
-
     private XContentGenerator generator;
 
     private final OutputStream bos;
-
-    private final Object payload;
 
     private FieldCaseConversion fieldCaseConversion = globalFieldCaseConversion;
 
@@ -65,17 +74,8 @@ public final class XContentBuilder implements BytesStream {
      * to call {@link #close()} when the builder is done with.
      */
     public XContentBuilder(XContent xContent, OutputStream bos) throws IOException {
-        this(xContent, bos, null);
-    }
-
-    /**
-     * Constructs a new builder using the provided xcontent and an OutputStream. Make sure
-     * to call {@link #close()} when the builder is done with.
-     */
-    public XContentBuilder(XContent xContent, OutputStream bos, Object payload) throws IOException {
         this.bos = bos;
         this.generator = xContent.createGenerator(bos);
-        this.payload = payload;
     }
 
     public XContentBuilder fieldCaseConversion(FieldCaseConversion fieldCaseConversion) {
@@ -93,6 +93,11 @@ public final class XContentBuilder implements BytesStream {
 
     public XContentBuilder prettyPrint() {
         generator.usePrettyPrint();
+        return this;
+    }
+
+    public XContentBuilder lfAtEnd() {
+        generator.usePrintLineFeedAtEnd();
         return this;
     }
 
@@ -115,6 +120,18 @@ public final class XContentBuilder implements BytesStream {
     }
 
     public XContentBuilder startObject(String name, FieldCaseConversion conversion) throws IOException {
+        field(name, conversion);
+        startObject();
+        return this;
+    }
+
+    public XContentBuilder startObject(XContentBuilderString name) throws IOException {
+        field(name);
+        startObject();
+        return this;
+    }
+
+    public XContentBuilder startObject(XContentBuilderString name, FieldCaseConversion conversion) throws IOException {
         field(name, conversion);
         startObject();
         return this;
@@ -169,6 +186,12 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder startArray(XContentBuilderString name) throws IOException {
+        field(name);
+        startArray();
+        return this;
+    }
+
     public XContentBuilder startArray() throws IOException {
         generator.writeStartArray();
         return this;
@@ -179,17 +202,40 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder field(XContentBuilderString name) throws IOException {
+        if (fieldCaseConversion == FieldCaseConversion.UNDERSCORE) {
+            generator.writeFieldName(name.underscore());
+        } else if (fieldCaseConversion == FieldCaseConversion.CAMELCASE) {
+            generator.writeFieldName(name.camelCase());
+        } else {
+            generator.writeFieldName(name.underscore());
+        }
+        return this;
+    }
+
+    public XContentBuilder field(XContentBuilderString name, FieldCaseConversion conversion) throws IOException {
+        if (conversion == FieldCaseConversion.UNDERSCORE) {
+            generator.writeFieldName(name.underscore());
+        } else if (conversion == FieldCaseConversion.CAMELCASE) {
+            generator.writeFieldName(name.camelCase());
+        } else {
+            generator.writeFieldName(name.underscore());
+        }
+        return this;
+    }
+
+
     public XContentBuilder field(String name) throws IOException {
         if (fieldCaseConversion == FieldCaseConversion.UNDERSCORE) {
             if (cachedStringBuilder == null) {
                 cachedStringBuilder = new StringBuilder();
             }
-            name = toUnderscoreCase(name, cachedStringBuilder);
+            name = Strings.toUnderscoreCase(name, cachedStringBuilder);
         } else if (fieldCaseConversion == FieldCaseConversion.CAMELCASE) {
             if (cachedStringBuilder == null) {
                 cachedStringBuilder = new StringBuilder();
             }
-            name = toCamelCase(name, cachedStringBuilder);
+            name = Strings.toCamelCase(name, cachedStringBuilder);
         }
         generator.writeFieldName(name);
         return this;
@@ -200,12 +246,12 @@ public final class XContentBuilder implements BytesStream {
             if (cachedStringBuilder == null) {
                 cachedStringBuilder = new StringBuilder();
             }
-            name = toUnderscoreCase(name, cachedStringBuilder);
+            name = Strings.toUnderscoreCase(name, cachedStringBuilder);
         } else if (conversion == FieldCaseConversion.CAMELCASE) {
             if (cachedStringBuilder == null) {
                 cachedStringBuilder = new StringBuilder();
             }
-            name = toCamelCase(name, cachedStringBuilder);
+            name = Strings.toCamelCase(name, cachedStringBuilder);
         }
         generator.writeFieldName(name);
         return this;
@@ -231,6 +277,16 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder field(XContentBuilderString name, String value) throws IOException {
+        field(name);
+        if (value == null) {
+            generator.writeNull();
+        } else {
+            generator.writeString(value);
+        }
+        return this;
+    }
+
     public XContentBuilder fieldIfNotNull(String name, String value) throws IOException {
         if (value != null) {
             field(name);
@@ -240,6 +296,16 @@ public final class XContentBuilder implements BytesStream {
     }
 
     public XContentBuilder field(String name, String value, FieldCaseConversion conversion) throws IOException {
+        field(name, conversion);
+        if (value == null) {
+            generator.writeNull();
+        } else {
+            generator.writeString(value);
+        }
+        return this;
+    }
+
+    public XContentBuilder field(XContentBuilderString name, String value, FieldCaseConversion conversion) throws IOException {
         field(name, conversion);
         if (value == null) {
             generator.writeNull();
@@ -275,13 +341,39 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder field(XContentBuilderString name, Integer value) throws IOException {
+        field(name);
+        if (value == null) {
+            generator.writeNull();
+        } else {
+            generator.writeNumber(value.intValue());
+        }
+        return this;
+    }
+
     public XContentBuilder field(String name, int value) throws IOException {
         field(name);
         generator.writeNumber(value);
         return this;
     }
 
+    public XContentBuilder field(XContentBuilderString name, int value) throws IOException {
+        field(name);
+        generator.writeNumber(value);
+        return this;
+    }
+
     public XContentBuilder field(String name, Long value) throws IOException {
+        field(name);
+        if (value == null) {
+            generator.writeNull();
+        } else {
+            generator.writeNumber(value.longValue());
+        }
+        return this;
+    }
+
+    public XContentBuilder field(XContentBuilderString name, Long value) throws IOException {
         field(name);
         if (value == null) {
             generator.writeNull();
@@ -305,7 +397,23 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder field(XContentBuilderString name, long value) throws IOException {
+        field(name);
+        generator.writeNumber(value);
+        return this;
+    }
+
     public XContentBuilder field(String name, Float value) throws IOException {
+        field(name);
+        if (value == null) {
+            generator.writeNull();
+        } else {
+            generator.writeNumber(value.floatValue());
+        }
+        return this;
+    }
+
+    public XContentBuilder field(XContentBuilderString name, Float value) throws IOException {
         field(name);
         if (value == null) {
             generator.writeNull();
@@ -329,6 +437,12 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder field(XContentBuilderString name, float value) throws IOException {
+        field(name);
+        generator.writeNumber(value);
+        return this;
+    }
+
     public XContentBuilder field(String name, Double value) throws IOException {
         field(name);
         if (value == null) {
@@ -347,31 +461,62 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder field(XContentBuilderString name, Double value) throws IOException {
+        field(name);
+        if (value == null) {
+            generator.writeNull();
+        } else {
+            generator.writeNumber(value);
+        }
+        return this;
+    }
+
     public XContentBuilder field(String name, double value) throws IOException {
         field(name);
         generator.writeNumber(value);
         return this;
     }
 
-    public XContentBuilder field(String name, BigDecimal value) throws IOException {
-        return field(name, value, value.scale(), RoundingMode.HALF_UP, true);
+    public XContentBuilder field(XContentBuilderString name, double value) throws IOException {
+        field(name);
+        generator.writeNumber(value);
+        return this;
     }
 
-    public XContentBuilder field(String name, BigDecimal value, int scale, RoundingMode rounding, boolean toDouble) throws IOException {
+    public XContentBuilder field(String name, BigInteger value) throws IOException {
         field(name);
-        if (toDouble) {
-            try {
-                generator.writeNumber(value.setScale(scale, rounding).doubleValue());
-            } catch (ArithmeticException e) {
-                generator.writeString(value.toEngineeringString());
-            }
-        } else {
-            generator.writeString(value.toEngineeringString());
-        }
+        generator.writeNumber(value);
+        return this;
+    }
+
+    public XContentBuilder field(XContentBuilderString name, BigInteger value) throws IOException {
+        field(name);
+        generator.writeNumber(value);
+        return this;
+    }
+
+    public XContentBuilder field(String name, BigDecimal value) throws IOException {
+        field(name);
+        generator.writeNumber(value);
+        return this;
+    }
+
+    public XContentBuilder field(XContentBuilderString name, BigDecimal value) throws IOException {
+        field(name);
+        generator.writeNumber(value);
         return this;
     }
 
     public XContentBuilder field(String name, BytesReference value) throws IOException {
+        field(name);
+        if (!value.hasArray()) {
+            value = value.toBytesArray();
+        }
+        generator.writeBinary(value.array(), value.arrayOffset(), value.length());
+        return this;
+    }
+
+    public XContentBuilder field(XContentBuilderString name, BytesReference value) throws IOException {
         field(name);
         if (!value.hasArray()) {
             value = value.toBytesArray();
@@ -392,7 +537,22 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder field(XContentBuilderString name, Map<String, Object> value) throws IOException {
+        field(name);
+        value(value);
+        return this;
+    }
+
     public XContentBuilder field(String name, Iterable value) throws IOException {
+        startArray(name);
+        for (Object o : value) {
+            value(o);
+        }
+        endArray();
+        return this;
+    }
+
+    public XContentBuilder field(XContentBuilderString name, Iterable value) throws IOException {
         startArray(name);
         for (Object o : value) {
             value(o);
@@ -410,7 +570,25 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder field(XContentBuilderString name, String... value) throws IOException {
+        startArray(name);
+        for (String o : value) {
+            value(o);
+        }
+        endArray();
+        return this;
+    }
+
     public XContentBuilder field(String name, Object... value) throws IOException {
+        startArray(name);
+        for (Object o : value) {
+            value(o);
+        }
+        endArray();
+        return this;
+    }
+
+    public XContentBuilder field(XContentBuilderString name, Object... value) throws IOException {
         startArray(name);
         for (Object o : value) {
             value(o);
@@ -428,7 +606,35 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder field(XContentBuilderString name, int offset, int length, int... value) throws IOException {
+        assert ((offset >= 0) && (value.length > length));
+        startArray(name);
+        for (int i = offset; i < length; i++) {
+            value(value[i]);
+        }
+        endArray();
+        return this;
+    }
+
+    public XContentBuilder field(XContentBuilderString name, int... value) throws IOException {
+        startArray(name);
+        for (Object o : value) {
+            value(o);
+        }
+        endArray();
+        return this;
+    }
+
     public XContentBuilder field(String name, long... value) throws IOException {
+        startArray(name);
+        for (Object o : value) {
+            value(o);
+        }
+        endArray();
+        return this;
+    }
+
+    public XContentBuilder field(XContentBuilderString name, long... value) throws IOException {
         startArray(name);
         for (Object o : value) {
             value(o);
@@ -446,6 +652,15 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder field(XContentBuilderString name, float... value) throws IOException {
+        startArray(name);
+        for (Object o : value) {
+            value(o);
+        }
+        endArray();
+        return this;
+    }
+
     public XContentBuilder field(String name, double... value) throws IOException {
         startArray(name);
         for (Object o : value) {
@@ -455,52 +670,24 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder field(XContentBuilderString name, double... value) throws IOException {
+        startArray(name);
+        for (Object o : value) {
+            value(o);
+        }
+        endArray();
+        return this;
+    }
+
     public XContentBuilder field(String name, Object value) throws IOException {
-        if (value == null) {
-            nullField(name);
-            return this;
-        }
-        Class type = value.getClass();
-        if (type == String.class) {
-            field(name, (String) value);
-        } else if (type == Float.class) {
-            field(name, ((Float) value).floatValue());
-        } else if (type == Double.class) {
-            field(name, ((Double) value).doubleValue());
-        } else if (type == Integer.class) {
-            field(name, ((Integer) value).intValue());
-        } else if (type == Long.class) {
-            field(name, ((Long) value).longValue());
-        } else if (type == Short.class) {
-            field(name, ((Short) value).shortValue());
-        } else if (type == Byte.class) {
-            field(name, ((Byte) value).byteValue());
-        } else if (type == Boolean.class) {
-            field(name, ((Boolean) value).booleanValue());
-        } else if (type == byte[].class) {
-            field(name, (byte[]) value);
-        } else if (value instanceof Map) {
-            //noinspection unchecked
-            field(name, (Map<String, Object>) value);
-        } else if (value instanceof Iterable) {
-            field(name, (Iterable) value);
-        } else if (value instanceof Object[]) {
-            field(name, (Object[]) value);
-        } else if (value instanceof int[]) {
-            field(name, (int[]) value);
-        } else if (value instanceof long[]) {
-            field(name, (long[]) value);
-        } else if (value instanceof float[]) {
-            field(name, (float[]) value);
-        } else if (value instanceof double[]) {
-            field(name, (double[]) value);
-        } else if (value instanceof BytesReference) {
-            field(name, (BytesReference) value);
-        } else if (value instanceof ToXContent) {
-            field(name, (ToXContent) value);
-        } else {
-            field(name, value.toString());
-        }
+        field(name);
+        writeValue(value);
+        return this;
+    }
+
+    public XContentBuilder field(XContentBuilderString name, Object value) throws IOException {
+        field(name);
+        writeValue(value);
         return this;
     }
 
@@ -512,37 +699,7 @@ public final class XContentBuilder implements BytesStream {
     }
 
     public XContentBuilder value(Object value) throws IOException {
-        if (value == null) {
-            return nullValue();
-        }
-        Class type = value.getClass();
-        if (type == String.class) {
-            value((String) value);
-        } else if (type == Float.class) {
-            value(((Float) value).floatValue());
-        } else if (type == Double.class) {
-            value(((Double) value).doubleValue());
-        } else if (type == Integer.class) {
-            value(((Integer) value).intValue());
-        } else if (type == Long.class) {
-            value(((Long) value).longValue());
-        } else if (type == Short.class) {
-            value(((Short) value).shortValue());
-        } else if (type == Byte.class) {
-            value(((Byte) value).byteValue());
-        } else if (type == Boolean.class) {
-            value((Boolean) value);
-        } else if (type == byte[].class) {
-            value((byte[]) value);
-        } else if (value instanceof BytesReference) {
-            value((BytesReference) value);
-        } else if (value instanceof Map) {
-            value((Map<String, Object>) value);
-        } else if (value instanceof Iterable) {
-            value((Iterable) value);
-        } else {
-            throw new IOException("Type not allowed [" + type + "]");
-        }
+        writeValue(value);
         return this;
     }
 
@@ -589,6 +746,11 @@ public final class XContentBuilder implements BytesStream {
 
     public XContentBuilder rawField(String fieldName, BytesReference content) throws IOException {
         generator.writeRawField(fieldName, content, bos);
+        return this;
+    }
+
+    public XContentBuilder value(XContentBuilder builder) throws IOException {
+        generator.writeValue(builder);
         return this;
     }
 
@@ -667,6 +829,16 @@ public final class XContentBuilder implements BytesStream {
         return this;
     }
 
+    public XContentBuilder value(BigInteger bi) throws IOException {
+        generator.writeNumber(bi);
+        return this;
+    }
+
+    public XContentBuilder value(BigDecimal bd) throws IOException {
+        generator.writeNumber(bd);
+        return this;
+    }
+
     public XContentBuilder value(String value) throws IOException {
         if (value == null) {
             return nullValue();
@@ -706,7 +878,7 @@ public final class XContentBuilder implements BytesStream {
         if (map == null) {
             return nullValue();
         }
-        XContentMapConverter.writeMap(generator, map);
+        writeMap(map);
         return this;
     }
 
@@ -714,7 +886,7 @@ public final class XContentBuilder implements BytesStream {
         if (map == null) {
             return nullValue();
         }
-        XContentMapConverter.writeMap(generator, map);
+        writeMap(map);
         return this;
     }
 
@@ -748,10 +920,6 @@ public final class XContentBuilder implements BytesStream {
         }
     }
 
-    public Object payload() {
-        return this.payload;
-    }
-
     public OutputStream stream() {
         return this.bos;
     }
@@ -771,8 +939,8 @@ public final class XContentBuilder implements BytesStream {
 
     /**
      * Returns a string representation of the builder (only applicable for text based xcontent).
-     * <p/>
-     * <p>Only applicable when the builder is constructed with {@link FastByteArrayOutputStream}.
+     *
+     * Only applicable when the builder is constructed with {@link FastByteArrayOutputStream}.
      */
     public String string() throws IOException {
         close();
@@ -780,81 +948,116 @@ public final class XContentBuilder implements BytesStream {
         return new String(bytesArray.array(), bytesArray.arrayOffset(), bytesArray.length(), "UTF-8");
     }
 
+    private void writeMap(Map<String, Object> map) throws IOException {
+        generator.writeStartObject();
 
-
-    public static String toCamelCase(String value) {
-        return toCamelCase(value, null);
-    }
-
-    public static String toCamelCase(String value, StringBuilder sb) {
-        boolean changed = false;
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            if (c == '_') {
-                if (!changed) {
-                    if (sb != null) {
-                        sb.setLength(0);
-                    } else {
-                        sb = new StringBuilder();
-                    }
-                    // copy it over here
-                    for (int j = 0; j < i; j++) {
-                        sb.append(value.charAt(j));
-                    }
-                    changed = true;
-                }
-                sb.append(Character.toUpperCase(value.charAt(++i)));
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            field(entry.getKey());
+            Object value = entry.getValue();
+            if (value == null) {
+                generator.writeNull();
             } else {
-                if (changed) {
-                    sb.append(c);
-                }
+                writeValue(value);
             }
         }
-        if (!changed) {
-            return value;
+        generator.writeEndObject();
+    }
+
+    private void writeValue(Object value) throws IOException {
+        if (value == null) {
+            generator.writeNull();
+            return;
         }
-        return sb.toString();
-    }
-
-    public static String toUnderscoreCase(String value) {
-        return toUnderscoreCase(value, null);
-    }
-
-    public static String toUnderscoreCase(String value, StringBuilder sb) {
-        boolean changed = false;
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            if (Character.isUpperCase(c)) {
-                if (!changed) {
-                    if (sb != null) {
-                        sb.setLength(0);
-                    } else {
-                        sb = new StringBuilder();
-                    }
-                    // copy it over here
-                    for (int j = 0; j < i; j++) {
-                        sb.append(value.charAt(j));
-                    }
-                    changed = true;
-                    if (i == 0) {
-                        sb.append(Character.toLowerCase(c));
-                    } else {
-                        sb.append('_');
-                        sb.append(Character.toLowerCase(c));
-                    }
-                } else {
-                    sb.append('_');
-                    sb.append(Character.toLowerCase(c));
-                }
-            } else {
-                if (changed) {
-                    sb.append(c);
-                }
+        Class type = value.getClass();
+        if (type == String.class) {
+            generator.writeString((String) value);
+        } else if (type == Integer.class) {
+            generator.writeNumber(((Integer) value).intValue());
+        } else if (type == Long.class) {
+            generator.writeNumber(((Long) value).longValue());
+        } else if (type == Float.class) {
+            generator.writeNumber(((Float) value).floatValue());
+        } else if (type == Double.class) {
+            generator.writeNumber(((Double) value).doubleValue());
+        } else if (type == Short.class) {
+            generator.writeNumber(((Short) value).shortValue());
+        } else if (type == Boolean.class) {
+            generator.writeBoolean(((Boolean) value).booleanValue());
+        } else if (type == GeoPoint.class) {
+            generator.writeStartObject();
+            generator.writeNumberField("lat", ((GeoPoint) value).lat());
+            generator.writeNumberField("lon", ((GeoPoint) value).lon());
+            generator.writeEndObject();
+        } else if (value instanceof Map) {
+            writeMap((Map) value);
+        } else if (value instanceof Iterable) {
+            generator.writeStartArray();
+            for (Object v : (Iterable) value) {
+                writeValue(v);
             }
+            generator.writeEndArray();
+        } else if (value instanceof Object[]) {
+            generator.writeStartArray();
+            for (Object v : (Object[]) value) {
+                writeValue(v);
+            }
+            generator.writeEndArray();
+        } else if (type == byte[].class) {
+            generator.writeBinary((byte[]) value);
+        } else if (value instanceof Date) {
+            Date date = (Date)value;
+            ZonedDateTime zdt = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+            generator.writeString(zdt.format(XContentBuilder.defaultDatePrinter));
+        } else if (value instanceof Calendar) {
+            Calendar calendar = (Calendar)value;
+            ZonedDateTime zdt = ZonedDateTime.ofInstant(calendar.toInstant(), ZoneId.systemDefault());
+            generator.writeString(zdt.format(XContentBuilder.defaultDatePrinter));
+        } else if (value instanceof BytesReference) {
+            BytesReference bytes = (BytesReference) value;
+            if (!bytes.hasArray()) {
+                bytes = bytes.toBytesArray();
+            }
+            generator.writeBinary(bytes.array(), bytes.arrayOffset(), bytes.length());
+        } else if (value instanceof XContentBuilder) {
+            value((XContentBuilder)value);
+        } else if (value instanceof ToXContent) {
+            ((ToXContent) value).toXContent(this, ToXContent.EMPTY_PARAMS);
+        } else if (value instanceof double[]) {
+            generator.writeStartArray();
+            for (double v : (double[]) value) {
+                generator.writeNumber(v);
+            }
+            generator.writeEndArray();
+        } else if (value instanceof long[]) {
+            generator.writeStartArray();
+            for (long v : (long[]) value) {
+                generator.writeNumber(v);
+            }
+            generator.writeEndArray();
+        } else if (value instanceof int[]) {
+            generator.writeStartArray();
+            for (int v : (int[]) value) {
+                generator.writeNumber(v);
+            }
+            generator.writeEndArray();
+        } else if (value instanceof float[]) {
+            generator.writeStartArray();
+            for (float v : (float[]) value) {
+                generator.writeNumber(v);
+            }
+            generator.writeEndArray();
+        } else if (value instanceof short[]) {
+            generator.writeStartArray();
+            for (float v : (short[]) value) {
+                generator.writeNumber(v);
+            }
+            generator.writeEndArray();
+        } else {
+            // if this is a "value" object, like enum, DistanceUnit, ..., just toString it
+            // yea, it can be misleading when toString a Java class, but really, jackson should be used in that case
+            generator.writeString(value.toString());
+            //throw new ElasticsearchIllegalArgumentException("type not supported for generic value conversion: " + type);
         }
-        if (!changed) {
-            return value;
-        }
-        return sb.toString();
     }
+
 }

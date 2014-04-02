@@ -58,7 +58,7 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
     /**
      * Set resource context
      *
-     * @param context
+     * @param context context
      */
     Resource<S, P, O> context(ResourceContext context);
 
@@ -72,7 +72,7 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
     /**
      * Set the subject of this resource
      *
-     * @param subject
+     * @param subject subject
      */
     Resource<S, P, O> subject(S subject);
 
@@ -117,16 +117,16 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
 
     /**
      * Add a property to this resource
-     * @param predicate
-     * @param externalResource
+     * @param predicate a predicate identifier
+     * @param externalResource external resource IRI
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(P predicate, IRI externalResource);
 
     /**
      * Add a property to this resource
-     * @param predicate
-     * @param literals
+     * @param predicate a predicate identifier
+     * @param literals literals
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(P predicate, Collection literals);
@@ -134,8 +134,8 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
     /**
      * Add another resource to this resource
      *
-     * @param predicate
-     * @param resource
+     * @param predicate a predicate identifier
+     * @param resource resource
      * @return the new resource with the resource added
      */
     Resource<S, P, O> add(P predicate, Resource<S, P, O> resource);
@@ -168,16 +168,16 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
 
     /**
      * Add a property to this resource
-     * @param predicate
-     * @param externalResource
+     * @param predicate predicate
+     * @param externalResource external resource
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(String predicate, IRI externalResource);
 
     /**
      * Add a property to this resource
-     * @param predicate
-     * @param literals
+     * @param predicate predicate
+     * @param literals literals
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(String predicate, Collection literals);
@@ -185,8 +185,8 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
 
     /**
      * Add another resource to this resource
-     * @param predicate
-     * @param resource
+     * @param predicate predicate
+     * @param resource resource
      * @return the new resource with the resource added
      */
     Resource<S, P, O> add(String predicate, Resource<S, P, O> resource);
@@ -195,8 +195,8 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
      * Setting the type of the resource.
      * This is equivalent to add("rdf:type", externalResource)
      *
-     * @param externalResource
-     * @return
+     * @param externalResource external resource
+     * @return this resource
      */
     Resource<S, P, O> a(IRI externalResource);
 
@@ -227,8 +227,8 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
      * resource under the given resource identifier already exists, the existing
      * resource is returned.
      *
-     * @param predicate the predicate ID for the resource
-     * @return the new anonymous resource
+     * @param predicate the predicate ID for the reesource
+     * @return the new anonymous reesource
      */
     Resource<S, P, O> newResource(P predicate);
 
@@ -245,22 +245,15 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
     /**
      * Return the set of predicates for a given subject
      *
-     * @param subject
+     * @param subject subject
      * @return set of predicates
      */
     Set<P> predicateSet(S subject);
 
     /**
-     * Return the set of predicates for a given subject
-     * @param subject
-     * @return
-     */
-    Set<P> predicateSet(String subject);
-
-    /**
      * Return object set for a given predicate
      *
-     * @param predicate
+     * @param predicate predicate
      * @return set of objects
      */
     Collection<O> objects(P predicate);
@@ -268,21 +261,21 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
     /**
      * Return object set for a given predicate
      *
-     * @param predicate
+     * @param predicate predicate
      * @return set of objects
      */
     Collection<O> objects(String predicate);
 
     /**
      * Return literal for this predicate
-     * @param predicate
+     * @param predicate predicate
      * @return literal
      */
     O literal(P predicate);
 
     /**
      * Return literal for this predicate
-     * @param predicate
+     * @param predicate predicate
      * @return literal
      */
     O literal(String predicate);
@@ -290,7 +283,7 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
     /**
      * Add a triple to this resource
      *
-     * @param triple
+     * @param triple triple
      */
     Resource<S, P, O> add(Triple<S,P,O> triple);
 
@@ -303,7 +296,7 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
 
     /**
      * Get iterator over triples thats are properties of this resource
-     * @return
+     * @return iterator over triple
      */
     Iterator<Triple<S,P,O>> propertyIterator();
 

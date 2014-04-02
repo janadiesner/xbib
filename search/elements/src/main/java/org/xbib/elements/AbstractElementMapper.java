@@ -42,7 +42,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +51,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
+
+import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * Basic element mapper
@@ -68,7 +70,7 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
 
     protected Specification specification;
 
-    protected final BlockingQueue<List<KeyValue>> queue;
+    protected final BlockingQueue<List<KeyValue<K,V>>> queue;
 
     protected final Map map;
 
@@ -91,7 +93,7 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
     public AbstractElementMapper(ClassLoader cl, String path, String format, AbstractSpecification specification) {
         this.specification = specification;
         this.queue = new SynchronousQueue<>(true);
-        this.pipelines = new HashSet();
+        this.pipelines = newHashSet();
         try {
             this.map = specification.getElementMap(cl, path, format);
         } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException e) {
@@ -145,7 +147,7 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
         }
         for (int i = 0; i < numPipelines; i++) {
             try {
-                queue.put(new LinkedList()); // send poison element to all numPipelines
+                queue.put(newLinkedList()); // send poison element to all numPipelines
             } catch (InterruptedException e) {
                 logger.error("interrupted while close()");
             }
@@ -156,7 +158,7 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
 
     @Override
     public AbstractElementMapper<K,V,E,C> begin() {
-        keyvalues = new LinkedList();
+        keyvalues = newLinkedList();
         return this;
     }
 
@@ -182,7 +184,7 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
     public AbstractElementMapper<K,V,E,C>  end() {
         try {
             // move shallow copy of key/values to pipeline, this ensures thread safety
-            queue.put((List<KeyValue>) keyvalues.clone());
+            queue.put((List<KeyValue<K,V>>) keyvalues.clone());
             keyvalues.clear();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

@@ -32,9 +32,11 @@
 package org.xbib.common.xcontent.xml;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 
 import org.xbib.common.xcontent.XContentBuilder;
+import org.xbib.common.xcontent.XContentString;
 import org.xbib.io.BytesReference;
 import org.xbib.common.xcontent.XContentGenerator;
 import org.xbib.common.xcontent.XContentHelper;
@@ -48,6 +50,8 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  *
@@ -59,6 +63,8 @@ public class XmlXContentGenerator implements XContentGenerator {
     private static final Logger logger = LoggerFactory.getLogger(XmlXContentGenerator.class.getName());
 
     protected final ToXmlGenerator generator;
+
+    private boolean writeLineFeedAtEnd;
 
     private XmlXParams params = XmlXParams.getDefaultParams();
 
@@ -95,6 +101,10 @@ public class XmlXContentGenerator implements XContentGenerator {
         generator.useDefaultPrettyPrinter();
     }
 
+    @Override
+    public void usePrintLineFeedAtEnd() {
+        writeLineFeedAtEnd = true;
+    }
 
     public void writeStartArray() throws IOException {
         generator.writeStartArray();
@@ -128,6 +138,11 @@ public class XmlXContentGenerator implements XContentGenerator {
 
     public void writeFieldName(String name) throws IOException {
         writeFieldNameWithNamespace(name);
+    }
+
+    @Override
+    public void writeFieldName(XContentString name) throws IOException {
+
     }
 
     public void writeString(String text) throws IOException {
@@ -166,6 +181,14 @@ public class XmlXContentGenerator implements XContentGenerator {
         generator.writeNumber(f);
     }
 
+    public void writeNumber(BigInteger bi) throws IOException {
+        generator.writeNumber(bi);
+    }
+
+    public void writeNumber(BigDecimal bd) throws IOException {
+        generator.writeNumber(bd);
+    }
+
     public void writeBoolean(boolean state) throws IOException {
         generator.writeBoolean(state);
     }
@@ -178,8 +201,20 @@ public class XmlXContentGenerator implements XContentGenerator {
         generator.writeStringField(fieldName, value);
     }
 
+    @Override
+    public void writeStringField(XContentString fieldName, String value) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeString(value);
+    }
+
     public void writeBooleanField(String fieldName, boolean value) throws IOException {
         generator.writeBooleanField(fieldName, value);
+    }
+
+    @Override
+    public void writeBooleanField(XContentString fieldName, boolean value) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeBoolean(value);
     }
 
     public void writeNullField(String fieldName) throws IOException {
@@ -190,28 +225,94 @@ public class XmlXContentGenerator implements XContentGenerator {
         generator.writeNumberField(fieldName, value);
     }
 
+    @Override
+    public void writeNumberField(XContentString fieldName, int value) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeNumber(value);
+    }
+
     public void writeNumberField(String fieldName, long value) throws IOException {
         generator.writeNumberField(fieldName, value);
+    }
+
+    @Override
+    public void writeNumberField(XContentString fieldName, long value) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeNumber(value);
     }
 
     public void writeNumberField(String fieldName, double value) throws IOException {
         generator.writeNumberField(fieldName, value);
     }
 
+    @Override
+    public void writeNumberField(XContentString fieldName, double value) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeNumber(value);
+    }
+
     public void writeNumberField(String fieldName, float value) throws IOException {
         generator.writeNumberField(fieldName, value);
+    }
+
+    @Override
+    public void writeNumberField(XContentString fieldName, float value) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeNumber(value);
+    }
+
+    @Override
+    public void writeNumberField(String fieldName, BigInteger value) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeNumber(value);
+    }
+
+    @Override
+    public void writeNumberField(XContentString fieldName, BigInteger value) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeNumber(value);
+    }
+
+    @Override
+    public void writeNumberField(String fieldName, BigDecimal value) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeNumber(value);
+    }
+
+    @Override
+    public void writeNumberField(XContentString fieldName, BigDecimal value) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeNumber(value);
     }
 
     public void writeBinaryField(String fieldName, byte[] data) throws IOException {
         generator.writeBinaryField(fieldName, data);
     }
 
+    @Override
+    public void writeBinaryField(XContentString fieldName, byte[] data) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeBinary(data);
+    }
+
     public void writeArrayFieldStart(String fieldName) throws IOException {
         generator.writeArrayFieldStart(fieldName);
     }
 
+    @Override
+    public void writeArrayFieldStart(XContentString fieldName) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeStartArray();
+    }
+
     public void writeObjectFieldStart(String fieldName) throws IOException {
         generator.writeObjectFieldStart(fieldName);
+    }
+
+    @Override
+    public void writeObjectFieldStart(XContentString fieldName) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeStartObject();
     }
 
     public void writeRawField(String fieldName, InputStream content, OutputStream bos) throws IOException {
@@ -263,6 +364,10 @@ public class XmlXContentGenerator implements XContentGenerator {
         }
     }
 
+    public void writeValue(XContentBuilder builder) throws IOException {
+        generator.writeRawValue(builder.string());
+    }
+
     public void copy(XContentBuilder builder, OutputStream bos) throws IOException {
         flush();
         builder.bytes().writeTo(bos);
@@ -284,8 +389,17 @@ public class XmlXContentGenerator implements XContentGenerator {
     }
 
     public void close() throws IOException {
+        if (generator.isClosed()) {
+            return;
+        }
+        if (writeLineFeedAtEnd) {
+            flush();
+            generator.writeRaw(LF);
+        }
         generator.close();
     }
+
+    private static final SerializedString LF = new SerializedString("\n");
 
     private void writeFieldNameWithNamespace(String name) throws IOException {
         QName qname = ToQName.toQName(params.getQName(), params.getNamespaceContext(), name);

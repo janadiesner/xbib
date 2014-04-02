@@ -2,7 +2,7 @@
 package org.xbib.template.handlebars.internal;
 
 
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 import org.xbib.template.handlebars.TagType;
 import org.xbib.template.handlebars.Template;
 import org.xbib.template.handlebars.TypeSafeTemplate;
@@ -43,8 +43,8 @@ class ForwardingTemplate implements Template {
     }
 
     @Override
-    public void apply(final Context context, final Writer writer) throws IOException {
-        Context wrappedContext = wrap(context);
+    public void apply(final HandlebarsContext context, final Writer writer) throws IOException {
+        HandlebarsContext wrappedContext = wrap(context);
         try {
             beforeApply(wrappedContext);
             template.apply(wrappedContext, writer);
@@ -57,8 +57,8 @@ class ForwardingTemplate implements Template {
     }
 
     @Override
-    public String apply(final Context context) throws IOException {
-        Context wrappedContext = wrap(context);
+    public String apply(final HandlebarsContext context) throws IOException {
+        HandlebarsContext wrappedContext = wrap(context);
         try {
             beforeApply(wrappedContext);
             return template.apply(wrappedContext);
@@ -75,7 +75,7 @@ class ForwardingTemplate implements Template {
      *
      * @param context The template context.
      */
-    protected void afterApply(final Context context) {
+    protected void afterApply(final HandlebarsContext context) {
     }
 
     /**
@@ -83,7 +83,7 @@ class ForwardingTemplate implements Template {
      *
      * @param context The template context.
      */
-    protected void beforeApply(final Context context) {
+    protected void beforeApply(final HandlebarsContext context) {
     }
 
     @Override
@@ -112,11 +112,11 @@ class ForwardingTemplate implements Template {
      * @param candidate The candidate object.
      * @return A context.
      */
-    private static Context wrap(final Object candidate) {
-        if (candidate instanceof Context) {
-            return (Context) candidate;
+    private static HandlebarsContext wrap(final Object candidate) {
+        if (candidate instanceof HandlebarsContext) {
+            return (HandlebarsContext) candidate;
         }
-        return Context.newContext(candidate);
+        return HandlebarsContext.newContext(candidate);
     }
 
     @Override

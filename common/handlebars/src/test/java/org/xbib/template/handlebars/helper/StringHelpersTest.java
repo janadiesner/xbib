@@ -2,7 +2,7 @@ package org.xbib.template.handlebars.helper;
 
 import org.junit.Test;
 import org.xbib.template.handlebars.AbstractTest;
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 import org.xbib.template.handlebars.Handlebars;
 import org.xbib.template.handlebars.Helper;
 import org.xbib.template.handlebars.Options;
@@ -237,7 +237,7 @@ public class StringHelpersTest extends AbstractTest {
     @Test
     public void substringWithStart() throws IOException {
         Handlebars hbs = createMock(Handlebars.class);
-        Context ctx = createMock(Context.class);
+        HandlebarsContext ctx = createMock(HandlebarsContext.class);
         Template fn = createMock(Template.class);
 
         Options options = new Options.Builder(hbs, TagType.VAR, ctx, fn)
@@ -252,7 +252,7 @@ public class StringHelpersTest extends AbstractTest {
     @Test
     public void substringWithStartAndEnd() throws IOException {
         Handlebars hbs = createMock(Handlebars.class);
-        Context ctx = createMock(Context.class);
+        HandlebarsContext ctx = createMock(HandlebarsContext.class);
         Template fn = createMock(Template.class);
 
         Options options = new Options.Builder(hbs, TagType.VAR, ctx, fn)
@@ -309,7 +309,7 @@ public class StringHelpersTest extends AbstractTest {
     @Test
     public void replace() throws IOException {
         Handlebars hbs = createMock(Handlebars.class);
-        Context ctx = createMock(Context.class);
+        HandlebarsContext ctx = createMock(HandlebarsContext.class);
         Template fn = createMock(Template.class);
 
         Options options = new Options.Builder(hbs, TagType.VAR, ctx, fn)
@@ -324,7 +324,7 @@ public class StringHelpersTest extends AbstractTest {
     @Test
     public void stringFormat() throws IOException {
         Handlebars hbs = createMock(Handlebars.class);
-        Context ctx = createMock(Context.class);
+        HandlebarsContext ctx = createMock(HandlebarsContext.class);
         Template fn = createMock(Template.class);
 
         Options options = new Options.Builder(hbs, TagType.VAR, ctx, fn)
@@ -340,7 +340,7 @@ public class StringHelpersTest extends AbstractTest {
     @Test
     public void stringDecimalFormat() throws IOException {
         Handlebars hbs = createMock(Handlebars.class);
-        Context ctx = createMock(Context.class);
+        HandlebarsContext ctx = createMock(HandlebarsContext.class);
         Template fn = createMock(Template.class);
 
         Options options = new Options.Builder(hbs, TagType.VAR, ctx, fn)

@@ -21,10 +21,10 @@ public class DefaultContentBuilderTest<S extends Identifier, P extends Property,
     @Test
     public void testSimpleBuilder() throws Exception {
         Resource<S, P, O> resource = new SimpleResource<>();
-        SimpleLiteral<String> l = new SimpleLiteral()
+        SimpleLiteral<String> l = new SimpleLiteral<String>()
                 .object("2013")
                 .type(IRI.create("xsd:gYear"));
-        resource.id(IRI.create("urn:resource"))
+        resource.id(IRI.create("urn:getResource"))
                 .add("urn:property", "Hello World")
                 .add("urn:date", l)
                 .add("urn:link", IRI.create("urn:pointer"));
@@ -37,10 +37,10 @@ public class DefaultContentBuilderTest<S extends Identifier, P extends Property,
     @Test
     public void testRDFType() throws Exception {
         Resource<S, P, O> resource = new SimpleResource<>();
-        SimpleLiteral<String> l = new SimpleLiteral()
+        SimpleLiteral<String> l = new SimpleLiteral<String>()
                 .object("2013")
                 .type(IRI.create("xsd:gYear"));
-        resource.id(IRI.create("urn:resource"))
+        resource.id(IRI.create("urn:getResource"))
                 .add("urn:property", "Hello World")
                 .add("urn:date", l)
                 .add("rdf:type", IRI.create("urn:type1"))

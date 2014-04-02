@@ -3,7 +3,12 @@
     <title>Home Page</title>
   </head>
   <body>
-    <h1>Welcome to the site!</h1>
+    <h1>Welcome to the Elasticsearch hit list</h1>
     <p>{{message}}</p>
+    <ol>
+    {{#each list}}
+        <li><p>{{@id}} {{@type}} </p></li>
+    {{/each}}
+     </ol>
   </body>
 </html>

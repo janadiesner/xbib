@@ -193,7 +193,8 @@
             "032$P$2abdefnop",
             "032$P$2abdehpz",
             "032$P$2bdefghpz",
-            "032$P$2bdefgnp"
+            "032$P$2bdefgnp",
+            "032$P$2abdeiklnp"
         ],
         "_predicate" : "LocationTypeResidence",
         "subfields" : {
@@ -241,7 +242,8 @@
             "035$I$acd",
             "035$I$ad",
             "035$I$aef",
-            "035$I$d"
+            "035$I$d",
+            "035$I$abc"
         ],
         "subfields" : {
             "a" : "libraryServiceRegion",
@@ -419,7 +421,8 @@
             "035$B$abcghik",
             "035$B$acdefgk",
             "035$B$acdefhi",
-            "035$B$acdfk"
+            "035$B$acdfk",
+            "035$B$abckl"
         ],
         "_predicate" : "code",
         "subfields" : {
@@ -648,6 +651,13 @@
          ],
          "subfields" : {
             "a" : "comment"
+         }
+    },
+    "License" : {
+         "values" : [
+         ],
+         "subfields" : {
+             "a" : "license"
          }
     },
     "Skip" : {

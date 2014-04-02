@@ -111,8 +111,14 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
     @Override
     public RdfXmlReader parse(XMLReader reader, InputSource source) throws IOException, SAXException {
         xmlHandler.setListener(listener);
+        if (listener != null) {
+            listener.begin();
+        }
         reader.setContentHandler(xmlHandler);
         reader.parse(source);
+        if (listener != null) {
+            listener.end();
+        }
         return this;
     }
 
@@ -314,7 +320,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
         frame.isSubject = true;
     }
 
-    // the complicated logic to deal with attributes with rdf:resource, nodeID attrs
+    // the complicated logic to deal with attributes with rdf:getResource, nodeID attrs
     private IRI getObjectNode(Stack<Frame> stack, Attributes attrs) throws SAXException {
         IRI node = null;
         String resource = attrs.getValue(RDF.toString(), "resource");
@@ -447,7 +453,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
                 frame.base = attrs.getValue("xml:base");
                 if (expectSubject(stack)) {
                     if (!uri.equals(RDF_RDF)) {
-                        // get this resource's ID
+                        // get this getResource's ID
                         getSubjectNode(frame, stack, attrs);
                         // we have the subject
                         if (!uri.equals(RDF_DESCRIPTION)) {
@@ -502,7 +508,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
                         // this predicate encloses pcdata, prepare to accumulate
                         pcdata = new StringBuilder();
                     }
-                    // handle rdf:parseType="resource"
+                    // handle rdf:parseType="getResource"
                     String parseType = attrs.getValue(RDF.toString(), "parseType");
                     if (parseType != null) {
                         switch (parseType) {

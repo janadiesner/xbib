@@ -19,9 +19,11 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <forkMode>once</forkMode>
                     <useSystemClassLoader>true</useSystemClassLoader>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -29,9 +31,8 @@
                     <appendAssemblyId>true</appendAssemblyId>
                     <outputDirectory>${basedir}/lib</outputDirectory>
                     <descriptors>
-                        <descriptor>${basedir}/src/main/assemblies/content.xml</descriptor>
-                        <descriptor>${basedir}/src/main/assemblies/elasticsearch.xml</descriptor>
-                        <descriptor>${basedir}/src/main/assemblies/oracle.xml</descriptor>
+                        <descriptor>${basedir}/src/main/assemblies/converter.xml</descriptor>
+                        <descriptor>${basedir}/src/main/assemblies/feeder.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>
@@ -85,6 +86,11 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>

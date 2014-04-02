@@ -34,6 +34,7 @@ package org.xbib.analyzer.marc.zdb.bib;
 import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
+import org.xbib.elements.marc.MARCPipeline;
 import org.xbib.marc.FieldCollection;
 
 public class GeneralInformation extends MARCElement {
@@ -48,8 +49,8 @@ public class GeneralInformation extends MARCElement {
      * Example "991118d19612006xx z||p|r ||| 0||||0ger c"
      */
     @Override
-    public void fields(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
-                       FieldCollection fields, String value) {
+    public boolean fields(MARCPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
+                          FieldCollection fields, String value) {
         String publicationStatus = value.substring(6,7);
         String publicationStatusText = null;
         switch (publicationStatus) {
@@ -96,15 +97,16 @@ public class GeneralInformation extends MARCElement {
                 publicationStatusText = "Continuing resource status unknown";
                 break;
         }
-        builder.context().resource().add("publicationstatus", publicationStatus);
-        builder.context().resource().add("publicationstatusText", publicationStatusText);
+        builder.context().getResource().add("publicationstatus", publicationStatus);
+        builder.context().getResource().add("publicationstatusText", publicationStatusText);
 
         String date1 = value.substring(7,11);
-        builder.context().resource().add("date1", check(date1));
+        builder.context().getResource().add("date1", check(date1));
 
         String date2 = value.substring(11,15);
-        builder.context().resource().add("date2", check(date2));
+        builder.context().getResource().add("date2", check(date2));
 
+        return true;
     }
 
     // check for valid date, else return null

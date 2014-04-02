@@ -173,6 +173,8 @@ public class DefaultHelperRegistry implements HelperRegistry {
     private static void registerBuiltinsHelpers(final HelperRegistry registry) {
         registry.registerHelper(WithHelper.NAME, WithHelper.INSTANCE);
         registry.registerHelper(IfHelper.NAME, IfHelper.INSTANCE);
+        registry.registerHelper(IfConditionHelper.NAME, IfConditionHelper.INSTANCE);
+        registry.registerHelper(EvalHelper.NAME, EvalHelper.INSTANCE);
         registry.registerHelper(UnlessHelper.NAME, UnlessHelper.INSTANCE);
         registry.registerHelper(EachHelper.NAME, EachHelper.INSTANCE);
         registry.registerHelper(EmbeddedHelper.NAME, EmbeddedHelper.INSTANCE);

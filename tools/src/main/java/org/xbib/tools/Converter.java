@@ -57,7 +57,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 
 public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline<T,R>>
-        extends AbstractPipeline<URIPipelineElement, PipelineException> {
+        extends AbstractPipeline<URIPipelineElement, PipelineException> implements Tool {
 
     private final static Logger logger = LoggerFactory.getLogger(Converter.class.getSimpleName());
 
@@ -75,12 +75,14 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
 
     private boolean done = false;
 
+    @Override
     public Converter<T,R,P> reader(Reader reader) {
         this.reader = reader;
         settings = settingsBuilder().loadFromReader(reader).build();
         return this;
     }
 
+    @Override
     public Converter<T,R,P> writer(Writer writer) {
         this.writer = writer;
         return this;
@@ -88,7 +90,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
 
     protected Converter<T,R,P> prepare() throws IOException {
         if (settings.get("uri") != null) {
-            input = new ConcurrentLinkedQueue<>();
+            input = new ConcurrentLinkedQueue<URI>();
             input.add(URI.create(settings.get("uri")));
             // parallel URI connection possible?
             if (settings.getAsBoolean("parallel", false)) {
@@ -107,7 +109,8 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
         return this;
     }
 
-    public Converter<T,R,P> run() throws Exception {
+    @Override
+    public void run() throws Exception {
         try {
             logger.info("preparing with settings {}", settings.getAsMap());
             prepare();
@@ -128,7 +131,6 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
                 writeMetrics(writer);
             }
         }
-        return this;
     }
 
     public Converter<T,R,P> run(Settings newSettings, Queue<URI> newInput) throws Exception {

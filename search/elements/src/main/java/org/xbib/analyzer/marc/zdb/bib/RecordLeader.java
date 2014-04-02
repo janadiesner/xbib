@@ -34,6 +34,7 @@ package org.xbib.analyzer.marc.zdb.bib;
 import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
+import org.xbib.elements.marc.MARCPipeline;
 import org.xbib.marc.FieldCollection;
 
 import java.util.Map;
@@ -59,17 +60,17 @@ public class RecordLeader extends MARCElement {
     }
 
     @Override
-    public void fields(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
-                       FieldCollection fields, String value) {
+    public boolean fields(MARCPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
+                          FieldCollection fields, String value) {
         if (codes == null) {
-            return;
+            return false;
         }
         for (String k : codes.keySet()) {
             int pos = Integer.parseInt(k);
             Map<String,String> v = (Map<String,String>)codes.get(k);
             String code = value.length() > pos ? value.substring(pos,pos+1) : "";
             if (v.containsKey(code)) {
-                builder.context().resource().add(predicate, v.get(code));
+                builder.context().getResource().add(predicate, v.get(code));
             }
         }
         // deleted record?
@@ -81,38 +82,39 @@ public class RecordLeader extends MARCElement {
         boolean isBook = (ch6 == 'a' || ch6 == 't') &&
                 (ch7 == 'a' || ch7 == 'c' || ch7 == 'd' || ch7 == 'm');
         if (isBook) {
-            builder.context().resource().add("type", "book");
+            builder.context().getResource().add("type", "book");
         }
 
         boolean isComputerFile = ch6 == 'm';
         if (isComputerFile) {
-            builder.context().resource().add("type", "computerfile");
+            builder.context().getResource().add("type", "computerfile");
         }
 
         boolean isMap = (ch6 == 'e' || ch6 == 'f');
         if (isMap) {
-            builder.context().resource().add("type", "map");
+            builder.context().getResource().add("type", "map");
         }
 
         boolean isMusic = (ch6 == 'c' || ch6 == 'd' || ch6 == 'i' || ch6 == 'j');
         if (isMusic) {
-            builder.context().resource().add("type", "music");
+            builder.context().getResource().add("type", "music");
         }
 
         boolean isContinuingResource = ch6 == 'a' &&
                 (ch7 == 'b' || ch7 == 'i' || ch7 == 's');
         if (isContinuingResource) {
-            builder.context().resource().add("type", "continuingresource");
+            builder.context().getResource().add("type", "continuingresource");
         }
 
         boolean isVisualMaterial = (ch6 == 'g' || ch6 == 'k' || ch6 == 'o' || ch6 == 'r');
         if (isVisualMaterial) {
-            builder.context().resource().add("type", "visualmaterial");
+            builder.context().getResource().add("type", "visualmaterial");
         }
 
         boolean isMixedMaterial = ch6 == 'p';
         if (isMixedMaterial) {
-            builder.context().resource().add("type", "mixedmaterial");
+            builder.context().getResource().add("type", "mixedmaterial");
         }
+        return true;
     }
 }

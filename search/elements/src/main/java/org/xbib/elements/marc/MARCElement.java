@@ -57,7 +57,7 @@ public abstract class MARCElement
 
     protected static final Logger logger = LoggerFactory.getLogger(MARCElement.class.getName());
 
-    protected Map params;
+    protected Map<String,Object> params;
 
     @Override
     public MARCElement setSettings(Map params) {
@@ -66,7 +66,7 @@ public abstract class MARCElement
     }
 
     @Override
-    public Map getSettings() {
+    public Map<String,Object> getSettings() {
         return params;
     }
 
@@ -88,32 +88,36 @@ public abstract class MARCElement
     /**
      * Process mapped element. Empty by default.
      *
-     * @param builder
-     * @param fields
-     * @param value
+     * @param builder the builder
+     * @param fields the fields
+     * @param value the value
      */
-    public void fields(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, FieldCollection fields, String value) {
-        // overridden 
+    public boolean fields(MARCPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, FieldCollection fields, String value) {
+        // overridden
+        return false;
     }
 
     /**
      * Process mapped element with subfield mappings. Empty by default.
      *
-     * @param builder
-     * @param field
-     * @param subfieldType
+     * @param builder the builder
+     * @param field the field
+     * @param subfieldType the subfield type
      */
-    public void field(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, Field field, String subfieldType) {
+    public boolean field(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, Field field, String subfieldType) {
         // overridden
+        return false;
     }
 
     /**
      * Transform field data
-     * @param value
-     * @return
      */
-    public String data(String resourcePredicate, Resource resource, String property, String value) {
+    public String data(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, String resourcePredicate, Resource resource, String property, String value) {
         return value;
+    }
+
+    public void facetize(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, Field field) {
+
     }
 
 }

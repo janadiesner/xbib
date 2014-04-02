@@ -34,6 +34,7 @@ package org.xbib.analyzer.marc.zdb.hol;
 import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
+import org.xbib.elements.marc.MARCPipeline;
 import org.xbib.marc.FieldCollection;
 
 import java.util.Map;
@@ -59,20 +60,20 @@ public class RecordLeader extends MARCElement {
     }
 
     @Override
-    public void fields(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
-                       FieldCollection fields, String value) {
+    public boolean fields(MARCPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
+                          FieldCollection fields, String value) {
         builder.context().label(value);
         if (codes == null) {
-            return;
+            return false;
         }
         for (String k : codes.keySet()) {
             int pos = Integer.parseInt(k);
             Map<String,String> v = (Map<String,String>)codes.get(k);
             String code = value.length() > pos ? value.substring(pos,pos+1) : "";
             if (v.containsKey(code)) {
-                builder.context().resource().add(predicate, v.get(code));
+                builder.context().getResource().add(predicate, v.get(code));
             }
         }
-
+        return false;
     }
 }

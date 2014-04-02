@@ -156,8 +156,18 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
     }
 
     @Override
+    public TripleListener<S, P, O> end() {
+        return this;
+    }
+
+    @Override
     public TurtleWriter triple(Triple triple) {
         resource.add(triple);
+        return this;
+    }
+
+    @Override
+    public TripleListener<S, P, O> begin() {
         return this;
     }
 
@@ -176,7 +186,7 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
 
     public void close() {
         try {
-            // write last resource
+            // write last getResource
             write(resource);
             idCounter++;
             writer.flush();
@@ -279,7 +289,7 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
                 writeObject(object);
             }
         } else {
-            // embedded resource switchback?
+            // embedded getResource switchback?
             IRI iri = embedded.isEmpty() ? null : embedded.peek();
             boolean closeEmbedded = lastSubject != null
                     && lastSubject.isBlank()
@@ -311,7 +321,7 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
                     writeIndent(embedded.size());
                 }
             }
-            // don't repeat subject in same resource
+            // don't repeat subject in same getResource
             if (!sameResource) {
                 writeSubject(subject);
             }

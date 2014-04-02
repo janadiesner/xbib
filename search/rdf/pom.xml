@@ -38,6 +38,7 @@
         <dependency>
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>

@@ -34,6 +34,7 @@ package org.xbib.analyzer.marc.zdb.bib;
 import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
+import org.xbib.elements.marc.MARCPipeline;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 
@@ -47,8 +48,8 @@ public class PhysicalDescriptionCode extends MARCElement {
     }
     
     @Override
-    public void fields(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
-                       FieldCollection fields, String value) {
+    public boolean fields(MARCPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
+                          FieldCollection fields, String value) {
         Map<String,Object> codes = (Map<String,Object>)getSettings().get("codes");
         if (codes != null) {
             // position 0 is the selector
@@ -70,10 +71,11 @@ public class PhysicalDescriptionCode extends MARCElement {
                 Map<String,Object> q = (Map<String,Object>)m.get(Integer.toString(i));
                 if (q != null) {
                     String code = (String)q.get(ch);
-                    builder.context().resource().add(predicate, code);
+                    builder.context().getResource().add(predicate, code);
                 }
             }
         }
+        return false;
     }
     
 }

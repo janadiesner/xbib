@@ -44,6 +44,11 @@ import java.io.IOException;
 public class RdfOutput implements TripleListener {
 
     @Override
+    public TripleListener begin() {
+        return this;
+    }
+
+    @Override
     public RdfOutput startPrefixMapping(String prefix, String uri) {
         return this;
     }
@@ -60,6 +65,11 @@ public class RdfOutput implements TripleListener {
 
     @Override
     public RdfOutput triple(Triple triple) {
+        return this;
+    }
+
+    @Override
+    public TripleListener end() {
         return this;
     }
 

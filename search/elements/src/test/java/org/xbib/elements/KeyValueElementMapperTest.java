@@ -34,7 +34,6 @@ package org.xbib.elements;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.elements.marc.MARCSpecification;
-import org.xbib.elements.marc.dialects.mab.MABSpecification;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
@@ -88,22 +87,6 @@ public class KeyValueElementMapperTest extends Assert {
         logger.info("spec={}", c.toSpec());
         Element e = specification.getElement(c.toSpec(), m);
         assertNotNull(e);
-    }
-
-
-    public void testMABSpecs() {
-        String value = "331";
-        Element element = new NullElement();
-        Map map = new TreeMap(); // for sorting
-        AbstractSpecification specification = new MABSpecification();
-        Map m = specification.addSpec(value, element, map);
-        logger.info("mab spec 1 = {}", m);
-        value = "331 10";
-        m = specification.addSpec(value, element, map);
-        logger.info("mab spec 2 = {}", m);
-        value = "[331 1a, 331 19]";
-        m = specification.addSpec(value, element, map);
-        logger.info("mab spec 3 = {}", m);
     }
 
 }

@@ -1,7 +1,7 @@
 
 package org.xbib.template.handlebars.internal;
 
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -33,7 +33,7 @@ class Text extends BaseTemplate {
     }
 
     @Override
-    protected void merge(final Context scope, final Writer writer)
+    protected void merge(final HandlebarsContext scope, final Writer writer)
             throws IOException {
         writer.append(text);
     }

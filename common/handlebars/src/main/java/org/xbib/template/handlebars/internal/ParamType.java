@@ -1,7 +1,7 @@
 
 package org.xbib.template.handlebars.internal;
 
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 
 /**
  * A strategy for parameter type resolver.
@@ -13,12 +13,12 @@ enum ParamType {
     CONTEXT {
         @Override
         boolean apply(final Object param) {
-            return param instanceof Context;
+            return param instanceof HandlebarsContext;
         }
 
         @Override
-        Object doParse(final Context scope, final Object param) {
-            return ((Context) param).model();
+        Object doParse(final HandlebarsContext scope, final Object param) {
+            return ((HandlebarsContext) param).model();
         }
     },
 
@@ -37,7 +37,7 @@ enum ParamType {
         }
 
         @Override
-        Object doParse(final Context scope, final Object param) {
+        Object doParse(final HandlebarsContext scope, final Object param) {
             String string = (String) param;
             return string.subSequence(1, string.length() - 1);
         }
@@ -53,7 +53,7 @@ enum ParamType {
         }
 
         @Override
-        Object doParse(final Context scope, final Object param) {
+        Object doParse(final HandlebarsContext scope, final Object param) {
             return param;
         }
     },
@@ -68,7 +68,7 @@ enum ParamType {
         }
 
         @Override
-        Object doParse(final Context scope, final Object param) {
+        Object doParse(final HandlebarsContext scope, final Object param) {
             return param;
         }
     },
@@ -83,7 +83,7 @@ enum ParamType {
         }
 
         @Override
-        Object doParse(final Context scope, final Object param) {
+        Object doParse(final HandlebarsContext scope, final Object param) {
             return scope.get((String) param);
         }
     };
@@ -103,7 +103,7 @@ enum ParamType {
      * @param param   The candidate param.
      * @return A parsed value.
      */
-    abstract Object doParse(Context context, Object param);
+    abstract Object doParse(HandlebarsContext context, Object param);
 
     /**
      * Parse the given parameter to a runtime representation.
@@ -112,7 +112,7 @@ enum ParamType {
      * @param param   The candidate parameter.
      * @return The parameter value at runtime.
      */
-    public static Object parse(final Context context, final Object param) {
+    public static Object parse(final HandlebarsContext context, final Object param) {
         return get(param).doParse(context, param);
     }
 

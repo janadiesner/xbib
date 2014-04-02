@@ -66,7 +66,7 @@ import java.util.Stack;
 public class ESFilterGenerator implements Visitor {
 
     /**
-     * the default resource bundle
+     * the default getResource bundle
      */
     private static final ResourceBundle DEFAULT_BUNDLE =
             ResourceBundle.getBundle("org.xbib.query.cql.elasticsearch.default");
@@ -87,7 +87,7 @@ public class ESFilterGenerator implements Visitor {
     }
 
     /**
-     * Constructor with custom resource bundle
+     * Constructor with custom getResource bundle
      *
      * @param bundle
      */

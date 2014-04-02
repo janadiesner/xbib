@@ -32,6 +32,7 @@
 package org.xbib.elasticsearch;
 
 import org.testng.annotations.Test;
+import org.xbib.elasticsearch.sink.ResourceSink;
 import org.xbib.elasticsearch.support.client.bulk.MockBulkClient;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Literal;
@@ -56,7 +57,7 @@ public class MockIndexWriteTest<S extends Resource<S, P, O>, P extends Property,
 
         try {
             ResourceContext context = createContext();
-            indexer.output(context, context.contentBuilder());
+            indexer.output(context, context.getResource(), context.getContentBuilder());
         } finally {
             es.shutdown();
         }

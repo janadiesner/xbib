@@ -64,10 +64,6 @@ public class SimpleLiteral<O extends Object>
     @Override
     public SimpleLiteral<O> object(O value) {
         this.value = value;
-        /*if (type == null) {
-            // auto-typing -> bad performance
-            deriveType();
-        }*/
         return this;
     }
 
@@ -130,7 +126,7 @@ public class SimpleLiteral<O extends Object>
 
     @Override
     public String toString() {
-        return lexicalValue(); //value != null ? value.toString() : null;
+        return lexicalValue();
     }
 
     public String lexicalValue() {
@@ -164,45 +160,6 @@ public class SimpleLiteral<O extends Object>
             // add more xsd here ...
             default:
                 return s;
-        }
-    }
-
-    protected void deriveType() {
-        if (value == null) {
-            return;
-        }
-        String s = value.toString();
-        try {
-            Integer.parseInt(s);
-            type(INT);
-            return;
-        } catch (Exception e) {
-        }
-        try {
-            Long.parseLong(s);
-            type(LONG);
-            return;
-        } catch (Exception e) {
-        }
-        try {
-            Float.parseFloat(s);
-            type(FLOAT);
-            return;
-        } catch (Exception e) {
-        }
-        try {
-            Double.parseDouble(s);
-            type(DOUBLE);
-            return;
-        } catch (Exception e) {
-        }
-        try {
-            if ("true".equals(s) || "false".equals(s)) {
-                Boolean.parseBoolean(s);
-                type(BOOLEAN);
-                return;
-            }
-        } catch (Exception e) {
         }
     }
 

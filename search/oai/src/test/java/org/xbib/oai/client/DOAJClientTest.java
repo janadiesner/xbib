@@ -144,7 +144,7 @@ public class DOAJClientTest {
         public RdfOutput output(ResourceContext resourceContext) throws IOException {
             StringWriter sw = new StringWriter();
             writer.output(sw);
-            writer.write(resourceContext.resource());
+            writer.write(resourceContext.getResource());
             logger.info("out = {}", sw);
             return this;
         }

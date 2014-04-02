@@ -32,29 +32,31 @@
 package org.xbib.elements;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 
+import static com.google.common.collect.Lists.newLinkedList;
+
 /**
+ * Base class for all element builders
  *
- *
- * @param <K>
- * @param <V>
- * @param <E>
- * @param <C>
+ * @param <K> the key type
+ * @param <V> the value type
+ * @param <E> the element type
+ * @param <C> the resource context type
  */
-public abstract class AbstractElementBuilder<K, V, E extends Element, C extends ResourceContext>
+public abstract class AbstractElementBuilder<K, V, E extends Element, C extends ResourceContext<Resource>>
         implements ElementBuilder<K, V, E, C> {
 
-    private final Logger logger = LoggerFactory.getLogger(AbstractElementBuilder.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(AbstractElementBuilder.class.getName());
 
-    private final ThreadLocal<C> contexts = new ThreadLocal();
+    private final ThreadLocal<C> contexts = new ThreadLocal<C>();
 
-    private final List<ElementOutput> outputs = new ArrayList();
+    private final List<ContextResourceOutput> outputs = newLinkedList();
 
     @Override
     public void build(E element, K key, V value) {
@@ -69,15 +71,16 @@ public abstract class AbstractElementBuilder<K, V, E extends Element, C extends 
 
     @Override
     public void end() {
-        C context = contexts.get();
-        context.prepareForOutput();
-        for (ElementOutput output : outputs) {
+        C context = context();
+        context.beforeOutput();
+        for (ContextResourceOutput output : outputs) {
             try {
-               output.output(context, context.contentBuilder() );
+               output.output(context, context.getResource(), context.getContentBuilder());
             } catch (IOException e) {
                 logger.error("output failed: " + e.getMessage(), e);
             }
         }
+        context.afterOutput();
     }
 
     @Override
@@ -86,7 +89,7 @@ public abstract class AbstractElementBuilder<K, V, E extends Element, C extends 
     }
 
     @Override
-    public AbstractElementBuilder<K, V, E, C> addOutput(ElementOutput output) {
+    public AbstractElementBuilder<K, V, E, C> addOutput(ContextResourceOutput output) {
         outputs.add(output);
         return this;
     }

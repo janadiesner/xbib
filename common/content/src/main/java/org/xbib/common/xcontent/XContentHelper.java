@@ -24,15 +24,21 @@ public class XContentHelper {
         return XContentFactory.xContent(data, offset, length).createParser(data, offset, length);
     }
 
+    public static Map<String, Object> convertToMap(String data) {
+        try {
+            return XContentFactory.xContent(XContentFactory.xContentType(data)).createParser(data).mapOrderedAndClose();
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Failed to parse content to map", e);
+        }
+    }
+
     public static Map<String, Object> convertToMap(BytesReference bytes, boolean ordered) {
         if (bytes.hasArray()) {
             return convertToMap(bytes.array(), bytes.arrayOffset(), bytes.length(), ordered);
         }
         try {
-            XContentParser parser;
-            XContentType contentType;
-                contentType = XContentFactory.xContentType(bytes);
-                parser = XContentFactory.xContent(contentType).createParser(bytes.streamInput());
+            XContentType contentType = XContentFactory.xContentType(bytes);
+            XContentParser parser = XContentFactory.xContent(contentType).createParser(bytes.streamInput());
             if (ordered) {
                 return parser.mapOrderedAndClose();
             } else {
@@ -302,8 +308,17 @@ public class XContentHelper {
                         generator.writeNumber(parser.floatValue());
                         break;
                     case DOUBLE:
-                        generator.writeNumber(parser.doubleValue());
+                        if (parser.isLosslessDecimals()) {
+                            generator.writeNumber(parser.bigDecimalValue());
+                        } else {
+                            generator.writeNumber(parser.doubleValue());
+                        }
                         break;
+                    case BIG_INTEGER:
+                        generator.writeNumber(parser.bigIntegerValue());
+                        break;
+                    case BIG_DECIMAL:
+                        generator.writeNumber(parser.bigDecimalValue());
                 }
                 break;
             case VALUE_BOOLEAN:

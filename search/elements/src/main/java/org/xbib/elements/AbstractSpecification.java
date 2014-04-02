@@ -43,14 +43,13 @@ import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.TreeMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.xbib.elements.scripting.ScriptElement;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 
+import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newTreeMap;
 
 /**
@@ -267,7 +266,7 @@ public abstract class AbstractSpecification implements Specification {
         if (m == null) {
             throw new IOException("format "+ format + " missing");
         }
-        elements = new TreeMap();
+        elements = newTreeMap();
         dump(null, m);
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(writer, elements);
@@ -284,7 +283,7 @@ public abstract class AbstractSpecification implements Specification {
                 String elemKey = e.getClass().getSimpleName();
                 List<String> l = elements.get(elemKey);
                 if (l == null) {
-                    l = new LinkedList();
+                    l = newLinkedList();
                 }
                 l.add(kk);
                 elements.put(elemKey, l);

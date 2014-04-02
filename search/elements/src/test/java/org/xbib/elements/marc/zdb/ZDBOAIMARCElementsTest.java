@@ -37,8 +37,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
-import org.testng.annotations.Test;
-import org.xbib.elements.CountableElementOutput;
+import org.xbib.elements.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -57,11 +56,11 @@ public class ZDBOAIMARCElementsTest {
     private static final Logger logger = LoggerFactory.getLogger(ZDBOAIMARCElementsTest.class.getName());
 
     public void testOAIElements() throws Exception {
-        final CountableElementOutput output = new CountableElementOutput<ResourceContext, Resource>() {
+        final CountableContextResourceOutput output = new CountableContextResourceOutput<ResourceContext, Resource>() {
 
             @Override
-            public void output(ResourceContext context, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
-                Resource r = context.resource();
+            public void output(ResourceContext context, Resource resource, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
+                Resource r = context.getResource();
                 r.id(IRI.builder().host("myindex").query("mytype").fragment(counter.toString()).build());
                 StringWriter sw = new StringWriter();
                 TurtleWriter tw = new TurtleWriter().output(sw);

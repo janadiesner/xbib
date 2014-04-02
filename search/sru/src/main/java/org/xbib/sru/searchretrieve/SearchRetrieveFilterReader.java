@@ -312,7 +312,7 @@ public class SearchRetrieveFilterReader extends XMLFilterReader {
     @Override
     public void endPrefixMapping(String prefix) throws SAXException {
         // no, we do not remove namespaces. Or you will get in trouble in RDF
-        //namespaceContext.removeNamespace(prefix);
+        //getNamespaceContext.removeNamespace(prefix);
         super.endPrefixMapping(prefix);
     }
 

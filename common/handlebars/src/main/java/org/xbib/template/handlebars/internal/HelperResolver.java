@@ -2,7 +2,7 @@
 package org.xbib.template.handlebars.internal;
 
 
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 import org.xbib.template.handlebars.Handlebars;
 import org.xbib.template.handlebars.Helper;
 import org.xbib.template.handlebars.HelperRegistry;
@@ -57,7 +57,7 @@ abstract class HelperResolver extends BaseTemplate {
      * @param context The current context.
      * @return A hash object with values in the current context.
      */
-    protected Map<String, Object> hash(final Context context) {
+    protected Map<String, Object> hash(final HandlebarsContext context) {
         Map<String, Object> result = new LinkedHashMap<String, Object>();
         for (Entry<String, Object> entry : hash.entrySet()) {
             Object value = entry.getValue();
@@ -73,7 +73,7 @@ abstract class HelperResolver extends BaseTemplate {
      * @param scope The current context.
      * @return A parameter list with values in the current context.
      */
-    protected Object[] params(final Context scope) {
+    protected Object[] params(final HandlebarsContext scope) {
         if (params.size() <= 1) {
             return PARAMS;
         }
@@ -94,7 +94,7 @@ abstract class HelperResolver extends BaseTemplate {
      * @param context The current context.
      * @return The current context.
      */
-    protected Object determineContext(final Context context) {
+    protected Object determineContext(final HandlebarsContext context) {
         if (params.size() == 0) {
             return context.model();
         }

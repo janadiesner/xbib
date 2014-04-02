@@ -108,19 +108,28 @@ public class JsonWriter<S extends Identifier, P extends Property, O extends Node
     }
 
     @Override
+    public TripleListener<S, P, O> begin() {
+        return this;
+    }
+
+    @Override
     public TripleListener<S, P, O> startPrefixMapping(String prefix, String uri) {
-        return null;
+        return this;
     }
 
     @Override
     public TripleListener<S, P, O> endPrefixMapping(String prefix) {
-        return null;
+        return this;
     }
-
 
     @Override
     public TripleListener<S, P, O> triple(Triple<S, P, O> triple) {
-        return null; // TODO
+        return this; // TODO
+    }
+
+    @Override
+    public TripleListener<S, P, O> end() {
+        return this;
     }
 
     public JsonWriter writeNamespaces() throws IOException {

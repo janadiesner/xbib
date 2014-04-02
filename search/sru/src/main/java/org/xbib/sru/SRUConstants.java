@@ -232,7 +232,7 @@ public interface SRUConstants {
      * In either case (via the httpAccept parameter or HTTP Accept
      * header), if the server does not support the requested media type t
      * hen the server MUST respond with a 406 status code and SHOULD
-     * return an HTML message with pointers to that  resource in
+     * return an HTML message with pointers to that  getResource in
      * supported media types.
      * If an SRU server supports multiple media types and uses content
      * negotiation to determine the media type of the response, then

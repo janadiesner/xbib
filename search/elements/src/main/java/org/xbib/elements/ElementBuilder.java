@@ -53,5 +53,5 @@ public interface ElementBuilder<K, V, E extends Element, C extends ResourceConte
 
     void end();
 
-    ElementBuilder<K,V,E,C> addOutput(ElementOutput output);
+    ElementBuilder<K,V,E,C> addOutput(ContextResourceOutput output);
 }

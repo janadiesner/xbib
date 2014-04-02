@@ -31,9 +31,6 @@
  */
 package org.xbib.rdf.context;
 
-import java.util.Collection;
-import java.util.Map;
-import org.xbib.iri.IRI;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.ResourceFactory;
 import org.xbib.rdf.xcontent.ContentBuilder;
@@ -41,51 +38,50 @@ import org.xbib.rdf.xcontent.ContentBuilder;
 /**
  * A Resource context. 
  * 
- * Resource contexts are useful in situation where you need to be aware
- * of the provenance of your data, or you want addressing resources to
- * different targets.
+ * Resource contexts are useful when many resources are stored together
+ * and common information about processing must be maintained,
+ * for example, creation, building, and output.
  * 
  */
 public interface ResourceContext<R extends Resource> extends ResourceFactory<R> {
 
     /**
      * Set a new IRI namespace context
-     * @param namespaces
-     * @return
+     * @param namespaceContext namespaces
+     * @return this context
      */
-    ResourceContext<R> newNamespaceContext(IRINamespaceContext namespaces);
+    ResourceContext<R> setNamespaceContext(IRINamespaceContext namespaceContext);
 
     /**
      * Get IRI namespace context
-     * @return
+     * @return namespace context
      */
-    IRINamespaceContext namespaceContext();
+    IRINamespaceContext getNamespaceContext();
 
     /**
      *
      * Set a new resource in this context.
-     * @param resource
-     * @return the current resource context
+     * @param resource the new resource
+     * @return the current esource context
      */
     ResourceContext<R> setResource(R resource);
 
     /**
-     * Get current resource in this context.
-     * @return current resource
+     * Get resource in this context.
+     * @return current getResource
      */
-    R resource();
+    R getResource();
 
-    /**
-     * Reset this context so the context becomes empty
-     */
-    ResourceContext<R> reset();
+    ResourceContext<R> setContentBuilder(ContentBuilder<ResourceContext, R> contentBuilder);
+
+    ContentBuilder<ResourceContext, R> getContentBuilder();
 
     /**
      * Prepare the context for output.
-     * @return
+     * @return this context
      */
-    ResourceContext<R> prepareForOutput();
+    ResourceContext<R> beforeOutput();
 
-    ContentBuilder<ResourceContext, R> contentBuilder();
+    ResourceContext<R> afterOutput();
 
 }

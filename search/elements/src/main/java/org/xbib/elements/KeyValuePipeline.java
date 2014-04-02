@@ -37,7 +37,6 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.context.ResourceContext;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +46,6 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * A key/value pipeline for threaded processing of elements
- *
  *
  * @param <K>
  * @param <V>
@@ -59,7 +57,7 @@ public class KeyValuePipeline<K,V,E extends Element,C extends ResourceContext>
 
     protected final Specification specification;
 
-    private final BlockingQueue<List<KeyValue>> queue;
+    private final BlockingQueue<List<KeyValue<K,V>>> queue;
 
     private final ElementBuilder<K,V,E,C> builder;
 
@@ -75,7 +73,7 @@ public class KeyValuePipeline<K,V,E extends Element,C extends ResourceContext>
 
     public KeyValuePipeline(int i,
                             Specification specification,
-                            BlockingQueue<List<KeyValue>> queue,
+                            BlockingQueue<List<KeyValue<K,V>>> queue,
                             Map map,
                             ElementBuilderFactory<K, V, E, C> factory) {
         this.logger = LoggerFactory.getLogger("pipeline" + i);
@@ -87,32 +85,27 @@ public class KeyValuePipeline<K,V,E extends Element,C extends ResourceContext>
         this.unknownKeys = new TreeSet<String>();
     }
 
-    public KeyValuePipeline detectUnknownKeys(boolean enabled) {
-        this.detectUnknownKeys = enabled;
-        return this;
-    }
-
+    @Override
     public Boolean call() {
         try {
             logger.debug("key/value pipeline {} starting", getClass().getName());
             while(true) {
-                List<KeyValue> e = queue.take();
-                // poison element? then quit
-                if (e.isEmpty()) {
-                    logger.debug("key/value pipeline ending {}", getClass());
+                List<KeyValue<K,V>> keyvalueList = queue.take();
+                // if poison element then quit
+                if (keyvalueList.isEmpty()) {
+                    logger.debug("key/value pipeline {} ending", getClass().getName());
                     break;
                 }
-                // only a single marker element in list? then skip
-                if (e.size() == 1) {
-                    if (e.get(0).key() == null) {
+                // if only a single element in list then skip this element
+                if (keyvalueList.size() == 1) {
+                    if (keyvalueList.get(0).key() == null) {
+                        logger.debug("single marker element skipped");
                         continue;
                     }
                 }
                 builder.begin();
                 boolean end = false;
-                Iterator<KeyValue> it = e.iterator();
-                while (it.hasNext()) {
-                    KeyValue<K, V> kv = it.next();
+                for (KeyValue<K,V> kv : keyvalueList) {
                     K key = kv.key();
                     V value = kv.value();
                     if (key == null) {
@@ -130,11 +123,15 @@ public class KeyValuePipeline<K,V,E extends Element,C extends ResourceContext>
         } catch (InterruptedException ex) {
             logger.warn("key/value pipeline {} interrupted", getClass());
             Thread.currentThread().interrupt();
-        } catch (Exception ex) {
-            logger.error("error in key/value pipeline, exiting", ex);
+        } catch (Throwable t) {
+            logger.error("error in key/value pipeline, exiting", t);
         }
-        // nothing special
         return true;
+    }
+
+    public KeyValuePipeline detectUnknownKeys(boolean enabled) {
+        this.detectUnknownKeys = enabled;
+        return this;
     }
 
     public long getCounter() {

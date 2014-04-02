@@ -55,6 +55,7 @@
         <filter-name>compressionFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+<!--
     <servlet>
         <servlet-name>DefaultServlet</servlet-name>
         <servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class>
@@ -63,12 +64,6 @@
         <display-name>JAX-RS REST</display-name>
         <servlet-name>federator</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-            <param-value>
-                 org.xbib.jaxrs.ConnegFilter;
-                 com.sun.jersey.api.container.filter.PostReplaceFilter</param-value>
-        </init-param>
         <init-param>
             <param-name>application/xhtml+xml</param-name>
             <param-value>xsl/isodis25577-xhtml.xsl</param-value>
@@ -91,6 +86,7 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+-->
     <servlet>
         <description>Elasticsearch SRU</description>
         <servlet-name>SRUServlet</servlet-name>

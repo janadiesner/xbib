@@ -2,6 +2,7 @@ package org.xbib.elasticsearch;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.xbib.elasticsearch.sink.ResourceSink;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elasticsearch.support.client.ingest.IngestClient;
 import org.xbib.elasticsearch.xml.ES;
@@ -12,7 +13,6 @@ import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleResourceContext;
 
-import java.io.ByteArrayOutputStream;
 import java.net.URI;
 
 public class BulkIndexerTest extends Assert {
@@ -29,7 +29,7 @@ public class BulkIndexerTest extends Assert {
 
             es.deleteIndex();
             ResourceContext context = createContext();
-            new ResourceSink(es).output(context, context.contentBuilder());
+            new ResourceSink(es).output(context, context.getResource(), context.getContentBuilder());
             es.flush();
             Thread.sleep(2000);
             Logger queryLogger = LoggerFactory.getLogger("test", BulkIndexerTest.class.getName());
@@ -50,9 +50,9 @@ public class BulkIndexerTest extends Assert {
     private ResourceContext createContext() {
         ResourceContext context = new SimpleResourceContext()
                 .newNamespaceContext();
-        context.namespaceContext().addNamespace(ES.NS_PREFIX, ES.NS_URI);
-        context.namespaceContext().addNamespace("urn", "http://urn");
-        context.namespaceContext().addNamespace("dc", "http://purl.org/dc/terms/");
+        context.getNamespaceContext().addNamespace(ES.NS_PREFIX, ES.NS_URI);
+        context.getNamespaceContext().addNamespace("urn", "http://urn");
+        context.getNamespaceContext().addNamespace("dc", "http://purl.org/dc/terms/");
         Resource resource = context.newResource()
                 .id(IRI.create("http://test?test#2"))
                 .add("dc:title", "Hello")

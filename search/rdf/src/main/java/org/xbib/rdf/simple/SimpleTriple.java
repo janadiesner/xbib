@@ -52,9 +52,9 @@ public class SimpleTriple<S extends Identifier, P extends Property, O extends No
     /**
      * Create a new triple
      *
-     * @param subject
-     * @param predicate
-     * @param object
+     * @param subject subject
+     * @param predicate predicate
+     * @param object object
      */
     public SimpleTriple(S subject, P predicate, O object) {
         this.subject = subject;

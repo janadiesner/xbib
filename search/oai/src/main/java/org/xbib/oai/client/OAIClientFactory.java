@@ -52,6 +52,14 @@ public class OAIClientFactory {
     private OAIClientFactory() {
     }
 
+    public static OAIClientFactory getInstance() {
+        return instance;
+    }
+
+    public static OAIClient newClient() {
+        return new DefaultOAIClient();
+    }
+
     public static OAIClient newClient(String spec) {
         Properties properties = new Properties();
         InputStream in = instance.getClass().getResourceAsStream("/org/xbib/oai/client/" + spec + ".properties");

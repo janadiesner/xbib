@@ -117,7 +117,7 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
 
     private Resource<S, P, O> createResource2() {
         Resource<S, P, O> r = new SimpleResource()
-                .id(IRI.create("urn:resource"))
+                .id(IRI.create("urn:getResource"))
                 .add("dc:title", "Hello")
                 .add("dc:title", "World")
                 .add("xbib:person", "Jörg Prante")
@@ -153,7 +153,7 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
 
     private Resource<S, P, O> createNestedResources() {
         Resource<S, P, O> r = new SimpleResource()
-                .id(IRI.create("urn:resource"))
+                .id(IRI.create("urn:getResource"))
                 .add("dc:title", "Hello")
                 .add("dc:title", "World")
                 .add("xbib:person", "Jörg Prante")

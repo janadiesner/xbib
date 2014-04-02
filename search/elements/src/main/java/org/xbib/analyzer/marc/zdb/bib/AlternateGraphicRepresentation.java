@@ -34,6 +34,7 @@ package org.xbib.analyzer.marc.zdb.bib;
 import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
+import org.xbib.elements.marc.MARCPipeline;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 
@@ -44,8 +45,8 @@ public class AlternateGraphicRepresentation extends MARCElement {
     public static MARCElement getInstance() { return instance; }
 
     @Override
-    public void fields(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
-                       FieldCollection fields, String value) {
+    public boolean fields(MARCPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
+                          FieldCollection fields, String value) {
         // http://www.loc.gov/marc/bibliographic/ecbdcntf.html
         // find linkage: $6 [linking tag]-[occurrence number]/[script identification code]/[field orientation code]
         for (Field field : fields) {
@@ -54,6 +55,6 @@ public class AlternateGraphicRepresentation extends MARCElement {
                 field.tag(tag);
             }
         }
-        super.fields(builder, fields, value);
+        return super.fields(pipeline, builder, fields, value);
     }
 }

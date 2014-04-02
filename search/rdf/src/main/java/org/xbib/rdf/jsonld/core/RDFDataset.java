@@ -584,12 +584,12 @@ public class RDFDataset extends LinkedHashMap<String, Object> implements Constan
 
     /**
      * Converts a JSON-LD value object to an RDF literal or a JSON-LD string or
-     * node object to an RDF resource.
+     * node object to an RDF getResource.
      * 
      * @param item
      *            the JSON-LD value or node object.
      *
-     * @return the RDF literal or RDF resource.
+     * @return the RDF literal or RDF getResource.
      */
     private Node objectToRDF(Object item) {
         // convert value object to RDF

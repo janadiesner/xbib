@@ -83,7 +83,7 @@ public final class IRINamespaceContext extends XmlNamespaceContext implements Co
     }
 
     public String compact(IRI uri, boolean dropfragment) {
-        // drop fragment (useful for resource counters in fragments)
+        // drop fragment (useful for getResource counters in fragments)
         final String s = dropfragment
                 ? new IRI(uri.getScheme(), uri.getSchemeSpecificPart(), null).toString() : uri.toString();
         // we assume we have a rather short set of name spaces (~ 10-20)

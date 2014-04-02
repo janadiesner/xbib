@@ -38,6 +38,12 @@ import java.util.Map;
 /**
  * A tag value mapper is a helper class to map MARC indicators to declarative names.
  *
+ * "tag" : {
+ *     "indicator1" :
+ *     "indicator2" : ...
+ *
+ * }
+ *
  */
 public class TagValueMapper {
 
@@ -47,6 +53,7 @@ public class TagValueMapper {
     public static Map.Entry<String, Object> map(Map indicators, final Field field) {
         String k = null;
         Object v = field.indicator();
+        // first level is a tag map
         Object indicatorDef = indicators.get(field.tag());
         if (indicatorDef instanceof Map) {
             // key/value mapping

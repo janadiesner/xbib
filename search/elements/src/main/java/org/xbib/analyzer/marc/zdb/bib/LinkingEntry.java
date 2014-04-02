@@ -31,7 +31,10 @@
  */
 package org.xbib.analyzer.marc.zdb.bib;
 
+import org.xbib.elements.ElementBuilder;
+import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
+import org.xbib.marc.FieldCollection;
 import org.xbib.rdf.Resource;
 
 public class LinkingEntry extends MARCElement {
@@ -42,7 +45,7 @@ public class LinkingEntry extends MARCElement {
     }
 
     @Override
-    public String data(String predicate, Resource resource, String property, String value) {
+    public String data(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,String predicate, Resource resource, String property, String value) {
         if ("identifier".equals(property)) {
             if (value.startsWith("(DE-600)")) {
                 resource.add("identifierZDB", value.substring(8).replaceAll("\\-","").toLowerCase());

@@ -39,6 +39,7 @@ import java.util.Collection;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
 
+import io.netty.channel.ConnectTimeoutException;
 import org.testng.annotations.Test;
 import org.xbib.io.Request;
 import org.xbib.logging.Logger;
@@ -133,12 +134,15 @@ public class AsyncClientTest {
             };
             request.addListener(listener);
             StylesheetTransformer transformer = new StylesheetTransformer("src/test/resources/xsl");
-            SRUResponse response = client
-                    .searchRetrieve(request)
-                    .setStylesheetTransformer(transformer)
-                    .to(writer);
+            try {
+                SRUResponse response = client
+                        .searchRetrieve(request)
+                        .setStylesheetTransformer(transformer)
+                        .to(writer);
+            } catch (ConnectTimeoutException e) {
+                logger.error(e.getMessage(), e);
+            }
             transformer.close();
-
             client.close();
         }
     }

@@ -627,7 +627,12 @@
             "092$ $ $adklwy",
             "092$ $ $adkly",
             "092$ $ $adklyz",
-            "092$ $ $adklz"
+            "092$ $ $adklz",
+            "092$ $ $adk",
+            "092$ $ $adkluw",
+            "092$ $ $adklwyz",
+            "092$ $ $adklwz",
+            "092$ $ $adky"
         ],
         "_predicate": "service",
         "subfields" : {
@@ -660,11 +665,13 @@
                 "b" : "copy",
                 "c" : "copy-loan",
                 "d" : "none",
-                "e" : "distribution-electronic"
+                "e" : "electronic"
         },
         "servicedistribution" : {
-                "a" : "distribution-domestic-only",
-                "b" : "distribution-postal"
+                "a" : "domestic",
+                "b" : "postal",
+                "p" : "postal", /* SWB code */
+                "n" : "domestic" /* SWB code */
         },
         "funding" : {
                 "a" : "dfg",
@@ -831,6 +838,7 @@
         "852$1$1$8ai",
         "852$1$1$8i",
         "852$3$0$a",
+        "852$ $2$9=c",
         "859$0$0$8",
         "859$0$0$8a",
         "859$0$0$8i",
@@ -848,9 +856,16 @@
         "859$3$0$a"
          ],
         "indicators" : {
-            "00" : "begingroup",
-            "01" : "opengroup",
-            "10" : "endgroup"
+            "852" : {
+                "00" : "FormattedEnumerationAndChronologyBeginGroup",
+                "01" : "FormattedEnumerationAndChronologyOpenGroup",
+                "10" : "FormattedEnumerationAndChronologyEndGroup"
+            },
+            "859" : {
+                "00" : "FormattedEnumerationAndChronologyBeginGroup",
+                "01" : "FormattedEnumerationAndChronologyOpenGroup",
+                "10" : "FormattedEnumerationAndChronologyEndGroup"
+            }
         },
         "subfields" : {
             "a" : "volume",
@@ -1059,52 +1074,54 @@
     },
     "ElectronicLocationAndAccess" : {
         "values" : [
-        "856$ $0$u",
-        "856$ $ $9y",
-        "856$ $0$2u",
-        "856$ $0$2uz",
-        "856$ $0$3u",
-        "856$ $0$3ux",
-        "856$ $0$eu",
-        "856$ $0$uu",
-        "856$ $0$ux",
-        "856$ $0$uxz",
-        "856$ $0$uz",
-        "856$ $0$x",
-        "856$ $0$z",
-        "856$0$0$8",
-        "856$0$0$89",
-        "856$0$0$89abi",
-        "856$0$0$89ai",
-        "856$0$0$89bi",
-        "856$0$0$89i",
-        "856$0$0$8ai",
-        "856$0$0$8i",
-        "856$0$1$89abi",
-        "856$0$1$89ai",
-        "856$0$1$89bi",
-        "856$0$1$89i",
-        "856$0$1$8a",
-        "856$0$1$8ai",
-        "856$0$1$8i",
-        "856$1$0$u",
-        "856$1$0$89abi",
-        "856$1$0$89ai",
-        "856$1$0$89i",
-        "856$1$0$89bi",
-        "856$1$0$8ai",
-        "856$1$0$8i",
-        "856$3$0$9",
-        "856$3$0$a",
-        "856$3$0$z",
-        "856$4$0$u",
-        "856$4$0$ux",
+            "856$ $0$u",
+            "856$ $ $9y",
+            "856$ $0$2u",
+            "856$ $0$2uz",
+            "856$ $0$3u",
+            "856$ $0$3ux",
+            "856$ $0$eu",
+            "856$ $0$uu",
+            "856$ $0$ux",
+            "856$ $0$uxz",
+            "856$ $0$uz",
+            "856$ $0$x",
+            "856$ $0$z",
+            "856$0$0$8",
+            "856$0$0$89",
+            "856$0$0$89abi",
+            "856$0$0$89ai",
+            "856$0$0$89bi",
+            "856$0$0$89i",
+            "856$0$0$8ai",
+            "856$0$0$8i",
+            "856$0$1$89abi",
+            "856$0$1$89ai",
+            "856$0$1$89bi",
+            "856$0$1$89i",
+            "856$0$1$8a",
+            "856$0$1$8ai",
+            "856$0$1$8i",
+            "856$1$0$u",
+            "856$1$0$89abi",
+            "856$1$0$89ai",
+            "856$1$0$89i",
+            "856$1$0$89bi",
+            "856$1$0$8ai",
+            "856$1$0$8i",
+            "856$3$0$9",
+            "856$3$0$a",
+            "856$3$0$z",
+            "856$4$0$u",
+            "856$4$0$ux",
             "856$4$0$2u",
             "856$4$0$2uz",
             "856$4$0$3u",
             "856$4$0$uxz",
             "856$4$0$uz",
-            "856$4$0$z"
+            "856$4$0$z",
+            "856$4$0$eu",
+            "856$4$0$x"
         ],
         "subfields" : {
             "2" : "accessmode",
@@ -1169,6 +1186,7 @@
             "859$3$0$z",
             "561$ $ $a",
             "562$ $ $a",
+            "562$ $ $ab",
             "583$ $ $a",
             "583$ $ $h"
             ]

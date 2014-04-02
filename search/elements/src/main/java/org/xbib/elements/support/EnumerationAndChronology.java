@@ -58,6 +58,7 @@ public class EnumerationAndChronology {
 
     private static final Logger logger = LoggerFactory.getLogger(EnumerationAndChronology.class.getName());
 
+    // yyyy
     private final static Pattern[] p1a = new Pattern[] {
             // 1921=1339
             // 1921/22=1339
@@ -75,6 +76,7 @@ public class EnumerationAndChronology {
             // SS 1922
             Pattern.compile("(\\d{4})")
     };
+    // i.yyyy
     private final static Pattern[] p1b = new Pattern[]{
             // 1.1970/71
             // 2.1938/40(1942)
@@ -89,6 +91,7 @@ public class EnumerationAndChronology {
             // 1.[19]93,1
             Pattern.compile("(\\d+)\\.(\\[?\\d{2}\\]?\\d{2}/?\\d{0,4})")
     };
+    // yyyy=yyyy
     private final static Pattern[] p1c = new Pattern[] {
             // An V= [1796/97]
             // 1.5678=[1917/18]
@@ -96,6 +99,7 @@ public class EnumerationAndChronology {
             // 1.1981=1401
             Pattern.compile("\\.(\\d{4}/?\\d{0,4})\\s*=")
     };
+    // yyyy -
     private final static Pattern[] p2a = new Pattern[] {
             // 1971 -
             Pattern.compile("(\\d{4}/?\\d{0,4}).*\\-\\s*$"),
@@ -104,17 +108,24 @@ public class EnumerationAndChronology {
             // [19]51,1 - [19]52,5
             Pattern.compile("(\\[\\d{2}\\]\\d{2}).*\\-\\s*$")
     };
+    // i.yyyy -
     private final static Pattern[] p2b = new Pattern[] {
             // 1.1971 -
             // 2.1947,15.Mai -
             Pattern.compile("(\\d+)\\.(\\d{4}/?\\d{0,4}).*\\-\\s*$")
     };
+    // yyyy,v -
+    private final static Pattern[] p2c = new Pattern[] {
+            Pattern.compile("(\\d{4}/?\\d{0,4}),(.*?)\\s*\\-\\s*$")
+    };
+    // yyyy - yyyy
     private final static Pattern[] p3a = new Pattern[] {
             // 1963 - 1972
             Pattern.compile("(\\d{4}/?\\d{0,4}).*\\-\\s*(\\d{4}/?\\d{0,4})"),
             // [19]51,1 - [19]52,5
             Pattern.compile("(\\[\\d{2}\\]\\d{2}/?\\d{0,4}).*\\-\\s*(\\[\\d{2}\\]\\d{2}/?\\d{0,4})")
     };
+    // i.yyyy - i.yyyy
     private final static Pattern[] p3b = new Pattern[] {
             // 6.1961/64 - 31.1970
             // 1.1963 - 12.1972
@@ -126,6 +137,19 @@ public class EnumerationAndChronology {
             Pattern.compile("(\\d+)\\.(\\[\\d{2}\\]\\d{2})(/\\d{0,4}).*\\-\\s*(\\d+)\\.(\\[\\d{2}\\]\\d{2})(/\\d{0,4})"),
             // 1.[19]51,1 - 1.[19]52,5
             Pattern.compile("(\\d+)\\.(\\[\\d{2}\\]\\d{2}).*\\-\\s*(\\d+)\\.(\\[\\d{2}\\]\\d{2})")
+    };
+    // yyyy,v - yyyy,v
+    private final static Pattern[] p3c = new Pattern[]{
+            Pattern.compile("(\\d{4}),(.*?)\\s*\\-\\s*(\\d{4}),(.*?)")
+    };
+    // yyyy,v - i.yyyy
+    private final static Pattern[] p3d = new Pattern[] {
+            // 1981,31 - 25.1997
+            Pattern.compile("(\\d{4}),(.*?)\\s*\\-\\s*(\\d+)\\.(\\d{4})")
+    };
+    // i.yyyy - yyyy,v
+    private final static Pattern[] p3e = new Pattern[]{
+            Pattern.compile("(\\d+)\\.(\\d{4})\\s*\\-\\s*(\\d{4}),(.*?)")
     };
     private final static Pattern[] p4a = new Pattern[] {
             // 2.1938/40(1942)
@@ -158,7 +182,62 @@ public class EnumerationAndChronology {
                             .add("begindate", sanitizeDate(m.group(1)));
                 }
             }
-            // always continue - parentheses dates are optional
+            // always continue here, parentheses dates are optional
+            found = false;
+            for (Pattern p : p3e) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    Integer b = sanitizeDate(m.group(2));
+                    Integer e = sanitizeDate(m.group(3));
+                    resource.newResource("group")
+                            .add("beginvolume", m.group(1))
+                            .add("begindate", b)
+                            .add("endvolume", m.group(4))
+                            .add("enddate", e);
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            found = false;
+            for (Pattern p : p3d) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    Integer b = sanitizeDate(m.group(1));
+                    Integer e = sanitizeDate(m.group(4));
+                    resource.newResource("group")
+                            .add("beginvolume", m.group(2))
+                            .add("begindate", b)
+                            .add("endvolume", m.group(3))
+                            .add("enddate", e);
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            found = false;
+            for (Pattern p : p3c) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    Integer b = sanitizeDate(m.group(1));
+                    Integer e = sanitizeDate(m.group(3));
+                    resource.newResource("group")
+                            .add("beginvolume", m.group(2))
+                            .add("begindate", b)
+                            .add("endvolume", m.group(4))
+                            .add("enddate", e);
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            found = false;
             for (Pattern p : p3b) {
                 Matcher m = p.matcher(value);
                 found = m.find();
@@ -198,6 +277,21 @@ public class EnumerationAndChronology {
                                 .add("begindate", b)
                                 .add("enddate", e);
                     }
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            found = false;
+            for (Pattern p : p2c) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    resource.newResource("group")
+                            .add("beginvolume", m.group(2))
+                            .add("begindate", sanitizeDate(m.group(1)))
+                            .add("open", "true");
                     break;
                 }
             }

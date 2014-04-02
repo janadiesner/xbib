@@ -1,7 +1,7 @@
 
 package org.xbib.template.handlebars.internal;
 
-import org.xbib.template.handlebars.Context;
+import org.xbib.template.handlebars.HandlebarsContext;
 import org.xbib.template.handlebars.Handlebars;
 import org.xbib.template.handlebars.HandlebarsError;
 import org.xbib.template.handlebars.HandlebarsException;
@@ -73,11 +73,11 @@ class Partial extends BaseTemplate {
     }
 
     @Override
-    public void merge(final Context context, final Writer writer)
+    public void merge(final HandlebarsContext context, final Writer writer)
             throws IOException {
         TemplateLoader loader = handlebars.getLoader();
         try {
-            LinkedList<TemplateSource> invocationStack = context.data(Context.INVOCATION_STACK);
+            LinkedList<TemplateSource> invocationStack = context.data(HandlebarsContext.INVOCATION_STACK);
 
             TemplateSource source = loader.sourceAt(path);
 
@@ -112,7 +112,7 @@ class Partial extends BaseTemplate {
             if (this.context.equals("this")) {
                 template.apply(context, writer);
             } else {
-                template.apply(Context.newContext(context, context.get(this.context)), writer);
+                template.apply(HandlebarsContext.newContext(context, context.get(this.context)), writer);
             }
         } catch (IOException ex) {
             String reason = String.format("The partial '%s' could not be found",

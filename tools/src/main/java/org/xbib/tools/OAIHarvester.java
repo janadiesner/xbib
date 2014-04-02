@@ -35,6 +35,7 @@ import org.xbib.io.Connection;
 import org.xbib.io.NullWriter;
 import org.xbib.io.Packet;
 import org.xbib.io.Session;
+import org.xbib.io.StringPacket;
 import org.xbib.io.archivers.tar.TarConnectionFactory;
 import org.xbib.io.archivers.tar.TarSession;
 import org.xbib.logging.Logger;
@@ -73,9 +74,7 @@ public abstract class OAIHarvester extends Converter {
 
     private final static Logger logger = LoggerFactory.getLogger(OAIHarvester.class.getSimpleName());
 
-    protected final static SimpleResourceContext resourceContext = new SimpleResourceContext();
-
-    protected static TarSession session;
+    private static Session<StringPacket> session;
 
     @Override
     protected OAIHarvester prepare() {
@@ -99,15 +98,9 @@ public abstract class OAIHarvester extends Converter {
         return this;
     }
 
-    public OAIHarvester run() throws Exception {
-        super.run();
-        logger.info("closing output");
-        session.close();
-        return this;
-    }
-
     @Override
     public void process(URI uri) throws Exception {
+        logger.info("uri={}", uri);
         Map<String,String> params = URIUtil.parseQueryString(uri);
         String server = uri.toString();
         String metadataPrefix = params.get("metadataPrefix");
@@ -169,7 +162,7 @@ public abstract class OAIHarvester extends Converter {
     }
 
     protected RdfResourceHandler rdfResourceHandler() {
-        return new RdfResourceHandler(resourceContext);
+        return new RdfResourceHandler(new SimpleResourceContext());
     }
 
     protected class XmlPacketHandler extends XmlMetadataHandler {
@@ -178,7 +171,7 @@ public abstract class OAIHarvester extends Converter {
             super.endDocument();
             logger.info("got XML document {}", getIdentifier());
             try {
-                Packet p = session.newPacket();
+                StringPacket p = session.newPacket();
                 p.name(getIdentifier());
                 String s = getWriter().toString();
                 // for Unicode in non-canonical form, normalize it here
@@ -211,9 +204,9 @@ public abstract class OAIHarvester extends Converter {
 
         @Override
         public RdfOutput output(ResourceContext resourceContext) throws IOException {
-            writer.write(resourceContext.resource());
-            Packet p = session.newPacket();
-            p.name(resourceContext.resource().id().getASCIIAuthority());
+            writer.write(resourceContext.getResource());
+            StringPacket p = session.newPacket();
+            p.name(resourceContext.getResource().id().getASCIIAuthority());
             String s = sw.toString();
             // for Unicode in non-canonical form, normalize it here
             s = Normalizer.normalize(s, Normalizer.Form.NFC);
@@ -238,9 +231,9 @@ public abstract class OAIHarvester extends Converter {
 
         @Override
         public RdfOutput output(ResourceContext resourceContext) throws IOException {
-            writer.write(resourceContext.resource());
-            Packet p = session.newPacket();
-            p.name(resourceContext.resource().id().getASCIIAuthority());
+            writer.write(resourceContext.getResource());
+            StringPacket p = session.newPacket();
+            p.name(resourceContext.getResource().id().getASCIIAuthority());
             String s = sw.toString();
             // for Unicode in non-canonical form, normalize it here
             s = Normalizer.normalize(s, Normalizer.Form.NFC);

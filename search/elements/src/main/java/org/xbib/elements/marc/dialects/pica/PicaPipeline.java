@@ -52,7 +52,7 @@ public class PicaPipeline extends KeyValuePipeline<FieldCollection, String, Pica
 
     public PicaPipeline(int i,
                         Specification specification,
-                        BlockingQueue<List<KeyValue>> queue,
+                        BlockingQueue<List<KeyValue<FieldCollection, String>>> queue,
                         Map map,
                         ElementBuilderFactory<FieldCollection, String, PicaElement, PicaContext> factory) {
         super(i, specification, queue, map, factory);
@@ -76,7 +76,7 @@ public class PicaPipeline extends KeyValuePipeline<FieldCollection, String, Pica
             Map<String, Object> subfields = (Map<String, Object>) element.getSettings().get("subfields");
             if (subfields != null) {
                 // get current resource and create new anoymous resource
-                Resource resource = builder().context().resource();
+                Resource resource = builder().context().getResource();
                 Resource newResource = builder().context().newResource();
                 // default predicate is the name of the element class
                 String predicate = element.getClass().getSimpleName();

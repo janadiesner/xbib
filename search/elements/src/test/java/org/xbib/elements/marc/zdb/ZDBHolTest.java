@@ -33,7 +33,7 @@ package org.xbib.elements.marc.zdb;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.elements.CountableElementOutput;
+import org.xbib.elements.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -65,7 +65,7 @@ public class ZDBHolTest extends Assert {
 
     @Test
     public void testZDBElements() throws Exception {
-        final CountableElementOutput out = new OurElementOutput();
+        final CountableContextResourceOutput out = new OurContextResourceOutput();
         final Charset UTF8 = Charset.forName("UTF-8");
         final Charset ISO88591 = Charset.forName("ISO-8859-1");
         final InputStream in =
@@ -116,12 +116,12 @@ public class ZDBHolTest extends Assert {
         assertEquals(out.getCounter(), 293);
     }
 
-    class OurElementOutput extends CountableElementOutput {
+    class OurContextResourceOutput extends CountableContextResourceOutput {
 
         @Override
-        public void output(ResourceContext context, ContentBuilder contentBuilder) throws IOException {
-            if (!context.resource().isEmpty()) {
-                Resource r = context.resource();
+        public void output(ResourceContext context, Resource resource, ContentBuilder contentBuilder) throws IOException {
+            if (!context.getResource().isEmpty()) {
+                Resource r = context.getResource();
                 r.id(IRI.builder()
                         .scheme("http")
                         .host("zdb")
