@@ -31,13 +31,9 @@
  */
 package org.xbib.tools.merge.zdb.entities;
 
-import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,15 +46,36 @@ import static com.google.common.collect.Sets.newTreeSet;
 
 public class Cluster extends TreeSet<Manifestation> {
 
-    private List<TimeLine> timeLines;
+    private final boolean isNewspaper;
+
+    private final boolean isDatabase;
+
+    private final boolean isWebsite;
+
+    private Set<TimeLine> timeLines;
 
     public Cluster(Collection<Manifestation> c) {
         super(c);
+        this.isNewspaper = c.stream().anyMatch(Manifestation::isNewspaper);
+        this.isDatabase = c.stream().anyMatch(Manifestation::isDatabase);
+        this.isWebsite = c.stream().anyMatch(Manifestation::isWebsite);
     }
 
-    public List<TimeLine> timeLines() {
+    public boolean isNewspaper() {
+        return isNewspaper;
+    }
+
+    public boolean isDatabase() {
+        return isDatabase;
+    }
+
+    public boolean isWebsite() {
+        return isWebsite;
+    }
+
+    public Set<TimeLine> timeLines() {
         if (this.timeLines == null) {
-            this.timeLines = timeLines(this);
+            this.timeLines = makeTimeLines();
         }
         return timeLines;
     }
@@ -67,33 +84,31 @@ public class Cluster extends TreeSet<Manifestation> {
         if (timeLines == null) {
             return null;
         }
+        // concatenate all timelines. Slow.
         List<Manifestation> list = newLinkedList();
-        for (TimeLine t : timeLines) {
-            list.addAll(t);
-        }
-        Set<Manifestation> manifestations = newHashSet(this);
-        manifestations.removeAll(list);
-        return manifestations;
+        timeLines.forEach(list::addAll);
+        Set<Manifestation> candidates = newHashSet(this);
+        candidates.removeAll(list);
+        return candidates;
     }
 
-    private List<TimeLine> timeLines(Set<Manifestation> set) {
-        LinkedList<Manifestation> manifestations = newLinkedList(set);
-        List<TimeLine> timeLines = newLinkedList();
+    private Set<TimeLine> makeTimeLines() {
+        LinkedList<Manifestation> manifestations = newLinkedList(this);
+        // sort by first publication date
+        Set<TimeLine> timeLines = newTreeSet(TimeLine.getTimelineComparator());
         while (!manifestations.isEmpty()) {
             Manifestation manifestation = manifestations.removeFirst();
-            Set<Manifestation> timeline = newTreeSet(TIME_COMPARATOR);
+            Set<Manifestation> timeline = newTreeSet(Manifestation.getTimeComparator());
             timeline.add(manifestation);
             // make a time line
             makeTimeLine(manifestation, timeline);
-            // split time line by country
+            // add neighborhood to timeline
+            addNeighborTimeLines(manifestation, timeline);
+            // split time line by country marker (only print)
             List<TimeLine> countries = splitIntoCountrySegments(new TimeLine(timeline));
             timeLines.addAll(countries);
-            // find neighborhood
-            makeNeighborTimeLines(manifestation, timeline);
             manifestations.removeAll(timeline);
         }
-        // sort by first publication date
-        Collections.sort(timeLines, TIMELINE_COMPARATOR);
         return timeLines;
     }
 
@@ -105,9 +120,10 @@ public class Cluster extends TreeSet<Manifestation> {
     };
 
     private void makeTimeLine(Manifestation manifestation, Set<Manifestation> result)  {
+        SetMultimap<String,Manifestation> neighbors = manifestation.getRelatedManifestations();
         Set<Manifestation> set = newTreeSet();
         for (String relation : timelineRelations) {
-            set.addAll(manifestation.getRelatedManifestations().get(relation));
+            set.addAll(neighbors.get(relation));
         }
         set.removeAll(result);
         result.addAll(set);
@@ -116,38 +132,36 @@ public class Cluster extends TreeSet<Manifestation> {
         }
     }
 
-    private void makeNeighborTimeLines(Manifestation manifestation, Set<Manifestation> result) {
-        SetMultimap<String,Manifestation> neighbors =
-                ImmutableSetMultimap.copyOf(manifestation.getRelatedManifestations());
-        Set<String> keys = neighbors.keySet();
-        for (String relation : keys) {
-            // check all outgoing "has..." relations and make time lines of them
-            if (relation.startsWith("has")) {
-                Set<Manifestation> relatedNeighbors = neighbors.get(relation);
-                for (Manifestation neighbor : relatedNeighbors) {
-                    TreeSet<Manifestation> children = newTreeSet(TIME_COMPARATOR);
-                    children.add(neighbor);
-                    makeTimeLine(neighbor, children);
-                    result.addAll(children);
-                }
+    private void addNeighborTimeLines(Manifestation manifestation, Set<Manifestation> result) {
+        SetMultimap<String,Manifestation> neighbors = manifestation.getRelatedManifestations();
+        // check all outgoing "has..." relations and make time lines of them
+        neighbors.keySet().stream().filter(relation -> relation.startsWith("has")).forEach(relation -> {
+            Set<Manifestation> relatedNeighbors = neighbors.get(relation);
+            for (Manifestation neighbor : relatedNeighbors) {
+                TreeSet<Manifestation> children = newTreeSet(Manifestation.getTimeComparator());
+                children.add(neighbor);
+                makeTimeLine(neighbor, children);
+                result.addAll(children);
             }
-        }
+        });
     }
 
     private List<TimeLine> splitIntoCountrySegments(TimeLine manifestations) {
         List<TimeLine> countrySegments = newLinkedList();
-        Set<Manifestation> countrySegment = newTreeSet(TIME_COMPARATOR);
+        Set<Manifestation> countrySegment = newTreeSet(Manifestation.getTimeComparator());
         Iterator<Manifestation> it = manifestations.iterator();
         Manifestation m = it.next();
         countrySegment.add(m);
         String country = m.country().toString();
         while (it.hasNext()) {
+            String carrier = m.carrierType();
             m = it.next();
-            if (!country.equals(m.country().toString())) {
+            if (carrier.equals(m.carrierType()) && !country.equals(m.country().toString())) {
+                // create new country segment
                 country = m.country().toString();
                 countrySegments.add(new TimeLine(countrySegment,
                         manifestations.getFirstDate(), manifestations.getLastDate()));
-                countrySegment = newTreeSet(TIME_COMPARATOR);
+                countrySegment = newTreeSet(Manifestation.getTimeComparator());
             }
             countrySegment.add(m);
         }
@@ -156,56 +170,8 @@ public class Cluster extends TreeSet<Manifestation> {
         return countrySegments;
     }
 
-    private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 
-    private final static class TimeComparator implements Comparator<Manifestation> {
-
-        @Override
-        public int compare(Manifestation m1, Manifestation m2) {
-            if (m1 == m2) {
-                return 0;
-            }
-            Integer d1 = m1.firstDate() == null ? currentYear : m1.firstDate();
-            Integer c1 = findCarrierTypeKey(m1);
-
-            Integer d2 = m2.firstDate() == null ? currentYear : m2.firstDate();
-            Integer c2 = findCarrierTypeKey(m2);
-
-            String s1 = new StringBuilder()
-                    .append(m1.country())
-                    .append(Integer.toString(d1))
-                    .append(Integer.toString(c1))
-                    .append(m1.id())
-                    .toString();
-
-            String s2 = new StringBuilder()
-                    .append(m2.country())
-                    .append(Integer.toString(d2))
-                    .append(Integer.toString(c2))
-                    .append(m2.id())
-                    .toString();
-
-            return s2.compareTo(s1);
-        }
-    }
-
-    private static Integer findCarrierTypeKey(Manifestation m) {
-        switch (m.carrierType()) {
-            case "online resource" : return 2;
-            case "volume": return 1;
-            case "computer disc" : return 4;
-            case "computer tape cassette" : return 4;
-            case "computer chip cartridge" : return 4;
-            case "microform" : return 5;
-            case "multicolored" : return 6;
-            case "other" : return 6;
-            default: throw new IllegalArgumentException("unknown carrier: " + m.carrierType() + " in " + m.externalID());
-        }
-    }
-
-    private final static TimeComparator TIME_COMPARATOR = new TimeComparator();
-
-    private final static class TimeLineComparator implements Comparator<Set<Manifestation>> {
+    /*private final static class TimeLineComparator implements Comparator<Set<Manifestation>> {
 
         @Override
         public int compare(Set<Manifestation> set1, Set<Manifestation> set2) {
@@ -236,17 +202,15 @@ public class Cluster extends TreeSet<Manifestation> {
             }
 
             Integer d1 = f1.firstDate() == null ? currentYear : f1.firstDate();
-            Integer c1 = findCarrierTypeKey(f1);
-
-            Integer d2 = f2.firstDate() == null ? currentYear : f2.firstDate();
-            Integer c2 = findCarrierTypeKey(f2);
-
+            Integer c1 = f1.findCarrierTypeKey();
             String s1 = new StringBuilder()
                     .append(Integer.toString(d1))
                     .append(Integer.toString(c1))
                     .append(f1.id())
                     .toString();
 
+            Integer d2 = f2.firstDate() == null ? currentYear : f2.firstDate();
+            Integer c2 = f2.findCarrierTypeKey();
             String s2 = new StringBuilder()
                     .append(Integer.toString(d2))
                     .append(Integer.toString(c2))
@@ -257,6 +221,6 @@ public class Cluster extends TreeSet<Manifestation> {
         }
     }
 
-    private final static TimeLineComparator TIMELINE_COMPARATOR = new TimeLineComparator();
+    private final static TimeLineComparator TIMELINE_COMPARATOR = new TimeLineComparator();*/
 
 }

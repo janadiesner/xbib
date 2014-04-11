@@ -29,6 +29,10 @@ public class HandlebarsService {
 
     protected final static Map<String,Template> templates = precompile();
 
+    protected String sanitize(String param) {
+        return param != null ? param.trim() : null;
+    }
+
     protected HandlebarsContext makeContext(Map<String,Object> settings,
                                             HttpServletRequest request,
                                             UriInfo uriInfo,
@@ -139,8 +143,7 @@ public class HandlebarsService {
         String[] names = new String[] {
                 "test",
                 "testfile",
-                "demo",
-                "dispatcher"
+                "html/demo"
         };
         Map<String,Template> templateMap = new HashMap<String,Template>();
         try {

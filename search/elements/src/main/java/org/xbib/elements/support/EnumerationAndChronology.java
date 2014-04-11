@@ -31,21 +31,23 @@
  */
 package org.xbib.elements.support;
 
+import org.xbib.iri.IRI;
 import org.xbib.util.DateUtil;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.simple.SimpleResource;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Sets.newTreeSet;
 
 /**
  * Parsing patterns of enumeration and chronology
@@ -112,7 +114,10 @@ public class EnumerationAndChronology {
     private final static Pattern[] p2b = new Pattern[] {
             // 1.1971 -
             // 2.1947,15.Mai -
-            Pattern.compile("(\\d+)\\.(\\d{4}/?\\d{0,4}).*\\-\\s*$")
+            Pattern.compile("(\\d+)\\.(\\d{4}/?\\d{0,4}).*?\\-\\s*$"),
+            // 63.2011,Okt. -
+            Pattern.compile("(\\d{0,4})\\.(\\d{4}).*?\\-\\s*$"),
+            Pattern.compile("(.*?)\\.(\\d{4}/?\\d{0,4}).*\\-\\s*$")
     };
     // yyyy,v -
     private final static Pattern[] p2c = new Pattern[] {
@@ -133,6 +138,7 @@ public class EnumerationAndChronology {
             // 3.1858,6 - 24.1881,3
             // 1.1960 - 5.1963; 11.1964; 23.1971 -
             Pattern.compile("(\\d+)\\.(\\d{4}/?\\d{0,4}).*\\-\\s*(\\d+)\\.(\\d{4}/?\\d{0,4})"),
+            Pattern.compile("(.*?)\\.(\\d{4}/?\\d{0,4}).*\\-\\s*(.*?)\\.(\\d{4}/?\\d{0,4})"),
             // [19]81/82 - [19]83
             Pattern.compile("(\\d+)\\.(\\[\\d{2}\\]\\d{2})(/\\d{0,4}).*\\-\\s*(\\d+)\\.(\\[\\d{2}\\]\\d{2})(/\\d{0,4})"),
             // 1.[19]51,1 - 1.[19]52,5
@@ -145,11 +151,12 @@ public class EnumerationAndChronology {
     // yyyy,v - i.yyyy
     private final static Pattern[] p3d = new Pattern[] {
             // 1981,31 - 25.1997
+            //
             Pattern.compile("(\\d{4}),(.*?)\\s*\\-\\s*(\\d+)\\.(\\d{4})")
     };
     // i.yyyy - yyyy,v
     private final static Pattern[] p3e = new Pattern[]{
-            Pattern.compile("(\\d+)\\.(\\d{4})\\s*\\-\\s*(\\d{4}),(.*?)")
+            Pattern.compile("(.*?)\\.(\\d{4})\\s*\\-\\s*(\\d{4}),(.*?)")
     };
     private final static Pattern[] p4a = new Pattern[] {
             // 2.1938/40(1942)
@@ -441,6 +448,295 @@ public class EnumerationAndChronology {
         return resource;
     }
 
+    public static void parse(String content,
+                             List<Integer> begin,
+                             List<Integer> end,
+                             List<String> beginVolume,
+                             List<String> endVolume,
+                             List<Boolean> open
+    ) {
+        if (content == null) {
+            return;
+        }
+        String[] values = content.split(";");
+        int i = 0;
+        for (String value : values) {
+            boolean found = false;
+            // first, check dates in parentheses
+            for (Pattern p : p4a) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    begin.add(i, sanitizeDate(m.group(1)));
+                    end.add(i, null);
+                    open.add(i, false);
+                    i++;
+                }
+            }
+            // parentheses dates are optional
+            if (found) {
+                continue;
+            }
+            found = false;
+            for (Pattern p : p3e) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    Integer b = sanitizeDate(m.group(2));
+                    Integer e = sanitizeDate(m.group(3));
+                    beginVolume.add(i, m.group(1));
+                    endVolume.add(i,  m.group(4));
+                    begin.add(i, b);
+                    end.add(i, e);
+                    i++;
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            found = false;
+            for (Pattern p : p3d) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    Integer b = sanitizeDate(m.group(1));
+                    Integer e = sanitizeDate(m.group(4));
+                    beginVolume.add(i, m.group(2));
+                    endVolume.add(i,  m.group(3));
+                    begin.add(i, b);
+                    end.add(i, e);
+                    i++;
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            found = false;
+            for (Pattern p : p3c) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    Integer b = sanitizeDate(m.group(1));
+                    Integer e = sanitizeDate(m.group(3));
+                    beginVolume.add(i, m.group(2));
+                    endVolume.add(i,  m.group(4));
+                    begin.add(i, b);
+                    end.add(i, e);
+                    i++;
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+
+            for (Pattern p : p3b) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    begin.add(i, sanitizeDate(m.group(2)));
+                    end.add(i, sanitizeDate(m.group(4)));
+                    beginVolume.add(i, m.group(1));
+                    endVolume.add(i, m.group(3));
+                    open.add(i, false);
+                    i++;
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            found = false;
+            // simple periods
+            for (Pattern p : p3a) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    if (m.groupCount() == 4) {
+                        List<Integer> l1 = fractionDate(m.group(1) + m.group(2));
+                        List<Integer> l2 = fractionDate(m.group(3) + m.group(4));
+                        begin.add(i, sanitizeDate(l1.get(0)));
+                        end.add(i, sanitizeDate(l2.get(l2.size() - 1)));
+                        open.add(i, false);
+                        i++;
+                    } else {
+                        List<Integer> l1 = fractionDate(m.group(1));
+                        List<Integer> l2 = fractionDate(m.group(2));
+                        begin.add(i, sanitizeDate(l1.get(0)));
+                        end.add(i, sanitizeDate(l2.get(l2.size() - 1)));
+                        open.add(i, false);
+                        i++;
+                    }
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            found = false;
+            for (Pattern p : p2c) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    beginVolume.add(i, m.group(2));
+                    begin.add(i, sanitizeDate(m.group(1)) );
+                    open.add(i, true);
+                    i++;
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            found = false;
+            // open periods with volume
+            for (Pattern p : p2b) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    begin.add(i, sanitizeDate(m.group(2)));
+                    end.add(i, null);
+                    beginVolume.add(i, m.group(1));
+                    endVolume.add(i, null);
+                    open.add(i, true);
+                    i++;
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            found = false;
+            // open periods without volume
+            for (Pattern p : p2a) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    begin.add(i, sanitizeDate(m.group(1)));
+                    end.add(i, null);
+                    open.add(i, true);
+                    i++;
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            found = false;
+            // renamed single date
+            for (Pattern p : p1c) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    if (m.groupCount() > 1) {
+                        List<Integer> l = fractionDate(m.group(1) + m.group(2));
+                        begin.add(i, sanitizeDate(l.get(0)));
+                        end.add(i, null);
+                        open.add(i, false);
+                        i++;
+                        if (l.size() > 1) {
+                            begin.add(i, sanitizeDate(l.get(1)));
+                            end.add(i, null);
+                            open.add(i, false);
+                            i++;
+                        }
+                    } else {
+                        begin.add(i, sanitizeDate(m.group(1)));
+                        end.add(i, null);
+                        open.add(i, false);
+                        i++;
+                    }
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            found = false;
+            // single date, with volume
+            for (Pattern p : p1b) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    if (m.groupCount() == 3) {
+                        List<Integer> l = fractionDate(m.group(2) + m.group(3));
+                        begin.add(i, sanitizeDate(l.get(0)));
+                        end.add(i, null);
+                        beginVolume.add(i, m.group(1));
+                        endVolume.add(i, null);
+                        open.add(i, false);
+                        i++;
+                        if (l.size() > 1) {
+                            begin.add(i, sanitizeDate(l.get(1)));
+                            end.add(i, null);
+                            beginVolume.add(i, m.group(1));
+                            endVolume.add(i, null);
+                            open.add(i, false);
+                        }
+                    } else {
+                        begin.add(i, sanitizeDate(m.group(2)));
+                        end.add(i, null);
+                        beginVolume.add(i, m.group(1));
+                        endVolume.add(i, null);
+                        open.add(i, false);
+                    }
+                    break;
+                }
+            }
+            if (found) {
+                continue;
+            }
+            // single date, without volume
+            for (Pattern p : p1a) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    if (m.groupCount() == 4) {
+                        List<Integer> l1 = fractionDate(m.group(1) + m.group(2));
+                        List<Integer> l2 = fractionDate(m.group(3) + m.group(4));
+                        begin.set(i, sanitizeDate(l1.get(0)));
+                        if (l1.size() > 1) {
+                            begin.add(i, sanitizeDate(l1.get(1)));
+                            end.add(i, null);
+                            open.add(i, false);
+                            i++;
+                        }
+                        begin.add(i, sanitizeDate(l2.get(0)));
+                        end.add(i, null);
+                        open.add(i, false);
+                        i++;
+                        if (l2.size() > 1) {
+                            begin.add(i, sanitizeDate(l2.get(1)));
+                            end.add(i, null);
+                            open.add(i, false);
+                            i++;
+                        }
+                    } else if (m.groupCount() == 2) {
+                        List<Integer> l = fractionDate(m.group(1) + m.group(2));
+                        begin.add(i, sanitizeDate(l.get(0)));
+                        end.add(i, null);
+                        open.add(i, false);
+                        i++;
+                        if (l.size() > 1) {
+                            begin.add(i, sanitizeDate(l.get(1)));
+                            end.add(i, null);
+                            open.add(i, false);
+                            i++;
+                        }
+                    } else {
+                        begin.add(i, sanitizeDate(m.group(1)));
+                        end.add(i, null);
+                        open.add(i, false);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+
     public static Integer sanitizeDate(String date) {
         int pos = date.indexOf("/");
         if (pos > 0) {
@@ -461,7 +757,7 @@ public class EnumerationAndChronology {
     }
 
     public static List<Integer> fractionDate(String date) {
-        List<Integer> dates = new ArrayList();
+        List<Integer> dates = newLinkedList();
         int pos = date.indexOf("/");
         if (pos > 0) {
             String s = date.substring(0, pos).replaceAll("[^\\d]","");
@@ -488,12 +784,10 @@ public class EnumerationAndChronology {
         return dates;
     }
 
-    public static Set<Integer> dates(Resource resource) {
-        Set<Integer> dates = new TreeSet();
+    public static Set<Integer> dates(IRI id, Resource resource) {
+        Set<Integer> dates = newTreeSet();
         Map m = resource.resources();
-        Iterator<Collection<Resource>> it = m.values().iterator();
-        while (it.hasNext()) {
-            Collection<Resource> groups = it.next();
+        for (Collection<Resource> groups : (Iterable<Collection<Resource>>) m.values()) {
             for (Resource group : groups) {
                 Object begindate = group.literal("begindate");
                 Object enddate = group.literal("enddate");
@@ -518,17 +812,17 @@ public class EnumerationAndChronology {
                 // add years from interval
                 if (start >= 0 && end >= 0) {
                     if (start > DateUtil.getYear() || end > DateUtil.getYear()) {
-                        logger.warn("future dates: {},{} (from {},{})",
-                                start, end, begindate, enddate);
+                        logger.warn("future dates in {}: {},{} (from {},{})",
+                                id, start, end, begindate, enddate);
                     } else if (end - start > 250) {
-                        logger.warn("too many years: {}-{} (from {},{})",
-                                start, end, begindate, enddate);
-                    // RDA: 1500
-                    // Acta eruditorum: 1682
-                    // Phil. Trans.: 1655 (but not in print)
+                        logger.warn("too many years in {}: {}-{} (from {},{})",
+                                id, start, end, begindate, enddate);
+                        // RDA: 1500
+                        // Acta eruditorum: 1682
+                        // Phil. Trans.: 1655 (but not in print)
                     } else if (start < 1500 || end < 1500) {
-                        logger.warn("too early: {},{} ({},{})",
-                                start, end, begindate, enddate);
+                        logger.warn("too early in {}: {},{} ({},{})",
+                                id, start, end, begindate, enddate);
                     } else {
                         for (int i = start; i <= end; i++) {
                             dates.add(i);
@@ -536,7 +830,7 @@ public class EnumerationAndChronology {
                     }
                 }
                 if (dates.size() > 250) {
-                    logger.warn("too many dates: {}", dates.size());
+                    logger.warn("too many dates in {}: {}", id, dates.size());
                     break;
                 }
             }

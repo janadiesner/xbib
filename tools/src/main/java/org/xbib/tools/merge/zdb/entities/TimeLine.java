@@ -34,6 +34,7 @@ package org.xbib.tools.merge.zdb.entities;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +42,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableSet;
 import org.xbib.common.xcontent.XContentBuilder;
+import org.xbib.elements.support.EnumerationAndChronology;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 
@@ -53,7 +54,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import static com.google.common.collect.Sets.newLinkedHashSet;
 import static com.google.common.collect.Sets.newTreeSet;
 
-public class TimeLine extends TreeSet<Manifestation> {
+public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeLine> {
 
     private final static Logger logger = LoggerFactory.getLogger(TimeLine.class.getName());
 
@@ -73,10 +74,16 @@ public class TimeLine extends TreeSet<Manifestation> {
 
     private Map<Integer, Set<License>> licensesByDate;
 
+    private final String fingerprint;
+
+    private final String timelineKey;
+
     public TimeLine(Collection<Manifestation> manifestations) {
         super(Manifestation.getKeyComparator());
         addAll(manifestations);
         findExtremes();
+        this.fingerprint = makeFingerprint();
+        this.timelineKey = makeTimelineKey();
     }
 
     public TimeLine(Collection<Manifestation> manifestations, Integer firstDate, Integer lastDate) {
@@ -84,6 +91,8 @@ public class TimeLine extends TreeSet<Manifestation> {
         addAll(manifestations);
         this.firstDate = firstDate;
         this.lastDate = lastDate;
+        this.fingerprint = makeFingerprint();
+        this.timelineKey = makeTimelineKey();
     }
 
     public Integer getFirstDate() {
@@ -92,6 +101,46 @@ public class TimeLine extends TreeSet<Manifestation> {
 
     public Integer getLastDate() {
         return lastDate;
+    }
+
+    public String getFingerprint() {
+        return fingerprint;
+    }
+
+    public String getTimelineKey() {
+        return timelineKey;
+    }
+
+    private String makeFingerprint() {
+        StringBuilder sb = new StringBuilder();
+        for (Manifestation m  : this) {
+            if (sb.length() > 0) {
+                sb.append(".");
+            }
+            sb.append(m.externalID());
+        }
+        return sb.toString();
+    }
+
+    private String makeTimelineKey() {
+        StringBuilder sb = new StringBuilder();
+        Set<Manifestation> set1 = this;
+        Manifestation f1 = set1.iterator().next();
+        for (Manifestation m : set1) {
+            if (m != null && m.firstDate() != null && f1 != null && f1.firstDate() != null) {
+                if (m.firstDate() < f1.firstDate()) {
+                    f1 = m;
+                }
+            }
+        }
+        if (f1 != null) {
+            sb.append(f1.firstDate() != null ? Integer.toString(f1.firstDate()): "9999")
+                    .append(Integer.toString(f1.findCarrierTypeKey()))
+                    .append(f1.id());
+        } else {
+            sb.append("99999ZZZZZZZ");
+        }
+        return sb.toString();
     }
 
     private void findExtremes() {
@@ -136,7 +185,7 @@ public class TimeLine extends TreeSet<Manifestation> {
                 continue;
             }
             List<Integer> dates = null;
-            // check for generated dates
+            // check for our generated dates
             Object o = holding.map().get("dates");
             if (o != null) {
                 if (!(o instanceof List)) {
@@ -163,26 +212,33 @@ public class TimeLine extends TreeSet<Manifestation> {
                 }
             }
             if (dates == null || dates.isEmpty()) {
-                continue;
-            }
-            Collection<Integer> invalid = newLinkedList();
-            for (Integer date : dates) {
-                if (((firstDate != null) && (date < firstDate)) ||
-                     (lastDate != null && (date > lastDate))) {
-                    invalid.add(date);
-                    continue;
-                }
-                // there might be more holdings than one per date
-                Set<Holding> set = holdingsByDate.get(date);
+                // no dates, or unparseable dates. Save as "default holdings" at -1
+                Set<Holding> set = holdingsByDate.get(-1);
                 if (set == null) {
                     set = newHashSet();
                 }
                 set.add(holding);
-                holdingsByDate.put(date, set);
-            }
-            if (!invalid.isEmpty()) {
-                logger.debug("dates {} in holdings for {} out of range {}-{}",
-                        invalid, holding.parent(), firstDate, lastDate);
+                holdingsByDate.put(-1, set);
+            } else {
+                Collection<Integer> invalid = newLinkedList();
+                for (Integer date : dates) {
+                    if (((firstDate != null) && (date < firstDate)) ||
+                            (lastDate != null && (date > lastDate))) {
+                        invalid.add(date);
+                        continue;
+                    }
+                    // there might be more holdings than one per date
+                    Set<Holding> set = holdingsByDate.get(date);
+                    if (set == null) {
+                        set = newHashSet();
+                    }
+                    set.add(holding);
+                    holdingsByDate.put(date, set);
+                }
+                if (!invalid.isEmpty()) {
+                    logger.debug("dates {} in holdings for {} out of range {}-{}",
+                            invalid, holding.parent(), firstDate, lastDate);
+                }
             }
         }
     }
@@ -287,7 +343,7 @@ public class TimeLine extends TreeSet<Manifestation> {
                         Set<Manifestation> online = parent.getRelatedManifestations().get("hasOnlineEdition");
                         if (online != null) {
                             // almost sure we have only one online manifestation...
-                            for (Manifestation m : ImmutableSet.copyOf(online)) {
+                            for (Manifestation m : online) {
                                 m.addVolume(date, holding);
                             }
                         }
@@ -312,7 +368,7 @@ public class TimeLine extends TreeSet<Manifestation> {
                         // copy online license over to print manifestation if available
                         Set<Manifestation> print = parent.getRelatedManifestations().get("hasPrintEdition");
                         if (print != null) {
-                            for (Manifestation m : ImmutableSet.copyOf(print)) {
+                            for (Manifestation m : print) {
                                 m.addVolume(date, license);
                             }
                         }
@@ -369,49 +425,44 @@ public class TimeLine extends TreeSet<Manifestation> {
 
     private Set<String> makeTitles() {
         Set<String> set = newLinkedHashSet();
-        for (Manifestation m : this) {
-            set.add(m.title());
-        }
+        set.addAll(this.stream().map(Manifestation::title).collect(Collectors.toList()));
         return set;
     }
 
     private Set<String> makeISILs() {
         Set<String> isils = newHashSet();
         if (holdings != null) {
-            for (Holding holding : holdings) {
-                if (holding.getISIL() != null) {
-                    isils.add(holding.getISIL());
-                }
-            }
+            isils.addAll(holdings.stream().filter(holding -> holding.getISIL() != null).map(Holding::getISIL).collect(Collectors.toList()));
         }
         if (licenses != null) {
-            for (License license : licenses) {
-                if (license.getISIL() != null) {
-                    isils.add(license.getISIL());
-                }
-            }
+            isils.addAll(licenses.stream().filter(license -> license.getISIL() != null).map(License::getISIL).collect(Collectors.toList()));
         }
         return isils;
     }
 
     private Set<String> makeCountries() {
         Set<String> set = newHashSet();
-        for (Manifestation m : this) {
-            set.addAll(m.country());
-        }
+        for (Manifestation m : this) set.addAll(m.country());
         return set;
     }
 
     private Set<String> makeLanguages() {
         Set<String> set = newHashSet();
-        for (Manifestation m : this) {
-            set.add(m.language());
-        }
+        set.addAll(this.stream().map(Manifestation::language).collect(Collectors.toList()));
         return set;
     }
 
     private List<String> collectIDs() {
         return this.stream().map(Manifestation::externalID).collect(Collectors.toList());
+    }
+
+    @Override
+    public int compareTo(TimeLine o) {
+        return getFingerprint().compareTo(o.getFingerprint());
+    }
+
+    public static Comparator<TimeLine> getTimelineComparator() {
+        return (o1, o2) -> o1.getTimelineKey().compareTo(o2.getTimelineKey());
     }
 
 }

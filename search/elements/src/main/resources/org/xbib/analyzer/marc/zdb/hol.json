@@ -913,7 +913,7 @@
         "subfields" : {
             "3" : "enumerationAndChronology", /* materialsSpecified ? */
             "6" : "linkage",
-            "9" : "name", /* ZDB */
+            "9" : "number", /* ZDB sequence number */
             "a" : "location",
             "b" : "collection",
             "c" : "shelvinglocation",
@@ -928,7 +928,6 @@
                 "k" : "copy",
                 "l" : "copyloan"
         }
-
     },
     "AdditionalLocation" : {
         "values" : [
@@ -941,9 +940,7 @@
         "852$ $2$9=bc"
         ],
         "subfields" : {
-            "3" : "",
-            "6" : "",
-            "9" : "name",
+            "9" : "number",
             "a" : "marcorg",
             "b" : "collection",
             "c" : "shelvinglocation",

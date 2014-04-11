@@ -188,6 +188,7 @@ public class WithHoldingsAndLicenses
         ingest.maxActionsPerBulkRequest(settings.getAsInt("maxBulkActions", 100))
                 .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests",
                         Runtime.getRuntime().availableProcessors()))
+                .maxRequestWait(TimeValue.parseTimeValue(settings.get("maxWait", "180s"), TimeValue.timeValueSeconds(180)))
                 .setIndex(settings.get("index"))
                 .setting(WithHoldingsAndLicenses.class.getResourceAsStream("transport-client-settings.json"))
                 .newClient(targetURI);

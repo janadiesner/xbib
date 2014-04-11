@@ -56,7 +56,7 @@ public class Identifier extends MARCElement {
                     return null;
                 } else {
                     int pos = value.indexOf(')');
-                    String prefix = pos > 0 ? value.substring(1,pos).toUpperCase() : "";
+                    String prefix = pos > 0 ? value.substring(1,pos).replaceAll("\\-", "").toUpperCase() : "";
                     value = pos > 0 ? value.substring(pos + 1) : value;
                     resource.add("identifier" + prefix, value.replaceAll("\\-", "").toLowerCase());
                     return null;

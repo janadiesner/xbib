@@ -1,4 +1,3 @@
 {
-    "client.transport.ping_timeout": "30s",
-    "action.ingest.timeout" : "180s"
+    "client.transport.ping_timeout": "30s"
 }

@@ -32,7 +32,6 @@ public class DefaultHelperRegistry implements HelperRegistry {
     private final Map<String, Helper<?>> helpers =
             new HashMap<String, Helper<?>>();
 
-
     {
         // make sure default helpers are registered
         registerBuiltinsHelpers(this);
@@ -174,6 +173,7 @@ public class DefaultHelperRegistry implements HelperRegistry {
         registry.registerHelper(WithHelper.NAME, WithHelper.INSTANCE);
         registry.registerHelper(IfHelper.NAME, IfHelper.INSTANCE);
         registry.registerHelper(IfConditionHelper.NAME, IfConditionHelper.INSTANCE);
+        registry.registerHelper(SelectHelper.NAME, SelectHelper.INSTANCE);
         registry.registerHelper(EvalHelper.NAME, EvalHelper.INSTANCE);
         registry.registerHelper(UnlessHelper.NAME, UnlessHelper.INSTANCE);
         registry.registerHelper(EachHelper.NAME, EachHelper.INSTANCE);

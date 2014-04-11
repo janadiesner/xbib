@@ -520,7 +520,7 @@ public class WithCitations {
                 String id = manifestation.externalID();
                 publication.put("xbib:zdbid", id);
                 // unique endeavor key, independent of ISSN
-                publication.put("dcterms:identifier", manifestation.getUniqueIdentifier());
+                //publication.put("dcterms:identifier", manifestation.getUniqueIdentifier());
                 // hyphenated form od ZDB ID
                 String zdborig = new StringBuilder(id).insert(id.length() - 1, "-").toString();
                 // link to ZDB service

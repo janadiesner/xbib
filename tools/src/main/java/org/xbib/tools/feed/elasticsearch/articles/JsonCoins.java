@@ -46,7 +46,6 @@ import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.tools.Feeder;
 import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
 import org.xbib.io.InputService;

@@ -31,6 +31,7 @@
  */
 package org.xbib.tools;
 
+import org.elasticsearch.common.unit.TimeValue;
 import org.xbib.elasticsearch.sink.ResourceSink;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elasticsearch.support.client.bulk.BulkClient;
@@ -90,9 +91,11 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
         Integer maxbulkactions = settings.getAsInt("maxbulkactions", 100);
         Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
                 Runtime.getRuntime().availableProcessors());
+        String maxtimewait = settings.get("maxtimewait", "60s");
         output = createIngest();
         output.maxActionsPerBulkRequest(maxbulkactions)
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
+                .maxRequestWait(TimeValue.parseTimeValue(maxtimewait, TimeValue.timeValueSeconds(60)))
                 .newClient(esURI);
         output.waitForCluster();
         beforeIndexCreation(output);

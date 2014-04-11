@@ -24,33 +24,28 @@ public class EvalHelper implements Helper<Object> {
     @Override
     public CharSequence apply(final Object context, final Options options)
             throws IOException {
-        return eval(options).fn();
-    }
-
-    private Options eval(Options options) {
-        Object v1 = options.param(0);
-        Object operator = options.param(1);
-        Object v2 = options.param(2);
+        Object operator = options.param(0);
+        Object operand = options.param(1);
         Object res;
         switch (operator.toString()) {
             case "+":
-                res = (Long)v1 + (Long)v2;
+                res = (Integer) context + (Integer)operand;
                 break;
             case "-":
-                res = (Long)v1 - (Long)v2;
+                res = (Integer) context - (Integer)operand;
                 break;
             case "*":
-                res = (Long)v1 * (Long)v2;
+                res = (Integer) context * (Integer)operand;
                 break;
             case "/":
-                res = (Long)v1 / (Long)v2;
+                res = (Integer) context / (Integer)operand;
                 break;
             case "%":
-                res = (Long)v1 % (Long)v2;
+                res = (Integer) context % (Integer)operand;
                 break;
             default:
-                res = v1;
+                res = options.fn(context);
         }
-        return new Options.Builder(options).setParams(new Object[]{res}).build();
+        return res.toString();
     }
 }

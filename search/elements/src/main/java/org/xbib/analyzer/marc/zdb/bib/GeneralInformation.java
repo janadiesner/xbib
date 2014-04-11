@@ -35,7 +35,10 @@ import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.elements.marc.MARCPipeline;
+import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
+
+import java.util.Map;
 
 public class GeneralInformation extends MARCElement {
 
@@ -45,60 +48,24 @@ public class GeneralInformation extends MARCElement {
         return instance;
     }
 
+    private Map<String,Object> codes;
+
+    private Map<String,Object> continuingresource;
+
+    @Override
+    public MARCElement setSettings(Map params) {
+        super.setSettings(params);
+        this.codes= (Map<String,Object>)params.get("codes");
+        this.continuingresource= (Map<String,Object>)params.get("continuingresource");
+        return this;
+    }
+
     /**
      * Example "991118d19612006xx z||p|r ||| 0||||0ger c"
      */
     @Override
     public boolean fields(MARCPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
                           FieldCollection fields, String value) {
-        String publicationStatus = value.substring(6,7);
-        String publicationStatusText = null;
-        switch (publicationStatus) {
-            case "b" :
-                publicationStatusText = "No dates given; B.C. date involved";
-                break;
-            case "c":
-                publicationStatusText = "Continuing resource currently published";
-                break;
-            case "d":
-                publicationStatusText = "Continuing resource ceased publication";
-                break;
-            case "e":
-                publicationStatusText = "Detailed date";
-                break;
-            case "i":
-                publicationStatusText = "Inclusive dates of collection";
-                break;
-            case "k":
-                publicationStatusText = "Range of years of bulk of collection";
-                break;
-            case "m":
-                publicationStatusText = "Multiple dates";
-                break;
-            case "n":
-                publicationStatusText = "Dates unknown";
-                break;
-            case "p":
-                publicationStatusText = "Date of distribution/release/issue and production/recording session when different";
-                break;
-            case "q":
-                publicationStatusText = "Questionable date";
-                break;
-            case "r":
-                publicationStatusText = "Reprint/reissue date and original date";
-                break;
-            case "s":
-                publicationStatusText = "Single known date/probable date";
-                break;
-            case "t":
-                publicationStatusText = "Publication date and copyright date";
-                break;
-            case "u":
-                publicationStatusText = "Continuing resource status unknown";
-                break;
-        }
-        builder.context().getResource().add("publicationstatus", publicationStatus);
-        builder.context().getResource().add("publicationstatusText", publicationStatusText);
 
         String date1 = value.substring(7,11);
         builder.context().getResource().add("date1", check(date1));
@@ -106,7 +73,43 @@ public class GeneralInformation extends MARCElement {
         String date2 = value.substring(11,15);
         builder.context().getResource().add("date2", check(date2));
 
-        return true;
+        for (Field field: fields) {
+            String data = field.data();
+            if (data == null) {
+                continue;
+            }
+            for (int i = 0; i < data.length(); i++) {
+                String ch = data.substring(i, i+1);
+                if ("|".equals(ch) || " ".equals(ch)) {
+                    continue;
+                }
+                if (codes != null) {
+                    Map<String, Object> q = (Map<String, Object>) codes.get(Integer.toString(i));
+                    if (q != null) {
+                        String predicate = (String) q.get("_predicate");
+
+                        String code = (String) q.get(ch);
+                        if (code == null) {
+                            logger.warn("unmapped code {} in field {} predicate {}", ch, field, predicate);
+                        }
+                        builder.context().getResource().add(predicate, code);
+                    }
+                }
+                if (continuingresource != null) {
+                    Map<String, Object> q = (Map<String, Object>) continuingresource.get(Integer.toString(i));
+                    if (q != null) {
+                        String predicate = (String) q.get("_predicate");
+                        String code = (String) q.get(ch);
+                        if (code == null) {
+                            logger.warn("unmapped code {} in field {} predicate {}", ch, field, predicate);
+                        }
+                        builder.context().getResource().add(predicate, code);
+                    }
+
+                }
+            }
+        }
+        return false;
     }
 
     // check for valid date, else return null
@@ -114,6 +117,9 @@ public class GeneralInformation extends MARCElement {
         try {
             int d = Integer.parseInt(date);
             if (d < 1450) {
+                if (d > 0) {
+                    logger.warn("very early date ignored: {}", d);
+                }
                 return null;
             }
             if (d == 9999) {

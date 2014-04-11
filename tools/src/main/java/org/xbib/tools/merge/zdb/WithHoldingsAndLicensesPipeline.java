@@ -45,7 +45,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
 
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -72,7 +73,6 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineRequestListener;
 import org.xbib.util.ExceptionFormatter;
 
-import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.google.common.collect.Sets.newSetFromMap;
@@ -117,8 +117,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
     private final String holdingsIndexType;
     private final String volumesIndex;
     private final String volumesIndexType;
-    private final String servicesIndex;
-    private final String servicesIndexType;
 
     private MeterMetric metric;
 
@@ -154,8 +152,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         this.holdingsIndexType = settings.get("holdingsIndexType", "Holding");
         this.volumesIndex = settings.get("volumesIndex", index);
         this.volumesIndexType = settings.get("volumesIndexType", "Volume");
-        this.servicesIndex = settings.get("servicesIndex", index);
-        this.servicesIndexType = settings.get("servicesIndexType", "Service");
     }
 
     public Queue<ClusterBuildContinuation> getBuildQueue() {
@@ -202,7 +198,11 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             while (hasNext()) {
                 manifestation = next();
                 if (check(manifestation)) {
-                    process(manifestation);
+                    if ("work" .equals(service.settings().get("mode", "work"))) {
+                        processWork(manifestation);
+                    } else {
+                        processManifestation(manifestation);
+                    }
                     for (PipelineRequestListener listener : listeners.values()) {
                         listener.newRequest(this, manifestation);
                     }
@@ -271,101 +271,118 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             service.skipped().add(id);
             return false;
         }
-        // if we had this seen, it is already in the global state, so skip it.
-        if (service.processed().contains(id)) {
-            return false;
-        }
-        return true;
+        // if we had this seen, skip it
+        return !service.processed().contains(id);
     }
 
-    private void process(Manifestation manifestation) throws IOException {
-        String id = manifestation.externalID();
-
-        // book keeping for our local docs. We add them to the global docs at last.
-        Set<String> docs = newHashSet();
-        // reuse online manifestations
-        if (!manifestation.isOnline()) {
-            docs.add(id);
+    private void processManifestation(Manifestation manifestation) throws IOException {
+        // no Work set algorithm, only other edition (print/online)
+        this.candidates = newSetFromMap(new ConcurrentHashMap<Manifestation,Boolean>());
+        candidates.add(manifestation);
+        if (!manifestation.isDatabase() && !manifestation.isNewspaper() && !manifestation.isPacket()) {
+            retrieveOtherEdition(manifestation, candidates);
         }
-        // create new candidate set.
+        Collection<Manifestation> manifestations = ImmutableSet.copyOf(candidates);
+        candidates.clear();
+        for (Manifestation m : manifestations) {
+            setAllRelationsBetween(m, manifestations);
+        }
+        Set<Holding> holdings = searchHoldings(manifestations);
+        Set<License> licenses = searchLicensesAndIndicators(manifestations);
+        TimeLine timeline = new TimeLine(manifestations);
+        timeline.setHoldings(holdings);
+        timeline.setLicensesAndIndicators(licenses);
+        timeline.makeServices();
+        Set<String> visited = newHashSet();
+        for (Manifestation m : timeline) {
+            indexManifestation(m, visited);
+        }
+    }
+
+    private void processWork(Manifestation manifestation) throws IOException {
+        // Work set algorithm
         // Candidates are unstructured, no timeline organization,
         // no relationship analysis, not ordered by ID
         this.candidates = newSetFromMap(new ConcurrentHashMap<Manifestation,Boolean>());
-        //  newTreeSet(Manifestation.getComparator());
         candidates.add(manifestation);
-        // retrieve all docs that are connected by relationships into the candidate set.
-        retrieveCandidates(candidates, manifestation);
+        // there are certain serial genres which are not fitting into our model of "few" timelines
+        if (!manifestation.isDatabase() && !manifestation.isNewspaper() && !manifestation.isPacket()) {
+            // retrieve all docs that are connected by relationships into the candidate set.
+            retrieveCandidates(manifestation, candidates);
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("{} skipped candidate retrieval because of genre", manifestation);
+            }
+        }
 
-        // while we process, there may be other thread stealing our clusters, children etc.
-        // So we work with immutable copies.
+        if (candidates.size() > 100) {
+            logger.warn("large list of candidates for {} ({})", manifestation, candidates.size());
+        }
 
         // microforms et al?
-        //Set<Manifestation> c1 = ImmutableSet.copyOf(candidates);
-        //candidates.addAll(extractOtherEditions(c1));
+        //candidates.addAll(extractOtherEditions(candidates));
 
-        // Ensure direct relationships in the cluster.
-        //Set<Manifestation> c2 = ImmutableSet.copyOf(candidates);
+        // Ensure all relationships in the cluster.
         for (Manifestation m : candidates) {
             setAllRelationsBetween(m, candidates);
         }
 
         // Create timelines, and process each timeline for services (holdings, licenses, indicators)
-        Cluster c = new Cluster(candidates);
-        List<TimeLine> timeLines = c.timeLines();
+        Cluster cluster = new Cluster(candidates);
 
+        // Now, this is expensive. Find holdings, licenses, indicators of candidates
+        Set<Holding> holdings = searchHoldings(candidates);
+        if (holdings.size() > 1000) {
+            logger.warn("large list of holdings for {} ({})", manifestation, holdings.size());
+        }
+        Set<License> licenses = searchLicensesAndIndicators(candidates);
+        if (licenses.size() > 1000) {
+            logger.warn("large list of licenses for {} ({})", manifestation, licenses.size());
+        }
+
+        Set<TimeLine> timeLines = cluster.timeLines();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("cluster: candidates={} timelines={}", candidates, timeLines);
+            for (TimeLine timeLine : timeLines) {
+                logger.debug("timeline {} {}-{}", timeLine.getFingerprint(), timeLine.getFirstDate(), timeLine.getLastDate());
+            }
+        }
+
+        Set<String> visited = newHashSet();
         for (TimeLine timeLine : timeLines) {
-            String timelineId = timeLine.first().externalID();
+            String timelineId = timeLine.getFingerprint();
             // precaution against processing a timeline again. This should not happen.
             if (service.timelines().contains(timelineId)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("timeline {} already exists (while processing manifestation {})",
+                logger.warn("timeline {} already exists (while processing manifestation {})",
                             timelineId, manifestation);
-                }
                 continue;
             }
             service.timelines().add(timelineId);
-
-            // Now, this is expensive. Find holdings, licenses, indicators of this time line
-            timeLine.setHoldings(searchHoldings(timeLine));
-            timeLine.setLicensesAndIndicators(searchLicensesAndIndicators(timeLine));
-
+            //timeLine.setHoldings(searchHoldings(timeLine));
+            timeLine.setHoldings(holdings);
+            //timeLine.setLicensesAndIndicators(searchLicensesAndIndicators(timeLine));
+            timeLine.setLicensesAndIndicators(licenses);
             // stratify and re-adjust the services in the timeline
             timeLine.makeServices();
-        }
-
-        for (TimeLine timeLine : timeLines) {
-            String timelineId = timeLine.first().externalID();
-            // index the time line object (it's a "serial")
+            // index the time line object (it's a "serial line of publication events")
             XContentBuilder builder = jsonBuilder();
             timeLine.build("Serial", builder);
             service.ingest().index(worksIndex, worksIndexType, timelineId, builder.string());
-            builder.close();
-
             // index every manifestation in the timeline
-            Set<String> visited = newHashSet();
             for (Manifestation m : timeLine) {
                 indexManifestation(m, visited);
             }
-            docs.addAll(visited);
-
             if (logger.isDebugEnabled()) {
-                logger.debug("timeline {}/{}/{} of size {}: indexed {} manifestations",
-                        worksIndex, worksIndexType, timelineId,
-                    timeLine.size(), visited.size()
-                );
+                logger.debug("indexed timeline {} of size {}: {} total manifestations",
+                        timelineId, timeLine.size(), visited.size());
             }
         }
-
         // What about manifestations not in timeline? Index them as loners.
         // These loners indicate sources of errors in the relation configuration.
-        Set<String> visited = newHashSet();
-        for (Manifestation m : c.notInTimeLines()) {
+        for (Manifestation m : cluster.notInTimeLines()) {
             indexManifestation(m, visited);
         }
-        docs.addAll(visited);
-
-        // At last, add all timeline doc ids to the global state
-        service.processed().addAll(docs);
     }
 
     private void indexManifestation(Manifestation m, Set<String> visited) throws IOException {
@@ -374,45 +391,31 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         if (visited.contains(id)) {
             return;
         }
-        if (!m.isOnline()) {
-            visited.add(id);
-        }
-        // make sure at global level we do never index a manifestation twice
+        visited.add(id);
+        // make sure at other threads that we do never index a manifestation twice
         if (service.indexed().contains(id)) {
             return;
         }
         service.indexed().add(id);
 
-        // first, index related manifestations
-        ImmutableMultimap<String,Manifestation> related = ImmutableMultimap.copyOf(m.getRelatedManifestations());
-        for (Manifestation mm : related.values()) {
-            indexManifestation(mm, visited);
-        }
-        // second, index this manifestation
+        // index this manifestation
         XContentBuilder builder = jsonBuilder();
         m.build(builder, null);
         service.ingest().index(manifestationsIndex, manifestationsIndexType, id, builder.string());
-        builder.close();
 
         // volumes by date and the services for them
+        Integer volumeHoldingsCount = 0;
         SetMultimap<Integer,Holding> volumesByDate = m.getVolumesByDate();
         for (Integer date : volumesByDate.keySet()) {
-            String identifier = m.externalID() + (date != null ? "." + date : "");
+            String identifier = m.externalID() + (date != -1 ? "." + date : "");
             Set<Holding> holdings = volumesByDate.get(date);
             if (holdings != null && !holdings.isEmpty()) {
-                Map<String, XContentBuilder> builderMap =
-                        m.buildVolume(identifier, m.externalID(), date, holdings);
+                Map<String, XContentBuilder> builderMap = m.buildVolume(identifier, m.externalID(), date, holdings);
                 for (String key : builderMap.keySet()) {
                     XContentBuilder b = builderMap.get(key);
-                    if (key.length() > 0) {
-                        // this will result in very high number of indexing docs, so it is disabled by default
-                        if (service.settings().getAsBoolean("indexservices", false)) {
-                            service.ingest().index(servicesIndex, servicesIndexType, identifier + "." + key, b.string());
-                        }
-                    } else {
-                        // all services merged into one doc
-                        service.ingest().index(volumesIndex, volumesIndexType, identifier, b.string());
-                    }
+                    // all services merged into one doc
+                    service.ingest().index(volumesIndex, volumesIndexType, identifier, b.string());
+                    volumeHoldingsCount++;
                 }
                 serviceMetric.mark(builderMap.size());
                 if (logger.isDebugEnabled()) {
@@ -422,29 +425,44 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         }
         // holdings (list of institutions)
         SetMultimap<String,Holding> holdings = m.getVolumesByHolder();
-        for (String holder : holdings.keySet()) {
+        if (!holdings.isEmpty()) {
             XContentBuilder holdingsBuilder = jsonBuilder();
-            m.buildHolding(holdingsBuilder, m.externalID(), holder, holdings.get(holder));
-            String identifier = m.externalID() + "." + holder;
-            service.ingest().index(holdingsIndex, holdingsIndexType, identifier, holdingsBuilder.string());
+            holdingsBuilder.startObject().startArray("holdings");
+            for (String holder : holdings.keySet()) {
+                m.buildHolding(holdingsBuilder, m.externalID(), holder, holdings.get(holder));
+            }
+            holdingsBuilder.endArray().endObject();
+            service.ingest().index(holdingsIndex, holdingsIndexType, m.externalID(), holdingsBuilder.string());
+            volumeHoldingsCount++;
+            serviceMetric.mark(holdings.size());
         }
-        serviceMetric.mark(holdings.size());
         if (logger.isDebugEnabled()) {
             logger.debug("indexed {} holdings for {}", holdings.size(), m.externalID());
         }
+        if (volumeHoldingsCount == 0) {
+            logger.warn("no volumes/holdings indexed for {}", m.externalID());
+        }
+        // index related manifestations
+        SetMultimap<String, Manifestation> rels = ImmutableSetMultimap.copyOf(m.getRelatedManifestations());
+        for (String rel : rels.keys()) {
+            for (Manifestation mm : rels.get(rel)) {
+                indexManifestation(mm, visited);
+            }
+        }
     }
 
-    private void retrieveCandidates(Collection<Manifestation> cluster,
-                                 Manifestation manifestation) throws IOException {
-        SetMultimap<String, String> relations = manifestation.getRelations();
-        Set<String> neighbors = newHashSet(relations.values());
-        QueryBuilder queryBuilder = neighbors.isEmpty() ?
-                termQuery("_all",  manifestation.id()) :
-                boolQuery().should(termQuery("_all",  manifestation.id()))
-                        .should(termsQuery("IdentifierDNB.identifierDNB", neighbors.toArray()));
+    private void retrieveOtherEdition(Manifestation manifestation, Collection<Manifestation> cluster) throws IOException {
+        // only print/online edition. That's it.
+        QueryBuilder queryBuilder = termQuery("_all", manifestation.id());
+        if (manifestation.getOnlineID() != null && !manifestation.id().equals(manifestation.getOnlineID())) {
+            queryBuilder = termQuery("IdentifierDNB.identifierDNB", manifestation.getOnlineID());
+        }
+        if (manifestation.getPrintID() != null && !manifestation.id().equals(manifestation.getPrintID())) {
+            queryBuilder = termQuery("IdentifierDNB.identifierDNB", manifestation.getPrintID());
+        }
         SearchRequestBuilder searchRequest = service.client().prepareSearch()
                 .setQuery(queryBuilder)
-                .setSize(service.size()) // getSize is per shard!
+                .setSize(service.size()) // size is per shard!
                 .setSearchType(SearchType.SCAN)
                 .setScroll(TimeValue.timeValueMillis(service.millis()));
         searchRequest.setIndices(sourceTitleIndex);
@@ -459,15 +477,53 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         if (hits.getHits().length == 0) {
             return;
         }
-        ClusterBuildContinuation cont =
-                new ClusterBuildContinuation(manifestation, searchResponse, 0, cluster);
+        do {
+            for (int i = 0; i < hits.getHits().length; i++) {
+                SearchHit hit = hits.getAt(i);
+                Manifestation m = new Manifestation(mapper.readValue(hit.source(), Map.class));
+                cluster.add(m);
+            }
+            searchResponse = service.client().prepareSearchScroll(searchResponse.getScrollId())
+                    .setScroll(TimeValue.timeValueMillis(service.millis()))
+                    .execute().actionGet();
+            hits = searchResponse.getHits();
+        } while (hits.getHits().length > 0);
+    }
+
+    private void retrieveCandidates(Manifestation manifestation, Collection<Manifestation> cluster) throws IOException {
+        SetMultimap<String, String> relations = manifestation.getRelations();
+        Set<String> neighbors = newHashSet(relations.values());
+        QueryBuilder queryBuilder = neighbors.isEmpty() ?
+                termQuery("_all",  manifestation.id()) :
+                boolQuery().should(termQuery("_all",  manifestation.id()))
+                        .should(termsQuery("IdentifierDNB.identifierDNB", neighbors.toArray()));
+        SearchRequestBuilder searchRequest = service.client().prepareSearch()
+                .setQuery(queryBuilder)
+                .setSize(service.size()) // size is per shard!
+                .setSearchType(SearchType.SCAN)
+                .setScroll(TimeValue.timeValueMillis(service.millis()));
+        searchRequest.setIndices(sourceTitleIndex);
+        if (sourceTitleType != null) {
+            searchRequest.setTypes(sourceTitleType);
+        }
+        SearchResponse searchResponse = searchRequest.execute().actionGet();
+        searchResponse = service.client().prepareSearchScroll(searchResponse.getScrollId())
+                .setScroll(TimeValue.timeValueMillis(service.millis()))
+                .execute().actionGet();
+        SearchHits hits = searchResponse.getHits();
+        if (hits.getHits().length == 0) {
+            return;
+        }
+        ClusterBuildContinuation cont = new ClusterBuildContinuation(manifestation, searchResponse, cluster, 0);
         buildQueue.offer(cont);
         while (!buildQueue.isEmpty()) {
-            continueClusterBuild(buildQueue.poll());
+            cont = buildQueue.poll();
+            cluster.addAll(cont.cluster);
+            continueClusterBuild(cluster, cont);
         }
     }
 
-    private void continueClusterBuild(ClusterBuildContinuation c) throws IOException {
+    private void continueClusterBuild(Collection<Manifestation> cluster, ClusterBuildContinuation c) throws IOException {
         SearchResponse searchResponse = c.searchResponse;
         SearchHits hits;
         do {
@@ -475,18 +531,32 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             for (int i = c.pos; i < hits.getHits().length; i++ ) {
                 SearchHit hit = hits.getAt(i);
                 Manifestation m = new Manifestation(mapper.readValue(hit.source(), Map.class));
-                boolean collided = detectCollisionAndTransfer(m, c, i);
-                if (collided) {
-                    return;
-                }
-                // check for local cluster docs (avoid loops)
-                if (c.cluster.contains(m)) {
+                if (m.id().equals(c.manifestation.id())) {
                     continue;
                 }
-                c.cluster.add(m);
+                if (m.isNewspaper()) {
+                    continue;
+                }
+                if (m.isDatabase()) {
+                    continue;
+                }
+                if (m.isWebsite()) {
+                    continue;
+                }
+                if (cluster.contains(m)) {
+                    continue;
+                }
+                cluster.add(m);
+                service.processed().add(m.externalID());
+                boolean collided = detectCollisionAndTransfer(m, c, i);
+                if (collided) {
+                    // break out
+                    return;
+                }
                 boolean temporalRelation = false;
                 boolean carrierRelation = false;
-                for (String relation : findTheRelationsBetween(c.manifestation, m.id())) {
+                Collection<String> rels = findTheRelationsBetween(c.manifestation, m.id());
+                for (String relation : rels) {
                     if (relation == null) {
                         // shoud not happen
                         logger.debug("unknown relation {}", relation);
@@ -507,7 +577,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                             || Manifestation.carrierEditions().contains(relation);
                 }
                 // other direction (missing entries in catalog are possible)
-                for (String relation : findTheRelationsBetween(m, c.manifestation.id())) {
+                for (String relation : rels) {
                     if (relation == null) {
                         logger.debug("unknown relation {}", relation);
                         continue;
@@ -529,7 +599,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                 // Look for more candidates for this manifestation iff temporal or carrier relation.
                 // Also expand if there are any other print/online editions.
                 if (temporalRelation || carrierRelation || m.hasCarrierRelations()) {
-                    retrieveCandidates(c.cluster, m);
+                    retrieveCandidates(m, cluster);
                 }
             }
             searchResponse = service.client().prepareSearchScroll(searchResponse.getScrollId())
@@ -546,8 +616,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                 continue;
             }
             if (pipeline.getCluster() != null && pipeline.getCluster().contains(manifestation)) {
-                logger.debug("collision detected for {} at hit pos {}, with {} ",
-                        manifestation, pos, pipeline);
+                logger.warn("collision detected for {} with {} ", manifestation, pipeline);
                 c.pos = pos;
                 pipeline.getBuildQueue().offer(c);
                 return true;
@@ -556,12 +625,13 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         return false;
     }
 
-    private Set<Holding> searchHoldings(Set<Manifestation> manifestations) throws IOException {
+    private Set<Holding> searchHoldings(Collection<Manifestation> manifestations) throws IOException {
+        // create a map of all manifestations that can have assigned a holding.
         Map<String,Manifestation> map = newHashMap();
         for (Manifestation m : manifestations) {
             map.put(m.id(), m);
-            // only print!
-            if (m.getPrintID() != null) {
+            // add print if not already there...
+            if (m.getPrintID() != null && !map.containsKey(m.getPrintID())) {
                 map.put(m.getPrintID(), m);
             }
         }
@@ -629,12 +699,13 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             }
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("found {} holdings for manifestations {}",
-                    holdings.size(), manifestations);
+            for (Manifestation m : manifestations.values()) {
+                logger.info("found holdings of {} = {} ", m.externalID(), m.getVolumesByHolder().size());
+            }
         }
     }
 
-    private Set<License> searchLicensesAndIndicators(Set<Manifestation> manifestations) throws IOException {
+    private Set<License> searchLicensesAndIndicators(Collection<Manifestation> manifestations) throws IOException {
         // create a map of all manifestations that can have assigned a license.
         Map<String,Manifestation> map = newHashMap();
         boolean isOnline = false;
@@ -650,7 +721,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         Set<License> licenses = newHashSet();
         if (isOnline) {
             if (logger.isDebugEnabled()) {
-                logger.debug("searching for licenses and indicators for: {}", map);
+                logger.debug("searching for licenses and indicators for {}", map);
             }
             searchLicenses(licenses, map);
             searchIndicators(licenses, map);
@@ -785,7 +856,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                     m.addRelatedHolding(isil, indicator);
                     indicator.addManifestation(m);
                     if (logger.isDebugEnabled()) {
-                        logger.debug("indicator {} parent{} attached to manifestation {}",
+                        logger.debug("indicator {} parent {} attached to manifestation {}",
                                 indicator.identifier(), indicator.parent(), m.externalID());
                     }
                     // trick: add also to print manifestation if possible
@@ -810,9 +881,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
     }
 
     private Set<String> findTheRelationsBetween(Manifestation manifestation, String id) {
-        if (manifestation.id().equals(id)) {
-            return null;
-        }
         Set<String> relationNames = new HashSet<String>();
         for (String entry : Manifestation.relationEntries()) {
             Object o = manifestation.map().get(entry);
@@ -907,12 +975,12 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
 
         ClusterBuildContinuation(Manifestation manifestation,
                                  SearchResponse searchResponse,
-                                 int pos,
-                                 Collection<Manifestation> cluster) {
+                                 Collection<Manifestation> cluster,
+                                 int pos) {
             this.manifestation = manifestation;
             this.searchResponse = searchResponse;
-            this.pos = pos;
             this.cluster = cluster;
+            this.pos = pos;
         }
     }
 

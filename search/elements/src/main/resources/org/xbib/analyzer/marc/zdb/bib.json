@@ -495,8 +495,10 @@
             "008"
         ],
         "codes" : {
+            /* Date entered on file */
             "0-5" : "date",
-            "6" : {
+            "6" : { /* */
+                "_predicate" : "typeOfDate", /* Type of date/Publication status */
                 "b" : "No dates given",
                 "c" : "Continuing resource currently published",
                 "d" : "Continuing resource ceased publication",
@@ -508,18 +510,20 @@
             },
             "7-10" : "date1",
             "11-14" : "date2",
-            "15-17" : {
+            "15-17" : { /*  Place of publication, production, or execution http://www.loc.gov/marc/countries/ */
                 "xx" : "no place",
                 "vp" : "various places"
             },
             "18-34" : "material-specific codes",
-            "35-37" : {
+            "35-37" : { /* http://www.loc.gov/marc/languages/ */
                 "zxx" : "no linguistic content",
+                "ger" : "german",
                 "mul" : "multiple languages",
                 "sgn" : "sign languages",
                 "und" : "undetermined"
             },
             "38" : {
+                "_predicate" : "modifiedRecord", /* Modified record */
                 "d" : "Dashed-on information omitted",
                 "o" : "Completely romanized/printed cards romanized",
                 "r" : "Completely romanized/printed cards in script",
@@ -527,6 +531,7 @@
                 "x" : "Missing characters"
             },
             "39" : {
+                "_predicate" : "catalogingSource", /* Cataloging source */
                 "c" : "Cooperative cataloging program",
                 "d" : "Other",
                 "u" : "Unknown"
@@ -534,6 +539,7 @@
         },
         "continuingresource" : {
             "18" : { /* Frequency (006/01) */
+            "_predicate" : "frequency",
             "a" : "Annual",
             "b" : "Bimonthly",
             "c" : "Semiweekly",
@@ -554,12 +560,14 @@
             "z" : "Other"
             },
             "19" : { /* Regularity (006/02) */
+            "_predicate" : "regularity",
             "n" : "Normalized irregular",
             "r" : "Regular",
             "u" : "Unknown",
             "x" : "Completely irregular"
             },
             "21" : { /* Type of continuing resource (006/04) */
+            "_predicate" : "typeOfContinuingResource",
             "d" : "Updating database",
             "l" : "Updating loose-leaf",
             "m" : "Monographic series",
@@ -568,6 +576,7 @@
             "w" : "Updating Web site"
             },
             "22" : { /* Form of original item (006/05) */
+            "_predicate" : "formOfOriginalItem",
             "a" : "Microfilm",
             "b" : "Microfiche",
             "c" : "Microopaque",
@@ -579,6 +588,7 @@
             "s" : "Electronic"
             },
             "23" : { /* Form of item (006/06) */
+            "_predicate" : "formOfItem",
             "a" : "Microfilm",
             "b" : "Microfiche",
             "c" : "Microopaque",
@@ -590,6 +600,7 @@
             "s" : "Electronic"
             },
             "24" : { /* Nature of entire work (006/07) */
+            "_predicate" : "natureOfWork",
             "a" : "Abstracts/summaries",
             "b" : "Bibliographies",
             "c" : "Catalogs",
@@ -618,6 +629,7 @@
             "6" : "Comics/graphic novels"
             },
             "25" : {  /* Nature of contents (006/08-10) */
+            "_predicate" : "natureOfContent",
             "a" : "Abstracts/summaries",
             "b" : "Bibliographies",
             "c" : "Catalogs",
@@ -646,6 +658,7 @@
             "6" : "Comics/graphic novels"
             },
             "28" : { /* Government publication (006/11) */
+            "_predicate" : "governmentPublication",
             "a" : "Autonomous or semi-autonomous component",
             "c" : "Multilocal",
             "f" : "Federal/national",
@@ -658,10 +671,12 @@
             "z" : "Other"
             },
             "29" : { /* Conference publication (006/12) */
+            "_predicate" : "conferencePublication",
             "0" : "Not a conference publication",
             "1" : "Conference publication"
             },
             "33" : { /* Original alphabet or script of title (006/16) */
+            "_predicate" : "scriptOfTitle",
             "a" : "Basic Roman",
             "b" : "Extended Roman",
             "c" : "Cyrillic",
@@ -678,6 +693,7 @@
             "z" : "Other"
             },
             "34" : { /* Entry convention (006/17) */
+            "_predicate" : "entryConvention",
             "0" : "Successive entry",
             "1" : "Latest entry",
             "2" : "Integrated entry"
@@ -1231,14 +1247,17 @@
             "m" : "canceledLinking",
             "y" : "incorrect",
             "z" : "canceled",
-            "2" : "source",
+            "2" : "sourceISSN",
             "6" : "linkage",
             "8" : "sequenceNumber"
+        },
+        "sourceISSN" : {
+            "6" : "Nationales ISSN-Zentrum für Deutschland"
         },
         "OtherStandardIdentifier" : {
             "a" : "value",
             "c" : "termsOfAvailability",
-            "d" : "otherCodes",
+            "d" : "other",
             "z" : "canceled",
             "2" : "type"
         },
@@ -2570,22 +2589,43 @@
            "090$r$ $a"
         ],
         "tags" : {
-          "090" : "otherCodes"
+          "090" : "OtherCodes"
         },
         "subfields" : {
-            "a" : "value",
-            "n" : "genre"
+            "a" : "paper",
+              "b" : "b",
+              "c" : "c",
+              "f" : "f",
+              "i" : "i",
+              "n" : "genre",
+              "t" : "t",
+              "w" : "w",
+              "0" : "0",
+              "5" : "5",
+              "D" : "D"
         },
-        "otherCodes" : {
+        "OtherCodes" : {
               "a" : "paper",
-              "n" : "genre"
+              "b" : "b",
+              "c" : "c",
+              "f" : "f",
+              "i" : "i",
+              "n" : "genre",
+              "t" : "t",
+              "w" : "w",
+              "0" : "0",
+              "5" : "5",
+              "D" : "D"
         },
         "paper" :{
               "b" : "paper-acidfree",
               "c" : "paper-nonacidfree",
               "d" : "paper-deacidified"
         },
-        "genre" : { /* http://www.zeitschriftendatenbank.de/erschliessung/arbeitsunterlagen/zeta/0600/ */
+        "genre" : { /*
+                 http://www.zeitschriftendatenbank.de/erschliessung/arbeitsunterlagen/zeta/0600/
+                 http://support.d-nb.de/iltis/katricht/zdb/1140.pdf
+                 */
                 "ab" : "abstract",
                 "ad" : "dfg-alliance-license",
                 "ag" : "aggregator-database",
@@ -2615,7 +2655,7 @@
                 "la" : "longterm-perservation",
                 "ld" : "layout-retention-digitization",
                 "lp" : "local-newspaper",
-                "mg" : "magazine",
+                "mg" : "merged",
                 "me" : "exhibition-journal",
                 "mm" : "microform-master",
                 "mt" : "music",
@@ -2626,6 +2666,7 @@
                 "nw" : "new",
                 "pa" : "parliament",
                 "pu" : "pay-per-use",
+                "pt" : "packet-import",
                 "ra" : "dnb-series-a",
                 "rb" : "dnb-series-b",
                 "rc" : "dnb-series-c",
@@ -4466,6 +4507,8 @@
             "w" : "controlNumber"
         },
         "SeriesUniformTitle" : {
+            "7" : "code",
+            "9" : "formatted",
             "a" : "value",
             "v" : "volume",
             "w" : "controlNumber"
@@ -5678,6 +5721,7 @@
             "Abstracts in English" : "isSummaryOf",
             "Index" : "hasSupplement",
             "Index zu" : "isSupplementOf",
+            "Reg. zu" : "isSupplementOf",
             "Anh. zu"  : "isSupplementOf",
             "Beih. zu" : "isSupplementOf",
             "Erg." : "hasSupplement",
@@ -5751,11 +5795,6 @@
                   3 - Bibliographic level */
             "8" : "sequenceNumber"
         },
-        "relationshipInformationpattern" : [
-            {
-                 ".*von" : "isPartOf"
-             }
-        ],
         "relationpattern" : [
             {
                 "Vorg..*u. Forts." : "hasTransientEdition"
@@ -5816,6 +5855,9 @@
             },
             {
                 ".*Spezialausgabe.*" : "hasSupplement"
+            },
+            {
+                 ".*\\d{4}.*\\s*von$" : "isPartOf"
             },
             {
                 "\\d+\\.\\d{4}.*" : "hasPart" /* einzelne Jahre und Hefte */

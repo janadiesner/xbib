@@ -102,7 +102,6 @@ public class MARCPipeline extends KeyValuePipeline<FieldCollection, String, MARC
         builder().build(element, fields, value);
     }
 
-
     public void addToResource(Resource resource,
                               FieldCollection fields,
                               MARCElement element,
@@ -161,14 +160,15 @@ public class MARCPipeline extends KeyValuePipeline<FieldCollection, String, MARC
             if (me.getKey() != null) {
                 String v = me.getValue().toString();
                 if (fieldNames.containsKey(field)) {
+                    String fieldName = fieldNames.get(field);
                     // field-specific subfield map
                     Map<String, Object> vm =
-                            (Map<String, Object>) element.getSettings().get(fieldNames.get(field));
+                            (Map<String, Object>) element.getSettings().get(fieldName);
                     if (vm == null) {
                         // fallback to "subfields"
                         vm =  (Map<String, Object>) element.getSettings().get("subfields");
                     }
-                    int pos = v.indexOf(' ');
+                    int pos = v.indexOf(' '); // code must be non-blank word
                     String vv = pos > 0 ? v.substring(0, pos) : v;
                     // code table lookup
                     if (vm.containsKey(v)) {
@@ -178,8 +178,7 @@ public class MARCPipeline extends KeyValuePipeline<FieldCollection, String, MARC
                         newResource.add(me.getKey() + "Source", v);
                         v = (String) vm.get(vv);
                     } else {
-                        // relation by pattern?
-                        List<Map<String, String>> patterns = (List<Map<String, String>>) element.getSettings().get(fieldNames.get(field) + "pattern");
+                        List<Map<String, String>> patterns = (List<Map<String, String>>) element.getSettings().get(fieldName + "pattern");
                         if (patterns != null) {
                             for (Map<String, String> pattern : patterns) {
                                 Map.Entry<String, String> mme = pattern.entrySet().iterator().next();
@@ -196,8 +195,9 @@ public class MARCPipeline extends KeyValuePipeline<FieldCollection, String, MARC
                     }
                 } else {
                     // default subfield map
-                    if (element.getSettings().containsKey(me.getKey())) {
-                        Map<String, Object> vm = (Map<String, Object>) element.getSettings().get(me.getKey());
+                    String fieldName = me.getKey();
+                    if (element.getSettings().containsKey(fieldName)) {
+                        Map<String, Object> vm = (Map<String, Object>) element.getSettings().get(fieldName);
                         int pos = v.indexOf(' ');
                         String vv = pos > 0 ? v.substring(0, pos) : v;
                         if (vm.containsKey(v)) {
@@ -208,7 +208,7 @@ public class MARCPipeline extends KeyValuePipeline<FieldCollection, String, MARC
                             v = (String) vm.get(vv);
                         } else {
                             // relation by pattern?
-                            List<Map<String, String>> patterns = (List<Map<String, String>>) element.getSettings().get(me.getKey() + "pattern");
+                            List<Map<String, String>> patterns = (List<Map<String, String>>) element.getSettings().get(fieldName + "pattern");
                             if (patterns != null) {
                                 for (Map<String, String> pattern : patterns) {
                                     Map.Entry<String, String> mme = pattern.entrySet().iterator().next();

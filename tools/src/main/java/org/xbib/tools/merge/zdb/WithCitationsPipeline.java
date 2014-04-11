@@ -296,7 +296,7 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
         if (publication != null) {
             String id = manifestation.externalID();
             // unique endeavor key, independent of ISSN
-            publication.put("dcterms:identifier", manifestation.getUniqueIdentifier());
+            //publication.put("dcterms:identifier", manifestation.getUniqueIdentifier());
             // un-hyphenated from of ZDB ID
             publication.put("xbib:zdbid", id);
             // hyphenated form of ZDB ID goes to ld.zdb-services.de

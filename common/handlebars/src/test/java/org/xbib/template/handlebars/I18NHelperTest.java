@@ -3,7 +3,6 @@ package org.xbib.template.handlebars;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Locale;
 
 public class I18NHelperTest extends AbstractTest {
 

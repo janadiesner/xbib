@@ -31,8 +31,6 @@
  */
 package org.xbib.tools.merge.zdb.entities;
 
-import org.xbib.map.MapBasedAnyObject;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,7 +41,9 @@ import java.util.Map;
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 
-public class Holding extends MapBasedAnyObject implements Comparable<Holding> {
+public class Holding implements Comparable<Holding> {
+
+    protected final Map<String, Object> map;
 
     protected String identifier;
 
@@ -76,15 +76,39 @@ public class Holding extends MapBasedAnyObject implements Comparable<Holding> {
 
     private String organization;
 
-    public Holding(Map<String, Object> m) {
-        super(m);
+    public Holding(Map<String, Object> map) {
+        this.map = map;
         build();
+    }
+
+    public Map map() {
+        return map;
+    }
+
+    public String getString(String key) {
+        return get(key);
+    }
+
+    <T> T get(String key) {
+        return this.<T>get(map, key.split("\\."));
+    }
+
+    private <T> T get(Map inner, String[] key) {
+        if (inner == null) {
+            return null;
+        }
+        Object o = inner.get(key[0]);
+        if (o instanceof List) {
+            o = ((List)o).get(0);
+        }
+        return (T) (o instanceof Map && key.length > 1 ?
+                get((Map) o, Arrays.copyOfRange(key, 1, key.length)) : o);
     }
 
     protected void build() {
         this.identifier = getString("identifierRecord");
         this.parent = getString("identifierParent").toLowerCase(); // DNB-ID, turn 'X' to lower case
-        Object leader = map().get("leader");
+        Object leader = map.get("leader");
         if (!(leader instanceof List)) {
             leader = Arrays.asList(leader);
         }
@@ -94,7 +118,7 @@ public class Holding extends MapBasedAnyObject implements Comparable<Holding> {
                 break;
             }
         }
-        Object o = map().get("Location");
+        Object o = map.get("Location");
         if (!(o instanceof List)) {
             o = Arrays.asList(o);
         }
@@ -213,12 +237,12 @@ public class Holding extends MapBasedAnyObject implements Comparable<Holding> {
     protected void findContentType() {
         this.mediaType = "unmediated";
         this.carrierType = "volume";
-        if ("EZB".equals(getString("license.origin")) || map().containsKey("ElectronicLocationAndAccess")) {
+        if ("EZB".equals(getString("license.origin")) || map.containsKey("ElectronicLocationAndAccess")) {
             this.mediaType = "computer";
             this.carrierType = "online resource";
             return;
         }
-        Object o = map().get("textualholdings");
+        Object o = map.get("textualholdings");
         if (!(o instanceof List)) {
             o = Arrays.asList(o);
         }
@@ -247,14 +271,14 @@ public class Holding extends MapBasedAnyObject implements Comparable<Holding> {
     private Map<String, Object> buildInfo() {
         Map<String, Object> m = newLinkedHashMap();
         List l = new ArrayList();
-        Object o = map().get("Location");
+        Object o = map.get("Location");
         if (o != null) {
             if (!(o instanceof List)) {
                 o = Arrays.asList(o);
             }
             l.addAll((List)o);
         }
-        Object p = map().get("AdditionalLocation");
+        Object p = map.get("AdditionalLocation");
         if (p != null) {
             if (!(p instanceof List)) {
                 p = Arrays.asList(p);
@@ -263,13 +287,13 @@ public class Holding extends MapBasedAnyObject implements Comparable<Holding> {
         }
         m.put("location", l);
 
-        Object textualholdings =  map().get("textualholdings");
+        Object textualholdings =  map.get("textualholdings");
         m.put("textualholdings",textualholdings);
-        m.put("holdings", map().get("holdings"));
-        if (map().containsKey("ElectronicLocationAndAccess")) {
-            m.put("links", map().get("ElectronicLocationAndAccess"));
+        m.put("holdings", map.get("holdings"));
+        if (map.containsKey("ElectronicLocationAndAccess")) {
+            m.put("links", map.get("ElectronicLocationAndAccess"));
         }
-        this.license = (Map<String, Object>)map().get("license");
+        this.license = (Map<String, Object>)map.get("license");
         if (license != null) {
             license.remove("originSource");
             license.remove("typeSource");
@@ -281,7 +305,7 @@ public class Holding extends MapBasedAnyObject implements Comparable<Holding> {
     }
 
     private void buildService() {
-        Map<String, Object> service = (Map<String, Object>)map().get("service");
+        Map<String, Object> service = (Map<String, Object>)map.get("service");
         if (service != null) {
             //setOrganization((String)service.remove("region"));
             service.remove("organization"); // drop Sigel
@@ -290,11 +314,11 @@ public class Holding extends MapBasedAnyObject implements Comparable<Holding> {
             service.remove("servicetypeSource");
             service.remove("servicemodeSource");
             this.servicetype = service.remove("servicetype");
-            map().put("type", this.servicetype);
+            map.put("type", this.servicetype);
             this.servicemode = service.remove("servicemode");
-            map().put("mode", this.servicemode);
+            map.put("mode", this.servicemode);
             this.servicedistribution = service.remove("servicedistribution");
-            map().put("distribution", this.servicedistribution);
+            map.put("distribution", this.servicedistribution);
         }
     }
 
@@ -363,7 +387,7 @@ public class Holding extends MapBasedAnyObject implements Comparable<Holding> {
     }
 
     public String toString() {
-        return map().toString();
+        return map.toString();
     }
 
     @Override

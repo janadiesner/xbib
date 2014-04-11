@@ -225,15 +225,15 @@ public class License extends Holding {
         m.put("holdings", holdings);
 
         Map<String, Object> link = newHashMap();
-        link.put("url", map().get("ezb:reference_url"));
+        link.put("url", map.get("ezb:reference_url"));
         link.put("nonpublicnote", "Verlagsangebot"); // ZDB = "Volltext"
         m.put("links", Arrays.asList(link));
 
         this.license = newHashMap();
-        license.put("type", map().get("ezb:type_id"));
-        license.put("licensetype", map().get("ezb:license_type_id"));
-        license.put("pricetype", map().get("ezb:price_type_id"));
-        license.put("readme", map().get("ezb:readme_url"));
+        license.put("type", map.get("ezb:type_id"));
+        license.put("licensetype", map.get("ezb:license_type_id"));
+        license.put("pricetype", map.get("ezb:price_type_id"));
+        license.put("readme", map.get("ezb:readme_url"));
         m.put("license", license);
 
         return m;

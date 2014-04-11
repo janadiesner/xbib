@@ -8,33 +8,64 @@ import static com.google.common.collect.Lists.newLinkedList;
 
 public class Institution extends HashMap<String,Object> implements Comparable<Institution> {
 
+    private String group;
+
     private final Map<String,Integer> groupPriorities;
 
-    private List<Service> services;
+    private List<Service> activeServices;
 
-    public Institution(Map<String,Object> map, Map<String,Integer> groupPriorities) {
+    private List<Service> otherServices;
+
+    public Institution(Map<String,Object> map, Map<String,Integer> groupPriorities, Map<String,String> groupMap) {
         super(map);
+        makeServices(this);
         this.groupPriorities = groupPriorities;
-        putServices(makeServices(this));
+        String s = firstService().getGroup();
+        this.group = groupMap != null ? groupMap.get(s) : s;
+        if (group == null) {
+            group = "X";
+        }
+        put("group", group);
     }
 
-    private List<Service> makeServices(Institution institution) {
-        List<Service> list = newLinkedList();
+    private void makeServices(Institution institution) {
+        List<Service> services = newLinkedList();
+        List<Service> other = newLinkedList();
         ((List<Map<String,Object>>)get("service")).stream()
                 .forEach(map -> {
-                    list.add(new Service(map, institution));
+                    Service service = new Service(map, institution);
+                    if (service.isActive()) {
+                        services.add(service);
+                    } else {
+                        other.add(service);
+                    }
                 });
-        return list;
+        putActiveServices(services);
+        putOther(other);
     }
 
-    public void putServices(List<Service> services) {
-        this.services = services;
+    public String getGroup() {
+        return group;
+    }
+
+    public void putActiveServices(List<Service> services) {
+        this.activeServices = services;
         put("service", services);
         put("servicecount", services.size());
     }
 
-    public List<Service> getServices() {
-        return services;
+    public List<Service> getActiveServices() {
+        return activeServices;
+    }
+
+    public void putOther(List<Service> services) {
+        this.otherServices = services;
+        put("other", services);
+        put("othercount", services.size());
+    }
+
+    public List<Service> getOtherServices() {
+        return otherServices;
     }
 
     public String getISIL() {
@@ -42,7 +73,8 @@ public class Institution extends HashMap<String,Object> implements Comparable<In
     }
 
     public Integer getGroupPriority(String group) {
-        return groupPriorities.containsKey(group) ? groupPriorities.get(group) : 0;
+        return groupPriorities != null ?
+                groupPriorities.containsKey(group) ? groupPriorities.get(group) : 0 : 0;
     }
 
     public Institution setMarker(String marker) {
@@ -52,10 +84,16 @@ public class Institution extends HashMap<String,Object> implements Comparable<In
         return this;
     }
 
+
     @Override
     public int compareTo(Institution o) {
-        Service s1 = getServices().get(0);
-        Service s2 = o.getServices().get(0);
+        Service s1 = firstService();
+        Service s2 = o.firstService();
         return s1.compareTo(s2);
+    }
+
+    private Service firstService() {
+         return !activeServices.isEmpty() ? activeServices.get(0) :
+                !otherServices.isEmpty() ? otherServices.get(0) : null;
     }
 }

@@ -37,6 +37,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
 
+import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elements.CountableContextResourceOutput;
 import org.xbib.tools.Feeder;
 import org.xbib.elements.marc.MARCElementBuilder;
@@ -74,6 +75,12 @@ public final class FromMARC extends Feeder {
                 return new FromMARC();
             }
         };
+    }
+
+    @Override
+    protected Feeder beforeIndexCreation(Ingest ingest) throws IOException {
+        ingest.mapping("title", FromMARC.class.getResourceAsStream("mapping-title.json"));
+        return this;
     }
 
     @Override

@@ -210,7 +210,7 @@ public class Handlebars implements HelperRegistry {
     }
 
     /**
-     * Compile the resource located at the given uri.
+     * Compile the resource located at the given URI.
      *
      * @param location The resource's location. Required.
      * @return A compiled template.
@@ -221,7 +221,7 @@ public class Handlebars implements HelperRegistry {
     }
 
     /**
-     * Compile the resource located at the given uri.
+     * Compile the resource located at the given URI.
      *
      * @param location       The resource's location. Required.
      * @param startDelimiter The start delimiter. Required.

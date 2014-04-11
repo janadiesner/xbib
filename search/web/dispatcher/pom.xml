@@ -104,11 +104,11 @@
         <profile>
             <id>deploy-localhost</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
                 <es.frontend.host>localhost</es.frontend.host>
-                <es.backend>es://zephyros:19300?es.cluster.name=zbn-1.0</es.backend>
+                <es.backend>es://localhost:19300?es.cluster.name=zbn-1.0</es.backend>
                 <syslog.host>localhost</syslog.host>
                 <syslog.facility>LOCAL1</syslog.facility>
             </properties>

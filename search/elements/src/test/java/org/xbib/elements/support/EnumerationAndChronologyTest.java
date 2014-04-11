@@ -53,7 +53,8 @@ public class EnumerationAndChronologyTest extends Assert {
             "2.1947,15.Mai -",
             "1963,21(22.Mai) -",
             "[19]81/82 - [19]83",
-            "1981,31 - 25.1997"
+            "1981,31 - 25.1997",
+            "1.1983 - 79/80.1992"
         };
         String[] dates = {
             "[1961]",
@@ -89,7 +90,8 @@ public class EnumerationAndChronologyTest extends Assert {
             "",
             "",
             "[1981, 1982, 1983]",
-            "[1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997]"
+            "[1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997]",
+            "[1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992]"
         };
         // set dynamic years
         int year =  Calendar.getInstance().get(Calendar.YEAR);
@@ -102,7 +104,7 @@ public class EnumerationAndChronologyTest extends Assert {
         for (int i = 0; i < specs.length; i++) {
             String s = specs[i];
             Resource r = EnumerationAndChronology.parse(s);
-            Set<Integer> d = EnumerationAndChronology.dates(r);
+            Set<Integer> d = EnumerationAndChronology.dates(r.id(), r);
             logger.info("{} {}", d.toString(), dates[i]);
             assertEquals(d.toString(), dates[i]);
         }
@@ -113,7 +115,7 @@ public class EnumerationAndChronologyTest extends Assert {
         Pattern[] p = new Pattern[]{Pattern.compile("Letzte (\\d+) Jg")};
         String s = "Letzte 10 Jg.";
         Resource r = EnumerationAndChronology.parse(s, new SimpleResource(), p);
-        Set<Integer> d = EnumerationAndChronology.dates(r);
+        Set<Integer> d = EnumerationAndChronology.dates(r.id(), r);
         // yeah, moving wall
         Set<Integer> set = new TreeSet();
         for (int i = 0; i < 11; i++) {

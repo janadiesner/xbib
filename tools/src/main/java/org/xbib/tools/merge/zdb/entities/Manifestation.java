@@ -39,7 +39,6 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.collect.TreeMultimap;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,12 +49,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.grouping.bibliographic.endeavor.PublishedJournal;
-import org.xbib.map.MapBasedAnyObject;
 import org.xbib.pipeline.PipelineRequest;
 import org.xbib.util.Strings;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
@@ -64,40 +60,40 @@ import static com.google.common.collect.Sets.newLinkedHashSet;
 import static com.google.common.collect.Sets.newTreeSet;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
-public class Manifestation extends MapBasedAnyObject
+public class Manifestation
         implements Comparable<Manifestation>, PipelineRequest {
+
+    protected final Map<String, Object> map;
 
     private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 
-    private final DecimalFormat df = new DecimalFormat("0000");
-
     private boolean forced;
 
-    private final String id;
+    private String id;
 
-    private final String externalID;
+    private String externalID;
 
-    private final String key;
+    private String key;
 
-    private final String publisher;
+    private String publisher;
 
-    private final String publisherPlace;
+    private String publisherPlace;
 
-    private final String language;
+    private String language;
 
-    private final Integer firstDate;
+    private Integer firstDate;
 
-    private final Integer lastDate;
+    private Integer lastDate;
 
-    private final String description;
+    private String description;
 
-    private final Map<String,Object> identifiers;
+    private Map<String,Object> identifiers;
 
-    private final SetMultimap<String, Manifestation> relatedManifestations;
+    private SetMultimap<String, Manifestation> relatedManifestations;
 
-    private final SetMultimap<String, Holding> relatedHoldings;
+    private SetMultimap<String, Holding> relatedHoldings;
 
-    private final SetMultimap<Integer, Holding> relatedVolumes;
+    private SetMultimap<Integer, Holding> relatedVolumes;
 
     private String title;
 
@@ -106,6 +102,18 @@ public class Manifestation extends MapBasedAnyObject
     private String meeting;
 
     private List<String> country;
+
+    private String genre;
+
+    private boolean isPeriodical;
+
+    private boolean isDatabase;
+
+    private boolean isPacket;
+
+    private boolean isNewspaper;
+
+    private boolean isWebsite;
 
     private boolean isInTimeline;
 
@@ -127,7 +135,7 @@ public class Manifestation extends MapBasedAnyObject
 
     private String carrierType;
 
-    private String unique;
+    private String timelineKey;
 
     private List<Map<String,Object>> links;
 
@@ -135,8 +143,12 @@ public class Manifestation extends MapBasedAnyObject
 
     private SetMultimap<String, String> externalRelations;
 
-    public Manifestation(Map<String, Object> m) {
-        super(m);
+    public Manifestation(Map<String, Object> map) {
+        this.map = map;
+        build();
+    }
+
+    private void build() {
         // we use DNB ID. ZDB ID collides with GND ID. Example: 21573803
         String s = getString("IdentifierDNB.identifierDNB");
         this.id = s != null ? s : "";
@@ -162,6 +174,19 @@ public class Manifestation extends MapBasedAnyObject
         this.description = getString("DatesOfPublication.value");
 
         findSupplement();
+        this.genre = getString("OtherCodes.genreSource");
+        String resourceType = getString("typeOfContinuingResource");
+        this.isPeriodical = "Periodical".equals(resourceType);
+        this.isDatabase = "Updating database".equals(resourceType)
+                || "ag".equals(genre);
+        this.isPacket = "pt".equals(genre);
+        this.isNewspaper = "Newspaper".equals(resourceType)
+                || "fn".equals(genre) || "lp".equals(genre) || "ao".equals(genre)
+                || "eo".equals(genre) || "up".equals(genre) || "zt".equals(genre) ;
+        this.isWebsite = "Updating Web site".equals(resourceType);
+        // "Monographic series"
+        // "Updating loose-leaf"
+
         // first, compute content types
         computeContentTypes();
         // last, compute key
@@ -174,7 +199,7 @@ public class Manifestation extends MapBasedAnyObject
         makeRelations();
 
         // prepare the construction of relations to manifestations
-        this.relatedManifestations = TreeMultimap.create();
+        this.relatedManifestations = Multimaps.synchronizedSortedSetMultimap(TreeMultimap.create());
         // prepare the construction of relations to holdings
         this.relatedHoldings = TreeMultimap.create();
         // prepare holdings by date
@@ -188,10 +213,55 @@ public class Manifestation extends MapBasedAnyObject
         if (publisherPlace != null && !publisherPlace.isEmpty()) {
             p.append('-').append(publisherPlace);
         }
-        this.unique = new PublishedJournal()
+        /*this.unique = new PublishedJournal()
                 .journalName(title)
                 .publisherName(p.toString())
-                .createIdentifier();
+                .createIdentifier();*/
+
+        this.timelineKey = makeTimelineKey();
+
+    }
+
+    private <T> T get(String key) {
+        return this.<T>get(map, key.split("\\."));
+    }
+
+    private <T> T get(Map inner, String[] key) {
+        if (inner == null) {
+            return null;
+        }
+        Object o = inner.get(key[0]);
+        if (o instanceof List) {
+            o = ((List)o).get(0);
+        }
+        return (T) (o instanceof Map && key.length > 1 ?
+                get((Map) o, Arrays.copyOfRange(key, 1, key.length)) : o);
+    }
+
+    private Object get(String key, Object defValue) {
+        Object o = get(key);
+        return (o != null) ? o : defValue;
+    }
+
+    public String getString(String key) {
+        return get(key);
+    }
+
+    private String getString(String key, String defValue) {
+        return (String) get(key, defValue);
+    }
+
+    private <T> T getAnyObject(String key) {
+        return get(key);
+    }
+
+    private Integer getInteger(String key) {
+        Object o = get(key);
+        return o == null ? null : o instanceof Integer ? (Integer) o : Integer.parseInt(o.toString());
+    }
+
+    public Map map() {
+        return map;
     }
 
     public Manifestation setForced(boolean forced) {
@@ -201,10 +271,6 @@ public class Manifestation extends MapBasedAnyObject
 
     public boolean getForced() {
         return forced;
-    }
-
-    public Long size() {
-        return Integer.valueOf(map().size()).longValue();
     }
 
     public String id() {
@@ -286,8 +352,32 @@ public class Manifestation extends MapBasedAnyObject
         return description;
     }
 
+    public String genre() {
+        return genre;
+    }
+
+    public boolean isPeriodical() {
+        return isPeriodical;
+    }
+
     public boolean isSupplement() {
         return isSupplement;
+    }
+
+    public boolean isDatabase() {
+        return isDatabase;
+    }
+
+    public boolean isNewspaper() {
+        return isNewspaper;
+    }
+
+    public boolean isPacket() {
+        return isPacket;
+    }
+
+    public boolean isWebsite() {
+        return isWebsite;
     }
 
     public boolean isSubseries() {
@@ -320,6 +410,10 @@ public class Manifestation extends MapBasedAnyObject
 
     public String getPrintExternalID() {
         return printExternalID;
+    }
+
+    public String getOnlineID() {
+        return onlineID;
     }
 
     public String getOnlineExternalID() {
@@ -363,31 +457,6 @@ public class Manifestation extends MapBasedAnyObject
         return false;
     }
 
-    public String getUniqueIdentifier() {
-        return unique;
-    }
-
-    public Manifestation cloneMicroformEdition() {
-        if (map().containsKey("physicalDescriptionMicroform")) {
-            // secondary microform?
-            if ("secondary-microform".equals(getString("otherCodes.genre"))) {
-                Manifestation secondary = new Manifestation(map());
-                secondary.contentType = "text";
-                secondary.mediaType = "microform";
-                secondary.carrierType = "other";
-                createRelation("OtherEditionEntry", "hasMicroformEdition", this, secondary);
-                createRelation("OtherEditionEntry", "hasPrintEdition", secondary, this);
-                // remove all microform hints from this
-                map().remove("physicalDescriptionMicroform");
-                map().remove("AdditionalPhysicalFormNote");
-                map().remove("otherCodes");
-                return secondary;
-                // TODO adjust holdings fro print to microform
-            }
-        }
-        return null;
-    }
-
     private void findSupplement() {
         // recognize supplement
         this.isSupplement = "isSupplementOf".equals(getString("SupplementParentEntry.relation"));
@@ -424,7 +493,7 @@ public class Manifestation extends MapBasedAnyObject
         }
         setTitle(sb.toString());
         // delete synthetic title words
-        Map<String, Object> m = (Map<String, Object>) map().get("TitleStatement");
+        Map<String, Object> m = (Map<String, Object>) map.get("TitleStatement");
         if (m != null) {
             if ("[Elektronische Ressource]".equals(m.get("titleMedium"))) {
                 m.remove("titleMedium");
@@ -457,7 +526,7 @@ public class Manifestation extends MapBasedAnyObject
     }
 
     private String getPublisherPlace() {
-        Object o = map().get("PublicationStatement");
+        Object o = map.get("PublicationStatement");
         if (o == null) {
             return "";
         }
@@ -486,7 +555,7 @@ public class Manifestation extends MapBasedAnyObject
     }
 
     private void findLinks() {
-        Object o = map().get("ElectronicLocationAndAccess");
+        Object o = map.get("ElectronicLocationAndAccess");
         if (o != null) {
             if (!(o instanceof List)) {
                 o = Arrays.asList(o);
@@ -498,7 +567,7 @@ public class Manifestation extends MapBasedAnyObject
     }
 
     private void computeContentTypes() {
-        Object o = map().get("physicalDescriptionElectronicResource");
+        Object o = map.get("physicalDescriptionElectronicResource");
         if (o != null) {
             if (o instanceof List) {
                 List l = (List) o;
@@ -516,7 +585,7 @@ public class Manifestation extends MapBasedAnyObject
         // before assuming unmediated text, check title strings for media phrases
         String[] phraseTitles = new String[]{
                 getString("AdditionalPhysicalFormNote.value"),
-                getString("otherCodes.genre"),
+                getString("OtherCodes.genre"),
                 getString("TitleStatement.titleMedium"),
                 getString("TitleStatement.titlePartName"),
                 getString("Note.value")
@@ -539,28 +608,8 @@ public class Manifestation extends MapBasedAnyObject
         this.carrierType = "volume";
     }
 
-    private void createRelation(String key, String subkey, Manifestation parent, Manifestation child) {
-
-        Map<String,Object> relation = newHashMap();
-        relation.put("relation", subkey);
-        relation.put("identifierDNB", child.id());
-        relation.put("identifierZDB", child.externalID());
-
-        Object o = parent.map().get(key);
-        if (o == null) {
-            o = newArrayList();
-        }
-        if (!(o instanceof List)) {
-            o = Arrays.asList(o);
-        }
-        // we must build a new list
-        List<Map<String,Object>> l = newLinkedList((List<Map<String, Object>>) o);
-        l.add(relation);
-        parent.map().put(key, l);
-    }
-
     private final static String[] ER = new String[]{
-            "Elektronische Ressource"
+        "Elektronische Ressource"
     };
 
     private String computeKey() {
@@ -607,7 +656,9 @@ public class Manifestation extends MapBasedAnyObject
         } catch (NumberFormatException e) {
             delta = 0;
         }
-        return df.format(d2) + df.format(delta) + sb.toString();
+        String d2Str = Integer.toString(d2);
+        String deltaStr = Integer.toString(delta);
+        return d2Str.length() + d2Str + deltaStr.length() + deltaStr + sb.toString();
     }
 
     private void findCountry() {
@@ -628,7 +679,7 @@ public class Manifestation extends MapBasedAnyObject
     private Map<String,Object> makeIdentifiers() {
         Map<String,Object> m = newHashMap();
         // get and convert all ISSN
-        Object o = map().get("IdentifierISSN");
+        Object o = map.get("IdentifierISSN");
         if (o != null) {
             if (!(o instanceof List)) {
                 o = Arrays.asList(o);
@@ -644,7 +695,7 @@ public class Manifestation extends MapBasedAnyObject
             m.put("issn", issns);
         }
         // get CODEN for better article matching
-        o = map().get("IdentifierCODEN");
+        o = map.get("IdentifierCODEN");
         if (o != null) {
             m.put("coden", o);
         }
@@ -676,7 +727,7 @@ public class Manifestation extends MapBasedAnyObject
         boolean hasTransient = false;
 
         for (String rel : relationEntries) {
-            Object o = map().get(rel);
+            Object o = map.get(rel);
             if (o == null) {
                 continue;
             }
@@ -855,8 +906,10 @@ public class Manifestation extends MapBasedAnyObject
         XContentBuilder builder = jsonBuilder();
         builder.startObject()
                 .field("@id", parentIdentifier)
-                .field("@type", "Volume")
-                .field("date", date);
+                .field("@type", "Volume");
+        if (date != -1) {
+            builder.field("date", date);
+        }
         if (hasLinks()) {
             builder.field("links", getLinks());
         }
@@ -995,22 +1048,47 @@ public class Manifestation extends MapBasedAnyObject
         return externalID.compareTo(m.externalID());
     }
 
-    private final static KeyComparator keyComparator = new KeyComparator();
-
-    private static class KeyComparator implements Comparator<Manifestation> {
-
-        @Override
-        public int compare(Manifestation m1, Manifestation m2) {
-            if (m1 == m2) {
-                return 0;
+    public static Comparator<Manifestation> getKeyComparator() {
+        return new Comparator<Manifestation>() {
+            @Override
+            public int compare(Manifestation m1, Manifestation m2) {
+                return m2.getKey().compareTo(m1.getKey());
             }
-            return m2.getKey().compareTo(m1.getKey());
+        };
+    }
+
+    private String makeTimelineKey() {
+        Integer d1 = firstDate() == null ? currentYear : firstDate();
+        Integer c1 = findCarrierTypeKey();
+        return new StringBuilder()
+                .append(country())
+                .append(Integer.toString(d1))
+                .append(Integer.toString(c1))
+                .append(id())
+                .toString();
+    }
+
+    public Integer findCarrierTypeKey() {
+        switch (carrierType()) {
+            case "online resource" : return 2;
+            case "volume": return 1;
+            case "computer disc" : return 4;
+            case "computer tape cassette" : return 4;
+            case "computer chip cartridge" : return 4;
+            case "microform" : return 5;
+            case "multicolored" : return 6;
+            case "other" : return 6;
+            default: throw new IllegalArgumentException("unknown carrier: " + carrierType() + " in " + externalID());
         }
     }
 
-    public static Comparator<Manifestation> getKeyComparator() {
-        return keyComparator;
+    public static Comparator<Manifestation> getTimeComparator() {
+        return new Comparator<Manifestation>() {
+            @Override
+            public int compare(Manifestation m1, Manifestation m2) {
+                return m1.timelineKey.compareTo(m2.timelineKey);
+            }
+        };
     }
-
 }
 

@@ -10,12 +10,15 @@ public class Service extends HashMap<String,Object> implements Comparable<Servic
 
     private final String id;
 
+    private final String group;
+
     private final Integer priority;
 
     public Service(Map<String, Object> map, Institution institution) {
         super(map);
         this.institution = institution;
         this.id = (String)get("@id");
+        this.group = (String)get("organization");
         this.priority = (Integer)get("priority");
     }
 
@@ -23,16 +26,23 @@ public class Service extends HashMap<String,Object> implements Comparable<Servic
         return id;
     }
 
+    public String getGroup() {
+        return group;
+    }
+
     public Integer getGroupPriority() {
-        return containsKey("organization") ? institution.getGroupPriority((String)get("organization")) : -1;
+        return group != null ? institution.getGroupPriority(group) : -1;
     }
 
     public Integer getPriority() {
         return priority;
     }
 
-    public String toString() {
-        return institution.getISIL() + "," + getID() + ":" + getGroupPriority() + "," + getPriority();
+    public boolean isActive() {
+        boolean b = "interlibrary".equals(get("type"));
+        String mode = containsKey("mode") ? get("mode").toString() : "";
+        b = b && mode.contains("copy");
+        return b;
     }
 
     @Override

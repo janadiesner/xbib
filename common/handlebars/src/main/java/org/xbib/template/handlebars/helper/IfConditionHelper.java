@@ -25,33 +25,43 @@ public class IfConditionHelper implements Helper<Object> {
     @Override
     public CharSequence apply(final Object context, final Options options)
             throws IOException {
-        if ((checkCondition(options.param(0), options.param(1), options.param(2)))) {
-            return options.inverse();
+        Object operator = options.param(0);
+        Object operand = options.param(1);
+        Object res;
+        switch (operator.toString()) {
+            case "==":
+                res = context.equals(operand);
+                break;
+            case "!==":
+                res = !context.equals(operand);
+                break;
+            case "<":
+                res = (Integer)context < (Integer)operand;
+                break;
+            case "<=":
+                res = (Integer)context <= (Integer)operand;
+                break;
+            case ">":
+                res = (Integer)context > (Integer)operand;
+                break;
+            case ">=":
+                res = (Integer)context >= (Integer)operand;
+                break;
+            case "&&":
+                res = (Boolean)context && (Boolean)operand;
+                break;
+            case "||":
+                res = (Boolean)context || (Boolean)operand;
+                break;
+            default:
+                res = options.fn(context);
+                break;
+        }
+        if (options.isFalsy(res)) {
+            return options.inverse(res);
         } else {
-            return options.fn();
+            return options.fn(res);
         }
     }
 
-    private boolean checkCondition(Object v1, Object operator, Object v2) {
-        switch (operator.toString()) {
-            case "==":
-                return v1.equals(v2);
-            case "!==":
-                return !v1.equals(v2);
-            case "<":
-                return (Long)v1 < (Long)v2;
-            case "<=":
-                return (Long)v1 <= (Long)v2;
-            case ">":
-                return (Long)v1 > (Long)v2;
-            case ">=":
-                return (Long)v1 >= (Long)v2;
-            case "&&":
-                return (Boolean)v1 && (Boolean)v2;
-            case "||":
-                return (Boolean)v1 || (Boolean)v2;
-            default:
-                return false;
-        }
-    }
 }

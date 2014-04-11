@@ -34,7 +34,6 @@ package org.xbib.map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +42,7 @@ public class MapBasedAnyObject implements AnyObject {
     private final Map map;
 
     public MapBasedAnyObject(Map map) {
-        this.map = new LinkedHashMap(map);
+        this.map = map;
     }
 
     public Map map() {

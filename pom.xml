@@ -91,7 +91,7 @@
         <maven.build.timestamp.format>dd.MM.yyyy HH:mm</maven.build.timestamp.format>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
-        <elasticsearch.support.plugin.version>1.1.0.0</elasticsearch.support.plugin.version>
+        <elasticsearch.support.plugin.version>1.1.0.2</elasticsearch.support.plugin.version>
     </properties>
 
     <build>
