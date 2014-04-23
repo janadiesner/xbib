@@ -1,272 +1,588 @@
 {
-      "Volume" : {
-        "date_detection" : false,
-        "properties" : {
-          "@id" : {
-            "type" : "string", "analyzer" : "keyword"
-          },
-          "@type" : {
-            "type" : "string", "analyzer" : "keyword"
-          },
-          "institution" : {
-            "properties" : {
-              "isil" : {
-                "type" : "string", "analyzer" : "keyword"
-              },
-              "service" : {
-                "properties" : {
-                  "@id" : {
-                    "type" : "string", "analyzer" : "keyword"
-                  },
-                  "@parent" : {
-                    "type" : "string", "analyzer" : "keyword"
-                  },
-                  "@type" : {
-                    "type" : "string", "analyzer" : "keyword"
-                  },
-                  "carriertype" : {
-                    "type" : "string", "analyzer" : "keyword"
-                  },
-                  "date" : {
-                    "type" : "long"
-                  },
-                  "info" : {
-                    "properties" : {
-                      "holdings" : {
-                        "properties" : {
-                          "firstdate" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "firstissue" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "firstvolume" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "group" : {
-                            "properties" : {
-                              "begindate" : {
-                                "type" : "long"
-                              },
-                              "beginvolume" : {
-                                "type" : "string", "analyzer" : "keyword"
-                              },
-                              "enddate" : {
-                                "type" : "long"
-                              },
-                              "endvolume" : {
-                                "type" : "string", "analyzer" : "keyword"
-                              },
-                              "open" : {
-                                "type" : "string", "analyzer" : "keyword"
-                              }
+    "Volume": {
+        "date_detection": false,
+        "properties": {
+            "@id": {
+                "analyzer": "keyword",
+                "index_options": "docs",
+                "norms": {
+                    "enabled": false
+                },
+                "type": "string"
+            },
+            "@type": {
+                "analyzer": "keyword",
+                "index_options": "docs",
+                "norms": {
+                    "enabled": false
+                },
+                "type": "string"
+            },
+            "institution": {
+                "properties": {
+                    "isil": {
+                        "analyzer": "keyword",
+                        "index_options": "docs",
+                        "norms": {
+                            "enabled": false
+                        },
+                        "type": "string"
+                    },
+                    "service": {
+                        "properties": {
+                            "@id": {
+                                "analyzer": "keyword",
+                                "index_options": "docs",
+                                "norms": {
+                                    "enabled": false
+                                },
+                                "type": "string"
+                            },
+                            "@parent": {
+                                "analyzer": "keyword",
+                                "index_options": "docs",
+                                "norms": {
+                                    "enabled": false
+                                },
+                                "type": "string"
+                            },
+                            "@type": {
+                                "analyzer": "keyword",
+                                "index_options": "docs",
+                                "norms": {
+                                    "enabled": false
+                                },
+                                "type": "string"
+                            },
+                            "carriertype": {
+                                "analyzer": "keyword",
+                                "index_options": "docs",
+                                "norms": {
+                                    "enabled": false
+                                },
+                                "type": "string"
+                            },
+                            "date": {
+                                "type": "long"
+                            },
+                            "info": {
+                                "properties": {
+                                    "holdings": {
+                                        "properties": {
+                                            "firstdate": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "firstissue": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "firstvolume": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "group": {
+                                                "properties": {
+                                                    "begindate": {
+                                                        "type": "long"
+                                                    },
+                                                    "beginvolume": {
+                                                        "analyzer": "keyword",
+                                                        "index_options": "docs",
+                                                        "norms": {
+                                                            "enabled": false
+                                                        },
+                                                        "type": "string"
+                                                    },
+                                                    "enddate": {
+                                                        "type": "long"
+                                                    },
+                                                    "endvolume": {
+                                                        "analyzer": "keyword",
+                                                        "index_options": "docs",
+                                                        "norms": {
+                                                            "enabled": false
+                                                        },
+                                                        "type": "string"
+                                                    },
+                                                    "open": {
+                                                        "analyzer": "keyword",
+                                                        "index_options": "docs",
+                                                        "norms": {
+                                                            "enabled": false
+                                                        },
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "lastdate": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "lastissue": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "lastvolume": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "license": {
+                                        "properties": {
+                                            "access": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "accessSource": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "charge": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "licensetype": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "origin": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "pricetype": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "readme": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "scope": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "type": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "links": {
+                                        "properties": {
+                                            "accessmode": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "nonpublicnote": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "publicnote": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "relatedto": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "uri": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "url": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "location": {
+                                        "properties": {
+                                            "collection": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "custom": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "customSource": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "enumerationAndChronology": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "loancode": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "location": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "publicnote": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "shelvinglocation": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "service": {
+                                        "properties": {
+                                            "comment": {
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "distribution": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "funding": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "fundingSource": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "mode": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "servicecomment": {
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "ssgnotation": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "ssgnumber": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "type": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            },
+                                            "zdbprio": {
+                                                "analyzer": "keyword",
+                                                "index_options": "docs",
+                                                "norms": {
+                                                    "enabled": false
+                                                },
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "textualholdings": {
+                                        "analyzer": "keyword",
+                                        "index_options": "docs",
+                                        "norms": {
+                                            "enabled": false
+                                        },
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "isil": {
+                                "analyzer": "keyword",
+                                "index_options": "docs",
+                                "norms": {
+                                    "enabled": false
+                                },
+                                "type": "string"
+                            },
+                            "mediatype": {
+                                "analyzer": "keyword",
+                                "index_options": "docs",
+                                "norms": {
+                                    "enabled": false
+                                },
+                                "type": "string"
+                            },
+                            "organization": {
+                                "analyzer": "keyword",
+                                "index_options": "docs",
+                                "norms": {
+                                    "enabled": false
+                                },
+                                "type": "string"
+                            },
+                            "priority": {
+                                "analyzer": "keyword",
+                                "index_options": "docs",
+                                "norms": {
+                                    "enabled": false
+                                },
+                                "type": "long"
+                            },
+                            "serviceisil": {
+                                "analyzer": "keyword",
+                                "index_options": "docs",
+                                "norms": {
+                                    "enabled": false
+                                },
+                                "type": "string"
                             }
-                          },
-                          "lastdate" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "lastissue" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "lastvolume" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          }
                         }
-                      },
-                      "license" : {
-                        "properties" : {
-                          "access" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "accessSource" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "c" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "charge" : {
-                            "type" : "string"
-                          },
-                          "licensetype" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "origin" : {
-                            "type" : "string"
-                          },
-                          "pricetype" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "readme" : {
-                            "type" : "string"
-                          },
-                          "scope" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "type" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          }
-                        }
-                      },
-                      "links" : {
-                        "properties" : {
-                          "accessmode" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "nonpublicnote" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "publicnote" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "relatedto" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "uri" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "url" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          }
-                        }
-                      },
-                      "location" : {
-                        "properties" : {
-                          "=" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "collection" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "custom" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "customSource" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "enumerationAndChronology" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "loancode" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "location" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "m" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "name" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "p" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "publicnote" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "shelvinglocation" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          }
-                        }
-                      },
-                      "service" : {
-                        "properties" : {
-                          "comment" : {
-                            "type" : "string"
-                          },
-                          "distribution" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "funding" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "fundingSource" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "mode" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "servicecomment" : {
-                            "type" : "string"
-                          },
-                          "ssgnotation" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "ssgnumber" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "type" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          },
-                          "zdbprio" : {
-                            "type" : "string", "analyzer" : "keyword"
-                          }
-                        }
-                      },
-                      "textualholdings" : {
-                        "type" : "string"
-                      }
+                    },
+                    "servicecount": {
+                        "type": "long"
                     }
-                  },
-                  "isil" : {
-                    "type" : "string", "analyzer" : "keyword"
-                  },
-                  "mediatype" : {
-                    "type" : "string", "analyzer" : "keyword"
-                  },
-                  "organization" : {
-                    "type" : "string", "analyzer" : "keyword"
-                  },
-                  "priority" : {
-                    "type" : "long", "analyzer" : "keyword"
-                  },
-                  "serviceisil" : {
-                    "type" : "string", "analyzer" : "keyword"
-                  }
                 }
-              },
-              "servicecount" : {
-                "type" : "long"
-              }
+            },
+            "institutioncount": {
+                "type": "long"
+            },
+            "links": {
+                "properties": {
+                    "contact": {
+                        "analyzer": "keyword",
+                        "index_options": "docs",
+                        "norms": {
+                            "enabled": false
+                        },
+                        "type": "string"
+                    },
+                    "format": {
+                        "analyzer": "keyword",
+                        "index_options": "docs",
+                        "norms": {
+                            "enabled": false
+                        },
+                        "type": "string"
+                    },
+                    "hostname": {
+                        "analyzer": "keyword",
+                        "index_options": "docs",
+                        "norms": {
+                            "enabled": false
+                        },
+                        "type": "string"
+                    },
+                    "locationofhost": {
+                        "analyzer": "keyword",
+                        "index_options": "docs",
+                        "norms": {
+                            "enabled": false
+                        },
+                        "type": "string"
+                    },
+                    "nonpublicnote": {
+                        "analyzer": "keyword",
+                        "index_options": "docs",
+                        "norms": {
+                            "enabled": false
+                        },
+                        "type": "string"
+                    },
+                    "port": {
+                        "analyzer": "keyword",
+                        "index_options": "docs",
+                        "norms": {
+                            "enabled": false
+                        },
+                        "type": "string"
+                    },
+                    "publicnote": {
+                        "analyzer": "keyword",
+                        "index_options": "docs",
+                        "norms": {
+                            "enabled": false
+                        },
+                        "type": "string"
+                    },
+                    "relatedto": {
+                        "analyzer": "keyword",
+                        "index_options": "docs",
+                        "norms": {
+                            "enabled": false
+                        },
+                        "type": "string"
+                    },
+                    "size": {
+                        "analyzer": "keyword",
+                        "index_options": "docs",
+                        "norms": {
+                            "enabled": false
+                        },
+                        "type": "string"
+                    },
+                    "uri": {
+                        "analyzer": "keyword",
+                        "index_options": "docs",
+                        "norms": {
+                            "enabled": false
+                        },
+                        "type": "string"
+                    }
+                }
             }
-          },
-          "institutioncount" : {
-            "type" : "long"
-          },
-          "links" : {
-            "properties" : {
-              "contact" : {
-                "type" : "string", "analyzer" : "keyword"
-              },
-              "format" : {
-                "type" : "string", "analyzer" : "keyword"
-              },
-              "hostname" : {
-                "type" : "string", "analyzer" : "keyword"
-              },
-              "locationofhost" : {
-                "type" : "string", "analyzer" : "keyword"
-              },
-              "nonpublicnote" : {
-                "type" : "string", "analyzer" : "keyword"
-              },
-              "port" : {
-                "type" : "string", "analyzer" : "keyword"
-              },
-              "publicnote" : {
-                "type" : "string", "analyzer" : "keyword"
-              },
-              "relatedto" : {
-                "type" : "string", "analyzer" : "keyword"
-              },
-              "size" : {
-                "type" : "string", "analyzer" : "keyword"
-              },
-              "uri" : {
-                "type" : "string", "analyzer" : "keyword"
-              }
-            }
-          }
         }
-      }
+    }
 }

@@ -37,6 +37,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.util.Date;
 
+import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.listrecords.ListRecordsListener;
 import org.xbib.tools.Feeder;
 import org.xbib.iri.IRI;
@@ -78,7 +79,7 @@ public class FromRdfXml extends Feeder {
     @Override
     public void process(URI uri) throws Exception {
         String server = settings.get("server");
-        String prefix = settings.get("prefix");
+        String prefix = settings.get("metadataPrefix");
         String set = settings.get("set");
         Date from = DateUtil.parseDateISO(settings.get("from"));
         Date until = DateUtil.parseDateISO(settings.get("until"));
@@ -86,8 +87,8 @@ public class FromRdfXml extends Feeder {
         ListRecordsRequest request = client.newListRecordsRequest()
                 .setMetadataPrefix(prefix)
                 .setSet(set)
-                .setFrom(from)
-                .setUntil(until);
+                .setFrom(from, OAIDateResolution.DAY)
+                .setUntil(until, OAIDateResolution.DAY);
         ResourceBuilder builder = new ResourceBuilder();
         RdfXmlReader reader = new RdfXmlReader().setTripleListener(builder);
         MetadataHandler metadataHandler = new OAIMetadataHandler(reader.getHandler());

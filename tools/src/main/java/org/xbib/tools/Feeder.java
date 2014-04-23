@@ -31,12 +31,13 @@
  */
 package org.xbib.tools;
 
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.unit.TimeValue;
-import org.xbib.elasticsearch.sink.ResourceSink;
+import org.xbib.elasticsearch.rdf.ResourceSink;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.bulk.BulkClient;
-import org.xbib.elasticsearch.support.client.ingest.IngestClient;
-import org.xbib.elasticsearch.support.client.ingest.MockIngestClient;
+import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
+import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
+import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
@@ -74,10 +75,10 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
 
     protected Ingest createIngest() {
         return settings.getAsBoolean("mock", false) ?
-                new MockIngestClient() :
+                new MockIngestTransportClient() :
                 "ingest".equals(settings.get("client")) ?
-                        new IngestClient() :
-                        new BulkClient();
+                        new IngestTransportClient() :
+                        new BulkTransportClient();
     }
 
     @Override
@@ -97,14 +98,14 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
                 .maxRequestWait(TimeValue.parseTimeValue(maxtimewait, TimeValue.timeValueSeconds(60)))
                 .newClient(esURI);
-        output.waitForCluster();
+        output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         beforeIndexCreation(output);
         output.setIndex(index)
                 .setType(type)
-                .dateDetection(false)
                 .shards(shards)
                 .replica(replica)
-                .newIndex();
+                .newIndex()
+                .startBulk();
         afterIndexCreation(output);
         sink = new ResourceSink(output);
         return this;
@@ -115,7 +116,13 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
         super.cleanup();
         if (output != null) {
             logger.info("shutdown");
-            output.shutdown();
+            try {
+                output.stopBulk();
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                output.shutdown();
+            }
         }
         logger.info("done with run");
         return this;

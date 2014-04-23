@@ -41,14 +41,14 @@ import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleProperty;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.rdf.types.XSD;
-import org.xbib.tools.OAIHarvester;
+import org.xbib.tools.OAIFeeder;
 
 import javax.xml.namespace.QName;
 
 /**
- * OAI harvester, write documents to RDF
+ * OAI harvester for DOAJ
  */
-public class FromDOAJ extends OAIHarvester {
+public class FromDOAJ extends OAIFeeder {
 
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
@@ -59,13 +59,12 @@ public class FromDOAJ extends OAIHarvester {
         };
     }
 
+    @Override
     protected RdfResourceHandler rdfResourceHandler() {
-        return resourceHandler;
+        return new DOAJResourceHandler(new SimpleResourceContext());
     }
 
-    private final static RdfResourceHandler resourceHandler = new DOAJResourceHandler(new SimpleResourceContext());
-
-    private static class DOAJResourceHandler extends RdfResourceHandler {
+    class DOAJResourceHandler extends RdfResourceHandler {
 
         public DOAJResourceHandler(ResourceContext context) {
             super(context);
@@ -113,11 +112,11 @@ public class FromDOAJ extends OAIHarvester {
             return super.toObject(name, content);
         }
 
-        private final static IRI ISSN = IRI.create("urn:ISSN");
+        private final IRI ISSN = IRI.create("urn:ISSN");
 
-        private final static IRI EISSN = IRI.create("urn:EISSN");
+        private final IRI EISSN = IRI.create("urn:EISSN");
 
-        private final static IRI LCCN = IRI.create("urn:LCC");
+        private final IRI LCCN = IRI.create("urn:LCC");
 
     }
 }

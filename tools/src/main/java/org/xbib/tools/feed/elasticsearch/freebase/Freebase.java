@@ -31,7 +31,7 @@
  */
 package org.xbib.tools.feed.elasticsearch.freebase;
 
-import org.xbib.elasticsearch.sink.ResourceSink;
+import org.xbib.elasticsearch.rdf.ResourceSink;
 import org.xbib.tools.Feeder;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;

@@ -1,8 +1,10 @@
 
 package org.xbib.tools.feed.elasticsearch.zdb;
 
-import org.xbib.elasticsearch.sink.ResourceSink;
-import org.xbib.elements.CountableContextResourceOutput;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
+import org.elasticsearch.common.unit.TimeValue;
+import org.xbib.elasticsearch.rdf.ResourceSink;
+import org.xbib.elements.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -16,7 +18,7 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.xcontent.ContentBuilder;
+import org.xbib.rdf.content.ContentBuilder;
 import org.xbib.sru.client.SRUClient;
 import org.xbib.sru.client.SRUClientFactory;
 import org.xbib.sru.searchretrieve.SearchRetrieveListener;
@@ -41,6 +43,10 @@ public class FromSRU extends Feeder {
     private final static Logger logger = LoggerFactory.getLogger(FromSRU.class.getName());
 
     private SRUClient client;
+
+    FromSRU() {
+        super();
+    }
 
     FromSRU(boolean b) {
         client = SRUClientFactory.newClient();
@@ -84,10 +90,9 @@ public class FromSRU extends Feeder {
         output.maxActionsPerBulkRequest(maxbulkactions)
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
                 .newClient(esURI);
-        output.waitForCluster();
+        output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         output.setIndex(index)
                 .setType(type)
-                .dateDetection(false)
                 .shards(shards)
                 .replica(replica)
                 .newIndex();

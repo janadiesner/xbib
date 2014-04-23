@@ -40,6 +40,7 @@ import org.xbib.io.archivers.tar.TarConnectionFactory;
 import org.xbib.io.archivers.tar.TarSession;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
 import org.xbib.oai.listrecords.ListRecordsListener;
@@ -112,8 +113,8 @@ public abstract class OAIHarvester extends Converter {
         ListRecordsRequest request = client.newListRecordsRequest()
                 .setMetadataPrefix(metadataPrefix)
                 .setSet(set)
-                .setFrom(from)
-                .setUntil(until);
+                .setFrom(from, OAIDateResolution.DAY)
+                .setUntil(until, OAIDateResolution.DAY);
         do {
             try {
                 if ("xml".equals(settings.get("handler"))) {

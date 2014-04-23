@@ -31,12 +31,12 @@
  */
 package org.xbib.tools.convert.zdb.bibdat;
 
-import org.xbib.elements.CountableContextResourceOutput;
+import org.xbib.elements.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.dialects.pica.PicaContext;
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilder;
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilderFactory;
 import org.xbib.elements.marc.dialects.pica.PicaElementMapper;
-import org.xbib.io.keyvalue.KeyValueStreamAdapter;
+import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.pipeline.PipelineProvider;
@@ -49,7 +49,7 @@ import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.xcontent.ContentBuilder;
+import org.xbib.rdf.content.ContentBuilder;
 import org.xbib.tools.Converter;
 import org.xml.sax.InputSource;
 

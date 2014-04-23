@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>elements</artifactId>
+            <artifactId>contextualization</artifactId>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
@@ -61,7 +61,11 @@
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>elasticsearch</artifactId>
+            <artifactId>elasticsearch-rdf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.xbib</groupId>
+            <artifactId>elasticsearch-sru</artifactId>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>

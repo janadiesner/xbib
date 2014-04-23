@@ -43,7 +43,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.xbib.common.settings.Settings;
 import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.elasticsearch.support.client.ingest.IngestClient;
+import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
 import org.xbib.elasticsearch.support.client.search.SearchClient;
 import org.xbib.util.URIUtil;
 import org.xbib.iri.IRI;
@@ -106,7 +106,7 @@ public class WithCitations {
     private Set<MergePump> pumps;
 
     private Client client;
-    private IngestClient ingest;
+    private IngestTransportClient ingest;
 
     private static AtomicLong counter = new AtomicLong(0L);
 
@@ -190,7 +190,7 @@ public class WithCitations {
             this.targetCitationType = "citations";
         }
 
-        this.ingest = new IngestClient()
+        this.ingest = new IngestTransportClient()
                 .maxActionsPerBulkRequest(maxBulkActions)
                 .maxConcurrentBulkRequests(maxConcurrentBulkRequests)
                 .newClient(targetURI);
@@ -290,7 +290,7 @@ public class WithCitations {
 
         long t1 = System.currentTimeMillis();
         long d = countWrites; //number of documents written
-        long bytes = ingest.getTotalSizeInBytes();
+        long bytes = ingest.getState().getTotalIngestSizeInBytes().count();
         double dps = d * 1000.0 / (double)(t1 - t0);
         double avg = bytes / (d + 1.0); // avoid div by zero
         double mbps = (bytes * 1000.0 / (double)(t1 - t0)) / (1024.0 * 1024.0) ;

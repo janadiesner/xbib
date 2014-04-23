@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -51,15 +52,15 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 import org.xbib.common.settings.Settings;
-import org.xbib.elasticsearch.support.client.bulk.BulkClient;
-import org.xbib.elasticsearch.support.client.ingest.MockIngestClient;
+import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
+import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
 import org.xbib.tools.Tool;
 import org.xbib.tools.merge.zdb.entities.BibdatLookup;
 import org.xbib.pipeline.queue.QueuePipelineExecutor;
 import org.xbib.tools.merge.zdb.entities.BlackListedISIL;
 import org.xbib.util.DateUtil;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.ingest.IngestClient;
+import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
 import org.xbib.elasticsearch.support.client.search.SearchClient;
 import org.xbib.tools.merge.zdb.entities.Manifestation;
 import org.xbib.pipeline.Pipeline;
@@ -115,11 +116,6 @@ public class WithHoldingsAndLicenses
 
     public WithHoldingsAndLicenses reader(Reader reader) {
         settings = settingsBuilder().loadFromReader(reader).build();
-        return this;
-    }
-
-    public WithHoldingsAndLicenses settings(Settings newSettings) {
-        settings = newSettings;
         return this;
     }
 
@@ -180,10 +176,10 @@ public class WithHoldingsAndLicenses
         this.identifier = settings.get("identifier");
 
         this.ingest = settings.getAsBoolean("mock", false) ?
-                new MockIngestClient() :
+                new MockIngestTransportClient() :
                 "ingest".equals(settings.get("client")) ?
-                        new IngestClient() :
-                        new BulkClient();
+                        new IngestTransportClient() :
+                        new BulkTransportClient();
 
         ingest.maxActionsPerBulkRequest(settings.getAsInt("maxBulkActions", 100))
                 .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests",
@@ -192,16 +188,13 @@ public class WithHoldingsAndLicenses
                 .setIndex(settings.get("index"))
                 .setting(WithHoldingsAndLicenses.class.getResourceAsStream("transport-client-settings.json"))
                 .newClient(targetURI);
-        ingest.waitForCluster();
+        ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         ingest.setting(WithHoldingsAndLicenses.class.getResourceAsStream("index-settings.json"))
                 .mapping("Work", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Work.json"))
                 .mapping("Manifestation", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Manifestation.json"))
                 .mapping("Volume", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Volume.json"))
                 .mapping("Holding", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Holding.json"));
         ingest.newIndex()
-                .refresh()
-                .shards(settings.getAsInt("shards",1))
-                .replica(settings.getAsInt("replica",0))
                 .startBulk();
 
         super.setPipelineProvider(new PipelineProvider<WithHoldingsAndLicensesPipeline>() {

@@ -197,17 +197,19 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             this.serviceMetric = new MeterMetric(5L, TimeUnit.SECONDS);
             while (hasNext()) {
                 manifestation = next();
-                if (check(manifestation)) {
-                    if ("work" .equals(service.settings().get("mode", "work"))) {
+                if ("simple".equals(service.settings().get("mode", "standard"))) {
+                    if (simpleCheck(manifestation)) {
+                        simpleProcess(manifestation);
+                    }
+                } else {
+                    if (check(manifestation)) {
                         processWork(manifestation);
-                    } else {
-                        processManifestation(manifestation);
                     }
                     for (PipelineRequestListener listener : listeners.values()) {
                         listener.newRequest(this, manifestation);
                     }
-                    metric.mark();
                 }
+                metric.mark();
             }
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
@@ -275,11 +277,24 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         return !service.processed().contains(id);
     }
 
-    private void processManifestation(Manifestation manifestation) throws IOException {
+    private boolean simpleCheck(Manifestation manifestation) {
+        if (manifestation.getForced()) {
+            return true;
+        }
+        String id = manifestation.externalID();
+        if (!service.processed().contains(id)) {
+            service.processed().add(id);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void simpleProcess(Manifestation manifestation) throws IOException {
         // no Work set algorithm, only other edition (print/online)
         this.candidates = newSetFromMap(new ConcurrentHashMap<Manifestation,Boolean>());
         candidates.add(manifestation);
-        if (!manifestation.isDatabase() && !manifestation.isNewspaper() && !manifestation.isPacket()) {
+        if (manifestation.hasOnline() || manifestation.hasPrint()) {
             retrieveOtherEdition(manifestation, candidates);
         }
         Collection<Manifestation> manifestations = ImmutableSet.copyOf(candidates);
@@ -367,7 +382,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             timeLine.makeServices();
             // index the time line object (it's a "serial line of publication events")
             XContentBuilder builder = jsonBuilder();
-            timeLine.build("Serial", builder);
+            timeLine.build(builder, service.settings().get("tag"), "Serial");
             service.ingest().index(worksIndex, worksIndexType, timelineId, builder.string());
             // index every manifestation in the timeline
             for (Manifestation m : timeLine) {
@@ -399,45 +414,50 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         service.indexed().add(id);
 
         // index this manifestation
+        String tag = service.settings().get("tag");
         XContentBuilder builder = jsonBuilder();
-        m.build(builder, null);
-        service.ingest().index(manifestationsIndex, manifestationsIndexType, id, builder.string());
+        String docid = m.build(builder, tag, null);
+        if (docid != null) {
+            service.ingest().index(manifestationsIndex, manifestationsIndexType, docid, builder.string());
+        }
 
         // volumes by date and the services for them
         Integer volumeHoldingsCount = 0;
-        SetMultimap<Integer,Holding> volumesByDate = m.getVolumesByDate();
+        SetMultimap<Integer,Holding> volumesByDate = ImmutableSetMultimap.copyOf(m.getVolumesByDate());
         for (Integer date : volumesByDate.keySet()) {
-            String identifier = m.externalID() + (date != -1 ? "." + date : "");
+            String identifier =
+                    (tag != null ? tag + "." : "") + m.externalID() + (date != -1 ? "." + date : "");
             Set<Holding> holdings = volumesByDate.get(date);
             if (holdings != null && !holdings.isEmpty()) {
-                Map<String, XContentBuilder> builderMap = m.buildVolume(identifier, m.externalID(), date, holdings);
-                for (String key : builderMap.keySet()) {
-                    XContentBuilder b = builderMap.get(key);
-                    // all services merged into one doc
-                    service.ingest().index(volumesIndex, volumesIndexType, identifier, b.string());
+                builder = jsonBuilder();
+                docid = m.buildVolume(builder, tag, m.externalID(), date, holdings);
+                if (docid != null) {
+                    service.ingest().index(volumesIndex, volumesIndexType, identifier, builder.string());
+                    serviceMetric.mark(1);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("indexed volume identifier {}, date {}", docid,  date);
+                    }
                     volumeHoldingsCount++;
-                }
-                serviceMetric.mark(builderMap.size());
-                if (logger.isDebugEnabled()) {
-                    logger.debug("indexed {} volumes, identifier {}, date {}", builderMap.size(), m.externalID(),  date);
                 }
             }
         }
         // holdings (list of institutions)
-        SetMultimap<String,Holding> holdings = m.getVolumesByHolder();
+        SetMultimap<String,Holding> holdings = ImmutableSetMultimap.copyOf(m.getVolumesByHolder());
         if (!holdings.isEmpty()) {
-            XContentBuilder holdingsBuilder = jsonBuilder();
-            holdingsBuilder.startObject().startArray("holdings");
+            builder = jsonBuilder();
+            builder.startObject().startArray("holdings");
             for (String holder : holdings.keySet()) {
-                m.buildHolding(holdingsBuilder, m.externalID(), holder, holdings.get(holder));
+                docid = m.buildHolding(builder, tag, m.externalID(), holder, holdings.get(holder));
             }
-            holdingsBuilder.endArray().endObject();
-            service.ingest().index(holdingsIndex, holdingsIndexType, m.externalID(), holdingsBuilder.string());
+            builder.endArray().endObject();
+            if (docid != null) {
+                service.ingest().index(holdingsIndex, holdingsIndexType, docid, builder.string());
+            }
             volumeHoldingsCount++;
             serviceMetric.mark(holdings.size());
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("indexed {} holdings for {}", holdings.size(), m.externalID());
+            logger.debug("indexed {} holdings for {}", holdings.size(), docid);
         }
         if (volumeHoldingsCount == 0) {
             logger.warn("no volumes/holdings indexed for {}", m.externalID());
@@ -453,12 +473,18 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
 
     private void retrieveOtherEdition(Manifestation manifestation, Collection<Manifestation> cluster) throws IOException {
         // only print/online edition. That's it.
-        QueryBuilder queryBuilder = termQuery("_all", manifestation.id());
-        if (manifestation.getOnlineID() != null && !manifestation.id().equals(manifestation.getOnlineID())) {
+        if (!manifestation.hasPrint() && !manifestation.hasOnline()) {
+            return;
+        }
+        QueryBuilder queryBuilder = null;
+        if (manifestation.getOnlineID() != null && manifestation.isPrint()) {
             queryBuilder = termQuery("IdentifierDNB.identifierDNB", manifestation.getOnlineID());
         }
-        if (manifestation.getPrintID() != null && !manifestation.id().equals(manifestation.getPrintID())) {
+        if (manifestation.getPrintID() != null && manifestation.isOnline()) {
             queryBuilder = termQuery("IdentifierDNB.identifierDNB", manifestation.getPrintID());
+        }
+        if (queryBuilder == null) {
+            return;
         }
         SearchRequestBuilder searchRequest = service.client().prepareSearch()
                 .setQuery(queryBuilder)
@@ -477,6 +503,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         if (hits.getHits().length == 0) {
             return;
         }
+        // we expect single hit, but we scroll although.
         do {
             for (int i = 0; i < hits.getHits().length; i++) {
                 SearchHit hit = hits.getAt(i);
@@ -491,7 +518,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
     }
 
     private void retrieveCandidates(Manifestation manifestation, Collection<Manifestation> cluster) throws IOException {
-        SetMultimap<String, String> relations = manifestation.getRelations();
+        SetMultimap<String, String> relations = ImmutableSetMultimap.copyOf(manifestation.getRelations());
         Set<String> neighbors = newHashSet(relations.values());
         QueryBuilder queryBuilder = neighbors.isEmpty() ?
                 termQuery("_all",  manifestation.id()) :

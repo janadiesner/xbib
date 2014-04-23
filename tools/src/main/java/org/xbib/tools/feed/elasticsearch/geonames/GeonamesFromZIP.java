@@ -33,7 +33,7 @@ package org.xbib.tools.feed.elasticsearch.geonames;
 
 import org.elasticsearch.common.xcontent.XContentBuilder;
 
-import org.xbib.elasticsearch.support.client.bulk.BulkClient;
+import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.tools.Feeder;
 import org.xbib.io.InputService;
@@ -71,7 +71,7 @@ public class GeonamesFromZIP extends Feeder {
 
     @Override
     protected Ingest createIngest() {
-        return new BulkClient();
+        return new BulkTransportClient();
     }
 
     @Override

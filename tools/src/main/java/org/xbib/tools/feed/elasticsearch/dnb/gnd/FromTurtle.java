@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import org.xbib.common.xcontent.xml.XmlNamespaceContext;
 import org.xbib.pipeline.PipelineException;
 import org.xbib.pipeline.PipelineRequest;
 import org.xbib.tools.Feeder;
@@ -51,6 +50,7 @@ import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.turtle.TurtleReader;
 import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.xml.namespace.XmlNamespaceContext;
 
 /**
  * GND ingest

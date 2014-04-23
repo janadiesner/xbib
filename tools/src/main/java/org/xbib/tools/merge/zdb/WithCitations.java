@@ -31,6 +31,7 @@
  */
 package org.xbib.tools.merge.zdb;
 
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -41,9 +42,9 @@ import org.elasticsearch.search.SearchHits;
 
 import org.xbib.common.settings.Settings;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.bulk.BulkClient;
-import org.xbib.elasticsearch.support.client.ingest.IngestClient;
-import org.xbib.elasticsearch.support.client.ingest.MockIngestClient;
+import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
+import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
+import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
 import org.xbib.elasticsearch.support.client.search.SearchClient;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
@@ -135,17 +136,17 @@ public class WithCitations
         this.identifier = settings.get("identifier");
 
         this.ingest = settings.getAsBoolean("mock", false) ?
-                new MockIngestClient() :
+                new MockIngestTransportClient() :
                 "ingest".equals(settings.get("client")) ?
-                        new IngestClient() :
-                        new BulkClient();
+                        new IngestTransportClient() :
+                        new BulkTransportClient();
         ingest.maxActionsPerBulkRequest(settings.getAsInt("maxBulkActions", 100))
                 .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests",
                         Runtime.getRuntime().availableProcessors()))
                 .setIndex(settings.get("index"))
                 .setting(WithCitations.class.getResourceAsStream("transport-client-settings.json"))
                 .newClient(URI.create(settings.get("target")));
-        ingest.waitForCluster();
+        ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         // TODO create settings/mappings
         //.setting(MergeWithLicenses.class.getResourceAsStream("index-settings.json"))
         //.mapping("works", MergeWithLicenses.class.getResourceAsStream("works.json"))

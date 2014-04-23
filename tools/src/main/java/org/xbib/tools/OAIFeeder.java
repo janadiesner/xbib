@@ -31,17 +31,18 @@
  */
 package org.xbib.tools;
 
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
+import org.elasticsearch.common.unit.TimeValue;
+import org.xbib.elasticsearch.rdf.ResourceSink;
 import org.xbib.io.NullWriter;
-import org.xbib.io.Session;
-import org.xbib.io.StringPacket;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
 import org.xbib.oai.listrecords.ListRecordsListener;
 import org.xbib.oai.listrecords.ListRecordsRequest;
-import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfOutput;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
@@ -71,7 +72,34 @@ public abstract class OAIFeeder extends Feeder {
     private final static Logger logger = LoggerFactory.getLogger(OAIFeeder.class.getSimpleName());
 
     @Override
-    protected OAIFeeder prepare() {
+    protected OAIFeeder prepare() throws IOException {
+        URI esURI = URI.create(settings.get("elasticsearch"));
+        String index = settings.get("index");
+        String type = settings.get("type");
+        Integer shards = settings.getAsInt("shards", 1);
+        Integer replica = settings.getAsInt("replica", 0);
+        Integer maxbulkactions = settings.getAsInt("maxbulkactions", 100);
+        Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
+                Runtime.getRuntime().availableProcessors());
+        String maxtimewait = settings.get("maxtimewait", "60s");
+        output = createIngest();
+        output.maxActionsPerBulkRequest(maxbulkactions)
+                .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
+                .maxRequestWait(TimeValue.parseTimeValue(maxtimewait, TimeValue.timeValueSeconds(60)))
+                .newClient(esURI);
+        output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
+        beforeIndexCreation(output);
+        output.setIndex(index)
+                .setType(type)
+                .shards(shards)
+                .replica(replica)
+                .newIndex()
+                .startBulk();
+        afterIndexCreation(output);
+        sink = new ResourceSink(output);
+
+        // a list of OAI URLs
+
         String[] inputs = settings.getAsArray("input");
         if (inputs == null) {
             throw new IllegalArgumentException("no input given");
@@ -96,23 +124,20 @@ public abstract class OAIFeeder extends Feeder {
         ListRecordsRequest request = client.newListRecordsRequest()
                 .setMetadataPrefix(metadataPrefix)
                 .setSet(set)
-                .setFrom(from)
-                .setUntil(until);
+                .setFrom(from, OAIDateResolution.DAY)
+                .setUntil(until, OAIDateResolution.DAY);
         do {
             try {
-                // TODO RDF or XML?
-                SimpleResourceContext resourceContext = new SimpleResourceContext();
-                RdfMetadataHandler metadataHandler = new RdfMetadataHandler()
-                        .setHandler(new RdfResourceHandler(resourceContext))
-                        .setOutput(new ElasticOut());
-                request.addHandler(metadataHandler);
-
+                request.addHandler(newMetadataHandler());
                 ListRecordsListener listener = new ListRecordsListener(request);
                 request.prepare().execute(listener).waitFor();
                 if (listener.getResponse() != null) {
+                    logger.debug("got OAI response");
                     NullWriter w = new NullWriter();
                     listener.getResponse().to(w);
                     request = client.resume(request, listener.getResumptionToken());
+                } else {
+                    logger.debug("no valid OAI response");
                 }
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
@@ -122,21 +147,50 @@ public abstract class OAIFeeder extends Feeder {
         client.close();
     }
 
+    protected RdfResourceHandler rdfResourceHandler() {
+        SimpleResourceContext resourceContext = new SimpleResourceContext();
+        return new RdfResourceHandler(resourceContext);
+    }
 
-    private class XmlMetadataHandler extends MetadataHandler {
+    protected MetadataHandler newMetadataHandler() {
+        RdfResourceHandler rdfResourceHandler = rdfResourceHandler();
+        return new XmlMetadataHandler()
+                .setHandler(rdfResourceHandler)
+                .setResourceContext(rdfResourceHandler.resourceContext())
+                .setOutput(new ElasticOut());
+    }
 
-        final XmlHandler handler;
+    class XmlMetadataHandler extends MetadataHandler {
 
         final IRINamespaceContext context;
 
-        final ResourceContext resourceContext;
+        XmlHandler handler;
 
-        XmlMetadataHandler(XmlHandler handler, ResourceContext resourceContext) {
-            this.handler = handler;
-            this.resourceContext = resourceContext;
+        ResourceContext resourceContext;
+
+        RdfOutput output;
+
+        XmlMetadataHandler() {
             context = IRINamespaceContext.newInstance();
+            context.addNamespace("oai_dc","http://www.openarchives.org/OAI/2.0/oai_dc/");
             context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
+        }
+
+        public XmlMetadataHandler setHandler(XmlHandler handler) {
+            this.handler = handler;
+            handler.setDefaultNamespace("oai_dc","http://www.openarchives.org/OAI/2.0/oai_dc/");
+            return this;
+        }
+
+        public XmlMetadataHandler setResourceContext(ResourceContext resourceContext) {
+            this.resourceContext = resourceContext;
             resourceContext.setNamespaceContext(context);
+            return this;
+        }
+
+        public XmlMetadataHandler setOutput(RdfOutput output) {
+            this.output = output;
+            return this;
         }
 
         @Override
@@ -154,7 +208,7 @@ public abstract class OAIFeeder extends Feeder {
                         .query(settings.get("type"))
                         .fragment(identifier).build();
                 resourceContext.getResource().id(iri);
-                sink.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
+                output.output(resourceContext);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -186,7 +240,7 @@ public abstract class OAIFeeder extends Feeder {
         }
     }
 
-    private class ResourceBuilder implements TripleListener {
+    class ResourceBuilder implements TripleListener {
 
         ResourceContext resourceContext;
 

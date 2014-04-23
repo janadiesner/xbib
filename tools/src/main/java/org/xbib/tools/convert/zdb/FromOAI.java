@@ -38,6 +38,7 @@ import org.xbib.io.archivers.tar.TarConnectionFactory;
 import org.xbib.io.archivers.tar.TarSession;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
 import org.xbib.oai.listrecords.ListRecordsListener;
@@ -110,17 +111,13 @@ public class FromOAI extends Converter {
     @Override
     protected void process(URI uri) throws Exception {
         Map<String,String> params = URIUtil.parseQueryString(uri);
-        String metadataPrefix = params.get("metadataPrefix");
-        String set = params.get("set");
-        Date from = DateUtil.parseDateISO(params.get("from"));
-        Date until = DateUtil.parseDateISO(params.get("until"));
         final OAIClient client = OAIClientFactory.newClient().setURL(uri);
         client.setTimeout(settings.getAsInt("timeout", 60000));
         ListRecordsRequest request = client.newListRecordsRequest()
-                .setMetadataPrefix(metadataPrefix)
-                .setSet(set)
-                .setFrom(from)
-                .setUntil(until);
+                .setMetadataPrefix(params.get("metadataPrefix"))
+                .setSet(params.get("set"))
+                .setFrom(DateUtil.parseDateISO(params.get("from")), OAIDateResolution.DAY)
+                .setUntil(DateUtil.parseDateISO(params.get("until")), OAIDateResolution.DAY);
         try {
             do {
                 ListRecordsListener listener = new ListRecordsListener(request);

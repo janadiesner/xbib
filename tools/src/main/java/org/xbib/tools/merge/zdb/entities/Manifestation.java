@@ -47,6 +47,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.pipeline.PipelineRequest;
@@ -54,7 +56,6 @@ import org.xbib.util.Strings;
 
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.google.common.collect.Sets.newLinkedHashSet;
 import static com.google.common.collect.Sets.newTreeSet;
@@ -85,6 +86,8 @@ public class Manifestation
 
     private Integer lastDate;
 
+    private Set<Integer> greenDates;
+
     private String description;
 
     private Map<String,Object> identifiers;
@@ -94,6 +97,10 @@ public class Manifestation
     private SetMultimap<String, Holding> relatedHoldings;
 
     private SetMultimap<Integer, Holding> relatedVolumes;
+
+    private SetMultimap<String, String> relations;
+
+    private SetMultimap<String, String> externalRelations;
 
     private String title;
 
@@ -139,10 +146,6 @@ public class Manifestation
 
     private List<Map<String,Object>> links;
 
-    private SetMultimap<String, String> relations;
-
-    private SetMultimap<String, String> externalRelations;
-
     public Manifestation(Map<String, Object> map) {
         this.map = map;
         build();
@@ -172,7 +175,6 @@ public class Manifestation
         this.lastDate = lastDate == null ? null : lastDate == 9999 ? null : lastDate;
         findLinks();
         this.description = getString("DatesOfPublication.value");
-
         findSupplement();
         this.genre = getString("OtherCodes.genreSource");
         String resourceType = getString("typeOfContinuingResource");
@@ -199,7 +201,7 @@ public class Manifestation
         makeRelations();
 
         // prepare the construction of relations to manifestations
-        this.relatedManifestations = Multimaps.synchronizedSortedSetMultimap(TreeMultimap.create());
+        this.relatedManifestations = TreeMultimap.create();
         // prepare the construction of relations to holdings
         this.relatedHoldings = TreeMultimap.create();
         // prepare holdings by date
@@ -444,8 +446,8 @@ public class Manifestation
         return relations;
     }
 
-    public SetMultimap<String, String> getExternalRelations() {
-        return externalRelations;
+    public Set<Integer> getGreenDates() {
+        return greenDates;
     }
 
     public boolean hasCarrierRelations() {
@@ -561,9 +563,26 @@ public class Manifestation
                 o = Arrays.asList(o);
             }
             this.links = (List)o;
+            makeGreenDates(links);
             return;
         }
         this.links = Collections.EMPTY_LIST;
+    }
+
+    private final static Pattern yearPattern = Pattern.compile("(\\d\\d\\d\\d)");
+
+    private void makeGreenDates(List<Map<String,Object>> links) {
+        this.greenDates = newTreeSet();
+        for (Map<String,Object> link : links) {
+            boolean b = "kostenfrei".equals(link.get("publicnote"));
+            if (b) {
+                String dateString = (String)link.get("nonpublicnote");
+                Matcher m = yearPattern.matcher(dateString);
+                if (m.matches()) {
+                    greenDates.add(Integer.parseInt(m.group()));
+                }
+            }
+        }
     }
 
     private void computeContentTypes() {
@@ -762,24 +781,31 @@ public class Manifestation
                 }
                 this.externalRelations.put(key, external);
 
-                if ("succeededBy".equals(key)) {
-                    hasSuccessor = true;
-                } else if ("precededBy".equals(key)) {
-                    hasPredecessor = true;
-                } else if ("hasTransientEdition".equals(key)) {
-                    hasTransient = true;
-                } else if ("isTransientEditionOf".equals(key)) {
-                    hasTransient = true;
-                } else if ("hasOnlineEdition".equals(key)) {
-                    this.printID = id;
-                    this.printExternalID = externalID;
-                    this.onlineID = internal;
-                    this.onlineExternalID = external;
-                } else if ("hasPrintEdition".equals(key)) {
-                    this.onlineID = id;
-                    this.onlineExternalID = externalID;
-                    this.printID = internal;
-                    this.printExternalID = external;
+                switch (key) {
+                    case "succeededBy":
+                        hasSuccessor = true;
+                        break;
+                    case "precededBy":
+                        hasPredecessor = true;
+                        break;
+                    case "hasTransientEdition":
+                        hasTransient = true;
+                        break;
+                    case "isTransientEditionOf":
+                        hasTransient = true;
+                        break;
+                    case "hasOnlineEdition":
+                        this.printID = id;
+                        this.printExternalID = externalID;
+                        this.onlineID = internal;
+                        this.onlineExternalID = external;
+                        break;
+                    case "hasPrintEdition":
+                        this.onlineID = id;
+                        this.onlineExternalID = externalID;
+                        this.printID = internal;
+                        this.printExternalID = external;
+                        break;
                 }
             }
         }
@@ -824,7 +850,7 @@ public class Manifestation
         relatedHoldings.put(relation, holding);
     }
 
-    public void addVolume(Integer date, Holding holding) {
+    public void addRelatedVolume(Integer date, Holding holding) {
         relatedVolumes.put(date, holding);
     }
 
@@ -840,16 +866,18 @@ public class Manifestation
         return relatedVolumes;
     }
 
-    public void build(XContentBuilder builder, Set<String> visited) throws IOException {
+    public String build(XContentBuilder builder, String tag, Set<String> visited) throws IOException {
         if (visited != null) {
             if (visited.contains(externalID)) {
-                return;
+                return null;
             }
             visited.add(externalID);
         }
+        String id = tag != null ? tag + "." + externalID : externalID;
         builder.startObject();
-        builder.field("@id", externalID())
+        builder.field("@id", id)
                 .field("@type", "Manifestation")
+                .fieldIfNotNull("@tag", tag)
                 .field("key", getKey())
                 .field("title", title());
         String s = corporateName();
@@ -864,11 +892,14 @@ public class Manifestation
                 .field("language", language())
                 .field("publishedat", publisherPlace())
                 .field("publishedby", publisher())
-                .field("firstdate", firstDate())
-                .field("lastdate", lastDate())
                 .field("contenttype", contentType())
                 .field("mediatype", mediaType())
-                .field("carriertype", carrierType());
+                .field("carriertype", carrierType())
+                .field("firstdate", firstDate())
+                .field("lastdate", lastDate());
+        if (!greenDates.isEmpty()) {
+            builder.field("greendate", greenDates);
+        }
         if (hasIdentifiers()) {
             builder.field("identifiers", getIdentifiers());
         }
@@ -879,13 +910,13 @@ public class Manifestation
             builder.field("supplement", isSupplement());
         }
         // add information for linking
-        SetMultimap<String,String> map = getExternalRelations();
+        SetMultimap<String,String> map = externalRelations;
         if (map != null && !map.isEmpty()) {
             builder.startArray("relations");
             for (String rel : map.keySet()) {
-                for (String id : map.get(rel)) {
+                for (String relid : map.get(rel)) {
                     builder.startObject()
-                            .field("@id", id)
+                            .field("@id", relid)
                             .field("@type", "Manifestation")
                             .field("@label", rel)
                             .endObject();
@@ -897,23 +928,27 @@ public class Manifestation
             builder.array("links", getLinks());
         }
         builder.endObject();
+        return id;
     }
 
-    public Map<String,XContentBuilder> buildVolume(String identifier, String parentIdentifier,
+    public String buildVolume(XContentBuilder builder, String tag, String parentIdentifier,
                                                    Integer date, Set<Holding> holdings)
             throws IOException {
-        Map<String,XContentBuilder> map = newLinkedHashMap();
-        XContentBuilder builder = jsonBuilder();
+        String id = tag != null ? tag + "." + parentIdentifier : parentIdentifier;
         builder.startObject()
-                .field("@id", parentIdentifier)
-                .field("@type", "Volume");
+                .field("@id", id)
+                .field("@type", "Volume")
+                .fieldIfNotNull("@tag", tag);
         if (date != -1) {
             builder.field("date", date);
         }
         if (hasLinks()) {
             builder.field("links", getLinks());
         }
-        SetMultimap<String,Holding> institutions = servicesPerInstitution(holdings);
+        SetMultimap<String,Holding> institutions = HashMultimap.create();
+        for (Holding holding : holdings) {
+            institutions.put(holding.getISIL(), holding);
+        }
         builder.field("institutioncount", institutions.size())
                 .startArray("institution");
         List<XContentBuilder> instBuilders = newLinkedList();
@@ -958,27 +993,20 @@ public class Manifestation
         }
         builder.copy(instBuilders);
         builder.endArray().endObject();
-        builder.close();
-        map.put("", builder);
-        return map;
+        return id;
     }
 
-    private SetMultimap<String,Holding> servicesPerInstitution(Set<Holding> holdings) {
-        SetMultimap<String,Holding> set = HashMultimap.create();
-        for (Holding holding : holdings) {
-            set.put(holding.getISIL(), holding);
-        }
-        return set;
-    }
-
-    public void buildHolding(XContentBuilder builder, String parentIdentifier, String isil, Set<Holding> holdings)
+    public String buildHolding(XContentBuilder builder, String tag, String parentIdentifier,
+                             String isil, Set<Holding> holdings)
         throws IOException {
         if (holdings == null || holdings.isEmpty()) {
-            return;
+            return null;
         }
+        String id = tag != null ? tag + "." + parentIdentifier : parentIdentifier;
         builder.startObject()
-                .field("@id", externalID())
+                .field("@id", id)
                 .field("@type", "Holding")
+                .fieldIfNotNull("@tag", tag)
                 .field("isil", isil);
         if (hasLinks()) {
             builder.field("links", getLinks());
@@ -1003,6 +1031,7 @@ public class Manifestation
                     .endObject();
         }
         builder.endArray().endObject();
+        return id;
     }
 
     /**

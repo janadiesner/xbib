@@ -1,0 +1,26 @@
+
+java="/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/bin/java"
+#java="/usr/java/jdk1.8.0/bin/java"
+
+echo '
+{
+    "path" : "'${HOME}'/import/harvard/",
+    "pattern" : "*.mrc",
+    "elements" : "marc/bib",
+    "concurrency" : 8,
+    "elasticsearch" : "es://localhost:9300?es.cluster.name=xbib",
+    "index" : "harvard2",
+    "type" : "title",
+    "shards" : 1,
+    "replica" : 0,
+    "maxbulkactions" : 10000,
+    "maxconcurrentbulkrequests" : 10,
+    "maxtimewait" : "180s",
+    "mock" : false,
+    "detect" : true,
+    "client" : "ingest",
+    "direct" : true
+}
+' | ${java} \
+     -cp $(pwd)/bin:$(pwd)/lib/tools-1.0.0.Beta2-feeder.jar \
+     org.xbib.tools.Runner org.xbib.tools.feed.elasticsearch.harvard.FromMARC

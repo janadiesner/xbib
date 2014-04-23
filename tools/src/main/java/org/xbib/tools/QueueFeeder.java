@@ -31,11 +31,13 @@
  */
 package org.xbib.tools;
 
-import org.xbib.elasticsearch.sink.ResourceSink;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
+import org.elasticsearch.common.unit.TimeValue;
+import org.xbib.elasticsearch.rdf.ResourceSink;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.bulk.BulkClient;
-import org.xbib.elasticsearch.support.client.ingest.IngestClient;
-import org.xbib.elasticsearch.support.client.ingest.MockIngestClient;
+import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
+import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
+import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
@@ -77,10 +79,10 @@ public abstract class QueueFeeder<T, R extends PipelineRequest, P extends Pipeli
 
     protected Ingest createIngest() {
         return settings.getAsBoolean("mock", false) ?
-                new MockIngestClient() :
+                new MockIngestTransportClient() :
                 "ingest".equals(settings.get("client")) ?
-                        new IngestClient() :
-                        new BulkClient();
+                        new IngestTransportClient() :
+                        new BulkTransportClient();
     }
 
     @Override
@@ -100,10 +102,9 @@ public abstract class QueueFeeder<T, R extends PipelineRequest, P extends Pipeli
         output.maxActionsPerBulkRequest(maxbulkactions)
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
                 .newClient(esURI);
-        output.waitForCluster();
+        output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         output.setIndex(index)
                 .setType(type)
-                .dateDetection(false)
                 .shards(shards)
                 .replica(replica)
                 .newIndex();

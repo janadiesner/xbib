@@ -1,3 +1,0 @@
-org.xbib.io.NullConnectionFactory
-org.xbib.io.archivers.file.FileConnectionFactory
-org.xbib.io.http.netty.HttpConnectionFactory

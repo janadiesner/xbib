@@ -37,7 +37,7 @@ import java.text.Normalizer;
 
 import org.xbib.marc.xml.MarcXmlEventConsumer;
 import org.xbib.tools.Feeder;
-import org.xbib.elements.CountableContextResourceOutput;
+import org.xbib.elements.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -50,7 +50,7 @@ import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.tools.util.MarcXmlTarReader;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.xcontent.ContentBuilder;
+import org.xbib.rdf.content.ContentBuilder;
 
 /**
  * Elasticsearch indexer for Zeitschriftendatenbank (ZDB) MARC-XML tar archive files

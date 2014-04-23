@@ -338,13 +338,13 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
                     }
                     list.add(holding);
                     for (Manifestation parent : holding.getManifestations()) {
-                        parent.addVolume(date, holding);
+                        parent.addRelatedVolume(date, holding);
                         // copy print holding over to online manifestation if available
                         Set<Manifestation> online = parent.getRelatedManifestations().get("hasOnlineEdition");
                         if (online != null) {
                             // almost sure we have only one online manifestation...
                             for (Manifestation m : online) {
-                                m.addVolume(date, holding);
+                                m.addRelatedVolume(date, holding);
                             }
                         }
                     }
@@ -364,12 +364,12 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
                     }
                     list.add(license);
                     for (Manifestation parent : license.getManifestations()) {
-                        parent.addVolume(date, license);
+                        parent.addRelatedVolume(date, license);
                         // copy online license over to print manifestation if available
                         Set<Manifestation> print = parent.getRelatedManifestations().get("hasPrintEdition");
                         if (print != null) {
                             for (Manifestation m : print) {
-                                m.addVolume(date, license);
+                                m.addRelatedVolume(date, license);
                             }
                         }
                     }
@@ -378,7 +378,7 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
         }
     }
 
-    public void build(String type, XContentBuilder builder) throws IOException {
+    public List<String> build(XContentBuilder builder, String tag, String type) throws IOException {
         makeDates();
         Set<String> isils = makeISILs();
         Set<String> titles = makeTitles();
@@ -388,6 +388,7 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
         builder.startObject()
                 .field("@id", ids)
                 .field("@type", type)
+                .fieldIfNotNull("@tag", tag)
                 .field("title", titles)
                 .field("firstDate", firstDate)
                 .field("lastDate", lastDate)
@@ -403,11 +404,12 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
                 .startArray("timeline");
         Set<String> visited = newHashSet();
         for (Manifestation m : this) {
-            m.build(builder, visited);
+            m.build(builder, tag, visited);
         }
         builder.endArray();
         builder.field("manifestationCount", visited.size());
         builder.endObject();
+        return ids;
     }
 
     private void makeDates() {

@@ -38,7 +38,7 @@ import java.nio.charset.Charset;
 import java.text.Normalizer;
 
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elements.CountableContextResourceOutput;
+import org.xbib.elements.context.CountableContextResourceOutput;
 import org.xbib.tools.Feeder;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
@@ -53,7 +53,7 @@ import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.xcontent.ContentBuilder;
+import org.xbib.rdf.content.ContentBuilder;
 import org.xml.sax.InputSource;
 
 /**
