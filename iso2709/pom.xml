@@ -53,7 +53,6 @@
             <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
             <type>jar</type>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>

@@ -32,6 +32,7 @@
 package org.xbib.oai.rdf;
 
 import org.xbib.iri.IRI;
+import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.TripleListener;
@@ -73,7 +74,7 @@ public class RdfOutput implements TripleListener {
         return this;
     }
 
-    public RdfOutput output(ResourceContext resourceContext) throws IOException {
+    public RdfOutput output(ResourceContext<Resource> resourceContext) throws IOException {
         return this;
     }
 }

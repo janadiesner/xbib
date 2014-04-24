@@ -164,10 +164,10 @@ public class PresentOperation {
                 message = "Some records were not returned (message size is too small)";
                 return new MessageSizeTooSmallException(message).setStatus(status).setNumber(nReturned);
             case 3:
-                message = "Some records were not returned (request was terminated by getResource control, at origin request)";
+                message = "Some records were not returned (request was terminated by control, at origin request)";
                 return new RequestTerminatedException(message).setStatus(status).setNumber(nReturned);
             case 4:
-                message = "Some records were not returned (request was terminated by getResource control, by the target)";
+                message = "Some records were not returned (request was terminated by control, by the target)";
                 return new RequestTerminatedException(message).setStatus(status).setNumber(nReturned);
             case 5:
                 return new NoRecordsReturnedException(response.toString()).setStatus(status);

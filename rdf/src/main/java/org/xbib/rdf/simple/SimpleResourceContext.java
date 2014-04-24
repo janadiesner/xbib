@@ -55,7 +55,7 @@ public class SimpleResourceContext
 
     @Override
     public Resource newResource() {
-        super.setResource(new SimpleResource());
+        super.switchTo(new SimpleResource());
         return super.getResource();
     }
 
@@ -68,5 +68,6 @@ public class SimpleResourceContext
     public ResourceContext<Resource> afterOutput() {
         return this;
     }
+
 
 }

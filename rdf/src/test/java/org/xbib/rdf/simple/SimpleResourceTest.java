@@ -109,12 +109,12 @@ public class SimpleResourceTest<S extends Identifier, P extends Property, O exte
                 .add("urn:valueURI", "Hello World")
                 .add("urn:name", "Smith")
                 .add("urn:name", "Jones");
-        // the first getResource adds a getResource value
+        // the first resource adds a resource value
         Resource<S, P, O> r1 = r.newResource("urn:res1");
-        r1.add("urn:has", "a first getResource value");
-        // the second getResource adds another getResource value
+        r1.add("urn:has", "a first res value");
+        // the second resource adds another resource value
         Resource<S, P, O> r2 = r.newResource("urn:res1");
-        r2.add("urn:has", "a second getResource value");
+        r2.add("urn:has", "a second res value");
         
         assertEquals(r.nodeMap().size(), 3);
         
@@ -143,8 +143,8 @@ public class SimpleResourceTest<S extends Identifier, P extends Property, O exte
          * val=Hello World
          * val=Smith
          * val=Jones
-         * val=_:a2 urn:has a first getResource value
-         * val=_:a3 urn:has a second getResource value
+         * val=_:a2 urn:has a first resource value
+         * val=_:a3 urn:has a second getRresourcesource value
          */
         assertEquals(objCounter, 5);
         /**
@@ -167,7 +167,6 @@ public class SimpleResourceTest<S extends Identifier, P extends Property, O exte
         int cnt = 0;
         while (it.hasNext()) {
             Triple<S,P,O> stmt = it.next();
-            //System.err.println("stmt="+stmt);
             cnt++;
         }
         assertEquals(cnt, 3);        
@@ -203,12 +202,12 @@ public class SimpleResourceTest<S extends Identifier, P extends Property, O exte
         t.id(IRI.create("urn:t"))
                 .add("urn:value", "Hello T");
 
-        // a blank node getResource ID
+        // a blank node resource ID
         IRI blank1 = new IdentifiableNode().blank().id();
         Resource<S, P, O> u = new SimpleResource<>();
         u.id(blank1).add("urn:value", "Hello U");
 
-        // another blank node getResource ID
+        // another blank node resource ID
         IRI blank2 = new IdentifiableNode().blank().id();
         Resource<S, P, O> v = new SimpleResource<>();
         v.id(blank2).add("urn:value", "Hello V");

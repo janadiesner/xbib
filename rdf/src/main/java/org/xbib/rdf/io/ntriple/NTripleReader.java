@@ -106,14 +106,28 @@ public class NTripleReader<S extends Identifier, P extends Property, O extends N
      * Groups in the regular expression are identified by round brackets. There
      * are actually 21 groups in the regex. They are defined as follows:
      *
-     * 0	the whole triple 1	subject 2	anonymous subject 3	getResource subject 4
-     * predicate 5	getResource predicate 6	object 7	anonymous subject 8	getResource
-     * object 9	literal object 10	literal value 11	string with quotes in literal
-     * value 12	string without quotes in literal value 13	last character in
-     * string 14	string with apostrophes in literal value 15	string without
-     * apostrophes in literal value 16	last character in string 17	datatype or
-     * language 18	datatype with ^^ 19	datatype without ^^ (getResource) 20
-     * language with @ 21	language without @
+     * 0	the whole triple
+     * 1	subject
+     * 2	anonymous subject
+     * 3	resource subject
+     * 4    predicate
+     * 5	resource predicate
+     * 6	object
+     * 7	anonymous subject
+     * 8	resource object
+     * 9	literal object
+     * 10	literal value
+     * 11	string with quotes in literal value
+     * 12	string without quotes in literal value
+     * 13	last character in string
+     * 14	string with apostrophes in literal value
+     * 15	string without apostrophes in literal value
+     * 16	last character in string
+     * 17	datatype or language
+     * 18	datatype with ^^
+     * 19	datatype without ^^ (resource)
+     * 20   language with @
+     * 21	language without @
      */
     private void parseLine(String line) throws IOException {
         if (line == null) {

@@ -37,7 +37,7 @@ import java.util.NoSuchElementException;
 import org.xbib.rdf.simple.SimpleTriple;
 
 /**
- * Iterate over a getResource and generate statements
+ * Iterate over a resource and generate statements
  * 
  */
 public class TripleIterator<S extends Identifier, P extends Property, O extends Node>

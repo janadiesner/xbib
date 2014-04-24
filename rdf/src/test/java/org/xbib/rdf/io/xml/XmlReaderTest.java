@@ -120,7 +120,7 @@ public class XmlReaderTest extends Assert {
 
             @Override
             public boolean isResourceDelimiter(QName name) {
-                return false; // only one getResource
+                return false; // only one resource
                 //return "oai_dc".equals(name.getLocalPart());
             }
 

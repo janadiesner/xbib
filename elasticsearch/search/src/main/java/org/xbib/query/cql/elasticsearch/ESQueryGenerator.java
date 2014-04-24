@@ -72,7 +72,7 @@ public class ESQueryGenerator implements Visitor {
     private XContentBuilder facets;
 
     /**
-     * Constructor with custom getResource bundle
+     * Constructor with custom ResourceBundle
      *
      * @param bundle
      */

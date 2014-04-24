@@ -6,7 +6,7 @@
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
         <version>1.0.0.Beta2</version>
-        <relativePath>../..</relativePath>
+        <relativePath>../</relativePath>
     </parent>
 
     <artifactId>query</artifactId>
@@ -34,7 +34,6 @@
             <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
             <type>jar</type>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

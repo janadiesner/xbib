@@ -33,7 +33,7 @@ package org.xbib.rdf.simple;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
+
 import org.xbib.iri.IRI;
 import org.xbib.rdf.AbstractResource;
 import org.xbib.rdf.IdentifiableNode;

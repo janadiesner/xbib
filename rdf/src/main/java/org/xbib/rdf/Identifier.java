@@ -38,6 +38,10 @@ import org.xbib.iri.IRI;
  */
 public interface Identifier {
 
+    /**
+     * Get the identifier
+     * @return the identifier
+     */
     IRI id();
 
     /**
@@ -54,6 +58,10 @@ public interface Identifier {
      */
     Identifier id(String identifier);
 
+    /**
+     * Is identifier poiting to an embedded resource?
+     * @return true if blank, otherwise false
+     */
     boolean isBlank();
 
 }

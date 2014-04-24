@@ -527,7 +527,7 @@ public class WithCitations {
                 IRI zdbserviceid = IRI.builder()
                         .scheme("http")
                         .host("ld.zdb-services.de")
-                        .path("/getResource/" + zdborig).build();
+                        .path("/resource/" + zdborig).build();
                 publication.put("dcterms:identifier", zdbserviceid.toString());
             }
             m.put("frbr:partOf", publication);

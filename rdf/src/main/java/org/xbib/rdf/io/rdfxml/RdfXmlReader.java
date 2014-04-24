@@ -320,7 +320,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
         frame.isSubject = true;
     }
 
-    // the complicated logic to deal with attributes with rdf:getResource, nodeID attrs
+    // the complicated logic to deal with attributes with rdf:resource, nodeID attrs
     private IRI getObjectNode(Stack<Frame> stack, Attributes attrs) throws SAXException {
         IRI node = null;
         String resource = attrs.getValue(RDF.toString(), "resource");
@@ -508,7 +508,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
                         // this predicate encloses pcdata, prepare to accumulate
                         pcdata = new StringBuilder();
                     }
-                    // handle rdf:parseType="getResource"
+                    // handle rdf:parseType="resource"
                     String parseType = attrs.getValue(RDF.toString(), "parseType");
                     if (parseType != null) {
                         switch (parseType) {

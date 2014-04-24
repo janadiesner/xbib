@@ -46,6 +46,7 @@ import java.util.Set;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.simple.SimpleResource;
 
 /**
  * An abstract resource
@@ -92,15 +93,17 @@ public abstract class AbstractResource<S extends Identifier, P extends Property,
         if (triple == null) {
             return this;
         }
-        if (triple.subject().id() == null || triple.subject().id().equals(id())) {
+        IRI id = triple.subject().id();
+        if (id == null || id.equals(id())) {
             add(triple.predicate(), triple.object());
         } else {
-            Resource<S, P, O> r =  (Resource<S, P, O>)resourceMap.get(triple.subject().id());
-            if (r == null) {
-                logger.warn("ignoring triple: {}, no resource in {}", triple, this);
-                return this;
+            Resource<S, P, O> r =  (Resource<S, P, O>)resourceMap.get(id);
+            if (r != null) {
+                return r.add(triple);
+            } else {
+                // continue with new resource with new subject
+                return new SimpleResource<S,P,O>().id(id).add(triple);
             }
-            return r.add(triple);
         }
         return this;
     }
@@ -136,9 +139,8 @@ public abstract class AbstractResource<S extends Identifier, P extends Property,
         if (resource.id() == null) {
             resource.id(super.id());
             Resource<S, P, O> r = newResource(predicate);
-            Iterator<Triple<S,P,O>> it = resource.iterator();
-            while (it.hasNext()) {
-                r.add(it.next());
+            for (Triple<S, P, O> aResource : resource) {
+                r.add(aResource);
             }
         } else {
             attributes.put(predicate, resource);
@@ -262,10 +264,4 @@ public abstract class AbstractResource<S extends Identifier, P extends Property,
         }
     };
 
-    private final static Predicate<Node> literals = new Predicate<Node>() {
-        @Override
-        public boolean apply(Node n) {
-            return n instanceof Literal;
-        }
-    };
 }

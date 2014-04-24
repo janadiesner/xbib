@@ -72,15 +72,15 @@ import z3950.v3.RPNStructure_rpnRpnOp;
 /**
  * This is a RPN (Type-1 query) generator for CQL queries.
  *
- * @see http://www.loc.gov/z3950/agency/markup/09.html
+ * @see <a href="http://www.loc.gov/z3950/agency/markup/09.html">RPN</a>
  * 
  */
 public final class RPNGenerator implements Visitor {
 
-    /** BIB-1 Use attributes getResource bundle */
+    /** BIB-1 Use attributes ResourceBundle */
     private static final ResourceBundle bib =
             ResourceBundle.getBundle("org.xbib.io.iso23950.cql.bib-1");
-    /** Dublin Core Use attributes getResource bundle */
+    /** Dublin Core Use attributes ResourceBundle */
     private static final ResourceBundle dc =
             ResourceBundle.getBundle("org.xbib.io.iso23950.cql.dc");
     /** a context map */

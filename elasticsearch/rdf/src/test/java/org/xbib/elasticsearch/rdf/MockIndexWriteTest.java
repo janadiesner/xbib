@@ -87,6 +87,6 @@ public class MockIndexWriteTest<S extends Resource<S, P, O>, P extends Property,
         return new SimpleResourceContext()
                 .setNamespaceContext(IRINamespaceContext.getInstance())
                 .setContentBuilder(new DefaultContentBuilder<>())
-                .setResource(resource);
+                .switchTo(resource);
     }
 }

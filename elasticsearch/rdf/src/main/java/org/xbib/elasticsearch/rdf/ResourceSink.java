@@ -101,7 +101,7 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
     /**
      * The IRI host is interpreted as the Elasticsearch index
      *
-     * @param resource the getResource
+     * @param resource the resource
      * @return the index
      */
     protected String makeIndex(R resource) {
@@ -111,7 +111,7 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
     /**
      * The IRI query is interpreted as the Elasticsearch index type
      *
-     * @param resource the getResource
+     * @param resource the resource
      * @return the type
      */
     protected String makeType(R resource) {
@@ -121,7 +121,7 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
     /**
      * The IRI fragment is interpreted as the Elasticsearch document ID
      *
-     * @param resource the getResource
+     * @param resource the resource
      * @return the id
      */
     protected String makeId(R resource) {

@@ -31,7 +31,15 @@
  */
 package org.xbib.rdf.context;
 
+import org.xbib.iri.IRI;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.Triple;
+import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.simple.SimpleResource;
+
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * An abstract resource context.
@@ -40,29 +48,31 @@ import org.xbib.rdf.Resource;
  */
 public abstract class AbstractResourceContext<R extends Resource> implements ResourceContext<R> {
 
-    private IRINamespaceContext namespaces;
+    private IRINamespaceContext namespaceContext;
 
     private R resource;
 
+    private Map<Object,R> resourceMap;
+
     public ResourceContext<R> newNamespaceContext() {
-        this.namespaces = IRINamespaceContext.newInstance();
+        this.namespaceContext = IRINamespaceContext.newInstance();
         return this;
     }
 
     public ResourceContext<R> setNamespaceContext(IRINamespaceContext namespaces) {
-        this.namespaces = namespaces;
+        this.namespaceContext = namespaces;
         return this;
     }
 
     public IRINamespaceContext getNamespaceContext() {
-        if (namespaces == null) {
-            this.namespaces = IRINamespaceContext.newInstance();
+        if (namespaceContext == null) {
+            this.namespaceContext = IRINamespaceContext.newInstance();
         }
-        return namespaces;
+        return namespaceContext;
     }
 
     @Override
-    public ResourceContext<R> setResource(R resource) {
+    public ResourceContext<R> switchTo(R resource) {
         this.resource = resource;
         return this;
     }
@@ -70,6 +80,51 @@ public abstract class AbstractResourceContext<R extends Resource> implements Res
     @Override
     public R getResource() {
         return resource;
+    }
+
+    public Collection<R> getResources() {
+        return resourceMap != null ? resourceMap.values() : null;
+    }
+
+    @Override
+    public TripleListener begin() {
+        return this;
+    }
+
+    @Override
+    public TripleListener startPrefixMapping(String prefix, String uri) {
+        getNamespaceContext().addNamespace(prefix, uri);
+        return this;
+    }
+
+    @Override
+    public TripleListener endPrefixMapping(String prefix) {
+        // ignore
+        return this;
+    }
+
+    @Override
+    public TripleListener newIdentifier(IRI identifier) {
+        // ignore
+        return this;
+    }
+
+    @Override
+    public TripleListener triple(Triple triple) {
+        if (resourceMap == null) {
+            resourceMap = new LinkedHashMap<>();
+        }
+        IRI iri = triple.subject().id();
+        if (!resourceMap.containsKey(iri)) {
+            resourceMap.put(iri, (R)new SimpleResource<>().id(iri));
+        }
+        resourceMap.get(iri).add(triple);
+        return this;
+    }
+
+    @Override
+    public TripleListener end() {
+        return this;
     }
 
     public String toString() {

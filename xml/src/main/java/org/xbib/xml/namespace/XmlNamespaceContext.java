@@ -52,7 +52,7 @@ public class XmlNamespaceContext implements NamespaceContext {
 
     private static final Logger logger = LoggerFactory.getLogger(XmlNamespaceContext.class.getName());
 
-    private static final String DEFAULT_RESOURCE = "xml-namespaces";
+    private static final String DEFAULT_RESOURCE = "org.xbib.xml.namespaces";
 
     private final SortedMap<String, String> namespaces = new TreeMap();
 

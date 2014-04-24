@@ -6,7 +6,7 @@
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
         <version>1.0.0.Beta2</version>
-        <relativePath>../../../</relativePath>
+        <relativePath>../../</relativePath>
     </parent>
 
     <artifactId>http</artifactId>
@@ -38,11 +38,6 @@
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>logging</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
             <artifactId>compress</artifactId>
             <type>jar</type>
         </dependency>
@@ -52,9 +47,15 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>org.xbib</groupId>
+            <artifactId>logging</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <type>jar</type>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -92,6 +93,5 @@
             <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 </project>

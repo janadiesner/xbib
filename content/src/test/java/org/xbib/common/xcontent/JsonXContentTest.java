@@ -1,4 +1,4 @@
-package org.xbib.xcontent;
+package org.xbib.common.xcontent;
 
 import com.google.common.io.CharStreams;
 import org.xbib.common.xcontent.XContentHelper;

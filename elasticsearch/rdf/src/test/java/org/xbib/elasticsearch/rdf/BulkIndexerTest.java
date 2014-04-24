@@ -75,7 +75,7 @@ public class BulkIndexerTest extends Assert {
         resource.newResource("urn:res1")
                 .add("property5", "value5")
                 .add("property6", "value6");
-        context.setResource(resource);
+        context.switchTo(resource);
         return context;
     }
 }

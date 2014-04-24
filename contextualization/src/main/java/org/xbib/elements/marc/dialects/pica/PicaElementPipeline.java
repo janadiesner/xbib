@@ -104,7 +104,7 @@ public class PicaElementPipeline extends KeyValueElementPipeline<FieldCollection
                 }
                 // add child resource
                 resource.add(predicate, newResource);
-                builder().context().setResource(resource); // switch back to old resource
+                builder().context().switchTo(resource); // switch back to old resource
             }
         } else {
             if (detectUnknownKeys) {

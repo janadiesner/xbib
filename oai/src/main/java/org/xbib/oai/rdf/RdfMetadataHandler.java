@@ -34,6 +34,7 @@ package org.xbib.oai.rdf;
 import org.xbib.iri.IRI;
 import org.xbib.oai.OAIConstants;
 import org.xbib.oai.xml.MetadataHandler;
+import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.xml.XmlResourceHandler;
@@ -50,7 +51,7 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
 
     private RdfResourceHandler handler;
 
-    private ResourceContext resourceContext;
+    private ResourceContext<Resource> resourceContext;
 
     private RdfOutput rdfOutput = new RdfOutput();
 
@@ -82,12 +83,12 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
         return context;
     }
 
-    public RdfMetadataHandler setResourceContext(ResourceContext resourceContext) {
+    public RdfMetadataHandler setResourceContext(ResourceContext<Resource> resourceContext) {
         this.resourceContext = resourceContext;
         return this;
     }
 
-    public ResourceContext getResourceContext() {
+    public ResourceContext<Resource> getResourceContext() {
         return resourceContext;
     }
 
@@ -116,8 +117,8 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
     }
 
     /**
-     * At the end of each OAI metadata, the getResource context receives the identifier from
-     * the metadata header. The getResource context is pushed to the RDF output.
+     * At the end of each OAI metadata, the resource context receives the identifier from
+     * the metadata header. The resource context is pushed to the RDF output.
      * Any IOException is converted to a SAXException.
      *
      * @throws SAXException

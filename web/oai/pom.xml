@@ -5,7 +5,7 @@
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
         <version>1.0.0.Beta2</version>
-        <relativePath>../../../</relativePath>
+        <relativePath>../../</relativePath>
     </parent>
 
     <artifactId>web-oai</artifactId>
@@ -89,6 +89,12 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <scope>test</scope>
@@ -164,6 +170,7 @@
                 </plugins>
             </build>
         </profile>
+        <!--
         <profile>
             <id>incontainer</id>
             <activation>
@@ -204,5 +211,6 @@
                 </dependency>
             </dependencies>
         </profile>
+        -->
     </profiles>
 </project>

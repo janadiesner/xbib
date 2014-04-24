@@ -102,7 +102,7 @@ public class JsonReaderTest extends Assert {
                 .setHandler(jsonHandler)
                 .root(new QName("http://purl.org/dc/elements/1.1/", "root", "dc"))
                 .parse(in);
-        logger.info("getResource={}", sw.toString());
+        logger.info("resource={}", sw.toString());
     }
 
 }

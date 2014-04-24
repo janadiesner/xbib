@@ -6,7 +6,7 @@
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
         <version>1.0.0.Beta2</version>
-        <relativePath>../..</relativePath>
+        <relativePath>../../</relativePath>
     </parent>
 
     <artifactId>elasticsearch-search</artifactId>
@@ -65,7 +65,6 @@
             <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
             <type>jar</type>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>

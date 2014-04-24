@@ -48,14 +48,14 @@ public class XmlResourceWriterTest<S extends Identifier, P extends Property, O e
     public void testXMLResourceWriter() throws Exception {
         IdentifiableNode.reset();
         Resource<S, P, O> root = new SimpleResource().id(IRI.create("urn:root"));
-        Resource resource = root.newResource("urn:getResource");
+        Resource resource = root.newResource("urn:res");
         resource.add("urn:property", "value");
         Resource nestedResource = resource.newResource("urn:nestedresource");
         nestedResource.add("urn:nestedproperty", "nestedvalue");
         XmlResourceWriter w = new XmlResourceWriter();
         StringWriter sw = new StringWriter();
         w.toXML(root, sw);
-        assertEquals("<urn:root><urn:getResource><urn:property>value</urn:property><urn:nestedresource><urn:nestedproperty>nestedvalue</urn:nestedproperty></urn:nestedresource></urn:getResource></urn:root>", sw.toString());
+        assertEquals("<urn:root><urn:res><urn:property>value</urn:property><urn:nestedresource><urn:nestedproperty>nestedvalue</urn:nestedproperty></urn:nestedresource></urn:res></urn:root>", sw.toString());
     }    
     
     @Test
@@ -63,13 +63,13 @@ public class XmlResourceWriterTest<S extends Identifier, P extends Property, O e
         IdentifiableNode.reset();
         SimpleResource<S, P, O> parent = new SimpleResource();
         parent.id(IRI.create("urn:doc3"));
-        Resource<S, P, O> child = parent.newResource("urn:getResource");
+        Resource<S, P, O> child = parent.newResource("urn:res");
         child.add("urn:property", "value");
         XmlResourceWriter xmlrw = new XmlResourceWriter();
         // parent parent
         StringWriter sw = new StringWriter();
         xmlrw.toXML(parent, sw);
-        assertEquals("<urn:doc3><urn:getResource><urn:property>value</urn:property></urn:getResource></urn:doc3>", sw.toString());
+        assertEquals("<urn:doc3><urn:res><urn:property>value</urn:property></urn:res></urn:doc3>", sw.toString());
         // child parent
         sw = new StringWriter();
         xmlrw.toXML(child, sw);

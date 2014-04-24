@@ -37,7 +37,7 @@ Revision 1.46 - Aquifer revision 1.25 - Changed mapping of 767 so that <type="ot
 Revision 1.45 - Aquifer revision 1.24 - Changed mapping of 765 so that <type="otherVersion>  2009/11/20  tmee 
 Revision 1.44 - Added <recordInfo><recordOrigin> canned text about the version of this stylesheet 2009 ntra
 Revision 1.43 - Mapped 351 subfields a,b,c 2009/11/20 tmee
-Revision 1.42 - Changed 856 second indicator=1 to go to <location><url displayLabel=”electronic getResource”> instead of to <relatedItem type=”otherVersion”><url> 2009/11/20 tmee
+Revision 1.42 - Changed 856 second indicator=1 to go to <location><url displayLabel=”electronic resource”> instead of to <relatedItem type=”otherVersion”><url> 2009/11/20 tmee
 Revision 1.41 - Aquifer revision 1.9 Added variable and choice protocol for adding usage=”primary display” 2009/11/19 tmee 
 Revision 1.40 - Dropped <note> for 510 and added <relatedItem type="isReferencedBy"> for 510 2009/11/19 tmee
 Revision 1.39 - Aquifer revision 1.23 Changed mapping for 762 (Subseries Entry) from <relatedItem type="series"> to <relatedItem type="constituent"> 2009/11/19 tmee

@@ -5,7 +5,7 @@
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
         <version>1.0.0.Beta2</version>
-        <relativePath>../../../</relativePath>
+        <relativePath>../../</relativePath>
     </parent>
 
     <artifactId>web-sru</artifactId>
@@ -89,23 +89,33 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
+            <type>jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <type>jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
+            <type>jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.htmlunit</groupId>
             <artifactId>htmlunit</artifactId>
+            <type>jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -165,6 +175,7 @@
                 </plugins>
             </build>
         </profile>
+        <!--
         <profile>
             <id>incontainer</id>
             <activation>
@@ -205,5 +216,6 @@
                 </dependency>
             </dependencies>
         </profile>
+        -->
     </profiles>
 </project>

@@ -34,6 +34,9 @@ package org.xbib.rdf.context;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.ResourceFactory;
 import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.io.TripleListener;
+
+import java.util.Collection;
 
 /**
  * A Resource context. 
@@ -41,9 +44,14 @@ import org.xbib.rdf.content.ContentBuilder;
  * Resource contexts are useful when many resources are stored together
  * and common information about processing must be maintained,
  * for example, creation, building, and output.
- * 
  */
-public interface ResourceContext<R extends Resource> extends ResourceFactory<R> {
+public interface ResourceContext<R extends Resource> extends ResourceFactory<R>, TripleListener {
+
+    /**
+     * Get collected resource
+     * @return a collection of resources
+     */
+    Collection<R> getResources();
 
     /**
      * Set a new IRI namespace context
@@ -60,15 +68,15 @@ public interface ResourceContext<R extends Resource> extends ResourceFactory<R> 
 
     /**
      *
-     * Set a new resource in this context.
-     * @param resource the new resource
-     * @return the current esource context
+     * Switch to this resource in this context.
+     * @param resource the resource
+     * @return the current resource context
      */
-    ResourceContext<R> setResource(R resource);
+    ResourceContext<R> switchTo(R resource);
 
     /**
      * Get resource in this context.
-     * @return current getResource
+     * @return current resource
      */
     R getResource();
 

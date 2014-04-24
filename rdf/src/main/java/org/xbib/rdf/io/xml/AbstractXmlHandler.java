@@ -38,6 +38,7 @@ import javax.xml.namespace.QName;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.TripleListener;
@@ -54,7 +55,7 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
 
     private final Logger logger = LoggerFactory.getLogger(AbstractXmlHandler.class.getName());
 
-    private final ResourceContext resourceContext;
+    private final ResourceContext<Resource> resourceContext;
 
     private final StringBuilder content = new StringBuilder();
 
@@ -68,7 +69,7 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
 
     private int lastlevel;
 
-    public AbstractXmlHandler(ResourceContext context) {
+    public AbstractXmlHandler(ResourceContext<Resource> context) {
         this.resourceContext = context;
     }
 

@@ -186,7 +186,7 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
 
     public void close() {
         try {
-            // write last getResource
+            // write last resource
             write(resource);
             idCounter++;
             writer.flush();
@@ -289,7 +289,7 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
                 writeObject(object);
             }
         } else {
-            // embedded getResource switchback?
+            // embedded resource switchback?
             IRI iri = embedded.isEmpty() ? null : embedded.peek();
             boolean closeEmbedded = lastSubject != null
                     && lastSubject.isBlank()
@@ -321,7 +321,7 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
                     writeIndent(embedded.size());
                 }
             }
-            // don't repeat subject in same getResource
+            // don't repeat subject in same resource
             if (!sameResource) {
                 writeSubject(subject);
             }

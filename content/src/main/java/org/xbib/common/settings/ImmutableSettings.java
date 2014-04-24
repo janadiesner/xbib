@@ -58,7 +58,6 @@ import org.xbib.io.stream.StreamOutput;
 import org.xbib.common.settings.loader.SettingsLoader;
 import org.xbib.common.settings.loader.SettingsLoaderFactory;
 
-import static com.google.common.collect.Maps.newHashMap;
 import static org.xbib.common.unit.TimeValue.parseTimeValue;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
@@ -459,7 +458,7 @@ public class ImmutableSettings implements Settings {
                 }
             }
             for (int i = 0; i < values.length; i++) {
-                put(setting + "" + i, values[i]);
+                put(setting + '.' + i, values[i]);
             }
             return this;
         }
@@ -481,7 +480,7 @@ public class ImmutableSettings implements Settings {
                 }
             }
             for (int i = 0; i < values.size(); i++) {
-                put(setting + "" + i, values.get(i).toString());
+                put(setting + '.' + i, values.get(i).toString());
             }
             return this;
         }

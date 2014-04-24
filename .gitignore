@@ -1,17 +1,22 @@
 *~
-
-.idea/
-.gradle/
-*.iml
-work/
-/data/
-logs/
 .DS_Store
+
+work/
+data/
+logs/
 build/
+
+## maven
 target/
 
+## gradle
+.gradle/
 
-## eclipse ignores (use 'gradle eclipse' to build eclipse projects)
+## intellij
+.idea/
+*.iml
+
+## eclipse
 .project
 .classpath
 .settings
@@ -20,40 +25,11 @@ target/
 */.settings
 */eclipse-build
 
-## netbeans ignores
+## netbeans
 nb-configuration.xml
 nbactions.xml
 
-# unreleased submodules
-xbib-openurl
-xbib-openrdf
-xbib-swingx
-xbib-printclient
-xbib-fa
-xbib-oauth
-xbib-json
-
-# deploy scripts
-release-github-deploy
-snapshot-github-deploy
-
-# passwords
-BVB.properties
-GBV.properties
-HBZ.properties
-HEBIS.properties
-SWB.properties
-KOBV.properties
-SWB.properties
-ZDB.properties
-*/BVB.properties
-*/GBV.properties
-*/HBZ.properties
-*/HEBIS.properties
-*/KOBV.properties
-*/SWB.properties
-*/ZDB.properties
-# ISIL codes
+BNF.properties
 DE-576.properties
 DE-600.properties
 DE-601.properties
@@ -61,10 +37,13 @@ DE-602.properties
 DE-603.properties
 DE-604.properties
 DE-605.properties
-*/DE-576.properties
-*/DE-600.properties
-*/DE-601.properties
-*/DE-602.properties
-*/DE-603.properties
-*/DE-604.properties
-*/DE-605.properties
+LCDB.properties
+LIBRIS.properties
+BVB.properties
+GBV.properties
+HBZ.properties
+HEBIS.properties
+KOBV.properties
+LCDB.properties
+SWB.properties
+ZDB.properties

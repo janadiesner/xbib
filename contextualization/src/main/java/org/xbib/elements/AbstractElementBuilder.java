@@ -63,7 +63,7 @@ public abstract class AbstractElementBuilder<K, V, E extends Element, C extends 
     @Override
     public void begin() {
         C context = contextFactory().newContext();
-        context.setResource(context.newResource());
+        context.switchTo(context.newResource());
         contexts.set(context);
     }
 

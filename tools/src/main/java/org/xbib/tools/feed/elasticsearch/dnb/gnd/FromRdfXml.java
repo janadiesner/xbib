@@ -145,7 +145,7 @@ public class FromRdfXml extends Feeder implements TripleListener {
         } catch (IOException e) {
             logger.error("output failed: {}", e.getMessage(), e);
         }
-        context.setResource(context.newResource());
+        context.switchTo(context.newResource());
         context.getResource().id(iri);
         return this;
     }

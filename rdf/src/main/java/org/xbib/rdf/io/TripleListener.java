@@ -32,9 +32,11 @@
 package org.xbib.rdf.io;
 
 import org.xbib.iri.IRI;
+import org.xbib.rdf.Identifier;
+import org.xbib.rdf.Property;
 import org.xbib.rdf.Triple;
 
-public interface TripleListener<S,P,O> {
+public interface TripleListener<S extends Identifier,P extends Property,O> {
 
     TripleListener<S,P,O> begin();
 

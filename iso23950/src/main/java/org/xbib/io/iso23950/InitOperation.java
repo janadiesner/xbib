@@ -82,9 +82,9 @@ public class InitOperation {
         options[0] = true; // search
         options[1] = true; // present
         options[2] = true;  // delete set
-        options[3] = false; // getResource-report
-        options[4] = false; // trigger getResource control
-        options[5] = false;  // getResource control
+        options[3] = false; // resource-report
+        options[4] = false; // trigger resource control
+        options[5] = false;  // resource control
         options[6] = false; // access control
         options[7] = true; // scan
         options[8] = false; // sort

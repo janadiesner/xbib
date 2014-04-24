@@ -25,7 +25,7 @@ public class DefaultContentBuilderTest<S extends Identifier, P extends Property,
         SimpleLiteral<String> l = new SimpleLiteral<String>()
                 .object("2013")
                 .type(IRI.create("xsd:gYear"));
-        resource.id(IRI.create("urn:getResource"))
+        resource.id(IRI.create("urn:res"))
                 .add("urn:property", "Hello World")
                 .add("urn:date", l)
                 .add("urn:link", IRI.create("urn:pointer"));
@@ -41,7 +41,7 @@ public class DefaultContentBuilderTest<S extends Identifier, P extends Property,
         SimpleLiteral<String> l = new SimpleLiteral<String>()
                 .object("2013")
                 .type(IRI.create("xsd:gYear"));
-        resource.id(IRI.create("urn:getResource"))
+        resource.id(IRI.create("urn:res"))
                 .add("urn:property", "Hello World")
                 .add("urn:date", l)
                 .add("rdf:type", IRI.create("urn:type1"))

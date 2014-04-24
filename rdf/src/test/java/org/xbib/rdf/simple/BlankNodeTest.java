@@ -20,13 +20,13 @@ public class BlankNodeTest extends Assert {
 
         // test order of adding
         Resource r1 = r.newResource("urn:res1");
-        r1.add("urn:has", "a first getResource");
+        r1.add("urn:has", "a first res");
         r.add("urn:has", "a first property");
         Resource q = new SimpleResource().id(IRI.create("urn:meta2"));
         Resource r2 = q.newResource("urn:res2");
-        r2.add("urn:has", "a second getResource");
+        r2.add("urn:has", "a second res");
         q.add("urn:has", "a second property");
-        // we test here getResource adding
+        // we test here resource adding
         r.add("a:res", q);
 
         Iterator<Triple> it = r.propertyIterator();

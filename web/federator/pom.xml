@@ -5,7 +5,7 @@
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
         <version>1.0.0.Beta2</version>
-        <relativePath>../../..</relativePath>
+        <relativePath>../../</relativePath>
     </parent>
 
     <artifactId>web-federator</artifactId>
@@ -72,31 +72,40 @@
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>charset</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>util</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>sru</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>iso23950</artifactId>
+            <type>jar</type>
         </dependency>
+<!--
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+            <type>jar</type>
         </dependency>
+        -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
+            <type>jar</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
+            <type>jar</type>
             <scope>provided</scope>
         </dependency>
     </dependencies>

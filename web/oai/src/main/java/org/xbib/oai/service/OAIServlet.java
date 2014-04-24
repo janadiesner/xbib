@@ -65,7 +65,6 @@ import org.xbib.oai.identify.IdentifyServerRequest;
 import org.xbib.oai.listrecords.ListRecordsServerRequest;
 import org.xbib.oai.listsets.ListSetsRequest;
 import org.xbib.oai.listsets.ListSetsResponse;
-import org.xbib.oai.util.OAIRequestDumper;
 import org.xbib.oai.util.ResumptionToken;
 import org.xbib.oai.exceptions.OAIException;
 

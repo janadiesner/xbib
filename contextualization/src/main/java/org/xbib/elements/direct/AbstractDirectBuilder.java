@@ -61,7 +61,7 @@ public abstract class AbstractDirectBuilder<K, V, C extends ResourceContext<Reso
     @Override
     public void begin() {
         C context = contextFactory().newContext();
-        context.setResource(context.newResource());
+        context.switchTo(context.newResource());
         contexts.set(context);
     }
 

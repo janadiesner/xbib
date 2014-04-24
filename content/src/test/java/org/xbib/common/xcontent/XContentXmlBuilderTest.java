@@ -1,4 +1,4 @@
-package org.xbib.xcontent;
+package org.xbib.common.xcontent;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;

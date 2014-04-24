@@ -49,12 +49,12 @@ import static com.google.common.collect.Lists.newLinkedList;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
- * A Builder for building XContent from a resource
+ * A content builder for building XContent from a resource
  *
  * @param <C> context type
  * @param <R> resource type
  */
-public class DefaultContentBuilder<C extends ResourceContext, R extends Resource>
+public class DefaultContentBuilder<C extends ResourceContext<R>, R extends Resource>
     implements ContentBuilder<C,R> {
 
     public DefaultContentBuilder<C,R> timestamp(Date timestamp) {
@@ -101,7 +101,8 @@ public class DefaultContentBuilder<C extends ResourceContext, R extends Resource
         }
         CompactingNamespaceContext context = resourceContext.getNamespaceContext();
         // iterate over properties
-        for (P predicate : resource.predicateSet(resource.subject())) {
+        S subject = resource.subject();
+        for (P predicate : resource.predicateSet(subject)) {
             Collection<O> values = resource.objects(predicate);
             if (values == null) {
                 throw new IllegalArgumentException("can't build property value set for predicate URI " + predicate);
@@ -118,6 +119,7 @@ public class DefaultContentBuilder<C extends ResourceContext, R extends Resource
                 } else if (object.nativeValue() != null) {
                     builder.field(context.compact(predicate.id()), object.nativeValue());
                 }
+                expandField(builder, resourceContext, subject, predicate, object);
                 // drop null value
             } else if (values.size() > 1) {
                 // array of values
@@ -131,9 +133,10 @@ public class DefaultContentBuilder<C extends ResourceContext, R extends Resource
                                 builder.value(id.id().toString()); // IRI -> string
                             }
                         } else if (object.nativeValue() != null) {
+                            // drop null values
                             builder.value(object.nativeValue());
                         }
-                        // drop null values
+                        expandValue(builder, resourceContext, subject, predicate, object);
                     }
                     builder.endArray();
                 }
@@ -171,6 +174,14 @@ public class DefaultContentBuilder<C extends ResourceContext, R extends Resource
                 }
             }
         }
+    }
+
+    protected <S extends Identifier, P extends Property, O extends Node>
+        void expandField(XContentBuilder builder, ResourceContext<R> context, S subject, P predicate, O object) throws IOException {
+    }
+
+    protected <S extends Identifier, P extends Property, O extends Node>
+        void expandValue(XContentBuilder builder, ResourceContext<R> context, S subject, P predicate, O object) throws IOException {
     }
 
     private <O extends Node> Collection<O> filterBlankNodes(Collection<O> objects) {

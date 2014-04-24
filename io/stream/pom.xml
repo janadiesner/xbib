@@ -6,7 +6,7 @@
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
         <version>1.0.0.Beta2</version>
-        <relativePath>../..</relativePath>
+        <relativePath>../../</relativePath>
     </parent>
 
     <artifactId>stream</artifactId>
@@ -14,6 +14,5 @@
 
     <name>stream</name>
     <description>Buffered and I/O streaming</description>
-
 
 </project>

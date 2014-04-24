@@ -106,7 +106,7 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
      */
     private boolean eof;
     /**
-     * Stack for getResource statements
+     * Stack for resource statements
      */
     private Stack<Triple> triples;
     /**
@@ -510,7 +510,7 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
     /**
      * Parse a collection
      *
-     * @return the collection as a getResource
+     * @return the collection as a resource
      * @throws IOException
      */
     private Resource<S, P, O> parseCollection() throws IOException {
