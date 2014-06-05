@@ -271,8 +271,9 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
                 .setScroll(TimeValue.timeValueMillis(service.millis()))
                 .execute().actionGet();
         SearchHits hits = searchResponse.getHits();
-        logger.info("hits={} q={}",
-                hits.getTotalHits(), queryBuilder.toString().replaceAll("\\n", ""));
+        if (logger.isTraceEnabled()) {
+            logger.trace("hits={} q={}", hits.getTotalHits(), queryBuilder.toString().replaceAll("\\n", ""));
+        }
         if (hits.getHits().length == 0) {
             return;
         }
@@ -294,6 +295,11 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
         Map<String,Object> m = hit.sourceAsMap();
         Map<String,Object> publication = (Map<String,Object>)m.get("frbr:partOf");
         if (publication != null) {
+            // check for 'CrossRef' tags in dc:publisher
+            String publisher = (String) publication.get("dc:publisher");
+            if (publisher != null && publisher.contains("CrossRef")) {
+                publication.remove("dc:publisher");
+            }
             String id = manifestation.externalID();
             // unique endeavor key, independent of ISSN
             //publication.put("dcterms:identifier", manifestation.getUniqueIdentifier());
@@ -309,14 +315,27 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
             publication.put("dcterms:identifier", zdbserviceid.toString());
         }
         m.put("frbr:partOf", publication);
+        if (m.containsKey("prism:publicationDate")) {
+            // add firstdate, lastdate (for sort)
+            Object o = m.get("prism:publicationDate");
+            m.put("firstdate", o);
+            m.put("lastdate", o);
+        }
+
         builder.value(m);
+
         String doiPart = hit.id().replaceAll("%2F","/");
+        String type = service.settings().get("targetCitationType");
+        // if author, move to citation with authors
+        if (m.containsKey("dc:creator")) {
+            type = type + "WithCreator";
+        }
         IRI id = IRI.builder()
                 .scheme("http")
                 .host("xbib.info")
                 .path("/endeavors/doi").fragment(doiPart).build();
         service.ingest().index(service.settings().get("targetCitationIndex"),
-                service.settings().get("targetCitationType"),
+                type,
                 id.toString(),
                 builder.string());
     }

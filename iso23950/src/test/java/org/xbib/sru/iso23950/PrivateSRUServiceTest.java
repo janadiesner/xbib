@@ -26,16 +26,16 @@ public class PrivateSRUServiceTest {
                 SRUService service = ZSRUServiceFactory.getService(name);
                 SRUClient client = service.newClient();
                 FileOutputStream out = new FileOutputStream("target/sru-" + service.getURI().getHost() + ".xml");
-                try (Writer writer = new OutputStreamWriter(out, "UTF-8")) {
-                    String query = "dc.title = test";
-                    int from = 1;
-                    int size = 10;
-                    SearchRetrieveRequest request = client.newSearchRetrieveRequest();
-                    request.setQuery(query)
-                            .setStartRecord(from)
-                            .setMaximumRecords(size);
-                    client.searchRetrieve(request).to(writer);
-                }
+                Writer writer = new OutputStreamWriter(out, "UTF-8");
+                String query = "dc.title = test";
+                int from = 1;
+                int size = 10;
+                SearchRetrieveRequest request = client.newSearchRetrieveRequest();
+                request.setQuery(query)
+                        .setStartRecord(from)
+                        .setMaximumRecords(size);
+                client.searchRetrieve(request).to(writer);
+                writer.close();
             } catch (Exception e) {
                 logger.warn(e.getMessage());
             }

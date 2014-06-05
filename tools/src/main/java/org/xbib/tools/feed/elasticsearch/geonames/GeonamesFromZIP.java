@@ -76,7 +76,7 @@ public class GeonamesFromZIP extends Feeder {
 
     @Override
     protected GeonamesFromZIP beforeIndexCreation(Ingest output) {
-        output.mapping(settings.get("type"),
+        output.addMapping(settings.get("type"),
             "{ \""+settings.get("type")+"\": { \"properties\" : { \"location\" : { \"type\" : \"geo_point\" } } } }");
         return this;
     }

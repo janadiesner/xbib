@@ -90,7 +90,7 @@ public class ListRecordsListener extends NettyHttpResponseListener
             return;
         }
         if (!result.ok()) {
-            throw new IOException("Status " + status + " Response " + body, result.getThrowable());
+            throw new IOException("status  = " + status + " response = " + body, result.getThrowable());
         }
         // activate XSLT only if XML content type
         if (result.getContentType().endsWith("xml")) {

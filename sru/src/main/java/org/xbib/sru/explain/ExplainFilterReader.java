@@ -67,19 +67,18 @@ public class ExplainFilterReader extends XMLFilterReader {
             ServerInfo serverInfo = new ServerInfo();
             for (int i = 0; i < atts.getLength(); i++) {
                 String attrName = atts.getQName(i);
-                switch (attrName) {
-                    case "protocol":
-                        serverInfo.setProtocol(atts.getValue(i));
-                        break;
-                    case "version":
-                        serverInfo.setVersion(atts.getValue(i));
-                        break;
-                    case "transport":
-                        serverInfo.setTransport(atts.getValue(i));
-                        break;
-                    case "method":
-                        serverInfo.setMethod(atts.getValue(i));
-                        break;
+                if (attrName.equals("protocol")) {
+                    serverInfo.setProtocol(atts.getValue(i));
+
+                } else if (attrName.equals("version")) {
+                    serverInfo.setVersion(atts.getValue(i));
+
+                } else if (attrName.equals("transport")) {
+                    serverInfo.setTransport(atts.getValue(i));
+
+                } else if (attrName.equals("method")) {
+                    serverInfo.setMethod(atts.getValue(i));
+
                 }
             }
             explain.setServerInfo(serverInfo);

@@ -33,7 +33,7 @@ package org.xbib.analyzer.dublincore;
 
 import org.xbib.elements.AbstractElementBuilder;
 import org.xbib.elements.context.ResourceContextFactory;
-import org.xbib.elements.context.ContextResourceOutput;
+import org.xbib.rdf.context.ContextResourceOutput;
 
 public class DublinCoreBuilder<K,V>
     extends AbstractElementBuilder<K, V, DublinCoreElement, DublinCoreContext> {

@@ -33,7 +33,7 @@ package org.xbib.elements.marc;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.elements.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -97,58 +97,58 @@ public class UNIMARCElementsTest extends Assert {
                 "/org/xbib/elements/marc/dialects/unimarc/serres.mrc"
         }) {
             InputStream in = getClass().getResourceAsStream(s);
-            try (InputStreamReader r = new InputStreamReader(in, ISO88591)) {
-                final CountableContextResourceOutput output = new CountableContextResourceOutput<ResourceContext, Resource>() {
+            InputStreamReader r = new InputStreamReader(in, ISO88591);
+            final CountableContextResourceOutput output = new CountableContextResourceOutput<ResourceContext, Resource>() {
 
-                    @Override
-                    public void output(ResourceContext context, Resource resource, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
-                        IRI iri = IRI.builder().scheme("http")
-                                .host("dummyindex")
-                                .query("dummytype")
-                                .fragment(Long.toString(counter.getAndIncrement())).build();
-                        context.getResource().id(iri);
-                        StringWriter sw = new StringWriter();
-                        TurtleWriter tw = new TurtleWriter().output(sw);
-                        tw.write(context.getResource());
-                        //logger.debug("out={}", sw.toString());
-                    }
+                @Override
+                public void output(ResourceContext context, Resource resource, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
+                    IRI iri = IRI.builder().scheme("http")
+                            .host("dummyindex")
+                            .query("dummytype")
+                            .fragment(Long.toString(counter.getAndIncrement())).build();
+                    context.getResource().id(iri);
+                    StringWriter sw = new StringWriter();
+                    TurtleWriter tw = new TurtleWriter().output(sw);
+                    tw.write(context.getResource());
+                    //logger.debug("out={}", sw.toString());
+                }
 
-                };
-                MARCElementMapper mapper = new MARCElementMapper("marc/bib")
-                        .detectUnknownKeys(true)
-                        .start(new MARCElementBuilderFactory() {
-                            public MARCElementBuilder newBuilder() {
-                                return new MARCElementBuilder().addOutput(output);
-                            }
-                        });
-                MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
+            };
+            MARCElementMapper mapper = new MARCElementMapper("marc/bib")
+                    .detectUnknownKeys(true)
+                    .start(new MARCElementBuilderFactory() {
+                        public MARCElementBuilder newBuilder() {
+                            return new MARCElementBuilder().addOutput(output);
+                        }
+                    });
+            MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
 
-                final Iso2709Reader reader = new Iso2709Reader()
-                        .setValueNormalizer(new ValueNormalizer() {
-                            @Override
-                            public String normalize(String value) {
-                                return value == null ? null : new String(value.getBytes(ISO88591), UTF8);
-                            }
-                        })
-                        .setMarcXchangeListener(kv);
-                reader.setProperty(Iso2709Reader.FORMAT, "MARC");
-                reader.setProperty(Iso2709Reader.TYPE, "Bibliographic");
+            final Iso2709Reader reader = new Iso2709Reader()
+                    .setValueNormalizer(new ValueNormalizer() {
+                        @Override
+                        public String normalize(String value) {
+                            return value == null ? null : new String(value.getBytes(ISO88591), UTF8);
+                        }
+                    })
+                    .setMarcXchangeListener(kv);
+            reader.setProperty(Iso2709Reader.FORMAT, "MARC");
+            reader.setProperty(Iso2709Reader.TYPE, "Bibliographic");
 
-                TransformerFactory tFactory = TransformerFactory.newInstance();
-                Transformer transformer = tFactory.newTransformer();
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-                InputSource source = new InputSource(r);
-                new File("target/" + s).getParentFile().mkdirs();
-                FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
-                Writer w = new OutputStreamWriter(out, UTF8);
-                StreamResult target = new StreamResult(w);
-                transformer.transform(new SAXSource(reader, source), target);
-                mapper.close();
-                // check if increment works
-                logger.info("unknown elements = {}", mapper.unknownKeys());
-                assertEquals(51279, output.getCounter());
-            }
+            TransformerFactory tFactory = TransformerFactory.newInstance();
+            Transformer transformer = tFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+            InputSource source = new InputSource(r);
+            new File("target/" + s).getParentFile().mkdirs();
+            FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
+            Writer w = new OutputStreamWriter(out, UTF8);
+            StreamResult target = new StreamResult(w);
+            transformer.transform(new SAXSource(reader, source), target);
+            mapper.close();
+            // check if increment works
+            logger.info("unknown elements = {}", mapper.unknownKeys());
+            assertEquals(51279, output.getCounter());
+            r.close();
 
 
         }

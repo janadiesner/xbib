@@ -1,3 +1,4 @@
+
 package org.xbib.re;
 
 import java.util.ArrayList;
@@ -69,21 +70,12 @@ public abstract class Pattern {
         return createMatcher().reset(input);
     }
 
-    /*public String pattern() {
-        return pattern;
-    }
-
-    @Override
-    public String toString() {
-        return pattern();
-    }*/
-
     public String[] split(CharSequence input) {
         return split(input, 0);
     }
 
     public String[] split(CharSequence input, int limit) {
-        List<String> parts = new ArrayList<>((limit <= 0) ? 10 : limit);
+        List<String> parts = new ArrayList((limit <= 0) ? 10 : limit);
         Matcher m = matcher(input);
         int p = 0;
         for (int count = 0; ++count != limit && m.find(p); p = m.end()) {

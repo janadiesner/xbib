@@ -64,7 +64,9 @@ public class XMLFilterReader extends XMLFilterImpl {
             parserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
             parserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             parser = parserFactory.newSAXParser();
-        } catch (ParserConfigurationException | SAXException e) {
+        } catch (ParserConfigurationException e) {
+            throw new IllegalArgumentException(e);
+        } catch (SAXException e) {
             throw new IllegalArgumentException(e);
         }
     }

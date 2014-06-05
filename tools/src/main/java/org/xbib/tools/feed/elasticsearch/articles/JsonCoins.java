@@ -45,6 +45,7 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 
 import org.xbib.tools.Feeder;
 import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
@@ -238,6 +239,12 @@ public class JsonCoins extends Feeder {
         OK, ERROR, MISSINGSERIAL
     }
 
+    private final static Pattern[] patterns = new Pattern[] {
+            Pattern.compile("^info:doi/"),
+            Pattern.compile("^http://dx.doi.org/"),
+            Pattern.compile("^http://doi.org/")
+    };
+
     protected Result parseCoinsInto(Resource resource, String value) {
         IRI coins = IRI.builder()
                 .scheme("http")
@@ -277,26 +284,26 @@ public class JsonCoins extends Feeder {
                 }
                 switch (k) {
                     case "rft_id" : {
-                        String w = URIUtil.decode(v, UTF8).toLowerCase();
-                        if (w.startsWith("info:doi/")) {
-                            w = w.substring(9);
-                        } else if (w.startsWith("http://dx.doi.org/")) {
-                            w = w.substring(18);
+                        // lowercase important, DOI is case-insensitive
+                        String s = URIUtil.decode(v, UTF8).toLowerCase();
+                        // remove URL/URI prefixes
+                        for (Pattern pattern : patterns) {
+                            s = pattern.matcher(s).replaceAll("");
                         }
                         try {
-                            // DOI is case-insensitive
+                            String doiURI = URIUtil.encode(s, UTF8);
                             // encode as URI, but info URI RFC wants slash as unencoded character
-                            String s = URIUtil.encode(w, UTF8);
-                            s = s.replaceAll("%2F","/");
+                            // anyway we use xbib.info/doi/
+                            doiURI = doiURI.replaceAll("%2F","/");
                             IRI iri = IRI.builder()
                                     .scheme("http")
                                     .host("xbib.info")
                                     .path("/doi/")
-                                    .fragment(s)
+                                    .fragment(doiURI)
                                     .build();
                             r.id(iri)
                                 .a(FABIO_ARTICLE)
-                                .add("prism:doi", w);
+                                .add("prism:doi", s);
                         } catch (Exception e) {
                             logger.warn("can't build IRI from DOI " + v, e);
                         }

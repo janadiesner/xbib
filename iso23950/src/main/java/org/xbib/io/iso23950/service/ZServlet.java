@@ -62,7 +62,7 @@ public class ZServlet extends HttpServlet {
 
     private final ConnectionService<ZSession> service = ConnectionService.getInstance();
 
-    private final Map<String, String> mediaTypes = new HashMap<>();
+    private final Map<String, String> mediaTypes = new HashMap();
 
     private final ContentTypeNegotiator ctn = new ZContentTypeNegotiator();
 

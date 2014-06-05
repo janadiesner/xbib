@@ -581,7 +581,7 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
         bnodes.put(nodeID, bnode);
         return bnode;
     }
-    private final HashMap<String, Identifier> bnodes = new HashMap<>();
+    private final HashMap<String, Identifier> bnodes = new HashMap();
 
     /**
      * Parse a literal

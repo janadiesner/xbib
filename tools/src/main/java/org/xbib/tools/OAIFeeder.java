@@ -89,12 +89,7 @@ public abstract class OAIFeeder extends Feeder {
                 .newClient(esURI);
         output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         beforeIndexCreation(output);
-        output.setIndex(index)
-                .setType(type)
-                .shards(shards)
-                .replica(replica)
-                .newIndex()
-                .startBulk();
+        output.shards(shards).replica(replica).newIndex(index).startBulk(index);
         afterIndexCreation(output);
         sink = new ResourceSink(output);
 

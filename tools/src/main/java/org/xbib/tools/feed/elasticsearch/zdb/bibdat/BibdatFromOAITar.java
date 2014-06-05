@@ -35,7 +35,7 @@ import org.xbib.io.Packet;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.dialects.pica.DNBPicaXmlEventConsumer;
 import org.xbib.tools.Feeder;
-import org.xbib.elements.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.dialects.pica.PicaContext;
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilder;
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilderFactory;

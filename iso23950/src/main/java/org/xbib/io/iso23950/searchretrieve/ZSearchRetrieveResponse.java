@@ -122,11 +122,11 @@ public class ZSearchRetrieveResponse extends SearchRetrieveResponse
             if (getStylesheets(version) != null) {
                 getTransformer().transform(Arrays.asList(getStylesheets(version)));
             } else {
-                // NPE in Saxon
+                // this gives NPE in Saxon
                 // t net.sf.saxon.event.ReceivingContentHandler.getNodeName(ReceivingContentHandler.java:391)
                 //getTransformer().transform();
             }
-        } catch (SAXNotRecognizedException | SAXNotSupportedException | TransformerException e) {
+        } catch (Exception e) {
             throw new IOException(e);
         } finally {
             writer.flush();

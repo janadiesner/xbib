@@ -4,8 +4,6 @@ import java.util.Iterator;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.IdentifiableNode;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;

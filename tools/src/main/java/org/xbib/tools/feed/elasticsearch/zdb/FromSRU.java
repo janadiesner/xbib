@@ -4,7 +4,7 @@ package org.xbib.tools.feed.elasticsearch.zdb;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.unit.TimeValue;
 import org.xbib.elasticsearch.rdf.ResourceSink;
-import org.xbib.elements.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -91,11 +91,7 @@ public class FromSRU extends Feeder {
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
                 .newClient(esURI);
         output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
-        output.setIndex(index)
-                .setType(type)
-                .shards(shards)
-                .replica(replica)
-                .newIndex();
+        output.shards(shards).replica(replica).newIndex(index);
         afterIndexCreation(output);
         sink = new ResourceSink(output);
     }

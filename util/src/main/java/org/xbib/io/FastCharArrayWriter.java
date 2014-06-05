@@ -133,10 +133,10 @@ public class FastCharArrayWriter extends Writer {
 
     /**
      * Appends the specified character sequence to this writer.
-     * <p/>
+     * <p>
      * <p> An invocation of this method of the form <tt>out.append(csq)</tt>
      * behaves in exactly the same way as the invocation
-     * <p/>
+     * <p>
      * <pre>
      *     out.write(csq.toString()) </pre>
      *
@@ -159,11 +159,11 @@ public class FastCharArrayWriter extends Writer {
 
     /**
      * Appends a subsequence of the specified character sequence to this writer.
-     * <p/>
+     * <p>
      * <p> An invocation of this method of the form <tt>out.append(csq, start,
      * end)</tt> when <tt>csq</tt> is not <tt>null</tt>, behaves in
      * exactly the same way as the invocation
-     * <p/>
+     * <p>
      * <pre>
      *     out.write(csq.subSequence(start, end).toString()) </pre>
      *
@@ -187,10 +187,10 @@ public class FastCharArrayWriter extends Writer {
 
     /**
      * Appends the specified character to this writer.
-     * <p/>
+     * <p>
      * <p> An invocation of this method of the form <tt>out.append(c)</tt>
      * behaves in exactly the same way as the invocation
-     * <p/>
+     * <p>
      * <pre>
      *     out.write(c) </pre>
      *

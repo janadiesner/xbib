@@ -233,7 +233,11 @@
                     "type" : "boolean"
                   },
                   "title" : {
-                    "type" : "string"
+                    "type" : "string",
+                    "fields": {
+                        "raw":   { "type": "string", "analyzer": "keyword" },
+                        "sort":   { "type": "string", "analyzer": "sortform" }
+                    }
                   }
                 }
               },
@@ -257,7 +261,11 @@
                 "type" : "boolean"
               },
               "title" : {
-                "type" : "string"
+                "type" : "string",
+                "fields": {
+                    "raw":   { "type": "string", "analyzer": "keyword" },
+                    "sort":   { "type": "string", "analyzer": "sortform" }
+                }
               }
             }
           },
@@ -265,7 +273,11 @@
             "type" : "long"
           },
           "title" : {
-            "type" : "string"
+            "type" : "string",
+            "fields": {
+                "raw":   { "type": "string", "analyzer": "keyword" },
+                "sort":   { "type": "string", "analyzer": "sortform" }
+            }
           },
           "volume" : {
             "type" : "long"

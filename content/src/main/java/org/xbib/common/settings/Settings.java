@@ -32,9 +32,11 @@
 package org.xbib.common.settings;
 
 import com.google.common.collect.ImmutableMap;
+import org.xbib.common.unit.ByteSizeValue;
 import org.xbib.common.unit.TimeValue;
 
 import java.io.StringReader;
+import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -148,6 +150,15 @@ public interface Settings {
      * returns the default value provided.
      */
     TimeValue getAsTime(String setting, TimeValue defaultValue);
+
+    /**
+     * Returns the value as byte size associated with the setting key.
+     * @param setting The setting key
+     * @param defaultValue the default value
+     * @return the byte size value
+     * @throws SettingsException
+     */
+    ByteSizeValue getAsBytesSize(String setting, ByteSizeValue defaultValue) throws SettingsException;
 
     /**
      * The values associated with a setting prefix as an array. The settings array is in the format of:

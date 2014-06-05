@@ -119,31 +119,31 @@ public class Cluster extends TreeSet<Manifestation> {
             "hasOnlineEdition"
     };
 
+    private void addNeighborTimeLines(Manifestation manifestation, Set<Manifestation> result) {
+        // check all outgoing "has..." relations and make time lines of them
+        synchronized (manifestation.getRelatedManifestations()) {
+            manifestation.getRelatedManifestations().keySet().stream().filter(relation -> relation.startsWith("has")).forEach(relation -> {
+                Set<Manifestation> relatedNeighbors = manifestation.getRelatedManifestations().get(relation);
+                for (Manifestation neighbor : relatedNeighbors) {
+                    TreeSet<Manifestation> children = newTreeSet(Manifestation.getTimeComparator());
+                    children.add(neighbor);
+                    makeTimeLine(neighbor, children);
+                    result.addAll(children);
+                }
+            });
+        }
+    }
+
     private void makeTimeLine(Manifestation manifestation, Set<Manifestation> result)  {
-        SetMultimap<String,Manifestation> neighbors = manifestation.getRelatedManifestations();
         Set<Manifestation> set = newTreeSet();
         for (String relation : timelineRelations) {
-            set.addAll(neighbors.get(relation));
+            set.addAll(manifestation.getRelatedManifestations().get(relation));
         }
         set.removeAll(result);
         result.addAll(set);
         for (Manifestation m : set) {
             makeTimeLine(m, result);
         }
-    }
-
-    private void addNeighborTimeLines(Manifestation manifestation, Set<Manifestation> result) {
-        SetMultimap<String,Manifestation> neighbors = manifestation.getRelatedManifestations();
-        // check all outgoing "has..." relations and make time lines of them
-        neighbors.keySet().stream().filter(relation -> relation.startsWith("has")).forEach(relation -> {
-            Set<Manifestation> relatedNeighbors = neighbors.get(relation);
-            for (Manifestation neighbor : relatedNeighbors) {
-                TreeSet<Manifestation> children = newTreeSet(Manifestation.getTimeComparator());
-                children.add(neighbor);
-                makeTimeLine(neighbor, children);
-                result.addAll(children);
-            }
-        });
     }
 
     private List<TimeLine> splitIntoCountrySegments(TimeLine manifestations) {
@@ -165,62 +165,8 @@ public class Cluster extends TreeSet<Manifestation> {
             }
             countrySegment.add(m);
         }
-        countrySegments.add(new TimeLine(countrySegment,
-                manifestations.getFirstDate(), manifestations.getLastDate()));
+        countrySegments.add(new TimeLine(countrySegment, manifestations.getFirstDate(), manifestations.getLastDate()));
         return countrySegments;
     }
-
-
-    /*private final static class TimeLineComparator implements Comparator<Set<Manifestation>> {
-
-        @Override
-        public int compare(Set<Manifestation> set1, Set<Manifestation> set2) {
-            if (set1 == set2) {
-                return 0;
-            }
-            Manifestation f1 = set1.iterator().next();
-            if (f1 == null || f1.firstDate() == null) {
-                return -1;
-            }
-            for (Manifestation m : set1) {
-                if (m != null && m.firstDate() != null) {
-                    if (m.firstDate() < f1.firstDate()) {
-                        f1 = m;
-                    }
-                }
-            }
-            Manifestation f2 = set2.iterator().next();
-            if (f2 == null || f2.firstDate() == null) {
-                return 1;
-            }
-            for (Manifestation m : set2) {
-                if (m != null && m.firstDate() != null) {
-                    if (m.firstDate() < f2.firstDate()) {
-                        f2 = m;
-                    }
-                }
-            }
-
-            Integer d1 = f1.firstDate() == null ? currentYear : f1.firstDate();
-            Integer c1 = f1.findCarrierTypeKey();
-            String s1 = new StringBuilder()
-                    .append(Integer.toString(d1))
-                    .append(Integer.toString(c1))
-                    .append(f1.id())
-                    .toString();
-
-            Integer d2 = f2.firstDate() == null ? currentYear : f2.firstDate();
-            Integer c2 = f2.findCarrierTypeKey();
-            String s2 = new StringBuilder()
-                    .append(Integer.toString(d2))
-                    .append(Integer.toString(c2))
-                    .append(f2.id())
-                    .toString();
-
-            return s1.compareTo(s2);
-        }
-    }
-
-    private final static TimeLineComparator TIMELINE_COMPARATOR = new TimeLineComparator();*/
 
 }

@@ -1,4 +1,3 @@
-
 package org.xbib.classloader;
 
 import java.io.IOException;
@@ -14,7 +13,7 @@ import java.util.jar.Manifest;
  * by a ResourceFinder. A resource handle allows easy access to the resource data
  * (using methods {@link #getInputStream} or {@link #getBytes}) as well as
  * access resource metadata, such as attributes, certificates, etc.
- * <p/>
+ * <p>
  * As soon as the handle is no longer in use, it should be explicitly
  * {@link #close}d, similarly to I/O streams.
  */

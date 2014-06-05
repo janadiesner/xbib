@@ -63,9 +63,9 @@ public final class URIUtil {
      * This method adds a single key/value parameter to the query
      * string of a given URI. Existing keys will be overwritten.
      *
-     * @param uri the URI
-     * @param key the key
-     * @param value the value
+     * @param uri      the URI
+     * @param key      the key
+     * @param value    the value
      * @param encoding the encoding
      * @return the URI
      * @throws URISyntaxException
@@ -82,8 +82,8 @@ public final class URIUtil {
      * This method adds a map of key/value parameters to the query
      * string of a given URI. Existing keys will be overwritten.
      *
-     * @param uri the URI
-     * @param map the map
+     * @param uri      the URI
+     * @param map      the map
      * @param encoding the encoding
      * @return the URI
      * @throws URISyntaxException
@@ -114,7 +114,7 @@ public final class URIUtil {
      * fragment identifier. This method will translate any escaped characters
      * back to the original.
      *
-     * @param uri the URI to decode
+     * @param uri      the URI to decode
      * @param encoding the encoding to decode into
      * @return The decoded URI
      */
@@ -172,7 +172,7 @@ public final class URIUtil {
      * <p>The character encoding used as the basis for determining the
      * octets depends on the setting of the second argument.</p>
      *
-     * @param s the String to convert
+     * @param s        the String to convert
      * @param encoding The encoding to use for unsafe characters
      * @return The converted String
      */
@@ -357,7 +357,7 @@ public final class URIUtil {
      * @return a Map of parameters
      */
     public static Map<String, String> parseQueryString(URI uri, Charset encoding, ParameterListener listener) {
-        Map<String, String> m = new HashMap<String,String>();
+        Map<String, String> m = new HashMap<String, String>();
         if (uri == null) {
             throw new IllegalArgumentException();
         }

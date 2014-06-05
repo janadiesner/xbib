@@ -66,12 +66,12 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         if (in == null) {
             throw new IOException("file " + filename + " not found");
         }
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line).append("\n");
         }
+        reader.close();
         String s1 = sb.toString().trim();
         Resource<S, P, O> resource = createResource();
         StringWriter sw = new StringWriter();

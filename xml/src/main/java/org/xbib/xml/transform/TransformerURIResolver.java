@@ -98,7 +98,9 @@ public class TransformerURIResolver implements URIResolver {
                 url = new URL(new URL(base), href);
                 href = url.toURI().getRawSchemeSpecificPart(); // drop scheme
             }
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (MalformedURLException e) {
+            throw new TransformerException(e);
+        } catch (URISyntaxException e) {
             throw new TransformerException(e);
         }
         String systemId = href;

@@ -72,10 +72,10 @@ public final class QueryModel {
      */
     public QueryModel(ResourceBundle bundle) {
         this.bundle = bundle;
-        this.options = new HashMap<>();
-        this.conjunctivefilters = new HashMap<>();
-        this.disjunctivefilters = new HashMap<>();
-        this.facets = new LinkedList<>();
+        this.options = new HashMap();
+        this.conjunctivefilters = new HashMap();
+        this.disjunctivefilters = new HashMap();
+        this.facets = new LinkedList();
     }
 
     /**

@@ -60,77 +60,77 @@ public class ClientTest {
                 .setMaximumRecords(10);
 
         FileOutputStream out = new FileOutputStream("target/sru-client-bielefeld.xml");
-        try (Writer writer = new OutputStreamWriter(out, "UTF-8")) {
-            SearchRetrieveListener listener = new SearchRetrieveResponseAdapter() {
+        Writer writer = new OutputStreamWriter(out, "UTF-8");
+        SearchRetrieveListener listener = new SearchRetrieveResponseAdapter() {
 
-                @Override
-                public void onConnect(Request request) {
-                    logger.info("connect, request = " + request);
-                }
+            @Override
+            public void onConnect(Request request) {
+                logger.info("connect, request = " + request);
+            }
 
-                @Override
-                public void version(String version) {
-                    logger.info("version = " + version);
-                }
+            @Override
+            public void version(String version) {
+                logger.info("version = " + version);
+            }
 
-                @Override
-                public void numberOfRecords(long numberOfRecords) {
-                    logger.info("numberOfRecords = " + numberOfRecords);
-                }
+            @Override
+            public void numberOfRecords(long numberOfRecords) {
+                logger.info("numberOfRecords = " + numberOfRecords);
+            }
 
-                @Override
-                public void beginRecord() {
-                    logger.info("begin record");
-                }
+            @Override
+            public void beginRecord() {
+                logger.info("begin record");
+            }
 
-                @Override
-                public void recordSchema(String recordSchema) {
-                    logger.info("got record scheme:" + recordSchema);
-                }
+            @Override
+            public void recordSchema(String recordSchema) {
+                logger.info("got record scheme:" + recordSchema);
+            }
 
-                @Override
-                public void recordPacking(String recordPacking) {
-                    logger.info("got recordPacking: " + recordPacking);
-                }
-                @Override
-                public void recordIdentifier(String recordIdentifier) {
-                    logger.info("got recordIdentifier=" + recordIdentifier);
-                }
+            @Override
+            public void recordPacking(String recordPacking) {
+                logger.info("got recordPacking: " + recordPacking);
+            }
+            @Override
+            public void recordIdentifier(String recordIdentifier) {
+                logger.info("got recordIdentifier=" + recordIdentifier);
+            }
 
-                @Override
-                public void recordPosition(int recordPosition) {
-                    logger.info("got recordPosition=" + recordPosition);
-                }
+            @Override
+            public void recordPosition(int recordPosition) {
+                logger.info("got recordPosition=" + recordPosition);
+            }
 
-                @Override
-                public XMLEventConsumer recordData() {
-                    //logger.info("recordData = " + record.size() + " events");
-                    return null;
-                }
+            @Override
+            public XMLEventConsumer recordData() {
+                //logger.info("recordData = " + record.size() + " events");
+                return null;
+            }
 
-                @Override
-                public XMLEventConsumer extraRecordData() {
-                    //logger.info("extraRecordData = " + record.size() + " events");
-                    return null;
-                }
+            @Override
+            public XMLEventConsumer extraRecordData() {
+                //logger.info("extraRecordData = " + record.size() + " events");
+                return null;
+            }
 
-                @Override
-                public void endRecord() {
-                    logger.info("end record");
-                }
+            @Override
+            public void endRecord() {
+                logger.info("end record");
+            }
 
-                @Override
-                public void onDisconnect(Request request) {
-                    logger.info("disconnect, request = " + request);
-                }
-            };
-            request.addListener(listener);
-            StylesheetTransformer transformer = new StylesheetTransformer("src/test/resources/xsl");
-            client.searchRetrieve(request)
-                    .setStylesheetTransformer(transformer)
-                    .to(writer);
-            transformer.close();
-            client.close();
-        }
+            @Override
+            public void onDisconnect(Request request) {
+                logger.info("disconnect, request = " + request);
+            }
+        };
+        request.addListener(listener);
+        StylesheetTransformer transformer = new StylesheetTransformer("src/test/resources/xsl");
+        client.searchRetrieve(request)
+                .setStylesheetTransformer(transformer)
+                .to(writer);
+        transformer.close();
+        client.close();
+        writer.close();
     }
 }

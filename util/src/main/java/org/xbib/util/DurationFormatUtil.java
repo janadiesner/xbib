@@ -1,4 +1,3 @@
-
 package org.xbib.util;
 
 import java.util.ArrayList;

@@ -66,21 +66,16 @@ public class Token implements Node {
         this.tokenClass = EnumSet.of(TokenClass.NORMAL);
         this.type = TokenType.STRING;
         // if this string is equal to true/false or on/off or yes/no, convert silently to bool
-        switch (value) {
-            case "true":
-            case "yes":
-            case "on":
-                this.booleanvalue = true;
-                this.value = null;
-                this.type = TokenType.BOOL;
-                break;
-            case "false":
-            case "no":
-            case "off":
-                this.booleanvalue = false;
-                this.value = null;
-                this.type = TokenType.BOOL;
-                break;
+        if (value.equals("true") || value.equals("yes") || value.equals("on")) {
+            this.booleanvalue = true;
+            this.value = null;
+            this.type = TokenType.BOOL;
+
+        } else if (value.equals("false") || value.equals("no") || value.equals("off")) {
+            this.booleanvalue = false;
+            this.value = null;
+            this.type = TokenType.BOOL;
+
         }
         if (this.value != null) {
             // protected?

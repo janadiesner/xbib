@@ -1,4 +1,3 @@
-
 package org.xbib.classloader.jar;
 
 import org.xbib.classloader.AbstractResourceHandle;

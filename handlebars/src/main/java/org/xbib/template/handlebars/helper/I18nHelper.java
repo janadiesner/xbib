@@ -127,11 +127,12 @@ public enum I18nHelper implements Helper<String> {
          */
         @Override
         public CharSequence apply(final String key, final Options options) throws IOException {
+            // allow empty strings, transform them to empty strings
             //notEmpty(key, "found: '%s', expected 'bundle's key'", key);
             if (key == null) {
                 return "";
             }
-            Locale locale = LocaleUtil.toLocale(options.hash("locale", defaultLocale.toString()));
+            Locale locale = LocaleUtil.toLocale((String) options.hash("locale", defaultLocale.toString()));
             String baseName = options.hash("bundle", defaultBundle);
             ClassLoader classLoader = options.hash("classLoader", getClass().getClassLoader());
             I18nSource localSource = source == null

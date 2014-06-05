@@ -184,18 +184,21 @@ public class WithHoldingsAndLicenses
         ingest.maxActionsPerBulkRequest(settings.getAsInt("maxBulkActions", 100))
                 .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests",
                         Runtime.getRuntime().availableProcessors()))
-                .maxRequestWait(TimeValue.parseTimeValue(settings.get("maxWait", "180s"), TimeValue.timeValueSeconds(180)))
-                .setIndex(settings.get("index"))
-                .setting(WithHoldingsAndLicenses.class.getResourceAsStream("transport-client-settings.json"))
-                .newClient(targetURI);
+                .maxRequestWait(TimeValue.parseTimeValue(settings.get("maxWait", "180s"), TimeValue.timeValueSeconds(180)));
+        ingest.addSetting(WithHoldingsAndLicenses.class.getResourceAsStream("transport-client-settings.json"));
+        ingest.newClient(targetURI);
         ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
-        ingest.setting(WithHoldingsAndLicenses.class.getResourceAsStream("index-settings.json"))
-                .mapping("Work", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Work.json"))
-                .mapping("Manifestation", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Manifestation.json"))
-                .mapping("Volume", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Volume.json"))
-                .mapping("Holding", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Holding.json"));
-        ingest.newIndex()
-                .startBulk();
+        ingest.addSetting(WithHoldingsAndLicenses.class.getResourceAsStream("index-settings.json"));
+        ingest.addMapping("Work", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Work.json"));
+        ingest.addMapping("Manifestation", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Manifestation.json"));
+        ingest.addMapping("Volume", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Volume.json"));
+        ingest.addMapping("Holding", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Holding.json"));
+
+        String index = settings.get("index");
+        ingest.shards(settings.getAsInt("shards", 3));
+        ingest.replica(settings.getAsInt("replica", 0));
+        ingest.newIndex(index);
+        ingest.startBulk(index);
 
         super.setPipelineProvider(new PipelineProvider<WithHoldingsAndLicensesPipeline>() {
             int i = 0;

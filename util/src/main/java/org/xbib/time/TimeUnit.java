@@ -1,4 +1,3 @@
-
 package org.xbib.time;
 
 
@@ -20,9 +19,9 @@ public interface TimeUnit {
      * between compared timestamps is larger than 5000ms, PrettyTime will move
      * on to the next smallest TimeUnit for calculation; <code>Minute</code>, by
      * default)
-     * <p/>
+     * <p>
      * millisPerUnit * maxQuantity = maxAllowedMs
-     * <p/>
+     * <p>
      * If maxQuantity is zero, it will be equal to the next highest
      * <code>TimeUnit.getMillisPerUnit() /
      * this.getMillisPerUnit()</code> or infinity if there are no greater

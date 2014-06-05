@@ -61,16 +61,16 @@ public class ZClientTest {
                 try {
                     File tmp = File.createTempFile(serviceName, "xml");
                     FileOutputStream out = new FileOutputStream(tmp);
-                    try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
-                        ZSearchRetrieveRequest request = client.newCQLSearchRetrieveRequest()
-                                .setQuery(query)
-                                .setFrom(from)
-                                .setSize(size);
-                        ZSearchRetrieveResponse response = request.execute();
-                        StylesheetTransformer transformer = new StylesheetTransformer("src/main/resources/xsl");
-                        response.setStylesheetTransformer(transformer).to(w);
-                        transformer.close();
-                    }
+                    Writer w = new OutputStreamWriter(out, "UTF-8");
+                    ZSearchRetrieveRequest request = client.newCQLSearchRetrieveRequest()
+                            .setQuery(query)
+                            .setFrom(from)
+                            .setSize(size);
+                    ZSearchRetrieveResponse response = request.execute();
+                    StylesheetTransformer transformer = new StylesheetTransformer("src/main/resources/xsl");
+                    response.setStylesheetTransformer(transformer).to(w);
+                    transformer.close();
+                    w.close();
                     tmp.delete();
                 } finally {
                     client.close();

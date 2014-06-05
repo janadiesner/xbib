@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
-        <version>1.0.0.Beta2</version>
+        <version>1.0.0.Beta3</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -50,6 +50,13 @@
             <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.8.5</version>
+            <type>jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

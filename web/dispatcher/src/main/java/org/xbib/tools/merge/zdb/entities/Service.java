@@ -12,14 +12,14 @@ public class Service extends HashMap<String,Object> implements Comparable<Servic
 
     private final String group;
 
-    private final Integer priority;
+    private final Integer servicePriority;
 
     public Service(Map<String, Object> map, Institution institution) {
         super(map);
         this.institution = institution;
         this.id = (String)get("@id");
         this.group = (String)get("organization");
-        this.priority = (Integer)get("priority");
+        this.servicePriority = (Integer)get("priority");
     }
 
     public String getID() {
@@ -30,12 +30,16 @@ public class Service extends HashMap<String,Object> implements Comparable<Servic
         return group;
     }
 
+    public Integer getPriority() {
+        return servicePriority;
+    }
+
     public Integer getGroupPriority() {
         return group != null ? institution.getGroupPriority(group) : -1;
     }
 
-    public Integer getPriority() {
-        return priority;
+    public Integer getInstitutionPriority() {
+        return institution.getPriority();
     }
 
     public boolean isActive() {
@@ -47,8 +51,8 @@ public class Service extends HashMap<String,Object> implements Comparable<Servic
 
     @Override
     public int compareTo(Service o) {
-        String s1 = ""+getGroupPriority()+getPriority();
-        String s2 = ""+o.getGroupPriority()+o.getPriority();
+        String s1 = "" + getInstitutionPriority() + getGroupPriority() + getPriority();
+        String s2 = "" + o.getInstitutionPriority() + o.getGroupPriority() + o.getPriority();
         return s1.compareTo(s2);
     }
 

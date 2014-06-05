@@ -41,7 +41,7 @@ import java.util.Set;
 
 /**
  * A memory-efficient hash map.
- * <p/>
+ * <p>
  * Modified version of com.google.gwt.dev.util.collect.HashMap
  *
  * @param <K> the key type

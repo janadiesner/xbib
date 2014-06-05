@@ -46,7 +46,7 @@ import java.util.List;
 public class NettyHttpConnection implements HttpConnection {
 
     private URI uri;
-    private List<HttpSession> sessions = new ArrayList<>();
+    private List<HttpSession> sessions = new ArrayList();
 
     @Override
     public NettyHttpConnection setURI(URI uri) {

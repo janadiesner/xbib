@@ -50,7 +50,7 @@ public class SortGenerator implements Visitor {
 
     public SortGenerator() throws IOException {
         this.builder = XContentFactory.jsonBuilder();
-        this.modifiers = new Stack<>();
+        this.modifiers = new Stack();
     }
 
     public void start() throws IOException {
@@ -79,16 +79,16 @@ public class SortGenerator implements Visitor {
                 builder.startObject().field(node.getName().toString()).startObject();
                 while (!modifiers.isEmpty()) {
                     ESModifier mod = modifiers.pop();
-                    switch (mod.getName().toString()) {
-                        case "ascending":
-                            builder.field("order", "asc");
-                            break;
-                        case "descending":
-                            builder.field("order", "desc");
-                            break;
-                        default:
-                            builder.field(mod.getName().toString(), mod.getTerm());
-                            break;
+                    String s = mod.getName().toString();
+                    if (s.equals("ascending")) {
+                        builder.field("order", "asc");
+
+                    } else if (s.equals("descending")) {
+                        builder.field("order", "desc");
+
+                    } else {
+                        builder.field(mod.getName().toString(), mod.getTerm());
+
                     }
                 }
                 builder.field("ignore_unmapped", true);

@@ -100,12 +100,10 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
                 .newClient(esURI);
         output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         beforeIndexCreation(output);
-        output.setIndex(index)
-                .setType(type)
-                .shards(shards)
+        output.shards(shards)
                 .replica(replica)
-                .newIndex()
-                .startBulk();
+                .newIndex(index)
+                .startBulk(index);
         afterIndexCreation(output);
         sink = new ResourceSink(output);
         return this;
@@ -117,7 +115,7 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
         if (output != null) {
             logger.info("shutdown");
             try {
-                output.stopBulk();
+                output.stopBulk(settings.get("index"));
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             } finally {

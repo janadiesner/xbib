@@ -50,7 +50,7 @@ public abstract class LoggerFactory {
                 // below will throw a NoSuchMethod failure with using slf4j log4j bridge
                 loggerClazz.getMethod("setLevel", Class.forName("org.apache.log4j.Level"));
                 defaultFactory = new Log4jLoggerFactory();
-            } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+            } catch (Exception e) {
                 // no log4j
             }
         }

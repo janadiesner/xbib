@@ -1,4 +1,3 @@
-
 package org.xbib.time.units;
 
 import org.xbib.time.TimeUnit;

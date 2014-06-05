@@ -3,20 +3,26 @@ package org.xbib.tools.merge.zdb.entities;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.collect.Lists.newLinkedList;
 
 public class Institution extends HashMap<String,Object> implements Comparable<Institution> {
 
+    private final Map<String,Integer> groupPriorities;
+
     private String group;
 
-    private final Map<String,Integer> groupPriorities;
+    private Set<String> carrier;
 
     private List<Service> activeServices;
 
     private List<Service> otherServices;
 
-    public Institution(Map<String,Object> map, Map<String,Integer> groupPriorities, Map<String,String> groupMap) {
+    public Institution(Map<String,Object> map,
+                       Map<String,Integer> groupPriorities,
+                       Map<String,String> groupMap
+    ) {
         super(map);
         makeServices(this);
         this.groupPriorities = groupPriorities;
@@ -46,6 +52,19 @@ public class Institution extends HashMap<String,Object> implements Comparable<In
 
     public String getGroup() {
         return group;
+    }
+
+    public Institution setCarrier(Set<String> carrier) {
+        this.carrier = carrier;
+        return this;
+    }
+
+    public Set<String> getCarrier() {
+        return carrier;
+    }
+
+    public boolean isCarrierAllowed(String carrier) {
+        return this.carrier == null || this.carrier.contains(carrier);
     }
 
     public void putActiveServices(List<Service> services) {
@@ -84,16 +103,21 @@ public class Institution extends HashMap<String,Object> implements Comparable<In
         return this;
     }
 
+    public boolean getMarker(String marker) {
+        return containsKey(marker);
+    }
 
+    public Integer getPriority() {
+        return containsKey("priority") ? 0 : 1;
+    }
     @Override
     public int compareTo(Institution o) {
-        Service s1 = firstService();
-        Service s2 = o.firstService();
-        return s1.compareTo(s2);
+        return firstService().compareTo(o.firstService());
     }
 
     private Service firstService() {
          return !activeServices.isEmpty() ? activeServices.get(0) :
                 !otherServices.isEmpty() ? otherServices.get(0) : null;
     }
+
 }

@@ -33,34 +33,34 @@ public class SelectHelper implements Helper<Object> {
         Object pos = options.param(2);
         Object neg = options.param(3);
         Object res;
-        switch (operator.toString()) {
-            case "==":
-                res = context.equals(operand) ? pos : neg;
-                break;
-            case "!==":
-                res = !context.equals(operand) ? pos : neg;
-                break;
-            case "<":
-                res = (Integer)context < (Integer)operand ? pos : neg;
-                break;
-            case "<=":
-                res = (Integer)context <= (Integer)operand ? pos : neg;
-                break;
-            case ">":
-                res = (Integer)context > (Integer)operand ? pos : neg;
-                break;
-            case ">=":
-                res = (Integer)context >= (Integer)operand ? pos : neg;
-                break;
-            case "&&":
-                res = (Boolean)context && (Boolean)operand ? pos : neg;
-                break;
-            case "||":
-                res = (Boolean)context || (Boolean)operand ? pos : neg;
-                break;
-            default:
-                res = options.fn(context);
-                break;
+        String s = operator.toString();
+        if (s.equals("==")) {
+            res = context.equals(operand) ? pos : neg;
+
+        } else if (s.equals("!==")) {
+            res = !context.equals(operand) ? pos : neg;
+
+        } else if (s.equals("<")) {
+            res = (Integer) context < (Integer) operand ? pos : neg;
+
+        } else if (s.equals("<=")) {
+            res = (Integer) context <= (Integer) operand ? pos : neg;
+
+        } else if (s.equals(">")) {
+            res = (Integer) context > (Integer) operand ? pos : neg;
+
+        } else if (s.equals(">=")) {
+            res = (Integer) context >= (Integer) operand ? pos : neg;
+
+        } else if (s.equals("&&")) {
+            res = (Boolean) context && (Boolean) operand ? pos : neg;
+
+        } else if (s.equals("||")) {
+            res = (Boolean) context || (Boolean) operand ? pos : neg;
+
+        } else {
+            res = options.fn(context);
+
         }
         return res.toString();
     }

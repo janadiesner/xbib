@@ -217,20 +217,19 @@ public class ISMN implements Comparable<ISMN>, StandardNumber {
                     EndElement element = e.asEndElement();
                     String name = element.getName().getLocalPart();
                     String v = content.pop().toString();
-                    switch (name) {
-                        case "Range":
-                            int pos = v.indexOf('-');
-                            if (pos > 0) {
-                                rangeBegin = v.substring(0, pos);
-                                rangeEnd = v.substring(pos + 1);
-                            }
-                            break;
-                        case "Rule":
-                            if (valid && rangeBegin != null && rangeEnd != null) {
-                                ranges.add(rangeBegin);
-                                ranges.add(rangeEnd);
-                            }
-                            break;
+                    if (name.equals("Range")) {
+                        int pos = v.indexOf('-');
+                        if (pos > 0) {
+                            rangeBegin = v.substring(0, pos);
+                            rangeEnd = v.substring(pos + 1);
+                        }
+
+                    } else if (name.equals("Rule")) {
+                        if (valid && rangeBegin != null && rangeEnd != null) {
+                            ranges.add(rangeBegin);
+                            ranges.add(rangeEnd);
+                        }
+
                     }
                     break;
                 }

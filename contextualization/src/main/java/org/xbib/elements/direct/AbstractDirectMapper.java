@@ -75,7 +75,7 @@ public abstract class AbstractDirectMapper<K, V, C extends ResourceContext>
     }
 
     public AbstractDirectMapper(ClassLoader cl) {
-        this.queue = new SynchronousQueue<>(true);
+        this.queue = new SynchronousQueue(true);
         this.pipelines = newHashSet();
     }
 
@@ -119,7 +119,7 @@ public abstract class AbstractDirectMapper<K, V, C extends ResourceContext>
         }
         for (int i = 0; i < numPipelines; i++) {
             try {
-                queue.put(newLinkedList()); // send poison element to all numPipelines
+                queue.put(new LinkedList()); // send poison element to all numPipelines
             } catch (InterruptedException e) {
                 logger.error("interrupted while close()");
             }

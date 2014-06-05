@@ -40,7 +40,6 @@ import com.google.common.collect.TreeMultimap;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
@@ -61,8 +60,7 @@ import static com.google.common.collect.Sets.newLinkedHashSet;
 import static com.google.common.collect.Sets.newTreeSet;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
-public class Manifestation
-        implements Comparable<Manifestation>, PipelineRequest {
+public class Manifestation implements Comparable<Manifestation>, PipelineRequest {
 
     protected final Map<String, Object> map;
 
@@ -92,15 +90,23 @@ public class Manifestation
 
     private Map<String,Object> identifiers;
 
-    private SetMultimap<String, Manifestation> relatedManifestations;
+    private final SetMultimap<String, Manifestation> relatedManifestations = TreeMultimap.create();
 
-    private SetMultimap<String, Holding> relatedHoldings;
+    private final SetMultimap<String, Holding> relatedHoldings = TreeMultimap.create();
 
-    private SetMultimap<Integer, Holding> relatedVolumes;
+    private final SetMultimap<Integer, Holding> relatedVolumes = TreeMultimap.create();
 
-    private SetMultimap<String, String> relations;
+    private final static Supplier<Set<String>> supplier = new Supplier<Set<String>>() {
 
-    private SetMultimap<String, String> externalRelations;
+        @Override
+        public Set<String> get() {
+            return newLinkedHashSet();
+        }
+    };
+
+    private final SetMultimap<String, String> relations = Multimaps.newSetMultimap(Maps.newTreeMap(), supplier);
+
+    private final SetMultimap<String, String> externalRelations = Multimaps.newSetMultimap(Maps.newTreeMap(), supplier);
 
     private String title;
 
@@ -199,13 +205,6 @@ public class Manifestation
 
         // relations to other manifestations on ID basis
         makeRelations();
-
-        // prepare the construction of relations to manifestations
-        this.relatedManifestations = TreeMultimap.create();
-        // prepare the construction of relations to holdings
-        this.relatedHoldings = TreeMultimap.create();
-        // prepare holdings by date
-        this.relatedVolumes = TreeMultimap.create();
 
         // unique identifier
         StringBuilder p = new StringBuilder();
@@ -451,12 +450,14 @@ public class Manifestation
     }
 
     public boolean hasCarrierRelations() {
-        for (String key : relations.keys()) {
-            if (carrierEditions.contains(key)) {
-                return true;
+        synchronized (relations) {
+            for (String key : relations.keys()) {
+                if (carrierEditions.contains(key)) {
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
     }
 
     private void findSupplement() {
@@ -576,10 +577,17 @@ public class Manifestation
         for (Map<String,Object> link : links) {
             boolean b = "kostenfrei".equals(link.get("publicnote"));
             if (b) {
-                String dateString = (String)link.get("nonpublicnote");
-                Matcher m = yearPattern.matcher(dateString);
-                if (m.matches()) {
-                    greenDates.add(Integer.parseInt(m.group()));
+                Object o = link.get("nonpublicnote");
+                if (!(o instanceof List)) {
+                    o = Arrays.asList(o);
+                }
+                List l = (List)o;
+                for (Object obj : l) {
+                    String dateString = (String) obj;
+                    Matcher m = yearPattern.matcher(dateString);
+                    if (m.matches()) {
+                        greenDates.add(Integer.parseInt(m.group()));
+                    }
                 }
             }
         }
@@ -722,23 +730,12 @@ public class Manifestation
         return m;
     }
 
-    private final static Supplier<Set<String>> supplier = new Supplier<Set<String>>() {
-
-        @Override
-        public Set<String> get() {
-            return newLinkedHashSet();
-        }
-    };
 
     /**
      * Iterate through relations. Check for DNB IDs and remember as internal IDs.
      * Check for ZDB IDs and remember as external IDs.
      */
     private void makeRelations() {
-        Map<String, Collection<String>> relationMap = Maps.newTreeMap();
-        this.relations = Multimaps.newSetMultimap(relationMap, supplier);
-        Map<String, Collection<String>> externalRelationMap = Maps.newTreeMap();
-        this.externalRelations = Multimaps.newSetMultimap(externalRelationMap, supplier);
 
         this.isInTimeline = false;
         boolean hasSuccessor = false;
@@ -770,7 +767,9 @@ public class Manifestation
                 if (internal == null) {
                     continue;
                 }
-                this.relations.put(key, internal);
+                synchronized (relations) {
+                    relations.put(key, internal);
+                }
 
                 // external ID = ZDB ID (used for external typed linking, internal linking may collide with GND ID)
                 Object externalObj = m.get("identifierZDB");
@@ -779,7 +778,9 @@ public class Manifestation
                 if (external == null) {
                     continue;
                 }
-                this.externalRelations.put(key, external);
+                synchronized (externalRelations) {
+                    externalRelations.put(key, external);
+                }
 
                 switch (key) {
                     case "succeededBy":
@@ -843,15 +844,21 @@ public class Manifestation
     }
 
     public void addRelatedManifestation(String relation, Manifestation manifestation) {
-        relatedManifestations.put(relation, manifestation);
+        synchronized (relatedManifestations) {
+            relatedManifestations.put(relation, manifestation);
+        }
     }
 
     public void addRelatedHolding(String relation, Holding holding) {
-        relatedHoldings.put(relation, holding);
+        synchronized (relatedHoldings) {
+            relatedHoldings.put(relation, holding);
+        }
     }
 
     public void addRelatedVolume(Integer date, Holding holding) {
-        relatedVolumes.put(date, holding);
+        synchronized (relatedVolumes) {
+            relatedVolumes.put(date, holding);
+        }
     }
 
     public SetMultimap<String, Manifestation> getRelatedManifestations() {
@@ -897,7 +904,7 @@ public class Manifestation
                 .field("carriertype", carrierType())
                 .field("firstdate", firstDate())
                 .field("lastdate", lastDate());
-        if (!greenDates.isEmpty()) {
+        if (greenDates != null && !greenDates.isEmpty()) {
             builder.field("greendate", greenDates);
         }
         if (hasIdentifiers()) {
@@ -910,19 +917,21 @@ public class Manifestation
             builder.field("supplement", isSupplement());
         }
         // add information for linking
-        SetMultimap<String,String> map = externalRelations;
-        if (map != null && !map.isEmpty()) {
-            builder.startArray("relations");
-            for (String rel : map.keySet()) {
-                for (String relid : map.get(rel)) {
-                    builder.startObject()
-                            .field("@id", relid)
-                            .field("@type", "Manifestation")
-                            .field("@label", rel)
-                            .endObject();
+        synchronized (externalRelations) {
+            SetMultimap<String, String> map = externalRelations;
+            if (map != null && !map.isEmpty()) {
+                builder.startArray("relations");
+                for (String rel : map.keySet()) {
+                    for (String relid : map.get(rel)) {
+                        builder.startObject()
+                                .field("@id", relid)
+                                .field("@type", "Manifestation")
+                                .field("@label", rel)
+                                .endObject();
+                    }
                 }
+                builder.endArray();
             }
-            builder.endArray();
         }
         if (hasLinks()) {
             builder.array("links", getLinks());

@@ -22,7 +22,7 @@ public class DispatcherApplication extends Application {
     public Set<Class<?>> getClasses() {
         return new HashSet<Class<?>>(Arrays.asList(
                 TestService.class,
-                ApiService.class,
+                RoutingService.class,
                 DemoService.class
         ));
     }

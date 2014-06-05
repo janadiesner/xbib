@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
-        <version>1.0.0.Beta2</version>
+        <version>1.0.0.Beta3</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>rdf</artifactId>
+            <artifactId>content</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>

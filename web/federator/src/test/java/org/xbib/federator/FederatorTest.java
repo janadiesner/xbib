@@ -53,12 +53,12 @@ public class FederatorTest {
                 + "{\"type\":\"sru\", \"name\":\"DE-601\", \"query\":\"pica.title = test\", \"from\": 1}"
                 + "]";
         try {
-        try (FileWriter writer = new FileWriter("target/federator-result.xml")) {
+            FileWriter writer = new FileWriter("target/federator-result.xml");
             federator
                     .bibliographic(query)
                     .execute()
                     .toSRUResponse("1.2", writer);
-        }
+            writer.close();
         } catch (Exception e) {
             // ignore exception
         }

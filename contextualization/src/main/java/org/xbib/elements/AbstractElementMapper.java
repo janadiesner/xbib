@@ -91,11 +91,11 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
 
     public AbstractElementMapper(ClassLoader cl, String path, String format, AbstractSpecification specification) {
         this.specification = specification;
-        this.queue = new SynchronousQueue<>(true);
+        this.queue = new SynchronousQueue(true);
         this.pipelines = newHashSet();
         try {
             this.map = specification.getElementMap(cl, path, format);
-        } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -149,7 +149,7 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
         }
         for (int i = 0; i < numPipelines; i++) {
             try {
-                queue.put(newLinkedList()); // send poison element to all numPipelines
+                queue.put(new LinkedList()); // send poison element to all numPipelines
             } catch (InterruptedException e) {
                 logger.error("interrupted while close()");
             }

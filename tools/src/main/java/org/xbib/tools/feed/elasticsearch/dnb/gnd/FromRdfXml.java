@@ -76,8 +76,8 @@ public class FromRdfXml extends Feeder implements TripleListener {
 
     @Override
     public FromRdfXml beforeIndexCreation(Ingest output) throws IOException {
-        output.setting(FromRdfXml.class.getResourceAsStream("settings.json"))
-            .mapping(settings.get("type"), FromRdfXml.class.getResourceAsStream("mapping.json"));
+        output.addSetting(FromRdfXml.class.getResourceAsStream("settings.json"));
+        output.addMapping(settings.get("type"), FromRdfXml.class.getResourceAsStream("mapping.json"));
         return this;
     }
 

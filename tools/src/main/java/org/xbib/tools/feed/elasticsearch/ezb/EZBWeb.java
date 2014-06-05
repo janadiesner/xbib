@@ -44,6 +44,9 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.content.DefaultContentBuilder;
+import org.xbib.rdf.context.ResourceContext;
 import org.xbib.tools.Feeder;
 import org.xbib.io.InputService;
 import org.xbib.io.NullWriter;
@@ -64,14 +67,6 @@ public class EZBWeb extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(EZBWeb.class.getName());
 
-    private final static IRINamespaceContext context = IRINamespaceContext.newInstance();
-    static {
-        context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
-        context.addNamespace("xbib", "http://xbib.org/elements/1.0/");
-    }
-
-    private final static SimpleResourceContext resourceContext = new SimpleResourceContext();
-
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
@@ -84,11 +79,18 @@ public class EZBWeb extends Feeder {
 
     @Override
     public void process(URI uri) throws Exception {
+        IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
+        namespaceContext.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
+        namespaceContext.addNamespace("xbib", "http://xbib.org/elements/1.0/");
+        ResourceContext<Resource> resourceContext = new SimpleResourceContext()
+                .setContentBuilder(contentBuilder(namespaceContext))
+                .setNamespaceContext(namespaceContext);
+
         InputStream in = InputService.getInputStream(uri);
         NullWriter nw = new NullWriter();
-        resourceContext.setNamespaceContext(context);
+        resourceContext.setNamespaceContext(namespaceContext);
         final TurtleWriter turtle = new TurtleWriter()
-                .setContext(context)
+                .setContext(namespaceContext)
                 .output(nw);
         Iterator<String> it = readZDBIDs(new InputStreamReader(in, "UTF-8"));
         long counter = 0;
@@ -186,6 +188,10 @@ public class EZBWeb extends Feeder {
         if (reader != null) {
             reader.close();
         }
+    }
+
+    protected ContentBuilder contentBuilder(IRINamespaceContext namespaceContext) {
+        return new DefaultContentBuilder<>();
     }
 
     private Iterator<String> readZDBIDs(Reader reader) throws IOException {

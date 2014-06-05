@@ -140,7 +140,7 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
                 service.listRecords(oaiRequest, oaiResponse);
                 oaiResponse.to(writer);
             }
-        } catch (OAIException | URISyntaxException e) {
+        } catch (Exception e) {
             logger.warn(e.getMessage(), e);
             response.setStatus(500);
         } finally {

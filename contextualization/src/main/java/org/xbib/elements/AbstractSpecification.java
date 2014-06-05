@@ -115,11 +115,11 @@ public abstract class AbstractSpecification implements Specification {
                     if (input == null) {
                         throw new IOException(path + script + " not found: " + path + script);
                     }
-                    try (InputStreamReader reader = new InputStreamReader(input, "UTF-8")) {
-                        ScriptElement scriptElement = new ScriptElement(language, getString(reader), invocable);
-                        scriptElement.setSettings(struct);
-                        element = scriptElement.getElement();
-                    }
+                    InputStreamReader reader = new InputStreamReader(input, "UTF-8");
+                    ScriptElement scriptElement = new ScriptElement(language, getString(reader), invocable);
+                    scriptElement.setSettings(struct);
+                    element = scriptElement.getElement();
+                    reader.close();
                 } else if (source != null) {
                     ScriptElement scriptElement = new ScriptElement(language, source, invocable);
                     scriptElement.setSettings(struct);

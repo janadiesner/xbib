@@ -19,11 +19,11 @@ public class GZIPTest {
     @Test
     public void testHelloWorld() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try (GZIPOutputStream zOut = new GZIPOutputStream(out)) {
-            ObjectOutputStream objOut = new ObjectOutputStream(zOut);
-            String helloWorld = "Hello World!";
-            objOut.writeObject(helloWorld);
-        }
+        GZIPOutputStream zOut = new GZIPOutputStream(out);
+        ObjectOutputStream objOut = new ObjectOutputStream(zOut);
+        String helloWorld = "Hello World!";
+        objOut.writeObject(helloWorld);
+        zOut.close();
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
         GZIPInputStream zIn = new GZIPInputStream(in);
         ObjectInputStream objIn = new ObjectInputStream(zIn);
@@ -33,13 +33,13 @@ public class GZIPTest {
     @Test
     public void testGzipChannel() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try (GZIPOutputStream zOut = new GZIPOutputStream(out)) {
-            ObjectOutputStream objOut = new ObjectOutputStream(zOut);
-            for (int i = 0; i < 10000; i++) {
-                String s = "Hello World!";
-                objOut.writeObject(s);
-            }
+        GZIPOutputStream zOut = new GZIPOutputStream(out);
+        ObjectOutputStream objOut = new ObjectOutputStream(zOut);
+        for (int i = 0; i < 10000; i++) {
+            String s = "Hello World!";
+            objOut.writeObject(s);
         }
+        zOut.close();
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
         GZIPInputStream gzin = new GZIPInputStream(in);
         ReadableByteChannel chin = Channels.newChannel(gzin);

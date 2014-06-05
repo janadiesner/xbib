@@ -2,14 +2,14 @@
 package org.xbib.web.dispatcher;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.search.SearchHit;
+
 import org.xbib.common.xcontent.XContentHelper;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -17,10 +17,8 @@ import org.xbib.tools.merge.zdb.entities.Institution;
 import org.xbib.tools.merge.zdb.entities.Service;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,237 +33,36 @@ import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
+/**
+ * Dispatcher algorithm for routing requests to libraries. Finds the right order of supplying libraries for a request.
+ */
 public class Dispatcher {
 
     private final static Logger logger = LoggerFactory.getLogger(Dispatcher.class.getName());
 
-    private Client client;
-
-    private boolean compact = false;
-
-    private Integer from = 0;
-
-    private Integer size = 10;
-
-    private String source;
-
-    private String identifier;
-
-    private Integer year;
-
-    private Map<String,Integer> groupOrder;
-
-    private Map<String,String> groupMap;
-
-    private String base;
-
-    private String baseGroup;
-
-    private Integer groupLimit;
-
-    private boolean expandGroups;
-
-    private Set<String> groupFilter;
-    private Set<String> excludeGroupFilter;
-
-    private Set<String> institutionFilter;
-    private Set<String> excludeInstitutionFilter;
-
-    private Set<String> carrierFilter;
-    private Set<String> excludeCarrierFilter;
-
-    private Set<String> typeFilter;
-    private Set<String> excludeTypeFilter;
-
-    private Set<String> modeFilter;
-    private Set<String> excludeModeFilter;
-
-    private Set<String> distributionFilter;
-    private Set<String> excludeDistributionFilter;
-
-    private Map<String, String> institutionMarker;
-
-    public Dispatcher setClient(Client client) {
-        this.client = client;
-        return this;
-    }
-
-    public Dispatcher setCompact(boolean compact) {
-        this.compact = compact;
-        return this;
-    }
-
-    public Dispatcher setBase(String base) {
-        if (base != null && !base.isEmpty()) {
-            this.base = base;
-            setInstitutionMarker("base", Arrays.asList(base));
+    public Map<String,Object> execute(Client client, DispatcherRequest request) throws IOException {
+        if (client == null) {
+            throw new IOException("no client found");
         }
-        return this;
-    }
-
-    public Dispatcher setBaseGroup(String baseGroup) {
-        this.baseGroup = baseGroup;
-        return this;
-    }
-
-    public Dispatcher setExpandGroups(boolean expand) {
-        this.expandGroups = expand;
-        return this;
-    }
-
-    public Dispatcher setSource(String source) {
-        this.source = source;
-        return this;
-    }
-
-    public Dispatcher setIdentifier(String identifier) {
-        this.identifier = identifier != null ? identifier.toLowerCase().replaceAll("\\-","") : null;
-        return this;
-    }
-
-    public Dispatcher setYear(Integer year) {
-        this.year = year;
-        return this;
-    }
-
-    public Dispatcher setFrom(Integer from) {
-        this.from = from;
-        return this;
-    }
-
-    public Dispatcher setSize(Integer size) {
-        this.size = size;
-        return this;
-    }
-
-    public Dispatcher setGroupLimit(Integer limit) {
-        this.groupLimit = limit;
-        return this;
-    }
-
-    public Dispatcher setGroupFilter(List<String> groupFilter) {
-        this.groupFilter = !isEmpty(groupFilter) ? Sets.newLinkedHashSet(groupFilter) : null;
-        this.groupOrder = Maps.newHashMap();
-        for (int i = 0; i < groupFilter.size(); i++) {
-            groupOrder.put(groupFilter.get(i), i);
+        if (request == null) {
+            throw new IOException("no request found");
         }
-        return this;
-    }
-
-    public Dispatcher setGroupMap(Map<String,String> groupMap) {
-        this.groupMap = groupMap;
-        return this;
-    }
-
-    public Dispatcher setExcludeGroupFilter(List<String> groupFilter) {
-        this.excludeGroupFilter = !isEmpty(groupFilter) ? Sets.newLinkedHashSet(groupFilter) : null;
-        return this;
-    }
-
-    public Dispatcher setInstitutionFilter(List<String> institutionFilter) {
-        this.institutionFilter = !isEmpty(institutionFilter) ? newHashSet(institutionFilter) : null;
-        return this;
-    }
-
-    public Dispatcher setExcludeInstitutionFilter(List<String> institutionFilter) {
-        this.excludeInstitutionFilter = !isEmpty(institutionFilter) ? newHashSet(institutionFilter) : null;
-        return this;
-    }
-
-    public Dispatcher setCarrierFilter(List<String> carrierFilter) {
-        this.carrierFilter = !isEmpty(carrierFilter) ? newHashSet(carrierFilter) : null;
-        return this;
-    }
-
-    public Dispatcher setExcludeCarrierFilter(List<String> carrierFilter) {
-        this.excludeCarrierFilter = !isEmpty(carrierFilter) ? newHashSet(carrierFilter) : null;
-        return this;
-    }
-
-    public Dispatcher setTypeFilter(List<String> typeFilter) {
-        this.typeFilter = !isEmpty(typeFilter) ? newHashSet(typeFilter) : null;
-        return this;
-    }
-
-    public Dispatcher setExcludeTypeFilter(List<String> typeFilter) {
-        this.excludeTypeFilter = !isEmpty(typeFilter) ? newHashSet(typeFilter) : null;
-        return this;
-    }
-
-    public Dispatcher setModeFilter(List<String> modeFilter) {
-        this.modeFilter = !isEmpty(modeFilter) ? newHashSet(modeFilter) : null;
-        return this;
-    }
-
-    public Dispatcher setExcludeModeFilter(List<String> modeFilter) {
-        this.excludeModeFilter = !isEmpty(modeFilter) ? newHashSet(modeFilter) : null;
-        return this;
-    }
-
-    public Dispatcher setDistributionFilter(List<String> distributionFilter) {
-        this.distributionFilter = !isEmpty(distributionFilter) ? newHashSet(distributionFilter) : null;
-        return this;
-    }
-
-    public Dispatcher setExcludeDistributionFilter(List<String> distributionFilter) {
-        this.excludeDistributionFilter = !isEmpty(distributionFilter) ? newHashSet(distributionFilter) : null;
-        return this;
-    }
-
-    public Dispatcher setInstitutionMarker(String marker, List<String> institutions) {
-        if (marker == null || marker.isEmpty()) {
-            return this;
+        if (request.getIdentifier() == null) {
+            return newHashMap();
         }
-        if (institutionMarker == null) {
-            institutionMarker = Maps.newHashMap();
-        }
-        if (!isEmpty(institutions)) {
-            institutions.stream()
-                    .filter(institution -> !institutionMarker.containsKey(institution))
-                    .forEach(institution -> {
-                        institutionMarker.put(institution, marker);
-                    });
-        }
-        return this;
-    }
-
-    public Map<String,Object> execute() throws IOException {
-        if (identifier != null && year != null) {
-            String id = (source != null ? source + "." : "" ) + identifier + "." + year;
-            GetRequestBuilder getRequest = client.prepareGet()
-                    .setIndex("xbib")
-                    .setType("Volume")
-                    .setId(id);
-            logger.info("executing get request {}", id);
-            GetResponse getResponse = getRequest.execute().actionGet();
-            Map<String,Object> result = newHashMap();
-            result.put("found", getResponse.isExists() ? 1 : 0);
-            if (getResponse.isExists()) {
-                Map<String,Object> source = getResponse.getSourceAsMap();
-                Map<String, Object> filtered = filter(toInstitutions(source));
-                result.putAll(filtered);
-                if (!compact) {
-                    result.put("@id", source.get("@id"));
-                    result.put("date", source.get("date"));
-                    result.put("links", source.get("links"));
-                }
-            } else {
-                logger.warn("no document exists");
-            }
-            return result;
-        } else if (identifier != null) {
-            String id = (source != null ? source + "." : "" ) + identifier;
+        if (request.getYear() == null) {
+            String id = (request.getSource() != null ? request.getSource() + "." : "" ) + request.getIdentifier();
             SearchRequestBuilder searchRequest = client.prepareSearch()
-                    .setIndices("xbib")
-                    .setTypes("Volume")
+                    .setIndices(request.getIndex())
+                    .setTypes(request.getType())
                     .setQuery(termQuery("@id", id));
-            if (from != null && from >= 0) {
-                searchRequest.setFrom(from);
+            if (request.getFrom() != null && request.getFrom() >= 0) {
+                searchRequest.setFrom(request.getFrom());
             }
-            if (size != null && size >= 0) {
-                searchRequest.setSize(size);
+            if (request.getSize() != null && request.getSize() >= 0) {
+                searchRequest.setSize(request.getSize());
             }
-            logger.info("executing search {}", searchRequest);
+            logger.info("index {}/{} executing search {}", request.getIndex(), request.getType(), searchRequest);
             SearchResponse searchResponse = searchRequest.execute().actionGet();
             Map<String, Object> result = newHashMap();
             result.put("found", searchResponse.getHits().getTotalHits());
@@ -273,10 +70,10 @@ public class Dispatcher {
             for (SearchHit hit : searchResponse.getHits().getHits()) {
                 Map<String, Object> m = newHashMap();
                 Map<String,Object> source = hit.getSource();
-                Map<String,Object> filtered = filter(toInstitutions(source));
+                Map<String,Object> filtered = filter(request, toInstitutions(request, source));
                 m.putAll(filtered);
                 m.put("year", source.get("date"));
-                if (!compact) {
+                if (!request.isCompact()) {
                     m.put("@id", source.get("@id"));
                     m.put("links", source.get("links"));
                 }
@@ -284,17 +81,37 @@ public class Dispatcher {
             }
             result.put("results", results);
             return result;
-        } else {
-            return newHashMap();
         }
+        String id = (request.getSource() != null ? request.getSource() + "." : "" ) + request.getIdentifier() + "." + request.getYear();
+        GetRequestBuilder getRequest = client.prepareGet()
+                .setIndex(request.getIndex())
+                .setType(request.getType())
+                .setId(id);
+        logger.info("index {}/{} executing get request {}", request.getIndex(), request.getType(), id);
+        GetResponse getResponse = getRequest.execute().actionGet();
+        Map<String,Object> result = newHashMap();
+        result.put("found", getResponse.isExists() ? 1 : 0);
+        if (getResponse.isExists()) {
+            Map<String,Object> source = getResponse.getSourceAsMap();
+            Map<String, Object> filtered = filter(request, toInstitutions(request, source));
+            result.putAll(filtered);
+            if (!request.isCompact()) {
+                result.put("@id", source.get("@id"));
+                result.put("date", source.get("date"));
+                result.put("links", source.get("links"));
+            }
+        } else {
+            logger.warn("no document exists");
+        }
+        return result;
     }
 
-    public Map<String,Object> execute(String json) throws IOException {
+    public Map<String,Object> execute(DispatcherRequest request, String json) throws IOException {
         Map<String,Object> result = newHashMap();
         Map<String,Object> source = XContentHelper.convertToMap(json);
-        Map<String, Object> filtered = filter(toInstitutions(source));
+        Map<String, Object> filtered = filter(request, toInstitutions(request, source));
         result.putAll(filtered);
-        if (!compact) {
+        if (!request.isCompact()) {
             result.put("@id", source.get("@id"));
             result.put("date", source.get("date"));
             result.put("links", source.get("links"));
@@ -302,36 +119,41 @@ public class Dispatcher {
         return result;
     }
 
-    public List<Institution> toInstitutions(Map<String,Object> source) throws IOException {
+    private List<Institution> toInstitutions(DispatcherRequest request, Map<String,Object> source) throws IOException {
         final List<Institution> list = newLinkedList();
         ((List<Map<String, Object>>) source.get("institution")).stream()
                 .forEach(new Consumer<Map<String, Object>>() {
                     @Override
                     public void accept(Map<String, Object> map) {
-                        list.add(new Institution(map, groupOrder, groupMap));
+                        Institution institution = new Institution(map, request.getGroupOrder(), request.getGroupMap());
+                        if (request.getInstituionCarrierFilter() != null && request.getInstituionCarrierFilter().containsKey(institution.getISIL())) {
+                            institution.setCarrier(request.getInstituionCarrierFilter().get(institution.getISIL()));
+                        }
+                        list.add(institution);
                     }
                 });
+
         return list;
     }
 
-    public Map<String, Object> filter(List<Institution> institutions) {
+    private Map<String, Object> filter(DispatcherRequest request, List<Institution> institutions) {
         institutions.stream()
                 .forEach(new Consumer<Institution>() {
                     @Override
                     public void accept(Institution institution) {
                         List<Service> filteredServices = institution.getActiveServices().stream()
-                                .filter(service -> includeCarrier(service))
-                                .filter(service -> excludeCarrier(service))
-                                .filter(service -> includeGroup(service))
-                                .filter(service -> excludeGroup(service))
-                                .filter(service -> includeInstitution(service))
-                                .filter(service -> excludeInstitution(service))
-                                .filter(service -> includeType(service))
-                                .filter(service -> excludeType(service))
-                                .filter(service -> includeMode(service))
-                                .filter(service -> excludeMode(service))
-                                .filter(service -> includeDistribution(service))
-                                .filter(service -> excludeDistribution(service))
+                                .filter(service -> includeCarrier(request, institution, service))
+                                .filter(service -> excludeCarrier(request, institution, service))
+                                .filter(service -> includeGroup(request, service))
+                                .filter(service -> excludeGroup(request, service))
+                                .filter(service -> includeInstitution(request, service))
+                                .filter(service -> excludeInstitution(request, service))
+                                .filter(service -> includeType(request, service))
+                                .filter(service -> excludeType(request, service))
+                                .filter(service -> includeMode(request, service))
+                                .filter(service -> excludeMode(request, service))
+                                .filter(service -> includeDistribution(request, service))
+                                .filter(service -> excludeDistribution(request, service))
                                 .sorted()
                                 .collect(toList());
                         institution.putActiveServices(filteredServices);
@@ -347,22 +169,34 @@ public class Dispatcher {
         // a bit of random here, we will sort later also.
         Collections.shuffle(institutions);
 
-        if (compact) {
+        if (request.isCompact()) {
             // compact display, only institution codes
             List<String> head = newLinkedList();
             List<String> tail = newLinkedList();
             List<String> other = newLinkedList();
             boolean hasBase;
-            if (isEmpty(baseGroup)) {
+            if (isEmpty(request.getBaseGroup())) {
                 // no division into groups
                 List<String> list = institutions.stream()
                         .filter(inst -> !inst.getActiveServices().isEmpty())
                         .sorted()
                         .map(Institution::getISIL)
                         .collect(toList());
-                hasBase = newHashSet(list).contains(base);
-                // limit by group limit, move others to otherlist
-                splitList(list, groupLimit, head, tail);
+                hasBase = newHashSet(list).contains(request.getBase());
+
+                // extract priority insts
+                Map<Boolean, List<String>> priorities = institutions.stream()
+                        .collect(groupingBy(i -> i.getMarker("priority"),
+                                mapping(Institution::getISIL, Collectors.toList())));
+                if (priorities.containsKey(true)) {
+                    head = priorities.remove(true);
+                }
+                if (priorities.containsKey(false)) {
+                    tail = priorities.remove(false);
+                }
+                // limit by group limit
+                //splitList(list, request.getGroupLimit(), head, tail);
+
                 // append other institution services
                 other.addAll(institutions.stream()
                         .filter(inst -> !inst.getOtherServices().isEmpty())
@@ -377,15 +211,28 @@ public class Dispatcher {
                         .sorted()
                         .collect(groupingBy(Institution::getGroup,
                                 mapping(Institution::getISIL, Collectors.toList())));
-                String group = groupMap != null ? groupMap.get(baseGroup) : baseGroup;
+                String group = request.getGroupMap() != null ?
+                        request.getGroupMap().get(request.getBaseGroup()) : request.getBaseGroup();
                 List<String> list = groups.containsKey(group) ? groups.remove(group) : newLinkedList();
-                hasBase = newHashSet(list).contains(base);
-                splitList(list, groupLimit, head, tail);
+                hasBase = newHashSet(list).contains(request.getBase());
+
+                // extract priority insts
+                Map<Boolean, List<String>> priorities = institutions.stream()
+                        .collect(groupingBy(i -> i.getMarker("priority"),
+                                mapping(Institution::getISIL, Collectors.toList())));
+                if (priorities.containsKey(true)) {
+                    head = priorities.remove(true);
+                }
+                if (priorities.containsKey(false)) {
+                    tail = priorities.remove(false);
+                }
+                //splitList(list, request.getGroupLimit(), head, tail);
+
                 List<String> last = newLinkedList(groups.keySet());
                 Collections.shuffle(last);
-                splitList(last, groupLimit, head, other);
+                splitList(last, request.getGroupLimit(), head, other);
                 groups = institutions.stream()
-                        .filter(inst -> !inst.getActiveServices().isEmpty())
+                        .filter(inst -> !inst.getOtherServices().isEmpty())
                         .filter(inst -> !inst.getGroup().equals("X"))
                         .sorted()
                         .collect(groupingBy(Institution::getGroup,
@@ -405,45 +252,72 @@ public class Dispatcher {
             List<Institution> other = newLinkedList();
             boolean hasBase;
             Map<String, Object> result = newHashMap();
-            if (isEmpty(baseGroup)) {
+            if (isEmpty(request.getBaseGroup())) {
                 List<Institution> list = institutions.stream()
                         .filter(inst -> !inst.getActiveServices().isEmpty())
-                        .map(i -> i.setMarker(getMarker(i)))
+                        .map(i -> i.setMarker(getMarker(request, i)))
                         .sorted()
                         .collect(toList());
-                hasBase = head.stream().anyMatch(i -> i.getISIL().equals(base));
-                splitList(list, groupLimit, head, tail);
+                hasBase = list.stream().anyMatch(i -> i.getISIL().equals(request.getBase()));
+
+                Map<Boolean, List<Institution>> priorities = list.stream()
+                        .collect(groupingBy(i -> i.getMarker("priority")));
+                if (priorities.containsKey(true)) {
+                    head = priorities.remove(true);
+                }
+                if (priorities.containsKey(false)) {
+                    tail = priorities.remove(false).stream().sorted().collect(toList());
+                }
+                //splitList(list, request.getGroupLimit(), head, tail);
+
                 other.addAll(institutions.stream()
                         .filter(inst -> !inst.getOtherServices().isEmpty())
                         .filter(inst -> !inst.getGroup().equals("X"))
-                        .map(i -> i.setMarker(getMarker(i)))
+                        .map(i -> i.setMarker(getMarker(request, i)))
                         .sorted()
                         .collect(toList()));
+
+
             } else {
                 // divide into groups, build first/last pair
                 Map<String, List<Institution>> groups = institutions.stream()
                         .filter(inst -> !inst.getActiveServices().isEmpty())
-                        .map(i -> i.setMarker(getMarker(i)))
+                        .map(inst -> inst.setMarker(getMarker(request, inst)))
                         .sorted()
                         .collect(groupingBy(Institution::getGroup));
                 // remove unknown institution groups
                 groups.remove("X");
-                String group = groupMap != null ? groupMap.get(baseGroup) : baseGroup;
+                String group = request.getGroupMap() != null ?
+                        request.getGroupMap().get(request.getBaseGroup()) : request.getBaseGroup();
+                // find our group (the base group)
                 List<Institution> list = groups.containsKey(group) ? groups.remove(group) : newLinkedList();
-                hasBase = list.stream().anyMatch(i -> i.getISIL().equals(base));
-                splitList(list, groupLimit, head, tail);
+                // find our institution (the base institution)
+                hasBase = list.stream().anyMatch(inst -> inst.getISIL().equals(request.getBase()));
+
+                // partition list into priority/non-priority insts
+                Map<Boolean, List<Institution>> priorities = list.stream()
+                        .collect(groupingBy(i -> i.getMarker("priority")));
+                if (priorities.containsKey(true)) {
+                    head = priorities.remove(true);
+                }
+                if (priorities.containsKey(false)) {
+                    tail = priorities.remove(false);
+                }
+                //splitList(list, request.getGroupLimit(), head, tail);
+
                 // append other services
                 Map<String, List<Institution>> groupsother = institutions.stream()
                         .filter(inst -> !inst.getOtherServices().isEmpty())
                         .filter(inst -> !inst.getGroup().equals("X"))
-                        .map(i -> i.setMarker(getMarker(i)))
+                        .map(inst -> inst.setMarker(getMarker(request, inst)))
                         .sorted()
                         .collect(groupingBy(Institution::getGroup));
+                // random order of groups
                 List<String> grouplist = Lists.newLinkedList(groups.keySet());
                 Collections.shuffle(grouplist);
                 list = groupsother.containsKey(group) ? groupsother.remove(group) : newLinkedList();
                 other.addAll(list);
-                if (expandGroups) {
+                if (request.isExpandGroups()) {
                     // append all the group as institutions to head
                     for (String l : grouplist) {
                         head.addAll(groups.get(l));
@@ -455,7 +329,7 @@ public class Dispatcher {
                     // only group names instead of whole group institutions
                     List<String> last = newLinkedList();
                     List<String> lastother = newLinkedList();
-                    splitList(grouplist, groupLimit, last, lastother);
+                    splitList(grouplist, request.getGroupLimit(), last, lastother);
                     lastother.addAll(groupsother.keySet());
                     result.put("group", last);
                     result.put("groupcount", last.size());
@@ -474,85 +348,85 @@ public class Dispatcher {
         }
     }
 
-    private boolean includeCarrier(Service service) {
-        return carrierFilter == null ||
-                (service.containsKey("carriertype") &&
-                        carrierFilter.contains(service.get("carriertype")));
+    private boolean includeCarrier(DispatcherRequest request, Institution institution, Service service) {
+        String carriertype = (String)service.get("carriertype");
+        return institution.isCarrierAllowed(carriertype) &&
+                (request.getCarrierFilter() == null ||
+                    (service.containsKey("carriertype") &&
+                            request.getCarrierFilter().contains(carriertype)));
     }
 
-    private boolean excludeCarrier(Service service) {
-        return excludeCarrierFilter == null ||
-                (service.containsKey("carriertype") &&
-                        !excludeCarrierFilter.contains(service.get("carriertype")));
+    private boolean excludeCarrier(DispatcherRequest request, Institution institution, Service service) {
+        String carriertype = (String)service.get("carriertype");
+        return institution.isCarrierAllowed(carriertype) &&
+                (request.getExcludeCarrierFilter() == null ||
+                    (service.containsKey("carriertype") &&
+                        ! request.getExcludeCarrierFilter().contains(carriertype)));
     }
 
-    private boolean includeGroup(Service service) {
-        return groupFilter == null ||
-                (service.containsKey("organization") &&
-                 groupFilter.contains(service.get("organization")));
+    private boolean includeGroup(DispatcherRequest request, Service service) {
+        String organization = (String)service.get("organization");
+        return request.getGroupFilter() == null ||
+                (service.containsKey("organization") && request.getGroupFilter().contains(organization));
     }
 
-    private boolean excludeGroup(Service service) {
-        return excludeGroupFilter == null ||
-                (service.containsKey("organization") &&
-                !excludeGroupFilter.contains(service.get("organization")));
+    private boolean excludeGroup(DispatcherRequest request, Service service) {
+        String organization = (String)service.get("organization");
+        return request.getExcludeGroupFilter() == null ||
+                (service.containsKey("organization") && ! request.getExcludeGroupFilter().contains(organization));
     }
 
-    private boolean includeInstitution(Service service) {
-        return institutionFilter == null ||
-                (service.containsKey("isil") && institutionFilter.contains(service.get("isil")));
+    private boolean includeInstitution(DispatcherRequest request, Service service) {
+        String isil = (String)service.get("isil");
+        return request.getInstitutionFilter() == null ||
+                (service.containsKey("isil") && request.getInstitutionFilter().contains(isil));
     }
 
-    private boolean excludeInstitution(Service service) {
-        return excludeInstitutionFilter == null ||
-                (service.containsKey("isil") && !excludeInstitutionFilter.contains(service.get("isil")));
+    private boolean excludeInstitution(DispatcherRequest request, Service service) {
+        String isil = (String)service.get("isil");
+        return request.getExcludeInstitutionFilter() == null ||
+                (service.containsKey("isil") && !request.getExcludeInstitutionFilter().contains(isil));
     }
 
-    private boolean includeType(Service service) {
-        return typeFilter == null ||
-                (service.containsKey("type") && typeFilter.contains(service.get("type")));
+    private boolean includeType(DispatcherRequest request, Service service) {
+        String type = (String)service.get("type");
+        return request.getTypeFilter() == null ||
+                (service.containsKey("type") && request.getTypeFilter().contains(type));
     }
 
-    private boolean excludeType(Service service) {
-        return excludeTypeFilter == null ||
-                (service.containsKey("type") && !excludeTypeFilter.contains(service.get("type")));
+    private boolean excludeType(DispatcherRequest request, Service service) {
+        String type = (String)service.get("type");
+        return request.getExcludeTypeFilter() == null ||
+                (service.containsKey("type") && !request.getExcludeTypeFilter() .contains(type));
     }
 
-    private boolean includeMode(Service service) {
-        return modeFilter == null ||
-                (service.containsKey("mode") && modeFilter.contains(service.get("mode")));
+    private boolean includeMode(DispatcherRequest request, Service service) {
+        String mode = (String)service.get("mode");
+        return request.getModeFilter() == null ||
+                (service.containsKey("mode") && request.getModeFilter().contains(mode));
     }
 
-    private boolean excludeMode(Service service) {
-        return excludeModeFilter == null ||
-                (service.containsKey("mode") && !excludeModeFilter.contains(service.get("mode")));
+    private boolean excludeMode(DispatcherRequest request, Service service) {
+        String mode = (String)service.get("mode");
+        return request.getExcludeModeFilter() == null ||
+                (service.containsKey("mode") && !request.getExcludeModeFilter().contains(mode));
     }
 
-    private boolean includeDistribution(Service service) {
-        return distributionFilter == null ||
-                (service.containsKey("distribution") && distributionFilter.contains(service.get("distribution")));
+    private boolean includeDistribution(DispatcherRequest request, Service service) {
+        return checkValueInSet(service.get("distribution"), request.getDistributionFilter() );
     }
 
-    private boolean excludeDistribution(Service service) {
-        return excludeDistributionFilter == null ||
-                (service.containsKey("distribution") && !excludeDistributionFilter.contains(service.get("distribution")));
+    private boolean excludeDistribution(DispatcherRequest request, Service service) {
+        return checkValueNotInSet(service.get("distribution"), request.getExcludeDistributionFilter());
     }
 
-    private String getMarker(Institution institution) {
-        return institutionMarker != null ?
-             institutionMarker.get(institution.getISIL()) : null;
+    private String getMarker(DispatcherRequest request, Institution institution) {
+        return request.getInstitutionMarker() != null ?
+                request.getInstitutionMarker().get(institution.getISIL()) : null;
     }
 
     private boolean isEmpty(String s) {
         return s == null || s.isEmpty();
-    }
-
-    private boolean isEmpty(Collection<String> collection) {
-        return collection == null
-                || collection.isEmpty()
-                || !collection.iterator().hasNext()
-                || collection.iterator().next() == null
-                || collection.iterator().next().isEmpty();
     }
 
     private void splitList(List list, Integer split, List a, List b) {
@@ -561,46 +435,32 @@ public class Dispatcher {
         b.addAll(list.subList(pos, list.size()));
     }
 
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("compact=[").append(compact).append("]")
-                .append(" from=").append(from)
-                .append(" size=").append(size)
-                .append(" source=").append(source)
-                .append(" identifier=").append(identifier)
-                .append(" year=").append(year)
-                .append(" base=").append(base)
-                .append(" group=").append(baseGroup)
-                .append(" groupLimit=").append(groupLimit)
-                .append(" groupFilter=").append(groupFilter)
-                .append(" groupMap=").append(groupMap)
-                .append(" organizationOrder=").append(groupOrder)
-                .append(" includeInstituion=").append(institutionFilter)
-                .append(" excludeInstitution=").append(excludeInstitutionFilter)
-                .append(" includeType=").append(typeFilter)
-                .append(" excludeType=").append(excludeTypeFilter)
-                .append(" includeMode=").append(modeFilter)
-                .append(" excludeMode=").append(excludeModeFilter)
-                .append(" includeDistribution=").append(distributionFilter)
-                .append(" excludeDistribution=").append(excludeDistributionFilter)
-                .append(" markers=").append(institutionMarker);
-        return sb.toString();
+    private boolean checkValueInSet(Object o, Set<String> set) {
+        if (o == null || set == null) {
+            return true;
+        }
+        if (!(o instanceof Collection)) {
+            o = Collections.singleton(o);
+        }
+        for (Object value : (Collection)o) {
+            if (set.contains(value.toString())) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public final static List<String> pilot =
-            Arrays.asList("DE-6","DE-38","DE-61","DE-361","DE-386","DE-465","DE-1010");
-
-    public final static Map<String,String> serviceMap = new HashMap<String,String>() {{
-        put("NRW", "HBZ");
-        put("HAM", "VZG");
-        put("NIE", "VZG");
-        put("SAA", "VZG");
-        put("THU", "VZG");
-        put("BAW", "BSZ");
-        put("SAX", "BSZ");
-        put("BAY", "BVB");
-        put("HES", "HEBIS");
-        put("BER", "ZIB");
-        put("WEU", null);
-    }};
+    private boolean checkValueNotInSet(Object o, Set<String> set) {
+        if (o == null || set == null) {
+            return true;
+        }
+        if (!(o instanceof Collection)) {
+            o = Collections.singleton(o);
+        }
+        boolean b = true;
+        for (Object value : (Collection)o) {
+            b = b && !set.contains(value.toString());
+        }
+        return b;
+    }
 }

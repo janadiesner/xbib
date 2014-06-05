@@ -1,7 +1,5 @@
 package org.xbib.json.events;
 
-import org.xbib.json.events.JsonReaderXmlEvent;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamConstants;

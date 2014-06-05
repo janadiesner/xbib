@@ -53,7 +53,7 @@ public final class StylesheetPool {
     /**
      * A map of precompiled stylesheets ({@link javax.xml.transform.Templates} objects).
      */
-    private final Map<String, Templates> stylesheets = new ConcurrentHashMap<>();
+    private final Map<String, Templates> stylesheets = new ConcurrentHashMap();
 
     /**
      * @return returns the identity transformer handler.

@@ -144,22 +144,22 @@ public class SimpleLiteral<O extends Object>
         if (type == null) {
             return s;
         }
-        switch (type.toString()) {
-            case "xsd:long":
-                return Long.parseLong(s);
-            case "xsd:int":
-                return Integer.parseInt(s);
-            case "xsd:boolean":
-                return Boolean.parseBoolean(s);
-            case "xsd:float":
-                return Float.parseFloat(s);
-            case "xsd:double":
-                return Double.parseDouble(s);
-            case "xsd:gYear":
-                return Integer.parseInt(s);
+        String s1 = type.toString();
+        if (s1.equals("xsd:long")) {
+            return Long.parseLong(s);
+        } else if (s1.equals("xsd:int")) {
+            return Integer.parseInt(s);
+        } else if (s1.equals("xsd:boolean")) {
+            return Boolean.parseBoolean(s);
+        } else if (s1.equals("xsd:float")) {
+            return Float.parseFloat(s);
+        } else if (s1.equals("xsd:double")) {
+            return Double.parseDouble(s);
+        } else if (s1.equals("xsd:gYear")) {
+            return Integer.parseInt(s);
             // add more xsd here ...
-            default:
-                return s;
+        } else {
+            return s;
         }
     }
 

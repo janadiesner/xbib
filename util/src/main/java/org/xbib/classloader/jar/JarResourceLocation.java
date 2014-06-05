@@ -1,4 +1,3 @@
-
 package org.xbib.classloader.jar;
 
 import org.xbib.classloader.AbstractResourceHandle;
@@ -57,7 +56,7 @@ public class JarResourceLocation extends AbstractURLResourceLocation {
                 try {
                     return new JarResourceHandle(jarFile, jarEntry, getCodeSource());
                 } catch (MalformedURLException e) {
-                   e.printStackTrace();
+                    e.printStackTrace();
                 }
             }
         } else {
@@ -74,7 +73,7 @@ public class JarResourceLocation extends AbstractURLResourceLocation {
                     }
                 }
             } catch (IOException e) {
-               e.printStackTrace();
+                e.printStackTrace();
             }
         }
         return null;

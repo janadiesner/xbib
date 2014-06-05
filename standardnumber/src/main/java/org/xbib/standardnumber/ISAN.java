@@ -127,23 +127,25 @@ public class ISAN implements Comparable<ISAN>, StandardNumber {
             i = sb.indexOf(" ");
         }
         this.formatted = "ISAN "
-                + sb.substring(0,4)
-                + "-"
-                + sb.substring(4,8)
-                + "-"
-                + sb.substring(8,12)
-                + "-"
-                + sb.substring(12,16)
-                + "-"
-                + sb.substring(16,17)
-                + (sb.length() > 17 ? "-"
-                        + sb.substring(17,21)
-                        + "-"
-                        + sb.substring(21,25)
-                        + "-"
-                        + sb.substring(25,26)
-                : ""
-        );
+                + (sb.length() < 4 ? sb :
+                sb.substring(0,4) + "-"
+                        + (sb.length() < 8 ? sb.substring(4) :
+                        sb.substring(4,8) + "-"
+                                + (sb.length() < 12 ? sb.substring(8) :
+                                sb.substring(8,12) + "-"
+                                        + (sb.length() < 16 ? sb.substring(12) :
+                                        sb.substring(12,16) + "-"
+                                                + (sb.length() < 17 ? sb.substring(16) :
+                                                sb.substring(16,17))))));
+        if (sb.length() > 17) {
+            this.formatted = this.formatted + "-"
+                    + (sb.length() < 21 ? sb.substring(17) :
+                    (sb.substring(17, 21) + "-"
+                            + (sb.length() < 25 ? sb.substring(21) :
+                            (sb.substring(21, 25)  + "-"
+                                    + (sb.length() < 26 ? sb.substring(25) :
+                                    sb.substring(25, 26))))));
+        }
         return sb.toString();
     }
 }

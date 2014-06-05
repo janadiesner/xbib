@@ -1,4 +1,3 @@
-
 package org.xbib.util;
 
 import java.util.AbstractSet;
@@ -14,7 +13,7 @@ import java.util.Set;
  * load factor increased to 0.9
  */
 public class CompactHashSet<E> extends AbstractSet<E>
-    implements Set<E> {
+        implements Set<E> {
 
     private final static int INITIAL_SIZE = 3;
 

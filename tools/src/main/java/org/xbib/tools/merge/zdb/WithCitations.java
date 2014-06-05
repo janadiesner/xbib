@@ -49,6 +49,7 @@ import org.xbib.elasticsearch.support.client.search.SearchClient;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.queue.QueuePipelineExecutor;
+import org.xbib.tools.Tool;
 import org.xbib.util.DateUtil;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -71,13 +72,12 @@ import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
  * Merge ZDB with citation database
  */
 public class WithCitations
-        extends QueuePipelineExecutor<Boolean, Manifestation, WithCitationsPipeline, SearchHitPipelineElement> {
+    extends QueuePipelineExecutor<Boolean, Manifestation, WithCitationsPipeline, SearchHitPipelineElement>
+    implements Tool {
 
     private final static Logger logger = LoggerFactory.getLogger(WithCitations.class.getName());
 
     private Set<String> docs;
-
-    private Set<String> issns;
 
     private static Settings settings;
 
@@ -87,15 +87,12 @@ public class WithCitations
 
     private WithCitations service;
 
-    // Elasticsearch source index/types
     private String serialIndex;
     private String serialType;
 
     private int size;
     private long millis;
     private String identifier;
-
-    private WithCitations() {}
 
     public WithCitations reader(Reader reader) {
         settings = settingsBuilder().loadFromReader(reader).build();
@@ -114,82 +111,74 @@ public class WithCitations
     public WithCitations prepare() {
         super.prepare();
         docs = newSetFromMap(new ConcurrentHashMap<String,Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
-        issns = newSetFromMap(new ConcurrentHashMap<String,Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
         return this;
     }
 
-    public WithCitations run() throws Exception {
-
+    @Override
+    public void run() throws Exception {
         URI sourceURI = URI.create(settings.get("source"));
-
-        //Map<String,String> params = URIUtil.parseQueryString(sourceURI);
-
-        // ZDB Titel
         this.serialIndex = settings.get("serialIndex");
         this.serialType = settings.get("serialType");
-
         SearchClient search = new SearchClient().newClient(sourceURI);
-        this.service = this;
-        this.client = search.client();
-        this.size = settings.getAsInt("scrollSize", 10);
-        this.millis = settings.getAsTime("scrollTimeout", org.xbib.common.unit.TimeValue.timeValueSeconds(60)).millis();
-        this.identifier = settings.get("identifier");
+        try {
+            this.service = this;
+            this.client = search.client();
+            this.size = settings.getAsInt("scrollSize", 10);
+            this.millis = settings.getAsTime("scrollTimeout", org.xbib.common.unit.TimeValue.timeValueSeconds(60)).millis();
+            this.identifier = settings.get("identifier");
 
-        this.ingest = settings.getAsBoolean("mock", false) ?
-                new MockIngestTransportClient() :
-                "ingest".equals(settings.get("client")) ?
-                        new IngestTransportClient() :
-                        new BulkTransportClient();
-        ingest.maxActionsPerBulkRequest(settings.getAsInt("maxBulkActions", 100))
-                .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests",
-                        Runtime.getRuntime().availableProcessors()))
-                .setIndex(settings.get("index"))
-                .setting(WithCitations.class.getResourceAsStream("transport-client-settings.json"))
-                .newClient(URI.create(settings.get("target")));
-        ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
-        // TODO create settings/mappings
-        //.setting(MergeWithLicenses.class.getResourceAsStream("index-settings.json"))
-        //.mapping("works", MergeWithLicenses.class.getResourceAsStream("works.json"))
-        //.mapping("manifestations", MergeWithLicenses.class.getResourceAsStream("manifestations.json"))
-        //.mapping("volumes", MergeWithLicenses.class.getResourceAsStream("volumes.json"))
-        ingest.newIndex()
-                .refresh()
-                .shards(settings.getAsInt("shards",1))
-                .replica(settings.getAsInt("replica",0))
-                .startBulk();
-        super.setPipelineProvider(new PipelineProvider<WithCitationsPipeline>() {
-            int i = 0;
+            this.ingest = settings.getAsBoolean("mock", false) ?
+                    new MockIngestTransportClient() :
+                    "ingest".equals(settings.get("client")) ?
+                            new IngestTransportClient() :
+                            new BulkTransportClient();
+            ingest.maxActionsPerBulkRequest(settings.getAsInt("maxBulkActions", 100))
+                    .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests",
+                            Runtime.getRuntime().availableProcessors()));
 
-            @Override
-            public WithCitationsPipeline get() {
-                return new WithCitationsPipeline(service, i++);
+            ingest.addSetting(WithCitations.class.getResourceAsStream("transport-client-settings.json"));
+            ingest.newClient(URI.create(settings.get("target")));
+            ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
+            // TODO create settings/mappings
+            //.setting(MergeWithLicenses.class.getResourceAsStream("index-settings.json"))
+            //.mapping("works", MergeWithLicenses.class.getResourceAsStream("works.json"))
+            //.mapping("manifestations", MergeWithLicenses.class.getResourceAsStream("manifestations.json"))
+            //.mapping("volumes", MergeWithLicenses.class.getResourceAsStream("volumes.json"))
+            ingest.shards(settings.getAsInt("shards", 3))
+                    .replica(settings.getAsInt("replica", 0))
+                    .newIndex(settings.get("targetCitationIndex"))
+                    .startBulk(settings.get("targetCitationIndex"));
+            super.setPipelineProvider(new PipelineProvider<WithCitationsPipeline>() {
+                int i = 0;
+
+                @Override
+                public WithCitationsPipeline get() {
+                    return new WithCitationsPipeline(service, i++);
+                }
+            });
+            super.setConcurrency(settings.getAsInt("concurrency", 1));
+            this.prepare();
+            this.execute();
+            logger.info("shutdown in progress");
+            shutdown(new SearchHitPipelineElement().set(null));
+
+            long total = 0L;
+            for (Pipeline p : getPipelines()) {
+                logger.info("pipeline {}, count {}, started {}, ended {}, took {}",
+                        p,
+                        p.getMetric().count(),
+                        DateUtil.formatDateISO(p.getMetric().startedAt()),
+                        DateUtil.formatDateISO(p.getMetric().stoppedAt()),
+                        TimeValue.timeValueMillis(p.getMetric().elapsed() / 1000000).format());
+                total += p.getMetric().count();
             }
-        });
-        super.setConcurrency(settings.getAsInt("concurrency", 1));
-
-        this.prepare();
-
-        this.execute();
-
-        logger.info("shutdown in progress");
-        shutdown(new SearchHitPipelineElement().set(null));
-
-        long total = 0L;
-        for (Pipeline p : getPipelines()) {
-            logger.info("pipeline {}, count {}, started {}, ended {}, took {}",
-                    p,
-                    p.getMetric().count(),
-                    DateUtil.formatDateISO(p.getMetric().startedAt()),
-                    DateUtil.formatDateISO(p.getMetric().stoppedAt()),
-                    TimeValue.timeValueMillis(p.getMetric().elapsed()/1000000).format());
-            total += p.getMetric().count();
+            logger.info("total={}", total);
+        } catch (Throwable t) {
+            logger.error(t.getMessage(), t);
+        } finally {
+            search.shutdown();
+            ingest.shutdown();
         }
-        logger.info("total={}", total);
-
-        search.shutdown();
-
-        ingest.shutdown();
-        return this;
     }
 
     @Override

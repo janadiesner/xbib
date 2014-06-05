@@ -54,7 +54,7 @@ public class ZServiceTest {
             ZService service = ZServiceFactory.getService(serviceName);
             ZClient client = service.newZClient();
             FileOutputStream out = new FileOutputStream("target/service-" + service.getURI().getHost() + ".xml");
-            try (Writer sw = new OutputStreamWriter(out, "UTF-8")) {
+            Writer sw = new OutputStreamWriter(out, "UTF-8");
                 String query = "@attr 1=4 test";
                 int from = 1;
                 int size = 10;
@@ -73,7 +73,7 @@ public class ZServiceTest {
                     transformer.close();
                     service.close(client);
                 }
-            }
+            sw.close();
         }
     }
 }

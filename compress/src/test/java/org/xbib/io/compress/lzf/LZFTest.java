@@ -13,11 +13,11 @@ public class LZFTest extends Assert {
     @Test
     public void testHelloWorld() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try (LZFOutputStream zOut = new LZFOutputStream(out)) {
-            ObjectOutputStream objOut = new ObjectOutputStream(zOut);
-            String helloWorld = "Hello World!";
-            objOut.writeObject(helloWorld);
-        }
+        LZFOutputStream zOut = new LZFOutputStream(out);
+        ObjectOutputStream objOut = new ObjectOutputStream(zOut);
+        String helloWorld = "Hello World!";
+        objOut.writeObject(helloWorld);
+        zOut.close();
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
         LZFInputStream zIn = new LZFInputStream(in);
         ObjectInputStream objIn = new ObjectInputStream(zIn);

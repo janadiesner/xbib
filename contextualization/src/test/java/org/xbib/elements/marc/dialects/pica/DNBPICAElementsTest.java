@@ -39,7 +39,7 @@ import java.text.Normalizer;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.elements.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;

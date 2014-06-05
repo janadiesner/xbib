@@ -61,10 +61,10 @@ public class MapBasedAnyObject implements AnyObject {
         }
         Object o = inner.get(key[0]);
         if (o instanceof List) {
-            o = ((List)o).get(0);
+            o = ((List) o).get(0);
         }
         return (T) (o instanceof Map && key.length > 1 ?
-            get((Map) o, Arrays.copyOfRange(key, 1, key.length)) : o);
+                get((Map) o, Arrays.copyOfRange(key, 1, key.length)) : o);
     }
 
     <T> T getAll(String key) {
@@ -92,9 +92,11 @@ public class MapBasedAnyObject implements AnyObject {
             return null;
         }
         if (o instanceof Iterable) {
-            return  (Iterable<T>)o;
+            return (Iterable<T>) o;
         }
-        return new ArrayList<T>() {{ add((T)o); }};
+        return new ArrayList<T>() {{
+            add((T) o);
+        }};
     }
 
     @Override

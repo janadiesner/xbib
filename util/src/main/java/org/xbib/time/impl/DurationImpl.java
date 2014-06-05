@@ -1,4 +1,3 @@
-
 package org.xbib.time.impl;
 
 import org.xbib.time.Duration;

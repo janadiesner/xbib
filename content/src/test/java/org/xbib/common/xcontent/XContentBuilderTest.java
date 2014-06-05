@@ -1,10 +1,7 @@
 package org.xbib.common.xcontent;
 
 import org.testng.annotations.Test;
-import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.common.xcontent.XContentFactory;
-import org.xbib.common.xcontent.XContentParser;
-import org.xbib.common.xcontent.XContentType;
+
 import org.xbib.logging.Logger;
 import org.xbib.logging.Loggers;
 
@@ -19,8 +16,6 @@ import static org.testng.Assert.assertEquals;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 public class XContentBuilderTest {
-
-    private final Logger logger = Loggers.getLogger(XContentBuilderTest.class);
 
     @Test
     public void testCopy() throws IOException {
@@ -124,8 +119,6 @@ public class XContentBuilderTest {
                 .losslessDecimals(false)
                 .mapAndClose();
         assertEquals("{value=2014-04-22T14:01:51.488Z}", map.toString());
-
-
     }
 
 }

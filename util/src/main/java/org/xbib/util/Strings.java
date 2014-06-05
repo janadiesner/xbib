@@ -131,7 +131,7 @@ public final class Strings {
      * <p>Replaces a String with another String inside a larger String, once.</p>
      * <p/>
      * <p>A <code>null</code> reference passed to this method is a no-op.</p>
-     * <p/>
+     * <p>
      * <pre>
      * StringUtils.replaceOnce(null, *, *)        = null
      * StringUtils.replaceOnce("", *, *)          = ""
@@ -158,7 +158,7 @@ public final class Strings {
      * <p>Replaces all occurrences of a String within another String.</p>
      * <p/>
      * <p>A <code>null</code> reference passed to this method is a no-op.</p>
-     * <p/>
+     * <p>
      * <pre>
      * StringUtils.replace(null, *, *)        = null
      * StringUtils.replace("", *, *)          = ""
@@ -186,7 +186,7 @@ public final class Strings {
      * for the first <code>max</code> values of the search String.</p>
      * <p/>
      * <p>A <code>null</code> reference passed to this method is a no-op.</p>
-     * <p/>
+     * <p>
      * <pre>
      * StringUtils.replace(null, *, *, *)         = null
      * StringUtils.replace("", *, *, *)           = ""

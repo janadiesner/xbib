@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
-        <version>1.0.0.Beta2</version>
+        <version>1.0.0.Beta3</version>
         <relativePath>../../</relativePath>
     </parent>
 
@@ -38,6 +38,10 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -121,8 +125,8 @@
             <dependencies>
                 <dependency>
                     <groupId>org.xbib</groupId>
-                    <artifactId>elasticsearch</artifactId>
-                    <version>1.0.0.Beta2</version>
+                    <artifactId>elasticsearch-search</artifactId>
+                    <version>1.0.0.Beta3</version>
                     <type>jar</type>
                 </dependency>
             </dependencies>
@@ -160,8 +164,8 @@
             <dependencies>
                 <dependency>
                     <groupId>org.xbib</groupId>
-                    <artifactId>elasticsearch</artifactId>
-                    <version>1.0.0.Beta2</version>
+                    <artifactId>elasticsearch-search</artifactId>
+                    <version>1.0.0.Beta3</version>
                     <type>jar</type>
                 </dependency>
             </dependencies>
@@ -201,8 +205,8 @@
             <dependencies>
                 <dependency>
                     <groupId>org.xbib</groupId>
-                    <artifactId>elasticsearch</artifactId>
-                    <version>1.0.0.Beta2</version>
+                    <artifactId>elasticsearch-search</artifactId>
+                    <version>1.0.0.Beta3</version>
                     <type>jar</type>
                 </dependency>
             </dependencies>
@@ -242,8 +246,8 @@
             <dependencies>
                 <dependency>
                     <groupId>org.xbib</groupId>
-                    <artifactId>elasticsearch</artifactId>
-                    <version>1.0.0.Beta2</version>
+                    <artifactId>elasticsearch-search</artifactId>
+                    <version>1.0.0.Beta3</version>
                     <type>jar</type>
                 </dependency>
             </dependencies>

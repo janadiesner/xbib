@@ -62,7 +62,7 @@ public class ZSRUServlet extends HttpServlet implements SRUConstants {
 
     private static final Logger logger = LoggerFactory.getLogger(ZSRUServlet.class.getName());
 
-    private final Map<String, String> mediaTypes = new HashMap<>();
+    private final Map<String, String> mediaTypes = new HashMap();
 
     private final ContentTypeNegotiator ctn = new SRUContentTypeNegotiator();
 

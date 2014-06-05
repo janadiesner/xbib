@@ -37,7 +37,6 @@ import java.lang.reflect.Method;
 
 /**
  * Format java exception messages and stack traces.
- *
  */
 public final class ExceptionFormatter {
 
@@ -46,7 +45,6 @@ public final class ExceptionFormatter {
 
     /**
      * Append Exception to string builder
-     *
      */
     @SuppressWarnings("rawtypes")
     public static void append(StringBuilder buf, Throwable t,
@@ -91,7 +89,6 @@ public final class ExceptionFormatter {
      * Format exception with stack trace
      *
      * @param t the thrown object
-     *
      * @return the formatted exception
      */
     public static String format(Throwable t) {

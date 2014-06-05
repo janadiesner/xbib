@@ -2,6 +2,7 @@
 package org.xbib.web.dispatcher;
 
 import com.google.common.collect.ImmutableMap;
+import org.elasticsearch.client.Client;
 import org.xbib.web.handlebars.HandlebarsService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,22 +17,18 @@ import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import static com.google.common.collect.Maps.newHashMap;
 
 @Path("/demo")
 public class DemoService extends HandlebarsService {
 
-    private final static Map<String,Object> settings = new HashMap<String,Object>() {{
-        put("form_action", "");
-        put("libraries", Arrays.asList("DE-6", "DE-38", "DE-61", "DE-82", "DE-361", "DE-386", "DE-465", "DE-1010"));
-        put("groups", Arrays.asList("NRW", "BAY", "BAW", "SAX", "NIE", "HAM",  "SAA", "THU", "HES", "BER"));
-    }};
-
     @GET
     public Response demoGet(@Context HttpServletRequest request,
                             @Context UriInfo uriInfo,
+                            @QueryParam("index") String index,
+                            @QueryParam("indextype") String indextype,
                             @QueryParam("baselibrary") String base,
                             @QueryParam("carrierFilter") String carrierFilter,
                             @QueryParam("id") String id,
@@ -60,8 +57,9 @@ public class DemoService extends HandlebarsService {
                     .put("isil", isil != null ? isil : "")
                     .build();
 
-            Dispatcher dispatcher = new Dispatcher()
-                    .setClient(ElasticsearchContextListener.client.client())
+            DispatcherRequest dispatcherRequest = new DispatcherRequest()
+                    .setIndex(index)
+                    .setType(indextype)
                     .setBase(base)
                     .setCarrierFilter(Arrays.asList(carrierFilter))
                     .setSource("zdb")
@@ -69,23 +67,32 @@ public class DemoService extends HandlebarsService {
                     .setYear(year)
                     .setGroupLimit(10)
                     .setExpandGroups(false)
-                    .setGroupFilter((List<String>) settings.get("groups"))
-                    .setInstitutionMarker("pilot", (List<String>) settings.get("libraries"))
-                    .setInstitutionFilter(Arrays.asList(isil));
+                    .setGroupFilter(DispatcherSettings.groups)
+                    .setInstitutionMarker("priority", DispatcherSettings.priority)
+                    .setInstitutionFilter(Arrays.asList(isil))
+                    .setInstitutionCarrierFilter(DispatcherSettings.serviceRestrictions);
 
-            return Response.ok().entity(getTemplate("html/demo").apply(makeContext(settings, request,
-                    uriInfo, formParams, dispatcher.execute()))).build();
+
+            Client client = ApplicationContextListener.searchSupport.client();
+            Dispatcher dispatcher = ApplicationContextListener.dispatcher;
+
+            return Response.ok()
+                    .entity(getTemplate("html/demo").apply(makeContext(emptySettings, request,
+                    uriInfo, formParams, dispatcher.execute(client, dispatcherRequest))))
+                    .build();
         } else {
             // search form only
             logger.info("at GET without identifier");
             return Response.ok().entity(getTemplate("html/demo")
-                    .apply(makeContext(settings, request, uriInfo))).build();
+                    .apply(makeContext(emptySettings, request, uriInfo))).build();
         }
     }
 
     @POST
     public Response demoPost(@Context HttpServletRequest request,
                              @Context UriInfo uriInfo,
+                             @FormParam("index") String index,
+                             @FormParam("indextype") String indextype,
                              @FormParam("carrierFilter") String carrierFilter,
                              @FormParam("baselibrary") String base,
                              @FormParam("id") String id,
@@ -112,8 +119,9 @@ public class DemoService extends HandlebarsService {
                 .put("isil", isil != null ? isil : "")
                 .build();
 
-        Dispatcher dispatcher = new Dispatcher()
-                .setClient(ElasticsearchContextListener.client.client())
+        DispatcherRequest dispatcherRequest = new DispatcherRequest()
+                .setIndex(index)
+                .setType(indextype)
                 .setBase(base)
                 .setCarrierFilter(Arrays.asList(carrierFilter))
                 .setSource("zdb")
@@ -121,13 +129,20 @@ public class DemoService extends HandlebarsService {
                 .setYear(year)
                 .setGroupLimit(10)
                 .setExpandGroups(false)
-                .setGroupFilter((List<String>) settings.get("groups"))
-                .setInstitutionMarker("pilot", (List<String>) settings.get("libraries"))
-                .setInstitutionFilter(Arrays.asList(isil));
+                .setGroupFilter(DispatcherSettings.groups)
+                .setInstitutionMarker("priority", DispatcherSettings.priority)
+                .setInstitutionFilter(Arrays.asList(isil))
+                .setInstitutionCarrierFilter(DispatcherSettings.serviceRestrictions);
 
-        return Response.ok().entity(getTemplate("html/demo")
-                .apply(makeContext(settings, request, uriInfo, formParams, dispatcher.execute()))).build();
+        Client client = ApplicationContextListener.searchSupport.client();
+        Dispatcher dispatcher = ApplicationContextListener.dispatcher;
 
+        return Response.ok()
+                .entity(getTemplate("html/demo")
+                .apply(makeContext(emptySettings, request, uriInfo, formParams, dispatcher.execute(client, dispatcherRequest))))
+                .build();
     }
+
+    private final static Map<String,Object> emptySettings = newHashMap();
 
 }

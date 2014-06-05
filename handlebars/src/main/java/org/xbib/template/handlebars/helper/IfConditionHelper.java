@@ -28,34 +28,34 @@ public class IfConditionHelper implements Helper<Object> {
         Object operator = options.param(0);
         Object operand = options.param(1);
         Object res;
-        switch (operator.toString()) {
-            case "==":
-                res = context.equals(operand);
-                break;
-            case "!==":
-                res = !context.equals(operand);
-                break;
-            case "<":
-                res = (Integer)context < (Integer)operand;
-                break;
-            case "<=":
-                res = (Integer)context <= (Integer)operand;
-                break;
-            case ">":
-                res = (Integer)context > (Integer)operand;
-                break;
-            case ">=":
-                res = (Integer)context >= (Integer)operand;
-                break;
-            case "&&":
-                res = (Boolean)context && (Boolean)operand;
-                break;
-            case "||":
-                res = (Boolean)context || (Boolean)operand;
-                break;
-            default:
-                res = options.fn(context);
-                break;
+        String s = operator.toString();
+        if (s.equals("==")) {
+            res = context.equals(operand);
+
+        } else if (s.equals("!==")) {
+            res = !context.equals(operand);
+
+        } else if (s.equals("<")) {
+            res = (Integer) context < (Integer) operand;
+
+        } else if (s.equals("<=")) {
+            res = (Integer) context <= (Integer) operand;
+
+        } else if (s.equals(">")) {
+            res = (Integer) context > (Integer) operand;
+
+        } else if (s.equals(">=")) {
+            res = (Integer) context >= (Integer) operand;
+
+        } else if (s.equals("&&")) {
+            res = (Boolean) context && (Boolean) operand;
+
+        } else if (s.equals("||")) {
+            res = (Boolean) context || (Boolean) operand;
+
+        } else {
+            res = options.fn(context);
+
         }
         if (options.isFalsy(res)) {
             return options.inverse(res);

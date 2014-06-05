@@ -51,7 +51,8 @@ public class MockIndexWriteTest<S extends Resource<S, P, O>, P extends Property,
     @Test
     public void testWrite() throws Exception {
 
-        final MockBulkTransportClient es = new MockBulkTransportClient().setIndex("test").setType("test");
+        final MockBulkTransportClient es = new MockBulkTransportClient();
+        es.newIndex("test");
 
         final ResourceSink<ResourceContext, Resource> indexer = new ResourceSink(es);
 
@@ -86,7 +87,7 @@ public class MockIndexWriteTest<S extends Resource<S, P, O>, P extends Property,
                 .add("property6", "value6");
         return new SimpleResourceContext()
                 .setNamespaceContext(IRINamespaceContext.getInstance())
-                .setContentBuilder(new DefaultContentBuilder<>())
+                .setContentBuilder(new DefaultContentBuilder())
                 .switchTo(resource);
     }
 }

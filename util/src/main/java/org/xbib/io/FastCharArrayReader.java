@@ -70,7 +70,7 @@ public class FastCharArrayReader extends Reader {
 
     /**
      * Creates a CharArrayReader from the specified array of chars.
-     * <p/>
+     * <p>
      * <p> The resulting reader will start reading at the given
      * <tt>offset</tt>.  The total number of <tt>char</tt> values that can be
      * read from this reader will be either <tt>length</tt> or
@@ -152,7 +152,7 @@ public class FastCharArrayReader extends Reader {
 
     /**
      * Skips characters.  Returns the number of characters that were skipped.
-     * <p/>
+     * <p>
      * <p>The <code>n</code> parameter may be negative, even though the
      * <code>skip</code> method of the {@link java.io.Reader} superclass throws
      * an exception in this case. If <code>n</code> is negative, then

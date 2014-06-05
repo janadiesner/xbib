@@ -155,7 +155,7 @@ public class ZConnection implements Connection<ZSession> {
             // initialize bi-directional communication channel
             this.src = new BufferedInputStream(socket.getInputStream());
             this.dest = new BufferedOutputStream(socket.getOutputStream());
-        } catch ( IOException | SecurityException | NullPointerException e) {
+        } catch (Exception e) {
             logger.warn(e.getMessage() + ": " + getURI().getHost(), e);
             try {
                 if (socket != null) {

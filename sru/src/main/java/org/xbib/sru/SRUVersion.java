@@ -43,15 +43,14 @@ public enum SRUVersion {
         if (version == null) {
             return VERSION_1_2;
         }
-        switch (version) {
-            case "1.1" :
-                return VERSION_1_1;
-            case "1.2" :
-                return VERSION_1_2;
-            case "2.0" :
-                return VERSION_2_0;
-            default:
-                return VERSION_1_2;
+        if (version.equals("1.1")) {
+            return VERSION_1_1;
+        } else if (version.equals("1.2")) {
+            return VERSION_1_2;
+        } else if (version.equals("2.0")) {
+            return VERSION_2_0;
+        } else {
+            return VERSION_1_2;
         }
     }
 }

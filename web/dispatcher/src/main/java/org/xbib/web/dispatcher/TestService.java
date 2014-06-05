@@ -26,7 +26,7 @@ import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 @Path("/test")
 public class TestService extends HandlebarsService {
 
-    private final static Client client = ElasticsearchContextListener.client.client();
+    private final static Client client = ApplicationContextListener.searchSupport.client();
 
     @GET
     public Response test(@Context UriInfo uriInfo, @Context HttpServletRequest request,

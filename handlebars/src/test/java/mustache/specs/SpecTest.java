@@ -96,7 +96,9 @@ public abstract class SpecTest {
         CharSequence output = template.apply(data);
         try {
             assertEquals(expected, output);
-        } catch (HandlebarsException | ComparisonFailure ex) {
+        } catch (HandlebarsException ex) {
+            throw ex;
+        } catch (ComparisonFailure ex) {
             throw ex;
         }
     }

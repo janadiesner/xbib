@@ -37,7 +37,7 @@ import java.text.Normalizer;
 
 import org.xbib.marc.xml.MarcXmlEventConsumer;
 import org.xbib.tools.Feeder;
-import org.xbib.elements.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;

@@ -37,13 +37,13 @@ import java.io.Writer;
 /**
  * A writer that can switch over to a new writer. This is useful for example,
  * when a large file must be split into smaller ones.
- * <p/>
+ * <p>
  * Large XML files produced by a {@link javax.xml.transform.stream.StreamResult}
  * can be split by manipulating the SAX handler. At the split condition, the
  * handler should send endDocument(), then performing a flush on the
  * StreamResult Writer, split with this Writerm and then continue
  * with startDocument().
- * <p/>
+ * <p>
  * Most of the code is copied from OpenJDK's BufferedWriter. Because
  * BufferedWriter uses a private instance of the internal writer, it can not be
  * extended.
@@ -134,7 +134,7 @@ public class SplitWriter extends Writer {
 
     /**
      * Writes a portion of an array of characters.
-     * <p/>
+     * <p>
      * <p> Ordinarily this method stores characters from the given array into
      * this stream's buffer, flushing the buffer to the underlying stream as
      * needed. If the requested length is at least as large as the buffer,
@@ -184,7 +184,7 @@ public class SplitWriter extends Writer {
 
     /**
      * Writes a portion of a String.
-     * <p/>
+     * <p>
      * <p> If the value of the <tt>len</tt> parameter is negative then no
      * characters are written. This is contrary to the specification of this
      * method in the {@linkplain java.io.Writer#write(java.lang.String, int, int)

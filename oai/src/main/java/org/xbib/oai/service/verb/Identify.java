@@ -31,9 +31,6 @@
  */
 package org.xbib.oai.service.verb;
 
-import java.io.IOException;
-import javax.xml.stream.XMLStreamException;
-
 import org.xbib.oai.service.OAIService;
 import org.xbib.oai.identify.IdentifyResponse;
 import org.xbib.oai.exceptions.OAIException;
@@ -54,7 +51,7 @@ public class Identify extends AbstractVerb {
             endElement("Identify");
             endOAIPMH();
             endDocument();
-        } catch (XMLStreamException | IOException e) {
+        } catch (Exception e) {
             throw new OAIException(e.getMessage(), e);
         }
     }

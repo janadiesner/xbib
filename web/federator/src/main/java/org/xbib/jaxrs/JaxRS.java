@@ -32,7 +32,7 @@ public class JaxRS extends Application {
         put("application/sru+xml", "xsl/es-searchretrieve-response.xsl"); // SRU
     }};
 
-    private final static Map<String, String> mediaTypes = new HashMap<>();
+    private final static Map<String, String> mediaTypes = new HashMap();
 
     private final static ContentTypeNegotiator ctn = new ContentTypeNegotiator();
 

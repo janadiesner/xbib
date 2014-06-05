@@ -10,6 +10,7 @@ import org.xbib.logging.LoggerFactory;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DispatcherTest {
@@ -32,20 +33,24 @@ public class DispatcherTest {
         map.put("HES", "HEBIS");
         map.put("BER", "ZIB");
 
-        Dispatcher dispatcher = new Dispatcher()
+        List<String> priority = Arrays.asList("DE-6", "DE-38", "DE-61", "DE-82", "DE-361", "DE-386", "DE-465", "DE-1010");
+
+        DispatcherRequest dispatcherRequest = new DispatcherRequest()
                // .setCompact(true)
                 .setBase("DE-384")
                 //.setBaseGroup("BAY")
-                //.setGroupLimit(5)
-                .setGroupMap(map);
-                //.setGroupFilter(Arrays.asList("NRW"));
-                //.setInstitutionMarker("pilot", Arrays.asList("DE-6", "DE-38", "DE-61", "DE-361", "DE-386", "DE-465", "DE-1010"))
-                //.setTypeFilter(Arrays.asList("interlibrary"))
-                //.setModeFilter(Arrays.asList("copy", "copy-loan"));
+                .setGroupLimit(10)
+                .setGroupMap(map)
+                .setGroupFilter(Arrays.asList("NRW"))
+                .setTypeFilter(Arrays.asList("interlibrary"))
+                .setModeFilter(Arrays.asList("copy", "copy-loan"))
+                .setInstitutionMarker("priority", priority);
+
 
         // just test the ordering and formatting
 
-        logger.info("{}", dispatcher.execute(json));
+        Dispatcher dispatcher = new Dispatcher();
+        logger.info("{}", dispatcher.execute(dispatcherRequest, json));
 
     }
 }

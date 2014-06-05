@@ -112,11 +112,11 @@ public abstract class AbstractResourceContext<R extends Resource> implements Res
     @Override
     public TripleListener triple(Triple triple) {
         if (resourceMap == null) {
-            resourceMap = new LinkedHashMap<>();
+            resourceMap = new LinkedHashMap();
         }
         IRI iri = triple.subject().id();
         if (!resourceMap.containsKey(iri)) {
-            resourceMap.put(iri, (R)new SimpleResource<>().id(iri));
+            resourceMap.put(iri, (R)new SimpleResource().id(iri));
         }
         resourceMap.get(iri).add(triple);
         return this;

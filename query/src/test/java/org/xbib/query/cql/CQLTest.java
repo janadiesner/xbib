@@ -26,22 +26,22 @@ public class CQLTest extends Assert {
     private void test(String path) throws IOException {
         int ok = 0;
         int errors = 0;
-        try (LineNumberReader lr = new LineNumberReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(path), "UTF-8"))) {
-            String line;
-            while ((line = lr.readLine()) != null) {
-                if (line.trim().length() > 0 && !line.startsWith("#")) {
-                    try {
-                        int pos = line.indexOf('|');
-                        line = pos > 0 ? line.substring(0,pos) : line;
-                        process(line);
-                        ok++;
-                    } catch (Exception e) {
-                        logger.warn(e.getMessage());
-                        errors++;
-                    }
+        LineNumberReader lr = new LineNumberReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(path), "UTF-8"));
+        String line;
+        while ((line = lr.readLine()) != null) {
+            if (line.trim().length() > 0 && !line.startsWith("#")) {
+                try {
+                    int pos = line.indexOf('|');
+                    line = pos > 0 ? line.substring(0,pos) : line;
+                    process(line);
+                    ok++;
+                } catch (Exception e) {
+                    logger.warn(e.getMessage());
+                    errors++;
                 }
             }
         }
+        lr.close();
         assertEquals(errors, 0);
     }
 

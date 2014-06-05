@@ -27,24 +27,24 @@ public class EvalHelper implements Helper<Object> {
         Object operator = options.param(0);
         Object operand = options.param(1);
         Object res;
-        switch (operator.toString()) {
-            case "+":
-                res = (Integer) context + (Integer)operand;
-                break;
-            case "-":
-                res = (Integer) context - (Integer)operand;
-                break;
-            case "*":
-                res = (Integer) context * (Integer)operand;
-                break;
-            case "/":
-                res = (Integer) context / (Integer)operand;
-                break;
-            case "%":
-                res = (Integer) context % (Integer)operand;
-                break;
-            default:
-                res = options.fn(context);
+        String s = operator.toString();
+        if (s.equals("+")) {
+            res = (Integer) context + (Integer) operand;
+
+        } else if (s.equals("-")) {
+            res = (Integer) context - (Integer) operand;
+
+        } else if (s.equals("*")) {
+            res = (Integer) context * (Integer) operand;
+
+        } else if (s.equals("/")) {
+            res = (Integer) context / (Integer) operand;
+
+        } else if (s.equals("%")) {
+            res = (Integer) context % (Integer) operand;
+
+        } else {
+            res = options.fn(context);
         }
         return res.toString();
     }

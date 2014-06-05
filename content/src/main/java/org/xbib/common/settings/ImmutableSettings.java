@@ -51,6 +51,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.xbib.common.settings.loader.JsonSettingsLoader;
+import org.xbib.common.unit.ByteSizeValue;
 import org.xbib.common.unit.TimeValue;
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.io.stream.StreamInput;
@@ -58,6 +60,7 @@ import org.xbib.io.stream.StreamOutput;
 import org.xbib.common.settings.loader.SettingsLoader;
 import org.xbib.common.settings.loader.SettingsLoaderFactory;
 
+import static org.xbib.common.unit.ByteSizeValue.parseBytesSizeValue;
 import static org.xbib.common.unit.TimeValue.parseTimeValue;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
@@ -198,6 +201,11 @@ public class ImmutableSettings implements Settings {
     @Override
     public TimeValue getAsTime(String setting, TimeValue defaultValue) {
         return parseTimeValue(get(setting), defaultValue);
+    }
+
+    @Override
+    public ByteSizeValue getAsBytesSize(String setting, ByteSizeValue defaultValue) throws SettingsException {
+        return parseBytesSizeValue(get(setting), defaultValue);
     }
 
     @Override
@@ -470,7 +478,7 @@ public class ImmutableSettings implements Settings {
          * @param values  The values
          * @return The builder
          */
-        public Builder putArray(String setting, List<Object> values) {
+        public Builder putArray(String setting, List<String> values) {
             remove(setting);
             int counter = 0;
             while (true) {
@@ -529,10 +537,10 @@ public class ImmutableSettings implements Settings {
 
         /**
          * Loads settings from the actual string content that represents them using the
-         * {@link SettingsLoaderFactory#loaderFromSource(String)}.
+         * {@link SettingsLoaderFactory#loaderFromString(String)}.
          */
-        public Builder loadFromSource(String source) {
-            SettingsLoader settingsLoader = SettingsLoaderFactory.loaderFromSource(source);
+        public Builder loadFromString(String source) {
+            SettingsLoader settingsLoader = SettingsLoaderFactory.loaderFromString(source);
             try {
                 Map<String, String> loadedSettings = settingsLoader.load(source);
                 put(loadedSettings);
@@ -543,8 +551,22 @@ public class ImmutableSettings implements Settings {
         }
 
         /**
+         * Loads settings from a map
+         */
+        public Builder loadFromMap(Map<String,Object> map) {
+            SettingsLoader settingsLoader = new JsonSettingsLoader();
+            try {
+                Map<String, String> loadedSettings = settingsLoader.load(jsonBuilder().map(map).string());
+                put(loadedSettings);
+            } catch (Exception e) {
+                throw new SettingsException("Failed to load settings from [" + map + "]", e);
+            }
+            return this;
+        }
+
+        /**
          * Loads settings from a url that represents them using the
-         * {@link SettingsLoaderFactory#loaderFromSource(String)}.
+         * {@link SettingsLoaderFactory#loaderFromString(String)}.
          */
         public Builder loadFromUrl(URL url) throws SettingsException {
             try {
@@ -556,7 +578,7 @@ public class ImmutableSettings implements Settings {
 
         /**
          * Loads settings from a stream that represents them using the
-         * {@link SettingsLoaderFactory#loaderFromSource(String)}.
+         * {@link SettingsLoaderFactory#loaderFromString(String)}.
          */
         public Builder loadFromStream(String resourceName, InputStream is) throws SettingsException {
             SettingsLoader settingsLoader = SettingsLoaderFactory.loaderFromResource(resourceName);

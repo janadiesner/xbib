@@ -31,8 +31,8 @@
  */
 package org.xbib.json.transform;
 
-import org.xbib.json.JsonXmlReader;
-import org.xbib.json.JsonXmlStreamer;
+import org.xbib.json.xml.JsonXmlReader;
+import org.xbib.json.xml.JsonXmlStreamer;
 import org.xbib.xml.namespace.XmlNamespaceContext;
 import org.xbib.xml.transform.StylesheetTransformer;
 import org.xml.sax.InputSource;

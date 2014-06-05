@@ -1,3 +1,4 @@
+
 package org.xbib.re;
 
 import java.util.ArrayList;
@@ -26,10 +27,6 @@ public class NamedPattern {
         groupNames = extractGroupNames(regex);
     }
 
-    //public int flags() {
-    //    return pattern.flags();
-    //}
-
     public NamedMatcher matcher(CharSequence input) {
         return new NamedMatcher(this, input);
     }
@@ -37,10 +34,6 @@ public class NamedPattern {
     Pattern pattern() {
         return pattern;
     }
-
-    //public String standardPattern() {
-    //    return pattern.pattern();
-    // }
 
     public String namedPattern() {
         return namedPattern;
@@ -64,7 +57,7 @@ public class NamedPattern {
     }
 
     static List<String> extractGroupNames(String namedPattern) {
-        List<String> groupNames = new ArrayList<>();
+        List<String> groupNames = new ArrayList();
         Matcher matcher = NAMED_GROUP_PATTERN.matcher(namedPattern);
         while (matcher.find()) {
             groupNames.add(matcher.group(1));

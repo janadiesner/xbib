@@ -50,8 +50,8 @@ import static org.xbib.servlet.filter.common.Constants.HTTP_CONTENT_TYPE_HEADER;
 public class WebUtilitiesResponseWrapper extends HttpServletResponseWrapper {
 
     private WebUtilitiesResponseOutputStream stream;
-    private Map<String, Object> headers = new HashMap<>();
-    private Set<Cookie> cookies = new HashSet<>();
+    private Map<String, Object> headers = new HashMap();
+    private Set<Cookie> cookies = new HashSet();
     private String contentType;
     private int status = 0;
     private boolean getWriterCalled = false;

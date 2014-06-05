@@ -32,34 +32,29 @@ abstract class AbstractStaxXMLReader extends AbstractXMLReader {
 
     @Override
     public boolean getFeature(String name) throws SAXNotRecognizedException, SAXNotSupportedException {
-        switch (name) {
-            case NAMESPACES_FEATURE_NAME:
-                return this.namespacesFeature;
-            case NAMESPACE_PREFIXES_FEATURE_NAME:
-                return this.namespacePrefixesFeature;
-            case IS_STANDALONE_FEATURE_NAME:
-                if (this.isStandalone != null) {
-                    return this.isStandalone;
-                } else {
-                    throw new SAXNotSupportedException("startDocument() callback not completed yet");
-                }
-            default:
-                return super.getFeature(name);
+        if (name.equals(NAMESPACES_FEATURE_NAME)) {
+            return this.namespacesFeature;
+        } else if (name.equals(NAMESPACE_PREFIXES_FEATURE_NAME)) {
+            return this.namespacePrefixesFeature;
+        } else if (name.equals(IS_STANDALONE_FEATURE_NAME)) {
+            if (this.isStandalone != null) {
+                return this.isStandalone;
+            } else {
+                throw new SAXNotSupportedException("startDocument() callback not completed yet");
+            }
+        } else {
+            return super.getFeature(name);
         }
     }
 
     @Override
     public void setFeature(String name, boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
-        switch (name) {
-            case NAMESPACES_FEATURE_NAME:
-                this.namespacesFeature = value;
-                break;
-            case NAMESPACE_PREFIXES_FEATURE_NAME:
-                this.namespacePrefixesFeature = value;
-                break;
-            default:
-                super.setFeature(name, value);
-                break;
+        if (name.equals(NAMESPACES_FEATURE_NAME)) {
+            this.namespacesFeature = value;
+        } else if (name.equals(NAMESPACE_PREFIXES_FEATURE_NAME)) {
+            this.namespacePrefixesFeature = value;
+        } else {
+            super.setFeature(name, value);
         }
     }
 

@@ -122,13 +122,12 @@ public class Federator {
         List<Action> actions = new ArrayList();
         for (Map<String, Object> params : specs) {
             String type = (String) params.get("type");
-            switch (type) {
-                case "z3950":
-                    actions.add(new PQFZAction().setParams(params).setBase(base));
-                    break;
-                case "sru":
-                    actions.add(new SRUAction().setParams(params).setBase(base));
-                    break;
+            if (type.equals("z3950")) {
+                actions.add(new PQFZAction().setParams(params).setBase(base));
+
+            } else if (type.equals("sru")) {
+                actions.add(new SRUAction().setParams(params).setBase(base));
+
             }
         }
         return execute(jobId, actions);

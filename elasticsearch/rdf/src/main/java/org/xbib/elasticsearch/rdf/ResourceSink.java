@@ -34,7 +34,7 @@ package org.xbib.elasticsearch.rdf;
 import java.io.IOException;
 
 import org.xbib.elasticsearch.support.client.Feeder;
-import org.xbib.elements.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.content.ContentBuilder;

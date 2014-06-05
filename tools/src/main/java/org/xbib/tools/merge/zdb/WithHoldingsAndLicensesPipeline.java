@@ -420,30 +420,36 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         if (docid != null) {
             service.ingest().index(manifestationsIndex, manifestationsIndexType, docid, builder.string());
         }
-
         // volumes by date and the services for them
         Integer volumeHoldingsCount = 0;
-        SetMultimap<Integer,Holding> volumesByDate = ImmutableSetMultimap.copyOf(m.getVolumesByDate());
-        for (Integer date : volumesByDate.keySet()) {
-            String identifier =
-                    (tag != null ? tag + "." : "") + m.externalID() + (date != -1 ? "." + date : "");
-            Set<Holding> holdings = volumesByDate.get(date);
-            if (holdings != null && !holdings.isEmpty()) {
-                builder = jsonBuilder();
-                docid = m.buildVolume(builder, tag, m.externalID(), date, holdings);
-                if (docid != null) {
-                    service.ingest().index(volumesIndex, volumesIndexType, identifier, builder.string());
-                    serviceMetric.mark(1);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("indexed volume identifier {}, date {}", docid,  date);
+        if (!m.getVolumesByDate().isEmpty()) {
+            SetMultimap<Integer, Holding> volumesByDate;
+            synchronized (m.getVolumesByDate()) {
+                volumesByDate = ImmutableSetMultimap.copyOf(m.getVolumesByDate());
+            }
+            for (Integer date : volumesByDate.keySet()) {
+                String identifier = (tag != null ? tag + "." : "") + m.externalID() + (date != -1 ? "." + date : "");
+                Set<Holding> holdings = volumesByDate.get(date);
+                if (holdings != null && !holdings.isEmpty()) {
+                    builder = jsonBuilder();
+                    docid = m.buildVolume(builder, tag, m.externalID(), date, holdings);
+                    if (docid != null) {
+                        service.ingest().index(volumesIndex, volumesIndexType, identifier, builder.string());
+                        serviceMetric.mark(1);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("indexed volume identifier {}, date {}", docid, date);
+                        }
+                        volumeHoldingsCount++;
                     }
-                    volumeHoldingsCount++;
                 }
             }
         }
         // holdings (list of institutions)
-        SetMultimap<String,Holding> holdings = ImmutableSetMultimap.copyOf(m.getVolumesByHolder());
-        if (!holdings.isEmpty()) {
+        if (!m.getVolumesByHolder().isEmpty()) {
+            SetMultimap<String, Holding> holdings;
+            synchronized (m.getVolumesByHolder()) {
+                holdings = ImmutableSetMultimap.copyOf(m.getVolumesByHolder());
+            }
             builder = jsonBuilder();
             builder.startObject().startArray("holdings");
             for (String holder : holdings.keySet()) {
@@ -455,18 +461,23 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             }
             volumeHoldingsCount++;
             serviceMetric.mark(holdings.size());
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("indexed {} holdings for {}", holdings.size(), docid);
-        }
-        if (volumeHoldingsCount == 0) {
-            logger.warn("no volumes/holdings indexed for {}", m.externalID());
+            if (logger.isDebugEnabled()) {
+                logger.debug("indexed {} holdings for {}", holdings.size(), docid);
+            }
+            if (volumeHoldingsCount == 0) {
+                logger.warn("no volumes/holdings indexed for {}", m.externalID());
+            }
         }
         // index related manifestations
-        SetMultimap<String, Manifestation> rels = ImmutableSetMultimap.copyOf(m.getRelatedManifestations());
-        for (String rel : rels.keys()) {
-            for (Manifestation mm : rels.get(rel)) {
-                indexManifestation(mm, visited);
+        if (!m.getRelatedManifestations().isEmpty()) {
+            SetMultimap<String, Manifestation> rels;
+            synchronized (m.getRelatedManifestations()) {
+                rels = ImmutableSetMultimap.copyOf(m.getRelatedManifestations());
+            }
+            for (String rel : rels.keys()) {
+                for (Manifestation mm : rels.get(rel)) {
+                    indexManifestation(mm, visited);
+                }
             }
         }
     }

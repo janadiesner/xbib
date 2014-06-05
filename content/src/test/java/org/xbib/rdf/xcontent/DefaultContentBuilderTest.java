@@ -21,7 +21,7 @@ public class DefaultContentBuilderTest<S extends Identifier, P extends Property,
 
     @Test
     public void testSimpleBuilder() throws Exception {
-        Resource<S, P, O> resource = new SimpleResource<>();
+        Resource<S, P, O> resource = new SimpleResource();
         SimpleLiteral<String> l = new SimpleLiteral<String>()
                 .object("2013")
                 .type(IRI.create("xsd:gYear"));
@@ -32,12 +32,12 @@ public class DefaultContentBuilderTest<S extends Identifier, P extends Property,
         ResourceContext context = resource.context();
         DefaultContentBuilder defaultContentBuilder = new DefaultContentBuilder();
         String result = defaultContentBuilder.build(context, resource);
-        logger.info("simple: {}", result);
+        assertEquals("{\"urn:property\":\"Hello World\",\"urn:date\":2013,\"urn:link\":\"urn:pointer\"}", result);
     }
 
     @Test
     public void testRDFType() throws Exception {
-        Resource<S, P, O> resource = new SimpleResource<>();
+        Resource<S, P, O> resource = new SimpleResource();
         SimpleLiteral<String> l = new SimpleLiteral<String>()
                 .object("2013")
                 .type(IRI.create("xsd:gYear"));
@@ -50,7 +50,7 @@ public class DefaultContentBuilderTest<S extends Identifier, P extends Property,
         ResourceContext context = resource.context();
         DefaultContentBuilder defaultContentBuilder = new DefaultContentBuilder();
         String result = defaultContentBuilder.build(context, resource);
-        logger.info("embbeded: {}", result);
+        assertEquals("{\"urn:property\":\"Hello World\",\"urn:date\":2013,\"rdf:type\":\"urn:type1\",\"urn:embedded\":{\"rdf:type\":\"urn:type2\"}}", result);
     }
 
 }

@@ -42,29 +42,29 @@ import java.util.Hashtable;
  * It is defined to be independent of any specific directory service
  * implementation. Thus a variety of directories - new, emerging, and already
  * deployed - can be accessed in a common way.
- * <p/>
+ * <p>
  * The JNDI architecture consists of an API and a service provider
  * interface (SPI). Java applications use the JNDI API to access a variety of
  * naming and directory services. The SPI enables a variety of naming and
  * directory services to be plugged in transparently, thereby allowing the
  * Java application using the JNDI API to access their services.
- * <p/>
+ * <p>
  * The javax.naming.spi package provides the means by which developers
  * of different naming/directory service providers can develop and hook up
  * their implementations so that the corresponding services are accessible
  * from applications that use the JNDI.
- * <p/>
+ * <p>
  * The javax.naming.spi package allows different implementations to be
  * plugged in dynamically. These implementations include those for the initial
  * context and for contexts that can be reached from the initial context.
- * <p/>
+ * <p>
  * The first thing you must do when you use a JNDI naming service is to
  * obtain a context in which you can add and find names. The context that
  * represents the entire name space is known as the initial context. You need
  * to have an initial context, since all of the operations that you can
  * perform on naming and directory services are performed relative to a
  * context.
- * <p/>
+ * <p>
  * In Java code, you represent the initial context with an instance of
  * the javax.naming.InitialContext class. As mentioned earlier in this
  * chapter, this class implements the javax.naming.Context interface that

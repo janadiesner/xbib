@@ -31,7 +31,7 @@
  */
 package org.xbib.elements.marc.direct;
 
-import org.xbib.elements.context.ContextResourceOutput;
+import org.xbib.rdf.context.ContextResourceOutput;
 import org.xbib.elements.context.ResourceContextFactory;
 import org.xbib.elements.direct.AbstractDirectBuilder;
 import org.xbib.elements.marc.MARCContext;

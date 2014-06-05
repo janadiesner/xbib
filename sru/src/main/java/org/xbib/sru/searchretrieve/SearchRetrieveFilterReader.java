@@ -121,17 +121,17 @@ public class SearchRetrieveFilterReader extends XMLFilterReader {
     public void startElement(String uri, String localname, String qname, Attributes atts)
             throws SAXException {
         if (SRUConstants.NS_URI.equals(uri)) {
-            switch (localname) {
-                case "record":
-                    recordPacking = null;
-                    recordSchema = null;
-                    recordIdentifier = null;
-                    recordPosition = 0;
-                    for (SearchRetrieveListener listener : request.getListeners()) {
-                        listener.beginRecord();
-                    }
-                    break;
-                case "recordData": try {
+            if (localname.equals("record")) {
+                recordPacking = null;
+                recordSchema = null;
+                recordIdentifier = null;
+                recordPosition = 0;
+                for (SearchRetrieveListener listener : request.getListeners()) {
+                    listener.beginRecord();
+                }
+
+            } else if (localname.equals("recordData")) {
+                try {
                     for (XMLEventConsumer consumer : consumers) {
                         inRecordData = true;
                         consumer.add(eventFactory.createStartDocument());
@@ -141,11 +141,11 @@ public class SearchRetrieveFilterReader extends XMLFilterReader {
                             consumer.add(eventFactory.createNamespace(ns.getPrefix(), ns.getNamespaceURI()));
                         }
                     }
-                    break;
                 } catch (XMLStreamException e) {
                     throw new SAXException(e);
                 }
-                case "extraRecordData": try {
+            } else if (localname.equals("extraRecordData")) {
+                try {
                     for (XMLEventConsumer extraConsumer : extraConsumers) {
                         inExtraRecordData = true;
                         extraConsumer.add(eventFactory.createStartDocument());
@@ -155,13 +155,12 @@ public class SearchRetrieveFilterReader extends XMLFilterReader {
                             extraConsumer.add(eventFactory.createNamespace(ns.getPrefix(), ns.getNamespaceURI()));
                         }
                     }
-                    break;
                 } catch (XMLStreamException e) {
                     throw new SAXException(e);
                 }
-                case "echoedSearchRetrieveRequest":
-                    echo = true;
-                    break;
+            } else if (localname.equals("echoedSearchRetrieveRequest")) {
+                echo = true;
+
             }
         } else {
             isRecordIdentifier = false;

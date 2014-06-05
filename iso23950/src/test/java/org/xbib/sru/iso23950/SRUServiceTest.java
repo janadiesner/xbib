@@ -62,7 +62,7 @@ public class SRUServiceTest {
             logger.info("trying " + name);
             ZSRUService service = ZSRUServiceFactory.getService(name);
             FileOutputStream out = new FileOutputStream("target/sru-" + service.getURI().getHost() + ".xml");
-            try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
+            Writer w = new OutputStreamWriter(out, "UTF-8");
                 try {
                     SRUClient client = service.newClient();
                     SearchRetrieveListener listener = new SearchRetrieveResponseAdapter() {
@@ -143,7 +143,7 @@ public class SRUServiceTest {
                 } catch (IOException e) {
                     logger.error(e.getMessage(), e);
                 }
-            }
+            w.close();
         }
     }
 }

@@ -64,12 +64,12 @@ public class ESQueryGeneratorTest extends Assert {
                 ESQueryGenerator generator = new ESQueryGenerator(bundle);
                 parser.getCQLQuery().accept(generator);
                 String q = generator.getQueryResult();
-                //logger.info("{} --> {} --> {}", s[0], q, generator.getSourceResult() );
-                //String pq = QueryParserService.parseQuery(q);
-                //logger.log(Level.INFO, "ES PARSER: " + pq );
-                //if (s.length > 1) {
-                    //assertEquals(s[1], generator.getResult());
-                //}
+                /*logger.info("{} --> {} --> {}", s[0], q, generator.getSourceResult() );
+                String pq = QueryParserService.parseQuery(q);
+                logger.info("ES PARSER: " + pq );
+                if (s.length > 1) {
+                    assertEquals(s[1], generator.getResult());
+                }*/
                 return true;
             }
 
@@ -84,7 +84,7 @@ public class ESQueryGeneratorTest extends Assert {
         int errors = 0;
 
         void execute(String resourcePath, LineProcessor lp) throws Exception {
-            try (LineNumberReader lr = new LineNumberReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(resourcePath),"UTF-8"))) {
+            LineNumberReader lr = new LineNumberReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(resourcePath),"UTF-8"));
                 String line;
                 while ((line = lr.readLine()) != null) {
                     if (line.trim().length() > 0 && !line.startsWith("#")) {
@@ -100,7 +100,7 @@ public class ESQueryGeneratorTest extends Assert {
                         }
                     }
                 }
-            }
+            lr.close();
         }
 
         int getOK() {

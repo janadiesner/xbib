@@ -13,11 +13,11 @@ public class BZip2Test extends Assert {
     @Test
     public void testBZip2HelloWorld() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try (Bzip2OutputStream zOut = new Bzip2OutputStream(out)) {
-            ObjectOutputStream objOut = new ObjectOutputStream(zOut);
-            String helloWorld = "Hello World!";
-            objOut.writeObject(helloWorld);
-        }
+        Bzip2OutputStream zOut = new Bzip2OutputStream(out);
+        ObjectOutputStream objOut = new ObjectOutputStream(zOut);
+        String helloWorld = "Hello World!";
+        objOut.writeObject(helloWorld);
+        zOut.close();
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
         Bzip2InputStream zIn = new Bzip2InputStream(in);
         ObjectInputStream objIn = new ObjectInputStream(zIn);

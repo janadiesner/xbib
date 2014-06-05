@@ -31,9 +31,6 @@
  */
 package org.xbib.oai.service.verb;
 
-import java.io.IOException;
-import javax.xml.stream.XMLStreamException;
-
 import org.xbib.oai.DefaultOAIResponse;
 import org.xbib.oai.service.OAIService;
 import org.xbib.oai.service.ServerOAIRequest;
@@ -54,7 +51,7 @@ public class ListMetadataFormats extends AbstractVerb {
             endElement("ListMetadataFormats");
             endOAIPMH();
             endDocument();
-        } catch (XMLStreamException | IOException e) {
+        } catch (Exception e) {
             throw new OAIException(e.getMessage(), e);
         }
     }

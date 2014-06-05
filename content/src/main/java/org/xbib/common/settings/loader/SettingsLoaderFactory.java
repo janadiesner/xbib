@@ -19,9 +19,14 @@
 
 package org.xbib.common.settings.loader;
 
+import org.xbib.common.xcontent.XContentBuilder;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
+import java.util.Map;
+
+import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * A settings loader factory automatically trying to identify what type of
@@ -54,7 +59,7 @@ public final class SettingsLoaderFactory {
     /**
      * Returns a {@link SettingsLoader} based on the actual settings source.
      */
-    public static SettingsLoader loaderFromSource(String source) {
+    public static SettingsLoader loaderFromString(String source) {
         if (source.indexOf('{') != -1 && source.indexOf('}') != -1) {
             return new JsonSettingsLoader();
         }

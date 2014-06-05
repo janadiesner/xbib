@@ -36,7 +36,7 @@ import java.io.StringReader;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.elements.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.keyvalue.KeyValueReader;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -62,9 +62,9 @@ public class DublinCoreBuilderTest extends Assert {
         
         DublinCoreBuilder builder = new DublinCoreBuilder().addOutput(output);
         DublinCoreElementMapper mapper = new DublinCoreElementMapper("dublincore").start(builder);
-        try (KeyValueReader reader = new KeyValueReader(sr).addListener(mapper)) {
-            while (reader.readLine() != null);
-        }
+        KeyValueReader reader = new KeyValueReader(sr).addListener(mapper);
+        while (reader.readLine() != null);
+        reader.close();
         mapper.close();
         assertEquals(output.getCounter() > 0L, true);
     }

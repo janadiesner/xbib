@@ -104,7 +104,7 @@ public class SimpleResourceTest<S extends Identifier, P extends Property, O exte
 
     @Test
     public void testPredicateSetIterator() throws Exception {
-        Resource<S, P, O> r = new SimpleResource<>();
+        Resource<S, P, O> r = new SimpleResource();
         r.id(IRI.create("urn:doc1"))
                 .add("urn:valueURI", "Hello World")
                 .add("urn:name", "Smith")
@@ -157,7 +157,7 @@ public class SimpleResourceTest<S extends Identifier, P extends Property, O exte
 
     @Test
     public void testCompactPredicate() throws Exception {
-        Resource<S, P, O> r = new SimpleResource<>();
+        Resource<S, P, O> r = new SimpleResource();
         r.id(IRI.create("urn:doc"))
                 .add("urn:value1", "Hello World");
         P predicate = simpleFactory.asPredicate("urn:pred");
@@ -188,28 +188,28 @@ public class SimpleResourceTest<S extends Identifier, P extends Property, O exte
 
     @Test
     public void testAddingResources() throws Exception {
-        Resource<S, P, O> r = new SimpleResource<>();
+        Resource<S, P, O> r = new SimpleResource();
         r.id(IRI.create("urn:r"))
                 .add("urn:value", "Hello R");
 
         // named ID
-        Resource<S, P, O> s = new SimpleResource<>();
+        Resource<S, P, O> s = new SimpleResource();
         s.id(IRI.create("urn:s"))
                 .add("urn:value", "Hello S");
 
         // another named ID
-        Resource<S, P, O> t = new SimpleResource<>();
+        Resource<S, P, O> t = new SimpleResource();
         t.id(IRI.create("urn:t"))
                 .add("urn:value", "Hello T");
 
         // a blank node resource ID
         IRI blank1 = new IdentifiableNode().blank().id();
-        Resource<S, P, O> u = new SimpleResource<>();
+        Resource<S, P, O> u = new SimpleResource();
         u.id(blank1).add("urn:value", "Hello U");
 
         // another blank node resource ID
         IRI blank2 = new IdentifiableNode().blank().id();
-        Resource<S, P, O> v = new SimpleResource<>();
+        Resource<S, P, O> v = new SimpleResource();
         v.id(blank2).add("urn:value", "Hello V");
 
         P predicate = simpleFactory.asPredicate("dc:subject");

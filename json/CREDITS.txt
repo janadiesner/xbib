@@ -1,0 +1,8 @@
+org.xbib.json.jackson is originally based on com.github.fge.jackson
+org.xbib.json.pointer is originally based on com.github.fge.jackson,jsoonpointer
+org.xbib.json.patch is originally bases on com.github.fge.jsonpatch
+
+
+Original copyright notice:
+
+Copyright (c) 2014, Francis Galiegue (fgaliegue@gmail.com)

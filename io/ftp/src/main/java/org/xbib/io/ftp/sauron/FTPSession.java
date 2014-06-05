@@ -31,7 +31,7 @@ public class FTPSession implements Session<StringPacket> {
             String userInfo = uri.getUserInfo();
             String[] auth = userInfo.split(":");
             client.login(auth[0], auth[1]);
-        } catch (IllegalStateException | IOException | FTPIllegalReplyException | FTPException ex) {
+        } catch (Exception ex) {
             throw new IOException(ex);
         }
         this.open = true;
@@ -43,7 +43,7 @@ public class FTPSession implements Session<StringPacket> {
             if (client != null) {
                 client.disconnect(true);
             }
-        } catch (IllegalStateException | IOException | FTPIllegalReplyException | FTPException ex) {
+        } catch (Exception ex) {
             throw new IOException(ex);
         }
     }
@@ -75,9 +75,7 @@ public class FTPSession implements Session<StringPacket> {
             } else {
                 return null;
             }
-        } catch (IllegalStateException | IOException | FTPIllegalReplyException |
-                FTPDataTransferException | FTPAbortedException |
-                FTPListParseException | FTPException ex) {
+        } catch (Exception ex) {
             throw new IOException(ex);
         }      
     }
@@ -87,8 +85,7 @@ public class FTPSession implements Session<StringPacket> {
             if (client != null) {
                 client.download(name, out, 0, null);
             }
-        } catch (IllegalStateException | IOException | FTPIllegalReplyException |
-                FTPDataTransferException | FTPAbortedException | FTPException ex) {
+        } catch (Exception ex) {
             throw new IOException(ex);
         }
     }

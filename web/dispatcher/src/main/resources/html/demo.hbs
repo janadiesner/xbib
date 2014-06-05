@@ -22,7 +22,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Eingabe</div>
                 <div class="panel-body">
-                    <form class="form-horizontal" action="{{form_action}}" method="post">
+                    <form class="form-horizontal" action="" method="post">
                         <fieldset>
                             <legend>Leitwegrecherche</legend>
                             <div class="form-group">
@@ -102,7 +102,7 @@
                         {{#each head}}
                             <li class="list-group-item">
                                 <p><strong>
-                                    {{#if pilot}}
+                                    {{#if priority}}
                                         <h3 style="color: green">{{group}}&nbsp;&mdash;&nbsp;{{isil}}</h3>
                                     {{else}}
                                         {{#if base}}
@@ -118,7 +118,7 @@
                                 {{/ifCond}}
                                 {{#each service}}
                                     <p style="border-bottom: 1px solid #ccc"></p>
-                                    <div>Service-Nummer {{eval @index "+" 1}} &nbsp;&mdash;&nbsp; Service-Rang {{priority}}<span style="float:right">{{@id}}</span></div>
+                                    <div>Service-Nummer {{eval @index "+" 1}} &nbsp;&mdash;&nbsp; Priorität {{priority}}<span style="float:right">{{@id}}</span></div>
                                     <div>{{i18n carriertype bundle="carriertype" locale="de"}}
                                     {{#each type}}
                                         {{#ifCond type "==" "interlibrary"}}
@@ -199,7 +199,7 @@
                         {{#each tail}}
                             <li class="list-group-item">
                                 <p><strong>
-                                    {{#if pilot}}
+                                    {{#if priority}}
                                         <h3 style="color: orange">{{group}}&nbsp;&mdash;&nbsp;{{isil}}</h3>
                                     {{else}}
                                         {{#if base}}
@@ -214,7 +214,7 @@
                                 {{/ifCond}}
                                 {{#each service}}
                                     <p style="border-bottom: 1px solid #ccc"></p>
-                                    <div>Service-Nummer {{eval @index "+" 1}} &nbsp;&mdash;&nbsp; Service-Rang {{priority}}<span style="float:right">{{@id}}</span></div>
+                                    <div>Service-Nummer {{eval @index "+" 1}} &nbsp;&mdash;&nbsp; Priorität {{priority}}<span style="float:right">{{@id}}</span></div>
                                     <div>{{i18n carriertype bundle="carriertype" locale="de"}}
                                         {{#each type}}
                                             {{#ifCond type "==" "interlibrary"}}
@@ -295,7 +295,7 @@
                         {{#each other}}
                             <li class="list-group-item">
                                 <p><strong>
-                                    {{#if pilot}}
+                                    {{#if priority}}
                                         <h3 style="color: gray">{{group}}&nbsp;&mdash;&nbsp;{{isil}}</h3>
                                     {{else}}
                                         {{#if base}}

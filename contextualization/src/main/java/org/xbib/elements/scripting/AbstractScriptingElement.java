@@ -86,7 +86,7 @@ public abstract class AbstractScriptingElement implements Element {
         Invocable inv = (Invocable) engine;
         try {
             inv.invokeMethod(element, "begin");
-        } catch (ScriptException | NoSuchMethodException ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
         return this;
@@ -97,7 +97,7 @@ public abstract class AbstractScriptingElement implements Element {
         Invocable inv = (Invocable) engine;
         try {
             inv.invokeMethod(element, "build", builder, key, value);
-        } catch (ScriptException |NoSuchMethodException ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
         return this;
@@ -108,7 +108,7 @@ public abstract class AbstractScriptingElement implements Element {
         Invocable inv = (Invocable) engine;
         try {
             inv.invokeMethod(element, "end");
-        } catch (ScriptException | NoSuchMethodException ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
         return this;

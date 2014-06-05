@@ -1,4 +1,3 @@
-
 package org.xbib.classloader.directory;
 
 import org.xbib.classloader.AbstractURLResourceLocation;

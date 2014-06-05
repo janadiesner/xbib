@@ -1,4 +1,3 @@
-
 package org.xbib.classloader.jar;
 
 import java.io.File;

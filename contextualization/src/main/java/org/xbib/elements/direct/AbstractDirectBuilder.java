@@ -31,7 +31,7 @@
  */
 package org.xbib.elements.direct;
 
-import org.xbib.elements.context.ContextResourceOutput;
+import org.xbib.rdf.context.ContextResourceOutput;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;

@@ -32,14 +32,14 @@ public class ItemLibraryIdentifier extends MARCElement {
     public ItemLibraryIdentifier build(MARCElementBuilder b, FieldCollection key, String value) {
         boolean servicecreated = false;
         for (Field d : key) {
-            switch (d.subfieldId()) {
-                case "a":
-                    resolveIdentifier(b, d.data());
-                    break;
-                case "e":
-                    createItemService(b, d.data());
-                    servicecreated = true;
-                    break;
+            String s = d.subfieldId();
+            if (s.equals("a")) {
+                resolveIdentifier(b, d.data());
+
+            } else if (s.equals("e")) {
+                createItemService(b, d.data());
+                servicecreated = true;
+
             }
         }
         if (!servicecreated) {

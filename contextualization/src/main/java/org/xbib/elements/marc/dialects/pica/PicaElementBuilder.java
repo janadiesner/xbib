@@ -34,7 +34,7 @@ package org.xbib.elements.marc.dialects.pica;
 import org.xbib.elements.AbstractElementBuilder;
 import org.xbib.elements.context.ResourceContextFactory;
 import org.xbib.analyzer.dublincore.DublinCoreProperties;
-import org.xbib.elements.context.ContextResourceOutput;
+import org.xbib.rdf.context.ContextResourceOutput;
 import org.xbib.marc.FieldCollection;
 
 public class PicaElementBuilder

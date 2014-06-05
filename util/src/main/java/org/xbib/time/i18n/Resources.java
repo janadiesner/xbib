@@ -1,4 +1,3 @@
-
 package org.xbib.time.i18n;
 
 import java.util.ListResourceBundle;

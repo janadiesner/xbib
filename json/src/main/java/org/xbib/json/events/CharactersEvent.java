@@ -1,6 +1,5 @@
 package org.xbib.json.events;
 
-
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamConstants;
 

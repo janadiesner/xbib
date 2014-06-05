@@ -107,24 +107,20 @@ public class DOAJClientTest {
 
         @Override
         public Object toObject(QName name, String content) {
-            switch (name.getLocalPart()) {
-                case "identifier" : {
-                    if (content.startsWith("http://")) {
-                        return new SimpleLiteral(content).type(IRI.create("xsd:anyUri"));
-                    }
-                    if (content.startsWith("issn: ")) {
-                        return new SimpleLiteral(content.substring(6)).type(ISSN);
-                    }
-                    if (content.startsWith("eissn: ")) {
-                        return new SimpleLiteral(content.substring(7)).type(EISSN);
-                    }
-                    break;
+            String s = name.getLocalPart();
+            if (s.equals("identifier")) {
+                if (content.startsWith("http://")) {
+                    return new SimpleLiteral(content).type(IRI.create("xsd:anyUri"));
                 }
-                case "subject" : {
-                    if (content.startsWith("LCC: ")) {
-                        return new SimpleLiteral(content.substring(5)).type(LCCN);
-                    }
-                    break;
+                if (content.startsWith("issn: ")) {
+                    return new SimpleLiteral(content.substring(6)).type(ISSN);
+                }
+                if (content.startsWith("eissn: ")) {
+                    return new SimpleLiteral(content.substring(7)).type(EISSN);
+                }
+            } else if (s.equals("subject")) {
+                if (content.startsWith("LCC: ")) {
+                    return new SimpleLiteral(content.substring(5)).type(LCCN);
                 }
             }
             return content;

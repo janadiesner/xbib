@@ -88,55 +88,45 @@ public class FederatorResponse {
         ew.add(eventFactory.createStartElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "records"));
         int pos = 1;
         boolean inElement = false;
-        Iterator<XMLEvent> it = events.iterator();
-        while (it.hasNext()) {
-            XMLEvent e = it.next();
+        for (XMLEvent e : events) {
             if (e.isProcessingInstruction()) {
                 // drop all processing instructions
                 ProcessingInstruction pi = (ProcessingInstruction) e;
                 String prefix = pi.getTarget();
                 String nsURI = pi.getData();
-                switch (prefix) {
-                    case "recordSchema":
-                        // declare SRU record schema only if registered in SRU class
-                        if (SRUConstants.RECORD_SCHEMAS.containsKey(nsURI)) {
-                            // add XML namespace
-                            if (SRUConstants.RECORD_SCHEMA_NAMESPACES.containsKey(nsURI)) {
-                                ew.add(eventFactory.createNamespace(nsURI, SRUConstants.RECORD_SCHEMA_NAMESPACES.get(nsURI).toASCIIString()));
-                            }
-                            ew.add(eventFactory.createStartElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordSchema"));
-                            ew.add(eventFactory.createCharacters(SRUConstants.RECORD_SCHEMAS.get(nsURI).toASCIIString()));
-                            ew.add(eventFactory.createEndElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordSchema"));
+                if (prefix.equals("recordSchema")) {// declare SRU record schema only if registered in SRU class
+                    if (SRUConstants.RECORD_SCHEMAS.containsKey(nsURI)) {
+                        // add XML namespace
+                        if (SRUConstants.RECORD_SCHEMA_NAMESPACES.containsKey(nsURI)) {
+                            ew.add(eventFactory.createNamespace(nsURI, SRUConstants.RECORD_SCHEMA_NAMESPACES.get(nsURI).toASCIIString()));
                         }
-                        break;
-                    case "recordPacking":
-                        // SRU record packing (always "xml")
-                        ew.add(eventFactory.createStartElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordPacking"));
-                        ew.add(eventFactory.createCharacters(nsURI));
-                        ew.add(eventFactory.createEndElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordPacking"));
-                        break;
-                    case "recordIdentifier":
-                        // SRU record identifier
-                        ew.add(eventFactory.createStartElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordIdentifier"));
-                        ew.add(eventFactory.createCharacters(nsURI));
-                        ew.add(eventFactory.createEndElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordIdentifier"));
-                        break;
-                    case "recordPosition":
-                        // SRU record position is the global position (NOT the local record position)
-                        ew.add(eventFactory.createStartElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordPosition"));
-                        ew.add(eventFactory.createCharacters(Integer.toString(pos++)));
-                        ew.add(eventFactory.createEndElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordPosition"));
-                        // now, after recordPosition, start with recordData
-                        ew.add(eventFactory.createStartElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordData"));
-                        break;
-                    case "id":
-                        // let us identify the origin of the record by an XML ID
-                        ew.add(eventFactory.createAttribute(prefix, nsURI));
-                        break;
-                    case "format":
-                    case "type":
-                        // skip format, type
-                        break;
+                        ew.add(eventFactory.createStartElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordSchema"));
+                        ew.add(eventFactory.createCharacters(SRUConstants.RECORD_SCHEMAS.get(nsURI).toASCIIString()));
+                        ew.add(eventFactory.createEndElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordSchema"));
+                    }
+
+                } else if (prefix.equals("recordPacking")) {// SRU record packing (always "xml")
+                    ew.add(eventFactory.createStartElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordPacking"));
+                    ew.add(eventFactory.createCharacters(nsURI));
+                    ew.add(eventFactory.createEndElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordPacking"));
+
+                } else if (prefix.equals("recordIdentifier")) {// SRU record identifier
+                    ew.add(eventFactory.createStartElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordIdentifier"));
+                    ew.add(eventFactory.createCharacters(nsURI));
+                    ew.add(eventFactory.createEndElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordIdentifier"));
+
+                } else if (prefix.equals("recordPosition")) {// SRU record position is the global position (NOT the local record position)
+                    ew.add(eventFactory.createStartElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordPosition"));
+                    ew.add(eventFactory.createCharacters(Integer.toString(pos++)));
+                    ew.add(eventFactory.createEndElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordPosition"));
+                    // now, after recordPosition, start with recordData
+                    ew.add(eventFactory.createStartElement(SRUConstants.NS_PREFIX, SRUConstants.NS_URI, "recordData"));
+
+                } else if (prefix.equals("id")) {// let us identify the origin of the record by an XML ID
+                    ew.add(eventFactory.createAttribute(prefix, nsURI));
+
+                } else if (prefix.equals("format") || prefix.equals("type")) {// skip format, type
+
                 }
 
             } else if (e.isStartDocument()) {
@@ -177,5 +167,5 @@ public class FederatorResponse {
     }
     
     private final static Pattern INVALID =
-            Pattern.compile("[^\\u0009\\u000A\\u000D\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF]");
+            Pattern.compile("[^\\u0009\\u000A\\u000D\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDBFF\\uDC00\\uDFFF]");
 }

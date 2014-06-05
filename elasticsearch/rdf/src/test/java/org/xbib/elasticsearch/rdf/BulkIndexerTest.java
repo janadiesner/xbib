@@ -24,11 +24,10 @@ public class BulkIndexerTest extends Assert {
     public void testBulkIndexerWithSingleResourceAndCQLSearch() throws Exception {
         try {
             final Ingest es = new IngestTransportClient()
-                    .newClient(URI.create("es://localhost:9300?es.cluster.name=test"))
-                    .setIndex("document")
-                    .setType("test");
+                    .newClient(URI.create("es://localhost:9300?es.cluster.name=test"));
+            es.newIndex("test");
+            es.deleteIndex("test");
 
-            es.deleteIndex();
             ResourceContext context = createContext();
             new ResourceSink(es).output(context, context.getResource(), context.getContentBuilder());
             es.flush();
@@ -51,7 +50,7 @@ public class BulkIndexerTest extends Assert {
     private ResourceContext createContext() {
         ResourceContext context = new SimpleResourceContext()
                 .newNamespaceContext()
-                .setContentBuilder(new DefaultContentBuilder<>());
+                .setContentBuilder(new DefaultContentBuilder());
         context.getNamespaceContext().addNamespace(ES.NS_PREFIX, ES.NS_URI);
         context.getNamespaceContext().addNamespace("urn", "http://urn");
         context.getNamespaceContext().addNamespace("dc", "http://purl.org/dc/terms/");

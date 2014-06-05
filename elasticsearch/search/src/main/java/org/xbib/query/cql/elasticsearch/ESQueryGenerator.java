@@ -239,7 +239,7 @@ public class ESQueryGenerator implements Visitor {
             String filtername = node.getSearchClause().getIndex().getName();
             Operator filterop = comparitorToES(node.getSearchClause().getRelation().getComparitor());
             Node filterterm = termToESwithoutWildCard(node.getSearchClause().getTerm());
-            Filter<Node> filter = new Filter<>(filtername, filterterm, filterop);
+            Filter<Node> filter = new Filter(filtername, filterterm, filterop);
             if (op == BooleanOperator.AND) {
                 model.addConjunctiveFilter(filter);
             } else if (op == BooleanOperator.OR) {
@@ -288,7 +288,7 @@ public class ESQueryGenerator implements Visitor {
             if (model.isOptionContext(context)) {
                 model.addOption(node.getIndex().getName(), node.getTerm().getValue());
             } else if (model.isFacetContext(context)) {
-                Facet<String> facet = new Facet<>(node.getIndex().getName(), Facet.Type.TERMS, node.getTerm().getValue());
+                Facet<String> facet = new Facet(node.getIndex().getName(), Facet.Type.TERMS, node.getTerm().getValue());
                 model.addFacet(facet);
             }
         }

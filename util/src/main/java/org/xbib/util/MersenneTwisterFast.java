@@ -14,12 +14,12 @@ import java.util.ListIterator;
  * The Mersenne Twister Home Page</a>, with the initialization
  * improved using the new 2002/1/26 initialization algorithm
  * By Sean Luke, October 2004.
- * <p/>
+ * <p>
  * <p><b>MersenneTwister</b> is a drop-in subclass replacement
  * for java.util.Random.  It is properly synchronized and
  * can be used in a multithreaded environment.  On modern VMs such
  * as HotSpot, it is approximately 1/3 slower than java.util.Random.
- * <p/>
+ * <p>
  * <p><b>MersenneTwisterFast</b> is not a subclass of java.util.Random.  It has
  * the same public methods as Random does, however, and it is
  * algorithmically identical to MersenneTwister.  MersenneTwisterFast
@@ -29,97 +29,97 @@ import java.util.ListIterator;
  * instance cannot be shared by multiple threads.  But all this helps
  * MersenneTwisterFast achieve well over twice the speed of MersenneTwister.
  * java.util.Random is about 1/3 slower than MersenneTwisterFast.
- * <p/>
+ * <p>
  * <h3>About the Mersenne Twister</h3>
  * <p>This is a Java version of the C-program for MT19937: Integer version.
  * The MT19937 algorithm was created by Makoto Matsumoto and Takuji Nishimura,
  * who ask: "When you use this, send an email to: matumoto@math.keio.ac.jp
  * with an appropriate reference to your work".  Indicate that this
  * is a translation of their algorithm into Java.
- * <p/>
+ * <p>
  * <p><b>Reference. </b>
  * Makato Matsumoto and Takuji Nishimura,
  * "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform
  * Pseudo-Random Number Generator",
  * <i>ACM Transactions on Modeling and. Computer Simulation,</i>
  * Vol. 8, No. 1, January 1998, pp 3--30.
- * <p/>
+ * <p>
  * <h3>About this Version</h3>
- * <p/>
+ * <p>
  * <p><b>Changes since V19:</b> nextFloat(boolean, boolean) now returns float,
  * not double.
- * <p/>
+ * <p>
  * <p><b>Changes since V18:</b> Removed old final declarations, which used to
  * potentially speed up the code, but no longer.
- * <p/>
+ * <p>
  * <p><b>Changes since V17:</b> Removed vestigial references to &= 0xffffffff
  * which stemmed from the original C code.  The C code could not guarantee that
  * ints were 32 bit, hence the masks.  The vestigial references in the Java
  * code were likely optimized out anyway.
- * <p/>
+ * <p>
  * <p><b>Changes since V16:</b> Added nextDouble(includeZero, includeOne) and
  * nextFloat(includeZero, includeOne) to allow for half-open, fully-closed, and
  * fully-open intervals.
- * <p/>
+ * <p>
  * <p><b>Changes Since V15:</b> Added serialVersionUID to quiet compiler warnings
  * from Sun's overly verbose compilers as of JDK 1.5.
- * <p/>
+ * <p>
  * <p><b>Changes Since V14:</b> made strictfp, with StrictMath.log and StrictMath.sqrt
  * in nextGaussian instead of Math.log and Math.sqrt.  This is largely just to be safe,
  * as it presently makes no difference in the speed, correctness, or results of the
  * algorithm.
- * <p/>
+ * <p>
  * <p><b>Changes Since V13:</b> clone() method CloneNotSupportedException removed.
- * <p/>
+ * <p>
  * <p><b>Changes Since V12:</b> clone() method added.
- * <p/>
+ * <p>
  * <p><b>Changes Since V11:</b> stateEquals(...) method added.  MersenneTwisterFast
  * is equal to other MersenneTwisterFasts with identical state; likewise
  * MersenneTwister is equal to other MersenneTwister with identical state.
  * This isn't equals(...) because that requires a contract of immutability
  * to compare by value.
- * <p/>
+ * <p>
  * <p><b>Changes Since V10:</b> A documentation error suggested that
  * setSeed(int[]) required an int[] array 624 long.  In fact, the array
  * can be any non-zero length.  The new version also checks for this fact.
- * <p/>
+ * <p>
  * <p><b>Changes Since V9:</b> readState(stream) and writeState(stream)
  * provided.
- * <p/>
+ * <p>
  * <p><b>Changes Since V8:</b> setSeed(int) was only using the first 28 bits
  * of the seed; it should have been 32 bits.  For small-number seeds the
  * behavior is identical.
- * <p/>
+ * <p>
  * <p><b>Changes Since V7:</b> A documentation error in MersenneTwisterFast
  * (but not MersenneTwister) stated that nextDouble selects uniformly from
  * the full-open interval [0,1].  It does not.  nextDouble's contract is
  * identical across MersenneTwisterFast, MersenneTwister, and java.util.Random,
  * namely, selection in the half-open interval [0,1).  That is, 1.0 should
  * not be returned.  A similar contract exists in nextFloat.
- * <p/>
+ * <p>
  * <p><b>Changes Since V6:</b> License has changed from LGPL to BSD.
  * New timing information to compare against
  * java.util.Random.  Recent versions of HotSpot have helped Random increase
  * in speed to the point where it is faster than MersenneTwister but slower
  * than MersenneTwisterFast (which should be the case, as it's a less complex
  * algorithm but is synchronized).
- * <p/>
+ * <p>
  * <p><b>Changes Since V5:</b> New empty constructor made to work the same
  * as java.util.Random -- namely, it seeds based on the current time in
  * milliseconds.
- * <p/>
+ * <p>
  * <p><b>Changes Since V4:</b> New initialization algorithms.  See
  * (see <a href="http://www.math.keio.ac.jp/matumoto/MT2002/emt19937ar.html"</a>
  * http://www.math.keio.ac.jp/matumoto/MT2002/emt19937ar.html</a>)
- * <p/>
+ * <p>
  * <p>The MersenneTwister code is based on standard MT19937 C/C++
  * code by Takuji Nishimura,
  * with suggestions from Topher Cooper and Marc Rieffel, July 1997.
  * The code was originally translated into Java by Michael Lecuyer,
  * January 1999, and the original code is Copyright (c) 1999 by Michael Lecuyer.
- * <p/>
+ * <p>
  * <h3>Java notes</h3>
- * <p/>
+ * <p>
  * <p>This implementation implements the bug fixes made
  * in Java 1.2's version of Random, which means it can be used with
  * earlier versions of Java.  See
@@ -128,23 +128,23 @@ import java.util.ListIterator;
  * on the random-number generation contracts made.  Additionally, there's
  * an undocumented bug in the JDK java.util.Random.nextBytes() method,
  * which this code fixes.
- * <p/>
+ * <p>
  * <p> Just like java.util.Random, this
  * generator accepts a long seed but doesn't use all of it.  java.util.Random
  * uses 48 bits.  The Mersenne Twister instead uses 32 bits (int size).
  * So it's best if your seed does not exceed the int range.
- * <p/>
+ * <p>
  * <p>MersenneTwister can be used reliably
  * on JDK version 1.1.5 or above.  Earlier Java versions have serious bugs in
  * java.util.Random; only MersenneTwisterFast (and not MersenneTwister nor
  * java.util.Random) should be used with them.
- * <p/>
+ * <p>
  * <h3>License</h3>
- * <p/>
+ * <p>
  * Copyright (c) 2003 by Sean Luke. <br>
  * Portions copyright (c) 1993 by Michael Lecuyer. <br>
  * All rights reserved. <br>
- * <p/>
+ * <p>
  * <p>Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * <ul>
@@ -311,7 +311,7 @@ public strictfp class MersenneTwisterFast implements Cloneable {
         mag01[0] = 0x0;
         mag01[1] = MATRIX_A;
 
-        mt[0] = (int)seed;
+        mt[0] = (int) seed;
         for (mti = 1; mti < N; mti++) {
             mt[mti] =
                     (1812433253 * (mt[mti - 1] ^ (mt[mti - 1] >>> 30)) + mti);
@@ -890,7 +890,7 @@ public strictfp class MersenneTwisterFast implements Cloneable {
 
     /**
      * Returns a double in the range from 0.0 to 1.0, possibly inclusive of 0.0 and 1.0 themselves.  Thus:
-     * <p/>
+     * <p>
      * <p><table border=0>
      * <th><td>Expression<td>Interval
      * <tr><td>nextDouble(false, false)<td>(0.0, 1.0)
@@ -898,7 +898,7 @@ public strictfp class MersenneTwisterFast implements Cloneable {
      * <tr><td>nextDouble(false, true)<td>(0.0, 1.0]
      * <tr><td>nextDouble(true, true)<td>[0.0, 1.0]
      * </table>
-     * <p/>
+     * <p>
      * <p>This version preserves all possible random values in the double range.
      */
     public double nextDouble(boolean includeZero, boolean includeOne) {
@@ -1086,7 +1086,7 @@ public strictfp class MersenneTwisterFast implements Cloneable {
 
     /**
      * Returns a float in the range from 0.0f to 1.0f, possibly inclusive of 0.0f and 1.0f themselves.  Thus:
-     * <p/>
+     * <p>
      * <p><table border=0>
      * <th><td>Expression<td>Interval
      * <tr><td>nextFloat(false, false)<td>(0.0f, 1.0f)
@@ -1094,7 +1094,7 @@ public strictfp class MersenneTwisterFast implements Cloneable {
      * <tr><td>nextFloat(false, true)<td>(0.0f, 1.0f]
      * <tr><td>nextFloat(true, true)<td>[0.0f, 1.0f]
      * </table>
-     * <p/>
+     * <p>
      * <p>This version preserves all possible random values in the float range.
      */
     public float nextFloat(boolean includeZero, boolean includeOne) {
@@ -1193,13 +1193,13 @@ public strictfp class MersenneTwisterFast implements Cloneable {
      * Randomly permute the specified list using the specified source of
      * randomness.  All permutations occur with equal likelihood
      * assuming that the source of randomness is fair.
-     * <p/>
+     * <p>
      * This implementation traverses the list backwards, from the last element
      * up to the second, repeatedly swapping a randomly selected element into
      * the "current position".  Elements are randomly selected from the
      * portion of the list that runs from the first element to the current
      * position, inclusive.
-     * <p/>
+     * <p>
      * This method runs in linear time.  If the specified list is large, this
      * implementation dumps the specified list into an array before shuffling
      * it, and dumps the shuffled array back into the list.  This avoids the

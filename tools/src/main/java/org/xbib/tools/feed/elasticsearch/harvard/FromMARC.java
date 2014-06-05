@@ -32,7 +32,7 @@
 package org.xbib.tools.feed.elasticsearch.harvard;
 
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elements.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -82,7 +82,7 @@ public final class FromMARC extends Feeder {
 
     @Override
     protected Feeder beforeIndexCreation(Ingest ingest) throws IOException {
-        ingest.mapping("title", FromMARC.class.getResourceAsStream("mapping-title.json"));
+        ingest.addMapping("title", FromMARC.class.getResourceAsStream("mapping-title.json"));
         return this;
     }
 

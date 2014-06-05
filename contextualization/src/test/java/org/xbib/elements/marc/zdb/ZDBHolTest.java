@@ -33,7 +33,7 @@ package org.xbib.elements.marc.zdb;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.elements.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -71,48 +71,48 @@ public class ZDBHolTest extends Assert {
         final InputStream in =
             getClass().getResourceAsStream("zdblokutf8.mrc");
             //new GZIPInputStream(new FileInputStream(System.getProperty("user.home") + "/Daten/zdb/1302zdblokalgesamt.mrc.gz"));
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591))) {
-            InputSource source = new InputSource(br);
-            MARCElementBuilderFactory factory = new MARCElementBuilderFactory() {
-                public MARCElementBuilder newBuilder() {
-                    MARCElementBuilder builder = new MARCElementBuilder().addOutput(out);
-                    return builder;
-                }
-            };
-            MARCElementMapper mapper = new MARCElementMapper("marc/zdb/hol")
-                    .detectUnknownKeys(true)
-                    .start(factory);
-            MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                    .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
-                        @Override
-                        public String transform(String value) {
-                            return Normalizer.normalize(
-                                    new String(value.getBytes(ISO88591), UTF8),
-                                    Normalizer.Form.NFKC);
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591));
+        InputSource source = new InputSource(br);
+        MARCElementBuilderFactory factory = new MARCElementBuilderFactory() {
+            public MARCElementBuilder newBuilder() {
+                MARCElementBuilder builder = new MARCElementBuilder().addOutput(out);
+                return builder;
+            }
+        };
+        MARCElementMapper mapper = new MARCElementMapper("marc/zdb/hol")
+                .detectUnknownKeys(true)
+                .start(factory);
+        MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
+                .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
+                    @Override
+                    public String transform(String value) {
+                        return Normalizer.normalize(
+                                new String(value.getBytes(ISO88591), UTF8),
+                                Normalizer.Form.NFKC);
+                    }
+                })
+                .addListener(mapper)
+                .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
+                    @Override
+                    public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
+                        logger.debug("begin");
+                        for (Field f : key) {
+                            logger.debug("tag={} ind={} subf={} data={}",
+                                    f.tag(), f.indicator(), f.subfieldId(), f.data());
                         }
-                    })
-                    .addListener(mapper)
-                    .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
-                        @Override
-                        public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
-                            logger.debug("begin");
-                            for (Field f : key) {
-                                logger.debug("tag={} ind={} subf={} data={}",
-                                        f.tag(), f.indicator(), f.subfieldId(), f.data());
-                            }
-                            logger.debug("end");
-                            return this;
-                        }
+                        logger.debug("end");
+                        return this;
+                    }
 
-                    });
-            Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);
-            reader.setProperty(Iso2709Reader.FORMAT, "MARC");
-            reader.setProperty(Iso2709Reader.TYPE, "Holdings");
-            reader.parse(source);
-            mapper.close();
-            logger.info("zdb holdings counter = {}", out.getCounter());
-            logger.info("zdb holdings unknown keys = {}", mapper.unknownKeys());
-        }
+                });
+        Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);
+        reader.setProperty(Iso2709Reader.FORMAT, "MARC");
+        reader.setProperty(Iso2709Reader.TYPE, "Holdings");
+        reader.parse(source);
+        mapper.close();
+        logger.info("zdb holdings counter = {}", out.getCounter());
+        logger.info("zdb holdings unknown keys = {}", mapper.unknownKeys());
+        br.close();
         assertEquals(out.getCounter(), 293);
     }
 

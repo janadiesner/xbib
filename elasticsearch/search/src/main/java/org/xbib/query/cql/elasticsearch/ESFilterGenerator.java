@@ -220,7 +220,7 @@ public class ESFilterGenerator implements Visitor {
             if (model.isOptionContext(context)) {
                 model.addOption(node.getIndex().getName(), node.getTerm().getValue());
             } else if (model.isFacetContext(context)) {
-                Facet<String> facet = new Facet<>(node.getIndex().getName(), Facet.Type.TERMS, node.getTerm().getValue());
+                Facet<String> facet = new Facet(node.getIndex().getName(), Facet.Type.TERMS, node.getTerm().getValue());
                 model.addFacet(facet);
             }
         }

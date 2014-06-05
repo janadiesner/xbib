@@ -7,6 +7,7 @@ import org.xbib.io.BytesReference;
 import org.xbib.common.xcontent.xml.XmlXParams;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,14 @@ public class XContentHelper {
 
     public static XContentParser createParser(byte[] data, int offset, int length) throws IOException {
         return XContentFactory.xContent(data, offset, length).createParser(data, offset, length);
+    }
+
+    public static Map<String, Object> convertFromJsonToMap(Reader reader) {
+        try {
+            return XContentFactory.xContent(XContentType.JSON).createParser(reader).mapOrderedAndClose();
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Failed to parse content to map", e);
+        }
     }
 
     public static Map<String, Object> convertToMap(String data) {

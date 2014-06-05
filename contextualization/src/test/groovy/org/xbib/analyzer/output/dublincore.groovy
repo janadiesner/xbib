@@ -1,7 +1,7 @@
 package org.xbib.analyzer.output
 
 import org.xbib.analyzer.dublincore.DublinCoreContext
-import org.xbib.elements.context.CountableContextResourceOutput
+import org.xbib.rdf.context.CountableContextResourceOutput
 import org.xbib.rdf.Resource
 import org.xbib.rdf.content.ContentBuilder
 

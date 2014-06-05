@@ -1,9 +1,8 @@
 
 package org.xbib.metric;
 
-import io.netty.util.internal.chmv8.LongAdder;
-
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * An exponentially-weighted moving average.

@@ -1,4 +1,3 @@
-
 package org.xbib.time;
 
 import org.xbib.time.impl.DurationImpl;
@@ -30,14 +29,14 @@ import java.util.Map;
 /**
  * A utility for creating social-networking style timestamps. (e.g. "just now", "moments ago", "3 days ago",
  * "within 2 months")
- * <p/>
+ * <p>
  * <b>Usage:</b>
- * <p/>
+ * <p>
  * <code>
  * PrettyTime t = new PrettyTime();<br/>
  * String timestamp = t.format(new Date());<br/>
  * //result: moments from now
- * <p/>
+ * <p>
  * </code>
  */
 public class PrettyTime {
@@ -55,7 +54,7 @@ public class PrettyTime {
     /**
      * Accept a {@link Date} timestamp to represent the point of reference for comparison. This may be changed by the
      * user, after construction.
-     * <p/>
+     * <p>
      * See {@code PrettyTime.setReference(Date timestamp)}.
      *
      * @param reference
@@ -76,7 +75,7 @@ public class PrettyTime {
     /**
      * Accept a {@link Date} timestamp to represent the point of reference for comparison. This may be changed by the
      * user, after construction. Use the given {@link Locale} instead of the system default.
-     * <p/>
+     * <p>
      * See {@code PrettyTime.setReference(Date timestamp)}.
      */
     public PrettyTime(final Date reference, final Locale locale) {
@@ -168,7 +167,7 @@ public class PrettyTime {
     /**
      * Calculate to the precision of the smallest provided {@link TimeUnit}, the exact duration represented by the
      * difference between the reference timestamp, and {@code then}
-     * <p/>
+     * <p>
      * <b>Note</b>: Precision may be lost if no supplied {@link TimeUnit} is granular enough to represent one millisecond
      *
      * @param then The date to be compared against the reference timestamp, or <i>now</i> if no reference timestamp was
@@ -352,7 +351,7 @@ public class PrettyTime {
 
     /**
      * Get the current reference timestamp.
-     * <p/>
+     * <p>
      * See {@code PrettyTime.setReference(Date timestamp)}
      *
      * @return
@@ -363,7 +362,7 @@ public class PrettyTime {
 
     /**
      * Set the reference timestamp.
-     * <p/>
+     * <p>
      * If the Date formatted is before the reference timestamp, the format command will produce a String that is in the
      * past tense. If the Date formatted is after the reference timestamp, the format command will produce a string that
      * is in the future tense.

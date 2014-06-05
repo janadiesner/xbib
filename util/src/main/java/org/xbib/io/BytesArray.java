@@ -181,7 +181,7 @@ public class BytesArray implements BytesReference {
      * Returns an array size >= minTargetSize, generally
      * over-allocating exponentially to achieve amortized
      * linear-time cost as the array grows.
-     * <p/>
+     * <p>
      * NOTE: this was originally borrowed from Python 2.4.2
      * listobject.c sources (attribution in LICENSE.txt), but
      * has now been substantially changed based on

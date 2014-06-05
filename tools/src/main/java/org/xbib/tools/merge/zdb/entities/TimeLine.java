@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.elasticsearch.common.collect.ImmutableSet;
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.elements.support.EnumerationAndChronology;
 import org.xbib.logging.Logger;
@@ -339,8 +340,11 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
                     list.add(holding);
                     for (Manifestation parent : holding.getManifestations()) {
                         parent.addRelatedVolume(date, holding);
-                        // copy print holding over to online manifestation if available
-                        Set<Manifestation> online = parent.getRelatedManifestations().get("hasOnlineEdition");
+                        Set<Manifestation> online;
+                        synchronized (parent.getRelatedManifestations()) {
+                            // copy print holding over to online manifestation if available
+                            online = ImmutableSet.copyOf(parent.getRelatedManifestations().get("hasOnlineEdition"));
+                        }
                         if (online != null) {
                             // almost sure we have only one online manifestation...
                             for (Manifestation m : online) {
@@ -365,8 +369,11 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
                     list.add(license);
                     for (Manifestation parent : license.getManifestations()) {
                         parent.addRelatedVolume(date, license);
-                        // copy online license over to print manifestation if available
-                        Set<Manifestation> print = parent.getRelatedManifestations().get("hasPrintEdition");
+                        Set<Manifestation> print;
+                        synchronized (parent.getRelatedManifestations()) {
+                            // copy online license over to print manifestation if available
+                            print = ImmutableSet.copyOf(parent.getRelatedManifestations().get("hasPrintEdition"));
+                        }
                         if (print != null) {
                             for (Manifestation m : print) {
                                 m.addRelatedVolume(date, license);
@@ -434,10 +441,16 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
     private Set<String> makeISILs() {
         Set<String> isils = newHashSet();
         if (holdings != null) {
-            isils.addAll(holdings.stream().filter(holding -> holding.getISIL() != null).map(Holding::getISIL).collect(Collectors.toList()));
+            isils.addAll(holdings.stream()
+                    .filter(holding -> holding.getISIL() != null)
+                    .map(Holding::getISIL)
+                    .collect(Collectors.toList()));
         }
         if (licenses != null) {
-            isils.addAll(licenses.stream().filter(license -> license.getISIL() != null).map(License::getISIL).collect(Collectors.toList()));
+            isils.addAll(licenses.stream()
+                    .filter(license -> license.getISIL() != null)
+                    .map(License::getISIL)
+                    .collect(Collectors.toList()));
         }
         return isils;
     }

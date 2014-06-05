@@ -173,7 +173,7 @@ public class NTripleReader<S extends Identifier, P extends Property, O extends N
             object = (O) simpleFactory.newLiteral(literal);
         }
         if (listener != null) {
-            Triple stmt = new SimpleTriple<>(subject, predicate, object);
+            Triple stmt = new SimpleTriple(subject, predicate, object);
             listener.triple(stmt);
         }
     }

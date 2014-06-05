@@ -341,7 +341,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
     // representation of this start tag
     private void xmlLiteralStart(StringBuilder out, String ns, String qn, Attributes attrs) {
         out.append("<").append(qn);
-        Map<String, String> pfxMap = new HashMap<>();
+        Map<String, String> pfxMap = new HashMap();
         for (int i = -1; i < attrs.getLength(); i++) {
             String aQn, aNs;
             if (i < 0) {
@@ -398,7 +398,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
 
     class Handler extends DefaultHandler implements XmlHandler {
 
-        private Stack<Frame> stack = new Stack<>();
+        private Stack<Frame> stack = new Stack();
 
         private StringBuilder pcdata = null;
 
@@ -511,33 +511,27 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
                     // handle rdf:parseType="resource"
                     String parseType = attrs.getValue(RDF.toString(), "parseType");
                     if (parseType != null) {
-                        switch (parseType) {
-                            case "Resource":
-                                object = object == null ? blankNode().id() : object;
-                                yield(ancestorSubject(stack), frame.node, object, frame.reification);
-                                // perform surgery on the current frame
-                                frame.node = object;
-                                frame.isSubject = true;
-                                break;
-                            case "Collection":
-                                frame.isCollection = true;
-                                frame.collection = new LinkedList();
-                                S s = simpleFactory.asSubject(ancestorSubject(stack));
-                                P p = simpleFactory.asPredicate(frame.node);
-                                O o = simpleFactory.asObject(blankNode());
-                                frame.collectionHead = new SimpleTriple(s,p,o);
-                                pcdata = null;
-                                break;
-                            case "Literal":
-                                literalLevel = 1; // enter into a literal
-                                xmlLiteral = new StringBuilder();
-                                // which means we shouldn't accumulate pcdata!
-                                pcdata = null;
-                                break;
-                            default:
-                                // handle datatype
-                                frame.datatype = attrs.getValue(RDF.toString(), "datatype");
-                                break;
+                        if (parseType.equals("Resource")) {
+                            object = object == null ? blankNode().id() : object;
+                            yield(ancestorSubject(stack), frame.node, object, frame.reification);
+                            // perform surgery on the current frame
+                            frame.node = object;
+                            frame.isSubject = true;
+                        } else if (parseType.equals("Collection")) {
+                            frame.isCollection = true;
+                            frame.collection = new LinkedList();
+                            S s = simpleFactory.asSubject(ancestorSubject(stack));
+                            P p = simpleFactory.asPredicate(frame.node);
+                            O o = simpleFactory.asObject(blankNode());
+                            frame.collectionHead = new SimpleTriple(s, p, o);
+                            pcdata = null;
+                        } else if (parseType.equals("Literal")) {
+                            literalLevel = 1; // enter into a literal
+                            xmlLiteral = new StringBuilder();
+                            // which means we shouldn't accumulate pcdata!
+                            pcdata = null;
+                        } else {// handle datatype
+                            frame.datatype = attrs.getValue(RDF.toString(), "datatype");
                         }
                     }
                     // now handle property attributes (if we do this, then this

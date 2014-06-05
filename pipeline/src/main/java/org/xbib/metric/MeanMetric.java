@@ -1,8 +1,7 @@
 
 package org.xbib.metric;
 
-
-import io.netty.util.internal.chmv8.LongAdder;
+import java.util.concurrent.atomic.LongAdder;
 
 public class MeanMetric implements Metric {
 

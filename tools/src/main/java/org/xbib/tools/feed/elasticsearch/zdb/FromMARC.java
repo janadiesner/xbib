@@ -38,7 +38,7 @@ import java.nio.charset.Charset;
 import java.text.Normalizer;
 
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elements.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.tools.Feeder;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
@@ -79,7 +79,7 @@ public final class FromMARC extends Feeder {
 
     @Override
     protected Feeder beforeIndexCreation(Ingest ingest) throws IOException {
-        ingest.mapping("title", FromMARC.class.getResourceAsStream("mapping-title.json"));
+        ingest.addMapping("title", FromMARC.class.getResourceAsStream("mapping-title.json"));
         return this;
     }
 
@@ -129,6 +129,10 @@ public final class FromMARC extends Feeder {
 
         @Override
         public void output(ResourceContext context, Resource resource, ContentBuilder contentBuilder) throws IOException {
+            if (context == null || context.getResource() == null) {
+                logger.warn("no resource to output");
+                return;
+            }
             IRI iri = context.getResource().id();
             context.getResource().id(IRI.builder().scheme("http").host(settings.get("index")).query(settings.get("type"))
                     .fragment(iri.getFragment()).build());

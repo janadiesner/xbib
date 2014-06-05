@@ -1,4 +1,3 @@
-
 package org.xbib.classloader;
 
 import java.io.IOException;

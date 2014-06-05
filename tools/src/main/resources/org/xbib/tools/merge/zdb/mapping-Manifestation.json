@@ -112,7 +112,11 @@
             "type" : "boolean"
           },
           "title" : {
-            "type" : "string"
+                "type" : "string",
+                "fields": {
+                    "raw":   { "type": "string", "analyzer": "keyword" },
+                    "sort":   { "type": "string", "analyzer": "sortform" }
+                }
           }
         }
       }

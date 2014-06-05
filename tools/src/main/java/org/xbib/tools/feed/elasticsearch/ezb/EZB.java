@@ -37,6 +37,11 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import javax.xml.namespace.QName;
 
+import org.xbib.oai.rdf.RdfOutput;
+import org.xbib.rdf.Resource;
+import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.content.DefaultContentBuilder;
+import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.tools.Feeder;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.Pipeline;
@@ -45,9 +50,7 @@ import org.xbib.util.URIUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
 import org.xbib.rdf.io.xml.XmlReader;
@@ -66,7 +69,6 @@ public final class EZB extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(EZB.class.getSimpleName());
 
-    private final static SimpleResourceContext resourceContext = new SimpleResourceContext();
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
@@ -80,9 +82,15 @@ public final class EZB extends Feeder {
 
     @Override
     public void process(URI uri) throws Exception {
-        AbstractXmlHandler handler = new Handler(resourceContext)
-                .setListener(new ResourceBuilder())
-                .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/");
+        IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
+        ResourceContext<Resource> resourceContext = new SimpleResourceContext()
+                .setContentBuilder(contentBuilder(namespaceContext))
+                .setNamespaceContext(namespaceContext);
+
+        AbstractXmlHandler handler = new EZBHandler(resourceContext)
+                .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/")
+                .setListener(new ElasticOut());
+
         InputStream in = InputService.getInputStream(uri);
         new XmlReader()
                 .setNamespaces(false)
@@ -91,10 +99,14 @@ public final class EZB extends Feeder {
         in.close();
     }
 
-    private class Handler extends AbstractXmlResourceHandler {
+    protected ContentBuilder contentBuilder(IRINamespaceContext namespaceContext) {
+        return new DefaultContentBuilder<>();
+    }
 
-        public Handler(ResourceContext ctx) {
-            super(ctx);
+    class EZBHandler extends AbstractXmlResourceHandler {
+
+        public EZBHandler(ResourceContext resourceContext) {
+            super(resourceContext);
         }
 
         @Override
@@ -111,7 +123,7 @@ public final class EZB extends Feeder {
                         .query(settings.get("type"))
                         .fragment(value)
                         .build();
-                resourceContext.getResource().id(id);
+                resourceContext().getResource().id(id);
             }
         }
 
@@ -122,11 +134,11 @@ public final class EZB extends Feeder {
 
         @Override
         public void closeResource() {
-            try { 
+            /*try {
                 sink.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
             } catch (IOException e ) {
                 logger.error(e.getMessage(), e);
-            }
+            }*/
             super.closeResource();
         }
 
@@ -190,7 +202,7 @@ public final class EZB extends Feeder {
         }
     }
 
-    private class ResourceBuilder implements TripleListener {
+    /*private class ResourceBuilder implements TripleListener {
 
         @Override
         public TripleListener begin() {
@@ -221,6 +233,40 @@ public final class EZB extends Feeder {
 
         @Override
         public TripleListener end() {
+            return this;
+        }
+    }*/
+
+    class ElasticOut extends RdfOutput {
+        @Override
+        public RdfOutput output(ResourceContext<Resource> resourceContext) throws IOException {
+            if (resourceContext == null) {
+                return this;
+            }
+             if (resourceContext.getResources() != null) {
+                for (Resource resource : resourceContext.getResources()) {
+                    // multiple documents. Rewrite IRI for ES index/type addressing
+                    String index = settings.get("index", "ezb");
+                    String type = settings.get("type", "ezb");
+                    if (index.equals(resource.id().getHost())) {
+                        IRI iri = IRI.builder().scheme("http").host(index).query(type)
+                                .fragment(resource.id().getFragment()).build();
+                        resource.add("iri", resource.id().getFragment());
+                        resource.id(iri);
+                    } else {
+                        IRI iri = IRI.builder().scheme("http").host(index).query(type)
+                                .fragment(resource.id().toString()).build();
+                        resource.add("iri", resource.id().toString());
+                        resource.id(iri);
+                    }
+                    sink.output(resourceContext, resource, resourceContext.getContentBuilder());
+                }
+            } else if (resourceContext.getResource() != null) {
+                // single document
+                sink.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
+            } else {
+                 logger.warn("no resource to output");
+             }
             return this;
         }
     }

@@ -126,7 +126,7 @@ public class SRUResponse extends SearchRetrieveResponse {
                     DocumentBuilder builder = factory.newDocumentBuilder();
                     Document doc = builder.parse(new InputSource(new StringReader(xmlFacets)));
                     getTransformer().addParameter("facets", doc.getDocumentElement());
-                } catch (SAXException | ParserConfigurationException e) {
+                } catch (Exception e) {
                     throw new IOException(e);
                 }
             } else {

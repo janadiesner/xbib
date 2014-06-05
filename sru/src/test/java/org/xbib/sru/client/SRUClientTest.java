@@ -107,80 +107,78 @@ public class SRUClientTest {
             int size = 10;
             FileOutputStream out = new FileOutputStream("target/sru-service-"
                     + clientName + ".xml");
-            try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
-                SearchRetrieveListener listener = new SearchRetrieveResponseAdapter() {
+            Writer w = new OutputStreamWriter(out, "UTF-8");
+            SearchRetrieveListener listener = new SearchRetrieveResponseAdapter() {
 
-                    @Override
-                    public void onConnect(Request request) {
-                        logger.info("connect, request = " + request);
-                    }
-
-                    @Override
-                    public void version(String version) {
-                        logger.info("version = " + version);
-                    }
-
-                    @Override
-                    public void numberOfRecords(long numberOfRecords) {
-                        logger.info("numberOfRecords = " + numberOfRecords);
-                    }
-
-                    @Override
-                    public void beginRecord() {
-                        logger.info("begin record");
-                    }
-
-                    @Override
-                    public void recordSchema(String recordSchema) {
-                        logger.info("got record scheme:" + recordSchema);
-                    }
-
-                    @Override
-                    public void recordPacking(String recordPacking) {
-                        logger.info("got recordPacking: " + recordPacking);
-                    }
-                    @Override
-                    public void recordIdentifier(String recordIdentifier) {
-                        logger.info("got recordIdentifier=" + recordIdentifier);
-                    }
-
-                    @Override
-                    public void recordPosition(int recordPosition) {
-                        logger.info("got recordPosition=" + recordPosition);
-                    }
-
-                    @Override
-                    public XMLEventConsumer recordData() {
-                        return new SaxEventConsumer(marcXmlHandler);
-                    }
-
-                    @Override
-                    public XMLEventConsumer extraRecordData() {
-                        return null;
-                    }
-
-                    @Override
-                    public void endRecord() {
-                        logger.info("end record");
-                    }
-
-                    @Override
-                    public void onDisconnect(Request request) {
-                        logger.info("disconnect, request = " + request);
-                    }
-                };
-                try (SRUClient client = SRUClientFactory.newClient(clientName)) {
-                    SearchRetrieveRequest request = client.newSearchRetrieveRequest()
-                            .addListener(listener)
-                            .setQuery(query)
-                            .setStartRecord(from)
-                            .setMaximumRecords(size);
-                    SearchRetrieveResponse response = client.searchRetrieve(request).to(w);
-                    logger.info("http status = {}", response.httpStatus());
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
+                @Override
+                public void onConnect(Request request) {
+                    logger.info("connect, request = " + request);
                 }
-            }
+
+                @Override
+                public void version(String version) {
+                    logger.info("version = " + version);
+                }
+
+                @Override
+                public void numberOfRecords(long numberOfRecords) {
+                    logger.info("numberOfRecords = " + numberOfRecords);
+                }
+
+                @Override
+                public void beginRecord() {
+                    logger.info("begin record");
+                }
+
+                @Override
+                public void recordSchema(String recordSchema) {
+                    logger.info("got record scheme:" + recordSchema);
+                }
+
+                @Override
+                public void recordPacking(String recordPacking) {
+                    logger.info("got recordPacking: " + recordPacking);
+                }
+                @Override
+                public void recordIdentifier(String recordIdentifier) {
+                    logger.info("got recordIdentifier=" + recordIdentifier);
+                }
+
+                @Override
+                public void recordPosition(int recordPosition) {
+                    logger.info("got recordPosition=" + recordPosition);
+                }
+
+                @Override
+                public XMLEventConsumer recordData() {
+                    return new SaxEventConsumer(marcXmlHandler);
+                }
+
+                @Override
+                public XMLEventConsumer extraRecordData() {
+                    return null;
+                }
+
+                @Override
+                public void endRecord() {
+                    logger.info("end record");
+                }
+
+                @Override
+                public void onDisconnect(Request request) {
+                    logger.info("disconnect, request = " + request);
+                }
+            };
+            SRUClient client = SRUClientFactory.newClient(clientName);
+            SearchRetrieveRequest request = client.newSearchRetrieveRequest()
+                    .addListener(listener)
+                    .setQuery(query)
+                    .setStartRecord(from)
+                    .setMaximumRecords(size);
+            SearchRetrieveResponse response = client.searchRetrieve(request).to(w);
+            logger.info("http status = {}", response.httpStatus());
+            client.close();
+            w.close();
         }
     }
 }
