@@ -109,7 +109,7 @@ public final class JsonPatch
      * @return the patched JSON value
      * @throws NullPointerException input is null
      */
-    public JsonNode apply(final JsonNode node) {
+    public JsonNode apply(final JsonNode node) throws JsonPatchException {
         JsonNode ret = node;
         for (final JsonPatchOperation operation : operations) {
             ret = operation.apply(ret);

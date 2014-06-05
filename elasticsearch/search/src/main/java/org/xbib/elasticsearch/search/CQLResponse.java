@@ -40,7 +40,7 @@ import org.xbib.elasticsearch.action.search.support.BasicSearchResponse;
 import org.xbib.elasticsearch.xml.ES;
 import org.xbib.io.StreamUtil;
 import org.xbib.io.stream.StreamByteBuffer;
-import org.xbib.json.JsonXmlStreamer;
+import org.xbib.json.xml.JsonXmlStreamer;
 import org.xbib.json.transform.JsonStylesheet;
 import org.xbib.search.SearchError;
 import org.xbib.xml.transform.StylesheetTransformer;

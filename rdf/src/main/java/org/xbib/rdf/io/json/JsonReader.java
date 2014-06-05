@@ -36,7 +36,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import org.xbib.json.JsonSaxAdapter;
+import org.xbib.json.xml.JsonSaxAdapter;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
