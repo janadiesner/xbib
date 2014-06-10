@@ -32,19 +32,13 @@
 package org.xbib.tools.feed.elasticsearch.oai;
 
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.Date;
-
-import org.xbib.oai.OAIDateResolution;
-import org.xbib.oai.listrecords.ListRecordsListener;
-import org.xbib.tools.Feeder;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
+import org.xbib.oai.listrecords.ListRecordsListener;
 import org.xbib.oai.listrecords.ListRecordsRequest;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.pipeline.Pipeline;
@@ -55,9 +49,15 @@ import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.rdfxml.RdfXmlReader;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.tools.Feeder;
 import org.xbib.util.DateUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URI;
+import java.util.Date;
 
 /**
  * A generic OAI indexer for Elasticsearch

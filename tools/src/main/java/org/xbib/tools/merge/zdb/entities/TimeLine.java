@@ -31,6 +31,12 @@
  */
 package org.xbib.tools.merge.zdb.entities;
 
+import org.elasticsearch.common.collect.ImmutableSet;
+import org.xbib.common.xcontent.XContentBuilder;
+import org.xbib.elements.support.EnumerationAndChronology;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,12 +47,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-
-import org.elasticsearch.common.collect.ImmutableSet;
-import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.elements.support.EnumerationAndChronology;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -114,7 +114,7 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
 
     private String makeFingerprint() {
         StringBuilder sb = new StringBuilder();
-        for (Manifestation m  : this) {
+        for (Manifestation m : this) {
             if (sb.length() > 0) {
                 sb.append(".");
             }
@@ -135,7 +135,7 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
             }
         }
         if (f1 != null) {
-            sb.append(f1.firstDate() != null ? Integer.toString(f1.firstDate()): "9999")
+            sb.append(f1.firstDate() != null ? Integer.toString(f1.firstDate()) : "9999")
                     .append(Integer.toString(f1.findCarrierTypeKey()))
                     .append(f1.id());
         } else {
@@ -193,7 +193,7 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
                     o = Arrays.asList(o);
                 }
                 dates = newLinkedList();
-                dates.addAll((List<Integer>)o);
+                dates.addAll((List<Integer>) o);
             } else {
                 // let's parse dates
                 o = holding.map().get("FormattedEnumerationAndChronology");
@@ -319,12 +319,11 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
     /**
      * Iterate through all dates and make the available services.
      * Concatenate services of same institution.
-     *
      */
     public void makeServices() {
         makeDates();
         for (Integer date : dates) {
-            Map<String,List<Holding>> services = newHashMap();
+            Map<String, List<Holding>> services = newHashMap();
             Set<Holding> holdings = holdingsByDate.get(date);
             if (holdings != null) {
                 for (Holding holding : holdings) {
@@ -457,7 +456,9 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
 
     private Set<String> makeCountries() {
         Set<String> set = newHashSet();
-        for (Manifestation m : this) set.addAll(m.country());
+        for (Manifestation m : this) {
+            set.addAll(m.country());
+        }
         return set;
     }
 

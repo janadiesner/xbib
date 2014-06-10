@@ -34,23 +34,6 @@ package org.xbib.tools.convert.articles;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.Queue;
-import java.util.regex.Pattern;
-import java.util.zip.Deflater;
-import java.util.zip.GZIPOutputStream;
-
 import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
 import org.xbib.io.InputService;
 import org.xbib.io.archivers.file.Finder;
@@ -73,6 +56,21 @@ import org.xbib.tools.Converter;
 import org.xbib.util.Entities;
 import org.xbib.util.URIUtil;
 import org.xbib.xml.XMLUtil;
+
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.Queue;
+import java.util.regex.Pattern;
+import java.util.zip.Deflater;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Convert article DB
@@ -104,6 +102,7 @@ public class JsonCoins extends Converter {
     private final static SerialsDB serialsdb = new SerialsDB();
 
     private final static IRINamespaceContext context = IRINamespaceContext.newInstance();
+
     static {
         context.addNamespace(RDF.NS_PREFIX, RDF.NS_URI);
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
@@ -128,7 +127,7 @@ public class JsonCoins extends Converter {
         }
         logger.info("serials done, getSize = {}", serialsdb.getMap().size());
 
-        if ( serialsdb.getMap().isEmpty()) {
+        if (serialsdb.getMap().isEmpty()) {
             throw new IllegalArgumentException("serials are empty?");
         }
 
@@ -137,7 +136,7 @@ public class JsonCoins extends Converter {
 
         String outputFilename = settings.get("output");
         FileOutputStream fout = new FileOutputStream(outputFilename + ".ttl.gz");
-        gzout = new GZIPOutputStream(fout){
+        gzout = new GZIPOutputStream(fout) {
             {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
@@ -149,7 +148,7 @@ public class JsonCoins extends Converter {
         serializer = writer;
 
         FileOutputStream errorfout = new FileOutputStream(outputFilename + "-errors.ttl.gz");
-        errorgzout = new GZIPOutputStream(errorfout){
+        errorgzout = new GZIPOutputStream(errorfout) {
             {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
@@ -161,7 +160,7 @@ public class JsonCoins extends Converter {
         errorSerializer = errorWriter;
 
         FileOutputStream noserialfout = new FileOutputStream(outputFilename + "-without-serial.ttl.gz");
-        noserialgzout = new GZIPOutputStream(noserialfout){
+        noserialgzout = new GZIPOutputStream(noserialfout) {
             {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
@@ -271,7 +270,9 @@ public class JsonCoins extends Converter {
 
     protected interface URIListener extends URIUtil.ParameterListener {
         void close();
+
         boolean hasErrors();
+
         boolean missingSerial();
     }
 
@@ -295,7 +296,7 @@ public class JsonCoins extends Converter {
         OK, ERROR, MISSINGSERIAL
     }
 
-    private final static Pattern[] patterns = new Pattern[] {
+    private final static Pattern[] patterns = new Pattern[]{
             Pattern.compile("^info:doi/"),
             Pattern.compile("^http://dx.doi.org/"),
             Pattern.compile("^http://doi.org/")
@@ -334,7 +335,7 @@ public class JsonCoins extends Converter {
                     error = true;
                 }
                 switch (k) {
-                    case "rft_id" : {
+                    case "rft_id": {
                         // lowercase important, DOI is case-insensitive
                         String s = URIUtil.decode(v, UTF8).toLowerCase();
                         // remove URL/URI prefixes
@@ -345,7 +346,7 @@ public class JsonCoins extends Converter {
                             String doiURI = URIUtil.encode(s, UTF8);
                             // encode as URI, but "info URI" RFC wants slash as unencoded character
                             // anyway we use xbib.info/doi/
-                            doiURI = doiURI.replaceAll("%2F","/");
+                            doiURI = doiURI.replaceAll("%2F", "/");
                             IRI iri = IRI.builder()
                                     .scheme("http")
                                     .host("xbib.info")
@@ -360,19 +361,19 @@ public class JsonCoins extends Converter {
                         }
                         break;
                     }
-                    case "rft.atitle" : {
+                    case "rft.atitle": {
                         v = Entities.HTML40.unescape(v);
                         r.add("dcterms:title", v);
                         work = v;
                         break;
                     }
-                    case "rft.jtitle" : {
+                    case "rft.jtitle": {
                         v = Entities.HTML40.unescape(v);
                         Resource j = r.newResource(FRBR_PARTOF)
                                 .a(FABIO_JOURNAL)
                                 .add("prism:publicationName", v);
                         if (serialsdb.getMap().containsKey(v)) {
-                            Resource serial =  serialsdb.getMap().get(v);
+                            Resource serial = serialsdb.getMap().get(v);
                             issns = serial.objects("prism:issn");
                             if (issns != null) {
                                 for (Node issn : issns) {
@@ -381,7 +382,7 @@ public class JsonCoins extends Converter {
                             }
                             Node publisher = serial.literal("dc:publisher");
                             if (publisher != null) {
-                                j.add("dc:publisher", publisher.toString() );
+                                j.add("dc:publisher", publisher.toString());
                             }
                         } else {
                             missingserial = true;
@@ -396,7 +397,7 @@ public class JsonCoins extends Converter {
                         }
                         break;
                     }
-                    case "rft.aulast" : {
+                    case "rft.aulast": {
                         v = Entities.HTML40.unescape(v);
                         if (aulast != null) {
                             r.newResource(FOAF_MAKER)
@@ -409,12 +410,12 @@ public class JsonCoins extends Converter {
                         }
                         break;
                     }
-                    case "rft.aufirst" : {
+                    case "rft.aufirst": {
                         v = Entities.HTML40.unescape(v);
                         if (aufirst != null) {
                             r.newResource(FOAF_MAKER)
                                     .add("foaf:familyName", aulast)
-                                    .add("foaf:givenName", aufirst );
+                                    .add("foaf:givenName", aufirst);
                             aulast = null;
                             aufirst = null;
                         } else {
@@ -422,7 +423,7 @@ public class JsonCoins extends Converter {
                         }
                         break;
                     }
-                    case "rft.au" : {
+                    case "rft.au": {
                         // fix author
                         if ("&NA;".equals(v)) {
                             v = null;
@@ -435,24 +436,24 @@ public class JsonCoins extends Converter {
                         }
                         break;
                     }
-                    case "rft.date" : {
+                    case "rft.date": {
                         Literal l = new SimpleLiteral(v).type(Literal.GYEAR);
                         r.add("prism:publicationDate", l);
                         break;
                     }
-                    case "rft.volume" : {
+                    case "rft.volume": {
                         r.newResource(FRBR_EMBODIMENT)
                                 .a(FABIO_PERIODICAL_VOLUME)
                                 .add("prism:volume", v);
                         break;
                     }
-                    case "rft.issue" : {
+                    case "rft.issue": {
                         r.newResource(FRBR_EMBODIMENT)
                                 .a(FABIO_PERIODICAL_ISSUE)
                                 .add("prism:number", v);
                         break;
                     }
-                    case "rft.spage" : {
+                    case "rft.spage": {
                         if (spage != null) {
                             r.newResource(FRBR_EMBODIMENT)
                                     .a(FABIO_PRINT_OBJECT)
@@ -465,7 +466,7 @@ public class JsonCoins extends Converter {
                         }
                         break;
                     }
-                    case "rft.epage" : {
+                    case "rft.epage": {
                         if (epage != null) {
                             r.newResource(FRBR_EMBODIMENT)
                                     .a(FABIO_PRINT_OBJECT)
@@ -479,7 +480,7 @@ public class JsonCoins extends Converter {
                         break;
                     }
                     case "rft_val_fmt":
-                    case "rft.genre" :
+                    case "rft.genre":
                     case "ctx_ver":
                     case "rfr_id":
                         break;
@@ -512,7 +513,7 @@ public class JsonCoins extends Converter {
                 if (author == null && aulast != null) {
                     author = aulast;
                 }
-                if (author!= null && work != null && key != null) {
+                if (author != null && work != null && key != null) {
                     r.add("xbib:key", key);
                     /*if (articles.containsKey(key)) {
                         dupCounter.incrementAndGet();
@@ -539,8 +540,8 @@ public class JsonCoins extends Converter {
         }
         listener.close();
         return listener.hasErrors() ? Result.ERROR :
-               listener.missingSerial() ? Result.MISSINGSERIAL :
-               Result.OK;
+                listener.missingSerial() ? Result.MISSINGSERIAL :
+                        Result.OK;
     }
 
 }

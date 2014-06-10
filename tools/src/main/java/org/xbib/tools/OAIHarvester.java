@@ -33,7 +33,6 @@ package org.xbib.tools;
 
 import org.xbib.io.Connection;
 import org.xbib.io.NullWriter;
-import org.xbib.io.Packet;
 import org.xbib.io.Session;
 import org.xbib.io.StringPacket;
 import org.xbib.io.archivers.tar.TarConnectionFactory;
@@ -45,10 +44,10 @@ import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
 import org.xbib.oai.listrecords.ListRecordsListener;
 import org.xbib.oai.listrecords.ListRecordsRequest;
-import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfOutput;
 import org.xbib.oai.rdf.RdfResourceHandler;
+import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.oai.xml.XmlMetadataHandler;
 import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
@@ -102,7 +101,7 @@ public abstract class OAIHarvester extends Converter {
     @Override
     public void process(URI uri) throws Exception {
         logger.info("uri={}", uri);
-        Map<String,String> params = URIUtil.parseQueryString(uri);
+        Map<String, String> params = URIUtil.parseQueryString(uri);
         String server = uri.toString();
         String metadataPrefix = params.get("metadataPrefix");
         String set = params.get("set");
@@ -153,6 +152,7 @@ public abstract class OAIHarvester extends Converter {
                 .setOutput(rdfout);
         return metadataHandler;
     }
+
     protected MetadataHandler ntripleMetadataHandler() {
         final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();

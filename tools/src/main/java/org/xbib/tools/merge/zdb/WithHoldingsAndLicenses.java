@@ -31,6 +31,34 @@
  */
 package org.xbib.tools.merge.zdb;
 
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.xbib.common.settings.Settings;
+import org.xbib.elasticsearch.support.client.Ingest;
+import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
+import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
+import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
+import org.xbib.elasticsearch.support.client.search.SearchClient;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.pipeline.queue.QueuePipelineExecutor;
+import org.xbib.tools.Tool;
+import org.xbib.tools.merge.zdb.entities.BibdatLookup;
+import org.xbib.tools.merge.zdb.entities.BlackListedISIL;
+import org.xbib.tools.merge.zdb.entities.Manifestation;
+import org.xbib.tools.util.SearchHitPipelineElement;
+import org.xbib.util.DateUtil;
+import org.xbib.util.ExceptionFormatter;
+import org.xbib.util.Strings;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
@@ -42,35 +70,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-
-import org.xbib.common.settings.Settings;
-import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
-import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
-import org.xbib.tools.Tool;
-import org.xbib.tools.merge.zdb.entities.BibdatLookup;
-import org.xbib.pipeline.queue.QueuePipelineExecutor;
-import org.xbib.tools.merge.zdb.entities.BlackListedISIL;
-import org.xbib.util.DateUtil;
-import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
-import org.xbib.elasticsearch.support.client.search.SearchClient;
-import org.xbib.tools.merge.zdb.entities.Manifestation;
-import org.xbib.pipeline.Pipeline;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.util.Strings;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.tools.util.SearchHitPipelineElement;
-import org.xbib.util.ExceptionFormatter;
-
 import static com.google.common.collect.Sets.newSetFromMap;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
@@ -79,8 +78,8 @@ import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
  * Merge ZDB title and holdings and EZB licenses
  */
 public class WithHoldingsAndLicenses
-    extends QueuePipelineExecutor<Boolean, Manifestation, WithHoldingsAndLicensesPipeline, SearchHitPipelineElement>
-    implements Tool {
+        extends QueuePipelineExecutor<Boolean, Manifestation, WithHoldingsAndLicensesPipeline, SearchHitPipelineElement>
+        implements Tool {
 
     private final static Logger logger = LoggerFactory.getLogger(WithHoldingsAndLicenses.class.getSimpleName());
 
@@ -145,10 +144,10 @@ public class WithHoldingsAndLicenses
         }
         logger.info("ISIL blacklist prepared");
 
-        processed = newSetFromMap(new ConcurrentHashMap<String,Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
-        timelines = newSetFromMap(new ConcurrentHashMap<String,Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
-        indexed = newSetFromMap(new ConcurrentHashMap<String,Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
-        skipped = newSetFromMap(new ConcurrentHashMap<String,Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
+        processed = newSetFromMap(new ConcurrentHashMap<String, Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
+        timelines = newSetFromMap(new ConcurrentHashMap<String, Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
+        indexed = newSetFromMap(new ConcurrentHashMap<String, Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
+        skipped = newSetFromMap(new ConcurrentHashMap<String, Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
 
         return this;
     }
@@ -224,7 +223,7 @@ public class WithHoldingsAndLicenses
                     p,
                     DateUtil.formatDateISO(p.getMetric().startedAt()),
                     DateUtil.formatDateISO(p.getMetric().stoppedAt()),
-                    TimeValue.timeValueMillis(p.getMetric().elapsed()/1000000).format(),
+                    TimeValue.timeValueMillis(p.getMetric().elapsed() / 1000000).format(),
                     p.getMetric().count(),
                     p.getServiceMetric().count());
             total += p.getMetric().count();
@@ -340,7 +339,7 @@ public class WithHoldingsAndLicenses
             }
             w.close();
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         // post process, index the skipped IDs. Now with force.
         force = true;
@@ -388,7 +387,7 @@ public class WithHoldingsAndLicenses
             }
             w.close();
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
 
         return this;

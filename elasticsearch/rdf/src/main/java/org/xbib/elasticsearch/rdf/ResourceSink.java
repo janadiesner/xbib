@@ -57,10 +57,10 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
     @Override
     public void output(C context, R resource, ContentBuilder<C, R> contentBuilder) throws IOException {
         if (resource == null) {
-            throw new IOException("resource is null");
+            throw new IllegalArgumentException("resource is null");
         }
         if (resource.id() == null) {
-            throw new IOException("resource ID is null");
+            throw new IllegalArgumentException("resource ID is null");
         }
         if (resource.isEmpty()) {
             return;
@@ -91,6 +91,9 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
             String id = makeId(resource);
             if (id == null) {
                 throw new IOException("id must not be null, no fragment set in IRI?");
+            }
+            if (contentBuilder == null) {
+                throw new IllegalArgumentException("resource content builder is null");
             }
             feeder.index(index, type, id, contentBuilder.build(context, resource));
 

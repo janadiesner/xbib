@@ -29,53 +29,54 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.tools.feed.elasticsearch.ezb;
+package org.xbib.tools.convert.ezb;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-import javax.xml.namespace.QName;
-
-import org.xbib.oai.rdf.RdfOutput;
+import org.xbib.io.InputService;
+import org.xbib.iri.IRI;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.content.ContentBuilder;
 import org.xbib.rdf.content.DefaultContentBuilder;
 import org.xbib.rdf.context.IRINamespaceContext;
-import org.xbib.tools.Feeder;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.Pipeline;
-import org.xbib.io.InputService;
-import org.xbib.util.URIUtil;
-import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.io.ResourceSerializer;
+import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
 import org.xbib.rdf.io.xml.XmlReader;
 import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.tools.Converter;
+import org.xbib.util.URIUtil;
 import org.xml.sax.SAXException;
 
+import javax.xml.namespace.QName;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Writer;
+import java.net.URI;
+import java.nio.charset.Charset;
+
 /**
- * Elasticsearch indexer for "Elektronische Zeitschriftenbibliothek" (EZB)
- *
+ * Converter for "Elektronische Zeitschriftenbibliothek" (EZB)
+ * <p>
  * Format documentation
- *
+ * <p>
  * http://www.zeitschriftendatenbank.de/fileadmin/user_upload/ZDB/pdf/services/Datenlieferdienst_ZDB_EZB_Lizenzdatenformat.pdf
- *
  */
-public final class EZB extends Feeder {
+public final class FromEZBXML extends Converter {
 
-    private final static Logger logger = LoggerFactory.getLogger(EZB.class.getSimpleName());
-
+    private final static Logger logger = LoggerFactory.getLogger(FromEZBXML.class.getSimpleName());
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override
             public Pipeline get() {
-                return new EZB();
+                return new FromEZBXML();
             }
         };
     }
@@ -84,19 +85,26 @@ public final class EZB extends Feeder {
     public void process(URI uri) throws Exception {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
         ResourceContext<Resource> resourceContext = new SimpleResourceContext()
-                .setContentBuilder(contentBuilder(namespaceContext))
                 .setNamespaceContext(namespaceContext);
 
-        AbstractXmlHandler handler = new EZBHandler(resourceContext)
-                .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/")
-                .setListener(new ElasticOut());
+        Writer writer = new FileWriter(settings.get("output"));
 
-        InputStream in = InputService.getInputStream(uri);
-        new XmlReader()
-                .setNamespaces(false)
-                .setHandler(handler)
-                .parse(in);
-        in.close();
+        final TurtleWriter turtle = new TurtleWriter()
+                .setContext(namespaceContext)
+                .output(writer);
+
+        AbstractXmlHandler handler = new EZBHandler(resourceContext, turtle)
+                .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/");
+
+        try (InputStream in = InputService.getInputStream(uri)) {
+            new XmlReader()
+                    .setNamespaces(false)
+                    .setHandler(handler)
+                    .parse(in);
+        } finally {
+            turtle.close();
+            writer.close();
+        }
     }
 
     protected ContentBuilder contentBuilder(IRINamespaceContext namespaceContext) {
@@ -105,12 +113,16 @@ public final class EZB extends Feeder {
 
     class EZBHandler extends AbstractXmlResourceHandler {
 
-        public EZBHandler(ResourceContext resourceContext) {
+        ResourceSerializer resourceSerializer;
+
+        public EZBHandler(ResourceContext resourceContext, ResourceSerializer resourceSerializer) {
             super(resourceContext);
+            //setListener(resourceSerializer);
+            this.resourceSerializer = resourceSerializer;
         }
 
         @Override
-        public void endElement (String uri, String localName, String qName)
+        public void endElement(String uri, String localName, String qName)
                 throws SAXException {
             super.endElement(uri, localName, qName);
         }
@@ -134,22 +146,27 @@ public final class EZB extends Feeder {
 
         @Override
         public void closeResource() {
-            /*try {
-                sink.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
-            } catch (IOException e ) {
+            // attach closeResource to output write
+            try {
+                if (resourceContext().getResource() != null) {
+                    resourceSerializer.write(resourceContext().getResource());
+                } else {
+                    logger.warn("no resource to output");
+                }
+            } catch (IOException e) {
                 logger.error(e.getMessage(), e);
-            }*/
+            }
             super.closeResource();
         }
 
         @Override
         public boolean skip(QName name) {
             return "ezb-export".equals(name.getLocalPart())
-            || "release".equals(name.getLocalPart())
-            || "version".equals(name.getLocalPart())
-            || name.getLocalPart().startsWith("@");
+                    || "release".equals(name.getLocalPart())
+                    || "version".equals(name.getLocalPart())
+                    || name.getLocalPart().startsWith("@");
         }
-        
+
         @Override
         public Object toObject(QName name, String content) {
             switch (name.getLocalPart()) {
@@ -162,39 +179,60 @@ public final class EZB extends Feeder {
                 }
                 case "type_id": {
                     switch (Integer.parseInt(content)) {
-                        case 1: return "full-text-online"; //"Volltext nur online";
-                        case 2: return "full-text-online-and-print"; //"Volltext online und Druckausgabe";
-                        case 9: return "local"; //"lokale Zeitschrift";
-                        case 11: return "digitized"; //"retrodigitalisiert";
-                        default: throw new IllegalArgumentException("unknown type_id: " + content);
+                        case 1:
+                            return "full-text-online"; //"Volltext nur online";
+                        case 2:
+                            return "full-text-online-and-print"; //"Volltext online und Druckausgabe";
+                        case 9:
+                            return "local"; //"lokale Zeitschrift";
+                        case 11:
+                            return "digitized"; //"retrodigitalisiert";
+                        default:
+                            throw new IllegalArgumentException("unknown type_id: " + content);
                     }
                 }
-                case "license_type_id" : {
+                case "license_type_id": {
                     switch (Integer.parseInt(content)) {
-                        case 1 : return "local-license"; // "Einzellizenz";
-                        case 2 : return "consortia-license"; //"Konsortiallizenz";
-                        case 4 : return "supra-regional-license"; // "Nationallizenz";
-                        default: throw new IllegalArgumentException("unknown license_type_id: " + content);
+                        case 1:
+                            return "local-license"; // "Einzellizenz";
+                        case 2:
+                            return "consortia-license"; //"Konsortiallizenz";
+                        case 4:
+                            return "supra-regional-license"; // "Nationallizenz";
+                        default:
+                            throw new IllegalArgumentException("unknown license_type_id: " + content);
                     }
                 }
-                case "price_type_id" : {
+                case "price_type_id": {
                     switch (Integer.parseInt(content)) {
-                        case 1 : return "no-fee"; //"lizenzfrei";
-                        case 2 : return "no-fee-included-in-print"; //"Kostenlos mit Druckausgabe";
-                        case 3 : return "fee"; //"Kostenpflichtig";
-                        default: throw new IllegalArgumentException("unknown price_type_id: " + content);
+                        case 1:
+                            return "no-fee"; //"lizenzfrei";
+                        case 2:
+                            return "no-fee-included-in-print"; //"Kostenlos mit Druckausgabe";
+                        case 3:
+                            return "fee"; //"Kostenpflichtig";
+                        default:
+                            throw new IllegalArgumentException("unknown price_type_id: " + content);
                     }
                 }
-                case "ill_code" : {
+                case "ill_code": {
                     switch (content) {
-                        case "n" : return "no"; // "nein";
-                        case "l" : return "copy-loan"; //"ja, Leihe und Kopie";
-                        case "k" : return "copy"; //"ja, nur Kopie";
-                        case "e" : return "copy-electronic";  //"ja, auch elektronischer Versand an Nutzer";
-                        case "ln" : return "copy-loan-domestic";  //"ja, Leihe und Kopie (nur Inland)";
-                        case "kn" : return "copy-domestic";  //"ja, nur Kopie (nur Inland)";
-                        case "en" : return "copy-electronic-domestic";  //"ja, auch elektronischer Versand an Nutzer (nur Inland)";
-                        default: throw new IllegalArgumentException("unknown ill_code: " + content);
+                        case "n":
+                            return "no"; // "nein";
+                        case "l":
+                            return "copy-loan"; //"ja, Leihe und Kopie";
+                        case "k":
+                            return "copy"; //"ja, nur Kopie";
+                        case "e":
+                            return "copy-electronic";  //"ja, auch elektronischer Versand an Nutzer";
+                        case "ln":
+                            return "copy-loan-domestic";  //"ja, Leihe und Kopie (nur Inland)";
+                        case "kn":
+                            return "copy-domestic";  //"ja, nur Kopie (nur Inland)";
+                        case "en":
+                            return "copy-electronic-domestic";  //"ja, auch elektronischer Versand an Nutzer (nur Inland)";
+                        default:
+                            throw new IllegalArgumentException("unknown ill_code: " + content);
                     }
                 }
             }
@@ -237,7 +275,7 @@ public final class EZB extends Feeder {
         }
     }*/
 
-    class ElasticOut extends RdfOutput {
+    /*class ElasticOut extends RdfOutput {
         @Override
         public RdfOutput output(ResourceContext<Resource> resourceContext) throws IOException {
             if (resourceContext == null) {
@@ -269,6 +307,6 @@ public final class EZB extends Feeder {
              }
             return this;
         }
-    }
+    }*/
 
 }

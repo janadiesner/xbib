@@ -108,7 +108,7 @@ public abstract class OAIFeeder extends Feeder {
 
     @Override
     public void process(URI uri) throws Exception {
-        Map<String,String> params = URIUtil.parseQueryString(uri);
+        Map<String, String> params = URIUtil.parseQueryString(uri);
         String server = uri.toString();
         String metadataPrefix = params.get("metadataPrefix");
         String set = params.get("set");
@@ -167,13 +167,13 @@ public abstract class OAIFeeder extends Feeder {
 
         XmlMetadataHandler() {
             context = IRINamespaceContext.newInstance();
-            context.addNamespace("oai_dc","http://www.openarchives.org/OAI/2.0/oai_dc/");
+            context.addNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
             context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         }
 
         public XmlMetadataHandler setHandler(XmlHandler handler) {
             this.handler = handler;
-            handler.setDefaultNamespace("oai_dc","http://www.openarchives.org/OAI/2.0/oai_dc/");
+            handler.setDefaultNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
             return this;
         }
 

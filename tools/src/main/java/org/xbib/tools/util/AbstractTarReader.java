@@ -1,4 +1,3 @@
-
 package org.xbib.tools.util;
 
 import org.xbib.io.Connection;

@@ -93,44 +93,38 @@ public class Indicator extends License {
         Map<String, Object> m = newLinkedHashMap();
         String s = getString("xbib:interlibraryloanCode");
         if (s != null) {
-            switch(s) {
-                case "kxn" :
-                {
+            switch (s) {
+                case "kxn": {
                     servicetype = "interlibrary";
                     servicemode = "copy";
                     servicedistribution = "domestic";
                     break;
                 }
-                case "kxx" :
-                {
+                case "kxx": {
                     servicetype = "interlibrary";
                     servicemode = "copy";
                     servicedistribution = "unrestricted";
                     break;
                 }
-                case "kpn" :
-                {
+                case "kpn": {
                     servicetype = "interlibrary";
                     servicemode = "copy";
                     servicedistribution = Arrays.asList("postal", "domestic");
                     break;
                 }
-                case "kpx" :
-                {
+                case "kpx": {
                     servicetype = "interlibrary";
                     servicemode = "copy";
                     servicedistribution = "postal";
                     break;
                 }
-                case "exn" :
-                {
+                case "exn": {
                     servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = Arrays.asList("electronic","domestic");
+                    servicedistribution = Arrays.asList("electronic", "domestic");
                     break;
                 }
-                case "exx" :
-                {
+                case "exx": {
                     servicetype = "interlibrary";
                     servicemode = "copy";
                     servicedistribution = "electronic";

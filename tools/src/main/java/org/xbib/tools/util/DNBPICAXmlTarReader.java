@@ -48,14 +48,6 @@ import org.xbib.pipeline.PipelineException;
 import org.xbib.pipeline.element.LongPipelineElement;
 import org.xbib.util.Strings;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URI;
-import java.util.Iterator;
-import java.util.Stack;
-import java.util.concurrent.atomic.AtomicLong;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -65,9 +57,16 @@ import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.util.Iterator;
+import java.util.Stack;
+import java.util.concurrent.atomic.AtomicLong;
 
 
-public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<LongPipelineElement,PipelineException>
+public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<LongPipelineElement, PipelineException>
         implements DNBPICAConstants, MarcXchangeListener {
 
     private final Logger logger = LoggerFactory.getLogger(DNBPICAXmlTarReader.class.getName());
@@ -239,7 +238,7 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Long
             if (session == null) {
                 createSession();
             }
-            this.packet = (P)read(session);
+            this.packet = (P) read(session);
             this.prepared = packet != null;
             if (prepared) {
                 nextNumber();
@@ -280,7 +279,7 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Long
                 switch (attributeLocalName) {
                     case ID:
                         if (attributeValue.length() > 3) {
-                            tag = attributeValue.substring(0,3);
+                            tag = attributeValue.substring(0, 3);
                             indicator = attributeValue.substring(3);
                         } else if (attributeValue.length() == 1) {
                             subfield = attributeValue;
@@ -311,11 +310,11 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Long
                     beginSubField(field);
                     break;
                 }
-                case GLOBAL : {
+                case GLOBAL: {
                     // ignore
                     break;
                 }
-                default : {
+                default: {
                     logger.error("unknown element {}", localName);
                     throw new IllegalArgumentException("unknown begin element: " + uri + " " + localName);
                 }
@@ -339,15 +338,15 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Long
                     break;
                 case RECORD:
                     //if (inRecord) {
-                        endRecord();
-                        //inRecord = false;
+                    endRecord();
+                    //inRecord = false;
                     //}
                     break;
-                case GLOBAL : {
+                case GLOBAL: {
                     // ignore
                     break;
                 }
-                default : {
+                default: {
                     logger.error("unknown element {}", localName);
                     // stop processing, this is fatal
                     throw new IllegalArgumentException("unknown end element: " + uri + " " + localName);
@@ -358,7 +357,7 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Long
     }
 
     private void createSession() throws IOException {
-        this.connection =  service
+        this.connection = service
                 .getConnectionFactory(uri)
                 .getConnection(uri);
         this.session = connection.createSession();
@@ -382,7 +381,7 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Long
         while ((pos < 0) || Strings.isNullOrEmpty(numberStr)) {
             logger.warn("skipping packet {}, number does not match", name);
             // next message
-            packet = (P)read(session);
+            packet = (P) read(session);
             name = packet.name();
             pos = name == null ? -1 : name.lastIndexOf('/');
             numberStr = pos >= 0 ? name.substring(pos + 1) : null;
@@ -391,8 +390,8 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Long
     }
 
     /**
-     *  Read packet, optionally check if iterator gives enough numbers
-     *  (assuming iterator counts from 1)
+     * Read packet, optionally check if iterator gives enough numbers
+     * (assuming iterator counts from 1)
      *
      * @param session the session
      * @return packet

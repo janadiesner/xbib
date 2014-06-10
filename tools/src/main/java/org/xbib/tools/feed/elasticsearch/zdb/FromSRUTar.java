@@ -1,7 +1,5 @@
-
 package org.xbib.tools.feed.elasticsearch.zdb;
 
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -11,13 +9,14 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.marc.xml.MarcXmlEventConsumer;
 import org.xbib.marc.xml.MarcXchangeContentHandler;
+import org.xbib.marc.xml.MarcXmlEventConsumer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.ResourceContext;
 import org.xbib.tools.Feeder;
 import org.xbib.tools.util.AbstractTarReader;
 

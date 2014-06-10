@@ -32,7 +32,6 @@
 package org.xbib.tools.feed.elasticsearch.b3kat;
 
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -48,8 +47,9 @@ import org.xbib.marc.xml.MarcXchangeReader;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.ResourceContext;
 import org.xbib.tools.Feeder;
 import org.xml.sax.InputSource;
 
@@ -90,7 +90,7 @@ public final class FromMARCXML extends Feeder {
     public void process(URI uri) throws Exception {
 
         final MARCElementMapper mapper = new MARCElementMapper(settings.get("elements"))
-                .pipelines(settings.getAsInt("pipelines",1))
+                .pipelines(settings.getAsInt("pipelines", 1))
                 .detectUnknownKeys(settings.getAsBoolean("detect", false))
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
@@ -99,7 +99,7 @@ public final class FromMARCXML extends Feeder {
                 });
 
         final MARCDirectMapper directMapper = new MARCDirectMapper()
-                .pipelines(settings.getAsInt("pipelines",1))
+                .pipelines(settings.getAsInt("pipelines", 1))
                 .start(new MARCDirectBuilderFactory() {
                     public MARCDirectBuilder newBuilder() {
                         return new MARCDirectBuilder().addOutput(new MyContextResourceOutput());

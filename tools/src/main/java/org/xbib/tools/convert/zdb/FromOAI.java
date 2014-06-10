@@ -52,7 +52,6 @@ import org.xbib.util.URIUtil;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
@@ -110,7 +109,7 @@ public class FromOAI extends Converter {
 
     @Override
     protected void process(URI uri) throws Exception {
-        Map<String,String> params = URIUtil.parseQueryString(uri);
+        Map<String, String> params = URIUtil.parseQueryString(uri);
         final OAIClient client = OAIClientFactory.newClient().setURL(uri);
         client.setTimeout(settings.getAsInt("timeout", 60000));
         ListRecordsRequest request = client.newListRecordsRequest()

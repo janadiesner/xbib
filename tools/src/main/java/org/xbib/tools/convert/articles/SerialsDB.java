@@ -31,16 +31,6 @@
  */
 package org.xbib.tools.convert.articles;
 
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.URI;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.xbib.csv.CSVParser;
 import org.xbib.grouping.bibliographic.endeavor.PublishedJournal;
 import org.xbib.io.InputService;
@@ -55,6 +45,15 @@ import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.tools.Converter;
 
+import java.io.EOFException;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Import serials list
  */
@@ -63,6 +62,7 @@ public class SerialsDB extends Converter {
     private final static Logger logger = LoggerFactory.getLogger(SerialsDB.class.getSimpleName());
 
     private final static IRINamespaceContext context = IRINamespaceContext.newInstance();
+
     static {
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         context.addNamespace("prism", "http://prismstandard.org/namespaces/basic/2.1/");
@@ -70,7 +70,7 @@ public class SerialsDB extends Converter {
 
     private final static SimpleResourceContext resourceContext = new SimpleResourceContext();
 
-    private final static Map<String,Resource> serials = new ConcurrentHashMap<>();
+    private final static Map<String, Resource> serials = new ConcurrentHashMap<>();
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
@@ -170,7 +170,7 @@ public class SerialsDB extends Converter {
 
     private String buildISSN(String[] issnArr, int i, boolean hyphen) {
         return issnArr.length > i && !issnArr[i].isEmpty() ?
-                (hyphen ? new StringBuilder(issnArr[i].toLowerCase()).insert(4,'-').toString() : issnArr[i].toLowerCase()) :
+                (hyphen ? new StringBuilder(issnArr[i].toLowerCase()).insert(4, '-').toString() : issnArr[i].toLowerCase()) :
                 null;
     }
 

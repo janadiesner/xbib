@@ -38,7 +38,8 @@ import org.xbib.rdf.Resource;
 
 import java.io.IOException;
 
-public interface ResourceSerializer<S extends Identifier, P extends Property, O extends Node> {
+public interface ResourceSerializer<S extends Identifier, P extends Property, O extends Node>
+    extends TripleListener<S, P, O>{
 
     ResourceSerializer<S,P,O> write(Resource<S,P,O> resource) throws IOException;
 }

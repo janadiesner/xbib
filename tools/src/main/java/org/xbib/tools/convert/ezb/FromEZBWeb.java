@@ -36,7 +36,6 @@ import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
@@ -61,35 +60,30 @@ import java.util.Scanner;
 /**
  * Harvest inter library loan codes from EZB web service
  */
-public class EZBWeb extends Converter {
+public class FromEZBWeb extends Converter {
 
-    private final static Logger logger = LoggerFactory.getLogger(EZBWeb.class.getSimpleName());
-
-    private final static IRINamespaceContext context = IRINamespaceContext.newInstance();
-    static {
-        context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
-        context.addNamespace("prism", "http://prismstandard.org/namespaces/basic/2.1/");
-    }
-
-    private final static SimpleResourceContext resourceContext = new SimpleResourceContext();
+    private final static Logger logger = LoggerFactory.getLogger(FromEZBWeb.class.getSimpleName());
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override
             public Pipeline get() {
-                return new EZBWeb();
+                return new FromEZBWeb();
             }
         };
     }
 
     @Override
     public void process(URI uri) throws Exception {
+        IRINamespaceContext context = IRINamespaceContext.newInstance();
+        context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
+        context.addNamespace("prism", "http://prismstandard.org/namespaces/basic/2.1/");
+        SimpleResourceContext resourceContext = new SimpleResourceContext();
+        resourceContext.setNamespaceContext(context);
 
         Reader reader = new InputStreamReader(InputService.getInputStream(uri), "UTF-8");
         Writer writer = new FileWriter(settings.get("output"));
-
-        resourceContext.setNamespaceContext(context);
 
         final TurtleWriter turtle = new TurtleWriter()
                 .setContext(context)
@@ -127,7 +121,7 @@ public class EZBWeb extends Converter {
                     if ("AAAAA".equals(sigel)) {
                         continue;
                     }
-                    String key = zdbid + "_" + isil + "_" + firstDate + "_" + lastDate + "_" + (movingWall.isEmpty()? "0" : movingWall) ;
+                    String key = zdbid + "_" + isil + "_" + firstDate + "_" + lastDate + "_" + (movingWall.isEmpty() ? "0" : movingWall);
                     IRI id = IRI.builder().scheme("http")
                             .host("xbib.info")
                             .path("/ezbws/" + key + "/")

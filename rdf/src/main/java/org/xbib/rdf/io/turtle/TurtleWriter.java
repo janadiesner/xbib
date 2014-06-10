@@ -64,7 +64,7 @@ import org.xbib.rdf.simple.SimpleResource;
  *
  */
 public class TurtleWriter<S extends Identifier, P extends Property, O extends Node>
-    implements ResourceSerializer<S,P,O>, TripleListener<S,P,O> {
+    implements ResourceSerializer<S,P,O> {
 
     private final Logger logger = LoggerFactory.getLogger(TurtleWriter.class.getName());
 

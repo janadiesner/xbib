@@ -84,7 +84,7 @@ public class FromDOAJ extends OAIFeeder {
         @Override
         public Object toObject(QName name, String content) {
             switch (name.getLocalPart()) {
-                case "identifier" : {
+                case "identifier": {
                     if (content.startsWith("http://")) {
                         return new SimpleLiteral(content).type(XSD.ANYURI);
                     }
@@ -96,17 +96,17 @@ public class FromDOAJ extends OAIFeeder {
                     }
                     break;
                 }
-                case "subject" : {
+                case "subject": {
                     if (content.startsWith("LCC: ")) {
                         return new SimpleLiteral(content.substring(5)).type(LCCN);
                     }
                     break;
                 }
-                case "issn" : {
-                    return new SimpleLiteral(content.substring(0,4) + "-" + content.substring(4)).type(ISSN);
+                case "issn": {
+                    return new SimpleLiteral(content.substring(0, 4) + "-" + content.substring(4)).type(ISSN);
                 }
-                case "eissn" : {
-                    return new SimpleLiteral(content.substring(0,4) + "-" + content.substring(4)).type(EISSN);
+                case "eissn": {
+                    return new SimpleLiteral(content.substring(0, 4) + "-" + content.substring(4)).type(EISSN);
                 }
             }
             return super.toObject(name, content);

@@ -40,8 +40,8 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.sru.client.SRUClientFactory;
 import org.xbib.sru.client.SRUClient;
+import org.xbib.sru.client.SRUClientFactory;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
 import org.xbib.sru.searchretrieve.SearchRetrieveResponse;
 import org.xbib.tools.Converter;
@@ -69,7 +69,8 @@ public class FromSRU extends Converter {
 
     private SRUClient client;
 
-    public FromSRU() {}
+    public FromSRU() {
+    }
 
     public FromSRU(boolean b) {
         client = SRUClientFactory.newClient();

@@ -31,26 +31,26 @@
  */
 package org.xbib.tools.feed.elasticsearch.dnb.gnd;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-
-import org.xbib.pipeline.PipelineException;
-import org.xbib.pipeline.PipelineRequest;
-import org.xbib.tools.Feeder;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineException;
 import org.xbib.pipeline.PipelineProvider;
+import org.xbib.pipeline.PipelineRequest;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.turtle.TurtleReader;
 import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.tools.Feeder;
 import org.xbib.xml.namespace.XmlNamespaceContext;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 
 /**
  * GND ingest

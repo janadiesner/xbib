@@ -31,6 +31,33 @@
  */
 package org.xbib.tools.merge.zdb;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.SetMultimap;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.xbib.common.settings.Settings;
+import org.xbib.common.xcontent.XContentBuilder;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.metric.MeterMetric;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineRequestListener;
+import org.xbib.tools.merge.zdb.entities.Cluster;
+import org.xbib.tools.merge.zdb.entities.Holding;
+import org.xbib.tools.merge.zdb.entities.Indicator;
+import org.xbib.tools.merge.zdb.entities.License;
+import org.xbib.tools.merge.zdb.entities.Manifestation;
+import org.xbib.tools.merge.zdb.entities.TimeLine;
+import org.xbib.tools.util.SearchHitPipelineElement;
+import org.xbib.util.ExceptionFormatter;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,35 +70,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.SetMultimap;
-
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-
-import org.xbib.common.settings.Settings;
-import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.tools.util.SearchHitPipelineElement;
-import org.xbib.tools.merge.zdb.entities.TimeLine;
-import org.xbib.tools.merge.zdb.entities.Cluster;
-import org.xbib.tools.merge.zdb.entities.Holding;
-import org.xbib.tools.merge.zdb.entities.Indicator;
-import org.xbib.tools.merge.zdb.entities.License;
-import org.xbib.tools.merge.zdb.entities.Manifestation;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.metric.MeterMetric;
-import org.xbib.pipeline.Pipeline;
-import org.xbib.pipeline.PipelineRequestListener;
-import org.xbib.util.ExceptionFormatter;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
@@ -145,9 +143,9 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             throw new IllegalArgumentException("no index given");
         }
         this.worksIndex = settings.get("worksIndex", index);
-        this.worksIndexType = settings.get("worksIndexType","Work");
+        this.worksIndexType = settings.get("worksIndexType", "Work");
         this.manifestationsIndex = settings.get("manifestationsIndex", index);
-        this.manifestationsIndexType = settings.get("manifestationsIndexType","Manifestation");
+        this.manifestationsIndexType = settings.get("manifestationsIndexType", "Manifestation");
         this.holdingsIndex = settings.get("holdingsIndex", index);
         this.holdingsIndexType = settings.get("holdingsIndexType", "Holding");
         this.volumesIndex = settings.get("volumesIndex", index);
@@ -249,7 +247,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         return WithHoldingsAndLicenses.class.getSimpleName() + "." + number;
     }
 
-    public Pipeline<Boolean, Manifestation> add(String name,PipelineRequestListener listener) {
+    public Pipeline<Boolean, Manifestation> add(String name, PipelineRequestListener listener) {
         this.listeners.put(name, listener);
         return this;
     }
@@ -292,7 +290,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
 
     private void simpleProcess(Manifestation manifestation) throws IOException {
         // no Work set algorithm, only other edition (print/online)
-        this.candidates = newSetFromMap(new ConcurrentHashMap<Manifestation,Boolean>());
+        this.candidates = newSetFromMap(new ConcurrentHashMap<Manifestation, Boolean>());
         candidates.add(manifestation);
         if (manifestation.hasOnline() || manifestation.hasPrint()) {
             retrieveOtherEdition(manifestation, candidates);
@@ -318,7 +316,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         // Work set algorithm
         // Candidates are unstructured, no timeline organization,
         // no relationship analysis, not ordered by ID
-        this.candidates = newSetFromMap(new ConcurrentHashMap<Manifestation,Boolean>());
+        this.candidates = newSetFromMap(new ConcurrentHashMap<Manifestation, Boolean>());
         candidates.add(manifestation);
         // there are certain serial genres which are not fitting into our model of "few" timelines
         if (!manifestation.isDatabase() && !manifestation.isNewspaper() && !manifestation.isPacket()) {
@@ -370,7 +368,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             // precaution against processing a timeline again. This should not happen.
             if (service.timelines().contains(timelineId)) {
                 logger.warn("timeline {} already exists (while processing manifestation {})",
-                            timelineId, manifestation);
+                        timelineId, manifestation);
                 continue;
             }
             service.timelines().add(timelineId);
@@ -532,8 +530,8 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         SetMultimap<String, String> relations = ImmutableSetMultimap.copyOf(manifestation.getRelations());
         Set<String> neighbors = newHashSet(relations.values());
         QueryBuilder queryBuilder = neighbors.isEmpty() ?
-                termQuery("_all",  manifestation.id()) :
-                boolQuery().should(termQuery("_all",  manifestation.id()))
+                termQuery("_all", manifestation.id()) :
+                boolQuery().should(termQuery("_all", manifestation.id()))
                         .should(termsQuery("IdentifierDNB.identifierDNB", neighbors.toArray()));
         SearchRequestBuilder searchRequest = service.client().prepareSearch()
                 .setQuery(queryBuilder)
@@ -566,7 +564,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         SearchHits hits;
         do {
             hits = searchResponse.getHits();
-            for (int i = c.pos; i < hits.getHits().length; i++ ) {
+            for (int i = c.pos; i < hits.getHits().length; i++) {
                 SearchHit hit = hits.getAt(i);
                 Manifestation m = new Manifestation(mapper.readValue(hit.source(), Map.class));
                 if (m.id().equals(c.manifestation.id())) {
@@ -665,7 +663,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
 
     private Set<Holding> searchHoldings(Collection<Manifestation> manifestations) throws IOException {
         // create a map of all manifestations that can have assigned a holding.
-        Map<String,Manifestation> map = newHashMap();
+        Map<String, Manifestation> map = newHashMap();
         for (Manifestation m : manifestations) {
             map.put(m.id(), m);
             // add print if not already there...
@@ -678,7 +676,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         return holdings;
     }
 
-    private void searchHoldings(Set<Holding> holdings, Map<String,Manifestation> manifestations) throws IOException {
+    private void searchHoldings(Set<Holding> holdings, Map<String, Manifestation> manifestations) throws IOException {
         if (sourceHoldingsIndex == null) {
             return;
         }
@@ -745,7 +743,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
 
     private Set<License> searchLicensesAndIndicators(Collection<Manifestation> manifestations) throws IOException {
         // create a map of all manifestations that can have assigned a license.
-        Map<String,Manifestation> map = newHashMap();
+        Map<String, Manifestation> map = newHashMap();
         boolean isOnline = false;
         for (Manifestation m : manifestations) {
             map.put(m.externalID(), m);
@@ -767,7 +765,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         return licenses;
     }
 
-    private void searchLicenses(Set<License> licenses, Map<String,Manifestation> manifestations) throws IOException {
+    private void searchLicenses(Set<License> licenses, Map<String, Manifestation> manifestations) throws IOException {
         if (sourceLicenseIndex == null) {
             return;
         }
@@ -843,7 +841,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         }
     }
 
-    private void searchIndicators(Set<License> indicators, Map<String,Manifestation> manifestations) throws IOException {
+    private void searchIndicators(Set<License> indicators, Map<String, Manifestation> manifestations) throws IOException {
         if (sourceIndicatorIndex == null) {
             return;
         }
@@ -931,7 +929,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                     Object internalObj = m.get("identifierDNB");
                     // take only first entry from list...
                     String value = internalObj == null ? null : internalObj instanceof List ?
-                            ((List)internalObj).get(0).toString() : internalObj.toString();
+                            ((List) internalObj).get(0).toString() : internalObj.toString();
                     if (id.equals(value)) {
                         // defined relation?
                         Object oo = m.get("relation");
@@ -939,7 +937,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                             if (!(oo instanceof List)) {
                                 oo = Arrays.asList(oo);
                             }
-                            for (Object relName : (List)oo) {
+                            for (Object relName : (List) oo) {
                                 relationNames.add(relName.toString());
                             }
                         }
@@ -961,7 +959,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                     Map<String, Object> entry = (Map<String, Object>) s;
                     Object internalObj = entry.get("relation");
                     String key = internalObj == null ? null : internalObj instanceof List ?
-                            ((List)internalObj).get(0).toString() : internalObj.toString();
+                            ((List) internalObj).get(0).toString() : internalObj.toString();
                     if (key == null) {
                         internalObj = entry.get("relationshipInformation");
                         if (internalObj != null) {
@@ -977,7 +975,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                     internalObj = entry.get("identifierDNB");
                     // take only first entry from list...
                     String value = internalObj == null ? null : internalObj instanceof List ?
-                            ((List)internalObj).get(0).toString() : internalObj.toString();
+                            ((List) internalObj).get(0).toString() : internalObj.toString();
                     for (Manifestation m : cluster) {
                         // self?
                         if (m.id().equals(manifestation.id())) {
@@ -1022,7 +1020,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         }
     }
 
-    private final Map<String,String> inverseRelations = new HashMap<String,String>() {{
+    private final Map<String, String> inverseRelations = new HashMap<String, String>() {{
 
         put("hasPart", "isPartOf");
         put("hasSupplement", "isSupplementOf");

@@ -39,10 +39,10 @@ public class Runner {
     public static void main(String[] args) {
         try {
             Class clazz = Class.forName(args[0]);
-            Tool tool = (Tool)clazz.newInstance();
+            Tool tool = (Tool) clazz.newInstance();
             tool.reader(new InputStreamReader(System.in, "UTF-8"))
-                .writer(new OutputStreamWriter(System.out, "UTF-8"))
-                .run();
+                    .writer(new OutputStreamWriter(System.out, "UTF-8"))
+                    .run();
         } catch (Throwable e) {
             e.printStackTrace();
             System.exit(1);

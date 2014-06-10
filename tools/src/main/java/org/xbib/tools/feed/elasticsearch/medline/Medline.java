@@ -31,21 +31,21 @@
  */
 package org.xbib.tools.feed.elasticsearch.medline;
 
-import javax.xml.namespace.QName;
-import java.io.InputStream;
-import java.net.URI;
-
-import org.xbib.tools.Feeder;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.Pipeline;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
 import org.xbib.rdf.io.xml.XmlReader;
 import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.tools.Feeder;
+
+import javax.xml.namespace.QName;
+import java.io.InputStream;
+import java.net.URI;
 
 /**
  * Elasticsearch indexer tool for Medline XML files
@@ -68,14 +68,14 @@ public final class Medline extends Feeder {
 
     @Override
     public void process(URI uri) throws Exception {
-            AbstractXmlHandler handler = new Handler()
-                    .setDefaultNamespace("ml", "http://www.nlm.nih.gov/medline");
-            InputStream in = InputService.getInputStream(uri);
-            new XmlReader()
-                    .setNamespaces(false)
-                    .setHandler(handler)
-                    .parse(in);
-            in.close();
+        AbstractXmlHandler handler = new Handler()
+                .setDefaultNamespace("ml", "http://www.nlm.nih.gov/medline");
+        InputStream in = InputService.getInputStream(uri);
+        new XmlReader()
+                .setNamespaces(false)
+                .setHandler(handler)
+                .parse(in);
+        in.close();
     }
 
     private class Handler extends AbstractXmlResourceHandler {

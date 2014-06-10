@@ -21,7 +21,7 @@ import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 public class BibdatLookup {
 
-    private Map<String,String> lookup = newHashMap();
+    private Map<String, String> lookup = newHashMap();
 
     private Map<String, Set<String>> groups = newHashMap();
 
@@ -45,9 +45,9 @@ public class BibdatLookup {
             for (SearchHit hit : hits) {
                 Map<String, Object> m = hit.getSource();
                 String key = m.containsKey("Identifier") ?
-                        (String)((Map<String, Object>)m.get("Identifier")).get("identifierAuthorityISIL") : null;
+                        (String) ((Map<String, Object>) m.get("Identifier")).get("identifierAuthorityISIL") : null;
                 String value = m.containsKey("LibraryService") ?
-                        (String)((Map<String, Object>)m.get("LibraryService")).get("libraryServiceRegion") : null;
+                        (String) ((Map<String, Object>) m.get("LibraryService")).get("libraryServiceRegion") : null;
                 if (key != null && value != null) {
                     lookup.put(key, value);
                     Set<String> g = groups.get(value);
@@ -67,11 +67,11 @@ public class BibdatLookup {
         }
     }
 
-    public Map<String,String> lookup() {
+    public Map<String, String> lookup() {
         return lookup;
     }
 
-    public Map<String,Set<String>> groups() {
+    public Map<String, Set<String>> groups() {
         return groups;
     }
 

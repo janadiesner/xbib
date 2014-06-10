@@ -31,30 +31,30 @@
  */
 package org.xbib.tools.feed.elasticsearch.zdb;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.text.Normalizer;
-
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.rdf.context.CountableContextResourceOutput;
-import org.xbib.tools.Feeder;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.Pipeline;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.tools.Feeder;
 import org.xml.sax.InputSource;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.text.Normalizer;
 
 /**
  * Indexing Zeitschriftendatenbank (ZDB) MARC ISO2709 files
@@ -87,7 +87,7 @@ public final class FromMARC extends Feeder {
     public void process(URI uri) throws Exception {
 
         final MARCElementMapper mapper = new MARCElementMapper(settings.get("elements"))
-                .pipelines(settings.getAsInt("pipelines",1))
+                .pipelines(settings.getAsInt("pipelines", 1))
                 .detectUnknownKeys(settings.getAsBoolean("detect", false))
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {

@@ -1,10 +1,8 @@
-
 package org.xbib.tools.feed.elasticsearch.zdb;
 
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.unit.TimeValue;
 import org.xbib.elasticsearch.rdf.ResourceSink;
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -17,8 +15,9 @@ import org.xbib.marc.xml.MarcXchangeContentHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.ResourceContext;
 import org.xbib.sru.client.SRUClient;
 import org.xbib.sru.client.SRUClientFactory;
 import org.xbib.sru.searchretrieve.SearchRetrieveListener;
@@ -190,6 +189,7 @@ public class FromSRU extends Feeder {
             public void recordPacking(String recordPacking) {
                 logger.info("got recordPacking: " + recordPacking);
             }
+
             @Override
             public void recordIdentifier(String recordIdentifier) {
                 logger.info("got recordIdentifier=" + recordIdentifier);
@@ -224,8 +224,8 @@ public class FromSRU extends Feeder {
 
         StringWriter w = new StringWriter();
         SearchRetrieveRequest request = client.newSearchRetrieveRequest()
-                    .setURI(uri)
-                    .addListener(listener);
+                .setURI(uri)
+                .addListener(listener);
         SearchRetrieveResponse response = client.searchRetrieve(request).to(w);
 
     }

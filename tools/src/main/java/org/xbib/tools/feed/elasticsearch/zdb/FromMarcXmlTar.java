@@ -31,26 +31,26 @@
  */
 package org.xbib.tools.feed.elasticsearch.zdb;
 
-import java.io.IOException;
-import java.net.URI;
-import java.text.Normalizer;
-
-import org.xbib.marc.xml.MarcXmlEventConsumer;
-import org.xbib.tools.Feeder;
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.Pipeline;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;
-import org.xbib.tools.util.MarcXmlTarReader;
+import org.xbib.marc.xml.MarcXmlEventConsumer;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.tools.Feeder;
+import org.xbib.tools.util.MarcXmlTarReader;
+
+import java.io.IOException;
+import java.net.URI;
+import java.text.Normalizer;
 
 /**
  * Elasticsearch indexer for Zeitschriftendatenbank (ZDB) MARC-XML tar archive files

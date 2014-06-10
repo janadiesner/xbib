@@ -31,14 +31,6 @@
  */
 package org.xbib.tools.feed.elasticsearch.zdb.bibdat;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.text.Normalizer;
-
-import org.xbib.tools.Feeder;
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.dialects.pica.PicaContext;
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilder;
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilderFactory;
@@ -56,7 +48,15 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.tools.Feeder;
 import org.xml.sax.InputSource;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.text.Normalizer;
 
 /**
  * Index bib addresses into Elasticsearch
@@ -95,7 +95,7 @@ public final class BibdatFromPPXML extends Feeder {
                 .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
                     @Override
                     public String transform(String value) {
-                        return Normalizer.normalize(value,Normalizer.Form.NFKC);
+                        return Normalizer.normalize(value, Normalizer.Form.NFKC);
                     }
                 })
                 .addListener(mapper)

@@ -31,21 +31,21 @@
  */
 package org.xbib.tools.convert.oai;
 
-import javax.xml.namespace.QName;
-
-import org.xbib.pipeline.Pipeline;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.tools.OAIHarvester;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.rdf.RdfResourceHandler;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleProperty;
+import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.rdf.types.XSD;
+import org.xbib.tools.OAIHarvester;
+
+import javax.xml.namespace.QName;
 
 /**
  * OAI harvester, write documents to RDF
@@ -89,7 +89,7 @@ public class DOAJ extends OAIHarvester {
         @Override
         public Object toObject(QName name, String content) {
             switch (name.getLocalPart()) {
-                case "identifier" : {
+                case "identifier": {
                     if (content.startsWith("http://")) {
                         return new SimpleLiteral(content).type(XSD.ANYURI);
                     }
@@ -101,17 +101,17 @@ public class DOAJ extends OAIHarvester {
                     }
                     break;
                 }
-                case "subject" : {
+                case "subject": {
                     if (content.startsWith("LCC: ")) {
                         return new SimpleLiteral(content.substring(5)).type(LCCN);
                     }
                     break;
                 }
-                case "issn" : {
-                    return new SimpleLiteral(content.substring(0,4) + "-" + content.substring(4)).type(ISSN);
+                case "issn": {
+                    return new SimpleLiteral(content.substring(0, 4) + "-" + content.substring(4)).type(ISSN);
                 }
-                case "eissn" : {
-                    return new SimpleLiteral(content.substring(0,4) + "-" + content.substring(4)).type(EISSN);
+                case "eissn": {
+                    return new SimpleLiteral(content.substring(0, 4) + "-" + content.substring(4)).type(EISSN);
                 }
             }
             return super.toObject(name, content);

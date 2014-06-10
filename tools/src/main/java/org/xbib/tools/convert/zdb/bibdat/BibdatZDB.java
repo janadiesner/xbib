@@ -31,25 +31,25 @@
  */
 package org.xbib.tools.convert.zdb.bibdat;
 
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.dialects.pica.PicaContext;
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilder;
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilderFactory;
 import org.xbib.elements.marc.dialects.pica.PicaElementMapper;
-import org.xbib.keyvalue.KeyValueStreamAdapter;
-import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.Pipeline;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
+import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.Field;
+import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.tools.Converter;
 import org.xml.sax.InputSource;
 
@@ -126,7 +126,7 @@ public final class BibdatZDB extends Converter {
 
     private final static OurContextResourceOutput out = new OurContextResourceOutput();
 
-    private final static class OurContextResourceOutput extends CountableContextResourceOutput<PicaContext,Resource> {
+    private final static class OurContextResourceOutput extends CountableContextResourceOutput<PicaContext, Resource> {
 
         File f;
         FileWriter fw;

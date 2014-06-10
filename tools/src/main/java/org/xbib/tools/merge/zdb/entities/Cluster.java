@@ -31,8 +31,6 @@
  */
 package org.xbib.tools.merge.zdb.entities;
 
-import com.google.common.collect.SetMultimap;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -112,7 +110,7 @@ public class Cluster extends TreeSet<Manifestation> {
         return timeLines;
     }
 
-    private final static String[] timelineRelations = new String[] {
+    private final static String[] timelineRelations = new String[]{
             "precededBy",
             "succeededBy",
             "hasPrintEdition",
@@ -134,7 +132,7 @@ public class Cluster extends TreeSet<Manifestation> {
         }
     }
 
-    private void makeTimeLine(Manifestation manifestation, Set<Manifestation> result)  {
+    private void makeTimeLine(Manifestation manifestation, Set<Manifestation> result) {
         Set<Manifestation> set = newTreeSet();
         for (String relation : timelineRelations) {
             set.addAll(manifestation.getRelatedManifestations().get(relation));

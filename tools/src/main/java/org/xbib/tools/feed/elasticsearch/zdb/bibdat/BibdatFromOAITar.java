@@ -31,15 +31,11 @@
  */
 package org.xbib.tools.feed.elasticsearch.zdb.bibdat;
 
-import org.xbib.io.Packet;
-import org.xbib.marc.MarcXchangeListener;
-import org.xbib.marc.dialects.pica.DNBPicaXmlEventConsumer;
-import org.xbib.tools.Feeder;
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.dialects.pica.PicaContext;
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilder;
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilderFactory;
 import org.xbib.elements.marc.dialects.pica.PicaElementMapper;
+import org.xbib.io.Packet;
 import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
@@ -47,10 +43,14 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.dialects.pica.DNBPicaXmlEventConsumer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.tools.Feeder;
 import org.xbib.tools.util.AbstractTarReader;
 
 import javax.xml.stream.XMLEventReader;
@@ -100,7 +100,8 @@ public final class BibdatFromOAITar extends Feeder {
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                 .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
                     @Override
-                    public String transform(String value) { return Normalizer.normalize(value, Normalizer.Form.NFC);
+                    public String transform(String value) {
+                        return Normalizer.normalize(value, Normalizer.Form.NFC);
                     }
                 })
                 .addListener(mapper)

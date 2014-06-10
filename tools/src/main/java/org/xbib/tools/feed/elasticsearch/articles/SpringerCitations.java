@@ -31,6 +31,19 @@
  */
 package org.xbib.tools.feed.elasticsearch.articles;
 
+import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
+import org.xbib.io.InputService;
+import org.xbib.iri.IRI;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.Literal;
+import org.xbib.rdf.Resource;
+import org.xbib.rdf.simple.SimpleLiteral;
+import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.tools.Feeder;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,20 +51,6 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.tools.Feeder;
-import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
-import org.xbib.io.InputService;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.Pipeline;
-import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Literal;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.simple.SimpleLiteral;
-import org.xbib.rdf.simple.SimpleResourceContext;
 
 /**
  * Push Springer citations to Elasticsearch
@@ -99,63 +98,63 @@ public class SpringerCitations extends Feeder {
                 }
                 char ch = line.charAt(1);
                 switch (ch) {
-                    case 'D' : {
+                    case 'D': {
                         year = line.substring(3).trim();
                         break;
                     }
-                    case 'T' : {
+                    case 'T': {
                         title = line.substring(3).trim();
                         break;
                     }
-                    case '@' : {
+                    case '@': {
                         issn = line.substring(3).trim();
                         break;
                     }
-                    case 'J' : {
+                    case 'J': {
                         journal = line.substring(3).trim();
                         break;
                     }
-                    case 'A' : {
+                    case 'A': {
                         author.add(line.substring(3).trim());
                         break;
                     }
-                    case 'V' : {
+                    case 'V': {
                         volume = line.substring(3).trim();
                         break;
                     }
-                    case 'N' : {
+                    case 'N': {
                         issue = line.substring(3).trim();
                         break;
                     }
-                    case 'P' : {
+                    case 'P': {
                         pagination = line.substring(3).trim();
                         break;
                     }
-                    case 'R' : {
+                    case 'R': {
                         doi = line.substring(3).trim();
                         break;
                     }
-                    case 'I' : {
+                    case 'I': {
                         publisher = line.substring(3).trim();
                         break;
                     }
-                    case 'U' : {
+                    case 'U': {
                         // URL (DOI resolver)
                         break;
                     }
-                    case 'K' : {
+                    case 'K': {
                         // keywords
                         break;
                     }
-                    case '0' : {
+                    case '0': {
                         // record type
                         break;
                     }
-                    case '8' : {
+                    case '8': {
                         // day
                         break;
                     }
-                    case 'G' : {
+                    case 'G': {
                         // language
                         break;
                     }

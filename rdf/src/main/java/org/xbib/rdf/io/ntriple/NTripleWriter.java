@@ -54,10 +54,9 @@ import org.xbib.rdf.simple.SimpleResource;
 
 /**
  * NTriple writer
- *
  */
 public class NTripleWriter<S extends Identifier, P extends Property, O extends Node>
-    implements ResourceSerializer<S,P,O>, TripleListener<S,P,O> {
+    implements ResourceSerializer<S,P,O> {
 
     private final Logger logger = LoggerFactory.getLogger(NTripleWriter.class.getName());
 

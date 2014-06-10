@@ -37,12 +37,12 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.AbstractPipeline;
-import org.xbib.pipeline.PipelineException;
-import org.xbib.pipeline.element.URIPipelineElement;
-import org.xbib.pipeline.simple.MetricSimplePipelineExecutor;
 import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineException;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.PipelineRequest;
+import org.xbib.pipeline.element.URIPipelineElement;
+import org.xbib.pipeline.simple.MetricSimplePipelineExecutor;
 import org.xbib.util.DurationFormatUtil;
 import org.xbib.util.FormatUtil;
 
@@ -56,7 +56,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 
-public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline<T,R>>
+public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline<T, R>>
         extends AbstractPipeline<URIPipelineElement, PipelineException> implements Tool {
 
     private final static Logger logger = LoggerFactory.getLogger(Converter.class.getSimpleName());
@@ -71,24 +71,24 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
 
     protected static Queue<URI> input;
 
-    protected MetricSimplePipelineExecutor<T,R,P> executor;
+    protected MetricSimplePipelineExecutor<T, R, P> executor;
 
     private boolean done = false;
 
     @Override
-    public Converter<T,R,P> reader(Reader reader) {
+    public Converter<T, R, P> reader(Reader reader) {
         this.reader = reader;
         settings = settingsBuilder().loadFromReader(reader).build();
         return this;
     }
 
     @Override
-    public Converter<T,R,P> writer(Writer writer) {
+    public Converter<T, R, P> writer(Writer writer) {
         this.writer = writer;
         return this;
     }
 
-    protected Converter<T,R,P> prepare() throws IOException {
+    protected Converter<T, R, P> prepare() throws IOException {
         if (settings.get("uri") != null) {
             input = new ConcurrentLinkedQueue<URI>();
             input.add(URI.create(settings.get("uri")));
@@ -117,7 +117,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
             logger.info("executing");
             //metric pipeline setExecutor only uses concurrency over different URIs
             // in the input queue, not with a single URI input
-            executor = new MetricSimplePipelineExecutor<T,R,P>()
+            executor = new MetricSimplePipelineExecutor<T, R, P>()
                     .setConcurrency(settings.getAsInt("concurrency", 1))
                     .setPipelineProvider(pipelineProvider())
                     .prepare()
@@ -133,12 +133,12 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
         }
     }
 
-    public Converter<T,R,P> run(Settings newSettings, Queue<URI> newInput) throws Exception {
+    public Converter<T, R, P> run(Settings newSettings, Queue<URI> newInput) throws Exception {
         try {
             settings = newSettings;
             input = newInput;
             logger.info("executing with settings {} and input {}", settings, input);
-            executor = new MetricSimplePipelineExecutor<T,R,P>()
+            executor = new MetricSimplePipelineExecutor<T, R, P>()
                     .setConcurrency(settings.getAsInt("concurrency", 1))
                     .setPipelineProvider(pipelineProvider())
                     .prepare()
@@ -155,7 +155,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
         return this;
     }
 
-    protected Converter<T,R,P> cleanup() {
+    protected Converter<T, R, P> cleanup() {
         return this;
     }
 
@@ -201,7 +201,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
         long elapsed = executor.metric().elapsed() / 1000000;
         double dps = docs * 1000 / elapsed;
         double avg = bytes / (docs + 1); // avoid div by zero
-        double mbps = (bytes * 1000 / elapsed) / (1024 * 1024) ;
+        double mbps = (bytes * 1000 / elapsed) / (1024 * 1024);
         NumberFormat formatter = NumberFormat.getNumberInstance();
         logger.info("Converter complete. {} inputs, {} docs, {} = {} ms, {} = {} bytes, {} = {} avg getSize, {} dps, {} MB/s",
                 input.size(),

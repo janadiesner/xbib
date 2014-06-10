@@ -32,7 +32,6 @@
 package org.xbib.tools.feed.elasticsearch.freebase;
 
 import org.xbib.elasticsearch.rdf.ResourceSink;
-import org.xbib.tools.Feeder;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
@@ -45,6 +44,7 @@ import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.turtle.TurtleReader;
 import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.tools.Feeder;
 
 import java.io.IOException;
 import java.io.InputStream;

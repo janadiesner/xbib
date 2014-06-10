@@ -1,12 +1,11 @@
-
 package org.xbib.tools;
 
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.Pipeline;
-import org.xbib.pipeline.PipelineRequestListener;
 import org.xbib.pipeline.PipelineRequest;
+import org.xbib.pipeline.PipelineRequestListener;
 import org.xbib.pipeline.element.PipelineElement;
 import org.xbib.util.ExceptionFormatter;
 
@@ -16,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.Maps.newHashMap;
 
-public abstract class QueueConverterPipeline<T, R extends PipelineRequest, P extends Pipeline<T,R>, E extends PipelineElement>
+public abstract class QueueConverterPipeline<T, R extends PipelineRequest, P extends Pipeline<T, R>, E extends PipelineElement>
         implements Pipeline<Boolean, R> {
 
     private final Logger logger;
@@ -29,7 +28,7 @@ public abstract class QueueConverterPipeline<T, R extends PipelineRequest, P ext
 
     private E element;
 
-    private Map<String, PipelineRequestListener<Boolean,R>> listeners;
+    private Map<String, PipelineRequestListener<Boolean, R>> listeners;
 
     public QueueConverterPipeline(QueueConverter<T, R, P, E> converter, int num) {
         this.converter = converter;
@@ -55,7 +54,7 @@ public abstract class QueueConverterPipeline<T, R extends PipelineRequest, P ext
             while (hasNext()) {
                 request = next();
                 process(request);
-                for (PipelineRequestListener<Boolean,R> listener : listeners.values()) {
+                for (PipelineRequestListener<Boolean, R> listener : listeners.values()) {
                     listener.newRequest(this, request);
                 }
                 metric.mark();

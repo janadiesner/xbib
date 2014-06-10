@@ -113,12 +113,11 @@ public class License extends Holding {
         Map<String, Object> m = newHashMap();
         String s = getString("ezb:ill_relevance.ezb:ill_code");
         if (s != null) {
-            switch(s) {
+            switch (s) {
                 case "n":
                 case "no":
                 case "none":
-                case "nein":
-                {
+                case "nein": {
                     servicetype = "interlibrary";
                     servicemode = "none";
                     servicedistribution = "none";
@@ -126,16 +125,14 @@ public class License extends Holding {
                 }
                 case "l":
                 case "copy-loan":
-                case "ja, Leihe und Kopie":
-                {
+                case "ja, Leihe und Kopie": {
                     servicetype = "interlibrary";
                     servicemode = "copy-loan";
                     servicedistribution = "unrestricted";
                     break;
                 }
                 case "copy-loan-domestic":
-                case "ja, Leihe und Kopie (nur Inland)":
-                {
+                case "ja, Leihe und Kopie (nur Inland)": {
                     servicetype = "interlibrary";
                     servicemode = "copy-loan";
                     servicedistribution = "domestic";
@@ -143,8 +140,7 @@ public class License extends Holding {
                 }
                 case "k":
                 case "copy":
-                case "ja, nur Kopie":
-                {
+                case "ja, nur Kopie": {
                     servicetype = "interlibrary";
                     servicemode = "copy";
                     servicedistribution = "unrestricted";
@@ -152,8 +148,7 @@ public class License extends Holding {
                 }
                 case "kn":
                 case "copy-domestic":
-                case "ja, nur Kopie (nur Inland)":
-                {
+                case "ja, nur Kopie (nur Inland)": {
                     servicetype = "interlibrary";
                     servicemode = "copy";
                     servicedistribution = "domestic";
@@ -161,8 +156,7 @@ public class License extends Holding {
                 }
                 case "e":
                 case "copy-electronic":
-                case "ja, auch elektronischer Versand an Nutzer":
-                {
+                case "ja, auch elektronischer Versand an Nutzer": {
                     servicetype = "interlibrary";
                     servicemode = "copy";
                     servicedistribution = "electronic";
@@ -170,11 +164,10 @@ public class License extends Holding {
                 }
                 case "en":
                 case "copy-electronic-domestic":
-                case "ja, auch elektronischer Versand an Nutzer (nur Inland)":
-                {
+                case "ja, auch elektronischer Versand an Nutzer (nur Inland)": {
                     servicetype = "interlibrary";
                     servicemode = "copy";
-                    servicedistribution = Arrays.asList("electronic","domestic");
+                    servicedistribution = Arrays.asList("electronic", "domestic");
                     break;
                 }
                 default: {
@@ -187,7 +180,7 @@ public class License extends Holding {
         String q = getString("ezb:ill_relevance.ezb:inland_only");
         String r = getString("ezb:ill_relevance.ezb:il_electronic_forbidden");
         if ("true".equals(q) && "true".equals(r)) {
-            servicedistribution = Arrays.asList("postal","domestic");
+            servicedistribution = Arrays.asList("postal", "domestic");
         } else if ("true".equals(q)) {
             servicedistribution = "domestic";
         } else if ("true".equals(r)) {
@@ -195,7 +188,7 @@ public class License extends Holding {
         }
 
         String comment = getString("ezb:ill_relevance.ezb:comment");
-        if (!Strings.isNullOrEmpty(comment)){
+        if (!Strings.isNullOrEmpty(comment)) {
             servicecomment = comment;
         }
 
@@ -245,15 +238,23 @@ public class License extends Holding {
             return 9;
         }
         switch (carrierType) {
-            case "online resource" : return (servicedistribution != null
-                    && servicedistribution.toString().contains("postal")) ? 3 : 1;
-            case "volume": return 2;
-            case "computer disc" : return 4;
-            case "computer tape cassette" : return 4;
-            case "computer chip cartridge" : return 4;
-            case "microform" : return 5;
-            case "other" : return 6;
-            default: throw new IllegalArgumentException("unknown carrier: " + carrierType());
+            case "online resource":
+                return (servicedistribution != null
+                        && servicedistribution.toString().contains("postal")) ? 3 : 1;
+            case "volume":
+                return 2;
+            case "computer disc":
+                return 4;
+            case "computer tape cassette":
+                return 4;
+            case "computer chip cartridge":
+                return 4;
+            case "microform":
+                return 5;
+            case "other":
+                return 6;
+            default:
+                throw new IllegalArgumentException("unknown carrier: " + carrierType());
         }
     }
 

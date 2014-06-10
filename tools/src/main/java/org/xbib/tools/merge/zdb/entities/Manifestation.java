@@ -37,6 +37,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.TreeMultimap;
+import org.xbib.common.xcontent.XContentBuilder;
+import org.xbib.pipeline.PipelineRequest;
+import org.xbib.util.Strings;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -48,10 +51,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.pipeline.PipelineRequest;
-import org.xbib.util.Strings;
 
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -88,7 +87,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
 
     private String description;
 
-    private Map<String,Object> identifiers;
+    private Map<String, Object> identifiers;
 
     private final SetMultimap<String, Manifestation> relatedManifestations = TreeMultimap.create();
 
@@ -150,7 +149,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
 
     private String timelineKey;
 
-    private List<Map<String,Object>> links;
+    private List<Map<String, Object>> links;
 
     public Manifestation(Map<String, Object> map) {
         this.map = map;
@@ -190,7 +189,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         this.isPacket = "pt".equals(genre);
         this.isNewspaper = "Newspaper".equals(resourceType)
                 || "fn".equals(genre) || "lp".equals(genre) || "ao".equals(genre)
-                || "eo".equals(genre) || "up".equals(genre) || "zt".equals(genre) ;
+                || "eo".equals(genre) || "up".equals(genre) || "zt".equals(genre);
         this.isWebsite = "Updating Web site".equals(resourceType);
         // "Monographic series"
         // "Updating loose-leaf"
@@ -233,7 +232,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         }
         Object o = inner.get(key[0]);
         if (o instanceof List) {
-            o = ((List)o).get(0);
+            o = ((List) o).get(0);
         }
         return (T) (o instanceof Map && key.length > 1 ?
                 get((Map) o, Arrays.copyOfRange(key, 1, key.length)) : o);
@@ -425,7 +424,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         return identifiers != null && !identifiers.isEmpty();
     }
 
-    public Map<String,Object> getIdentifiers() {
+    public Map<String, Object> getIdentifiers() {
         return identifiers;
     }
 
@@ -433,11 +432,11 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         return links != null && !links.isEmpty();
     }
 
-    public void setLinks( List<Map<String,Object>> links) {
+    public void setLinks(List<Map<String, Object>> links) {
         this.links = links;
     }
 
-    public List<Map<String,Object>> getLinks() {
+    public List<Map<String, Object>> getLinks() {
         return links;
     }
 
@@ -516,7 +515,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         if (pos > 0) {
             title = title.substring(0, pos - 1);
         }
-        title = title.replaceAll("\\[.*?\\]","").trim();
+        title = title.replaceAll("\\[.*?\\]", "").trim();
         return title;
     }
 
@@ -537,8 +536,8 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
             o = Arrays.asList(o);
         }
         StringBuilder sb = new StringBuilder();
-        List<Map<String,Object>> list = (List<Map<String,Object>>)o;
-        for (Map<String,Object> m : list) {
+        List<Map<String, Object>> list = (List<Map<String, Object>>) o;
+        for (Map<String, Object> m : list) {
             o = m.get("placeOfPublication");
             if (o == null) {
                 continue;
@@ -546,7 +545,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
             if (!(o instanceof List)) {
                 o = Arrays.asList(o);
             }
-            List<String> l = (List<String>)o;
+            List<String> l = (List<String>) o;
             for (String s : l) {
                 if (sb.length() > 0) {
                     sb.append(", ");
@@ -563,7 +562,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
             if (!(o instanceof List)) {
                 o = Arrays.asList(o);
             }
-            this.links = (List)o;
+            this.links = (List) o;
             makeGreenDates(links);
             return;
         }
@@ -572,16 +571,16 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
 
     private final static Pattern yearPattern = Pattern.compile("(\\d\\d\\d\\d)");
 
-    private void makeGreenDates(List<Map<String,Object>> links) {
+    private void makeGreenDates(List<Map<String, Object>> links) {
         this.greenDates = newTreeSet();
-        for (Map<String,Object> link : links) {
+        for (Map<String, Object> link : links) {
             boolean b = "kostenfrei".equals(link.get("publicnote"));
             if (b) {
                 Object o = link.get("nonpublicnote");
                 if (!(o instanceof List)) {
                     o = Arrays.asList(o);
                 }
-                List l = (List)o;
+                List l = (List) o;
                 for (Object obj : l) {
                     String dateString = (String) obj;
                     Matcher m = yearPattern.matcher(dateString);
@@ -636,7 +635,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
     }
 
     private final static String[] ER = new String[]{
-        "Elektronische Ressource"
+            "Elektronische Ressource"
     };
 
     private String computeKey() {
@@ -691,10 +690,10 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
     private void findCountry() {
         Object o = getAnyObject("publishingCountry.isoCountryCodesSource");
         if (o instanceof List) {
-            this.country = (List<String>)o;
+            this.country = (List<String>) o;
         } else if (o instanceof String) {
             List<String> l = newLinkedList();
-            l.add((String)o);
+            l.add((String) o);
             this.country = l;
         } else {
             List<String> l = newLinkedList();
@@ -703,8 +702,8 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         }
     }
 
-    private Map<String,Object> makeIdentifiers() {
-        Map<String,Object> m = newHashMap();
+    private Map<String, Object> makeIdentifiers() {
+        Map<String, Object> m = newHashMap();
         // get and convert all ISSN
         Object o = map.get("IdentifierISSN");
         if (o != null) {
@@ -712,7 +711,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
                 o = Arrays.asList(o);
             }
             List<String> issns = newLinkedList();
-            List<Map<String,Object>> l = (List<Map<String,Object>>)o;
+            List<Map<String, Object>> l = (List<Map<String, Object>>) o;
             for (Map<String, Object> aL : l) {
                 String s = (String) aL.get("value");
                 if (s != null) {
@@ -757,13 +756,13 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
                     continue;
                 }
                 String key = relObj instanceof List ?
-                        ((List)relObj).get(0).toString() : relObj.toString();
+                        ((List) relObj).get(0).toString() : relObj.toString();
                 // internal ID = DNB ID (used for identifying relationships between hits)
                 // more than one DNB identifier is strange...
                 Object internalObj = m.get("identifierDNB");
                 // take only first entry from list
                 String internal = internalObj == null ? null : internalObj instanceof List ?
-                        ((List)internalObj).get(0).toString() : internalObj.toString();
+                        ((List) internalObj).get(0).toString() : internalObj.toString();
                 if (internal == null) {
                     continue;
                 }
@@ -774,7 +773,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
                 // external ID = ZDB ID (used for external typed linking, internal linking may collide with GND ID)
                 Object externalObj = m.get("identifierZDB");
                 String external = externalObj == null ? null : externalObj instanceof List ?
-                        ((List)externalObj).get(0).toString() : externalObj.toString();
+                        ((List) externalObj).get(0).toString() : externalObj.toString();
                 if (external == null) {
                     continue;
                 }
@@ -829,7 +828,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         return relationEntries;
     }
 
-    private final static Set<String> carrierEditions =  newHashSet(
+    private final static Set<String> carrierEditions = newHashSet(
             "hasPrintEdition",
             "hasOnlineEdition",
             "hasBrailleEdition",
@@ -941,7 +940,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
     }
 
     public String buildVolume(XContentBuilder builder, String tag, String parentIdentifier,
-                                                   Integer date, Set<Holding> holdings)
+                              Integer date, Set<Holding> holdings)
             throws IOException {
         String id = tag != null ? tag + "." + parentIdentifier : parentIdentifier;
         builder.startObject()
@@ -954,7 +953,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         if (hasLinks()) {
             builder.field("links", getLinks());
         }
-        SetMultimap<String,Holding> institutions = HashMultimap.create();
+        SetMultimap<String, Holding> institutions = HashMultimap.create();
         for (Holding holding : holdings) {
             institutions.put(holding.getISIL(), holding);
         }
@@ -1006,8 +1005,8 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
     }
 
     public String buildHolding(XContentBuilder builder, String tag, String parentIdentifier,
-                             String isil, Set<Holding> holdings)
-        throws IOException {
+                               String isil, Set<Holding> holdings)
+            throws IOException {
         if (holdings == null || holdings.isEmpty()) {
             return null;
         }
@@ -1030,7 +1029,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
                     .field("mediatype", holding.mediaType())
                     .field("carriertype", holding.carrierType())
                     .field("organization", holding.getOrganization())
-                    .field("isil", holding.getServiceISIL() )
+                    .field("isil", holding.getServiceISIL())
                     .field("priority", holding.getPriority())
                     .fieldIfNotNull("type", holding.getServiceType())
                     .fieldIfNotNull("mode", holding.getServiceMode())
@@ -1056,7 +1055,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
             if (holding instanceof License) {
                 Holding other = holding.getSame(holdings);
                 if (other != null) {
-                   newHoldings.add(holding);
+                    newHoldings.add(holding);
                 }
             }
         }
@@ -1108,15 +1107,24 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
 
     public Integer findCarrierTypeKey() {
         switch (carrierType()) {
-            case "online resource" : return 2;
-            case "volume": return 1;
-            case "computer disc" : return 4;
-            case "computer tape cassette" : return 4;
-            case "computer chip cartridge" : return 4;
-            case "microform" : return 5;
-            case "multicolored" : return 6;
-            case "other" : return 6;
-            default: throw new IllegalArgumentException("unknown carrier: " + carrierType() + " in " + externalID());
+            case "online resource":
+                return 2;
+            case "volume":
+                return 1;
+            case "computer disc":
+                return 4;
+            case "computer tape cassette":
+                return 4;
+            case "computer chip cartridge":
+                return 4;
+            case "microform":
+                return 5;
+            case "multicolored":
+                return 6;
+            case "other":
+                return 6;
+            default:
+                throw new IllegalArgumentException("unknown carrier: " + carrierType() + " in " + externalID());
         }
     }
 

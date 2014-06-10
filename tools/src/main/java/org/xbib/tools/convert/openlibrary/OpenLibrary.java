@@ -31,24 +31,23 @@
  */
 package org.xbib.tools.convert.openlibrary;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.xbib.io.InputService;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.tools.Converter;
+
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.util.Map;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.Pipeline;
-import org.xbib.io.InputService;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.tools.Converter;
 
 /**
  * OpenLibrary converter from couchdb JSON.
@@ -75,7 +74,7 @@ public class OpenLibrary extends Converter {
         if (!output.endsWith(".gz")) {
             output = output + ".gz";
         }
-        OutputStream out =  new GZIPOutputStream(new FileOutputStream(output)) {
+        OutputStream out = new GZIPOutputStream(new FileOutputStream(output)) {
             {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
@@ -83,9 +82,9 @@ public class OpenLibrary extends Converter {
         ObjectMapper mapper = new ObjectMapper();
         BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line;
-        while ((line = reader.readLine()) != null ) {
+        while ((line = reader.readLine()) != null) {
             String[] l = line.split("\t"); // type, unique key, revision, last modified, JSON
-            Map<String,Object> m = mapper.readValue(l[4], Map.class);
+            Map<String, Object> m = mapper.readValue(l[4], Map.class);
             logger.info("{}", m);
         }
         reader.close();

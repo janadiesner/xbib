@@ -52,8 +52,8 @@ import java.io.Writer;
 import java.net.URI;
 import java.text.NumberFormat;
 
-public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,R>>
-        extends Converter<T,R,P> {
+public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T, R>>
+        extends Converter<T, R, P> {
 
     private final static Logger logger = LoggerFactory.getLogger(Feeder.class.getSimpleName());
 
@@ -62,13 +62,13 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
     protected static ResourceSink sink;
 
     @Override
-    public Feeder<T,R,P> reader(Reader reader) {
+    public Feeder<T, R, P> reader(Reader reader) {
         super.reader(reader);
         return this;
     }
 
     @Override
-    public Feeder<T,R,P> writer(Writer writer) {
+    public Feeder<T, R, P> writer(Writer writer) {
         super.writer(writer);
         return this;
     }
@@ -82,7 +82,7 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
     }
 
     @Override
-    protected Feeder<T,R,P> prepare() throws IOException {
+    protected Feeder<T, R, P> prepare() throws IOException {
         super.prepare();
         URI esURI = URI.create(settings.get("elasticsearch"));
         String index = settings.get("index");
@@ -110,19 +110,29 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
     }
 
     @Override
-    protected Feeder<T,R,P> cleanup() {
+    protected Feeder<T, R, P> cleanup() {
         super.cleanup();
         if (output != null) {
-            logger.info("shutdown");
+            logger.info("flush");
+            output.flush();
+            logger.info("waiting for responses");
+            try {
+                output.waitForResponses(TimeValue.timeValueSeconds(60));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.error(e.getMessage(), e);
+            }
+            logger.info("stopping bulk mode");
             try {
                 output.stopBulk(settings.get("index"));
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             } finally {
+                logger.info("shutdown");
                 output.shutdown();
             }
         }
-        logger.info("done with run");
+        logger.info("done");
         return this;
     }
 
@@ -134,7 +144,7 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
         long elapsed = executor.metric().elapsed() / 1000000;
         double dps = docs * 1000 / elapsed;
         double avg = bytes / (docs + 1); // avoid div by zero
-        double mbps = (bytes * 1000 / elapsed) / (1024 * 1024) ;
+        double mbps = (bytes * 1000 / elapsed) / (1024 * 1024);
         NumberFormat formatter = NumberFormat.getNumberInstance();
         logger.info("Indexing complete. {} inputs, {} docs, {} = {} ms, {} = {} bytes, {} = {} avg getSize, {} dps, {} MB/s",
                 input.size(),
@@ -153,7 +163,7 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
                     p,
                     DateUtil.formatDateISO(p.getMetric().startedAt()),
                     DateUtil.formatDateISO(p.getMetric().stoppedAt()),
-                    DurationFormatUtil.formatDurationWords(p.getMetric().elapsed()/1000000, true, true),
+                    DurationFormatUtil.formatDurationWords(p.getMetric().elapsed() / 1000000, true, true),
                     p.getMetric().count());
         }
 

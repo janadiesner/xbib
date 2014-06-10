@@ -34,25 +34,25 @@ package org.xbib.tools;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.metric.MeterMetric;
-import org.xbib.pipeline.queue.MetricQueuePipelineExecutor;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.PipelineRequest;
 import org.xbib.pipeline.element.PipelineElement;
+import org.xbib.pipeline.queue.MetricQueuePipelineExecutor;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
-public abstract class QueueConverter<T, R extends PipelineRequest, P extends Pipeline<T,R>, E extends PipelineElement>
-    extends Converter<T,R,P> {
+public abstract class QueueConverter<T, R extends PipelineRequest, P extends Pipeline<T, R>, E extends PipelineElement>
+        extends Converter<T, R, P> {
 
     private final Logger logger = LoggerFactory.getLogger(QueueConverter.class.getSimpleName());
 
     private static QueueConverter converter;
 
-    protected MetricQueuePipelineExecutor<T,R,P,E> executor;
+    protected MetricQueuePipelineExecutor<T, R, P, E> executor;
 
-    protected QueueConverter<T,R,P,E> prepare() throws IOException {
+    protected QueueConverter<T, R, P, E> prepare() throws IOException {
         super.prepare();
         converter = this;
         return this;
@@ -64,7 +64,7 @@ public abstract class QueueConverter<T, R extends PipelineRequest, P extends Pip
             logger.info("preparing");
             prepare();
             logger.info("executing");
-            executor = new MetricQueuePipelineExecutor<T,R,P,E>()
+            executor = new MetricQueuePipelineExecutor<T, R, P, E>()
                     .setConcurrency(settings.getAsInt("concurrency", 1))
                     .setPipelineProvider(pipelineProvider())
                     .prepare()
@@ -95,13 +95,13 @@ public abstract class QueueConverter<T, R extends PipelineRequest, P extends Pip
 
             @Override
             public P get() {
-                return (P)new DefaultQueueConverterPipeline(converter, i++);
+                return (P) new DefaultQueueConverterPipeline(converter, i++);
             }
         };
     }
 
     public class DefaultQueueConverterPipeline
-            extends QueueConverterPipeline<T,DefaultPipelineRequest,Pipeline<T,DefaultPipelineRequest>,E> {
+            extends QueueConverterPipeline<T, DefaultPipelineRequest, Pipeline<T, DefaultPipelineRequest>, E> {
 
         public DefaultQueueConverterPipeline(QueueConverter converter, int num) {
             super(converter, num);

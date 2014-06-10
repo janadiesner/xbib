@@ -77,9 +77,8 @@
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>dd.MM.yyyy HH:mm</maven.build.timestamp.format>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <elasticsearch.support.plugin.version>1.2.0.1</elasticsearch.support.plugin.version>
+        <java.compiler.source>1.7</java.compiler.source>
+        <elasticsearch.support.plugin.version>1.2.1.0</elasticsearch.support.plugin.version>
     </properties>
 
     <build>
@@ -99,8 +98,8 @@
                     <version>3.1</version>
                     <configuration>
                         <encoding>UTF-8</encoding>
-                        <source>${maven.compiler.source}</source>
-                        <target>${maven.compiler.target}</target>
+                        <source>${java.compiler.source}</source>
+                        <target>${java.compiler.source}</target>
                         <encoding>UTF-8</encoding>
                         <optimize>true</optimize>
                         <showDeprecation>true</showDeprecation>

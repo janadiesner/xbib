@@ -99,7 +99,7 @@ public class Holding implements Comparable<Holding> {
         }
         Object o = inner.get(key[0]);
         if (o instanceof List) {
-            o = ((List)o).get(0);
+            o = ((List) o).get(0);
         }
         return (T) (o instanceof Map && key.length > 1 ?
                 get((Map) o, Arrays.copyOfRange(key, 1, key.length)) : o);
@@ -112,7 +112,7 @@ public class Holding implements Comparable<Holding> {
         if (!(leader instanceof List)) {
             leader = Arrays.asList(leader);
         }
-        for (String s : (List<String>)leader) {
+        for (String s : (List<String>) leader) {
             if ("Deleted".equals(s)) {
                 this.deleted = true;
                 break;
@@ -209,7 +209,7 @@ public class Holding implements Comparable<Holding> {
         return servicecomment;
     }
 
-    public Map<String,Object> getInfo() {
+    public Map<String, Object> getInfo() {
         return info;
     }
 
@@ -276,24 +276,24 @@ public class Holding implements Comparable<Holding> {
             if (!(o instanceof List)) {
                 o = Arrays.asList(o);
             }
-            l.addAll((List)o);
+            l.addAll((List) o);
         }
         Object p = map.get("AdditionalLocation");
         if (p != null) {
             if (!(p instanceof List)) {
                 p = Arrays.asList(p);
             }
-            l.addAll((List)p);
+            l.addAll((List) p);
         }
         m.put("location", l);
 
-        Object textualholdings =  map.get("textualholdings");
-        m.put("textualholdings",textualholdings);
+        Object textualholdings = map.get("textualholdings");
+        m.put("textualholdings", textualholdings);
         m.put("holdings", map.get("holdings"));
         if (map.containsKey("ElectronicLocationAndAccess")) {
             m.put("links", map.get("ElectronicLocationAndAccess"));
         }
-        this.license = (Map<String, Object>)map.get("license");
+        this.license = (Map<String, Object>) map.get("license");
         if (license != null) {
             license.remove("originSource");
             license.remove("typeSource");
@@ -305,7 +305,7 @@ public class Holding implements Comparable<Holding> {
     }
 
     private void buildService() {
-        Map<String, Object> service = (Map<String, Object>)map.get("service");
+        Map<String, Object> service = (Map<String, Object>) map.get("service");
         if (service != null) {
             //setOrganization((String)service.remove("region"));
             service.remove("organization"); // drop Sigel
@@ -323,25 +323,33 @@ public class Holding implements Comparable<Holding> {
     }
 
     protected Integer findPriority() {
-        if (carrierType ==null) {
+        if (carrierType == null) {
             return 9;
         }
         switch (carrierType) {
-            case "online resource" :
+            case "online resource":
                 return (servicedistribution != null && servicedistribution.toString().contains("postal")) ? 3 : 1;
-            case "volume": return 2;
-            case "computer disc" : return 4;
-            case "computer tape cassette" : return 4;
-            case "computer chip cartridge" : return 4;
-            case "microform" : return 5;
-            case "other" : return 6;
-            default: throw new IllegalArgumentException("unknown carrier: " + carrierType());
+            case "volume":
+                return 2;
+            case "computer disc":
+                return 4;
+            case "computer tape cassette":
+                return 4;
+            case "computer chip cartridge":
+                return 4;
+            case "microform":
+                return 5;
+            case "other":
+                return 6;
+            default:
+                throw new IllegalArgumentException("unknown carrier: " + carrierType());
         }
     }
 
     /**
      * Similarity of holdings: they must have same media type, same
      * carrier type, and same date period (if any).
+     *
      * @param holdings the holdings to check for similarity against this holding
      * @return a holding which is similar, or null if no holding is similar
      */
@@ -360,9 +368,9 @@ public class Holding implements Comparable<Holding> {
                 } else if (dates != null && !dates.isEmpty() && holding.dates() != null && !holding.dates().isEmpty()) {
                     // compare first date and last date
                     Integer d1 = dates.get(0);
-                    Integer d2 = dates.get(dates.size()-1);
+                    Integer d2 = dates.get(dates.size() - 1);
                     Integer e1 = holding.dates().get(0);
-                    Integer e2 = holding.dates().get(holding.dates().size()-1);
+                    Integer e2 = holding.dates().get(holding.dates().size() - 1);
                     if (d1.equals(e1) && d2.equals(e2)) {
                         return holding;
                     }

@@ -31,6 +31,25 @@
  */
 package org.xbib.tools.convert.viaf;
 
+import org.xbib.io.InputService;
+import org.xbib.iri.IRI;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.oai.rdf.RdfOutput;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.Resource;
+import org.xbib.rdf.Triple;
+import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.io.ntriple.NTripleWriter;
+import org.xbib.rdf.io.rdfxml.RdfXmlReader;
+import org.xbib.rdf.io.turtle.TurtleWriter;
+import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.tools.Converter;
+import org.xml.sax.InputSource;
+
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,25 +64,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
-
-import org.xbib.oai.rdf.RdfOutput;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.Pipeline;
-import org.xbib.io.InputService;
-import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.IRINamespaceContext;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.io.rdfxml.RdfXmlReader;
-import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.tools.Converter;
-import org.xml.sax.InputSource;
 
 /**
  * VIAF indexer to Elasticsearch

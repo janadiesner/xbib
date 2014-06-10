@@ -79,7 +79,7 @@ public class GeonamesFromZIP extends Converter {
         logger.info("start of processing {}", uri);
         InputStream in = InputService.getInputStream(uri);
         ZipInputStream zin = new ZipInputStream(in);
-        for (ZipEntry zipEntry;(zipEntry = zin.getNextEntry()) != null;) {
+        for (ZipEntry zipEntry; (zipEntry = zin.getNextEntry()) != null; ) {
             logger.info("reading zip entry {}", zipEntry.getName());
             Scanner sc = new Scanner(zin);
             while (sc.hasNextLine()) {

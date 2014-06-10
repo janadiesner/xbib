@@ -31,23 +31,23 @@
  */
 package org.xbib.tools.convert.dnb.gnd;
 
+import org.xbib.io.InputService;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.io.ntriple.NTripleWriter;
+import org.xbib.rdf.io.rdfxml.RdfXmlReader;
+import org.xbib.rdf.io.turtle.TurtleWriter;
+import org.xbib.tools.Converter;
+import org.xml.sax.InputSource;
+
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
-
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.Pipeline;
-import org.xbib.io.InputService;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.io.rdfxml.RdfXmlReader;
-import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.tools.Converter;
-import org.xml.sax.InputSource;
 
 /**
  * Convert GND from RDF/XML to Turtle or Ntriples
@@ -71,7 +71,7 @@ public class FromRdfXml extends Converter {
         InputStream in = InputService.getInputStream(uri);
         String outName = settings.get("output") + ".gz";
         OutputStream out = new FileOutputStream(outName);
-        out = new GZIPOutputStream(out){
+        out = new GZIPOutputStream(out) {
             {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }

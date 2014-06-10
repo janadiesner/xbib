@@ -31,24 +31,22 @@
  */
 package org.xbib.tools.convert.freebase;
 
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.URI;
-import java.util.zip.Deflater;
-import java.util.zip.GZIPOutputStream;
-
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.Pipeline;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.turtle.TurtleReader;
 import org.xbib.tools.Converter;
+
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.util.zip.Deflater;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Freebase converter
@@ -73,7 +71,7 @@ public class Freebase extends Converter {
         if (!output.endsWith(".gz")) {
             output = output + ".gz";
         }
-        OutputStream out =  new GZIPOutputStream(new FileOutputStream(output)){
+        OutputStream out = new GZIPOutputStream(new FileOutputStream(output)) {
             {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }

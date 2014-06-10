@@ -39,22 +39,21 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-
 import org.xbib.common.settings.Settings;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
 import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
 import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
 import org.xbib.elasticsearch.support.client.search.SearchClient;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.queue.QueuePipelineExecutor;
 import org.xbib.tools.Tool;
-import org.xbib.util.DateUtil;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.tools.util.SearchHitPipelineElement;
 import org.xbib.tools.merge.zdb.entities.Manifestation;
+import org.xbib.tools.util.SearchHitPipelineElement;
+import org.xbib.util.DateUtil;
 import org.xbib.util.ExceptionFormatter;
 
 import java.io.Reader;
@@ -72,8 +71,8 @@ import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
  * Merge ZDB with citation database
  */
 public class WithCitations
-    extends QueuePipelineExecutor<Boolean, Manifestation, WithCitationsPipeline, SearchHitPipelineElement>
-    implements Tool {
+        extends QueuePipelineExecutor<Boolean, Manifestation, WithCitationsPipeline, SearchHitPipelineElement>
+        implements Tool {
 
     private final static Logger logger = LoggerFactory.getLogger(WithCitations.class.getName());
 
@@ -110,7 +109,7 @@ public class WithCitations
 
     public WithCitations prepare() {
         super.prepare();
-        docs = newSetFromMap(new ConcurrentHashMap<String,Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
+        docs = newSetFromMap(new ConcurrentHashMap<String, Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
         return this;
     }
 

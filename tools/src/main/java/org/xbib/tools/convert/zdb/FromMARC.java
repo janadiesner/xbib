@@ -31,13 +31,12 @@
  */
 package org.xbib.tools.convert.zdb;
 
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
 import org.xbib.io.InputService;
-import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.iri.IRI;
+import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
@@ -47,9 +46,10 @@ import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.content.ContentBuilder;
 import org.xbib.tools.Converter;
 import org.xml.sax.InputSource;
 
@@ -85,7 +85,7 @@ public final class FromMARC extends Converter {
     public void process(URI uri) throws Exception {
 
         final MARCElementMapper mapper = new MARCElementMapper(settings.get("elements"))
-                .pipelines(settings.getAsInt("pipelines",1))
+                .pipelines(settings.getAsInt("pipelines", 1))
                 .detectUnknownKeys(settings.getAsBoolean("detect", false))
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {

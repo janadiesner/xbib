@@ -31,6 +31,23 @@
  */
 package org.xbib.tools.feed.elasticsearch.ezb;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.xbib.io.InputService;
+import org.xbib.io.NullWriter;
+import org.xbib.iri.IRI;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.Resource;
+import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.content.DefaultContentBuilder;
+import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.io.turtle.TurtleWriter;
+import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.tools.Feeder;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,36 +60,19 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.xbib.rdf.content.ContentBuilder;
-import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.tools.Feeder;
-import org.xbib.io.InputService;
-import org.xbib.io.NullWriter;
-import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.pipeline.Pipeline;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.IRINamespaceContext;
-import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.simple.SimpleResourceContext;
-
 /**
  * Ingest inter library loan codes from EZB web service into Elasticsearch
  */
-public class EZBWeb extends Feeder {
+public class FromEZBWeb extends Feeder {
 
-    private final static Logger logger = LoggerFactory.getLogger(EZBWeb.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(FromEZBWeb.class.getName());
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override
             public Pipeline get() {
-                return new EZBWeb();
+                return new FromEZBWeb();
             }
         };
     }
@@ -143,7 +143,7 @@ public class EZBWeb extends Feeder {
                             + isil + "."
                             + firstDate + "."
                             + lastDate + "."
-                            + (movingWall.isEmpty() ? "0" : movingWall) ;
+                            + (movingWall.isEmpty() ? "0" : movingWall);
                     IRI id = IRI.builder()
                             .scheme("iri")
                             .host(settings.get("index"))

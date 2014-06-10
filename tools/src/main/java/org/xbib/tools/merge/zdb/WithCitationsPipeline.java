@@ -47,8 +47,8 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineRequestListener;
-import org.xbib.tools.util.SearchHitPipelineElement;
 import org.xbib.tools.merge.zdb.entities.Manifestation;
+import org.xbib.tools.util.SearchHitPipelineElement;
 import org.xbib.util.ExceptionFormatter;
 
 import java.io.IOException;
@@ -91,7 +91,7 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
         this.listeners = newHashMap();
     }
 
-    public Pipeline<Boolean, Manifestation> add(String name,PipelineRequestListener listener) {
+    public Pipeline<Boolean, Manifestation> add(String name, PipelineRequestListener listener) {
         this.listeners.put(name, listener);
         return this;
     }
@@ -147,6 +147,7 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
             return null;
         }
     }
+
     @Override
     public void close() throws IOException {
         if (!service.queue().isEmpty()) {
@@ -181,7 +182,7 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
 
         // extract given ISSNs
         List<String> issns = new LinkedList();
-        Map<String,Object> m = manifestation.getIdentifiers();
+        Map<String, Object> m = manifestation.getIdentifiers();
         if (m != null) {
             for (String k : m.keySet()) {
                 if ("issn".equals(k)) {
@@ -193,9 +194,8 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
                     List list = null;
                     if (o instanceof Map) {
                         list = Arrays.asList(m.get(k));
-                    }
-                    else if (o instanceof List) {
-                        list = (List)m.get(k);
+                    } else if (o instanceof List) {
+                        list = (List) m.get(k);
                     } else {
                         issns.add(o.toString());
                     }
@@ -206,11 +206,11 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
                             }
                             List list2 = null;
                             if (oo instanceof Map) {
-                                list2 = Arrays.asList(((Map)oo).get("value"));
+                                list2 = Arrays.asList(((Map) oo).get("value"));
                             } else if (oo instanceof List) {
-                                list2 = (List)oo;
+                                list2 = (List) oo;
                             } else {
-                                issns.add(oo.toString() );
+                                issns.add(oo.toString());
                             }
                             if (list2 != null) {
                                 for (Object ooo : list2) {
@@ -229,7 +229,7 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
                 for (String issn : issns) {
                     if (issn != null) {
                         String s = issn.indexOf('-') > 0 ? issn :
-                                new StringBuilder(issn.toLowerCase()).insert(4,'-').toString();
+                                new StringBuilder(issn.toLowerCase()).insert(4, '-').toString();
                         issnQuery.should(matchPhraseQuery("prism:issn", s));
                     }
                 }
@@ -241,11 +241,11 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
             String t = manifestation.title();
             int pos = t.indexOf('/');
             if (pos > 0) {
-                t = t.substring(0,pos - 1);
+                t = t.substring(0, pos - 1);
             }
             pos = t.indexOf(':');
             if (pos > 0) {
-                t = t.substring(0,pos - 1);
+                t = t.substring(0, pos - 1);
             }
             QueryBuilder titleQuery = matchPhrasePrefixQuery("prism:publicationName", t);
             QueryBuilder dateQuery = rangeQuery("prism:publicationDate")
@@ -279,7 +279,7 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
         }
         do {
             hits = searchResponse.getHits();
-            for (int i = 0; i < hits.getHits().length; i++ ) {
+            for (int i = 0; i < hits.getHits().length; i++) {
                 SearchHit hit = hits.getAt(i);
                 copyToTarget(hit, manifestation);
             }
@@ -292,8 +292,8 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
 
     private void copyToTarget(SearchHit hit, Manifestation manifestation) throws IOException {
         XContentBuilder builder = jsonBuilder();
-        Map<String,Object> m = hit.sourceAsMap();
-        Map<String,Object> publication = (Map<String,Object>)m.get("frbr:partOf");
+        Map<String, Object> m = hit.sourceAsMap();
+        Map<String, Object> publication = (Map<String, Object>) m.get("frbr:partOf");
         if (publication != null) {
             // check for 'CrossRef' tags in dc:publisher
             String publisher = (String) publication.get("dc:publisher");
@@ -324,7 +324,7 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
 
         builder.value(m);
 
-        String doiPart = hit.id().replaceAll("%2F","/");
+        String doiPart = hit.id().replaceAll("%2F", "/");
         String type = service.settings().get("targetCitationType");
         // if author, move to citation with authors
         if (m.containsKey("dc:creator")) {

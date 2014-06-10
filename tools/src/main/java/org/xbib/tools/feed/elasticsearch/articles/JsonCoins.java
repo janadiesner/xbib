@@ -34,6 +34,27 @@ package org.xbib.tools.feed.elasticsearch.articles;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
+import org.xbib.io.InputService;
+import org.xbib.io.archivers.file.Finder;
+import org.xbib.iri.IRI;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.Literal;
+import org.xbib.rdf.Node;
+import org.xbib.rdf.RDF;
+import org.xbib.rdf.Resource;
+import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.rdf.simple.SimpleLiteral;
+import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.text.InvalidCharacterException;
+import org.xbib.tools.Feeder;
+import org.xbib.tools.convert.articles.SerialsDB;
+import org.xbib.util.Entities;
+import org.xbib.util.URIUtil;
+import org.xbib.xml.XMLUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,28 +67,6 @@ import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
-
-import org.xbib.tools.Feeder;
-import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
-import org.xbib.io.InputService;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.Pipeline;
-import org.xbib.io.archivers.file.Finder;
-import org.xbib.tools.convert.articles.SerialsDB;
-import org.xbib.util.URIUtil;
-import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Literal;
-import org.xbib.rdf.Node;
-import org.xbib.rdf.RDF;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.IRINamespaceContext;
-import org.xbib.rdf.simple.SimpleLiteral;
-import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.text.InvalidCharacterException;
-import org.xbib.util.Entities;
-import org.xbib.xml.XMLUtil;
 
 /**
  * Index article DB into Elasticsearch
@@ -239,7 +238,7 @@ public class JsonCoins extends Feeder {
         OK, ERROR, MISSINGSERIAL
     }
 
-    private final static Pattern[] patterns = new Pattern[] {
+    private final static Pattern[] patterns = new Pattern[]{
             Pattern.compile("^info:doi/"),
             Pattern.compile("^http://dx.doi.org/"),
             Pattern.compile("^http://doi.org/")
@@ -283,7 +282,7 @@ public class JsonCoins extends Feeder {
                     error = true;
                 }
                 switch (k) {
-                    case "rft_id" : {
+                    case "rft_id": {
                         // lowercase important, DOI is case-insensitive
                         String s = URIUtil.decode(v, UTF8).toLowerCase();
                         // remove URL/URI prefixes
@@ -294,7 +293,7 @@ public class JsonCoins extends Feeder {
                             String doiURI = URIUtil.encode(s, UTF8);
                             // encode as URI, but info URI RFC wants slash as unencoded character
                             // anyway we use xbib.info/doi/
-                            doiURI = doiURI.replaceAll("%2F","/");
+                            doiURI = doiURI.replaceAll("%2F", "/");
                             IRI iri = IRI.builder()
                                     .scheme("http")
                                     .host("xbib.info")
@@ -302,20 +301,20 @@ public class JsonCoins extends Feeder {
                                     .fragment(doiURI)
                                     .build();
                             r.id(iri)
-                                .a(FABIO_ARTICLE)
-                                .add("prism:doi", s);
+                                    .a(FABIO_ARTICLE)
+                                    .add("prism:doi", s);
                         } catch (Exception e) {
                             logger.warn("can't build IRI from DOI " + v, e);
                         }
                         break;
                     }
-                    case "rft.atitle" : {
+                    case "rft.atitle": {
                         v = Entities.HTML40.unescape(v);
                         r.add("dc:title", v);
                         work = v;
                         break;
                     }
-                    case "rft.jtitle" : {
+                    case "rft.jtitle": {
                         v = Entities.HTML40.unescape(v);
                         title = v;
                         j = r.newResource(FRBR_PARTOF)
@@ -331,19 +330,19 @@ public class JsonCoins extends Feeder {
                             }
                             Node publisher = serial.literal("dc:publisher");
                             if (publisher != null) {
-                                j.add("dc:publisher", publisher.toString() );
+                                j.add("dc:publisher", publisher.toString());
                             }
                         } else {
                             missingserial = true;
                         }
                         break;
                     }
-                    case "rft.aulast" : {
+                    case "rft.aulast": {
                         v = Entities.HTML40.unescape(v);
                         if (aulast != null) {
                             r.newResource(FOAF_MAKER)
                                     .add("foaf:familyName", aulast)
-                                    .add("foaf:givenName", aufirst );
+                                    .add("foaf:givenName", aufirst);
                             author = aulast + " " + aufirst;
                             aulast = null;
                             aufirst = null;
@@ -352,7 +351,7 @@ public class JsonCoins extends Feeder {
                         }
                         break;
                     }
-                    case "rft.aufirst" : {
+                    case "rft.aufirst": {
                         v = Entities.HTML40.unescape(v);
                         if (aufirst != null) {
                             r.newResource(FOAF_MAKER)
@@ -366,7 +365,7 @@ public class JsonCoins extends Feeder {
                         }
                         break;
                     }
-                    case "rft.au" : {
+                    case "rft.au": {
                         // fix author strings
                         if ("&NA;".equals(v)) {
                             v = null;
@@ -379,25 +378,25 @@ public class JsonCoins extends Feeder {
                         }
                         break;
                     }
-                    case "rft.date" : {
+                    case "rft.date": {
                         year = v;
                         Literal l = new SimpleLiteral(v).type(Literal.GYEAR);
                         r.add("prism:publicationDate", l);
                         break;
                     }
-                    case "rft.volume" : {
+                    case "rft.volume": {
                         r.newResource(FRBR_EMBODIMENT)
                                 .a(FABIO_PERIODICAL_VOLUME)
                                 .add("prism:volume", v);
                         break;
                     }
-                    case "rft.issue" : {
+                    case "rft.issue": {
                         r.newResource(FRBR_EMBODIMENT)
                                 .a(FABIO_PERIODICAL_ISSUE)
                                 .add("prism:number", v);
                         break;
                     }
-                    case "rft.spage" : {
+                    case "rft.spage": {
                         if (spage != null) {
                             r.newResource(FRBR_EMBODIMENT)
                                     .a(FABIO_PRINT_OBJECT)
@@ -410,7 +409,7 @@ public class JsonCoins extends Feeder {
                         }
                         break;
                     }
-                    case "rft.epage" : {
+                    case "rft.epage": {
                         if (epage != null) {
                             r.newResource(FRBR_EMBODIMENT)
                                     .a(FABIO_PRINT_OBJECT)
@@ -459,7 +458,7 @@ public class JsonCoins extends Feeder {
                 if (author == null && aulast != null) {
                     author = aulast;
                 }
-                if (author!= null && work != null && key != null) {
+                if (author != null && work != null && key != null) {
                     r.add("xbib:key", key);
                 }
             }
@@ -474,13 +473,13 @@ public class JsonCoins extends Feeder {
         };
         try {
             URIUtil.parseQueryString(coins.toURI(), UTF8, listener);
-        } catch (InvalidCharacterException | URISyntaxException  e) {
+        } catch (InvalidCharacterException | URISyntaxException e) {
             logger.warn("can't parse query string: " + coins, e);
         }
         listener.close();
         return listener.hasErrors() ? Result.ERROR :
-               listener.missingSerial() ? Result.MISSINGSERIAL :
-               Result.OK;
+                listener.missingSerial() ? Result.MISSINGSERIAL :
+                        Result.OK;
     }
 
 }

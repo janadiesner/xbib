@@ -43,8 +43,9 @@ import java.io.OutputStream;
  */
 public class ProgressMonitoredOutputStream extends OutputStream implements OutputStreamWrapper {
 
-    private OutputStream outputStream = null;
-    private BytesProgressWatcher progressWatcher = null;
+    private OutputStream outputStream;
+
+    private BytesProgressWatcher progressWatcher;
 
     /**
      * Construts the output stream around an underlying stream and sends
@@ -59,8 +60,10 @@ public class ProgressMonitoredOutputStream extends OutputStream implements Outpu
      */
     public ProgressMonitoredOutputStream(OutputStream outputStream, BytesProgressWatcher progressWatcher) {
         if (outputStream == null) {
-            throw new IllegalArgumentException(
-                    "ProgressMonitoredOutputStream cannot run with a null OutputStream");
+            throw new IllegalArgumentException("ProgressMonitoredOutputStream cannot run with a null OutputStream");
+        }
+        if (progressWatcher == null) {
+            throw new IllegalArgumentException("ProgressMonitoredOutputStream cannot run without a progress watcher");
         }
         this.outputStream = outputStream;
         this.progressWatcher = progressWatcher;
@@ -71,7 +74,7 @@ public class ProgressMonitoredOutputStream extends OutputStream implements Outpu
      * and sends a notification message if this number exceeds the minimum bytes
      * transferred value.
      *
-     * @param bytesTransmitted
+     * @param bytesTransmitted the byte count transmitted
      */
     public void sendNotificationUpdate(long bytesTransmitted) {
         progressWatcher.updateBytesTransferred(bytesTransmitted);

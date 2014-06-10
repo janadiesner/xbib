@@ -31,6 +31,21 @@
  */
 package org.xbib.tools.feed.elasticsearch.viaf;
 
+import org.xbib.io.InputService;
+import org.xbib.iri.IRI;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.pipeline.Pipeline;
+import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.Resource;
+import org.xbib.rdf.Triple;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.io.rdfxml.RdfXmlReader;
+import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.tools.Feeder;
+import org.xml.sax.InputSource;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,24 +56,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
-import org.xbib.tools.Feeder;
-import org.xbib.pipeline.PipelineProvider;
-import org.xbib.pipeline.Pipeline;
-import org.xbib.io.InputService;
-import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.io.rdfxml.RdfXmlReader;
-import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xml.sax.InputSource;
-
 /**
  * VIAF indexer to Elasticsearch
- *
  */
 public class VIAF extends Feeder {
 

@@ -32,15 +32,14 @@
 package org.xbib.tools.feed.elasticsearch.geonames;
 
 import org.elasticsearch.common.xcontent.XContentBuilder;
-
-import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.tools.Feeder;
+import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
 import org.xbib.io.InputService;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
+import org.xbib.tools.Feeder;
 import org.xbib.util.Strings;
 
 import java.io.InputStream;
@@ -77,7 +76,7 @@ public class GeonamesFromZIP extends Feeder {
     @Override
     protected GeonamesFromZIP beforeIndexCreation(Ingest output) {
         output.addMapping(settings.get("type"),
-            "{ \""+settings.get("type")+"\": { \"properties\" : { \"location\" : { \"type\" : \"geo_point\" } } } }");
+                "{ \"" + settings.get("type") + "\": { \"properties\" : { \"location\" : { \"type\" : \"geo_point\" } } } }");
         return this;
     }
 
@@ -86,7 +85,7 @@ public class GeonamesFromZIP extends Feeder {
         logger.info("start of processing {}", uri);
         InputStream in = InputService.getInputStream(uri);
         ZipInputStream zin = new ZipInputStream(in);
-        for (ZipEntry zipEntry;(zipEntry = zin.getNextEntry()) != null;) {
+        for (ZipEntry zipEntry; (zipEntry = zin.getNextEntry()) != null; ) {
             logger.info("reading zip entry {}", zipEntry.getName());
             Scanner sc = new Scanner(zin);
             while (sc.hasNextLine()) {
@@ -118,8 +117,8 @@ public class GeonamesFromZIP extends Feeder {
                         .field("asciiname", asciiname)
                         .field("alternatenames", alternatenames)
                         .startArray("location")
-                            .value(longitude)
-                            .value(latitude)
+                        .value(longitude)
+                        .value(latitude)
                         .endArray()
                         .field("featureClass", featureClass)
                         .field("featureCode", featureCode)
