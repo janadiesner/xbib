@@ -33,8 +33,8 @@ package org.xbib.oai.listrecords;
 
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.oai.client.ClientOAIResponse;
 import org.xbib.util.DateUtil;
-import org.xbib.oai.DefaultOAIResponse;
 import org.xbib.oai.exceptions.BadArgumentException;
 import org.xbib.oai.exceptions.BadResumptionTokenException;
 import org.xbib.oai.exceptions.NoRecordsMatchException;
@@ -47,7 +47,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Date;
 
-public class ListRecordsResponse extends DefaultOAIResponse {
+public class ListRecordsResponse extends ClientOAIResponse {
 
     private final Logger logger = LoggerFactory.getLogger(ListRecordsResponse.class.getName());
 
@@ -62,12 +62,7 @@ public class ListRecordsResponse extends DefaultOAIResponse {
     private StylesheetTransformer transformer;
 
     public ListRecordsResponse(ListRecordsRequest request) {
-        super(request);
         this.request = request;
-    }
-
-    public ListRecordsResponse(ListRecordsServerRequest request) {
-        super(request);
     }
 
     public void setError(String error) {

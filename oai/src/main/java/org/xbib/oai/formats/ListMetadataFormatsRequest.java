@@ -31,11 +31,11 @@
  */
 package org.xbib.oai.formats;
 
-import org.xbib.oai.DefaultOAIRequest;
+import org.xbib.oai.client.ClientOAIRequest;
 import org.xbib.oai.OAIRequest;
 import org.xbib.oai.OAISession;
 
-public class ListMetadataFormatsRequest extends DefaultOAIRequest implements OAIRequest {
+public class ListMetadataFormatsRequest extends ClientOAIRequest implements OAIRequest {
 
     public ListMetadataFormatsRequest(OAISession session) {
         super(session);

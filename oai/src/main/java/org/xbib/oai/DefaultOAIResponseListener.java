@@ -36,10 +36,9 @@ import org.xbib.io.http.netty.NettyHttpResponseListener;
 import org.xbib.io.http.HttpResponse;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.oai.client.ClientOAIResponse;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 
 public class DefaultOAIResponseListener<Response extends OAIResponse>
         extends NettyHttpResponseListener implements OAIResponseListener {
@@ -75,7 +74,7 @@ public class DefaultOAIResponseListener<Response extends OAIResponse>
     @Override
     public void receivedResponse(HttpResponse result) throws IOException {
         super.receivedResponse(result);
-        this.response = (Response)new DefaultOAIResponse(request);
+        this.response = (Response)new ClientOAIResponse();
         if (!result.ok()) {
             String msg = "HTTP error " + result.getStatusCode();
             if (result.getThrowable() == null) {

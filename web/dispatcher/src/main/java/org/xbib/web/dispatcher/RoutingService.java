@@ -58,6 +58,8 @@ public class RoutingService {
                           @QueryParam("style") String style
                          ) throws IOException {
 
+        DispatcherSettings dispatcherSettings= DispatcherSettings.Factory.getDispatcherSettings(baseGroup);
+
         DispatcherRequest dispatcherRequest = new DispatcherRequest()
                 .setIndex(index)
                 .setType(indextype)
@@ -65,12 +67,13 @@ public class RoutingService {
                 .setFrom(from)
                 .setSize(size)
                 .setBase(base)
-                .setBaseGroup(baseGroup)
                 .setSource(source)
                 .setIdentifier(identifier)
                 .setYear(year)
+                .setBaseGroup(baseGroup)
+                .setGroupMap(contains(style, "region") ? null : dispatcherSettings.getServiceMap())
                 .setGroupLimit(groupLimit)
-                .setGroupMap(contains(style, "region") ? null : DispatcherSettings.serviceMap)
+                .setExpandGroups(true)
                 .setCarrierFilter(carrier)
                 .setExcludeCarrierFilter(excludecarrier)
                 .setGroupFilter(group)
@@ -126,6 +129,8 @@ public class RoutingService {
             logger.info("got settings from POST body {}", settings.getAsMap());
         }
 
+        DispatcherSettings dispatcherSettings = DispatcherSettings.Factory.getDispatcherSettings(baseGroup);
+
         DispatcherRequest dispatcherRequest = new DispatcherRequest()
                 .setIndex(index)
                 .setType(indextype)
@@ -137,8 +142,9 @@ public class RoutingService {
                 .setSource(source)
                 .setIdentifier(identifier)
                 .setYear(year)
+                .setGroupMap(contains(style, "region") ? null : dispatcherSettings.getServiceMap())
                 .setGroupLimit(groupLimit)
-                .setGroupMap(contains(style, "region") ? null : DispatcherSettings.serviceMap)
+                .setExpandGroups(true)
                 .setCarrierFilter(carrier)
                 .setExcludeCarrierFilter(excludecarrier)
                 .setGroupFilter(group)
@@ -189,19 +195,22 @@ public class RoutingService {
     private Response execute(String base, String group, String source, String identifier, Integer year, String style,
                              List<String> carrier) throws IOException {
 
+        DispatcherSettings dispatcherSettings = DispatcherSettings.Factory.getDispatcherSettings(group);
+
         style = style != null ? style : "";
 
         DispatcherRequest dispatcherRequest = new DispatcherRequest()
                 .setCompact(contains(style, "compact"))
                 .setBase(base)
                 .setBaseGroup(group != null ? group.toUpperCase() : null)
-                .setGroupMap(contains(style, "region") ? null : DispatcherSettings.serviceMap)
+                .setGroupMap(contains(style, "region") ? null : dispatcherSettings.getServiceMap())
                 .setGroupLimit(contains(style, "unlimited") ? 0 : 10)
-                .setInstitutionCarrierFilter(DispatcherSettings.serviceRestrictions)
+                .setExpandGroups(false)
+                .setInstitutionCarrierFilter(dispatcherSettings.getServiceRestrictions())
                 .setSource(source)
                 .setIdentifier(identifier)
                 .setYear(year)
-                .setInstitutionMarker("priority", DispatcherSettings.priority)
+                .setInstitutionMarker("priority", dispatcherSettings.getPriority())
                 .setTypeFilter(style.contains("alltypes") ? null : Arrays.asList("interlibrary"))
                 .setModeFilter(style.contains("allmodes") ? null : Arrays.asList("copy", "copy-loan"))
                 .setCarrierFilter(carrier);

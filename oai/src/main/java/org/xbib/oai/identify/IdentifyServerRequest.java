@@ -31,29 +31,7 @@
  */
 package org.xbib.oai.identify;
 
-import org.xbib.oai.OAISession;
-import org.xbib.oai.service.ServerOAIRequest;
+import org.xbib.oai.service.OAIServerRequest;
 
-import java.util.List;
-import java.util.Map;
-
-public class IdentifyServerRequest extends IdentifyRequest implements ServerOAIRequest {
-
-    String path;
-
-    Map<String, List<String>> parameters;
-
-    public IdentifyServerRequest(OAISession session) {
-        super(session);
-    }
-
-    @Override
-    public String getPath() {
-        return path;
-    }
-
-    @Override
-    public Map<String, List<String>> getParameterMap() {
-        return parameters;
-    }
+public class IdentifyServerRequest extends OAIServerRequest {
 }

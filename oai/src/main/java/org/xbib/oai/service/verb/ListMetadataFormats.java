@@ -31,14 +31,14 @@
  */
 package org.xbib.oai.service.verb;
 
-import org.xbib.oai.DefaultOAIResponse;
+import org.xbib.oai.client.ClientOAIResponse;
 import org.xbib.oai.service.OAIService;
-import org.xbib.oai.service.ServerOAIRequest;
+import org.xbib.oai.service.OAIServerRequest;
 import org.xbib.oai.exceptions.OAIException;
 
 public class ListMetadataFormats extends AbstractVerb {
 
-    public ListMetadataFormats(ServerOAIRequest request, DefaultOAIResponse response) {
+    public ListMetadataFormats(OAIServerRequest request, ClientOAIResponse response) {
         super(request, response);
     }
 

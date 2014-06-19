@@ -55,7 +55,7 @@ import org.xbib.oai.getrecord.GetRecordRequest;
 import org.xbib.oai.identify.IdentifyResponse;
 import org.xbib.oai.identify.ListIdentifiersRequest;
 import org.xbib.oai.formats.ListMetadataFormatsRequest;
-import org.xbib.oai.service.ServerOAIRequest;
+import org.xbib.oai.service.OAIServerRequest;
 import org.xbib.oai.listrecords.ListRecordsServerRequest;
 import org.xbib.oai.listsets.ListSetsRequest;
 import org.xbib.oai.listsets.ListSetsResponse;
@@ -180,7 +180,7 @@ public class OAIService implements org.xbib.oai.service.OAIService {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private String getIndex(ServerOAIRequest request) {
+    private String getIndex(OAIServerRequest request) {
         String index = null;
         String path = request.getPath();
         path = path != null && path.startsWith("/oai") ? path.substring(4) : path;

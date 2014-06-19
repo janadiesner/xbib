@@ -31,12 +31,8 @@
  */
 package org.xbib.oai.identify;
 
-import org.xbib.oai.DefaultOAIResponse;
+import org.xbib.oai.client.ClientOAIResponse;
 
-public class ListIdentifiersResponse extends DefaultOAIResponse {
-
-    public ListIdentifiersResponse(ListIdentifiersRequest request) {
-        super(request);
-    }
+public class ListIdentifiersResponse extends ClientOAIResponse {
 
 }

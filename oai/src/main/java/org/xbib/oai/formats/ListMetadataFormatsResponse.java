@@ -31,12 +31,8 @@
  */
 package org.xbib.oai.formats;
 
-import org.xbib.oai.DefaultOAIResponse;
+import org.xbib.oai.client.ClientOAIResponse;
 
-public class ListMetadataFormatsResponse extends DefaultOAIResponse {
-
-    public ListMetadataFormatsResponse(ListMetadataFormatsRequest request) {
-        super(request);
-    }
+public class ListMetadataFormatsResponse extends ClientOAIResponse {
 
 }

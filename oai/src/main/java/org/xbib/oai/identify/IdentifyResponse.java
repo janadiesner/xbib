@@ -31,7 +31,7 @@
  */
 package org.xbib.oai.identify;
 
-import org.xbib.oai.DefaultOAIResponse;
+import org.xbib.oai.client.ClientOAIResponse;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -40,9 +40,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class IdentifyResponse extends DefaultOAIResponse {
-
-    private IdentifyRequest request;
+public class IdentifyResponse extends ClientOAIResponse {
 
     private String repositoryName;
 
@@ -59,15 +57,6 @@ public class IdentifyResponse extends DefaultOAIResponse {
     private String granularity;
 
     private String compression;
-
-    public IdentifyResponse(IdentifyRequest request) {
-        super(request);
-    }
-
-    @Override
-    public IdentifyRequest getRequest() {
-        return request;
-    }
 
     @Override
     public IdentifyResponse to(Writer writer) throws IOException {

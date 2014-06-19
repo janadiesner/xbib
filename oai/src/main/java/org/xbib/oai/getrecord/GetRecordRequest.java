@@ -31,11 +31,11 @@
  */
 package org.xbib.oai.getrecord;
 
-import org.xbib.oai.DefaultOAIRequest;
+import org.xbib.oai.client.ClientOAIRequest;
 import org.xbib.oai.OAIRequest;
 import org.xbib.oai.OAISession;
 
-public class GetRecordRequest extends DefaultOAIRequest implements OAIRequest {
+public class GetRecordRequest extends ClientOAIRequest implements OAIRequest {
 
     public GetRecordRequest(OAISession session) {
         super(session);

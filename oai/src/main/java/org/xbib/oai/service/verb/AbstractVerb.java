@@ -42,22 +42,22 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 
-import org.xbib.oai.DefaultOAIResponse;
+import org.xbib.oai.client.ClientOAIResponse;
 import org.xbib.oai.OAIConstants;
 import org.xbib.oai.service.OAIService;
 import org.xbib.oai.exceptions.OAIException;
-import org.xbib.oai.service.ServerOAIRequest;
+import org.xbib.oai.service.OAIServerRequest;
 import org.xbib.xml.XSI;
 
 public abstract class AbstractVerb {
 
     private final XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
-    protected final ServerOAIRequest request;
+    protected final OAIServerRequest request;
 
-    protected final DefaultOAIResponse response;
+    protected final ClientOAIResponse response;
     
-    public AbstractVerb(ServerOAIRequest request, DefaultOAIResponse response) {
+    public AbstractVerb(OAIServerRequest request, ClientOAIResponse response) {
         this.request = request;
         this.response = response;
     }

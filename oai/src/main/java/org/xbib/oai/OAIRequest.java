@@ -31,7 +31,6 @@
  */
 package org.xbib.oai;
 
-import org.xbib.io.http.HttpRequest;
 import org.xbib.oai.util.ResumptionToken;
 
 import java.util.Date;
@@ -40,7 +39,7 @@ import java.util.Date;
  *  OAI request API
  *
  */
-public interface OAIRequest<R extends OAIRequest> extends HttpRequest, OAIConstants {
+public interface OAIRequest<R extends OAIRequest> extends OAIConstants {
 
     R setSet(String set);
 

@@ -31,32 +31,9 @@
  */
 package org.xbib.oai.listrecords;
 
-import org.xbib.oai.DefaultOAIRequest;
-import org.xbib.oai.OAISession;
-import org.xbib.oai.service.ServerOAIRequest;
-
-import java.util.List;
-import java.util.Map;
+import org.xbib.oai.service.OAIServerRequest;
 
 public class ListRecordsServerRequest
-    extends DefaultOAIRequest<ListRecordsServerRequest>
-    implements ServerOAIRequest<ListRecordsServerRequest> {
+    extends OAIServerRequest<ListRecordsServerRequest> {
 
-    String path;
-
-    Map<String, List<String>> parameters;
-
-    public ListRecordsServerRequest(OAISession session) {
-        super(session);
-    }
-
-    @Override
-    public String getPath() {
-        return path;
-    }
-
-    @Override
-    public Map<String, List<String>> getParameterMap() {
-        return parameters;
-    }
 }

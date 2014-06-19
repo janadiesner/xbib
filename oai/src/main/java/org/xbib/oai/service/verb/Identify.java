@@ -34,11 +34,11 @@ package org.xbib.oai.service.verb;
 import org.xbib.oai.service.OAIService;
 import org.xbib.oai.identify.IdentifyResponse;
 import org.xbib.oai.exceptions.OAIException;
-import org.xbib.oai.service.ServerOAIRequest;
+import org.xbib.oai.service.OAIServerRequest;
 
 public class Identify extends AbstractVerb {
     
-    public Identify(ServerOAIRequest request, IdentifyResponse response) {
+    public Identify(OAIServerRequest request, IdentifyResponse response) {
         super(request, response);
     }
 

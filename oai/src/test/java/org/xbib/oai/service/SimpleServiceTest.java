@@ -55,20 +55,15 @@ public class SimpleServiceTest {
         OAISession session = service.newSession();
         StringWriter sw = new StringWriter();
         XMLOutputFactory factory  = XMLOutputFactory.newInstance();
-        MyIdentifyRequest request = new MyIdentifyRequest(session);
-        IdentifyResponse response = new IdentifyResponse(request);
+        MyIdentifyServerRequest request = new MyIdentifyServerRequest();
+        IdentifyResponse response = new IdentifyResponse();
         response.setConsumer(factory.createXMLEventWriter(sw));
         service.identify(request, response);
         response.to(sw);
         session.close();
     }
 
-    // TODO this is not what we like!
-    class MyIdentifyRequest extends IdentifyServerRequest {
-
-        protected MyIdentifyRequest(OAISession session) {
-            super(session);
-        }
+    class MyIdentifyServerRequest extends IdentifyServerRequest {
 
         @Override
             public Map<String, List<String>> getParameterMap() {

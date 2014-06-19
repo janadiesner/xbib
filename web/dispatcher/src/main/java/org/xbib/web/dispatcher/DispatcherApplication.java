@@ -4,6 +4,16 @@ import org.xbib.io.negotiate.ContentTypeNegotiator;
 import org.xbib.io.negotiate.MediaRangeSpec;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.web.dispatcher.baw.BAWService;
+import org.xbib.web.dispatcher.bay.BAYService;
+import org.xbib.web.dispatcher.ber.BERService;
+import org.xbib.web.dispatcher.ham.HAMService;
+import org.xbib.web.dispatcher.hes.HESService;
+import org.xbib.web.dispatcher.nie.NIEService;
+import org.xbib.web.dispatcher.nrw.NRWService;
+import org.xbib.web.dispatcher.saa.SAAService;
+import org.xbib.web.dispatcher.sax.SAXService;
+import org.xbib.web.dispatcher.thu.THUService;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -23,7 +33,17 @@ public class DispatcherApplication extends Application {
         return new HashSet<Class<?>>(Arrays.asList(
                 TestService.class,
                 RoutingService.class,
-                DemoService.class
+                DemoService.class,
+                BAWService.class,
+                BAYService.class,
+                BERService.class,
+                HAMService.class,
+                HESService.class,
+                NIEService.class,
+                NRWService.class,
+                SAAService.class,
+                SAXService.class,
+                THUService.class
         ));
     }
 

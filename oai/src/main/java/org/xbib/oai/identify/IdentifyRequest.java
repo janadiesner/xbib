@@ -31,11 +31,11 @@
  */
 package org.xbib.oai.identify;
 
-import org.xbib.oai.DefaultOAIRequest;
+import org.xbib.oai.client.ClientOAIRequest;
 import org.xbib.oai.OAIRequest;
 import org.xbib.oai.OAISession;
 
-public class IdentifyRequest extends DefaultOAIRequest implements OAIRequest {
+public class IdentifyRequest extends ClientOAIRequest implements OAIRequest {
 
     public IdentifyRequest(OAISession session) {
         super(session);

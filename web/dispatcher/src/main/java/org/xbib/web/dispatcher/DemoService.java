@@ -57,6 +57,8 @@ public class DemoService extends HandlebarsService {
                     .put("isil", isil != null ? isil : "")
                     .build();
 
+            DispatcherSettings dispatcherSettings = DispatcherSettings.Factory.getDispatcherSettings("nrw");
+
             DispatcherRequest dispatcherRequest = new DispatcherRequest()
                     .setIndex(index)
                     .setType(indextype)
@@ -67,10 +69,10 @@ public class DemoService extends HandlebarsService {
                     .setYear(year)
                     .setGroupLimit(10)
                     .setExpandGroups(false)
-                    .setGroupFilter(DispatcherSettings.groups)
-                    .setInstitutionMarker("priority", DispatcherSettings.priority)
+                    .setGroupFilter(dispatcherSettings.getGroups())
+                    .setInstitutionMarker("priority", dispatcherSettings.getPriority())
                     .setInstitutionFilter(Arrays.asList(isil))
-                    .setInstitutionCarrierFilter(DispatcherSettings.serviceRestrictions);
+                    .setInstitutionCarrierFilter(dispatcherSettings.getServiceRestrictions());
 
 
             Client client = ApplicationContextListener.searchSupport.client();
@@ -119,6 +121,8 @@ public class DemoService extends HandlebarsService {
                 .put("isil", isil != null ? isil : "")
                 .build();
 
+        DispatcherSettings dispatcherSettings = DispatcherSettings.Factory.getDispatcherSettings("nrw");
+
         DispatcherRequest dispatcherRequest = new DispatcherRequest()
                 .setIndex(index)
                 .setType(indextype)
@@ -129,10 +133,10 @@ public class DemoService extends HandlebarsService {
                 .setYear(year)
                 .setGroupLimit(10)
                 .setExpandGroups(false)
-                .setGroupFilter(DispatcherSettings.groups)
-                .setInstitutionMarker("priority", DispatcherSettings.priority)
+                .setGroupFilter(dispatcherSettings.getGroups())
+                .setInstitutionMarker("priority", dispatcherSettings.getPriority())
                 .setInstitutionFilter(Arrays.asList(isil))
-                .setInstitutionCarrierFilter(DispatcherSettings.serviceRestrictions);
+                .setInstitutionCarrierFilter(dispatcherSettings.getServiceRestrictions());
 
         Client client = ApplicationContextListener.searchSupport.client();
         Dispatcher dispatcher = ApplicationContextListener.dispatcher;

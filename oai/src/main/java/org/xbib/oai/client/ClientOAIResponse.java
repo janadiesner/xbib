@@ -29,8 +29,9 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.oai;
+package org.xbib.oai.client;
 
+import org.xbib.oai.OAIResponse;
 import org.xbib.xml.transform.StylesheetTransformer;
 
 import javax.xml.stream.util.XMLEventConsumer;
@@ -40,9 +41,7 @@ import java.io.Writer;
 /**
  * Default OAI response
  */
-public class DefaultOAIResponse implements OAIResponse {
-
-    private OAIRequest request;
+public class ClientOAIResponse implements OAIResponse {
 
     private StylesheetTransformer transformer;
 
@@ -53,7 +52,7 @@ public class DefaultOAIResponse implements OAIResponse {
     private XMLEventConsumer consumer;
 
     @Override
-    public DefaultOAIResponse setStylesheetTransformer(StylesheetTransformer transformer) {
+    public ClientOAIResponse setStylesheetTransformer(StylesheetTransformer transformer) {
         this.transformer = transformer;
         return this;
     }
@@ -63,13 +62,13 @@ public class DefaultOAIResponse implements OAIResponse {
     }
 
     @Override
-    public DefaultOAIResponse setStylesheets(String... stylesheets) {
+    public ClientOAIResponse setStylesheets(String... stylesheets) {
         this.stylesheets = stylesheets;
         return this;
     }
 
     @Override
-    public DefaultOAIResponse setOutputFormat(String format) {
+    public ClientOAIResponse setOutputFormat(String format) {
         this.format = format;
         return this;
     }
@@ -79,19 +78,12 @@ public class DefaultOAIResponse implements OAIResponse {
     }
 
     @Override
-    public DefaultOAIResponse to(Writer writer) throws IOException {
+    public ClientOAIResponse to(Writer writer) throws IOException {
         return this;
     }
 
-    public DefaultOAIResponse(OAIRequest request) {
-        this.request = request;
-    }
 
-    public OAIRequest getRequest() {
-        return request;
-    }
-
-    public DefaultOAIResponse setConsumer(XMLEventConsumer consumer) {
+    public ClientOAIResponse setConsumer(XMLEventConsumer consumer) {
         this.consumer = consumer;
         return this;
     }

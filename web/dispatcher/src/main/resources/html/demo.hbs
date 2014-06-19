@@ -38,21 +38,17 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-lg-2 control-label" for="isil">Bibliothek</label>
+                                <label class="col-lg-2 control-label" for="isil">Bibliothek (optional)</label>
                                 <div class="col-lg-6">
                                     <input class="form-control" id="isil" name="isil" type="text" value="{{isil}}">
-                                    <span class="help-block">Bitte ISIL der Bibliothek eintragen, auf die eingegrenzt werden soll</span>
+                                    <span class="help-block">Bitte ISIL einer Bibliothek eintragen, auf die eingegrenzt werden soll</span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-lg-2 control-label" for="baselibrary">Heimatbibliothek</label>
+                                <label class="col-lg-2 control-label" for="baselibrary">Heimatbibliothek (optional)</label>
                                 <div class="col-lg-6">
-                                    <select id="baselibrary" name="baselibrary" class="form-control">
-                                        <option value="">bitte wählen</option>
-                                        {{#each libraries}}
-                                            <option {{select this "==" baselibrary "selected" ""}}>{{this}}</option>
-                                        {{/each}}
-                                    </select>
+                                    <input class="form-control" id="baselibrary" name="baselibrary" type="text" value="{{baselibrary}}">
+                                    <span class="help-block">Bitte ISIL einer Heimatbibliothek eintragen</span>
                                 </div>
                             </div>
                             <div class="form-group">

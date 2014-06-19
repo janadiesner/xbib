@@ -31,12 +31,8 @@
  */
 package org.xbib.oai.getrecord;
 
-import org.xbib.oai.DefaultOAIResponse;
+import org.xbib.oai.client.ClientOAIResponse;
 
-public class GetRecordResponse extends DefaultOAIResponse {
-
-    public GetRecordResponse(GetRecordRequest request) {
-        super(request);
-    }
+public class GetRecordResponse extends ClientOAIResponse {
 
 }

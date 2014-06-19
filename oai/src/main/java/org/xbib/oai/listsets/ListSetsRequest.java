@@ -31,10 +31,10 @@
  */
 package org.xbib.oai.listsets;
 
-import org.xbib.oai.DefaultOAIRequest;
+import org.xbib.oai.client.ClientOAIRequest;
 import org.xbib.oai.OAISession;
 
-public class ListSetsRequest extends DefaultOAIRequest<ListSetsRequest> {
+public class ListSetsRequest extends ClientOAIRequest<ListSetsRequest> {
 
     public ListSetsRequest(OAISession session) {
         super(session);

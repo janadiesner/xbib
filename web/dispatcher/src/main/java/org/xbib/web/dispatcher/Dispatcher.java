@@ -1,4 +1,3 @@
-
 package org.xbib.web.dispatcher;
 
 import com.google.common.collect.Lists;
@@ -109,6 +108,7 @@ public class Dispatcher {
     public Map<String,Object> execute(DispatcherRequest request, String json) throws IOException {
         Map<String,Object> result = newHashMap();
         Map<String,Object> source = XContentHelper.convertToMap(json);
+        logger.info("source={}", source);
         Map<String, Object> filtered = filter(request, toInstitutions(request, source));
         result.putAll(filtered);
         if (!request.isCompact()) {
@@ -161,11 +161,14 @@ public class Dispatcher {
                         Set<Service> diff = newHashSet(institution.getActiveServices());
                         diff.removeAll(filteredServices);
                         List<Service> other = institution.getOtherServices();
-                        other.addAll(diff);
-                        institution.putOther(other);
+                        if (!diff.isEmpty()) {
+                            other.addAll(diff);
+                        }
+                        if (!other.isEmpty()) {
+                            institution.putOther(other);
+                        }
                     }
                 });
-
         // a bit of random here, we will sort later also.
         Collections.shuffle(institutions);
 
@@ -184,25 +187,25 @@ public class Dispatcher {
                         .collect(toList());
                 hasBase = newHashSet(list).contains(request.getBase());
 
-                // extract priority insts
+                // extract only priority insts
                 Map<Boolean, List<String>> priorities = institutions.stream()
                         .collect(groupingBy(i -> i.getMarker("priority"),
                                 mapping(Institution::getISIL, Collectors.toList())));
                 if (priorities.containsKey(true)) {
                     head = priorities.remove(true);
+                } else if (priorities.containsKey(false)) {
+                    splitList(priorities.remove(false), request.getGroupLimit(), head, tail);
                 }
-                if (priorities.containsKey(false)) {
-                    tail = priorities.remove(false);
-                }
-                // limit by group limit
-                //splitList(list, request.getGroupLimit(), head, tail);
 
                 // append other institution services
-                other.addAll(institutions.stream()
+                List<String> otherList = institutions.stream()
                         .filter(inst -> !inst.getOtherServices().isEmpty())
                         .sorted()
                         .map(Institution::getISIL)
-                        .collect(toList()));
+                        .collect(toList());
+                if (!otherList.isEmpty()) {
+                    other.addAll(otherList);
+                }
             } else {
                 // divide into groups when baseGroup is given
                 Map<String, List<String>> groups = institutions.stream()
@@ -216,17 +219,15 @@ public class Dispatcher {
                 List<String> list = groups.containsKey(group) ? groups.remove(group) : newLinkedList();
                 hasBase = newHashSet(list).contains(request.getBase());
 
-                // extract priority insts
+                // extract only priority insts
                 Map<Boolean, List<String>> priorities = institutions.stream()
                         .collect(groupingBy(i -> i.getMarker("priority"),
                                 mapping(Institution::getISIL, Collectors.toList())));
                 if (priorities.containsKey(true)) {
                     head = priorities.remove(true);
+                } else if (priorities.containsKey(false)) {
+                    splitList(priorities.remove(false), request.getGroupLimit(), head, tail);
                 }
-                if (priorities.containsKey(false)) {
-                    tail = priorities.remove(false);
-                }
-                //splitList(list, request.getGroupLimit(), head, tail);
 
                 List<String> last = newLinkedList(groups.keySet());
                 Collections.shuffle(last);
@@ -237,12 +238,20 @@ public class Dispatcher {
                         .sorted()
                         .collect(groupingBy(Institution::getGroup,
                                 mapping(Institution::getISIL, Collectors.toList())));
-                other.addAll(groups.keySet());
+                if (!groups.keySet().isEmpty()) {
+                    other.addAll(groups.keySet());
+                }
             }
             Map<String,Object> result = newHashMap();
-            result.put("head", head);
-            result.put("tail", tail);
-            result.put("other", other);
+            if (!head.isEmpty()) {
+                result.put("head", head);
+            }
+            if (!tail.isEmpty()) {
+                result.put("tail", tail);
+            }
+            if (!other.isEmpty()) {
+                result.put("other", other);
+            }
             result.put("hasbase", hasBase);
             return result;
         } else {
@@ -264,20 +273,19 @@ public class Dispatcher {
                         .collect(groupingBy(i -> i.getMarker("priority")));
                 if (priorities.containsKey(true)) {
                     head = priorities.remove(true);
+                    //tail = priorities.remove(false).stream().sorted().collect(toList());
+                } else if (priorities.containsKey(false)) {
+                    splitList(priorities.remove(false), request.getGroupLimit(), head, tail);
                 }
-                if (priorities.containsKey(false)) {
-                    tail = priorities.remove(false).stream().sorted().collect(toList());
-                }
-                //splitList(list, request.getGroupLimit(), head, tail);
-
-                other.addAll(institutions.stream()
+                List<Institution> otherInst = institutions.stream()
                         .filter(inst -> !inst.getOtherServices().isEmpty())
                         .filter(inst -> !inst.getGroup().equals("X"))
                         .map(i -> i.setMarker(getMarker(request, i)))
                         .sorted()
-                        .collect(toList()));
-
-
+                        .collect(toList());
+                if (!otherInst.isEmpty()) {
+                    other.addAll(otherInst);
+                }
             } else {
                 // divide into groups, build first/last pair
                 Map<String, List<Institution>> groups = institutions.stream()
@@ -294,16 +302,14 @@ public class Dispatcher {
                 // find our institution (the base institution)
                 hasBase = list.stream().anyMatch(inst -> inst.getISIL().equals(request.getBase()));
 
-                // partition list into priority/non-priority insts
+                // priority/non-priority insts
                 Map<Boolean, List<Institution>> priorities = list.stream()
                         .collect(groupingBy(i -> i.getMarker("priority")));
                 if (priorities.containsKey(true)) {
                     head = priorities.remove(true);
+                } else if (priorities.containsKey(false)) {
+                    splitList(priorities.remove(false), request.getGroupLimit(), head, tail);
                 }
-                if (priorities.containsKey(false)) {
-                    tail = priorities.remove(false);
-                }
-                //splitList(list, request.getGroupLimit(), head, tail);
 
                 // append other services
                 Map<String, List<Institution>> groupsother = institutions.stream()
@@ -316,7 +322,9 @@ public class Dispatcher {
                 List<String> grouplist = Lists.newLinkedList(groups.keySet());
                 Collections.shuffle(grouplist);
                 list = groupsother.containsKey(group) ? groupsother.remove(group) : newLinkedList();
-                other.addAll(list);
+                if (!list.isEmpty()) {
+                    other.addAll(list);
+                }
                 if (request.isExpandGroups()) {
                     // append all the group as institutions to head
                     for (String l : grouplist) {
@@ -326,23 +334,35 @@ public class Dispatcher {
                         other.addAll(groupsother.get(l));
                     }
                 } else {
-                    // only group names instead of whole group institutions
+                    // collapse: only group names instead of whole group institutions
                     List<String> last = newLinkedList();
                     List<String> lastother = newLinkedList();
                     splitList(grouplist, request.getGroupLimit(), last, lastother);
-                    lastother.addAll(groupsother.keySet());
-                    result.put("group", last);
-                    result.put("groupcount", last.size());
-                    result.put("groupother", lastother);
-                    result.put("groupothercount", lastother.size());
+                    if (!groupsother.isEmpty()) {
+                        lastother.addAll(groupsother.keySet());
+                    }
+                    if (!last.isEmpty()) {
+                        result.put("group", last);
+                        result.put("groupcount", last.size());
+                    }
+                    if (!lastother.isEmpty()) {
+                        result.put("groupother", lastother);
+                        result.put("groupothercount", lastother.size());
+                    }
                 }
             }
-            result.put("head", head);
-            result.put("headcount", head.size());
-            result.put("tail", tail);
-            result.put("tailcount", tail.size());
-            result.put("other", other);
-            result.put("othercount", other.size());
+            if (!head.isEmpty()) {
+                result.put("head", head);
+                result.put("headcount", head.size());
+            }
+            if (!tail.isEmpty()) {
+                result.put("tail", tail);
+                result.put("tailcount", tail.size());
+            }
+            if (!other.isEmpty()) {
+                result.put("other", other);
+                result.put("othercount", other.size());
+            }
             result.put("hasbase", hasBase);
             return result;
         }

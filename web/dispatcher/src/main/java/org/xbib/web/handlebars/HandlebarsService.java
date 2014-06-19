@@ -143,7 +143,7 @@ public class HandlebarsService {
         String[] names = new String[] {
                 "test",
                 "testfile",
-                "html/demo"
+                "html/demo",
         };
         Map<String,Template> templateMap = new HashMap<String,Template>();
         try {

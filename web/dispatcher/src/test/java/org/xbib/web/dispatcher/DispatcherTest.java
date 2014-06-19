@@ -51,6 +51,5 @@ public class DispatcherTest {
 
         Dispatcher dispatcher = new Dispatcher();
         logger.info("{}", dispatcher.execute(dispatcherRequest, json));
-
     }
 }

@@ -31,12 +31,9 @@
  */
 package org.xbib.oai.listsets;
 
-import org.xbib.oai.DefaultOAIResponse;
+import org.xbib.oai.client.ClientOAIResponse;
 
-public class ListSetsResponse extends DefaultOAIResponse {
+public class ListSetsResponse extends ClientOAIResponse {
 
-    public ListSetsResponse(ListSetsRequest request) {
-        super(request);
-    }
 
 }

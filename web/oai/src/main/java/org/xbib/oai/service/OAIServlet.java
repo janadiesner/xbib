@@ -36,7 +36,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,12 +60,9 @@ import org.xbib.oai.identify.ListIdentifiersResponse;
 import org.xbib.oai.formats.ListMetadataFormatsRequest;
 import org.xbib.oai.formats.ListMetadataFormatsResponse;
 import org.xbib.oai.listrecords.ListRecordsResponse;
-import org.xbib.oai.identify.IdentifyServerRequest;
-import org.xbib.oai.listrecords.ListRecordsServerRequest;
 import org.xbib.oai.listsets.ListSetsRequest;
 import org.xbib.oai.listsets.ListSetsResponse;
 import org.xbib.oai.util.ResumptionToken;
-import org.xbib.oai.exceptions.OAIException;
 
 /**
  *  OAI servlet
@@ -110,7 +106,7 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
             String verb = request.getParameter(OAIConstants.VERB_PARAMETER);
             Writer writer = new OutputStreamWriter(response.getOutputStream(), responseEncoding);
             if (OAIConstants.IDENTIFY.equals(verb)) {
-                ServerIdentifyRequest oaiRequest = new ServerIdentifyRequest(session, request);
+                IdentifyServerRequest oaiRequest = new IdentifyServerRequest(session, request);
                 IdentifyResponse oaiResponse = new IdentifyResponse(oaiRequest);
                 oaiRequest.setURL(service.getBaseURL().toURI());
                 service.identify(oaiRequest, oaiResponse);
@@ -134,7 +130,7 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
                 service.listIdentifiers(oaiRequest, oaiResponse);
                 oaiResponse.to(writer);
             } else if (OAIConstants.LIST_RECORDS.equals(verb)) {
-                ServerListRecordsRequest oaiRequest = new ServerListRecordsRequest(session, request);
+                ListRecordsServerRequest oaiRequest = new ListRecordsServerRequest(session, request);
                 ListRecordsResponse oaiResponse = new ListRecordsResponse(oaiRequest);
                 oaiRequest.setURL(service.getBaseURL().toURI());
                 service.listRecords(oaiRequest, oaiResponse);
@@ -166,11 +162,11 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
         return request.getPathInfo();
     }
 
-    private class ServerIdentifyRequest extends IdentifyServerRequest {
+    private class IdentifyServerRequest extends org.xbib.oai.identify.IdentifyServerRequest {
 
         HttpServletRequest request;
 
-        ServerIdentifyRequest(OAISession session, HttpServletRequest request) {
+        IdentifyServerRequest(OAISession session, HttpServletRequest request) {
             super(session);
             this.request = request;
         }
@@ -224,17 +220,17 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
 
     }
 
-    private class ServerListRecordsRequest extends ListRecordsServerRequest {
+    private class ListRecordsServerRequest extends org.xbib.oai.listrecords.ListRecordsServerRequest {
 
         HttpServletRequest request;
 
-        ServerListRecordsRequest(OAISession session, HttpServletRequest request) {
+        ListRecordsServerRequest(OAISession session, HttpServletRequest request) {
             super(session);
             this.request = request;
         }
 
         @Override
-        public ServerListRecordsRequest setFrom(Date from, OAIDateResolution oaiDateResolution) {
+        public ListRecordsServerRequest setFrom(Date from, OAIDateResolution oaiDateResolution) {
             return this;
         }
 
@@ -244,7 +240,7 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
         }
 
         @Override
-        public ServerListRecordsRequest setUntil(Date until, OAIDateResolution oaiDateResolution) {
+        public ListRecordsServerRequest setUntil(Date until, OAIDateResolution oaiDateResolution) {
             return this;
         }
 
@@ -264,7 +260,7 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
         }
 
         @Override
-        public ServerListRecordsRequest setResumptionToken(ResumptionToken token) {
+        public ListRecordsServerRequest setResumptionToken(ResumptionToken token) {
             return this;
         }
 

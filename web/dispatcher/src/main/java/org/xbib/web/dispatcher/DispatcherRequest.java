@@ -40,7 +40,7 @@ public class DispatcherRequest {
 
     private Integer groupLimit;
 
-    private boolean expandGroups;
+    private boolean expandGroups = false;
 
     private Set<String> groupFilter;
     private Set<String> excludeGroupFilter;

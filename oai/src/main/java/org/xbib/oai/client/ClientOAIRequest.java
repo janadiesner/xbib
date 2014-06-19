@@ -29,25 +29,25 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.oai;
+package org.xbib.oai.client;
 
+import org.xbib.io.http.HttpRequest;
+import org.xbib.oai.OAIConstants;
+import org.xbib.oai.OAIDateResolution;
+import org.xbib.oai.OAIRequest;
+import org.xbib.oai.OAISession;
 import org.xbib.util.DateUtil;
 import org.xbib.io.http.netty.NettyHttpRequest;
-import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.util.ResumptionToken;
-import org.xbib.util.URIUtil;
 
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.Date;
 
 /**
- * Default OAI request
- *
+ * Client OAI request
  */
-public class DefaultOAIRequest<R extends DefaultOAIRequest>
-        extends NettyHttpRequest
-        implements OAIRequest<R> {
+public class ClientOAIRequest<R extends ClientOAIRequest>
+        extends NettyHttpRequest implements HttpRequest, OAIRequest<R> {
 
     private ResumptionToken token;
 
@@ -61,7 +61,7 @@ public class DefaultOAIRequest<R extends DefaultOAIRequest>
 
     private boolean retry;
 
-    protected DefaultOAIRequest(OAISession session) {
+    protected ClientOAIRequest(OAISession session) {
         super(session.getSession());
         setMethod("GET");
         addHeader("User-Agent", OAIClient.USER_AGENT);
