@@ -13,16 +13,12 @@ public class ChecksumSyslogMessageModifier extends AbstractSyslogMessageModifier
 
     protected ChecksumSyslogMessageModifierConfig config = null;
 
-    public static final ChecksumSyslogMessageModifier createCRC32() {
-        ChecksumSyslogMessageModifier crc32 = new ChecksumSyslogMessageModifier(ChecksumSyslogMessageModifierConfig.createCRC32());
-
-        return crc32;
+    public static ChecksumSyslogMessageModifier createCRC32() {
+        return new ChecksumSyslogMessageModifier(ChecksumSyslogMessageModifierConfig.createCRC32());
     }
 
-    public static final ChecksumSyslogMessageModifier createADLER32() {
-        ChecksumSyslogMessageModifier adler32 = new ChecksumSyslogMessageModifier(ChecksumSyslogMessageModifierConfig.createADLER32());
-
-        return adler32;
+    public static ChecksumSyslogMessageModifier createADLER32() {
+        return new ChecksumSyslogMessageModifier(ChecksumSyslogMessageModifierConfig.createADLER32());
     }
 
     public ChecksumSyslogMessageModifier(ChecksumSyslogMessageModifierConfig config) {
@@ -74,20 +70,15 @@ public class ChecksumSyslogMessageModifier extends AbstractSyslogMessageModifier
 
     public String modify(SyslogIF syslog, int facility, int level, String message) {
         synchronized (this.config.getChecksum()) {
-            StringBuffer messageBuffer = new StringBuffer(message);
-
+            StringBuilder messageBuffer = new StringBuilder(message);
             byte[] messageBytes = SyslogUtility.getBytes(syslog.getConfig(), message);
-
             if (!this.config.isContinuous()) {
                 this.config.getChecksum().reset();
             }
-
             this.config.getChecksum().update(messageBytes, 0, message.length());
-
             messageBuffer.append(this.config.getPrefix());
             messageBuffer.append(Long.toHexString(this.config.getChecksum().getValue()).toUpperCase());
             messageBuffer.append(this.config.getSuffix());
-
             return messageBuffer.toString();
         }
     }

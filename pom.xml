@@ -718,6 +718,7 @@
         <module>oai</module>
         <module>iso23950</module>
         <module>opensearch</module>
+        <module>syslog</module>
 
         <module>io/stream</module>
         <module>io/file</module>
