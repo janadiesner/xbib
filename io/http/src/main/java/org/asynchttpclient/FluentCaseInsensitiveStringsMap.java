@@ -1,4 +1,3 @@
-
 package org.asynchttpclient;
 
 import static org.asynchttpclient.util.MiscUtil.isNonEmpty;
@@ -203,9 +202,6 @@ public class FluentCaseInsensitiveStringsMap implements Map<String, List<String>
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<String> put(String key, List<String> value) {
         if (key == null) {
@@ -218,9 +214,6 @@ public class FluentCaseInsensitiveStringsMap implements Map<String, List<String>
         return oldValue;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void putAll(Map<? extends String, ? extends List<String>> values) {
         replaceAll(values);
@@ -274,9 +267,6 @@ public class FluentCaseInsensitiveStringsMap implements Map<String, List<String>
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<String> remove(Object key) {
         if (key == null) {
@@ -289,66 +279,42 @@ public class FluentCaseInsensitiveStringsMap implements Map<String, List<String>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void clear() {
         keyLookup.clear();
         values.clear();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<Entry<String, List<String>>> iterator() {
         return Collections.unmodifiableSet(values.entrySet()).iterator();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<String> keySet() {
         return new LinkedHashSet<String>(keyLookup.values());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<Entry<String, List<String>>> entrySet() {
         return values.entrySet();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int size() {
         return values.size();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isEmpty() {
         return values.isEmpty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean containsKey(Object key) {
         return key != null && keyLookup.containsKey(key.toString().toLowerCase(Locale.US));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean containsValue(Object value) {
         return values.containsValue(value);
@@ -399,9 +365,6 @@ public class FluentCaseInsensitiveStringsMap implements Map<String, List<String>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<String> get(Object key) {
         if (key == null) {
@@ -418,9 +381,6 @@ public class FluentCaseInsensitiveStringsMap implements Map<String, List<String>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<List<String>> values() {
         return values.values();

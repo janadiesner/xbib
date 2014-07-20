@@ -89,9 +89,8 @@ public class FromEZBWeb extends Feeder {
         InputStream in = InputService.getInputStream(uri);
         NullWriter nw = new NullWriter();
         resourceContext.setNamespaceContext(namespaceContext);
-        final TurtleWriter turtle = new TurtleWriter()
-                .setContext(namespaceContext)
-                .output(nw);
+        final TurtleWriter turtle = new TurtleWriter(nw)
+                .setContext(namespaceContext);
         Iterator<String> it = readZDBIDs(new InputStreamReader(in, "UTF-8"));
         long counter = 0;
         while (it.hasNext()) {
@@ -166,8 +165,9 @@ public class FromEZBWeb extends Feeder {
                                             + (code2.isEmpty() ? "x" : code2)
                                             + (code3.isEmpty() ? "x" : code3))
                             .add("xbib:comment", comment);
-                    // turtle output plus Elasticsearch
-                    turtle.write(resource);
+                    // turtle
+                    turtle.write(resourceContext);
+                    // Elasticsearch
                     sink.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
                     counter++;
                     if (counter % 1000 == 0) {

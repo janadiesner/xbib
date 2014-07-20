@@ -1,18 +1,3 @@
-/*
- * Copyright 2010-2013 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
 package org.asynchttpclient.providers.netty.handler;
 
 import io.netty.channel.Channel;
@@ -35,13 +20,13 @@ import org.asynchttpclient.providers.netty.channel.Channels;
 import org.asynchttpclient.providers.netty.future.NettyResponseFuture;
 import org.asynchttpclient.providers.netty.future.NettyResponseFutures;
 import org.asynchttpclient.providers.netty.request.NettyRequestSender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 @Sharable
 public class NettyChannelHandler extends ChannelInboundHandlerAdapter {
 
-    static final Logger LOGGER = LoggerFactory.getLogger(NettyChannelHandler.class);
+    static final Logger logger = LoggerFactory.getLogger(NettyChannelHandler.class.getName());
 
     private final AsyncHttpClientConfig config;
     private final NettyRequestSender requestSender;
@@ -78,7 +63,7 @@ public class NettyChannelHandler extends ChannelInboundHandlerAdapter {
 
         } else if (attribute != DiscardEvent.INSTANCE) {
             try {
-                LOGGER.trace("Closing an orphan channel {}", ctx.channel());
+                logger.trace("Closing an orphan channel {}", ctx.channel());
                 ctx.channel().close();
             } catch (Throwable t) {
             }
@@ -94,12 +79,12 @@ public class NettyChannelHandler extends ChannelInboundHandlerAdapter {
         try {
             super.channelInactive(ctx);
         } catch (Exception ex) {
-            LOGGER.trace("super.channelClosed", ex);
+            logger.trace("super.channelClosed", ex);
         }
 
         channels.removeFromPool(ctx);
         Object attachment = Channels.getDefaultAttribute(ctx);
-        LOGGER.debug("Channel Closed: {} with attachment {}", ctx.channel(), attachment);
+        logger.debug("Channel Closed: {} with attachment {}", ctx.channel(), attachment);
 
         if (attachment instanceof Callback) {
             Callback callback = (Callback) attachment;
@@ -137,7 +122,7 @@ public class NettyChannelHandler extends ChannelInboundHandlerAdapter {
             return;
         }
 
-        LOGGER.debug("Unexpected I/O exception on channel {}", channel, cause);
+        logger.debug("Unexpected I/O exception on channel {}", channel, cause);
 
         try {
             if (cause instanceof ClosedChannelException) {
@@ -170,7 +155,7 @@ public class NettyChannelHandler extends ChannelInboundHandlerAdapter {
                 }
 
                 if (NettyResponseFutures.abortOnReadCloseException(cause) || NettyResponseFutures.abortOnWriteCloseException(cause)) {
-                    LOGGER.debug("Trying to recover from dead Channel: {}", channel);
+                    logger.debug("Trying to recover from dead Channel: {}", channel);
                     return;
                 }
             } else if (attribute instanceof Callback) {
@@ -182,10 +167,10 @@ public class NettyChannelHandler extends ChannelInboundHandlerAdapter {
 
         if (future != null) {
             try {
-                LOGGER.debug("Was unable to recover Future: {}", future);
+                logger.debug("Was unable to recover Future: {}", future);
                 channels.abort(future, cause);
             } catch (Throwable t) {
-                LOGGER.error(t.getMessage(), t);
+                logger.error(t.getMessage(), t);
             }
         }
 

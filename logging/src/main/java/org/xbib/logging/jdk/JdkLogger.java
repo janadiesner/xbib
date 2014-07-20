@@ -36,9 +36,7 @@ import org.xbib.logging.support.AbstractLogger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- */
+
 public class JdkLogger extends AbstractLogger {
 
     private final Logger logger;
@@ -49,21 +47,6 @@ public class JdkLogger extends AbstractLogger {
         super(prefix);
         this.logger = logger;
         this.name = name;
-    }
-
-    @Override
-    public void setLevel(String level) {
-        if ("error".equalsIgnoreCase(level)) {
-            logger.setLevel(Level.SEVERE);
-        } else if ("warn".equalsIgnoreCase(level)) {
-            logger.setLevel(Level.WARNING);
-        } else if ("info".equalsIgnoreCase(level)) {
-            logger.setLevel(Level.INFO);
-        } else if ("debug".equalsIgnoreCase(level)) {
-            logger.setLevel(Level.FINE);
-        } else if ("trace".equalsIgnoreCase(level)) {
-            logger.setLevel(Level.FINE);
-        }
     }
 
     @Override

@@ -1,15 +1,3 @@
-/*
- * Copyright (c) 2010-2012 Sonatype, Inc. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
 package org.asynchttpclient.util;
 
 import static org.asynchttpclient.util.MiscUtil.isNonEmpty;
@@ -27,17 +15,16 @@ import org.asynchttpclient.ProxyServer;
 import org.asynchttpclient.ProxyServer.Protocol;
 import org.asynchttpclient.ProxyServerSelector;
 import org.asynchttpclient.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 /**
  * Utilities for Proxy handling.
  *
- * @author cstamas
  */
 public class ProxyUtils {
 
-    private final static Logger log = LoggerFactory.getLogger(ProxyUtils.class);
+    private final static Logger logger = LoggerFactory.getLogger(ProxyUtils.class.getName());
 
     private static final String PROPERTY_PREFIX = "org.asynchttpclient.AsyncHttpClientConfig.proxy.";
 
@@ -205,7 +192,7 @@ public class ProxyUtils {
                         switch (proxy.type()) {
                             case HTTP:
                                 if (!(proxy.address() instanceof InetSocketAddress)) {
-                                    log.warn("Don't know how to connect to address " + proxy.address());
+                                    logger.warn("Don't know how to connect to address " + proxy.address());
                                 } else {
                                     InetSocketAddress address = (InetSocketAddress) proxy.address();
                                     return new ProxyServer(Protocol.HTTP, address.getHostName(), address.getPort());
@@ -213,7 +200,7 @@ public class ProxyUtils {
                             case DIRECT:
                                 return null;
                             default:
-                                log.warn("ProxySelector returned proxy type that we don't know how to use: " + proxy.type());
+                                logger.warn("ProxySelector returned proxy type that we don't know how to use: " + proxy.type());
                                 break;
                         }
                     }

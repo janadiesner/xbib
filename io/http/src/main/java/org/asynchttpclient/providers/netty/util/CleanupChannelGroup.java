@@ -40,17 +40,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Extension of {@link io.netty.channel.group.DefaultChannelGroup} that's used mainly as a cleanup container, where {@link #close()} is only
  * supposed to be called once.
  *
- * @author <a href="http://bruno.biasedbit.com/">Bruno de Carvalho</a>
  */
 public class CleanupChannelGroup extends DefaultChannelGroup {
 
-
-    // internal vars --------------------------------------------------------------------------------------------------
-
     private final AtomicBoolean closed = new AtomicBoolean(false);
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
-    // constructors ---------------------------------------------------------------------------------------------------
 
     public CleanupChannelGroup() {
         super(GlobalEventExecutor.INSTANCE);
@@ -59,8 +53,6 @@ public class CleanupChannelGroup extends DefaultChannelGroup {
     public CleanupChannelGroup(String name) {
         super(name, GlobalEventExecutor.INSTANCE);
     }
-
-    // DefaultChannelGroup --------------------------------------------------------------------------------------------
 
     @Override
     public ChannelGroupFuture close() {

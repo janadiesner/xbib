@@ -33,18 +33,15 @@ package org.xbib.oai.client;
 
 import org.testng.annotations.Test;
 import org.xbib.oai.OAIDateResolution;
-import org.xbib.oai.listrecords.ListRecordsListener;
+import org.xbib.oai.client.listrecords.ListRecordsListener;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.oai.listrecords.ListRecordsRequest;
+import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfMetadataHandler;
-import org.xbib.oai.rdf.RdfOutput;
 import org.xbib.oai.rdf.RdfResourceHandler;
-import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleLiteral;
 
 import javax.xml.namespace.QName;
@@ -64,10 +61,10 @@ public class DOAJClientTest {
 
         final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
         final RdfResourceHandler resourceHandler = new DOAJResourceHandler(metadataHandler.getResourceContext());
-        final RdfOutput out = new MyOutput(metadataHandler.getContext());
+        //final RdfOutput out = new MyOutput(metadataHandler.getContext());
 
-        metadataHandler.setHandler(resourceHandler)
-            .setOutput(out);
+        metadataHandler.setHandler(resourceHandler);
+            //.setOutput(out);
 
         OAIClient client = OAIClientFactory.newClient("DOAJ");
         ListRecordsRequest request = client.newListRecordsRequest()
@@ -127,7 +124,7 @@ public class DOAJClientTest {
         }
     }
 
-    class MyOutput extends RdfOutput {
+    /*class MyOutput extends RdfOutput {
 
         TurtleWriter writer;
 
@@ -145,6 +142,6 @@ public class DOAJClientTest {
             logger.info("out = {}", sw);
             return this;
         }
-    }
+    }*/
 
 }

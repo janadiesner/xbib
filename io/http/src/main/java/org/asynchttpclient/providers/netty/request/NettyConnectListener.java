@@ -1,19 +1,3 @@
-/*
- * Copyright 2010 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- *
- */
 package org.asynchttpclient.providers.netty.request;
 
 import io.netty.channel.Channel;
@@ -35,8 +19,8 @@ import org.asynchttpclient.providers.netty.channel.Channels;
 import org.asynchttpclient.providers.netty.future.NettyResponseFuture;
 import org.asynchttpclient.providers.netty.future.NettyResponseFutures;
 import org.asynchttpclient.util.ProxyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 /**
  * Non Blocking connect.
@@ -44,9 +28,13 @@ import org.slf4j.LoggerFactory;
 // FIXME Netty 3: NettyConnectListener don't need to be passed the request as
 // the future has it too
 final class NettyConnectListener<T> implements ChannelFutureListener {
-    private final static Logger logger = LoggerFactory.getLogger(NettyConnectListener.class);
+
+    private final static Logger logger = LoggerFactory.getLogger(NettyConnectListener.class.getName());
+
     private final AsyncHttpClientConfig config;
+
     private final NettyRequestSender requestSender;
+
     private final NettyResponseFuture<T> future;
 
     private NettyConnectListener(AsyncHttpClientConfig config, NettyRequestSender requestSender, NettyResponseFuture<T> future) {

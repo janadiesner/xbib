@@ -40,10 +40,10 @@ import org.xbib.rdf.Triple;
 import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResource;
-import org.xml.sax.InputSource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 public class GNDRdfXmlReaderTest {
@@ -58,11 +58,9 @@ public class GNDRdfXmlReaderTest {
             throw new IOException("file " + filename + " not found");
         }
         StringWriter sw = new StringWriter();
-        TurtleWriter writer  = new TurtleWriter()
-                .output(sw);
+        TurtleWriter writer  = new TurtleWriter(sw);
         RdfXmlReader reader = new RdfXmlReader();
-        reader.setTripleListener(writer);
-        reader.parse(new InputSource(in));
+        reader.parse(new InputStreamReader(in, "UTF-8"), writer);
         writer.close();
         logger.info("gnd = {}", sw.toString());
     }
@@ -76,8 +74,7 @@ public class GNDRdfXmlReaderTest {
         }
         TripleContentBuilder tripleContentBuilder = new TripleContentBuilder();
         RdfXmlReader reader = new RdfXmlReader();
-        reader.setTripleListener(tripleContentBuilder);
-        reader.parse(new InputSource(in));
+        reader.parse(new InputStreamReader(in, "UTF-8"), tripleContentBuilder);
     }
 
     class TripleContentBuilder implements TripleListener {

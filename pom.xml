@@ -78,7 +78,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>dd.MM.yyyy HH:mm</maven.build.timestamp.format>
         <java.compiler.source>1.7</java.compiler.source>
-        <elasticsearch.support.plugin.version>1.2.1.0</elasticsearch.support.plugin.version>
+        <elasticsearch.support.plugin.version>1.2.2.0</elasticsearch.support.plugin.version>
     </properties>
 
     <build>
@@ -588,22 +588,22 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.2</version>
+                <version>1.7.7</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>1.7.2</version>
-            </dependency>
-           <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>1.7.2</version>
+                <artifactId>slf4j-log4j2</artifactId>
+                <version>1.7.7</version>
             </dependency>
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.17</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>2.0</version>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
@@ -679,12 +679,17 @@
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <artifactId>slf4j-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -713,7 +718,6 @@
         <module>oai</module>
         <module>iso23950</module>
         <module>opensearch</module>
-        <module>syslog</module>
 
         <module>io/stream</module>
         <module>io/file</module>
@@ -727,7 +731,6 @@
         <module>elasticsearch/sru</module>
         <module>elasticsearch/oai</module>
         <module>elasticsearch/opensearch</module>
-        <module>elasticsearch/log4j</module>
 
         <module>web/federator</module>
         <module>web/dispatcher</module>

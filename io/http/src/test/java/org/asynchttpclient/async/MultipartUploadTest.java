@@ -1,15 +1,3 @@
-/*
- * Copyright (c) 2010-2012 Sonatype, Inc. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
 package org.asynchttpclient.async;
 
 import static org.asynchttpclient.async.util.TestUtils.*;
@@ -57,9 +45,6 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-/**
- * @author dominict
- */
 public abstract class MultipartUploadTest extends AbstractBasicTest {
     public static byte GZIPTEXT[] = new byte[] { 31, -117, 8, 8, 11, 43, 79, 75, 0, 3, 104, 101, 108, 108, 111, 46, 116, 120, 116, 0, -53, 72, -51, -55, -55, -25, 2, 0, 32, 48,
             58, 54, 6, 0, 0, 0 };
@@ -311,8 +296,6 @@ public abstract class MultipartUploadTest extends AbstractBasicTest {
 
     /**
      * Takes the content that is being passed to it, and streams to a file on disk
-     * 
-     * @author dominict
      */
     public static class MockMultipartUploadServlet extends HttpServlet {
 

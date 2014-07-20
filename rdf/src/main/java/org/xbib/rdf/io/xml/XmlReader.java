@@ -33,14 +33,13 @@ package org.xbib.rdf.io.xml;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 
 import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.io.Triplifier;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -54,7 +53,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @param <O>
  */
 public class XmlReader<S extends Identifier, P extends Property, O extends Node>
-        implements Closeable, XmlTriplifier<S, P, O> {
+        implements Closeable, Triplifier<S, P, O> {
 
     private InputSource source;
 
@@ -66,24 +65,11 @@ public class XmlReader<S extends Identifier, P extends Property, O extends Node>
 
     private boolean validate = false;
 
-    /**
-     * Set the triple listener that gets called every time a triple is read.
-     *
-     * @param listener the triple listener
-     */
-    @Override
-    public XmlReader setTripleListener(TripleListener listener) {
-        this.listener = listener;
-        return this;
-    }
-
-    @Override
-    public XmlReader setHandler(XmlHandler handler) {
+    public XmlReader<S, P, O> setHandler(XmlHandler handler) {
         this.handler = handler;
         return this;
     }
 
-    @Override
     public XmlHandler getHandler() {
         return handler;
     }
@@ -99,12 +85,8 @@ public class XmlReader<S extends Identifier, P extends Property, O extends Node>
     }
 
     @Override
-    public XmlReader parse(InputStream in) throws IOException {
-        return parse(new InputStreamReader(in, "UTF-8"));
-    }
-
-    @Override
-    public XmlReader parse(Reader reader) throws IOException {
+    public XmlReader parse(Reader reader, TripleListener<S, P, O> listener) throws IOException {
+        this.listener = listener;
         try {
             parse(new InputSource(reader));
         } catch (SAXException ex) {
@@ -113,12 +95,10 @@ public class XmlReader<S extends Identifier, P extends Property, O extends Node>
         return this;
     }
 
-    @Override
     public XmlReader parse(InputSource source) throws IOException, SAXException {
         return parse(XMLReaderFactory.createXMLReader(), source);
     }
 
-    @Override
     public XmlReader parse(XMLReader reader, InputSource source) throws IOException, SAXException {
         this.source = source;
         if (handler != null) {

@@ -42,15 +42,12 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
-import org.xbib.oai.listrecords.ListRecordsListener;
-import org.xbib.oai.listrecords.ListRecordsRequest;
+import org.xbib.oai.client.listrecords.ListRecordsListener;
+import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfMetadataHandler;
-import org.xbib.oai.rdf.RdfOutput;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.oai.xml.XmlMetadataHandler;
-import org.xbib.rdf.context.IRINamespaceContext;
-import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
@@ -77,7 +74,7 @@ public abstract class OAIHarvester extends Converter {
     private static Session<StringPacket> session;
 
     @Override
-    protected OAIHarvester prepare() {
+    protected OAIHarvester prepare() throws IOException {
         String[] inputs = settings.getAsArray("input");
         if (inputs == null) {
             throw new IllegalArgumentException("no input given");
@@ -147,18 +144,16 @@ public abstract class OAIHarvester extends Converter {
     protected MetadataHandler turtleMetadataHandler() {
         final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();
-        final RdfOutput rdfout = new TurtleOutput(metadataHandler.getContext());
         metadataHandler.setHandler(resourceHandler)
-                .setOutput(rdfout);
+                .setTripleLine(new TurtleWriter(writer));
         return metadataHandler;
     }
 
     protected MetadataHandler ntripleMetadataHandler() {
         final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();
-        final RdfOutput rdfout = new NTripleOutput();
         metadataHandler.setHandler(resourceHandler)
-                .setOutput(rdfout);
+                .setTripleLine(new NTripleWriter(writer));
         return metadataHandler;
     }
 
@@ -186,40 +181,35 @@ public abstract class OAIHarvester extends Converter {
         }
     }
 
-    protected class TurtleOutput extends RdfOutput {
+   /* protected class TurtleWriterOutput extends TurtleWriter {
 
-        StringWriter sw;
-
-        TurtleWriter writer;
-
-        TurtleOutput(IRINamespaceContext context) {
+        TurtleWriterOutput(Writer writer, IRINamespaceContext context) {
+            super(writer);
             try {
-                this.writer = new TurtleWriter()
-                        .output(sw)
-                        .setContext(context)
-                        .writeNamespaces();
+                setContext(context);
+                writeNamespaces();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
         }
 
         @Override
-        public RdfOutput output(ResourceContext resourceContext) throws IOException {
-            writer.write(resourceContext.getResource());
+        public TurtleWriterOutput write(ResourceContext resourceContext) throws IOException {
+            super.write(resourceContext);
             StringPacket p = session.newPacket();
             p.name(resourceContext.getResource().id().getASCIIAuthority());
-            String s = sw.toString();
+            String s = getWriter().toString();
             // for Unicode in non-canonical form, normalize it here
             s = Normalizer.normalize(s, Normalizer.Form.NFC);
             p.packet(s);
             session.write(p);
             sw = new StringWriter();
-            writer.output(sw);
+            writer.write(sw);
             return this;
         }
-    }
+    }*/
 
-    protected class NTripleOutput extends RdfOutput {
+    /*protected class NTripleOutput extends RdfOutput {
 
         StringWriter sw;
 
@@ -244,5 +234,5 @@ public abstract class OAIHarvester extends Converter {
             writer.output(sw);
             return this;
         }
-    }
+    }*/
 }

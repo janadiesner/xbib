@@ -1,22 +1,9 @@
-/*
- * Copyright (c) 2010-2012 Sonatype, Inc. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
-
 package org.asynchttpclient.generators;
 
 import org.asynchttpclient.Body;
 import org.asynchttpclient.BodyGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,10 +18,10 @@ import java.nio.ByteBuffer;
  */
 public class InputStreamBodyGenerator implements BodyGenerator {
 
+    private final static Logger logger = LoggerFactory.getLogger(InputStreamBodyGenerator.class.getName());
     private final static byte[] END_PADDING = "\r\n".getBytes();
     private final static byte[] ZERO = "0".getBytes();
     private final InputStream inputStream;
-    private final static Logger logger = LoggerFactory.getLogger(InputStreamBodyGenerator.class);
     private boolean patchNettyChunkingIssue = false;
 
     public InputStreamBodyGenerator(InputStream inputStream) {
@@ -49,9 +36,6 @@ public class InputStreamBodyGenerator implements BodyGenerator {
         return inputStream;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Body createBody() throws IOException {
         return new ISBody();

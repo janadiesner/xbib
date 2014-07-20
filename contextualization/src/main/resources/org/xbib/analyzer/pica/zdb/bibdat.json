@@ -6,7 +6,11 @@
             "001$D$0",
             "001$U$0",
             "001$X$0"
-        ]
+        ],
+        "subfields" : {
+           "0" : "identifierForTheSource",
+           "t" : null
+        }
     },
     "RecordIdentifier" : {
         "values"  :[
@@ -33,7 +37,9 @@
             "008$H$bdef",
             "008$H$def",
             "008$H$cde",
-            "008$H$ce"
+            "008$H$ce",
+            "008$H$ceh",
+            "008$H$d"
         ],
         "subfields" : {
             "a" : "identifierAuthorityBIK",
@@ -194,7 +200,39 @@
             "032$P$2abdehpz",
             "032$P$2bdefghpz",
             "032$P$2bdefgnp",
-            "032$P$2abdeiklnp"
+            "032$P$2abdeiklnp",
+            "032$P$23abdefhijnopz",
+            "032$P$23abdefijopz",
+            "032$P$23abdefklnp",
+            "032$P$23abdehijp",
+            "032$P$23abdeiopz",
+            "032$P$23abdeip",
+            "032$P$23abdeklpz",
+            "032$P$23abefjp",
+            "032$P$23bdefgp",
+            "032$P$2abde",
+            "032$P$2abdefgijklnp",
+            "032$P$2abdefgijnp",
+            "032$P$2abdefginop",
+            "032$P$2abdefgklnp",
+            "032$P$2abdefhijnopz",
+            "032$P$2abdefhiklnopz",
+            "032$P$2abdefhiklnpz",
+            "032$P$2abdefhinopz",
+            "032$P$2abdefhjklnop",
+            "032$P$2abdefhklnpz",
+            "032$P$2abdefhnpz",
+            "032$P$2abdefiklnopz",
+            "032$P$2abdefiklop",
+            "032$P$2abdefin",
+            "032$P$2abdefklnop",
+            "032$P$2abdegpz",
+            "032$P$2abdehklp",
+            "032$P$2abdeiop",
+            "032$P$2abefhjkln",
+            "032$P$2abefp",
+            "032$P$2bdefghp",
+            "032$P$2begp"
         ],
         "_predicate" : "LocationTypeResidence",
         "subfields" : {
@@ -243,7 +281,9 @@
             "035$I$ad",
             "035$I$aef",
             "035$I$d",
-            "035$I$abc"
+            "035$I$abc",
+            "035$I$a",
+            "035$I$c"
         ],
         "subfields" : {
             "a" : "libraryServiceRegion",
@@ -370,7 +410,9 @@
             "035$O$abcd",
             "035$O$abd",
             "035$O$acd",
-            "035$O$bd"
+            "035$O$bd",
+            "035$O$a",
+            "035$O$ab"
         ],
         "subfields" : {
             "a" : "mediaTransportType",
@@ -422,7 +464,12 @@
             "035$B$acdefgk",
             "035$B$acdefhi",
             "035$B$acdfk",
-            "035$B$abckl"
+            "035$B$abckl",
+            "035$B$abcdefghil",
+            "035$B$abcghi",
+            "035$B$acdefghk",
+            "035$B$acdehk",
+            "035$B$acghikl"
         ],
         "_predicate" : "code",
         "subfields" : {
@@ -525,7 +572,43 @@
             "035$E$abfgi",
             "035$E$adfgh",
             "035$E$adfghi",
-            "035$E$afk"
+            "035$E$afk",
+            "035$E$abcdefghil",
+            "035$E$abcdefghkl",
+            "035$E$abcdefghl",
+            "035$E$abcdfghil",
+            "035$E$abcdfghkl",
+            "035$E$abcdfghl",
+            "035$E$abcdfgil",
+            "035$E$abcdfl",
+            "035$E$abcefghikl",
+            "035$E$abcefghil",
+            "035$E$abcefghkl",
+            "035$E$abcefghl",
+            "035$E$abcefkl",
+            "035$E$abcfghikl",
+            "035$E$abcfghil",
+            "035$E$abcfghl",
+            "035$E$abcfgil",
+            "035$E$abcfgl",
+            "035$E$abdfgi",
+            "035$E$abfh",
+            "035$E$acdfghikl",
+            "035$E$acdfghil",
+            "035$E$acdfghkl",
+            "035$E$acdfghl",
+            "035$E$acdfgikl",
+            "035$E$acdfgil",
+            "035$E$acdfgkl",
+            "035$E$acdfgl",
+            "035$E$acdfkl",
+            "035$E$acefghikl",
+            "035$E$acefghil",
+            "035$E$acefghkl",
+            "035$E$acefghl",
+            "035$E$acfghl",
+            "035$E$adf",
+            "035$E$afgi"
         ],
         "subfields" : {
             "a" : "organizationState",
@@ -537,7 +620,8 @@
             "g" : "fundingType",
             "h" : "organizationSize",
             "i" : "serviceRestrictions",
-            "k" : "formerSigel"
+            "k" : "formerSigel",
+            "l" : "licenseInformation"
         },
         "organizationState" : {
             "H" : "Adresse",
@@ -651,13 +735,6 @@
          ],
          "subfields" : {
             "a" : "comment"
-         }
-    },
-    "License" : {
-         "values" : [
-         ],
-         "subfields" : {
-             "a" : "license"
          }
     },
     "Skip" : {

@@ -46,19 +46,15 @@ public abstract class LoggerFactory {
         } catch (Throwable e1) {
             // no slf4j
             try {
-                Class<?> loggerClazz = Class.forName("org.apache.log4j.Logger");
-                // below will throw a NoSuchMethod failure with using slf4j log4j bridge
-                loggerClazz.getMethod("setLevel", Class.forName("org.apache.log4j.Level"));
+                Class.forName("org.apache.log4j.logging.Logger");
                 defaultFactory = new Log4jLoggerFactory();
             } catch (Exception e) {
-                // no log4j
+                // no log4j 2
+                defaultFactory = new JdkLoggerFactory();
             }
         }
     }
 
-    /**
-     * Changes the default factory.
-     */
     public static void setDefaultFactory(LoggerFactory defaultFactory) {
         if (defaultFactory == null) {
             throw new NullPointerException("defaultFactory");

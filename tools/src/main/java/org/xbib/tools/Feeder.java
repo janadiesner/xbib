@@ -113,10 +113,10 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
     protected Feeder<T, R, P> cleanup() {
         super.cleanup();
         if (output != null) {
-            logger.info("flush");
-            output.flush();
-            logger.info("waiting for responses");
             try {
+                logger.info("flush");
+                output.flushIngest();
+                logger.info("waiting for responses");
                 output.waitForResponses(TimeValue.timeValueSeconds(60));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

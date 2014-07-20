@@ -1,28 +1,13 @@
-/*
- * Copyright 2010 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- *
- */
 package org.asynchttpclient;
 
 import org.asynchttpclient.filter.FilterContext;
 import org.asynchttpclient.filter.FilterException;
 import org.asynchttpclient.filter.RequestFilter;
 import org.asynchttpclient.resumable.ResumableAsyncHandler;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+
 import java.io.Closeable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -140,6 +125,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class AsyncHttpClient implements Closeable {
 
+    private final static Logger logger = LoggerFactory.getLogger(AsyncHttpClient.class.getName());
+
     /**
      * Providers that will be searched for, on the classpath, in order when no
      * provider is explicitly specified by the developer.
@@ -150,13 +137,11 @@ public class AsyncHttpClient implements Closeable {
 
     private final AsyncHttpProvider httpProvider;
     private final AsyncHttpClientConfig config;
-    private final static Logger logger = LoggerFactory.getLogger(AsyncHttpClient.class);
     private final AtomicBoolean isClosed = new AtomicBoolean(false);
 
     /**
      * Default signature calculator to use for all requests constructed by this client instance.
      *
-     * @since 1.1
      */
     protected SignatureCalculator signatureCalculator;
 

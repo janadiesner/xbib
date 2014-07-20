@@ -36,12 +36,17 @@ import org.xbib.oai.OAIConstants;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.OAIRequest;
 import org.xbib.oai.OAISession;
+import org.xbib.oai.client.listrecords.ListRecordsListener;
+import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.util.DateUtil;
 import org.xbib.io.http.netty.NettyHttpRequest;
 import org.xbib.oai.util.ResumptionToken;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
+
+import static com.google.common.collect.Lists.newLinkedList;
 
 /**
  * Client OAI request
@@ -70,19 +75,19 @@ public class ClientOAIRequest<R extends ClientOAIRequest>
     @Override
     public R setUser(String user) {
         super.setUser(user);
-        return (R)this;
+        return (R) this;
     }
 
     @Override
     public R setPassword(String password) {
         super.setPassword(password);
-        return (R)this;
+        return (R) this;
     }
 
     @Override
     public R setURL(URI uri) {
         super.setURL(uri);
-        return (R)this;
+        return (R) this;
     }
 
     @Override
@@ -90,13 +95,13 @@ public class ClientOAIRequest<R extends ClientOAIRequest>
         if (value != null && value.length() > 0) {
             super.addParameter(name, value);
         }
-        return (R)this;
+        return (R) this;
     }
 
     public R setSet(String set) {
         this.set = set;
         addParameter(OAIConstants.SET_PARAMETER, set);
-        return (R)this;
+        return (R) this;
     }
 
     public String getSet() {
@@ -106,7 +111,7 @@ public class ClientOAIRequest<R extends ClientOAIRequest>
     public R setMetadataPrefix(String prefix) {
         this.metadataPrefix = prefix;
         addParameter(OAIConstants.METADATA_PREFIX_PARAMETER, prefix);
-        return (R)this;
+        return (R) this;
     }
 
     public String getMetadataPrefix() {
@@ -119,7 +124,7 @@ public class ClientOAIRequest<R extends ClientOAIRequest>
                 resolution == OAIDateResolution.DAY ? DateUtil.ISO_FORMAT_DAYS :
                         DateUtil.ISO_FORMAT_SECONDS
         ));
-        return (R)this;
+        return (R) this;
     }
 
     public Date getFrom() {
@@ -132,7 +137,7 @@ public class ClientOAIRequest<R extends ClientOAIRequest>
                 resolution == OAIDateResolution.DAY ? DateUtil.ISO_FORMAT_DAYS :
                         DateUtil.ISO_FORMAT_SECONDS
         ));
-        return (R)this;
+        return (R) this;
     }
 
     public Date getUntil() {
@@ -144,7 +149,7 @@ public class ClientOAIRequest<R extends ClientOAIRequest>
         if (token != null) {
             addParameter(OAIConstants.RESUMPTION_TOKEN_PARAMETER, token.toString());
         }
-        return (R)this;
+        return (R) this;
     }
 
     public ResumptionToken getResumptionToken() {
@@ -153,11 +158,79 @@ public class ClientOAIRequest<R extends ClientOAIRequest>
 
     public R setRetry(boolean retry) {
         this.retry = retry;
-        return (R)this;
+        return (R) this;
     }
 
     public boolean isRetry() {
         return retry;
     }
 
+    class GetRecord extends ClientOAIRequest<GetRecord> {
+
+        public GetRecord(OAISession session) {
+            super(session);
+            addParameter(VERB_PARAMETER, GET_RECORD);
+        }
+    }
+
+    class Identify extends ClientOAIRequest<Identify> {
+
+        public Identify(OAISession session) {
+            super(session);
+            addParameter(VERB_PARAMETER, IDENTIFY);
+        }
+    }
+
+    class ListIdentifiers extends ClientOAIRequest<ListIdentifiers> {
+
+        public ListIdentifiers(OAISession session) {
+            super(session);
+            addParameter(VERB_PARAMETER, LIST_IDENTIFIERS);
+        }
+    }
+
+    class ListMetadataFormats extends ClientOAIRequest<ListMetadataFormats> {
+
+        public ListMetadataFormats(OAISession session) {
+            super(session);
+            addParameter(VERB_PARAMETER, LIST_METADATA_FORMATS);
+        }
+    }
+
+    class ListRecordsRequest extends ClientOAIRequest<ListRecordsRequest> {
+
+        private List<ListRecordsListener> listeners = newLinkedList();
+
+        private List<MetadataHandler> handlers = newLinkedList();
+
+        public ListRecordsRequest(OAISession session) {
+            super(session);
+            addParameter(OAIConstants.VERB_PARAMETER, LIST_RECORDS);
+        }
+
+        public void addListener(ListRecordsListener listener) {
+            listeners.add(listener);
+        }
+
+        public List<ListRecordsListener> getListeners() {
+            return listeners;
+        }
+
+        public void addHandler(MetadataHandler handler) {
+            handlers.add(handler);
+        }
+
+        public List<MetadataHandler> getHandlers() {
+            return handlers;
+        }
+
+    }
+
+    class ListSetsRequest extends ClientOAIRequest<ListSetsRequest> {
+
+        public ListSetsRequest(OAISession session) {
+            super(session);
+            addParameter(VERB_PARAMETER, LIST_SETS);
+        }
+    }
 }

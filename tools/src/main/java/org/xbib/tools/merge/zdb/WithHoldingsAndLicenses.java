@@ -75,7 +75,7 @@ import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 
 /**
- * Merge ZDB title and holdings and EZB licenses
+ * Merge ZDB title and holdings and EZB licenses (without timeline)
  */
 public class WithHoldingsAndLicenses
         extends QueuePipelineExecutor<Boolean, Manifestation, WithHoldingsAndLicensesPipeline, SearchHitPipelineElement>
@@ -84,8 +84,6 @@ public class WithHoldingsAndLicenses
     private final static Logger logger = LoggerFactory.getLogger(WithHoldingsAndLicenses.class.getSimpleName());
 
     private static Set<String> processed;
-
-    private static Set<String> timelines;
 
     private static Set<String> indexed;
 
@@ -145,7 +143,6 @@ public class WithHoldingsAndLicenses
         logger.info("ISIL blacklist prepared");
 
         processed = newSetFromMap(new ConcurrentHashMap<String, Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
-        timelines = newSetFromMap(new ConcurrentHashMap<String, Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
         indexed = newSetFromMap(new ConcurrentHashMap<String, Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
         skipped = newSetFromMap(new ConcurrentHashMap<String, Boolean>(16, 0.75f, settings.getAsInt("concurrency", 1)));
 
@@ -292,9 +289,9 @@ public class WithHoldingsAndLicenses
                     count++;
                     long percent = count * 100 / total;
                     if (percent != lastpercent && logger.isInfoEnabled()) {
-                        logger.info("{}/{} {}% processed={} timelines={} indexed={} skipped={}",
+                        logger.info("{}/{} {}% processed={} indexed={} skipped={}",
                                 count, total, percent,
-                                processed.size(), timelines.size(), indexed.size(), skipped.size());
+                                processed.size(), indexed.size(), skipped.size());
                         for (Pipeline p : getPipelines()) {
                             logger.info("{} throughput={} {} {} mean={}",
                                     p.toString(),
@@ -395,10 +392,6 @@ public class WithHoldingsAndLicenses
 
     public Set<String> processed() {
         return processed;
-    }
-
-    public Set<String> timelines() {
-        return timelines;
     }
 
     public Set<String> indexed() {

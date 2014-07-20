@@ -46,19 +46,25 @@ import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.IRINamespaceContext;
-import org.xbib.rdf.simple.SimpleResource;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.simple.SimpleResourceContext;
 
 public class TurtleTest<S extends Identifier, P extends Property, O extends Node>
         extends Assert {
 
     private final Logger logger = LoggerFactory.getLogger(TurtleTest.class.getName());
 
+    @Test
     public void testTurtleGND() throws Exception {
+        IRINamespaceContext context = IRINamespaceContext.newInstance();
+        context.addNamespace("gnd", "http://d-nb.info/gnd/");
         InputStream in = getClass().getResourceAsStream("GND.ttl");
-        TurtleReader reader = new TurtleReader(IRI.create("http://d-nb.info/gnd/"));
-        reader.parse(in);
+        TurtleReader reader = new TurtleReader().setBaseIRI(IRI.create("http://d-nb.info/gnd/"))
+                .context(context);
+        reader.parse(new InputStreamReader(in, "UTF-8"), null);
     }
 
+    @Test
     public void testTurtleReader() throws Exception {
         StringBuilder sb = new StringBuilder();
         String filename = "turtle-demo.ttl";
@@ -73,25 +79,25 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         }
         reader.close();
         String s1 = sb.toString().trim();
-        Resource<S, P, O> resource = createResource();
-        StringWriter sw = new StringWriter();
+        ResourceContext<Resource<S, P, O>> resourceContext = createResourceContext();
 
         IRINamespaceContext context = IRINamespaceContext.newInstance();
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         context.addNamespace("dcterms", "http://purl.org/dc/terms/");
 
-        new TurtleWriter()
-            .output(sw)
+        StringWriter sw = new StringWriter();
+        new TurtleWriter(sw)
             .setContext(context)
             .writeNamespaces()
-            .write(resource);
+            .write(resourceContext);
         String s2 = sw.toString().trim();
         assertEquals(s2, s1);
     }
 
-    private Resource createResource() {
-        Resource<S, P, O> resource = new SimpleResource()
-                .id(IRI.create("urn:doc1"));
+    private ResourceContext<Resource<S, P, O>> createResourceContext() {
+        SimpleResourceContext<S, P, O> context = new SimpleResourceContext();
+        Resource<S, P, O> resource = context.newResource();
+        resource.id(IRI.create("urn:doc1"));
         resource.add("dc:creator", "Smith");
         resource.add("dc:creator", "Jones");
         Resource r = resource.newResource("dcterms:hasPart")
@@ -103,21 +109,21 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         r = resource.newResource("dcterms:isPartOf")
                 .add("dc:title", "another")
                 .add("dc:title", "title");
-        return resource;
+        return context;
     }
 
     public void testTurtleWrite() throws Exception {
-        Resource resource = createResource2();
+        ResourceContext<Resource<S, P, O>> resourceContext = createResourceContext2();
         StringWriter sw = new StringWriter();
-        TurtleWriter t = new TurtleWriter()
-                .output(sw)
-                .write(resource);
+        TurtleWriter t = new TurtleWriter(sw)
+                .write(resourceContext);
         sw.toString().trim();
     }
 
-    private Resource<S, P, O> createResource2() {
-        Resource<S, P, O> r = new SimpleResource()
-                .id(IRI.create("urn:res"))
+    private ResourceContext<Resource<S, P, O>> createResourceContext2() {
+        SimpleResourceContext<S, P, O> context = new SimpleResourceContext();
+        Resource<S, P, O> r = context.newResource();
+        r.id(IRI.create("urn:res"))
                 .add("dc:title", "Hello")
                 .add("dc:title", "World")
                 .add("xbib:person", "Jörg Prante")
@@ -137,23 +143,23 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         Resource<S, P, O> r3 = r.newResource("urn:res3")
                 .add("property5", "value5")
                 .add("property6", "value6");
-        return r;
+        return context;
     }
 
 
     @Test
     public void testTurtleResourceIndent() throws Exception {
-        Resource resource = createNestedResources();
+        ResourceContext<Resource<S, P, O>> resource = createNestedResources();
         StringWriter sw = new StringWriter();
-        TurtleWriter t = new TurtleWriter()
-                .output(sw)
+        TurtleWriter t = new TurtleWriter(sw)
                 .write(resource);
         logger.info(sw.toString().trim());
     }
 
-    private Resource<S, P, O> createNestedResources() {
-        Resource<S, P, O> r = new SimpleResource()
-                .id(IRI.create("urn:res"))
+    private ResourceContext<Resource<S, P, O>> createNestedResources() {
+        SimpleResourceContext<S, P, O> context = new SimpleResourceContext();
+        Resource<S, P, O> r = context.newResource();
+        r.id(IRI.create("urn:res"))
                 .add("dc:title", "Hello")
                 .add("dc:title", "World")
                 .add("xbib:person", "Jörg Prante")
@@ -173,7 +179,7 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         Resource<S, P, O> r3 = r.newResource("urn:res3")
                 .add("property5", "value5")
                 .add("property6", "value6");
-        return r;
+        return context;
     }
 
 

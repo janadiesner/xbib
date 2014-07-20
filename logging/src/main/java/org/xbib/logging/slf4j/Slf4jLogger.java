@@ -34,9 +34,6 @@ package org.xbib.logging.slf4j;
 import org.slf4j.Logger;
 import org.xbib.logging.support.AbstractLogger;
 
-/**
- *
- */
 public class Slf4jLogger extends AbstractLogger {
 
     private final Logger logger;
@@ -44,11 +41,6 @@ public class Slf4jLogger extends AbstractLogger {
     public Slf4jLogger(String prefix, Logger logger) {
         super(prefix);
         this.logger = logger;
-    }
-
-    @Override
-    public void setLevel(String level) {
-        // can't set it in slf4j...
     }
 
     @Override

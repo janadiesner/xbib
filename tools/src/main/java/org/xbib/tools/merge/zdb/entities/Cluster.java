@@ -31,140 +31,293 @@
  */
 package org.xbib.tools.merge.zdb.entities;
 
+import org.elasticsearch.common.collect.ImmutableSet;
+import org.xbib.elements.support.EnumerationAndChronology;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.newTreeMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.google.common.collect.Sets.newTreeSet;
 
 public class Cluster extends TreeSet<Manifestation> {
 
-    private final boolean isNewspaper;
+    private final static Logger logger = LoggerFactory.getLogger(TimeLine.class.getName());
 
-    private final boolean isDatabase;
+    private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 
-    private final boolean isWebsite;
+    private Integer firstDate;
 
-    private Set<TimeLine> timeLines;
+    private Integer lastDate;
+
+    private Map<Integer, Set<Holding>> holdingsByDate;
+
+    private Map<Integer, Set<License>> licensesByDate;
 
     public Cluster(Collection<Manifestation> c) {
         super(c);
-        this.isNewspaper = c.stream().anyMatch(Manifestation::isNewspaper);
-        this.isDatabase = c.stream().anyMatch(Manifestation::isDatabase);
-        this.isWebsite = c.stream().anyMatch(Manifestation::isWebsite);
+        findFirstAndLastDate();
     }
 
-    public boolean isNewspaper() {
-        return isNewspaper;
+    public Map<Integer, Set<Holding>> getHoldingsByDate() {
+        return holdingsByDate;
     }
 
-    public boolean isDatabase() {
-        return isDatabase;
+    public Map<Integer, Set<License>> getLicensesByDate() {
+        return licensesByDate;
     }
 
-    public boolean isWebsite() {
-        return isWebsite;
-    }
-
-    public Set<TimeLine> timeLines() {
-        if (this.timeLines == null) {
-            this.timeLines = makeTimeLines();
-        }
-        return timeLines;
-    }
-
-    public Set<Manifestation> notInTimeLines() {
-        if (timeLines == null) {
-            return null;
-        }
-        // concatenate all timelines. Slow.
-        List<Manifestation> list = newLinkedList();
-        timeLines.forEach(list::addAll);
-        Set<Manifestation> candidates = newHashSet(this);
-        candidates.removeAll(list);
-        return candidates;
-    }
-
-    private Set<TimeLine> makeTimeLines() {
-        LinkedList<Manifestation> manifestations = newLinkedList(this);
-        // sort by first publication date
-        Set<TimeLine> timeLines = newTreeSet(TimeLine.getTimelineComparator());
-        while (!manifestations.isEmpty()) {
-            Manifestation manifestation = manifestations.removeFirst();
-            Set<Manifestation> timeline = newTreeSet(Manifestation.getTimeComparator());
-            timeline.add(manifestation);
-            // make a time line
-            makeTimeLine(manifestation, timeline);
-            // add neighborhood to timeline
-            addNeighborTimeLines(manifestation, timeline);
-            // split time line by country marker (only print)
-            List<TimeLine> countries = splitIntoCountrySegments(new TimeLine(timeline));
-            timeLines.addAll(countries);
-            manifestations.removeAll(timeline);
-        }
-        return timeLines;
-    }
-
-    private final static String[] timelineRelations = new String[]{
-            "precededBy",
-            "succeededBy",
-            "hasPrintEdition",
-            "hasOnlineEdition"
-    };
-
-    private void addNeighborTimeLines(Manifestation manifestation, Set<Manifestation> result) {
-        // check all outgoing "has..." relations and make time lines of them
-        synchronized (manifestation.getRelatedManifestations()) {
-            manifestation.getRelatedManifestations().keySet().stream().filter(relation -> relation.startsWith("has")).forEach(relation -> {
-                Set<Manifestation> relatedNeighbors = manifestation.getRelatedManifestations().get(relation);
-                for (Manifestation neighbor : relatedNeighbors) {
-                    TreeSet<Manifestation> children = newTreeSet(Manifestation.getTimeComparator());
-                    children.add(neighbor);
-                    makeTimeLine(neighbor, children);
-                    result.addAll(children);
-                }
-            });
-        }
-    }
-
-    private void makeTimeLine(Manifestation manifestation, Set<Manifestation> result) {
-        Set<Manifestation> set = newTreeSet();
-        for (String relation : timelineRelations) {
-            set.addAll(manifestation.getRelatedManifestations().get(relation));
-        }
-        set.removeAll(result);
-        result.addAll(set);
-        for (Manifestation m : set) {
-            makeTimeLine(m, result);
-        }
-    }
-
-    private List<TimeLine> splitIntoCountrySegments(TimeLine manifestations) {
-        List<TimeLine> countrySegments = newLinkedList();
-        Set<Manifestation> countrySegment = newTreeSet(Manifestation.getTimeComparator());
-        Iterator<Manifestation> it = manifestations.iterator();
-        Manifestation m = it.next();
-        countrySegment.add(m);
-        String country = m.country().toString();
-        while (it.hasNext()) {
-            String carrier = m.carrierType();
-            m = it.next();
-            if (carrier.equals(m.carrierType()) && !country.equals(m.country().toString())) {
-                // create new country segment
-                country = m.country().toString();
-                countrySegments.add(new TimeLine(countrySegment,
-                        manifestations.getFirstDate(), manifestations.getLastDate()));
-                countrySegment = newTreeSet(Manifestation.getTimeComparator());
+    public void setHoldings(Set<Holding> holdings) {
+        holdingsByDate = newTreeMap();
+        for (Holding holding : holdings) {
+            if (holding.isDeleted()) {
+                continue;
             }
-            countrySegment.add(m);
+            List<Integer> dates = null;
+            // check for our generated dates
+            Object o = holding.map().get("dates");
+            if (o != null) {
+                if (!(o instanceof List)) {
+                    o = Arrays.asList(o);
+                }
+                dates = newLinkedList();
+                dates.addAll((List<Integer>) o);
+            } else {
+                // let's parse dates
+                o = holding.map().get("FormattedEnumerationAndChronology");
+                if (o != null) {
+                    if (!(o instanceof List)) {
+                        o = Arrays.asList(o);
+                    }
+                    dates = parseDates((List<Map<String, Object>>) o);
+                } else {
+                    o = holding.map().get("NormalizedHolding");
+                    if (o != null) {
+                        if (!(o instanceof List)) {
+                            o = Arrays.asList(o);
+                        }
+                        dates = parseDates((List<Map<String, Object>>) o);
+                    }
+                }
+            }
+            if (dates == null || dates.isEmpty()) {
+                // no dates, or unparseable dates. Save as "default holdings" at -1
+                Set<Holding> set = holdingsByDate.get(-1);
+                if (set == null) {
+                    set = newHashSet();
+                }
+                set.add(holding);
+                holdingsByDate.put(-1, set);
+            } else {
+                Collection<Integer> invalid = newLinkedList();
+                for (Integer date : dates) {
+                    if (((firstDate != null) && (date < firstDate)) ||
+                            (lastDate != null && (date > lastDate))) {
+                        invalid.add(date);
+                        continue;
+                    }
+                    // there might be more holdings than one per date
+                    Set<Holding> set = holdingsByDate.get(date);
+                    if (set == null) {
+                        set = newHashSet();
+                    }
+                    set.add(holding);
+                    holdingsByDate.put(date, set);
+                }
+                if (!invalid.isEmpty()) {
+                    logger.debug("dates {} in holdings for {} out of range {}-{}",
+                            invalid, holding.parent(), firstDate, lastDate);
+                }
+            }
         }
-        countrySegments.add(new TimeLine(countrySegment, manifestations.getFirstDate(), manifestations.getLastDate()));
-        return countrySegments;
     }
 
+    public void setLicensesAndIndicators(Set<License> licenses) {
+        licensesByDate = newTreeMap();
+        if (licenses == null) {
+            return;
+        }
+        for (License license : licenses) {
+            if (license.isDeleted()) {
+                continue;
+            }
+            Collection<Integer> invalid = newHashSet();
+            for (Integer date : license.dates()) {
+                if (((firstDate != null) && (date < firstDate)) ||
+                        (lastDate != null && (date > lastDate))) {
+                    invalid.add(date);
+                    continue;
+                }
+                Set<License> l = licensesByDate.get(date);
+                if (l == null) {
+                    l = newHashSet();
+                }
+                l.add(license);
+                licensesByDate.put(date, l);
+            }
+            if (!invalid.isEmpty()) {
+                logger.debug("dates {} in license for {} out of range {}-{}",
+                        invalid, license.parent(), firstDate, lastDate);
+            }
+        }
+    }
+
+    /**
+     * Iterate through all dates and make the available services.
+     * Concatenate services of same institution.
+     */
+    public void attachServicesToManifestations() {
+        Set<Integer> dates = newTreeSet();
+        if (holdingsByDate != null) {
+            dates.addAll(holdingsByDate.keySet());
+        }
+        if (licensesByDate != null) {
+            dates.addAll(licensesByDate.keySet());
+        }
+        for (Integer date : dates) {
+            Map<String, List<Holding>> services = newHashMap();
+            Set<Holding> holdings = holdingsByDate.get(date);
+            if (holdings != null) {
+                for (Holding holding : holdings) {
+                    String isil = holding.getISIL();
+                    if (isil == null) {
+                        continue;
+                    }
+                    List<Holding> list = services.get(isil);
+                    if (list == null) {
+                        list = newLinkedList();
+                        services.put(isil, list);
+                    }
+                    list.add(holding);
+                    for (Manifestation parent : holding.getManifestations()) {
+                        parent.addRelatedVolume(date, holding);
+                        Set<Manifestation> online;
+                        synchronized (parent.getRelatedManifestations()) {
+                            // copy print holding over to online manifestation if available
+                            online = ImmutableSet.copyOf(parent.getRelatedManifestations().get("hasOnlineEdition"));
+                        }
+                        if (online != null) {
+                            // almost sure we have only one online manifestation...
+                            for (Manifestation m : online) {
+                                m.addRelatedVolume(date, holding);
+                            }
+                        }
+                    }
+                }
+            }
+            Set<License> licenses = licensesByDate.get(date);
+            if (licenses != null) {
+                for (License license : licenses) {
+                    String isil = license.getISIL();
+                    if (isil == null) {
+                        continue;
+                    }
+                    List<Holding> list = services.get(isil);
+                    if (list == null) {
+                        list = newLinkedList();
+                        services.put(isil, list);
+                    }
+                    list.add(license);
+                    for (Manifestation parent : license.getManifestations()) {
+                        parent.addRelatedVolume(date, license);
+                        Set<Manifestation> print;
+                        synchronized (parent.getRelatedManifestations()) {
+                            // copy online license over to print manifestation if available
+                            print = ImmutableSet.copyOf(parent.getRelatedManifestations().get("hasPrintEdition"));
+                        }
+                        if (print != null) {
+                            for (Manifestation m : print) {
+                                m.addRelatedVolume(date, license);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private List<Integer> parseDates(List<Map<String, Object>> groups) {
+        List<Integer> begin = newLinkedList();
+        List<Integer> end = newLinkedList();
+        List<String> beginvolume = newLinkedList();
+        List<String> endvolume = newLinkedList();
+        List<Boolean> open = newLinkedList();
+        for (Map<String, Object> m : groups) {
+            Object o = m.get("movingwall");
+            if (o != null) {
+                logger.debug("movingwall detected: {}", o);
+            }
+            o = m.get("date");
+            if (o == null) {
+                continue;
+            }
+            if (!(o instanceof List)) {
+                o = Arrays.asList(o);
+            }
+            for (String content : (List<String>) o) {
+                if (content == null) {
+                    continue;
+                }
+                EnumerationAndChronology.parse(content, begin, end, beginvolume, endvolume, open);
+            }
+        }
+        List<Integer> dates = newLinkedList();
+        for (int i = 0; i < begin.size(); i++) {
+            if (open.get(i)) {
+                end.set(i, currentYear);
+            }
+            if (begin.get(i) != null && end.get(i) != null) {
+                for (int d = begin.get(i); d <= end.get(i); d++) {
+                    dates.add(d);
+                }
+            } else if (begin.get(i) != null && begin.get(i) > 0) {
+                dates.add(begin.get(i));
+            }
+        }
+        return dates;
+    }
+
+    private void findFirstAndLastDate() {
+        this.firstDate = Integer.MAX_VALUE;
+        this.lastDate = Integer.MIN_VALUE;
+        for (Manifestation m : this) {
+            if (m.firstDate() == null) {
+                continue;
+            }
+            if (m.firstDate() < this.firstDate) {
+                this.firstDate = m.firstDate();
+            }
+            int d = m.lastDate() == null ? currentYear : m.lastDate();
+            if (d > this.lastDate) {
+                this.lastDate = d;
+            }
+            // we have to check all related manifestations for first/last dates
+            for (Manifestation p : m.getRelatedManifestations().values()) {
+                if (p.firstDate() != null && p.firstDate() < firstDate) {
+                    this.firstDate = p.firstDate();
+                }
+                d = p.lastDate() == null ? currentYear : p.lastDate();
+                if (d > this.lastDate) {
+                    this.lastDate = d;
+                }
+            }
+        }
+        if (firstDate == Integer.MAX_VALUE) {
+            // "Produkt-ISIL" z.B. 21543057
+            firstDate = null;
+            lastDate = null;
+        } else if (lastDate == Integer.MIN_VALUE) {
+            lastDate = currentYear;
+        }
+    }
 }

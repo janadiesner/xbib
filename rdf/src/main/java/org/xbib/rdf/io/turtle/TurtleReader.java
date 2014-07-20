@@ -33,8 +33,6 @@ package org.xbib.rdf.io.turtle;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
@@ -108,7 +106,7 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
     /**
      * Stack for resource statements
      */
-    private Stack<Triple> triples;
+    private Stack<Triple<S, P, O>> triples;
     /**
      * Counter for parsed triples
      */
@@ -117,39 +115,19 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
      * The namespace context
      */
     private XmlNamespaceContext context = XmlNamespaceContext.getDefaultInstance();
-    /**
-     * An optional triple listener
-     */
+
     private TripleListener<S, P, O> listener;
+
     private boolean strict = false;
 
-    public TurtleReader(IRI baseIRI) {
+    public TurtleReader setBaseIRI(IRI baseIRI) {
         this.baseIRI = baseIRI;
+        return this;
     }
 
     public TurtleReader context(XmlNamespaceContext context) {
         this.context = context;
         return this;
-    }
-
-    @Override
-    public TurtleReader setTripleListener(TripleListener<S, P, O> listener) {
-        this.listener = listener;
-        return this;
-    }
-
-    /**
-     * Parse turtle input stream. Character encoding must be UTF-8. Turtle is a
-     * subset of N3, and N3 uses UTF-8.
-     *
-     * @see <a href="www.w3.org/DesignIssues/Notation3.html">N3</a>
-     *
-     * @param in the turtle input stream
-     * @throws IOException
-     */
-    @Override
-    public TurtleReader parse(InputStream in) throws IOException {
-        return parse(new InputStreamReader(in, "UTF-8"));
     }
 
     /**
@@ -160,11 +138,12 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
      * @throws IOException if stream can not be parsed
      */
     @Override
-    public TurtleReader parse(Reader reader) throws IOException {
+    public TurtleReader parse(Reader reader, TripleListener<S, P, O> listener) throws IOException {
         this.reader = new PushbackReader(reader, 2);
+        this.listener = listener;
         this.sb = new StringBuilder();
         this.eof = false;
-        this.triples = new Stack();
+        this.triples = new Stack<Triple<S, P, O>>();
         if (listener != null) {
             listener.begin();
         }

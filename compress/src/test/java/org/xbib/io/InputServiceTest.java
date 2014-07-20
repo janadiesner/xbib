@@ -6,7 +6,6 @@ public class InputServiceTest {
 
     @Test
     public void testInputService() {
-          InputService.asLinesFromResource("/log4j.properties");
+        InputService.asLinesFromResource("/log4j2.xml");
     }
-
 }

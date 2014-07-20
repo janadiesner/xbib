@@ -65,20 +65,14 @@ import org.apache.commons.io.FileCleaningTracker;
  * your web application ends. See the section on "Resource cleanup"
  * in the users guide of commons-fileupload.</p>
  *
- * @since FileUpload 1.1
- *
- * @version $Id: DiskFileItemFactory.java 1455094 2013-03-11 11:00:14Z simonetripodi $
  */
 public class DiskFileItemFactory implements FileItemFactory {
 
-    // ----------------------------------------------------- Manifest constants
 
     /**
      * The default threshold above which uploads will be stored on disk.
      */
     public static final int DEFAULT_SIZE_THRESHOLD = 10240;
-
-    // ----------------------------------------------------- Instance Variables
 
     /**
      * The directory in which uploaded files will be stored, if stored on disk.
@@ -96,8 +90,6 @@ public class DiskFileItemFactory implements FileItemFactory {
      * <p>May be null, if tracking files is not required.</p>
      */
     private FileCleaningTracker fileCleaningTracker;
-
-    // ----------------------------------------------------------- Constructors
 
     /**
      * Constructs an unconfigured instance of this class. The resulting factory
@@ -121,8 +113,6 @@ public class DiskFileItemFactory implements FileItemFactory {
         this.sizeThreshold = sizeThreshold;
         this.repository = repository;
     }
-
-    // ------------------------------------------------------------- Properties
 
     /**
      * Returns the directory used to temporarily store files that are larger
@@ -173,8 +163,6 @@ public class DiskFileItemFactory implements FileItemFactory {
     public void setSizeThreshold(int sizeThreshold) {
         this.sizeThreshold = sizeThreshold;
     }
-
-    // --------------------------------------------------------- Public Methods
 
     /**
      * Create a new {@link DiskFileItem}

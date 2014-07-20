@@ -135,9 +135,8 @@ public final class BibdatZDB extends Converter {
         public OurContextResourceOutput init(String filename) throws IOException {
             this.f = new File(filename);
             this.fw = new FileWriter(f);
-            this.writer = new NTripleWriter()
-                    .output(fw)
-                    .setNullPredicate(IRI.builder().scheme("http").host("xbib.org").path("/adr").build());
+            this.writer = new NTripleWriter(fw);
+                    //.setNullPredicate(IRI.builder().scheme("http").host("xbib.org").path("/adr").build());
             return this;
         }
 
@@ -146,7 +145,7 @@ public final class BibdatZDB extends Converter {
             IRI id = IRI.builder().scheme("http").host("xbib.org").path("/pica/zdb/bibdat")
                     .fragment(context.getID()).build();
             context.getResource().id(id);
-            writer.write(context.getResource());
+            writer.write(context);
             counter.incrementAndGet();
         }
 

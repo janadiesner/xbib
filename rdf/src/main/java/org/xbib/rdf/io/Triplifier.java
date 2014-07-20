@@ -32,7 +32,6 @@
 package org.xbib.rdf.io;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 
 import org.xbib.rdf.Identifier;
@@ -41,10 +40,6 @@ import org.xbib.rdf.Property;
 
 public interface Triplifier<S extends Identifier, P extends Property, O extends Node> {
 
-    Triplifier setTripleListener(TripleListener<S, P, O> listener);
-
-    Triplifier parse(InputStream in) throws IOException;
-    
-    Triplifier parse(Reader reader) throws IOException;
+    Triplifier parse(Reader reader, TripleListener<S, P, O> listener) throws IOException;
     
 }

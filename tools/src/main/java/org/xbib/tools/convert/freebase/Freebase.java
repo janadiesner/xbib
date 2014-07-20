@@ -43,7 +43,9 @@ import org.xbib.tools.Converter;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
@@ -76,11 +78,9 @@ public class Freebase extends Converter {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
         };
-        NTripleWriter writer = new NTripleWriter()
-                .output(out);
-        new TurtleReader(IRI.create(settings.get("base")))
-                .setTripleListener(writer)
-                .parse(in);
+        NTripleWriter writer = new NTripleWriter(new OutputStreamWriter(out, "UTF-8"));
+        new TurtleReader().setBaseIRI(IRI.create(settings.get("base")))
+                .parse(new InputStreamReader(in, "UTF-8"), writer);
         in.close();
     }
 

@@ -54,19 +54,11 @@ import javax.xml.namespace.QName;
 public class JsonReader<S extends Resource<S, P, O>, P extends Property, O extends Literal<O>>
         implements Triplifier<S, P, O> {
 
-    private TripleListener listener;
-
     private XmlHandler handler;
 
     private QName root;
 
     public JsonReader() {
-    }
-
-    @Override
-    public JsonReader setTripleListener(TripleListener listener) {
-        this.listener = listener;
-        return this;
     }
 
     public JsonReader setHandler(XmlHandler handler) {
@@ -84,12 +76,7 @@ public class JsonReader<S extends Resource<S, P, O>, P extends Property, O exten
     }
 
     @Override
-    public JsonReader parse(InputStream in) throws IOException {
-        return parse(new InputStreamReader(in, "UTF-8"));
-    }
-
-    @Override
-    public JsonReader parse(Reader reader) throws IOException {
+    public JsonReader parse(Reader reader, TripleListener<S, P, O> listener) throws IOException {
         if (handler != null) {
             if (listener != null) {
                 handler.setListener(listener);
@@ -105,6 +92,5 @@ public class JsonReader<S extends Resource<S, P, O>, P extends Property, O exten
         }
         return this;
     }
-
 
 }

@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.commons.fileupload.servlet;
 
 import java.io.IOException;
@@ -32,16 +16,13 @@ import org.apache.commons.fileupload.FileUploadException;
 /**
  * <p>High level API for processing file uploads.</p>
  *
- * <p>This class handles multiple files per single HTML widget, sent using
+ * This class handles multiple files per single HTML widget, sent using
  * <code>multipart/mixed</code> encoding type, as specified by
- * <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>.  Use {@link
- * #parseRequest(HttpServletRequest)} to acquire a list of {@link
- * org.apache.commons.fileupload.FileItem}s associated with a given HTML
- * widget.</p>
+ * <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>.
  *
- * <p>How the data for individual parts is stored is determined by the factory
+ * How the data for individual parts is stored is determined by the factory
  * used to create them; a given part may be in memory, on disk, or somewhere
- * else.</p>
+ * else.
  *
  */
 public class ServletFileUpload extends FileUpload {
@@ -50,8 +31,6 @@ public class ServletFileUpload extends FileUpload {
      * Constant for HTTP POST method.
      */
     private static final String POST_METHOD = "POST";
-
-    // ---------------------------------------------------------- Class methods
 
     /**
      * Utility method that determines whether the request contains multipart
@@ -62,15 +41,10 @@ public class ServletFileUpload extends FileUpload {
      * @return <code>true</code> if the request is multipart;
      *         <code>false</code> otherwise.
      */
-    public static final boolean isMultipartContent(
+    public static boolean isMultipartContent(
             HttpServletRequest request) {
-        if (!POST_METHOD.equalsIgnoreCase(request.getMethod())) {
-            return false;
-        }
-        return FileUploadBase.isMultipartContent(new ServletRequestContext(request));
+        return POST_METHOD.equalsIgnoreCase(request.getMethod()) && FileUploadBase.isMultipartContent(new ServletRequestContext(request));
     }
-
-    // ----------------------------------------------------------- Constructors
 
     /**
      * Constructs an uninitialised instance of this class. A factory must be
@@ -94,26 +68,6 @@ public class ServletFileUpload extends FileUpload {
         super(fileItemFactory);
     }
 
-    // --------------------------------------------------------- Public methods
-
-    /**
-     * Processes an <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>
-     * compliant <code>multipart/form-data</code> stream.
-     *
-     * @param request The servlet request to be parsed.
-     *
-     * @return A list of <code>FileItem</code> instances parsed from the
-     *         request, in the order that they were transmitted.
-     *
-     * @throws FileUploadException if there are problems reading/parsing
-     *                             the request or storing files.
-     */
-    @Override
-    public List<FileItem> parseRequest(HttpServletRequest request)
-    throws FileUploadException {
-        return parseRequest(new ServletRequestContext(request));
-    }
-
     /**
      * Processes an <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>
      * compliant <code>multipart/form-data</code> stream.
@@ -124,8 +78,6 @@ public class ServletFileUpload extends FileUpload {
      *
      * @throws FileUploadException if there are problems reading/parsing
      *                             the request or storing files.
-     *
-     * @since 1.3
      */
     public Map<String, List<FileItem>> parseParameterMap(HttpServletRequest request)
             throws FileUploadException {

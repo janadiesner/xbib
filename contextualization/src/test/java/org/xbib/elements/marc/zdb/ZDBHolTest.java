@@ -120,19 +120,17 @@ public class ZDBHolTest extends Assert {
 
         @Override
         public void output(ResourceContext context, Resource resource, ContentBuilder contentBuilder) throws IOException {
-            if (!context.getResource().isEmpty()) {
-                Resource r = context.getResource();
-                r.id(IRI.builder()
-                        .scheme("http")
-                        .host("zdb")
-                        .query("holdings")
-                        .fragment(counter.toString()).build());
-                StringWriter sw = new StringWriter();
-                TurtleWriter tw = new TurtleWriter().output(sw);
-                tw.write(r);
-                logger.debug("out={}", sw.toString());
-                counter.incrementAndGet();
-            }
+            Resource r = context.getResource();
+            r.id(IRI.builder()
+                    .scheme("http")
+                    .host("zdb")
+                    .query("holdings")
+                    .fragment(counter.toString()).build());
+            StringWriter sw = new StringWriter();
+            TurtleWriter tw = new TurtleWriter(sw);
+            tw.write(context);
+            logger.debug("out={}", sw.toString());
+            counter.incrementAndGet();
         }
     }
 

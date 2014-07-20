@@ -133,8 +133,8 @@ public final class FromMARC extends Converter {
                     .fragment(iri.getFragment()).build());
 
             StringWriter sw = new StringWriter();
-            NTripleWriter writer = new NTripleWriter().output(sw);
-            writer.write(context.getResource());
+            NTripleWriter writer = new NTripleWriter(sw);
+            writer.write(context);
             logger.debug("{}", sw.toString());
         }
     }

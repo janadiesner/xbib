@@ -45,6 +45,7 @@ import org.xbib.tools.Feeder;
 
 import javax.xml.namespace.QName;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 
 /**
@@ -71,10 +72,9 @@ public final class Medline extends Feeder {
         AbstractXmlHandler handler = new Handler()
                 .setDefaultNamespace("ml", "http://www.nlm.nih.gov/medline");
         InputStream in = InputService.getInputStream(uri);
-        new XmlReader()
-                .setNamespaces(false)
+        new XmlReader().setNamespaces(false)
                 .setHandler(handler)
-                .parse(in);
+                .parse(new InputStreamReader(in, "UTF-8"), null);
         in.close();
     }
 

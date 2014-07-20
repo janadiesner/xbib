@@ -31,35 +31,16 @@
  */
 package org.xbib.logging.log4j;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.xbib.logging.support.AbstractLogger;
 
-/**
- *
- */
 public class Log4jLogger extends AbstractLogger {
 
-    private final org.apache.log4j.Logger logger;
+    private final Logger logger;
 
     public Log4jLogger(String prefix, Logger logger) {
         super(prefix);
         this.logger = logger;
-    }
-
-    @Override
-    public void setLevel(String level) {
-        if ("error".equalsIgnoreCase(level)) {
-            logger.setLevel(Level.ERROR);
-        } else if ("warn".equalsIgnoreCase(level)) {
-            logger.setLevel(Level.WARN);
-        } else if ("info".equalsIgnoreCase(level)) {
-            logger.setLevel(Level.INFO);
-        } else if ("debug".equalsIgnoreCase(level)) {
-            logger.setLevel(Level.DEBUG);
-        } else if ("trace".equalsIgnoreCase(level)) {
-            logger.setLevel(Level.TRACE);
-        }
     }
 
     @Override
@@ -84,12 +65,12 @@ public class Log4jLogger extends AbstractLogger {
 
     @Override
     public boolean isWarnEnabled() {
-        return logger.isEnabledFor(Level.WARN);
+        return logger.isWarnEnabled();
     }
 
     @Override
     public boolean isErrorEnabled() {
-        return logger.isEnabledFor(Level.ERROR);
+        return logger.isErrorEnabled();
     }
 
     @Override

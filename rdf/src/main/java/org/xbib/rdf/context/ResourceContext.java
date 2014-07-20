@@ -80,9 +80,9 @@ public interface ResourceContext<R extends Resource> extends ResourceFactory<R>,
      */
     R getResource();
 
-    ResourceContext<R> setContentBuilder(ContentBuilder<ResourceContext, R> contentBuilder);
+    ResourceContext<R> setContentBuilder(ContentBuilder<ResourceContext<R>, R> contentBuilder);
 
-    ContentBuilder<ResourceContext, R> getContentBuilder();
+    ContentBuilder<ResourceContext<R>, R> getContentBuilder();
 
     /**
      * Prepare the context for output.

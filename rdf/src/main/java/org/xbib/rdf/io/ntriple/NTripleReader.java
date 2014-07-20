@@ -33,14 +33,11 @@ package org.xbib.rdf.io.ntriple;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.xbib.iri.IRI;
-import org.xbib.rdf.Triple;
 import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.simple.SimpleFactory;
 import org.xbib.rdf.Identifier;
@@ -69,35 +66,19 @@ public class NTripleReader<S extends Identifier, P extends Property, O extends N
     private static final String objectExpression = "(" + anonymousExpression + "|" + resourceExpression + "|" + literalExpression + ")";
     public static final String tripleExpression = subjectExpression + "\\s+" + predicateExpression + "\\s+" + objectExpression + "\\s*\\.";
     public static final Pattern NTRIPLE_PATTERN = Pattern.compile(tripleExpression);
-    private BufferedReader reader;
     private boolean eof;
     private final SimpleFactory<S,P,O> simpleFactory = SimpleFactory.getInstance();
-    private TripleListener<S, P, O> listener;
 
     @Override
-    public NTripleReader setTripleListener(TripleListener<S, P, O> listener) {
-        this.listener = listener;
-        return this;
-    }
-
-    @Override
-    public NTripleReader parse(InputStream in) throws IOException {
-        return parse(new InputStreamReader(in, "UTF-8"));
-    }
-
-    @Override
-    public NTripleReader parse(Reader reader) throws IOException {
-        this.reader = new BufferedReader(reader);
+    public NTripleReader parse(Reader reader, TripleListener<S, P, O> listener) throws IOException {
         this.eof = false;
-        try {
+        try (BufferedReader br = new BufferedReader(reader)) {
             while (!eof) {
-                parseLine(this.reader.readLine());
+                parseLine(br.readLine(), listener);
                 if (eof) {
                     break;
                 }
             }
-        } finally {
-            this.reader.close();
         }
         return this;
     }
@@ -129,7 +110,7 @@ public class NTripleReader<S extends Identifier, P extends Property, O extends N
      * 20   language with @
      * 21	language without @
      */
-    private void parseLine(String line) throws IOException {
+    private void parseLine(String line, TripleListener<S, P, O> listener) throws IOException {
         if (line == null) {
             eof = true;
             return;
@@ -173,8 +154,7 @@ public class NTripleReader<S extends Identifier, P extends Property, O extends N
             object = (O) simpleFactory.newLiteral(literal);
         }
         if (listener != null) {
-            Triple stmt = new SimpleTriple(subject, predicate, object);
-            listener.triple(stmt);
+            listener.triple(new SimpleTriple<S, P, O>(subject, predicate, object));
         }
     }
 }

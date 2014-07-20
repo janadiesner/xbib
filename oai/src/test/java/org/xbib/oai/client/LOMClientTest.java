@@ -36,16 +36,13 @@ import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIDateResolution;
-import org.xbib.oai.listrecords.ListRecordsListener;
-import org.xbib.oai.listrecords.ListRecordsRequest;
-import org.xbib.oai.rdf.RdfOutput;
+import org.xbib.oai.client.listrecords.ListRecordsListener;
+import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.oai.xml.XmlMetadataHandler;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.ContentBuilder;
 import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.context.ContextResourceOutput;
 import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
@@ -65,12 +62,8 @@ public class LOMClientTest {
 
     private final Logger logger = LoggerFactory.getLogger(LOMClientTest.class.getName());
 
-    private static MockOutput mock;
-
     @Test
     public void testListRecordsLOM() throws Exception {
-
-        mock = new MockOutput();
 
         OAIClient client = OAIClientFactory.newClient("http://www.melt.fwu.de/oai2.php");
         ListRecordsRequest request = client.newListRecordsRequest()
@@ -100,27 +93,20 @@ public class LOMClientTest {
     protected MetadataHandler xmlMetadataHandler() {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
         ResourceContext<Resource> resourceContext = new SimpleResourceContext()
-                .setContentBuilder(contentBuilder(namespaceContext))
+                .setContentBuilder(new DefaultContentBuilder())
                 .setNamespaceContext(namespaceContext);
         resourceContext.setNamespaceContext(IRINamespaceContext.getInstance());
         RdfResourceHandler handler = new RdfResourceHandler(resourceContext);
         return new LOMHandler()
                 .setHandler(handler)
-                .setResourceContext(handler.resourceContext())
-                .setOutput(new ElasticOut());
-    }
-
-    protected ContentBuilder contentBuilder(IRINamespaceContext namespaceContext) {
-        return new DefaultContentBuilder();
+                .setResourceContext(handler.resourceContext());
     }
 
     class LOMHandler extends XmlMetadataHandler {
 
         private XmlHandler handler;
 
-        private ResourceContext resourceContext;
-
-        private RdfOutput output;
+        private ResourceContext<Resource> resourceContext;
 
         private boolean attributes;
 
@@ -134,15 +120,11 @@ public class LOMClientTest {
             return this;
         }
 
-        public LOMHandler setResourceContext(ResourceContext resourceContext) {
+        public LOMHandler setResourceContext(ResourceContext<Resource> resourceContext) {
             this.resourceContext = resourceContext;
             return this;
         }
 
-        public LOMHandler setOutput(RdfOutput output) {
-            this.output = output;
-            return this;
-        }
         @Override
         public void startDocument() throws SAXException {
             handler.startDocument();
@@ -151,7 +133,6 @@ public class LOMClientTest {
         public void endDocument() throws SAXException {
             handler.endDocument();
             String identifier = getHeader().getIdentifier();
-            try {
                 if (resourceContext.getResource() != null) {
                     IRI iri = IRI.builder().scheme("http")
                             .host("test")
@@ -159,12 +140,36 @@ public class LOMClientTest {
                             .fragment(identifier).build();
                     resourceContext.getResource().id(iri);
                 }
-                output.output(resourceContext);
+                //output.write(resourceContext);
+                if (resourceContext.getResources() == null) {
+                    // single document
+                    //mock.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
+                } else for (Resource resource : resourceContext.getResources()) {
+                    // multiple documents. Rewrite IRI for ES index/type addressing
+                    String index = "test";
+                    String type = "test";
+                    if (index.equals(resource.id().getHost())) {
+                        IRI iri = IRI.builder().scheme("http").host(index).query(type)
+                                .fragment(resource.id().getFragment()).build();
+                        resource.add("iri", resource.id().getFragment());
+                        resource.id(iri);
+                    } else {
+                        IRI iri = IRI.builder().scheme("http").host(index).query(type)
+                                .fragment(resource.id().toString()).build();
+                        resource.add("iri", resource.id().toString());
+                        resource.id(iri);
+                    }
+                    //mock.output(resourceContext, resource, resourceContext.getContentBuilder());
+                }
+            try {
+                StringWriter sw = new StringWriter();
+                NTripleWriter writer = new NTripleWriter(sw);
+                writer.write(resourceContext);
+                logger.info("{}", sw.toString());
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
         }
-
 
         @Override
         public void startPrefixMapping(String prefix, String nsURI) throws SAXException {
@@ -233,47 +238,6 @@ public class LOMClientTest {
         }
 
         private final Attributes emptyAttributes = new AttributesImpl();
-    }
-
-    class ElasticOut extends RdfOutput {
-        @Override
-        public RdfOutput output(ResourceContext<Resource> resourceContext) throws IOException {
-            if (resourceContext == null) {
-                return this;
-            }
-            if (resourceContext.getResources() == null) {
-                // single document
-                mock.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
-            } else for (Resource resource : resourceContext.getResources()) {
-                // multiple documents. Rewrite IRI for ES index/type addressing
-                String index = "test";
-                String type = "test";
-                if (index.equals(resource.id().getHost())) {
-                    IRI iri = IRI.builder().scheme("http").host(index).query(type)
-                            .fragment(resource.id().getFragment()).build();
-                    resource.add("iri", resource.id().getFragment());
-                    resource.id(iri);
-                } else {
-                    IRI iri = IRI.builder().scheme("http").host(index).query(type)
-                            .fragment(resource.id().toString()).build();
-                    resource.add("iri", resource.id().toString());
-                    resource.id(iri);
-                }
-                mock.output(resourceContext, resource, resourceContext.getContentBuilder());
-            }
-            return this;
-        }
-    }
-
-    class MockOutput implements ContextResourceOutput {
-
-        @Override
-        public void output(ResourceContext context, Resource resource, ContentBuilder builder) throws IOException {
-            StringWriter sw = new StringWriter();
-            NTripleWriter writer = new NTripleWriter().output(sw);
-            writer.write(resource);
-            logger.info("{}", sw.toString());
-        }
     }
 
 }

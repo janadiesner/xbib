@@ -1,15 +1,3 @@
-/*
- * Copyright (c) 2010-2012 Sonatype, Inc. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
 package org.asynchttpclient.providers.netty.handler;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
@@ -33,12 +21,12 @@ import org.asynchttpclient.providers.netty.channel.Channels;
 import org.asynchttpclient.providers.netty.future.NettyResponseFuture;
 import org.asynchttpclient.providers.netty.request.NettyRequestSender;
 import org.asynchttpclient.util.AsyncHttpProviderUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 public abstract class Protocol {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger logger = LoggerFactory.getLogger(Protocol.class.getName());
 
     protected final Channels channels;
     protected final AsyncHttpClientConfig config;

@@ -97,9 +97,7 @@ public class SerialsDB extends Converter {
         FileWriter w = new FileWriter(fileName);
 
         resourceContext.setNamespaceContext(context);
-        final TurtleWriter writer = new TurtleWriter()
-                .setContext(context)
-                .output(w);
+        final TurtleWriter writer = new TurtleWriter(w).setContext(context);
         CSVParser parser = new CSVParser(new InputStreamReader(in, "UTF-8"));
         try {
             int i = 0;
@@ -143,7 +141,7 @@ public class SerialsDB extends Converter {
                         .add("prism:issn", issn2)
                         .add("prism:doi", doi.isEmpty() ? null : doi);
                 if (!serials.containsKey(journalTitle)) {
-                    writer.write(resource);
+                    writer.write(resourceContext);
                     serials.put(journalTitle, resource);
                 } else {
                     logger.info("ignoring double serial title: {}", journalTitle);

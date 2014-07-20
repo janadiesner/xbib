@@ -28,8 +28,6 @@ public interface Logger {
 
     String getName();
 
-    void setLevel(String level);
-
     /**
      * Returns {@code true} if a TRACE level message is logged.
      */

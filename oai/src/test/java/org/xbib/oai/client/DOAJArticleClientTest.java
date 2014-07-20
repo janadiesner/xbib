@@ -33,19 +33,17 @@ package org.xbib.oai.client;
 
 import org.testng.annotations.Test;
 import org.xbib.oai.OAIDateResolution;
-import org.xbib.oai.listrecords.ListRecordsListener;
+import org.xbib.oai.client.listrecords.ListRecordsListener;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.oai.listrecords.ListRecordsRequest;
+import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfMetadataHandler;
-import org.xbib.oai.rdf.RdfOutput;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleProperty;
 
@@ -65,7 +63,7 @@ public class DOAJArticleClientTest {
 
     private final static String DOAJ_NS_URI = "http://www.doaj.org/schemas/";
 
-    private StringWriter sw = new StringWriter();
+    //private StringWriter sw = new StringWriter();
 
     @Test
     public void testListRecordsDOAJArticles() throws Exception {
@@ -76,16 +74,16 @@ public class DOAJArticleClientTest {
         final RdfMetadataHandler metadataHandler = new RdfMetadataHandler(context);
         final RdfResourceHandler resourceHandler = new DOAJResourceHandler(metadataHandler.getResourceContext());
         resourceHandler.setDefaultNamespace(DOAJ_NS_PREFIX,  DOAJ_NS_URI);
-        final RdfOutput out = new MyOutput(metadataHandler.getContext());
+        //final RdfOutput out = new MyOutput(metadataHandler.getContext());
 
-        metadataHandler.setHandler(resourceHandler)
-            .setOutput(out);
+        metadataHandler.setHandler(resourceHandler);
+            //.setOutput(out);
 
         OAIClient client = OAIClientFactory.newClient("http://doaj.org/oai.article");
         ListRecordsRequest request = client.newListRecordsRequest()
                 .setFrom( DateUtil.parseDateISO("2014-04-16T00:00:00Z"), OAIDateResolution.DAY)
                 .setUntil(DateUtil.parseDateISO("2014-04-17T00:00:00Z"), OAIDateResolution.DAY)
-                .setMetadataPrefix("oai_dc"); // doajArticle has gone
+                .setMetadataPrefix("oai_dc"); // doajArticle format no longer there!
 
         do {
             try {
@@ -154,7 +152,7 @@ public class DOAJArticleClientTest {
         }
     }
 
-    class MyOutput extends RdfOutput {
+    /*class MyOutput extends RdfOutput {
 
         TurtleWriter writer;
 
@@ -173,6 +171,6 @@ public class DOAJArticleClientTest {
             writer.output(sw);
             return this;
         }
-    }
+    }*/
 
 }

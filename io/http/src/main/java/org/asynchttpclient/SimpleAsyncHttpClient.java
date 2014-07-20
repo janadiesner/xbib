@@ -1,23 +1,11 @@
-/*
- * Copyright (c) 2010 Sonatype, Inc. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
 package org.asynchttpclient;
 
 import org.asynchttpclient.resumable.ResumableAsyncHandler;
 import org.asynchttpclient.resumable.ResumableIOExceptionFilter;
 import org.asynchttpclient.simple.HeaderMap;
 import org.asynchttpclient.simple.SimpleAHCTransferListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 
@@ -61,15 +49,24 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class SimpleAsyncHttpClient implements Closeable {
 
-    private final static Logger logger = LoggerFactory.getLogger(SimpleAsyncHttpClient.class);
+    private final static Logger logger = LoggerFactory.getLogger(SimpleAsyncHttpClient.class.getName());
+
     private final AsyncHttpClientConfig config;
+
     private final RequestBuilder requestBuilder;
+
     private AsyncHttpClient asyncHttpClient;
+
     private final ThrowableHandler defaultThrowableHandler;
+
     private final boolean resumeEnabled;
+
     private final ErrorDocumentBehaviour errorDocumentBehaviour;
+
     private final SimpleAHCTransferListener listener;
+
     private final boolean derived;
+
     private final String providerClass;
 
     private SimpleAsyncHttpClient(AsyncHttpClientConfig config, RequestBuilder requestBuilder, ThrowableHandler defaultThrowableHandler, ErrorDocumentBehaviour errorDocumentBehaviour, boolean resumeEnabled, AsyncHttpClient ahc, SimpleAHCTransferListener listener, String providerClass) {

@@ -29,7 +29,7 @@ while [ ${iterations} -gt 0 ]; do
     "output" : "'${set}'/'${p1}'-'${p2}'.tar.gz"
   }
   ' | ${java} \
-      -cp $(pwd)/bin:$(pwd)/lib/tools-1.0.0.Beta2-converter.jar \
+      -cp $(pwd)/bin:$(pwd)/lib/tools-1.0.0.Beta3-converter.jar \
       org.xbib.tools.Runner org.xbib.tools.convert.zdb.FromOAI
 
   d=${p1}

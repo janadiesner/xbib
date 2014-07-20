@@ -1,16 +1,3 @@
-/*
- * Copyright (c) 2012 Sonatype, Inc. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
-
 package org.asynchttpclient.async;
 
 import static org.testng.Assert.*;
@@ -37,14 +24,10 @@ import org.testng.annotations.Test;
 
 public abstract class PostRedirectGetTest extends AbstractBasicTest {
 
-    // ------------------------------------------------------ Test Configuration
-
     @Override
     public AbstractHandler configureHandler() throws Exception {
         return new PostRedirectGetHandler();
     }
-
-    // ------------------------------------------------------------ Test Methods
 
     @Test(groups = { "standalone", "post_redirect_get" })
     public void postRedirectGet302Test() throws Exception {
@@ -70,8 +53,6 @@ public abstract class PostRedirectGetTest extends AbstractBasicTest {
     public void postRedirectGet307Test() throws Exception {
         doTestNegative(307, false);
     }
-
-    // --------------------------------------------------------- Private Methods
 
     private void doTestNegative(final int status, boolean strict) throws Exception {
         AsyncHttpClient p = getAsyncHttpClient(new AsyncHttpClientConfig.Builder().setFollowRedirects(true).setStrict302Handling(strict).addResponseFilter(new ResponseFilter() {

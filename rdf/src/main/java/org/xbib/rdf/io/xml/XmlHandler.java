@@ -40,7 +40,6 @@ import org.xml.sax.ErrorHandler;
 
 /**
  * XML handler with triple listener
- *
  */
 public interface XmlHandler
      extends EntityResolver, DTDHandler, ContentHandler, ErrorHandler {

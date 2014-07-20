@@ -150,7 +150,6 @@ public class Checksum32 implements RollingChecksum {
      * @param buf The byte array that holds the new block.
      * @param off From whence to begin reading.
      * @param len The length of the block to read.
-     * @since 1.1
      */
     public void check(byte[] buf, int off, int len) {
         block = new byte[len];

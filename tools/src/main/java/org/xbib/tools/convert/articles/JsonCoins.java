@@ -47,7 +47,6 @@ import org.xbib.rdf.Node;
 import org.xbib.rdf.RDF;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.IRINamespaceContext;
-import org.xbib.rdf.io.ResourceSerializer;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleResourceContext;
@@ -63,6 +62,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -85,11 +85,11 @@ public class JsonCoins extends Converter {
 
     protected final static SimpleResourceContext resourceContext = new SimpleResourceContext();
 
-    private static ResourceSerializer serializer;
+    private static TurtleWriter serializer;
 
-    private static ResourceSerializer errorSerializer;
+    private static TurtleWriter errorSerializer;
 
-    private static ResourceSerializer missingSerializer;
+    private static TurtleWriter missingSerializer;
 
     private static GZIPOutputStream gzout;
 
@@ -141,11 +141,9 @@ public class JsonCoins extends Converter {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
         };
-        final TurtleWriter writer = new TurtleWriter()
-                .setContext(context)
-                .output(gzout);
-        writer.writeNamespaces();
-        serializer = writer;
+        serializer = new TurtleWriter(new OutputStreamWriter(gzout, "UTF-8"))
+                .setContext(context);
+        serializer.writeNamespaces();
 
         FileOutputStream errorfout = new FileOutputStream(outputFilename + "-errors.ttl.gz");
         errorgzout = new GZIPOutputStream(errorfout) {
@@ -153,11 +151,9 @@ public class JsonCoins extends Converter {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
         };
-        final TurtleWriter errorWriter = new TurtleWriter()
-                .setContext(context)
-                .output(errorgzout);
-        errorWriter.writeNamespaces();
-        errorSerializer = errorWriter;
+        errorSerializer = new TurtleWriter(new OutputStreamWriter(errorgzout, "UTF-8"))
+                .setContext(context);
+        errorSerializer.writeNamespaces();
 
         FileOutputStream noserialfout = new FileOutputStream(outputFilename + "-without-serial.ttl.gz");
         noserialgzout = new GZIPOutputStream(noserialfout) {
@@ -165,11 +161,9 @@ public class JsonCoins extends Converter {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
         };
-        final TurtleWriter noserialWriter = new TurtleWriter()
-                .setContext(context)
-                .output(noserialgzout);
-        noserialWriter.writeNamespaces();
-        missingSerializer = noserialWriter;
+        missingSerializer = new TurtleWriter(new OutputStreamWriter(noserialgzout, "UTF-8"))
+                .setContext(context);
+        missingSerializer.writeNamespaces();
 
         // extra text file for missing serials
         missingserials = new FileWriter("missingserials.txt");
@@ -220,17 +214,17 @@ public class JsonCoins extends Converter {
                         switch (result) {
                             case OK:
                                 synchronized (serializer) {
-                                    serializer.write(resource);
+                                    serializer.write(resourceContext);
                                 }
                                 break;
                             case MISSINGSERIAL:
                                 synchronized (missingSerializer) {
-                                    missingSerializer.write(resource);
+                                    missingSerializer.write(resourceContext);
                                 }
                                 break;
                             case ERROR:
                                 synchronized (errorSerializer) {
-                                    errorSerializer.write(resource);
+                                    errorSerializer.write(resourceContext);
                                 }
                                 break;
 

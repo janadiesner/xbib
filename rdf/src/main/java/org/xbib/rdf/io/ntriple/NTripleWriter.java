@@ -32,11 +32,7 @@
 package org.xbib.rdf.io.ntriple;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
-import java.util.Iterator;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -48,30 +44,26 @@ import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.IRINamespaceContext;
-import org.xbib.rdf.io.ResourceSerializer;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.io.TripleLine;
 import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.simple.SimpleResource;
+import org.xbib.rdf.simple.SimpleResourceContext;
 
 /**
  * NTriple writer
  */
 public class NTripleWriter<S extends Identifier, P extends Property, O extends Node>
-    implements ResourceSerializer<S,P,O> {
+    implements TripleLine<S,P,O> {
 
-    private final Logger logger = LoggerFactory.getLogger(NTripleWriter.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(NTripleWriter.class.getName());
 
     private final static char LF = '\n';
 
-    /**
-     * A Namespace context with URI-related methods
-     */
-    private IRINamespaceContext context;
+    private final IRINamespaceContext context;
 
-    private IRI nullPredicate;
+    private final Writer writer;
 
-    private Writer writer;
-
-    private Resource resource;
+    private SimpleResourceContext<S,P,O> resourceContext;
 
     private long byteCounter;
 
@@ -79,12 +71,18 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
 
     private String translatePicaSortMarker;
 
-    public NTripleWriter() {
+    public NTripleWriter(Writer writer) {
+        this.writer = writer;
         this.context = IRINamespaceContext.newInstance();
-        this.resource = new SimpleResource();
+        this.resourceContext = new SimpleResourceContext();
+        resourceContext.newResource();
         this.byteCounter = 0L;
         this.idCounter = 0L;
         this.translatePicaSortMarker = null;
+    }
+
+    public Writer getWriter() {
+        return writer;
     }
 
     public long getByteCounter() {
@@ -95,21 +93,6 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
         return idCounter;
     }
 
-    public NTripleWriter output(OutputStream out) {
-        this.writer = new OutputStreamWriter(out, Charset.forName("UTF-8"));
-        return this;
-    }
-
-    public NTripleWriter output(Writer writer) {
-        this.writer = writer;
-        return this;
-    }
-
-    public NTripleWriter setNullPredicate(IRI iri) {
-        this.nullPredicate = iri;
-        return this;
-    }
-
     public NTripleWriter translatePicaSortMarker(String marker) {
         this.translatePicaSortMarker = marker;
         return this;
@@ -117,16 +100,16 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
 
     @Override
     public NTripleWriter<S,P,O> newIdentifier(IRI iri) {
-        if (!iri.equals(resource.id())) {
+        if (!iri.equals(resourceContext.getResource().id())) {
             try {
-                write(resource);
+                write(resourceContext);
                 idCounter++;
-                resource = new SimpleResource();
+                resourceContext.newResource();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
         }
-        resource.id(iri);
+        resourceContext.getResource().id(iri);
         return this;
     }
 
@@ -136,8 +119,8 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
     }
 
     @Override
-    public NTripleWriter<S,P,O> triple(Triple triple) {
-        resource.add(triple);
+    public NTripleWriter<S,P,O> triple(Triple<S, P, O> triple) {
+        resourceContext.getResource().add(triple);
         return this;
     }
 
@@ -153,7 +136,7 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
     }
 
     @Override
-    public NTripleWriter endPrefixMapping(String prefix) {
+    public NTripleWriter<S, P, O> endPrefixMapping(String prefix) {
         // we don't remove name spaces. It's troubling RDF serializations.
         //context.removeNamespace(prefix);
         return this;
@@ -161,7 +144,7 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
 
     public void close() {
         try {
-            write(resource);
+            write(resourceContext);
             idCounter++;
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
@@ -169,14 +152,24 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
     }
 
     @Override
-    public NTripleWriter<S,P,O> write(Resource<S, P, O> resource) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        Iterator<Triple<S,P,O>> it = resource.iterator();
-        while (it.hasNext()) {
-            sb.append(writeStatement(it.next()));
+    public NTripleWriter<S,P,O> write(ResourceContext<Resource<S, P, O>> resourceContext) throws IOException {
+        if (resourceContext.getResource() != null) {
+            StringBuilder sb = new StringBuilder();
+            for (Triple<S, P, O> t : resourceContext.getResource()) {
+                sb.append(writeStatement(t));
+            }
+            byteCounter += sb.length();
+            writer.write(sb.toString());
+        } else if (resourceContext.getResources() != null) {
+            for (Resource<S, P, O> resource : resourceContext.getResources()) {
+                StringBuilder sb = new StringBuilder();
+                for (Triple<S, P, O> t : resource) {
+                    sb.append(writeStatement(t));
+                }
+                byteCounter += sb.length();
+                writer.write(sb.toString());
+            }
         }
-        byteCounter += sb.length();
-        writer.write(sb.toString());
         return this;
     }
 
@@ -188,21 +181,20 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
     }
 
     public String writeSubject(S subject) {
-        return //Identifier.GENID.equals(subject.id().getScheme()) ?
-                subject.isBlank() ?
+        return subject.isBlank() ?
                 subject.toString() :
                 "<" + escape(subject.toString()) + ">" ;
     }
 
     public String writePredicate(P predicate) {
-        if (predicate.id().getScheme() == null && nullPredicate !=null) {
+        /*if (predicate.id().getScheme() == null && nullPredicate !=null) {
             IRI iri = IRI.builder()
                     .scheme(nullPredicate.getScheme())
                     .host(nullPredicate.getHost())
                     .path(nullPredicate.getPath() + "/" + predicate.id().getSchemeSpecificPart())
                     .build();
             return "<" + escape(iri.toString()) + ">";
-        }
+        }*/
         return "<" + escape(predicate.id().toString()) + ">";
     }
 
@@ -227,8 +219,7 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
             return s;
         } else if (object instanceof IdentifiableNode) {
             IdentifiableNode node = (IdentifiableNode)object;
-            return //Identifier.GENID.equals(node.id().getScheme()) ?
-                    node.isBlank() ?
+            return node.isBlank() ?
                     node.toString() :
                     "<" + escape(node.toString()) + ">" ;
         }

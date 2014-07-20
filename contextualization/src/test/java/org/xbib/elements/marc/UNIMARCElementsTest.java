@@ -108,8 +108,8 @@ public class UNIMARCElementsTest extends Assert {
                             .fragment(Long.toString(counter.getAndIncrement())).build();
                     context.getResource().id(iri);
                     StringWriter sw = new StringWriter();
-                    TurtleWriter tw = new TurtleWriter().output(sw);
-                    tw.write(context.getResource());
+                    TurtleWriter tw = new TurtleWriter(sw);
+                    tw.write(context);
                     //logger.debug("out={}", sw.toString());
                 }
 

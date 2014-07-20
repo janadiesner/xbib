@@ -1,18 +1,3 @@
-/*
- * Copyright 2010-2013 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
 package org.asynchttpclient.providers.netty.request;
 
 import static org.asynchttpclient.providers.netty.util.HttpUtil.*;
@@ -69,12 +54,12 @@ import org.asynchttpclient.providers.netty.request.FeedableBodyGenerator.FeedLis
 import org.asynchttpclient.util.AsyncHttpProviderUtils;
 import org.asynchttpclient.util.ProxyUtils;
 import org.asynchttpclient.websocket.WebSocketUpgradeHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 public class NettyRequestSender {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NettyRequestSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(NettyRequestSender.class.getName());
 
     private final AtomicBoolean closed;
     private final AsyncHttpClientConfig config;
@@ -103,7 +88,7 @@ public class NettyRequestSender {
                 future.setState(NettyResponseFuture.STATE.RECONNECTED);
                 future.getAndSetStatusReceived(false);
 
-                LOGGER.debug("Trying to recover request {}\n", future.getNettyRequest());
+                logger.debug("Trying to recover request {}\n", future.getNettyRequest());
 
                 try {
                     sendNextRequest(future.getRequest(), future);
@@ -112,10 +97,10 @@ public class NettyRequestSender {
                 } catch (IOException iox) {
                     future.setState(NettyResponseFuture.STATE.CLOSED);
                     future.abort(iox);
-                    LOGGER.error("Remotely Closed, unable to recover", iox);
+                    logger.error("Remotely Closed, unable to recover", iox);
                 }
             } else {
-                LOGGER.debug("Unable to recover future {}\n", future);
+                logger.debug("Unable to recover future {}\n", future);
             }
         }
         return success;
@@ -178,21 +163,21 @@ public class NettyRequestSender {
         future.setState(NettyResponseFuture.STATE.POOLED);
         future.attachChannel(channel, false);
 
-        LOGGER.debug("\nUsing cached Channel {}\n for request \n{}\n", channel, nettyRequest);
+        logger.debug("\nUsing cached Channel {}\n for request \n{}\n", channel, nettyRequest);
         Channels.setDefaultAttribute(channel, future);
 
         try {
             writeRequest(channel, config, future);
         } catch (Exception ex) {
-            LOGGER.debug("writeRequest failure", ex);
+            logger.debug("writeRequest failure", ex);
             if (ex.getMessage() != null && ex.getMessage().contains("SSLEngine")) {
-                LOGGER.debug("SSLEngine failure", ex);
+                logger.debug("SSLEngine failure", ex);
                 future = null;
             } else {
                 try {
                     asyncHandler.onThrowable(ex);
                 } catch (Throwable t) {
-                    LOGGER.warn("doConnect.writeRequest()", t);
+                    logger.warn("doConnect.writeRequest()", t);
                 }
                 IOException ioe = new IOException(ex.getMessage());
                 ioe.initCause(ex);
@@ -251,7 +236,7 @@ public class NettyRequestSender {
             try {
                 asyncHandler.onThrowable(ioe);
             } catch (Throwable t) {
-                LOGGER.warn("c.operationComplete()", t);
+                logger.warn("c.operationComplete()", t);
             }
             throw ioe;
         }
@@ -288,7 +273,7 @@ public class NettyRequestSender {
             channelFuture.addListener(cl);
         }
 
-        LOGGER.debug("\nNon cached request \n{}\n\nusing Channel \n{}\n", cl.future().getNettyRequest(), channelFuture.channel());
+        logger.debug("\nNon cached request \n{}\n\nusing Channel \n{}\n", cl.future().getNettyRequest(), channelFuture.channel());
 
         if (!cl.future().isCancelled() || !cl.future().isDone()) {
             channels.registerChannel(channelFuture.channel());
@@ -339,7 +324,7 @@ public class NettyRequestSender {
                     try {
                         raf.close();
                     } catch (IOException e) {
-                        LOGGER.warn("Failed to close request body: {}", e.getMessage(), e);
+                        logger.warn("Failed to close request body: {}", e.getMessage(), e);
                     }
                     super.operationComplete(cf);
                 }
@@ -362,7 +347,7 @@ public class NettyRequestSender {
             if (is.markSupported())
                 is.reset();
             else {
-                LOGGER.warn("Stream has already been consumed and cannot be reset");
+                logger.warn("Stream has already been consumed and cannot be reset");
                 return true;
             }
         } else {
@@ -374,7 +359,7 @@ public class NettyRequestSender {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    LOGGER.warn("Failed to close request body: {}", e.getMessage(), e);
+                    logger.warn("Failed to close request body: {}", e.getMessage(), e);
                 }
                 super.operationComplete(cf);
             }
@@ -408,7 +393,7 @@ public class NettyRequestSender {
                 try {
                     b.close();
                 } catch (IOException e) {
-                    LOGGER.warn("Failed to close request body: {}", e.getMessage(), e);
+                    logger.warn("Failed to close request body: {}", e.getMessage(), e);
                 }
                 super.operationComplete(cf);
             }
@@ -497,11 +482,11 @@ public class NettyRequestSender {
                     channel.writeAndFlush(nettyRequest, channel.newProgressivePromise()).addListener(new ProgressListener(config, true, future.getAsyncHandler(), future));
                 } catch (Throwable cause) {
                     // FIXME why not notify?
-                    LOGGER.debug(cause.getMessage(), cause);
+                    logger.debug(cause.getMessage(), cause);
                     try {
                         channel.close();
                     } catch (RuntimeException ex) {
-                        LOGGER.debug(ex.getMessage(), ex);
+                        logger.debug(ex.getMessage(), ex);
                     }
                     return;
                 }
@@ -530,7 +515,7 @@ public class NettyRequestSender {
             try {
                 channel.close();
             } catch (RuntimeException ex) {
-                LOGGER.debug(ex.getMessage(), ex);
+                logger.debug(ex.getMessage(), ex);
             }
         }
 
@@ -544,7 +529,7 @@ public class NettyRequestSender {
         future.setState(NettyResponseFuture.STATE.NEW);
         future.touch();
 
-        LOGGER.debug("\n\nReplaying Request {}\n for Future {}\n", newRequest, future);
+        logger.debug("Replaying Request {} for Future {}", newRequest, future);
         channels.drainChannel(ctx, future);
         sendNextRequest(newRequest, future);
     }

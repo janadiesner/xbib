@@ -32,7 +32,7 @@
 package org.xbib.oai.client;
 
 import org.xbib.oai.OAIDateResolution;
-import org.xbib.oai.listrecords.ListRecordsListener;
+import org.xbib.oai.client.listrecords.ListRecordsListener;
 import org.xbib.util.DateUtil;
 import org.xbib.io.Connection;
 import org.xbib.io.Packet;
@@ -41,7 +41,7 @@ import org.xbib.io.archivers.tar.TarConnectionFactory;
 import org.xbib.io.archivers.tar.TarSession;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.oai.listrecords.ListRecordsRequest;
+import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.xml.XmlMetadataHandler;
 import org.xml.sax.SAXException;
 

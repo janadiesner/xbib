@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.commons.fileupload.disk;
 
 import static java.lang.String.format;
@@ -46,14 +30,8 @@ import org.apache.commons.io.output.DeferredFileOutputStream;
  * <p> The default implementation of the
  * {@link org.apache.commons.fileupload.FileItem FileItem} interface.
  *
- *
- * @since FileUpload 1.1
- *
- * @version $Id: DiskFileItem.java 1454690 2013-03-09 12:08:48Z simonetripodi $
  */
 public class DiskFileItem implements FileItem {
-
-    // ----------------------------------------------------- Manifest constants
 
     /**
      * Default content charset to be used when no explicit charset
@@ -63,13 +41,10 @@ public class DiskFileItem implements FileItem {
      */
     public static final String DEFAULT_CHARSET = "ISO-8859-1";
 
-    // ----------------------------------------------------------- Data members
-
     /**
      * UID used in unique file name generation.
      */
-    private static final String UID =
-            UUID.randomUUID().toString().replace('-', '_');
+    private static final String UID = UUID.randomUUID().toString().replace('-', '_');
 
     /**
      * Counter used in unique identifier generation.
@@ -102,7 +77,6 @@ public class DiskFileItem implements FileItem {
      * file item is moved from its original location.
      */
     private long size = -1;
-
 
     /**
      * The threshold above which uploads will be stored on disk.
@@ -139,8 +113,6 @@ public class DiskFileItem implements FileItem {
      */
     private FileItemHeaders headers;
 
-    // ----------------------------------------------------------- Constructors
-
     /**
      * Constructs a new <code>DiskFileItem</code> instance.
      *
@@ -168,8 +140,6 @@ public class DiskFileItem implements FileItem {
         this.sizeThreshold = sizeThreshold;
         this.repository = repository;
     }
-
-    // ------------------------------- Methods from javax.activation.DataSource
 
     /**
      * Returns an {@link java.io.InputStream InputStream} that can be
@@ -230,8 +200,6 @@ public class DiskFileItem implements FileItem {
     public String getName() {
         return Streams.checkFileName(fileName);
     }
-
-    // ------------------------------------------------------- FileItem methods
 
     /**
      * Provides a hint as to whether or not the file contents will be read
@@ -322,7 +290,7 @@ public class DiskFileItem implements FileItem {
      * character encoding.  This method uses {@link #get()} to retrieve the
      * contents of the file.
      *
-     * <b>TODO</b> Consider making this method throw UnsupportedEncodingException.
+     * TODO Consider making this method throw UnsupportedEncodingException.
      *
      * @return The contents of the file, as a string.
      */
@@ -503,8 +471,6 @@ public class DiskFileItem implements FileItem {
         return dfos;
     }
 
-    // --------------------------------------------------------- Public methods
-
     /**
      * Returns the {@link java.io.File} object for the <code>FileItem</code>'s
      * data's temporary location on the disk. Note that for
@@ -524,8 +490,6 @@ public class DiskFileItem implements FileItem {
         }
         return dfos.getFile();
     }
-
-    // ------------------------------------------------------ Protected methods
 
     /**
      * Removes the file contents from the temporary storage.
@@ -561,8 +525,6 @@ public class DiskFileItem implements FileItem {
         return tempFile;
     }
 
-    // -------------------------------------------------------- Private methods
-
     /**
      * Returns an identifier that is unique within the class loader used to
      * load this class, but does not have random-like apearance.
@@ -592,8 +554,6 @@ public class DiskFileItem implements FileItem {
         return format("name=%s, StoreLocation=%s, size=%s bytes, isFormField=%s, FieldName=%s",
                       getName(), getStoreLocation(), getSize(), isFormField(), getFieldName());
     }
-
-    // -------------------------------------------------- Serialization methods
 
     /**
      * Writes the state of this object during serialization.

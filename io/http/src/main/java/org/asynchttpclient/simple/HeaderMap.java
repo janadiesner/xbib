@@ -23,8 +23,6 @@ import java.util.Set;
 /**
  * A map containing headers with the sole purpose of being given to
  * {@link SimpleAHCTransferListener#onHeaders(String, org.asynchttpclient.simple.HeaderMap)}.
- *
- * @author Benjamin Hanzelmann
  */
 public class HeaderMap implements Map<String, List<String>> {
 

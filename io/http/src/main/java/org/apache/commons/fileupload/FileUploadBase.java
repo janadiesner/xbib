@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.commons.fileupload;
 
 import static java.lang.String.format;
@@ -56,8 +40,6 @@ import org.apache.commons.fileupload.util.Streams;
  */
 public abstract class FileUploadBase {
 
-    // ---------------------------------------------------------- Class methods
-
     /**
      * <p>Utility method that determines whether the request contains multipart
      * content.</p>
@@ -82,24 +64,6 @@ public abstract class FileUploadBase {
         }
         return false;
     }
-
-    /**
-     * Utility method that determines whether the request contains multipart
-     * content.
-     *
-     * @param req The servlet request to be evaluated. Must be non-null.
-     *
-     * @return <code>true</code> if the request is multipart;
-     *         <code>false</code> otherwise.
-     *
-     * @deprecated 1.1 Use the method on <code>ServletFileUpload</code> instead.
-     */
-    @Deprecated
-    public static boolean isMultipartContent(HttpServletRequest req) {
-        return ServletFileUpload.isMultipartContent(req);
-    }
-
-    // ----------------------------------------------------- Manifest constants
 
     /**
      * HTTP content type header name.
@@ -141,17 +105,6 @@ public abstract class FileUploadBase {
      */
     public static final String MULTIPART_MIXED = "multipart/mixed";
 
-    /**
-     * The maximum length of a single header line that will be parsed
-     * (1024 bytes).
-     * @deprecated This constant is no longer used. As of commons-fileupload
-     *   1.2, the only applicable limit is the total size of a parts headers,
-     *   {@link MultipartStream#HEADER_PART_SIZE_MAX}.
-     */
-    @Deprecated
-    public static final int MAX_HEADER_SIZE = 1024;
-
-    // ----------------------------------------------------------- Data members
 
     /**
      * The maximum size permitted for the complete request, as opposed to
@@ -174,8 +127,6 @@ public abstract class FileUploadBase {
      * The progress listener.
      */
     private ProgressListener listener;
-
-    // ----------------------------------------------------- Property accessors
 
     /**
      * Returns the factory class used when creating file items.
@@ -263,28 +214,6 @@ public abstract class FileUploadBase {
      */
     public void setHeaderEncoding(String encoding) {
         headerEncoding = encoding;
-    }
-
-    // --------------------------------------------------------- Public methods
-
-    /**
-     * Processes an <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>
-     * compliant <code>multipart/form-data</code> stream.
-     *
-     * @param req The servlet request to be parsed.
-     *
-     * @return A list of <code>FileItem</code> instances parsed from the
-     *         request, in the order that they were transmitted.
-     *
-     * @throws FileUploadException if there are problems reading/parsing
-     *                             the request or storing files.
-     *
-     * @deprecated 1.1 Use {@link org.apache.commons.fileupload.servlet.ServletFileUpload#parseRequest(HttpServletRequest)} instead.
-     */
-    @Deprecated
-    public List<FileItem> parseRequest(HttpServletRequest req)
-    throws FileUploadException {
-        return parseRequest(new ServletRequestContext(req));
     }
 
     /**
@@ -383,7 +312,6 @@ public abstract class FileUploadBase {
      * @throws FileUploadException if there are problems reading/parsing
      *                             the request or storing files.
      *
-     * @since 1.3
      */
     public Map<String, List<FileItem>> parseParameterMap(UploadContext ctx)
             throws FileUploadException {
@@ -404,8 +332,6 @@ public abstract class FileUploadBase {
 
         return itemsMap;
     }
-
-    // ------------------------------------------------------ Protected methods
 
     /**
      * Retrieves the boundary from the <code>Content-type</code> header.
@@ -432,20 +358,6 @@ public abstract class FileUploadBase {
             boundary = boundaryStr.getBytes(); // Intentionally falls back to default charset
         }
         return boundary;
-    }
-
-    /**
-     * Retrieves the file name from the <code>Content-disposition</code>
-     * header.
-     *
-     * @param headers A <code>Map</code> containing the HTTP request headers.
-     *
-     * @return The file name for the current <code>encapsulation</code>.
-     * @deprecated 1.2.1 Use {@link #getFileName(FileItemHeaders)}.
-     */
-    @Deprecated
-    protected String getFileName(Map<String, String> headers) {
-        return getFileName(getHeader(headers, CONTENT_DISPOSITION));
     }
 
     /**
@@ -525,44 +437,6 @@ public abstract class FileUploadBase {
     }
 
     /**
-     * Retrieves the field name from the <code>Content-disposition</code>
-     * header.
-     *
-     * @param headers A <code>Map</code> containing the HTTP request headers.
-     *
-     * @return The field name for the current <code>encapsulation</code>.
-     * @deprecated 1.2.1 Use {@link #getFieldName(FileItemHeaders)}.
-     */
-    @Deprecated
-    protected String getFieldName(Map<String, String> headers) {
-        return getFieldName(getHeader(headers, CONTENT_DISPOSITION));
-    }
-
-    /**
-     * Creates a new {@link org.apache.commons.fileupload.FileItem} instance.
-     *
-     * @param headers       A <code>Map</code> containing the HTTP request
-     *                      headers.
-     * @param isFormField   Whether or not this item is a form field, as
-     *                      opposed to a file.
-     *
-     * @return A newly created <code>FileItem</code> instance.
-     *
-     * @throws FileUploadException if an error occurs.
-     * @deprecated 1.2 This method is no longer used in favour of
-     *   internally created instances of {@link org.apache.commons.fileupload.FileItem}.
-     */
-    @Deprecated
-    protected FileItem createItem(Map<String, String> headers,
-                                  boolean isFormField)
-        throws FileUploadException {
-        return getFileItemFactory().createItem(getFieldName(headers),
-                getHeader(headers, CONTENT_TYPE),
-                isFormField,
-                getFileName(headers));
-    }
-
-    /**
      * <p> Parses the <code>header-part</code> and returns as key/value
      * pairs.
      *
@@ -616,35 +490,6 @@ public abstract class FileUploadBase {
     }
 
     /**
-     * <p> Parses the <code>header-part</code> and returns as key/value
-     * pairs.
-     *
-     * <p> If there are multiple headers of the same names, the name
-     * will map to a comma-separated list containing the values.
-     *
-     * @param headerPart The <code>header-part</code> of the current
-     *                   <code>encapsulation</code>.
-     *
-     * @return A <code>Map</code> containing the parsed HTTP request headers.
-     * @deprecated 1.2.1 Use {@link #getParsedHeaders(String)}
-     */
-    @Deprecated
-    protected Map<String, String> parseHeaders(String headerPart) {
-        FileItemHeaders headers = getParsedHeaders(headerPart);
-        Map<String, String> result = new HashMap<String, String>();
-        for (Iterator<String> iter = headers.getHeaderNames();  iter.hasNext();) {
-            String headerName = iter.next();
-            Iterator<String> iter2 = headers.getHeaders(headerName);
-            StringBuilder headerValue = new StringBuilder(iter2.next());
-            while (iter2.hasNext()) {
-                headerValue.append(",").append(iter2.next());
-            }
-            result.put(headerName, headerValue.toString());
-        }
-        return result;
-    }
-
-    /**
      * Skips bytes until the end of the current line.
      * @param headerPart The headers, which are being parsed.
      * @param end Index of the last byte, which has yet been
@@ -682,23 +527,6 @@ public abstract class FileUploadBase {
         String headerValue =
             header.substring(header.indexOf(':') + 1).trim();
         headers.addHeader(headerName, headerValue);
-    }
-
-    /**
-     * Returns the header with the specified name from the supplied map. The
-     * header lookup is case-insensitive.
-     *
-     * @param headers A <code>Map</code> containing the HTTP request headers.
-     * @param name    The name of the header to return.
-     *
-     * @return The value of specified header, or a comma-separated list if
-     *         there were multiple headers of that name.
-     * @deprecated 1.2.1 Use {@link FileItemHeaders#getHeader(String)}.
-     */
-    @Deprecated
-    protected final String getHeader(Map<String, String> headers,
-            String name) {
-        return headers.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     /**
@@ -1125,36 +953,13 @@ public abstract class FileUploadBase {
     public static class FileUploadIOException extends IOException {
 
         /**
-         * The exceptions UID, for serializing an instance.
-         */
-        private static final long serialVersionUID = -7047616958165584154L;
-
-        /**
-         * The exceptions cause; we overwrite the parent
-         * classes field, which is available since Java
-         * 1.4 only.
-         */
-        private final FileUploadException cause;
-
-        /**
          * Creates a <code>FileUploadIOException</code> with the
          * given cause.
          *
-         * @param pCause The exceptions cause, if any, or null.
+         * @param cause The exceptions cause, if any, or null.
          */
-        public FileUploadIOException(FileUploadException pCause) {
-            // We're not doing super(pCause) cause of 1.3 compatibility.
-            cause = pCause;
-        }
-
-        /**
-         * Returns the exceptions cause.
-         *
-         * @return The exceptions cause, if any, or null.
-         */
-        @Override
-        public Throwable getCause() {
-            return cause;
+        public FileUploadIOException(Exception cause) {
+           super(cause);
         }
 
     }
@@ -1164,11 +969,6 @@ public abstract class FileUploadBase {
      */
     public static class InvalidContentTypeException
             extends FileUploadException {
-
-        /**
-         * The exceptions UID, for serializing an instance.
-         */
-        private static final long serialVersionUID = -9073026332015646668L;
 
         /**
          * Constructs a <code>InvalidContentTypeException</code> with no
@@ -1196,36 +996,13 @@ public abstract class FileUploadBase {
     public static class IOFileUploadException extends FileUploadException {
 
         /**
-         * The exceptions UID, for serializing an instance.
-         */
-        private static final long serialVersionUID = 1749796615868477269L;
-
-        /**
-         * The exceptions cause; we overwrite the parent
-         * classes field, which is available since Java
-         * 1.4 only.
-         */
-        private final IOException cause;
-
-        /**
          * Creates a new instance with the given cause.
          *
          * @param pMsg The detail message.
          * @param pException The exceptions cause.
          */
-        public IOFileUploadException(String pMsg, IOException pException) {
-            super(pMsg);
-            cause = pException;
-        }
-
-        /**
-         * Returns the exceptions cause.
-         *
-         * @return The exceptions cause, if any, or null.
-         */
-        @Override
-        public Throwable getCause() {
-            return cause;
+        public IOFileUploadException(String pMsg, Exception pException) {
+            super(pMsg, pException);
         }
 
     }
@@ -1235,12 +1012,6 @@ public abstract class FileUploadBase {
      * is exceeded.
      */
     protected abstract static class SizeException extends FileUploadException {
-
-        /**
-         * Serial version UID, being used, if serialized.
-         */
-        private static final long serialVersionUID = -8776225574705254126L;
-
         /**
          * The actual size of the request.
          */
@@ -1268,7 +1039,6 @@ public abstract class FileUploadBase {
          * Retrieves the actual size of the request.
          *
          * @return The actual size of the request.
-         * @since 1.3
          */
         public long getActualSize() {
             return actual;
@@ -1278,7 +1048,6 @@ public abstract class FileUploadBase {
          * Retrieves the permitted size of the request.
          *
          * @return The permitted size of the request.
-         * @since 1.3
          */
         public long getPermittedSize() {
             return permitted;
@@ -1286,72 +1055,12 @@ public abstract class FileUploadBase {
 
     }
 
-    /**
-     * Thrown to indicate that the request size is not specified. In other
-     * words, it is thrown, if the content-length header is missing or
-     * contains the value -1.
-     *
-     * @deprecated 1.2 As of commons-fileupload 1.2, the presence of a
-     *   content-length header is no longer required.
-     */
-    @Deprecated
-    public static class UnknownSizeException
-        extends FileUploadException {
-
-        /**
-         * The exceptions UID, for serializing an instance.
-         */
-        private static final long serialVersionUID = 7062279004812015273L;
-
-        /**
-         * Constructs a <code>UnknownSizeException</code> with no
-         * detail message.
-         */
-        public UnknownSizeException() {
-            super();
-        }
-
-        /**
-         * Constructs an <code>UnknownSizeException</code> with
-         * the specified detail message.
-         *
-         * @param message The detail message.
-         */
-        public UnknownSizeException(String message) {
-            super(message);
-        }
-
-    }
 
     /**
      * Thrown to indicate that the request size exceeds the configured maximum.
      */
     public static class SizeLimitExceededException
             extends SizeException {
-
-        /**
-         * The exceptions UID, for serializing an instance.
-         */
-        private static final long serialVersionUID = -2474893167098052828L;
-
-        /**
-         * @deprecated 1.2 Replaced by
-         * {@link #SizeLimitExceededException(String, long, long)}
-         */
-        @Deprecated
-        public SizeLimitExceededException() {
-            this(null, 0, 0);
-        }
-
-        /**
-         * @deprecated 1.2 Replaced by
-         * {@link #SizeLimitExceededException(String, long, long)}
-         * @param message The exceptions detail message.
-         */
-        @Deprecated
-        public SizeLimitExceededException(String message) {
-            this(message, 0, 0);
-        }
 
         /**
          * Constructs a <code>SizeExceededException</code> with
@@ -1373,11 +1082,6 @@ public abstract class FileUploadBase {
      */
     public static class FileSizeLimitExceededException
             extends SizeException {
-
-        /**
-         * The exceptions UID, for serializing an instance.
-         */
-        private static final long serialVersionUID = 8150776562029630058L;
 
         /**
          * File name of the item, which caused the exception.

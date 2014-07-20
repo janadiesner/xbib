@@ -1,19 +1,7 @@
-/*
- * Copyright (c) 2010-2012 Sonatype, Inc. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
 package org.asynchttpclient.resumable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,9 +16,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * to store the download index information.
  */
 public class PropertiesBasedResumableProcessor implements ResumableAsyncHandler.ResumableProcessor {
-    private final static Logger log = LoggerFactory.getLogger(PropertiesBasedResumableProcessor.class);
+
+    private final static Logger logger = LoggerFactory.getLogger(PropertiesBasedResumableProcessor.class.getName());
+
     private final static File TMP = new File(System.getProperty("java.io.tmpdir"), "ahc");
+
     private final static String storeName = "ResumableAsyncHandler.properties";
+
     private final ConcurrentHashMap<String, Long> properties = new ConcurrentHashMap<String, Long>();
 
     /**
@@ -56,7 +48,7 @@ public class PropertiesBasedResumableProcessor implements ResumableAsyncHandler.
      */
     @Override
     public void save(Map<String, Long> map) {
-        log.debug("Saving current download state {}", properties.toString());
+        logger.debug("Saving current download state {}", properties.toString());
         FileOutputStream os = null;
         try {
 
@@ -78,7 +70,7 @@ public class PropertiesBasedResumableProcessor implements ResumableAsyncHandler.
             }
             os.flush();
         } catch (Throwable e) {
-            log.warn(e.getMessage(), e);
+            logger.warn(e.getMessage(), e);
         } finally {
             if (os != null) {
                 try {
@@ -110,12 +102,12 @@ public class PropertiesBasedResumableProcessor implements ResumableAsyncHandler.
                 value = scan.next().trim();
                 properties.put(key, Long.valueOf(value));
             }
-            log.debug("Loading previous download state {}", properties.toString());
+            logger.debug("Loading previous download state {}", properties.toString());
         } catch (FileNotFoundException ex) {
-            log.debug("Missing {}", storeName);
+            logger.debug("Missing {}", storeName);
         } catch (Throwable ex) {
             // Survive any exceptions
-            log.warn(ex.getMessage(), ex);
+            logger.warn(ex.getMessage(), ex);
         } finally {
             if (scan != null)
                 scan.close();

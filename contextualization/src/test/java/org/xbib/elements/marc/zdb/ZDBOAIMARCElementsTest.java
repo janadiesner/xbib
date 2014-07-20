@@ -63,8 +63,8 @@ public class ZDBOAIMARCElementsTest {
                 Resource r = context.getResource();
                 r.id(IRI.builder().host("myindex").query("mytype").fragment(counter.toString()).build());
                 StringWriter sw = new StringWriter();
-                TurtleWriter tw = new TurtleWriter().output(sw);
-                tw.write(r);
+                TurtleWriter tw = new TurtleWriter(sw);
+                tw.write(context);
                 logger.info("out={}", sw.toString());
                 counter.incrementAndGet();
             }

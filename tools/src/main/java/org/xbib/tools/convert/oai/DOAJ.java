@@ -52,8 +52,6 @@ import javax.xml.namespace.QName;
  */
 public class DOAJ extends OAIHarvester {
 
-    private final static Logger logger = LoggerFactory.getLogger(DOAJ.class.getSimpleName());
-
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

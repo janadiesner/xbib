@@ -1,18 +1,3 @@
-/*
- * Copyright 2010-2013 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
 package org.asynchttpclient.providers.netty.request;
 
 import io.netty.channel.ChannelProgressiveFuture;
@@ -27,12 +12,12 @@ import org.asynchttpclient.ProgressAsyncHandler;
 import org.asynchttpclient.Realm;
 import org.asynchttpclient.providers.netty.future.NettyResponseFuture;
 import org.asynchttpclient.providers.netty.future.NettyResponseFutures;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 public class ProgressListener implements ChannelProgressiveFutureListener {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProgressListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProgressListener.class.getName());
 
     private final AsyncHttpClientConfig config;
     private final boolean notifyHeaders;
@@ -55,25 +40,25 @@ public class ProgressListener implements ChannelProgressiveFutureListener {
         if (cause != null && future.getState() != NettyResponseFuture.STATE.NEW) {
 
             if (cause instanceof IllegalStateException) {
-                LOGGER.debug(cause.getMessage(), cause);
+                logger.debug(cause.getMessage(), cause);
                 try {
                     cf.channel().close();
                 } catch (RuntimeException ex) {
-                    LOGGER.debug(ex.getMessage(), ex);
+                    logger.debug(ex.getMessage(), ex);
                 }
                 return;
             }
 
             if (cause instanceof ClosedChannelException || NettyResponseFutures.abortOnReadCloseException(cause) || NettyResponseFutures.abortOnWriteCloseException(cause)) {
 
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(cf.cause() == null ? "" : cf.cause().getMessage(), cf.cause());
+                if (logger.isDebugEnabled()) {
+                    logger.debug(cf.cause() == null ? "" : cf.cause().getMessage(), cf.cause());
                 }
 
                 try {
                     cf.channel().close();
                 } catch (RuntimeException ex) {
-                    LOGGER.debug(ex.getMessage(), ex);
+                    logger.debug(ex.getMessage(), ex);
                 }
                 return;
             } else {

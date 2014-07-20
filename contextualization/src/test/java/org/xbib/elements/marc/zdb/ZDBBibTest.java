@@ -127,8 +127,8 @@ public class ZDBBibTest extends Assert {
                     .query("title")
                     .fragment(counter.toString()).build());
             StringWriter sw = new StringWriter();
-            TurtleWriter tw = new TurtleWriter().output(sw);
-            tw.write(r);
+            TurtleWriter tw = new TurtleWriter(sw);
+            tw.write(context);
             logger.debug("out={}", sw.toString());
             counter.incrementAndGet();
         }

@@ -92,10 +92,20 @@ public class XmlMetadataHandler extends MetadataHandler implements OAIConstants 
         return writer;
     }
 
+    public XmlMetadataHandler setEventWriter(XMLEventWriter eventWriter) {
+        this.eventWriter = eventWriter;
+        return this;
+    }
+
+    public XMLEventWriter getEventWriter() {
+        return eventWriter;
+    }
+
     public String getIdentifier() {
         return id;
     }
 
+    @Override
     public void setDocumentLocator(Locator locator) {
         this.locator = locator;
     }

@@ -32,8 +32,6 @@
 package org.xbib.rdf.io.rdfxml;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -46,13 +44,13 @@ import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.io.Triplifier;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.rdf.simple.SimpleFactory;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.RDF;
-import org.xbib.rdf.io.xml.XmlTriplifier;
 import org.xbib.rdf.IdentifiableNode;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleTriple;
@@ -76,7 +74,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  *
  */
 public class RdfXmlReader<S extends Identifier, P extends Property, O extends Node>
-        implements RDF, XmlTriplifier<S,P,O> {
+        implements RDF, Triplifier<S,P,O> {
 
     private final SimpleFactory<S,P,O> simpleFactory = SimpleFactory.getInstance();
 
@@ -88,12 +86,8 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
     private int bn = 0;
 
     @Override
-    public RdfXmlReader parse(InputStream in) throws IOException {
-        return parse(new InputStreamReader(in, "UTF-8"));
-    }
-    
-    @Override
-    public RdfXmlReader parse(Reader reader) throws IOException {
+    public RdfXmlReader parse(Reader reader, TripleListener<S,P,O> listener) throws IOException {
+        this.listener = listener;
         try {
             parse(new InputSource(reader));
         } catch (SAXException ex) {
@@ -102,16 +96,14 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
         return this;
     } 
 
-    @Override
     public RdfXmlReader parse(InputSource source) throws IOException, SAXException {
         parse(XMLReaderFactory.createXMLReader(), source);
         return this;
     }
 
-    @Override
     public RdfXmlReader parse(XMLReader reader, InputSource source) throws IOException, SAXException {
-        xmlHandler.setListener(listener);
         if (listener != null) {
+            xmlHandler.setListener(listener);
             listener.begin();
         }
         reader.setContentHandler(xmlHandler);
@@ -127,14 +119,14 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
         return this;
     }
 
-    @Override
-    public RdfXmlReader setTripleListener(TripleListener<S,P,O> tripleHandler) {
-        this.listener = tripleHandler;
-        return this;
+    public XmlHandler getHandler() {
+        return xmlHandler;
     }
 
-    @Override
-    public XmlHandler getHandler() {
+    public XmlHandler getHandler(TripleListener<S,P,O> listener) {
+        if (listener != null) {
+            xmlHandler.setListener(listener);
+        }
         return xmlHandler;
     }
 
@@ -147,7 +139,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
     }
 
     // produce a triple for the listener
-    private void yield(Triple t) {
+    private void yield(Triple<S, P, O> t) {
         if (listener != null) {
             listener.triple(t);
         }

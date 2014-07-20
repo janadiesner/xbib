@@ -35,12 +35,12 @@ import java.net.URI;
 
 import org.xbib.oai.OAIConstants;
 import org.xbib.oai.OAISession;
-import org.xbib.oai.getrecord.GetRecordRequest;
-import org.xbib.oai.identify.IdentifyRequest;
-import org.xbib.oai.identify.ListIdentifiersRequest;
-import org.xbib.oai.formats.ListMetadataFormatsRequest;
-import org.xbib.oai.listrecords.ListRecordsRequest;
-import org.xbib.oai.listsets.ListSetsRequest;
+import org.xbib.oai.client.getrecord.GetRecordRequest;
+import org.xbib.oai.client.identify.IdentifyRequest;
+import org.xbib.oai.client.listidentifiers.ListIdentifiersRequest;
+import org.xbib.oai.client.listmetadataformats.ListMetadataFormatsRequest;
+import org.xbib.oai.client.listrecords.ListRecordsRequest;
+import org.xbib.oai.client.listsets.ListSetsRequest;
 import org.xbib.oai.util.ResumptionToken;
 
 /**

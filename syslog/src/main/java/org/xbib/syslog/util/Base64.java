@@ -153,7 +153,6 @@ public class Base64 {
             };
 	
 	
-/* ********  U R L   S A F E   B A S E 6 4   A L P H A B E T  ******** */
 
     /**
      * Used in the URL- and Filename-safe dialect described in Section 4 of RFC3548:
@@ -373,7 +372,6 @@ public class Base64 {
      * @param threeBytes  the array to convert
      * @param numSigBytes the number of significant bytes in your array
      * @return four byte array in Base64 notation.
-     * @since 1.5.1
      */
     private static byte[] encode3to4(byte[] b4, byte[] threeBytes, int numSigBytes, int options) {
         encode3to4(threeBytes, 0, numSigBytes, b4, 0, options);
@@ -402,7 +400,6 @@ public class Base64 {
      * @param destination the array to hold the conversion
      * @param destOffset  the index where output will be put
      * @return the <var>destination</var> array
-     * @since 1.3
      */
     private static byte[] encode3to4(
             byte[] source, int srcOffset, int numSigBytes,
@@ -461,7 +458,6 @@ public class Base64 {
      *
      * @param serializableObject The object to encode
      * @return The Base64-encoded object
-     * @since 1.4
      */
     public static String encodeObject(java.io.Serializable serializableObject) {
         return encodeObject(serializableObject, NO_OPTIONS);
@@ -489,7 +485,6 @@ public class Base64 {
      * @return The Base64-encoded object
      * @see org.xbib.syslog.util.Base64#GZIP
      * @see org.xbib.syslog.util.Base64#DONT_BREAK_LINES
-     * @since 2.0
      */
     public static String encodeObject(java.io.Serializable serializableObject, int options) {
         // Streams
@@ -569,7 +564,6 @@ public class Base64 {
      * Does not GZip-compress data.
      *
      * @param source The data to convert
-     * @since 1.4
      */
     public static String encodeBytes(byte[] source) {
         return encodeBytes(source, 0, source.length, NO_OPTIONS);
@@ -734,12 +728,6 @@ public class Base64 {
         }   // end else: don't compress
 
     }   // end encodeBytes
-    
-
-    
-    
-    
-/* ********  D E C O D I N G   M E T H O D S  ******** */
 
 
     /**

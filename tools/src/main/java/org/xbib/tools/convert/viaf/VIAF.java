@@ -32,30 +32,19 @@
 package org.xbib.tools.convert.viaf;
 
 import org.xbib.io.InputService;
-import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.oai.rdf.RdfOutput;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.IRINamespaceContext;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.rdfxml.RdfXmlReader;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.tools.Converter;
-import org.xml.sax.InputSource;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.net.URI;
@@ -132,121 +121,22 @@ public class VIAF extends Converter {
 
         @Override
         public Boolean call() throws Exception {
+            FileWriter fileWriter = new FileWriter(settings.get("output"));
             try {
                 while (true) {
                     String line = pump.take();
                     if ("|".equals(line)) {
                         break;
                     }
-                    final ElasticBuilder builder = new ElasticBuilder();
                     RdfXmlReader rdfxml = new RdfXmlReader();
-                    rdfxml.setTripleListener(builder);
-                    rdfxml.parse(new InputSource(new StringReader(line)));
-                    builder.close();
+                    rdfxml.parse(new StringReader(line), settings.getAsBoolean("ntriples", false) ?
+                         new NTripleWriter(fileWriter) : new TurtleWriter(fileWriter));
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 return false;
             }
             return true;
-        }
-    }
-
-    private final ResourceContext context = new SimpleResourceContext();
-
-    private class ElasticBuilder implements TripleListener {
-
-        private Resource resource;
-
-        private RdfOutput out;
-
-        ElasticBuilder() throws IOException {
-            resource = context.newResource();
-            OutputStream outputStream = new FileOutputStream(settings.get("output"));
-            out = settings.getAsBoolean("ntriples", false) ?
-                    new NTripleOutput(context.getNamespaceContext(), outputStream) :
-                    new TurtleOutput(context.getNamespaceContext(), outputStream);
-        }
-
-        @Override
-        public TripleListener begin() {
-            return this;
-        }
-
-        @Override
-        public TripleListener startPrefixMapping(String prefix, String uri) {
-            return this;
-        }
-
-        @Override
-        public TripleListener endPrefixMapping(String prefix) {
-            return this;
-        }
-
-        @Override
-        public ElasticBuilder newIdentifier(IRI iri) {
-            flush();
-            resource.id(iri);
-            return this;
-        }
-
-        @Override
-        public ElasticBuilder triple(Triple triple) {
-            resource.add(triple);
-            return this;
-        }
-
-        @Override
-        public TripleListener end() {
-            return this;
-        }
-
-        public void close() throws IOException {
-            flush();
-        }
-
-        private void flush() {
-            try {
-                out.output(context);
-            } catch (IOException e) {
-                logger.error("flush failed: {}", e.getMessage(), e);
-            }
-            resource = context.newResource();
-        }
-
-    }
-
-    private class TurtleOutput extends RdfOutput {
-
-        TurtleWriter writer;
-
-        TurtleOutput(IRINamespaceContext context, OutputStream out) throws IOException {
-            this.writer = new TurtleWriter()
-                    .output(out)
-                    .setContext(context)
-                    .writeNamespaces();
-        }
-
-        @Override
-        public RdfOutput output(ResourceContext resourceContext) throws IOException {
-            writer.write(resourceContext.getResource());
-            return this;
-        }
-    }
-
-    private class NTripleOutput extends RdfOutput {
-
-        NTripleWriter writer;
-
-        NTripleOutput(IRINamespaceContext context, OutputStream out) throws IOException {
-            this.writer = new NTripleWriter()
-                    .output(out);
-        }
-
-        @Override
-        public RdfOutput output(ResourceContext resourceContext) throws IOException {
-            writer.write(resourceContext.getResource());
-            return this;
         }
     }
 

@@ -53,6 +53,7 @@ import org.xml.sax.SAXException;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.Charset;
 
@@ -88,10 +89,9 @@ public final class FromEZBXML extends Feeder {
                 .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/");
 
         InputStream in = InputService.getInputStream(uri);
-            new XmlReader()
-                    .setNamespaces(false)
+        new XmlReader().setNamespaces(false)
                     .setHandler(handler)
-                    .parse(in);
+                    .parse(new InputStreamReader(in, "UTF-8"), null);
         in.close();
     }
 

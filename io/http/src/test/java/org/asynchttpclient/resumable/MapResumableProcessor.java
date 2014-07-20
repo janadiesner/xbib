@@ -5,9 +5,6 @@ import org.asynchttpclient.resumable.ResumableAsyncHandler.ResumableProcessor;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Benjamin Hanzelmann
- */
 public class MapResumableProcessor
         implements ResumableProcessor {
 
@@ -21,16 +18,9 @@ public class MapResumableProcessor
         map.remove(key);
     }
 
-    /**
-     * NOOP
-     */
     public void save(Map<String, Long> map) {
-
     }
 
-    /**
-     * NOOP
-     */
     public Map<String, Long> load() {
         return map;
     }

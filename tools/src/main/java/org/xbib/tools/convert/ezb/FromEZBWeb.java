@@ -84,10 +84,7 @@ public class FromEZBWeb extends Converter {
 
         Reader reader = new InputStreamReader(InputService.getInputStream(uri), "UTF-8");
         Writer writer = new FileWriter(settings.get("output"));
-
-        final TurtleWriter turtle = new TurtleWriter()
-                .setContext(context)
-                .output(writer);
+        final TurtleWriter turtle = new TurtleWriter(writer).setContext(context);
         Iterator<String> it = readZDBIDs(reader);
         long counter = 0;
         while (it.hasNext()) {
@@ -142,7 +139,7 @@ public class FromEZBWeb extends Converter {
                                             + (code2.isEmpty() ? "x" : code2)
                                             + (code3.isEmpty() ? "x" : code3))
                             .add("xbib:comment", comment);
-                    turtle.write(resource);
+                    turtle.write(resourceContext);
                     counter++;
                     if (counter % 1000 == 0) {
                         logger.info("{}", counter);

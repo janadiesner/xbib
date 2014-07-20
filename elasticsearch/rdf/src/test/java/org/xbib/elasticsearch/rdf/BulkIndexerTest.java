@@ -1,5 +1,6 @@
 package org.xbib.elasticsearch.rdf;
 
+import org.elasticsearch.common.unit.TimeValue;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.elasticsearch.search.SearchSupport;
@@ -27,11 +28,10 @@ public class BulkIndexerTest extends Assert {
                     .newClient(URI.create("es://localhost:9300?es.cluster.name=test"));
             es.newIndex("test");
             es.deleteIndex("test");
-
             ResourceContext context = createContext();
             new ResourceSink(es).output(context, context.getResource(), context.getContentBuilder());
-            es.flush();
-            Thread.sleep(2000);
+            es.flushIngest();
+            es.waitForResponses(TimeValue.timeValueSeconds(30));
             Logger queryLogger = LoggerFactory.getLogger("test", BulkIndexerTest.class.getName());
             // check if IRI path "document" worked
             new SearchSupport()

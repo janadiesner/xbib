@@ -1,19 +1,3 @@
-/*
- * Copyright 2010 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- *
- */
 package org.asynchttpclient.oauth;
 
 import org.asynchttpclient.util.UTF8UrlEncoder;
@@ -28,8 +12,6 @@ import javax.crypto.spec.SecretKeySpec;
  * Assumption is that this is bit more efficient (even considering synchronization)
  * than locating and reconstructing instance each time.
  * In future we may want to use soft references and thread local instance.
- *
- * @author tatu (tatu.saloranta@iki.fi)
  */
 public class ThreadSafeHMAC {
     private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";

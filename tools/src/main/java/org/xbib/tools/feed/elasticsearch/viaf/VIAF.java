@@ -112,8 +112,7 @@ public class VIAF extends Feeder {
                     }
                     final ElasticBuilder builder = new ElasticBuilder();
                     RdfXmlReader rdfxml = new RdfXmlReader();
-                    rdfxml.setTripleListener(builder);
-                    rdfxml.parse(new InputSource(new StringReader(line)));
+                    rdfxml.parse(new StringReader(line), builder);
                     builder.close();
                 }
             } catch (Exception e) {

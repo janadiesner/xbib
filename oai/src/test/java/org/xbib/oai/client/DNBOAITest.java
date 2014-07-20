@@ -36,12 +36,13 @@ import java.io.StringWriter;
 
 import org.testng.annotations.Test;
 import org.xbib.oai.OAIDateResolution;
-import org.xbib.oai.listrecords.ListRecordsListener;
+import org.xbib.oai.client.listrecords.ListRecordsListener;
+import org.xbib.rdf.context.ResourceContext;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.oai.listrecords.ListRecordsRequest;
+import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
@@ -57,16 +58,6 @@ public class DNBOAITest {
 
     private final Logger logger = LoggerFactory.getLogger(DNBOAITest.class.getName());
 
-    private Resource resource;
-
-    public void setResource(Resource resource) {
-        this.resource = resource;
-    }
-
-    public Resource getResource() {
-        return resource;
-    }
-
     @Test
     public void testDNBOAI() throws Exception {
 
@@ -77,8 +68,8 @@ public class DNBOAITest {
                 .setFrom(DateUtil.parseDateISO("2012-01-23T00:00:00Z"), OAIDateResolution.SECOND)
                 .setUntil(DateUtil.parseDateISO("2012-01-23T01:00:00Z"), OAIDateResolution.SECOND);
         do {
-            RdfXmlReader reader = new RdfXmlReader();
-            final TripleListener stmt = new TripleListener() {
+            //RdfXmlReader rdfXmlReader = new RdfXmlReader();
+            /*final TripleListener stmt = new TripleListener() {
 
                 @Override
                 public TripleListener begin() {
@@ -111,24 +102,27 @@ public class DNBOAITest {
                 public TripleListener end() {
                     return this;
                 }
-            };
-            reader.setTripleListener(stmt);
-            final XmlHandler handler = reader.getHandler();
-            MetadataHandler metadataHandler = new MetadataHandler() {
+            };*/
+            //reader.setTripleListener(stmt);
+            //final XmlHandler handler = reader.getHandler();
+            //ResourceContext<Resource> resourceContext = new ResourceContext<Resource>();
+
+            //RdfXmlReader rdfXmlReader = new RdfXmlReader();
+
+            /*MetadataHandler metadataHandler = new MetadataHandler() {
 
                 @Override
                 public void startDocument() throws SAXException {
-                    handler.startDocument();
-                    setResource(new SimpleResource());
+                    //handler.startDocument();
+                    //setResource(new SimpleResource());
                 }
 
                 @Override
                 public void endDocument() throws SAXException {
-                    handler.endDocument();
+                    //handler.endDocument();
                     try {
                         StringWriter sw = new StringWriter();
-                        new TurtleWriter()
-                                .output(sw)
+                        new TurtleWriter(sw)
                                 .write(getResource());
                         logger.info(sw.toString());
                     } catch (IOException ex) {
@@ -160,9 +154,9 @@ public class DNBOAITest {
                 public void characters(char[] chars, int i, int i1) throws SAXException {
                     handler.characters(chars, i, i1);
                 }
-            };
+            };*/
             StringWriter sw = new StringWriter();
-            request.addHandler(metadataHandler);
+            //request.addHandler(metadataHandler);
             ListRecordsListener listener = new ListRecordsListener(request);
             try {
                 request.prepare().execute(listener).waitFor();

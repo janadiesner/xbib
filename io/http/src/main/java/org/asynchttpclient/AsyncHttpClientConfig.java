@@ -1,18 +1,3 @@
-/*
- * Copyright 2010 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
 package org.asynchttpclient;
 
 import org.asynchttpclient.filter.IOExceptionFilter;
@@ -373,8 +358,6 @@ public class AsyncHttpClientConfig {
 
     /**
      * @return <code>true</code> if {@link org.asynchttpclient.filter.RequestFilter}s have been defined.
-     *
-     * @since 2.0.0
      */
     public boolean hasRequestFilters() {
         return !requestFilters.isEmpty();
@@ -391,7 +374,6 @@ public class AsyncHttpClientConfig {
 
     /**
      * @return <code>true</code> if {@link org.asynchttpclient.filter.ResponseFilter}s have been defined.
-     * @since 2.0.0
      */
     public boolean hasResponseFilters() {
         return !responseFilters.isEmpty();
@@ -516,7 +498,6 @@ public class AsyncHttpClientConfig {
      * @return <code>true</code> if string 302 handling is to be used,
      *  otherwise <code>false</code>.
      *
-     * @since 1.7.2
      */
     public boolean isStrict302Handling() {
         return strict302Handling;
@@ -526,7 +507,6 @@ public class AsyncHttpClientConfig {
      * @return<code>true</code> if AHC should use relative URIs instead of absolute ones when talking with a SSL proxy,
      *  otherwise <code>false</code>.
      *  
-     *  @since 1.7.12
      */
     public boolean isUseRelativeURIsWithSSLProxies() {
         return useRelativeURIsWithSSLProxies;
@@ -544,7 +524,6 @@ public class AsyncHttpClientConfig {
     /**
      * @return<code>true</code> if AHC should use rfc6265 for encoding client side cookies, otherwise <code>false</code>.
      * 
-     * @since 1.7.18
      */
     public boolean isRfc6265CookieEncoding() {
         return rfc6265CookieEncoding;
@@ -553,8 +532,6 @@ public class AsyncHttpClientConfig {
     /**
      * @return <code>true</code> if the underlying provider should make new connections asynchronously or not.  By default
      *  new connections are made synchronously.
-     *
-     * @since 2.0.0
      */
     public boolean isAsyncConnectMode() {
         return asyncConnectMode;
@@ -1036,7 +1013,6 @@ public class AsyncHttpClientConfig {
          *
          * @return this
          *
-         * @since 1.7.2
          */
         public Builder setStrict302Handling(final boolean strict302Handling) {
             this.strict302Handling = strict302Handling;
@@ -1059,8 +1035,6 @@ public class AsyncHttpClientConfig {
          *
          * @param useRelativeURIsWithSSLProxies
          * @return this
-         *
-         * @since 1.7.2
          */
         public Builder setUseRelativeURIsWithSSLProxies(boolean useRelativeURIsWithSSLProxies) {
             this.useRelativeURIsWithSSLProxies = useRelativeURIsWithSSLProxies;
@@ -1074,8 +1048,6 @@ public class AsyncHttpClientConfig {
          * @param spdyEnabled configures spdy support.
          *
          * @return this
-         *
-         * @since 2.0
          */
         public Builder setSpdyEnabled(boolean spdyEnabled) {
             this.spdyEnabled = spdyEnabled;
@@ -1088,8 +1060,6 @@ public class AsyncHttpClientConfig {
          * @param spdyInitialWindowSize the initial window size.
          *
          * @return this
-         *
-         * @since 2.0
          */
         public Builder setSpdyInitialWindowSize(int spdyInitialWindowSize) {
             this.spdyInitialWindowSize = spdyInitialWindowSize;
@@ -1104,8 +1074,6 @@ public class AsyncHttpClientConfig {
          *                                 streams over a single SPDY session.
          *
          * @return this
-         *
-         * @since 2.0
          */
         public Builder setSpdyMaxConcurrentStreams(int spdyMaxConcurrentStreams) {
             this.spdyMaxConcurrentStreams = spdyMaxConcurrentStreams;
@@ -1117,8 +1085,6 @@ public class AsyncHttpClientConfig {
          * 
          * @param rfc6265CookieEncoding
          * @return this
-         * 
-         * @since 1.7.18
          */
         public Builder setRfc6265CookieEncoding(boolean rfc6265CookieEncoding) {
             this.rfc6265CookieEncoding = rfc6265CookieEncoding;
@@ -1132,8 +1098,6 @@ public class AsyncHttpClientConfig {
          * @param asyncConnectMode pass <code>true</code> to enable async connect mode.
          *
          * @return this
-         *
-         * @since 2.0.0
          */
         public Builder setAsyncConnectMode(boolean asyncConnectMode) {
             this.asyncConnectMode = asyncConnectMode;

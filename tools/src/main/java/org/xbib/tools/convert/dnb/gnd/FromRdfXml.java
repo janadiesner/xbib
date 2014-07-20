@@ -40,11 +40,12 @@ import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.rdfxml.RdfXmlReader;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.tools.Converter;
-import org.xml.sax.InputSource;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
@@ -53,8 +54,6 @@ import java.util.zip.GZIPOutputStream;
  * Convert GND from RDF/XML to Turtle or Ntriples
  */
 public class FromRdfXml extends Converter {
-
-    private final static Logger logger = LoggerFactory.getLogger(FromRdfXml.class.getSimpleName());
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
@@ -78,22 +77,18 @@ public class FromRdfXml extends Converter {
         };
         String marker = settings.get("translatePicaSortMarker");
         if ("turtle".equals(settings.get("format"))) {
-            TurtleWriter turtle = new TurtleWriter()
-                    .translatePicaSortMarker(marker)
-                    .output(out);
+            TurtleWriter turtle = new TurtleWriter(new OutputStreamWriter(out, "UTF-8"))
+                    .translatePicaSortMarker(marker);
             RdfXmlReader reader = new RdfXmlReader();
-            reader.setTripleListener(turtle);
-            reader.parse(new InputSource(in));
+            reader.parse(new InputStreamReader(in, "UTF-8"), turtle);
             turtle.close();
             in.close();
             out.close();
         } else if ("ntriples".equals(settings.get("format"))) {
-            NTripleWriter ntriples = new NTripleWriter()
-                    .translatePicaSortMarker(marker)
-                    .output(out);
+            NTripleWriter ntriples = new NTripleWriter(new OutputStreamWriter(out, "UTF-8"))
+                    .translatePicaSortMarker(marker);
             RdfXmlReader reader = new RdfXmlReader();
-            reader.setTripleListener(ntriples);
-            reader.parse(new InputSource(in));
+            reader.parse(new InputStreamReader(in, "UTF-8"), ntriples);
             ntriples.close();
             in.close();
             out.close();

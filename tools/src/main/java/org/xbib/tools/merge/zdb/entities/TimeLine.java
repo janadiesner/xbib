@@ -82,7 +82,7 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
     public TimeLine(Collection<Manifestation> manifestations) {
         super(Manifestation.getKeyComparator());
         addAll(manifestations);
-        findExtremes();
+        findFirstAndLastDate();
         this.fingerprint = makeFingerprint();
         this.timelineKey = makeTimelineKey();
     }
@@ -144,7 +144,7 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
         return sb.toString();
     }
 
-    private void findExtremes() {
+    private void findFirstAndLastDate() {
         this.firstDate = Integer.MAX_VALUE;
         this.lastDate = Integer.MIN_VALUE;
         for (Manifestation m : this) {

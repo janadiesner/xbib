@@ -1,16 +1,3 @@
-/*
- * Copyright (c) 2010-2012 Sonatype, Inc. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
-
 package org.asynchttpclient.webdav;
 
 import org.asynchttpclient.AsyncCompletionHandlerBase;
@@ -21,12 +8,12 @@ import org.asynchttpclient.HttpResponseBodyPart;
 import org.asynchttpclient.HttpResponseHeaders;
 import org.asynchttpclient.HttpResponseStatus;
 import org.asynchttpclient.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,43 +34,32 @@ import java.util.List;
  * @param <T>
  */
 public abstract class WebDavCompletionHandlerBase<T> implements AsyncHandler<T> {
-    private final Logger logger = LoggerFactory.getLogger(AsyncCompletionHandlerBase.class);
+
+    private final Logger logger = LoggerFactory.getLogger(WebDavCompletionHandlerBase.class.getName());
 
     private final List<HttpResponseBodyPart> bodies =
             Collections.synchronizedList(new ArrayList<HttpResponseBodyPart>());
     private HttpResponseStatus status;
     private HttpResponseHeaders headers;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final STATE onBodyPartReceived(final HttpResponseBodyPart content) throws Exception {
         bodies.add(content);
         return STATE.CONTINUE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final STATE onStatusReceived(final HttpResponseStatus status) throws Exception {
         this.status = status;
         return STATE.CONTINUE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final STATE onHeadersReceived(final HttpResponseHeaders headers) throws Exception {
         this.headers = headers;
         return STATE.CONTINUE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final T onCompleted() throws Exception {
         if (status != null) {
@@ -98,9 +74,6 @@ public abstract class WebDavCompletionHandlerBase<T> implements AsyncHandler<T> 
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onThrowable(Throwable t) {
         logger.debug(t.getMessage(), t);
@@ -113,7 +86,6 @@ public abstract class WebDavCompletionHandlerBase<T> implements AsyncHandler<T> 
      * @return Type of the value that will be returned by the associated {@link java.util.concurrent.Future}
      */
     abstract public T onCompleted(WebDavResponse response) throws Exception;
-
 
     private class HttpStatusWrapper extends HttpResponseStatus {
 

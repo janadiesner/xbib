@@ -31,10 +31,6 @@
  */
 package org.xbib.logging;
 
-/**
- * A set of utilities around Logging.
- *
- */
 public class Loggers {
 
     private final static String commonPrefix = System.getProperty("org.xbib.logger.prefix", "org.xbib.");

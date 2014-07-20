@@ -1,19 +1,3 @@
-/*
- * Copyright 2010 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- *
- */
 package org.asynchttpclient;
 
 import static org.asynchttpclient.util.MiscUtil.isNonEmpty;
@@ -170,9 +154,6 @@ public class FluentStringsMap implements Map<String, List<String>>, Iterable<Map
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<String> put(String key, List<String> value) {
         if (key == null) {
@@ -185,9 +166,6 @@ public class FluentStringsMap implements Map<String, List<String>>, Iterable<Map
         return oldValue;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void putAll(Map<? extends String, ? extends List<String>> values) {
         replaceAll(values);
@@ -234,9 +212,6 @@ public class FluentStringsMap implements Map<String, List<String>>, Iterable<Map
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<String> remove(Object key) {
         if (key == null) {
@@ -249,65 +224,41 @@ public class FluentStringsMap implements Map<String, List<String>>, Iterable<Map
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void clear() {
         values.clear();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<Entry<String, List<String>>> iterator() {
         return Collections.unmodifiableSet(values.entrySet()).iterator();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<String> keySet() {
         return Collections.unmodifiableSet(values.keySet());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<Entry<String, List<String>>> entrySet() {
         return values.entrySet();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int size() {
         return values.size();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isEmpty() {
         return values.isEmpty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean containsKey(Object key) {
         return key == null ? false : values.containsKey(key.toString());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean containsValue(Object value) {
         return values.containsValue(value);
@@ -358,9 +309,6 @@ public class FluentStringsMap implements Map<String, List<String>>, Iterable<Map
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<String> get(Object key) {
         if (key == null) {
@@ -370,9 +318,6 @@ public class FluentStringsMap implements Map<String, List<String>>, Iterable<Map
         return values.get(key.toString());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<List<String>> values() {
         return values.values();

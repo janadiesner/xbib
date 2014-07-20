@@ -38,8 +38,8 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
-import org.xbib.oai.listrecords.ListRecordsListener;
-import org.xbib.oai.listrecords.ListRecordsRequest;
+import org.xbib.oai.client.listrecords.ListRecordsListener;
+import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
@@ -89,8 +89,8 @@ public class FromRdfXml extends Feeder {
                 .setSet(set)
                 .setFrom(from, OAIDateResolution.DAY)
                 .setUntil(until, OAIDateResolution.DAY);
-        ResourceBuilder builder = new ResourceBuilder();
-        RdfXmlReader reader = new RdfXmlReader().setTripleListener(builder);
+        //ResourceBuilder builder = new ResourceBuilder();
+        RdfXmlReader reader = new RdfXmlReader(); // .setTripleListener(builder);
         MetadataHandler metadataHandler = new OAIMetadataHandler(reader.getHandler());
         request.addHandler(metadataHandler);
         ListRecordsListener listener = new ListRecordsListener(request);

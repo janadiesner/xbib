@@ -32,10 +32,7 @@
 package org.xbib.rdf.io.turtle;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 import org.xbib.iri.IRI;
@@ -50,9 +47,10 @@ import org.xbib.rdf.RDF;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.IRINamespaceContext;
-import org.xbib.rdf.io.ResourceSerializer;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.io.TripleLine;
 import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.simple.SimpleResource;
+import org.xbib.rdf.simple.SimpleResourceContext;
 
 /**
  * RDF Turtle serialization
@@ -60,21 +58,19 @@ import org.xbib.rdf.simple.SimpleResource;
  * See <a href="http://www.w3.org/TeamSubmission/turtle/">Turtle - Terse RDF
  * Triple Language</a>
  *
- * Warning, many bugs ahead.
- *
  */
 public class TurtleWriter<S extends Identifier, P extends Property, O extends Node>
-    implements ResourceSerializer<S,P,O> {
+    implements TripleLine<S, P, O> {
 
     private final Logger logger = LoggerFactory.getLogger(TurtleWriter.class.getName());
+
+    private final Writer writer;
+
+    private SimpleResourceContext<S,P,O> resourceContext;
 
     private final static char LF = '\n';
 
     private final static char TAB = '\t';
-
-    private Writer writer;
-
-    private Resource resource;
 
     private IRINamespaceContext context;
 
@@ -104,10 +100,12 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
 
     private long idCounter;
 
-    public TurtleWriter() {
+    public TurtleWriter(Writer writer) {
+        this.writer = writer;
+        this.resourceContext = new SimpleResourceContext();
+        resourceContext.newResource();
         this.context = IRINamespaceContext.newInstance();
         this.nsWritten = false;
-        this.resource = new SimpleResource();
         this.sameResource = false;
         this.sameProperty = false;
         this.triples = new Stack();
@@ -117,6 +115,10 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
         this.translatePicaSortMarker = null;
         this.namespaceBuilder = new StringBuilder();
         this.sb = new StringBuilder();
+    }
+
+    public Writer getWriter() {
+        return writer;
     }
 
     public TurtleWriter setContext(IRINamespaceContext context) {
@@ -138,20 +140,17 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
     }
 
     @Override
-    public TurtleWriter newIdentifier(IRI iri) {
-        if (!iri.equals(resource.id())) {
+    public TurtleWriter<S, P, O> newIdentifier(IRI iri) {
+        if (!iri.equals(resourceContext.getResource().id())) {
             try {
-                if (!nsWritten) {
-                    writeNamespaces();
-                }
-                write(resource);
+                write(resourceContext);
                 idCounter++;
-                resource = new SimpleResource();
+                resourceContext.newResource();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
         }
-        resource.id(iri);
+        resourceContext.getResource().id(iri);
         return this;
     }
 
@@ -161,8 +160,8 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
     }
 
     @Override
-    public TurtleWriter triple(Triple triple) {
-        resource.add(triple);
+    public TurtleWriter<S, P, O> triple(Triple triple) {
+        resourceContext.getResource().add(triple);
         return this;
     }
 
@@ -172,13 +171,13 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
     }
 
     @Override
-    public TurtleWriter startPrefixMapping(String prefix, String uri) {
+    public TurtleWriter<S, P, O> startPrefixMapping(String prefix, String uri) {
         context.addNamespace(prefix, uri);
         return this;
     }
 
     @Override
-    public TurtleWriter endPrefixMapping(String prefix) {
+    public TurtleWriter<S, P, O> endPrefixMapping(String prefix) {
         // nooooo keep it!
         //context.removeNamespace(prefix);
         return this;
@@ -187,7 +186,7 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
     public void close() {
         try {
             // write last resource
-            write(resource);
+            write(resourceContext);
             idCounter++;
             writer.flush();
         } catch (IOException e) {
@@ -195,27 +194,10 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
         }
     }
 
-    public TurtleWriter output(OutputStream out) throws IOException {
-        if (out == null) {
-            return this;
-        }
-        this.writer = new OutputStreamWriter(out, "UTF-8");
-        return this;
-    }
-
-    public TurtleWriter output(Writer writer) throws IOException {
-        this.writer = writer;
-        return this;
-    }
-
     @Override
-    public TurtleWriter write(Resource<S, P, O> resource) throws IOException {
-        if (resource == null) {
-            return this;
-        }
-        Iterator<Triple<S, P, O>> it = resource.iterator();
-        while (it.hasNext()) {
-            writeTriple(it.next());
+    public TurtleWriter<S, P, O> write(ResourceContext<Resource<S, P, O>> resourceContext) throws IOException {
+        for (Triple<S, P, O> spoTriple : resourceContext.getResource()) {
+            writeTriple(spoTriple);
         }
         // close hanging embedded resources
         while (!embedded.isEmpty()) {

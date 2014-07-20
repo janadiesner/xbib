@@ -33,7 +33,7 @@ package org.xbib.elasticsearch.rdf;
 
 import java.io.IOException;
 
-import org.xbib.elasticsearch.support.client.Feeder;
+import org.xbib.elasticsearch.support.client.Feed;
 import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
@@ -48,9 +48,9 @@ import org.xbib.rdf.content.ContentBuilder;
 public class ResourceSink<C extends ResourceContext, R extends Resource>
         extends CountableContextResourceOutput<C, R> {
 
-    private final Feeder feeder;
+    private final Feed feeder;
 
-    public ResourceSink(final Feeder feeder) {
+    public ResourceSink(final Feed feeder) {
         this.feeder = feeder;
     }
 

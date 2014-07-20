@@ -29,8 +29,6 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Unit test for {@link ClassPathTemplateLoader}.
  *
- * @author edgar.espina
- * @since 0.1.0
  */
 public class ClassPathTemplateLoaderTest {
 

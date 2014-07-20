@@ -37,19 +37,15 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.testng.annotations.Test;
 import org.xbib.oai.OAIDateResolution;
-import org.xbib.oai.listrecords.ListRecordsListener;
+import org.xbib.oai.client.listrecords.ListRecordsListener;
 import org.xbib.util.DateUtil;
-import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.oai.identify.IdentifyRequest;
-import org.xbib.oai.identify.IdentifyResponseListener;
-import org.xbib.oai.listrecords.ListRecordsRequest;
+import org.xbib.oai.client.identify.IdentifyRequest;
+import org.xbib.oai.client.identify.IdentifyResponseListener;
+import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.xml.MetadataHandler;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.xml.XmlReader;
-import org.xbib.rdf.io.xml.XmlTriplifier;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -73,7 +69,7 @@ public class DNBClientTest {
                 .setUntil(DateUtil.parseDateISO("2013-01-10T00:00:00Z"), OAIDateResolution.SECOND)
                 .setSet("bib")
                 .setMetadataPrefix("PicaPlus-xml");
-        final XmlTriplifier reader = new XmlReader();
+        final XmlReader reader = new XmlReader();
         final AtomicLong count = new AtomicLong(0L);
         MetadataHandler metadataHandler = new MetadataHandler() {
             @Override

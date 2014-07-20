@@ -32,53 +32,29 @@
 package org.xbib.oai.service;
 
 import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAISession;
-import org.xbib.oai.identify.IdentifyResponse;
-import org.xbib.oai.identify.IdentifyServerRequest;
+import org.xbib.oai.server.identify.IdentifyServerRequest;
+import org.xbib.oai.server.OAIServer;
+import org.xbib.oai.server.OAIServiceFactory;
+import org.xbib.oai.server.identify.IdentifyServerResponse;
 
 import javax.xml.stream.XMLOutputFactory;
 
 public class SimpleServiceTest {
 
-    private final Logger logger = LoggerFactory.getLogger(SimpleServiceTest.class.getName());
-
     @Test
     public void testIdentifyService() throws Exception {
-        OAIService service = OAIServiceFactory.getDefaultService();
+        OAIServer service = OAIServiceFactory.getDefaultService();
         OAISession session = service.newSession();
         StringWriter sw = new StringWriter();
         XMLOutputFactory factory  = XMLOutputFactory.newInstance();
-        MyIdentifyServerRequest request = new MyIdentifyServerRequest();
-        IdentifyResponse response = new IdentifyResponse();
+        IdentifyServerRequest request = new IdentifyServerRequest();
+        IdentifyServerResponse response = new IdentifyServerResponse();
         response.setConsumer(factory.createXMLEventWriter(sw));
         service.identify(request, response);
         response.to(sw);
         session.close();
     }
 
-    class MyIdentifyServerRequest extends IdentifyServerRequest {
-
-        @Override
-            public Map<String, List<String>> getParameterMap() {
-                return new HashMap() {
-
-                    {
-                        put("verb", Arrays.asList("Identify"));
-                    }
-                };
-            }
-
-            @Override
-            public String getPath() {
-                return "/path";
-            }
-        
-    }
 }

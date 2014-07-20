@@ -1,15 +1,3 @@
-/*
- * Copyright (c) 2010-2012 Sonatype, Inc. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
 package org.asynchttpclient.providers.netty.channel;
 
 import static org.asynchttpclient.util.DateUtil.millisTime;
@@ -28,24 +16,34 @@ import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.ConnectionsPool;
 import org.asynchttpclient.providers.netty.DiscardEvent;
 import org.asynchttpclient.providers.netty.future.NettyResponseFuture;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 /**
  * A simple implementation of {@link org.asynchttpclient.ConnectionsPool} based on a {@link java.util.concurrent.ConcurrentHashMap}
  */
 public class NettyConnectionsPool implements ConnectionsPool<String, Channel> {
 
-    private final static Logger log = LoggerFactory.getLogger(NettyConnectionsPool.class);
+    private final static Logger log = LoggerFactory.getLogger(NettyConnectionsPool.class.getName());
+
     private final ConcurrentHashMap<String, ConcurrentLinkedQueue<IdleChannel>> connectionsPool = new ConcurrentHashMap<String, ConcurrentLinkedQueue<IdleChannel>>();
+
     private final ConcurrentHashMap<Channel, IdleChannel> channel2IdleChannel = new ConcurrentHashMap<Channel, IdleChannel>();
+
     private final ConcurrentHashMap<Channel, Long> channel2CreationDate = new ConcurrentHashMap<Channel, Long>();
+
     private final AtomicBoolean closed = new AtomicBoolean(false);
+
     private final Timer idleConnectionDetector;
+
     private final boolean sslConnectionPoolEnabled;
+
     private final int maxTotalConnections;
+
     private final int maxConnectionPerHost;
+
     private final int maxConnectionLifeTimeInMs;
+
     private final long maxIdleTime;
 
     public NettyConnectionsPool(AsyncHttpClientConfig config) {

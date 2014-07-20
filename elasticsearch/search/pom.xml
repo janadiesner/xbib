@@ -66,11 +66,6 @@
             <artifactId>logging</artifactId>
             <type>jar</type>
         </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <optional>true</optional>
-        </dependency>
     </dependencies>
 
 </project>

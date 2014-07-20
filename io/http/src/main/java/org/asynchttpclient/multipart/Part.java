@@ -1,18 +1,3 @@
-/*
- * Copyright 2010 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
 package org.asynchttpclient.multipart;
 
 import java.io.ByteArrayOutputStream;
@@ -169,7 +154,6 @@ public abstract class Part implements org.asynchttpclient.Part {
      * Sets the part boundary. Only meant to be used by {@link org.asynchttpclient.multipart.Part#sendParts(java.io.OutputStream, org.asynchttpclient.multipart.Part[], byte[])} and {@link org.asynchttpclient.multipart.Part#getLengthOfParts(org.asynchttpclient.multipart.Part[], byte[])}
      * 
      * @param boundaryBytes An array of ASCII bytes.
-     * @since 3.0
      */
     void setPartBoundary(byte[] boundaryBytes) {
         this.boundaryBytes = boundaryBytes;
@@ -179,7 +163,6 @@ public abstract class Part implements org.asynchttpclient.Part {
      * Tests if this part can be sent more than once.
      * 
      * @return <code>true</code> if {@link #sendData(java.io.OutputStream)} can be successfully called more than once.
-     * @since 3.0
      */
     public boolean isRepeatable() {
         return true;
@@ -364,7 +347,6 @@ public abstract class Part implements org.asynchttpclient.Part {
      * @param parts The parts to write.
      * @param partBoundary The ASCII bytes to use as the part boundary.
      * @throws java.io.IOException If an I/O error occurs while writing the parts.
-     * @since 3.0
      */
     public static void sendParts(OutputStream out, Part[] parts, byte[] partBoundary) throws IOException {
 
@@ -403,7 +385,6 @@ public abstract class Part implements org.asynchttpclient.Part {
      * @param out The stream to write to.
      * @param part The part to write.
      * @throws java.io.IOException If an I/O error occurs while writing the parts.
-     * @since N/A
      */
     public static void sendPart(OutputStream out, Part part, byte[] partBoundary) throws IOException {
 
@@ -433,7 +414,6 @@ public abstract class Part implements org.asynchttpclient.Part {
      * @param partBoundary The ASCII bytes to use as the part boundary.
      * @return The total length
      * @throws java.io.IOException If an I/O error occurs while writing the parts.
-     * @since 3.0
      */
     public static long getLengthOfParts(Part[] parts, byte[] partBoundary) throws IOException {
         if (parts == null) {

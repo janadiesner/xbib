@@ -1,31 +1,3 @@
-/*
- * Copyright (c) 2010-2012 Sonatype, Inc. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
-/*
- * Copyright (C) 2007 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.asynchttpclient.listenable;
 
 import java.util.Queue;
@@ -35,15 +7,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * <p>A list of ({@code Runnable}, {@code Executor}) pairs that guarantees
+ * A list of ({@code Runnable}, {@code Executor}) pairs that guarantees
  * that every {@code Runnable} that is added using the add method will be
  * executed in its associated {@code Executor} after {@link #run()} is called.
  * {@code Runnable}s added after {@code run} is called are still guaranteed to
  * execute.
- *
- * @author Nishant Thakkar
- * @author Sven Mawson
- * @since 1
  */
 public final class ExecutionList implements Runnable {
 

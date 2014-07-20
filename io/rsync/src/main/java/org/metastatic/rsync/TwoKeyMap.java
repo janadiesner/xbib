@@ -235,8 +235,6 @@ public class TwoKeyMap<V> implements Map<ChecksumPair, V> {
      * {@link #hashCode()} and {@link #compareTo(Object)}
      * methods.
      *
-     * @author Casey Marshall
-     * @version 1.0
      */
     public static class StrongKey implements Comparable<StrongKey> {
 

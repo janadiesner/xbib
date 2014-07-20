@@ -41,15 +41,13 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
-import org.xbib.oai.listrecords.ListRecordsListener;
-import org.xbib.oai.listrecords.ListRecordsRequest;
-import org.xbib.oai.rdf.RdfOutput;
+import org.xbib.oai.client.listrecords.ListRecordsListener;
+import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
-import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.io.ResourceWriter;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.util.DateUtil;
@@ -152,7 +150,7 @@ public abstract class OAIFeeder extends Feeder {
         return new XmlMetadataHandler()
                 .setHandler(rdfResourceHandler)
                 .setResourceContext(rdfResourceHandler.resourceContext())
-                .setOutput(new ElasticOut());
+                .setResourceWriter(new MyResourceWriter());
     }
 
     class XmlMetadataHandler extends MetadataHandler {
@@ -163,7 +161,7 @@ public abstract class OAIFeeder extends Feeder {
 
         ResourceContext resourceContext;
 
-        RdfOutput output;
+        ResourceWriter resourceWriter;
 
         XmlMetadataHandler() {
             context = IRINamespaceContext.newInstance();
@@ -183,8 +181,8 @@ public abstract class OAIFeeder extends Feeder {
             return this;
         }
 
-        public XmlMetadataHandler setOutput(RdfOutput output) {
-            this.output = output;
+        public XmlMetadataHandler setResourceWriter(ResourceWriter resourceWriter) {
+            this.resourceWriter = resourceWriter;
             return this;
         }
 
@@ -203,7 +201,7 @@ public abstract class OAIFeeder extends Feeder {
                         .query(settings.get("type"))
                         .fragment(identifier).build();
                 resourceContext.getResource().id(iri);
-                output.output(resourceContext);
+                resourceWriter.write(resourceContext);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -235,49 +233,10 @@ public abstract class OAIFeeder extends Feeder {
         }
     }
 
-    class ResourceBuilder implements TripleListener {
-
-        ResourceContext resourceContext;
-
-        ResourceBuilder(ResourceContext resourceContext) {
-            this.resourceContext = resourceContext;
-        }
+    class MyResourceWriter implements ResourceWriter {
 
         @Override
-        public TripleListener begin() {
-            return this;
-        }
-
-        @Override
-        public TripleListener startPrefixMapping(String prefix, String uri) {
-            return this;
-        }
-
-        @Override
-        public TripleListener endPrefixMapping(String prefix) {
-            return this;
-        }
-
-        @Override
-        public ResourceBuilder newIdentifier(IRI identifier) {
-            return this;
-        }
-
-        @Override
-        public ResourceBuilder triple(Triple triple) {
-            resourceContext.getResource().add(triple);
-            return this;
-        }
-
-        @Override
-        public TripleListener end() {
-            return this;
-        }
-    }
-
-    class ElasticOut extends RdfOutput {
-        @Override
-        public RdfOutput output(ResourceContext resourceContext) throws IOException {
+        public MyResourceWriter write(ResourceContext resourceContext) throws IOException {
             sink.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
             return this;
         }

@@ -92,8 +92,7 @@ public class XmlReaderTest extends Assert {
 
         };
         StringWriter sw = new StringWriter();
-        TurtleWriter t = new TurtleWriter()
-                .output(sw)
+        TurtleWriter t = new TurtleWriter(sw)
                 .setContext(context)
                 .writeNamespaces();
         xmlHandler.setListener(t);

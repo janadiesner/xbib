@@ -1,18 +1,3 @@
-/*
- * Copyright 2010-2013 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
 package org.asynchttpclient.providers.netty.handler;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
@@ -58,8 +43,12 @@ import org.asynchttpclient.providers.netty.response.ResponseHeaders;
 import org.asynchttpclient.providers.netty.response.ResponseStatus;
 import org.asynchttpclient.spnego.SpnegoEngine;
 import org.asynchttpclient.util.AsyncHttpProviderUtils;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 final class HttpProtocol extends Protocol {
+
+    private final static Logger logger = LoggerFactory.getLogger(HttpProtocol.class.getName());
 
     public HttpProtocol(Channels channels, AsyncHttpClientConfig config, NettyAsyncHttpProviderConfig nettyConfig, NettyRequestSender requestSender) {
         super(channels, config, nettyConfig, requestSender);
@@ -184,7 +173,7 @@ final class HttpProtocol extends Protocol {
         markAsDone(future, ctx);
     }
 
-    private final boolean updateBodyAndInterrupt(NettyResponseFuture<?> future, AsyncHandler<?> handler, HttpResponseBodyPart bodyPart) throws Exception {
+    private boolean updateBodyAndInterrupt(NettyResponseFuture<?> future, AsyncHandler<?> handler, HttpResponseBodyPart bodyPart) throws Exception {
         boolean state = handler.onBodyPartReceived(bodyPart) != STATE.CONTINUE;
         if (bodyPart.isUnderlyingConnectionToBeClosed()) {
             future.setKeepAlive(false);
@@ -199,7 +188,7 @@ final class HttpProtocol extends Protocol {
             future.done();
         } catch (Throwable t) {
             // Never propagate exception once we know we are done.
-            NettyChannelHandler.LOGGER.debug(t.getMessage(), t);
+            logger.debug(t.getMessage(), t);
         }
 
         if (!future.isKeepAlive() || !ctx.channel().isActive()) {
@@ -280,7 +269,7 @@ final class HttpProtocol extends Protocol {
 
                 final Realm nr = new Realm.RealmBuilder().clone(newRealm).setUri(URI.create(request.getUrl()).getPath()).build();
 
-                NettyChannelHandler.LOGGER.debug("Sending authentication to {}", request.getUrl());
+                logger.debug("Sending authentication to {}", request.getUrl());
                 Callback callback = new Callback(future) {
                     public void call() throws Exception {
                         channels.drainChannel(ctx, future);
@@ -309,7 +298,7 @@ final class HttpProtocol extends Protocol {
         } else if (statusCode == PROXY_AUTHENTICATION_REQUIRED.code()) {
             List<String> proxyAuth = getAuthorizationToken(response.headers(), HttpHeaders.Names.PROXY_AUTHENTICATE);
             if (realm != null && !proxyAuth.isEmpty() && !future.getAndSetAuth(true)) {
-                NettyChannelHandler.LOGGER.debug("Sending proxy authentication to {}", request.getUrl());
+                logger.debug("Sending proxy authentication to {}", request.getUrl());
 
                 future.setState(NettyResponseFuture.STATE.NEW);
                 Realm newRealm = null;
@@ -335,14 +324,14 @@ final class HttpProtocol extends Protocol {
 
         } else if (statusCode == OK.code() && nettyRequest.getMethod() == HttpMethod.CONNECT) {
 
-            NettyChannelHandler.LOGGER.debug("Connected to {}:{}", proxyServer.getHost(), proxyServer.getPort());
+            logger.debug("Connected to {}:{}", proxyServer.getHost(), proxyServer.getPort());
 
             if (future.isKeepAlive()) {
                 future.attachChannel(ctx.channel(), true);
             }
 
             try {
-                NettyChannelHandler.LOGGER.debug("Connecting to proxy {} for scheme {}", proxyServer, request.getUrl());
+                logger.debug("Connecting to proxy {} for scheme {}", proxyServer, request.getUrl());
                 channels.upgradeProtocol(ctx.channel().pipeline(), request.getURI().getScheme());
             } catch (Throwable ex) {
                 channels.abort(future, ex);
@@ -382,7 +371,7 @@ final class HttpProtocol extends Protocol {
         try {
             if (e instanceof HttpResponse) {
                 HttpResponse response = (HttpResponse) e;
-                NettyChannelHandler.LOGGER.debug("\n\nRequest {}\n\nResponse {}\n", nettyRequest, response);
+                logger.debug("\n\nRequest {}\n\nResponse {}\n", nettyRequest, response);
                 future.setPendingResponse(response);
                 return;
             }

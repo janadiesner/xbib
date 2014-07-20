@@ -42,7 +42,6 @@ import org.xbib.rdf.content.ContentBuilder;
 import org.xbib.rdf.content.DefaultContentBuilder;
 import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.ResourceSerializer;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
@@ -54,8 +53,8 @@ import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -89,20 +88,18 @@ public final class FromEZBXML extends Converter {
 
         Writer writer = new FileWriter(settings.get("output"));
 
-        final TurtleWriter turtle = new TurtleWriter()
-                .setContext(namespaceContext)
-                .output(writer);
+        final TurtleWriter turtleWriter = new TurtleWriter(writer)
+                .setContext(namespaceContext);
 
-        AbstractXmlHandler handler = new EZBHandler(resourceContext, turtle)
+        AbstractXmlHandler handler = new EZBHandler(resourceContext)
                 .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/");
 
         try (InputStream in = InputService.getInputStream(uri)) {
-            new XmlReader()
-                    .setNamespaces(false)
+            new XmlReader().setNamespaces(false)
                     .setHandler(handler)
-                    .parse(in);
+                    .parse(new InputStreamReader(in, "UTF-8"), turtleWriter);
         } finally {
-            turtle.close();
+            turtleWriter.close();
             writer.close();
         }
     }
@@ -113,12 +110,12 @@ public final class FromEZBXML extends Converter {
 
     class EZBHandler extends AbstractXmlResourceHandler {
 
-        ResourceSerializer resourceSerializer;
+        //ResourceSerializer resourceSerializer;
 
-        public EZBHandler(ResourceContext resourceContext, ResourceSerializer resourceSerializer) {
+        public EZBHandler(ResourceContext resourceContext) {
             super(resourceContext);
             //setListener(resourceSerializer);
-            this.resourceSerializer = resourceSerializer;
+            //this.resourceSerializer = resourceSerializer;
         }
 
         @Override
@@ -147,7 +144,7 @@ public final class FromEZBXML extends Converter {
         @Override
         public void closeResource() {
             // attach closeResource to output write
-            try {
+            /*try {
                 if (resourceContext().getResource() != null) {
                     resourceSerializer.write(resourceContext().getResource());
                 } else {
@@ -155,7 +152,7 @@ public final class FromEZBXML extends Converter {
                 }
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
-            }
+            }*/
             super.closeResource();
         }
 

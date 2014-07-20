@@ -33,10 +33,10 @@ package org.xbib.rdf.io.rdfxml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import org.testng.annotations.Test;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xml.sax.InputSource;
 
 public class RdfXmlReaderTest {
 
@@ -47,12 +47,10 @@ public class RdfXmlReaderTest {
         if (in == null) {
             throw new IOException("file " + filename + " not found");
         }
-        StringWriter sw = new StringWriter();
-        TurtleWriter turtle = new TurtleWriter()
-                .output(sw);
         RdfXmlReader reader = new RdfXmlReader();
-        reader.setTripleListener(turtle);
-        reader.parse(new InputSource(in));
+        StringWriter sw = new StringWriter();
+        TurtleWriter turtle = new TurtleWriter(sw);
+        reader.parse(new InputStreamReader(in, "UTF-8"), turtle);
     }
 
 

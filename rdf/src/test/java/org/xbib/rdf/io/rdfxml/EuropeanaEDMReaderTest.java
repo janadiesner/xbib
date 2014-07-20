@@ -35,20 +35,17 @@ import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.IdentifiableProperty;
-import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.simple.SimpleProperty;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.rdf.simple.SimpleTriple;
-import org.xml.sax.InputSource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 public class EuropeanaEDMReaderTest {
@@ -66,28 +63,13 @@ public class EuropeanaEDMReaderTest {
         SimpleResourceContext resourceContext = new SimpleResourceContext();
 
         RdfXmlReader reader = new RdfXmlReader();
-        reader.setTripleListener(new GeoJSONFilter(resourceContext));
-        reader.parse(new InputSource(in));
+        reader.parse(new InputStreamReader(in, "UTF-8"), new GeoJSONFilter(resourceContext));
 
-        String index = "index";
-        String type = "type";
+        StringWriter sw = new StringWriter();
+        NTripleWriter writer = new NTripleWriter(sw);
+        writer.write(resourceContext);
 
-        logger.info("{} resources", resourceContext.getResources().size());
-        for (Resource resource : resourceContext.getResources()) {
-            //logger.info("before id=" + resource.id());
-            IRI iri = IRI.builder().scheme("http")
-                    .host(index)
-                    .query(type)
-                    .fragment(resource.id().toString()).build();
-            resource.id(iri);
-
-            //logger.info("after id=" + resource.id());
-            StringWriter sw = new StringWriter();
-            NTripleWriter writer = new NTripleWriter().output(sw);
-            writer.write(resource);
-            logger.info("output=" + sw.toString());
-        }
-
+        logger.info("output=" + sw.toString());
     }
 
     class GeoJSONFilter implements TripleListener {

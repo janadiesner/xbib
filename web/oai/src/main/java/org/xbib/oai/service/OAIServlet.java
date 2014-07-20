@@ -36,11 +36,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -49,19 +45,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.xbib.oai.OAIDateResolution;
+import org.xbib.oai.server.OAIServer;
+import org.xbib.oai.server.OAIServiceFactory;
+import org.xbib.oai.server.identify.IdentifyServerRequest;
+import org.xbib.oai.server.identify.IdentifyServerResponse;
+import org.xbib.oai.server.listidentifiers.ListIdentifiersServerRequest;
+import org.xbib.oai.server.listidentifiers.ListIdentifiersServerResponse;
+import org.xbib.oai.server.listmetadataformats.ListMetadataFormatsServerRequest;
+import org.xbib.oai.server.listmetadataformats.ListMetadataFormatsServerResponse;
+import org.xbib.oai.server.listrecords.ListRecordsServerRequest;
+import org.xbib.oai.server.listrecords.ListRecordsServerResponse;
+import org.xbib.oai.server.listsets.ListSetsServerRequest;
+import org.xbib.oai.server.listsets.ListSetsServerResponse;
 import org.xbib.util.DateUtil;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIConstants;
 import org.xbib.oai.OAISession;
-import org.xbib.oai.identify.IdentifyResponse;
-import org.xbib.oai.identify.ListIdentifiersRequest;
-import org.xbib.oai.identify.ListIdentifiersResponse;
-import org.xbib.oai.formats.ListMetadataFormatsRequest;
-import org.xbib.oai.formats.ListMetadataFormatsResponse;
-import org.xbib.oai.listrecords.ListRecordsResponse;
-import org.xbib.oai.listsets.ListSetsRequest;
-import org.xbib.oai.listsets.ListSetsResponse;
 import org.xbib.oai.util.ResumptionToken;
 
 /**
@@ -78,7 +78,7 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
 
     private final String contentType = "text/xml";
 
-    private OAIService service;
+    private OAIServer server;
 
     private OAISession session;
 
@@ -87,7 +87,7 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
         super.init(config);
         String serviceName = config.getInitParameter("name");
         String serviceURI = config.getInitParameter("uri");
-        this.service = serviceName != null ?
+        this.server = serviceName != null ?
                 OAIServiceFactory.getService(serviceName) :
                 serviceURI != null ?
                         OAIServiceFactory.getService(serviceURI) :
@@ -100,41 +100,47 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
         final OutputStream out = response.getOutputStream();
         logger.info(requestDumper.toString(request));
         if (session == null) {
-            session = service.newSession();
+            session = server.newSession();
         }
         try {
             String verb = request.getParameter(OAIConstants.VERB_PARAMETER);
             Writer writer = new OutputStreamWriter(response.getOutputStream(), responseEncoding);
-            if (OAIConstants.IDENTIFY.equals(verb)) {
-                IdentifyServerRequest oaiRequest = new IdentifyServerRequest(session, request);
-                IdentifyResponse oaiResponse = new IdentifyResponse(oaiRequest);
-                oaiRequest.setURL(service.getBaseURL().toURI());
-                service.identify(oaiRequest, oaiResponse);
-                oaiResponse.to(writer);
-            } else if (OAIConstants.LIST_METADATA_FORMATS.equals(verb)) {
-                ServerListMetadataFormatsRequest oaiRequest = new ServerListMetadataFormatsRequest(session, request);
-                ListMetadataFormatsResponse oaiResponse = new ListMetadataFormatsResponse(oaiRequest);
-                oaiRequest.setURL(service.getBaseURL().toURI());
-                service.listMetadataFormats(oaiRequest, oaiResponse);
-                oaiResponse.to(writer);
-            } else if (OAIConstants.LIST_SETS.equals(verb)) {
-                ServerListSetsRequest oaiRequest = new ServerListSetsRequest(session, request);
-                ListSetsResponse oaiResponse = new ListSetsResponse(oaiRequest);
-                oaiRequest.setURL(service.getBaseURL().toURI());
-                service.listSets(oaiRequest, oaiResponse);
-                oaiResponse.to(writer);
-            } else if (OAIConstants.LIST_IDENTIFIERS.equals(verb)) {
-                ServerListIdentifiersRequest oaiRequest = new ServerListIdentifiersRequest(session, request);
-                ListIdentifiersResponse oaiResponse = new ListIdentifiersResponse(oaiRequest);
-                oaiRequest.setURL(service.getBaseURL().toURI());
-                service.listIdentifiers(oaiRequest, oaiResponse);
-                oaiResponse.to(writer);
-            } else if (OAIConstants.LIST_RECORDS.equals(verb)) {
-                ListRecordsServerRequest oaiRequest = new ListRecordsServerRequest(session, request);
-                ListRecordsResponse oaiResponse = new ListRecordsResponse(oaiRequest);
-                oaiRequest.setURL(service.getBaseURL().toURI());
-                service.listRecords(oaiRequest, oaiResponse);
-                oaiResponse.to(writer);
+            switch (verb) {
+                case OAIConstants.IDENTIFY: {
+                    HttpServerIdentifyRequest oaiRequest = new HttpServerIdentifyRequest(server, session, request);
+                    IdentifyServerResponse oaiResponse = new IdentifyServerResponse();
+                    server.identify(oaiRequest, oaiResponse);
+                    oaiResponse.to(writer);
+                    break;
+                }
+                case OAIConstants.LIST_METADATA_FORMATS: {
+                    HttpServerListMetadataFormatsRequest oaiRequest = new HttpServerListMetadataFormatsRequest(server, session, request);
+                    ListMetadataFormatsServerResponse oaiResponse = new ListMetadataFormatsServerResponse();
+                    server.listMetadataFormats(oaiRequest, oaiResponse);
+                    oaiResponse.to(writer);
+                    break;
+                }
+                case OAIConstants.LIST_SETS: {
+                    HttpServerListSetsRequest oaiRequest = new HttpServerListSetsRequest(server, session, request);
+                    ListSetsServerResponse oaiResponse = new ListSetsServerResponse();
+                    server.listSets(oaiRequest, oaiResponse);
+                    oaiResponse.to(writer);
+                    break;
+                }
+                case OAIConstants.LIST_IDENTIFIERS: {
+                    HttpServerListIdentifiersRequest oaiRequest = new HttpServerListIdentifiersRequest(server, session, request);
+                    ListIdentifiersServerResponse oaiResponse = new ListIdentifiersServerResponse();
+                    server.listIdentifiers(oaiRequest, oaiResponse);
+                    oaiResponse.to(writer);
+                    break;
+                }
+                case OAIConstants.LIST_RECORDS: {
+                    HttpServerListRecordsRequest oaiRequest = new HttpServerListRecordsRequest(server, session, request);
+                    ListRecordsServerResponse oaiResponse = new ListRecordsServerResponse();
+                    server.listRecords(oaiRequest, oaiResponse);
+                    oaiResponse.to(writer);
+                    break;
+                }
             }
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
@@ -162,16 +168,19 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
         return request.getPathInfo();
     }
 
-    private class IdentifyServerRequest extends org.xbib.oai.identify.IdentifyServerRequest {
+    private class HttpServerIdentifyRequest extends IdentifyServerRequest {
 
+        OAIServer server;
+        OAISession session;
         HttpServletRequest request;
 
-        IdentifyServerRequest(OAISession session, HttpServletRequest request) {
-            super(session);
+        HttpServerIdentifyRequest(OAIServer server, OAISession session, HttpServletRequest request) {
+            this.server = server;
+            this.session = session;
             this.request = request;
         }
 
-        @Override
+        /*@Override
         public Map<String, List<String>> getParameterMap() {
             Map<String,String[]> m = request.getParameterMap();
             Map<String, List<String>> result = new HashMap();
@@ -184,31 +193,36 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
         @Override
         public String getPath() {
             return getPathInfo(request);
-        }
-    };
+        }*/
+    }
 
-    private class ServerListMetadataFormatsRequest extends ListMetadataFormatsRequest {
+    private class HttpServerListMetadataFormatsRequest extends ListMetadataFormatsServerRequest {
 
+        OAIServer server;
+        OAISession session;
         HttpServletRequest request;
 
-        ServerListMetadataFormatsRequest(OAISession session, HttpServletRequest request) {
-            super(session);
+        HttpServerListMetadataFormatsRequest(OAIServer server, OAISession session, HttpServletRequest request) {
+            this.server = server;
+            this.session = session;
             this.request = request;
         }
+    }
 
-    };
+    private class HttpServerListSetsRequest extends ListSetsServerRequest {
 
-    private class ServerListSetsRequest extends ListSetsRequest {
-
+        OAIServer server;
+        OAISession session;
         HttpServletRequest request;
 
-        ServerListSetsRequest(OAISession session, HttpServletRequest request) {
-            super(session);
+        HttpServerListSetsRequest(OAIServer server, OAISession session, HttpServletRequest request) {
+            this.server = server;
+            this.session = session;
             this.request = request;
         }
 
         @Override
-        public ServerListSetsRequest setResumptionToken(ResumptionToken token) {
+        public HttpServerListSetsRequest setResumptionToken(ResumptionToken token) {
             return this;
         }
 
@@ -220,17 +234,20 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
 
     }
 
-    private class ListRecordsServerRequest extends org.xbib.oai.listrecords.ListRecordsServerRequest {
+    private class HttpServerListRecordsRequest extends ListRecordsServerRequest {
 
+        OAIServer server;
+        OAISession session;
         HttpServletRequest request;
 
-        ListRecordsServerRequest(OAISession session, HttpServletRequest request) {
-            super(session);
+        HttpServerListRecordsRequest(OAIServer server, OAISession session, HttpServletRequest request) {
+            this.server = server;
+            this.session = session;
             this.request = request;
         }
 
         @Override
-        public ListRecordsServerRequest setFrom(Date from, OAIDateResolution oaiDateResolution) {
+        public HttpServerListRecordsRequest setFrom(Date from, OAIDateResolution oaiDateResolution) {
             return this;
         }
 
@@ -240,7 +257,7 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
         }
 
         @Override
-        public ListRecordsServerRequest setUntil(Date until, OAIDateResolution oaiDateResolution) {
+        public HttpServerListRecordsRequest setUntil(Date until, OAIDateResolution oaiDateResolution) {
             return this;
         }
 
@@ -266,36 +283,38 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
 
         @Override
         public ResumptionToken getResumptionToken() {
-            UUID uuid = UUID.fromString(request.getParameter(OAIConstants.RESUMPTION_TOKEN_PARAMETER));
-            return ResumptionToken.get(uuid);
+            return ResumptionToken.get(UUID.fromString(request.getParameter(OAIConstants.RESUMPTION_TOKEN_PARAMETER)));
         }
 
-        @Override
-        public Map<String, List<String>> getParameterMap() {
+
+        /*public Map<String, List<String>> getParameterMap() {
             Map<String,String[]> m = request.getParameterMap();
             Map<String, List<String>> result = new HashMap();
             for (String key : m.keySet()) {
                 result.put(key, Arrays.asList(m.get(key)));
             }
             return result;
-        }
+        }*/
 
         public String getPath() {
             return getPathInfo(request);
         }
     }
 
-    private class ServerListIdentifiersRequest extends ListIdentifiersRequest {
+    private class HttpServerListIdentifiersRequest extends ListIdentifiersServerRequest {
 
+        OAIServer server;
+        OAISession session;
         HttpServletRequest request;
 
-        ServerListIdentifiersRequest(OAISession session, HttpServletRequest request) {
-            super(session);
+        HttpServerListIdentifiersRequest(OAIServer server, OAISession session, HttpServletRequest request) {
+            this.server = server;
+            this.session = session;
             this.request = request;
         }
 
         @Override
-        public ServerListIdentifiersRequest setFrom(Date from, OAIDateResolution oaiDateResolution) {
+        public HttpServerListIdentifiersRequest setFrom(Date from, OAIDateResolution oaiDateResolution) {
             return this;
         }
 
@@ -305,7 +324,7 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
         }
 
         @Override
-        public ServerListIdentifiersRequest setUntil(Date until, OAIDateResolution oaiDateResolution) {
+        public HttpServerListIdentifiersRequest setUntil(Date until, OAIDateResolution oaiDateResolution) {
             return this;
         }
 
@@ -325,7 +344,7 @@ public class OAIServlet extends HttpServlet implements OAIConstants {
         }
 
         @Override
-        public ServerListIdentifiersRequest setResumptionToken(ResumptionToken token) {
+        public HttpServerListIdentifiersRequest setResumptionToken(ResumptionToken token) {
             return this;
         }
 

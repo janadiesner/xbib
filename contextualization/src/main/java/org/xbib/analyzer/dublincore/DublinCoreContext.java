@@ -42,16 +42,16 @@ public class DublinCoreContext
         extends AbstractResourceContext<Resource>
         implements ResourceContext<Resource>, DublinCoreElements {
 
-    private ContentBuilder<ResourceContext, Resource> contentBuilder = new DefaultContentBuilder();
+    private ContentBuilder<ResourceContext<Resource>, Resource> contentBuilder = new DefaultContentBuilder();
 
     @Override
-    public ResourceContext<Resource> setContentBuilder(ContentBuilder<ResourceContext, Resource> contentBuilder) {
+    public ResourceContext<Resource> setContentBuilder(ContentBuilder<ResourceContext<Resource>, Resource> contentBuilder) {
         this.contentBuilder = contentBuilder;
         return this;
     }
 
     @Override
-    public ContentBuilder<ResourceContext, Resource> getContentBuilder() {
+    public ContentBuilder<ResourceContext<Resource>, Resource> getContentBuilder() {
         return contentBuilder;
     }
 

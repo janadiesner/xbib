@@ -31,15 +31,13 @@
  */
 package org.xbib.logging.slf4j;
 
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
-/**
- *
- */
-public class Slf4jLoggerFactory extends org.xbib.logging.LoggerFactory {
+public class Slf4jLoggerFactory extends LoggerFactory {
 
     @Override
-    protected org.xbib.logging.Logger newInstance(String prefix, String name) {
-        return new Slf4jLogger(prefix, LoggerFactory.getLogger(name));
+    protected Logger newInstance(String prefix, String name) {
+        return new Slf4jLogger(prefix, org.slf4j.LoggerFactory.getLogger(name));
     }
 }

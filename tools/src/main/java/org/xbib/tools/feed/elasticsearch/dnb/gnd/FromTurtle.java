@@ -50,6 +50,7 @@ import org.xbib.xml.namespace.XmlNamespaceContext;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 
 /**
@@ -97,10 +98,8 @@ public class FromTurtle extends Feeder implements TripleListener {
         xmlContext.addNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         xmlContext.addNamespace("skos", "http://www.w3.org/2004/02/skos/core#");
 
-        TurtleReader reader = new TurtleReader(id)
-                .context(xmlContext);
-        reader.setTripleListener(this);
-        reader.parse(in);
+        TurtleReader reader = new TurtleReader().setBaseIRI(id).context(xmlContext);
+        reader.parse(new InputStreamReader(in, "UTF-8"), this);
     }
 
     @Override

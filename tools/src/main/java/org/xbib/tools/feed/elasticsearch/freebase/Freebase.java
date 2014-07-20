@@ -48,6 +48,7 @@ import org.xbib.tools.Feeder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 
 /**
@@ -72,9 +73,8 @@ public class Freebase extends Feeder {
         InputStream in = InputService.getInputStream(uri);
         ElasticBuilder builder = new ElasticBuilder(sink);
         IRI base = IRI.create(settings.get("base"));
-        new TurtleReader(base)
-                .setTripleListener(builder)
-                .parse(in);
+        new TurtleReader().setBaseIRI(base)
+                .parse(new InputStreamReader(in, "UTF-8"), builder);
         in.close();
     }
 

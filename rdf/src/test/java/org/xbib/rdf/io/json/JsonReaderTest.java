@@ -33,6 +33,7 @@ package org.xbib.rdf.io.json;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 import org.testng.Assert;
@@ -96,12 +97,12 @@ public class JsonReaderTest extends Assert {
 
         };
         StringWriter sw = new StringWriter();
-        TurtleWriter t = new TurtleWriter().output(sw);
-        jsonHandler.setListener(t);
+        TurtleWriter t = new TurtleWriter(sw);
+        //jsonHandler.setListener(t);
         new JsonReader()
                 .setHandler(jsonHandler)
                 .root(new QName("http://purl.org/dc/elements/1.1/", "root", "dc"))
-                .parse(in);
+                .parse(new InputStreamReader(in, "UTF-8"), t);
         logger.info("resource={}", sw.toString());
     }
 

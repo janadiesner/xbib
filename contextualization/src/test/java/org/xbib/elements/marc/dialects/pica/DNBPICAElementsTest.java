@@ -131,20 +131,18 @@ public class DNBPICAElementsTest extends Assert {
 
         @Override
         public void output(ResourceContext context, Resource resource, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
-            if (context != null) {
-                Resource r = context.getResource();
-                IRI id = IRI.builder()
-                        .scheme("http")
-                        .host("xbib.org")
-                        .query("bibdat")
-                        .fragment(Long.toString(counter.get())).build();
-                r.id(id);
-                StringWriter sw = new StringWriter();
-                TurtleWriter tw = new TurtleWriter().output(sw);
-                tw.write(r);
-                logger.debug("out={}", sw.toString());
-                counter.incrementAndGet();
-            }
+            Resource r = context.getResource();
+            IRI id = IRI.builder()
+                    .scheme("http")
+                    .host("xbib.org")
+                    .query("bibdat")
+                    .fragment(Long.toString(counter.get())).build();
+            r.id(id);
+            StringWriter sw = new StringWriter();
+            TurtleWriter tw = new TurtleWriter(sw);
+            tw.write(context);
+            logger.debug("out={}", sw.toString());
+            counter.incrementAndGet();
         }
     };
 }

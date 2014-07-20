@@ -1,18 +1,3 @@
-/*
- * Copyright 2010-2013 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
 package org.asynchttpclient.providers.netty.channel;
 
 import static org.asynchttpclient.providers.netty.util.HttpUtil.*;
@@ -60,12 +45,13 @@ import org.asynchttpclient.providers.netty.future.NettyResponseFuture;
 import org.asynchttpclient.providers.netty.handler.NettyChannelHandler;
 import org.asynchttpclient.providers.netty.util.CleanupChannelGroup;
 import org.asynchttpclient.util.SslUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 public class Channels {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Channels.class);
+    private static final Logger logger = LoggerFactory.getLogger(Channels.class.getName());
+
     public static final String HTTP_HANDLER = "httpHandler";
     public static final String SSL_HANDLER = "sslHandler";
     public static final String AHC_HANDLER = "httpProcessor";
@@ -334,7 +320,7 @@ public class Channels {
         final Channel channel = connectionsPool.poll(connectionPoolKeyStrategy.getKey(uri));
 
         if (channel != null) {
-            LOGGER.debug("Using cached Channel {}\n for uri {}\n", channel, uri);
+            logger.debug("Using cached Channel {}\n for uri {}\n", channel, uri);
 
             try {
                 // Always make sure the channel who got cached support the
@@ -344,7 +330,7 @@ public class Channels {
                 // https.
                 return verifyChannelPipeline(channel, uri.getScheme());
             } catch (Exception ex) {
-                LOGGER.debug(ex.getMessage(), ex);
+                logger.debug(ex.getMessage(), ex);
             }
         }
         return null;
@@ -357,7 +343,7 @@ public class Channels {
             try {
                 asyncHandler.onThrowable(ex);
             } catch (Throwable t) {
-                LOGGER.warn("!connectionsPool.canCacheConnection()", t);
+                logger.warn("!connectionsPool.canCacheConnection()", t);
             }
             throw ex;
         }
@@ -370,7 +356,7 @@ public class Channels {
                 try {
                     asyncHandler.onThrowable(ex);
                 } catch (Throwable t) {
-                    LOGGER.warn("!connectionsPool.canCacheConnection()", t);
+                    logger.warn("!connectionsPool.canCacheConnection()", t);
                 }
                 throw ex;
             }
@@ -409,12 +395,12 @@ public class Channels {
             return;
         }
 
-        LOGGER.debug("Closing Channel {} ", ctx.channel());
+        logger.debug("Closing Channel {} ", ctx.channel());
 
         try {
             ctx.channel().close();
         } catch (Throwable t) {
-            LOGGER.debug("Error closing a connection", t);
+            logger.debug("Error closing a connection", t);
         }
 
         if (ctx.channel() != null) {
@@ -449,8 +435,8 @@ public class Channels {
         }
 
         if (!future.isCancelled() && !future.isDone()) {
-            LOGGER.debug("Aborting Future {}\n", future);
-            LOGGER.debug(t.getMessage(), t);
+            logger.debug("Aborting Future {}", future);
+            logger.debug(t.getMessage(), t);
         }
 
         future.abort(t);

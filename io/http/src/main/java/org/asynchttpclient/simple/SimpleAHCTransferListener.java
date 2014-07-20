@@ -22,7 +22,6 @@ import org.asynchttpclient.SimpleAsyncHttpClient;
  * established. For error handling, see
  * {@link org.asynchttpclient.SimpleAsyncHttpClient.Builder#setDefaultThrowableHandler(org.asynchttpclient.ThrowableHandler)}
  *
- * @author Benjamin Hanzelmann
  */
 public interface SimpleAHCTransferListener {
 

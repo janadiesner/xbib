@@ -37,6 +37,7 @@ import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.io.TripleLine;
 import org.xbib.rdf.io.xml.XmlResourceHandler;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xml.sax.Attributes;
@@ -53,19 +54,19 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
 
     private ResourceContext<Resource> resourceContext;
 
-    private RdfOutput rdfOutput = new RdfOutput();
+    private TripleLine tripleLine;
 
     private IRINamespaceContext context;
+
+    public RdfMetadataHandler() {
+        this(getDefaultContext());
+    }
 
     public static IRINamespaceContext getDefaultContext() {
         IRINamespaceContext context = IRINamespaceContext.newInstance();
         context.addNamespace(DC_PREFIX, DC_NS_URI);
         context.addNamespace(OAIDC_NS_PREFIX, OAIDC_NS_URI);
         return context;
-    }
-
-    public RdfMetadataHandler() {
-        this(getDefaultContext());
     }
 
     public RdfMetadataHandler(IRINamespaceContext context) {
@@ -76,7 +77,6 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
         // set up our default handler
         this.handler = new RdfResourceHandler(resourceContext);
         handler.setDefaultNamespace(NS_PREFIX, NS_URI);
-        handler.setListener(rdfOutput);
     }
 
     public IRINamespaceContext getContext() {
@@ -93,9 +93,11 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
     }
 
     public RdfMetadataHandler setHandler(RdfResourceHandler handler) {
-        this.handler = handler;
         handler.setDefaultNamespace(NS_PREFIX, NS_URI);
-        handler.setListener(rdfOutput);
+        this.handler = handler;
+        if (tripleLine != null) {
+            handler.setListener(tripleLine);
+        }
         return this;
     }
 
@@ -103,9 +105,11 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
         return handler;
     }
 
-    public RdfMetadataHandler setOutput(RdfOutput rdfOutput) {
-        handler.setListener(rdfOutput);
-        this.rdfOutput = rdfOutput;
+    public RdfMetadataHandler setTripleLine(TripleLine tripleLine) {
+        if (tripleLine != null) {
+            handler.setListener(tripleLine);
+            this.tripleLine = tripleLine;
+        }
         return this;
     }
 
@@ -131,7 +135,9 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
             resourceContext.getResource().id(IRI.create(id));
             handler.endDocument();
             try {
-                rdfOutput.output(resourceContext);
+                if (tripleLine != null) {
+                    tripleLine.write(resourceContext);
+                }
             } catch (IOException e) {
                 throw new SAXException(e);
             }

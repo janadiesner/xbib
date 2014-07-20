@@ -54,7 +54,6 @@ import org.xbib.tools.merge.zdb.entities.Holding;
 import org.xbib.tools.merge.zdb.entities.Indicator;
 import org.xbib.tools.merge.zdb.entities.License;
 import org.xbib.tools.merge.zdb.entities.Manifestation;
-import org.xbib.tools.merge.zdb.entities.TimeLine;
 import org.xbib.tools.util.SearchHitPipelineElement;
 import org.xbib.util.ExceptionFormatter;
 
@@ -107,8 +106,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
     private String sourceIndicatorIndex;
     private String sourceIndicatorType;
 
-    private final String worksIndex;
-    private final String worksIndexType;
     private final String manifestationsIndex;
     private final String manifestationsIndexType;
     private final String holdingsIndex;
@@ -142,8 +139,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         if (index == null) {
             throw new IllegalArgumentException("no index given");
         }
-        this.worksIndex = settings.get("worksIndex", index);
-        this.worksIndexType = settings.get("worksIndexType", "Work");
         this.manifestationsIndex = settings.get("manifestationsIndex", index);
         this.manifestationsIndexType = settings.get("manifestationsIndexType", "Manifestation");
         this.holdingsIndex = settings.get("holdingsIndex", index);
@@ -195,17 +190,11 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             this.serviceMetric = new MeterMetric(5L, TimeUnit.SECONDS);
             while (hasNext()) {
                 manifestation = next();
-                if ("simple".equals(service.settings().get("mode", "standard"))) {
-                    if (simpleCheck(manifestation)) {
-                        simpleProcess(manifestation);
-                    }
-                } else {
-                    if (check(manifestation)) {
-                        processWork(manifestation);
-                    }
-                    for (PipelineRequestListener listener : listeners.values()) {
-                        listener.newRequest(this, manifestation);
-                    }
+                if (check(manifestation)) {
+                    processWork(manifestation);
+                }
+                for (PipelineRequestListener listener : listeners.values()) {
+                    listener.newRequest(this, manifestation);
                 }
                 metric.mark();
             }
@@ -275,43 +264,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         return !service.processed().contains(id);
     }
 
-    private boolean simpleCheck(Manifestation manifestation) {
-        if (manifestation.getForced()) {
-            return true;
-        }
-        String id = manifestation.externalID();
-        if (!service.processed().contains(id)) {
-            service.processed().add(id);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private void simpleProcess(Manifestation manifestation) throws IOException {
-        // no Work set algorithm, only other edition (print/online)
-        this.candidates = newSetFromMap(new ConcurrentHashMap<Manifestation, Boolean>());
-        candidates.add(manifestation);
-        if (manifestation.hasOnline() || manifestation.hasPrint()) {
-            retrieveOtherEdition(manifestation, candidates);
-        }
-        Collection<Manifestation> manifestations = ImmutableSet.copyOf(candidates);
-        candidates.clear();
-        for (Manifestation m : manifestations) {
-            setAllRelationsBetween(m, manifestations);
-        }
-        Set<Holding> holdings = searchHoldings(manifestations);
-        Set<License> licenses = searchLicensesAndIndicators(manifestations);
-        TimeLine timeline = new TimeLine(manifestations);
-        timeline.setHoldings(holdings);
-        timeline.setLicensesAndIndicators(licenses);
-        timeline.makeServices();
-        Set<String> visited = newHashSet();
-        for (Manifestation m : timeline) {
-            indexManifestation(m, visited);
-        }
-    }
-
     private void processWork(Manifestation manifestation) throws IOException {
         // Work set algorithm
         // Candidates are unstructured, no timeline organization,
@@ -340,7 +292,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             setAllRelationsBetween(m, candidates);
         }
 
-        // Create timelines, and process each timeline for services (holdings, licenses, indicators)
         Cluster cluster = new Cluster(candidates);
 
         // Now, this is expensive. Find holdings, licenses, indicators of candidates
@@ -348,52 +299,17 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         if (holdings.size() > 1000) {
             logger.warn("large list of holdings for {} ({})", manifestation, holdings.size());
         }
+        cluster.setHoldings(holdings);
         Set<License> licenses = searchLicensesAndIndicators(candidates);
         if (licenses.size() > 1000) {
             logger.warn("large list of licenses for {} ({})", manifestation, licenses.size());
         }
+        cluster.setLicensesAndIndicators(licenses);
 
-        Set<TimeLine> timeLines = cluster.timeLines();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("cluster: candidates={} timelines={}", candidates, timeLines);
-            for (TimeLine timeLine : timeLines) {
-                logger.debug("timeline {} {}-{}", timeLine.getFingerprint(), timeLine.getFirstDate(), timeLine.getLastDate());
-            }
-        }
+        cluster.attachServicesToManifestations();
 
         Set<String> visited = newHashSet();
-        for (TimeLine timeLine : timeLines) {
-            String timelineId = timeLine.getFingerprint();
-            // precaution against processing a timeline again. This should not happen.
-            if (service.timelines().contains(timelineId)) {
-                logger.warn("timeline {} already exists (while processing manifestation {})",
-                        timelineId, manifestation);
-                continue;
-            }
-            service.timelines().add(timelineId);
-            //timeLine.setHoldings(searchHoldings(timeLine));
-            timeLine.setHoldings(holdings);
-            //timeLine.setLicensesAndIndicators(searchLicensesAndIndicators(timeLine));
-            timeLine.setLicensesAndIndicators(licenses);
-            // stratify and re-adjust the services in the timeline
-            timeLine.makeServices();
-            // index the time line object (it's a "serial line of publication events")
-            XContentBuilder builder = jsonBuilder();
-            timeLine.build(builder, service.settings().get("tag"), "Serial");
-            service.ingest().index(worksIndex, worksIndexType, timelineId, builder.string());
-            // index every manifestation in the timeline
-            for (Manifestation m : timeLine) {
-                indexManifestation(m, visited);
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("indexed timeline {} of size {}: {} total manifestations",
-                        timelineId, timeLine.size(), visited.size());
-            }
-        }
-        // What about manifestations not in timeline? Index them as loners.
-        // These loners indicate sources of errors in the relation configuration.
-        for (Manifestation m : cluster.notInTimeLines()) {
+        for (Manifestation m : cluster) {
             indexManifestation(m, visited);
         }
     }

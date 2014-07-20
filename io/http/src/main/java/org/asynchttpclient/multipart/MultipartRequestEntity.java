@@ -1,25 +1,10 @@
-/*
- * Copyright 2010 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
 package org.asynchttpclient.multipart;
 
 import static org.asynchttpclient.util.MiscUtil.isNonEmpty;
 
 import org.asynchttpclient.FluentCaseInsensitiveStringsMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,6 +16,8 @@ import java.util.Random;
  * @link http://hc.apache.org/httpclient-3.x/
  */
 public class MultipartRequestEntity implements RequestEntity {
+
+    private final static Logger logger = LoggerFactory.getLogger(MultipartRequestEntity.class.getName());
 
     /**
      * The Content-Type for multipart/form-data.
@@ -56,7 +43,6 @@ public class MultipartRequestEntity implements RequestEntity {
         return bytes;
     }
 
-    private final Logger log = LoggerFactory.getLogger(MultipartRequestEntity.class);
 
     /**
      * The MIME parts as set by the constructor
@@ -132,7 +118,7 @@ public class MultipartRequestEntity implements RequestEntity {
         try {
             return Part.getLengthOfParts(parts, multipartBoundary);
         } catch (Exception e) {
-            log.error("An exception occurred while getting the length of the parts", e);
+            logger.error("An exception occurred while getting the length of the parts", e);
             return 0;
         }
     }

@@ -1,18 +1,3 @@
-/*
- * Copyright 2010-2013 Ning, Inc.
- *
- * Ning licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
 package org.asynchttpclient.providers.netty.handler;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
@@ -48,8 +33,12 @@ import org.asynchttpclient.providers.netty.response.ResponseStatus;
 import org.asynchttpclient.providers.netty.ws.NettyWebSocket;
 import org.asynchttpclient.providers.netty.ws.WebSocketUtil;
 import org.asynchttpclient.websocket.WebSocketUpgradeHandler;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 final class WebSocketProtocol extends Protocol {
+
+    private final static Logger logger = LoggerFactory.getLogger(WebSocketProtocol.class.getName());
 
     private static final byte OPCODE_TEXT = 0x1;
     private static final byte OPCODE_BINARY = 0x2;
@@ -67,7 +56,7 @@ final class WebSocketProtocol extends Protocol {
             try {
                 h.onSuccess(new NettyWebSocket(ctx.channel()));
             } catch (Exception ex) {
-                NettyChannelHandler.LOGGER.warn("onSuccess unexpected exception", ex);
+                logger.warn("onSuccess unexpected exception", ex);
             }
         }
     }
@@ -169,12 +158,12 @@ final class WebSocketProtocol extends Protocol {
                     }
                 }
             } else {
-                NettyChannelHandler.LOGGER.debug("UpgradeHandler returned a null NettyWebSocket ");
+                logger.debug("UpgradeHandler returned a null NettyWebSocket ");
             }
         } else if (e instanceof LastHttpContent) {
             // FIXME what to do with this kind of messages?
         } else {
-            NettyChannelHandler.LOGGER.error("Invalid message {}", e);
+            logger.error("Invalid message {}", e);
         }
     }
 
@@ -182,7 +171,7 @@ final class WebSocketProtocol extends Protocol {
     public void onError(ChannelHandlerContext ctx, Throwable e) {
         try {
             Object attribute = Channels.getDefaultAttribute(ctx);
-            NettyChannelHandler.LOGGER.warn("onError {}", e);
+            logger.warn("onError {}", e);
             if (!(attribute instanceof NettyResponseFuture)) {
                 return;
             }
@@ -196,13 +185,13 @@ final class WebSocketProtocol extends Protocol {
                 webSocket.close();
             }
         } catch (Throwable t) {
-            NettyChannelHandler.LOGGER.error("onError", t);
+            logger.error("onError", t);
         }
     }
 
     @Override
     public void onClose(ChannelHandlerContext ctx) {
-        NettyChannelHandler.LOGGER.trace("onClose {}");
+        logger.trace("onClose {}");
         Object attribute = Channels.getDefaultAttribute(ctx);
         if (!(attribute instanceof NettyResponseFuture)) {
             return;
@@ -218,7 +207,7 @@ final class WebSocketProtocol extends Protocol {
             if (attribute != DiscardEvent.INSTANCE)
                 webSocket.close(1006, "Connection was closed abnormally (that is, with no close frame being sent).");
         } catch (Throwable t) {
-            NettyChannelHandler.LOGGER.error("onError", t);
+            logger.error("onError", t);
         }
     }
 }

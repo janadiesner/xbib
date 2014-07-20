@@ -1415,7 +1415,6 @@ public class ChannelSftp extends ChannelSession{
    * canceled immediately.
    *
    * @see #LsEntrySelector
-   * @since 0.1.47
    */
    public void ls(String path, LsEntrySelector selector) throws SftpException{
      //System.out.println("ls: "+path);
@@ -2732,7 +2731,6 @@ public class ChannelSftp extends ChannelSession{
    *
    * @see #LsEntry
    * @see #ls(String, LsEntrySelector)
-   * @since 0.1.47
    */
   public interface LsEntrySelector {
     public final int CONTINUE = 0;

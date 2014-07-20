@@ -1,15 +1,3 @@
-/*
- * Copyright (c) 2010-2012 Sonatype, Inc. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
 package org.asynchttpclient.websocket;
 
 import org.asynchttpclient.AsyncHandler;
@@ -44,9 +32,6 @@ public class WebSocketUpgradeHandler implements UpgradeHandler<WebSocket>, Async
         maxTextSize = b.maxTextSize;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final void onThrowable(Throwable t) {
         onFailure(t);
@@ -56,17 +41,11 @@ public class WebSocketUpgradeHandler implements UpgradeHandler<WebSocket>, Async
         return onSuccessCalled.getAndSet(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final STATE onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
         return STATE.CONTINUE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final STATE onStatusReceived(HttpResponseStatus responseStatus) throws Exception {
         if (responseStatus.getStatusCode() == 101) {
@@ -76,17 +55,11 @@ public class WebSocketUpgradeHandler implements UpgradeHandler<WebSocket>, Async
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final STATE onHeadersReceived(HttpResponseHeaders headers) throws Exception {
         return STATE.CONTINUE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final WebSocket onCompleted() throws Exception {
         if (webSocket == null) {
@@ -95,9 +68,6 @@ public class WebSocketUpgradeHandler implements UpgradeHandler<WebSocket>, Async
         return webSocket;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final void onSuccess(WebSocket webSocket) {
         this.webSocket = webSocket;
@@ -108,9 +78,6 @@ public class WebSocketUpgradeHandler implements UpgradeHandler<WebSocket>, Async
         ok.set(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final void onFailure(Throwable t) {
         for (WebSocketListener w : l) {

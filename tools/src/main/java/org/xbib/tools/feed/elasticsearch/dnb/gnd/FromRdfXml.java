@@ -47,10 +47,10 @@ import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.rdfxml.RdfXmlReader;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.tools.Feeder;
-import org.xml.sax.InputSource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 
 /**
@@ -106,8 +106,7 @@ public class FromRdfXml extends Feeder implements TripleListener {
 
         InputStream in = InputService.getInputStream(uri);
         RdfXmlReader reader = new RdfXmlReader();
-        reader.setTripleListener(this);
-        reader.parse(new InputSource(in));
+        reader.parse(new InputStreamReader(in, "UTF-8"), this);
         in.close();
 
     }

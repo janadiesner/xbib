@@ -1,15 +1,3 @@
-/*
- * Copyright (c) 2010-2012 Sonatype, Inc. All rights reserved.
- *
- * This program is licensed to you under the Apache License Version 2.0,
- * and you may not use this file except in compliance with the Apache License Version 2.0.
- * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the Apache License Version 2.0 is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
- */
 package org.asynchttpclient.providers.netty.ws;
 
 import org.asynchttpclient.websocket.WebSocket;
@@ -23,8 +11,8 @@ import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -32,7 +20,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 
 public class NettyWebSocket implements WebSocket {
-    private final static Logger logger = LoggerFactory.getLogger(NettyWebSocket.class);
+
+    private final static Logger logger = LoggerFactory.getLogger(NettyWebSocket.class.getName());
 
     private final Channel channel;
     private final ConcurrentLinkedQueue<WebSocketListener> listeners = new ConcurrentLinkedQueue<WebSocketListener>();

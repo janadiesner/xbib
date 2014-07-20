@@ -54,16 +54,12 @@ public class OAITest extends Assert {
 
             @Override
             public boolean skip(QName name) {
-                if (name.getLocalPart().startsWith("@")) {
-                    return true;
-                }
-                return false;
+                return name.getLocalPart().startsWith("@");
             }
 
         };
         StringWriter sw = new StringWriter();
-        TurtleWriter t = new TurtleWriter()
-                .output(sw)
+        TurtleWriter t = new TurtleWriter(sw)
                 .setContext(context)
                 .writeNamespaces();
         xmlHandler.setListener(t)
