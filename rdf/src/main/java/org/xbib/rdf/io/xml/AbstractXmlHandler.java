@@ -31,10 +31,6 @@
  */
 package org.xbib.rdf.io.xml;
 
-import java.util.Iterator;
-import java.util.Stack;
-import javax.xml.namespace.QName;
-
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -42,14 +38,16 @@ import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.TripleListener;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.namespace.QName;
+import java.util.Iterator;
+import java.util.Stack;
+
 /**
  * Abstract XML handler
- *
  */
 public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHandler {
 
@@ -125,7 +123,7 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
                     if (attrValue != null && !attrValue.isEmpty()) {
                         String attrName = '@' + atts.getLocalName(i);
                         if (!skip(new QName(atts.getURI(i), attrName, atts.getQName(i)))) {
-                            startElement(atts.getURI(i), attrName , atts.getQName(i), null);
+                            startElement(atts.getURI(i), attrName, atts.getQName(i), null);
                             characters(attrValue.toCharArray(), 0, attrValue.length());
                             endElement(atts.getURI(i), attrName, atts.getQName(i));
                         }

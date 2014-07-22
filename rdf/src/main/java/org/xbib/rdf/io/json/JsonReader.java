@@ -31,28 +31,24 @@
  */
 package org.xbib.rdf.io.json;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-
 import org.xbib.json.xml.JsonSaxAdapter;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.io.Triplifier;
+import org.xbib.rdf.io.TripleReader;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.io.Reader;
 
 /**
  * A triplifier for JSON (not JSON-LD)
- *
  */
 public class JsonReader<S extends Resource<S, P, O>, P extends Property, O extends Literal<O>>
-        implements Triplifier<S, P, O> {
+        implements TripleReader<S, P, O> {
 
     private XmlHandler handler;
 

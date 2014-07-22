@@ -41,7 +41,7 @@ import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.Loggers;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
@@ -92,14 +92,14 @@ public class XmlReaderTest extends Assert {
 
         };
         StringWriter sw = new StringWriter();
-        TurtleWriter t = new TurtleWriter(sw)
-                .setContext(context)
-                .writeNamespaces();
-        xmlHandler.setListener(t);
+        TurtleWriter writer = new TurtleWriter(sw);
+        writer.setNamespaceContext(context);
+        writer.writeNamespaces();
+        xmlHandler.setListener(writer);
         new XmlReader()
                 .setHandler(xmlHandler)
                 .parse(new InputSource(in));
-        t.close();
+        writer.close();
         String s = sw.toString().trim();
         logger.info(s);
         assertEquals(s.length(), 2115);

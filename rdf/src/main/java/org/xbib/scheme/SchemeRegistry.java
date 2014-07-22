@@ -29,7 +29,7 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.iri;
+package org.xbib.scheme;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,8 +42,9 @@ public final class SchemeRegistry {
     private static SchemeRegistry registry;
 
     public static synchronized SchemeRegistry getInstance() {
-        if (registry == null)
+        if (registry == null) {
             registry = new SchemeRegistry();
+        }
         return registry;
     }
 
@@ -57,13 +58,13 @@ public final class SchemeRegistry {
     }
 
     public synchronized boolean register(String schemeClass) throws ClassNotFoundException, IllegalAccessException,
-        InstantiationException {
-        Class<Scheme> klass = (Class<Scheme>)Thread.currentThread().getContextClassLoader().loadClass(schemeClass);
+            InstantiationException {
+        Class<Scheme> klass = (Class<Scheme>) Thread.currentThread().getContextClassLoader().loadClass(schemeClass);
         return register(klass);
     }
 
     public synchronized boolean register(Class<Scheme> schemeClass) throws IllegalAccessException,
-        InstantiationException {
+            InstantiationException {
         Scheme scheme = schemeClass.newInstance();
         return register(scheme);
     }
@@ -73,13 +74,15 @@ public final class SchemeRegistry {
         if (schemes.get(name) == null) {
             schemes.put(name.toLowerCase(), scheme);
             return true;
-        } else
+        } else {
             return false;
+        }
     }
 
     public Scheme getScheme(String scheme) {
-        if (scheme == null)
+        if (scheme == null) {
             return null;
+        }
         Scheme s = schemes.get(scheme.toLowerCase());
         return (s != null) ? s : new DefaultScheme(scheme);
     }

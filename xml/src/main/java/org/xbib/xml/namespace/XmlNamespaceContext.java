@@ -108,6 +108,10 @@ public class XmlNamespaceContext implements NamespaceContext {
         }
     }
 
+    public final synchronized void removeNamespace(String prefix) {
+        prefixes.remove(namespaces.remove(prefix));
+    }
+
     public Map<String, String> getNamespaces() {
         return namespaces;
     }

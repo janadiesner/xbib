@@ -31,13 +31,13 @@
  */
 package org.xbib.rdf;
 
+import org.xbib.iri.IRI;
+import org.xbib.rdf.context.ResourceContext;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import org.xbib.iri.IRI;
-import org.xbib.rdf.context.ResourceContext;
 
 /**
  * A Resource is an iterable over statements of subjects, predicates, and
@@ -45,10 +45,11 @@ import org.xbib.rdf.context.ResourceContext;
  * resources and local properties.
  */
 public interface Resource<S extends Identifier, P extends Property, O extends Node>
-        extends Identifier, Node, Iterable<Triple<S,P,O>> {
+        extends Identifier, Node, Iterable<Triple<S, P, O>> {
 
     /**
      * Set the identifier of this resource
+     *
      * @param id the IRI for this resource
      * @return this resource
      */
@@ -85,39 +86,44 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
 
     /**
      * Add a property to this resource with a string object value
+     *
      * @param predicate a predicate identifier
-     * @param object an object in its string representation form
+     * @param object    an object in its string representation form
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(P predicate, O object);
 
     /**
      * Add a property to this resource with a string object value
+     *
      * @param predicate a predicate identifier
-     * @param object an object in its string representation form
+     * @param object    an object in its string representation form
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(P predicate, String object);
 
     /**
      * Add a property to this resource
+     *
      * @param predicate a predicate identifier
-     * @param number an integer
+     * @param number    an integer
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(P predicate, Integer number);
 
     /**
      * Add a property to this resource
+     *
      * @param predicate a predicate identifier
-     * @param literal a literal
+     * @param literal   a literal
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(P predicate, Literal<O> literal);
 
     /**
      * Add a property to this resource
-     * @param predicate a predicate identifier
+     *
+     * @param predicate        a predicate identifier
      * @param externalResource external resource IRI
      * @return the new resource with the property added
      */
@@ -125,8 +131,9 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
 
     /**
      * Add a property to this resource
+     *
      * @param predicate a predicate identifier
-     * @param literals literals
+     * @param literals  literals
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(P predicate, Collection literals);
@@ -135,7 +142,7 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
      * Add another resource to this resource
      *
      * @param predicate a predicate identifier
-     * @param resource resource
+     * @param resource  resource
      * @return the new resource with the resource added
      */
     Resource<S, P, O> add(P predicate, Resource<S, P, O> resource);
@@ -144,15 +151,16 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
      * Add a property to this resource.
      *
      * @param predicate a predicate identifier in its string representation form
-     * @param object an object in its string representation form
+     * @param object    an object in its string representation form
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(String predicate, String object);
 
     /**
      * Add a property to this resource
+     *
      * @param predicate a predicate identifier
-     * @param number an integer
+     * @param number    an integer
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(String predicate, Integer number);
@@ -161,14 +169,15 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
      * Add a property to this resource.
      *
      * @param predicate a predicate identifier in its string representation form
-     * @param literal an object in its string representation form
+     * @param literal   an object in its string representation form
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(String predicate, Literal literal);
 
     /**
      * Add a property to this resource
-     * @param predicate predicate
+     *
+     * @param predicate        predicate
      * @param externalResource external resource
      * @return the new resource with the property added
      */
@@ -176,8 +185,9 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
 
     /**
      * Add a property to this resource
+     *
      * @param predicate predicate
-     * @param literals literals
+     * @param literals  literals
      * @return the new resource with the property added
      */
     Resource<S, P, O> add(String predicate, Collection literals);
@@ -185,8 +195,9 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
 
     /**
      * Add another resource to this resource
+     *
      * @param predicate predicate
-     * @param resource resource
+     * @param resource  resource
      * @return the new resource with the resource added
      */
     Resource<S, P, O> add(String predicate, Resource<S, P, O> resource);
@@ -202,15 +213,17 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
 
     /**
      * Return the map of nodes attached to the properties of this resource.
+     *
      * @return the map of nodes
      */
     Map<P, Collection<Node>> nodeMap();
 
     /**
      * Return the map of resources attached to this resource.
+     *
      * @return the map of resources
      */
-    Map<P, Collection<Resource<S,P,O>>> resources();
+    Map<P, Collection<Resource<S, P, O>>> resources();
 
     /**
      * Create an anonymous resource and associate it with this resource. If the
@@ -268,6 +281,7 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
 
     /**
      * Return literal for this predicate
+     *
      * @param predicate predicate
      * @return literal
      */
@@ -275,6 +289,7 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
 
     /**
      * Return literal for this predicate
+     *
      * @param predicate predicate
      * @return literal
      */
@@ -285,20 +300,21 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
      *
      * @param triple triple
      */
-    Resource<S, P, O> add(Triple<S,P,O> triple);
+    Resource<S, P, O> add(Triple<S, P, O> triple);
 
     /**
      * Get iterator over triples
      *
      * @return statements
      */
-    Iterator<Triple<S,P,O>> iterator();
+    Iterator<Triple<S, P, O>> iterator();
 
     /**
      * Get iterator over triples thats are properties of this resource
+     *
      * @return iterator over triple
      */
-    Iterator<Triple<S,P,O>> propertyIterator();
+    Iterator<Triple<S, P, O>> propertyIterator();
 
     /**
      * Compact a predicate. Under the predicate, there is a single blank node

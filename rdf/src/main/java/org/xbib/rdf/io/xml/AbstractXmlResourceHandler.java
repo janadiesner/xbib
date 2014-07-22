@@ -31,9 +31,6 @@
  */
 package org.xbib.rdf.io.xml;
 
-import java.util.Stack;
-import javax.xml.namespace.QName;
-
 import org.xbib.rdf.IdentifiableNode;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Property;
@@ -41,9 +38,11 @@ import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleFactory;
 
+import javax.xml.namespace.QName;
+import java.util.Stack;
+
 /**
  * The XML resource handler can create nested RDF resources from arbitrary XML.
- *
  */
 public abstract class AbstractXmlResourceHandler
         extends AbstractXmlHandler implements XmlResourceHandler {
@@ -69,12 +68,12 @@ public abstract class AbstractXmlResourceHandler
     }
 
     /**
-     *  Open a predicate. Create new resource, even if there will be only a single literal.
-     *  It will be compacted later.
+     * Open a predicate. Create new resource, even if there will be only a single literal.
+     * It will be compacted later.
      *
      * @param parent the parent
-     * @param name the name
-     * @param level the level
+     * @param name   the name
+     * @param level  the level
      */
     @Override
     public void openPredicate(QName parent, QName name, int level) {
@@ -103,9 +102,9 @@ public abstract class AbstractXmlResourceHandler
                 if (!stack.isEmpty()) {
                     Object o = simpleFactory.asObject(toObject(name, s));
                     if (o instanceof Literal) {
-                        r.add(p, (Literal)o);
+                        r.add(p, (Literal) o);
                     } else if (o instanceof IdentifiableNode) {
-                        r.add(p, (IdentifiableNode)o);
+                        r.add(p, (IdentifiableNode) o);
                     }
                     stack.peek().compactPredicate(p);
                 }

@@ -15,7 +15,7 @@ import java.util.Map;
 import static org.testng.Assert.assertEquals;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
-public class XContentBuilderTest {
+public class XResourceContextContentBuilderTest {
 
     @Test
     public void testCopy() throws IOException {

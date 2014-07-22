@@ -4,6 +4,7 @@ package org.xbib.rdf.context;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 
 public class IRINamespaceCompactionTest extends Assert {
 

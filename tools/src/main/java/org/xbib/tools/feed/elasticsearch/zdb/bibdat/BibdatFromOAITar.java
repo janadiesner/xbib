@@ -48,8 +48,7 @@ import org.xbib.marc.dialects.pica.DNBPicaXmlEventConsumer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.ContentBuilder;
-import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.tools.Feeder;
 import org.xbib.tools.util.AbstractTarReader;
 
@@ -94,7 +93,9 @@ public final class BibdatFromOAITar extends Feeder {
                 .detectUnknownKeys(settings.getAsBoolean("detect", false))
                 .start(new PicaElementBuilderFactory() {
                     public PicaElementBuilder newBuilder() {
-                        return new PicaElementBuilder().addOutput(out);
+                        PicaElementBuilder builder = new PicaElementBuilder();
+                        builder.addWriter(out);
+                        return builder;
                     }
                 });
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
@@ -131,8 +132,6 @@ public final class BibdatFromOAITar extends Feeder {
         if (settings.getAsBoolean("detect", false)) {
             logger.info("unknown keys = {}", mapper.unknownKeys());
         }
-        total.addAndGet(out.getCounter());
-        logger.info("end of processing {}, counter = {}", uri, out.getCounter());
     }
 
     @Override
@@ -178,10 +177,10 @@ public final class BibdatFromOAITar extends Feeder {
 
     }
 
-    private class OurContextResourceOutput extends CountableContextResourceOutput<PicaContext, Resource> {
+    private class OurContextResourceOutput extends AbstractResourceContextWriter<PicaContext, Resource> {
 
         @Override
-        public void output(PicaContext context, Resource resource, ContentBuilder contentBuilder) throws IOException {
+        public void write(PicaContext context) throws IOException {
             IRI id = IRI.builder()
                     .scheme("http")
                     .host(settings.get("index"))
@@ -189,8 +188,7 @@ public final class BibdatFromOAITar extends Feeder {
                     .query(settings.get("type"))
                     .fragment(context.getID()).build();
             context.getResource().id(id);
-            sink.output(context, context.getResource(), context.getContentBuilder());
-            counter.incrementAndGet();
+            sink.write(context);
         }
     }
 

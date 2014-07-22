@@ -31,8 +31,15 @@
  */
 package org.xbib.rdf.io.xml;
 
-import java.io.Writer;
-import java.util.Iterator;
+import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.Identifier;
+import org.xbib.rdf.Literal;
+import org.xbib.rdf.Node;
+import org.xbib.rdf.Property;
+import org.xbib.rdf.Resource;
+import org.xbib.rdf.Triple;
+
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
@@ -40,19 +47,11 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.util.XMLEventConsumer;
-
-import org.xbib.iri.IRI;
-import org.xbib.rdf.Identifier;
-import org.xbib.rdf.Literal;
-import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.IRINamespaceContext;
+import java.io.Writer;
+import java.util.Iterator;
 
 /**
  * Write resource to XML stream
- *
  */
 public class XmlResourceWriter<S extends Identifier, P extends Property, O extends Node> {
 
@@ -93,7 +92,7 @@ public class XmlResourceWriter<S extends Identifier, P extends Property, O exten
     public void writeResource(XMLEventConsumer consumer, Resource<S, P, O> resource, QName parent)
             throws XMLStreamException {
         boolean startElementWritten = false;
-        Iterator<Triple<S,P,O>> it = resource.propertyIterator();
+        Iterator<Triple<S, P, O>> it = resource.propertyIterator();
         while (it.hasNext()) {
             Triple<S, P, O> triple = it.next();
             if (!startElementWritten) {
@@ -107,14 +106,14 @@ public class XmlResourceWriter<S extends Identifier, P extends Property, O exten
         if (!startElementWritten) {
             if (parent != null) {
                 consumer.add(eventFactory.createStartElement(parent, null, null));
-            }            
+            }
         }
         if (parent != null) {
             consumer.add(eventFactory.createEndElement(parent, null));
         }
     }
 
-    private void write(XMLEventConsumer consumer, Triple<S,P,O> triple)
+    private void write(XMLEventConsumer consumer, Triple<S, P, O> triple)
             throws XMLStreamException {
         P predicate = triple.predicate();
         O object = triple.object();
@@ -124,7 +123,7 @@ public class XmlResourceWriter<S extends Identifier, P extends Property, O exten
         if (object instanceof Resource) {
             writeResource(consumer, (Resource<S, P, O>) object, new QName(nsURI, name, nsPrefix));
         } else if (object instanceof Literal) {
-            String literal = ((Literal)object).object().toString();
+            String literal = ((Literal) object).object().toString();
             consumer.add(eventFactory.createStartElement(nsPrefix, nsURI, name));
             consumer.add(eventFactory.createCharacters(literal));
             consumer.add(eventFactory.createEndElement(nsPrefix, nsURI, name));

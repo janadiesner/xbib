@@ -42,7 +42,7 @@ import org.xml.sax.ErrorHandler;
  * XML handler with triple listener
  */
 public interface XmlHandler
-     extends EntityResolver, DTDHandler, ContentHandler, ErrorHandler {
+        extends EntityResolver, DTDHandler, ContentHandler, ErrorHandler {
 
     XmlHandler setDefaultNamespace(String prefix, String uri);
 

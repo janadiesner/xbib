@@ -35,6 +35,7 @@ import org.xbib.classloader.uri.URIClassLoader;
 import org.xbib.keyvalue.KeyValue;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 
 import java.util.LinkedList;
@@ -55,7 +56,7 @@ import static com.google.common.collect.Sets.newHashSet;
  * @param <V>
  * @param <C>
  */
-public abstract class AbstractDirectMapper<K, V, C extends ResourceContext>
+public abstract class AbstractDirectMapper<K, V, C extends ResourceContext<Resource>>
         implements DirectMapper<K,V,C> {
 
     private final Logger logger = LoggerFactory.getLogger(AbstractDirectMapper.class.getName());

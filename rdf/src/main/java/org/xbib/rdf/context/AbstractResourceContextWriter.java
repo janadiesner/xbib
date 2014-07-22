@@ -29,40 +29,25 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.iri;
+package org.xbib.rdf.context;
+
+import org.xbib.rdf.Resource;
+
+import java.io.IOException;
 
 /**
- * Base implementation for IRI scheme providers
+ * An abstract resource writer that does nothing when closed or flushed.
  */
-public abstract class AbstractScheme implements Scheme {
+public abstract class AbstractResourceContextWriter<C extends ResourceContext<R>, R extends Resource>
+        implements ResourceContextWriter<C, R> {
 
-    protected final String name;
-    protected final int port;
-
-    protected AbstractScheme(String name, int port) {
-        this.name = name;
-        this.port = port;
+    @Override
+    public void flush() throws IOException {
     }
 
-    public int getDefaultPort() {
-        return port;
+    @Override
+    public void close() throws IOException {
     }
 
-    public String getName() {
-        return name;
-    }
 
-    /**
-     * Default return unmodified
-     */
-    public IRI normalize(IRI iri) {
-        return iri;
-    }
-
-    /**
-     * Default return unmodified
-     */
-    public String normalizePath(String path) {
-        return path;
-    }
 }

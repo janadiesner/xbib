@@ -33,7 +33,6 @@ package org.xbib.elements.marc.zdb;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -46,9 +45,9 @@ import org.xbib.marc.FieldCollection;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.content.ContentBuilder;
 import org.xml.sax.InputSource;
 
 import java.io.BufferedReader;
@@ -58,6 +57,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ZDBHolTest extends Assert {
 
@@ -65,7 +65,7 @@ public class ZDBHolTest extends Assert {
 
     @Test
     public void testZDBElements() throws Exception {
-        final CountableContextResourceOutput out = new OurContextResourceOutput();
+        final OurContextResourceOutput out = new OurContextResourceOutput();
         final Charset UTF8 = Charset.forName("UTF-8");
         final Charset ISO88591 = Charset.forName("ISO-8859-1");
         final InputStream in =
@@ -75,7 +75,8 @@ public class ZDBHolTest extends Assert {
         InputSource source = new InputSource(br);
         MARCElementBuilderFactory factory = new MARCElementBuilderFactory() {
             public MARCElementBuilder newBuilder() {
-                MARCElementBuilder builder = new MARCElementBuilder().addOutput(out);
+                MARCElementBuilder builder = new MARCElementBuilder();
+                builder.addWriter(out);
                 return builder;
             }
         };
@@ -116,10 +117,10 @@ public class ZDBHolTest extends Assert {
         assertEquals(out.getCounter(), 293);
     }
 
-    class OurContextResourceOutput extends CountableContextResourceOutput {
+    class OurContextResourceOutput extends AbstractResourceContextWriter {
 
         @Override
-        public void output(ResourceContext context, Resource resource, ContentBuilder contentBuilder) throws IOException {
+        public void write(ResourceContext context) throws IOException {
             Resource r = context.getResource();
             r.id(IRI.builder()
                     .scheme("http")
@@ -132,6 +133,13 @@ public class ZDBHolTest extends Assert {
             logger.debug("out={}", sw.toString());
             counter.incrementAndGet();
         }
+
+        public final AtomicInteger counter = new AtomicInteger();
+
+        public int getCounter() {
+            return counter.get();
+        }
+
     }
 
 

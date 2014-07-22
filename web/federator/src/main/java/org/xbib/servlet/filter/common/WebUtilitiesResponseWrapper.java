@@ -171,7 +171,7 @@ public class WebUtilitiesResponseWrapper extends HttpServletResponseWrapper {
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         if (getWriterCalled) {
-            throw new IllegalStateException("getWriter already called.");
+            throw new IllegalStateException("getContentBuilder already called.");
         }
         getStreamCalled = true;
         return this.stream;

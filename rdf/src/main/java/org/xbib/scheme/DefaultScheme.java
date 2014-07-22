@@ -29,15 +29,12 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.iri;
+package org.xbib.scheme;
 
-class FtpScheme extends HttpScheme {
+public class DefaultScheme extends AbstractScheme {
 
-    static final String NAME = "ftp";
-    static final int DEFAULT_PORT = 21;
-
-    public FtpScheme() {
-        super(NAME, DEFAULT_PORT);
+    public DefaultScheme(String name) {
+        super(name, -1);
     }
 
 }

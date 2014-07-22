@@ -145,7 +145,7 @@ public abstract class OAIHarvester extends Converter {
         final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();
         metadataHandler.setHandler(resourceHandler)
-                .setTripleLine(new TurtleWriter(writer));
+                .setTripleWriter(new TurtleWriter(writer));
         return metadataHandler;
     }
 
@@ -153,7 +153,7 @@ public abstract class OAIHarvester extends Converter {
         final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();
         metadataHandler.setHandler(resourceHandler)
-                .setTripleLine(new NTripleWriter(writer));
+                .setTripleWriter(new NTripleWriter(writer));
         return metadataHandler;
     }
 
@@ -198,7 +198,7 @@ public abstract class OAIHarvester extends Converter {
             super.write(resourceContext);
             StringPacket p = session.newPacket();
             p.name(resourceContext.getResource().id().getASCIIAuthority());
-            String s = getWriter().toString();
+            String s = getContentBuilder().toString();
             // for Unicode in non-canonical form, normalize it here
             s = Normalizer.normalize(s, Normalizer.Form.NFC);
             p.packet(s);

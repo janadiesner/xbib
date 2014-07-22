@@ -42,7 +42,7 @@ import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.simple.SimpleResource;
 
-public class XmlResourceWriterTest<S extends Identifier, P extends Property, O extends Node> extends Assert {
+public class XmlResourceContextWriterTest<S extends Identifier, P extends Property, O extends Node> extends Assert {
     
     @Test
     public void testXMLResourceWriter() throws Exception {

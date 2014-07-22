@@ -40,9 +40,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.ContentBuilder;
-import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
@@ -83,14 +81,14 @@ public class FromEZBWeb extends Feeder {
         namespaceContext.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         namespaceContext.addNamespace("xbib", "http://xbib.org/elements/1.0/");
         ResourceContext<Resource> resourceContext = new SimpleResourceContext()
-                .setContentBuilder(contentBuilder(namespaceContext))
+                //.setContentBuilder(contentBuilder(namespaceContext))
                 .setNamespaceContext(namespaceContext);
 
         InputStream in = InputService.getInputStream(uri);
         NullWriter nw = new NullWriter();
         resourceContext.setNamespaceContext(namespaceContext);
-        final TurtleWriter turtle = new TurtleWriter(nw)
-                .setContext(namespaceContext);
+        final TurtleWriter turtle = new TurtleWriter(nw);
+        turtle.setNamespaceContext(namespaceContext);
         Iterator<String> it = readZDBIDs(new InputStreamReader(in, "UTF-8"));
         long counter = 0;
         while (it.hasNext()) {
@@ -168,7 +166,7 @@ public class FromEZBWeb extends Feeder {
                     // turtle
                     turtle.write(resourceContext);
                     // Elasticsearch
-                    sink.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
+                    sink.write(resourceContext);
                     counter++;
                     if (counter % 1000 == 0) {
                         logger.info("{}", counter);
@@ -188,10 +186,6 @@ public class FromEZBWeb extends Feeder {
         if (reader != null) {
             reader.close();
         }
-    }
-
-    protected ContentBuilder contentBuilder(IRINamespaceContext namespaceContext) {
-        return new DefaultContentBuilder<>();
     }
 
     private Iterator<String> readZDBIDs(Reader reader) throws IOException {

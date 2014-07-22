@@ -29,18 +29,18 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.iri;
+package org.xbib.rdf.context;
+
+import org.xbib.rdf.Resource;
+
+import java.io.Closeable;
+import java.io.Flushable;
+import java.io.IOException;
 
 /**
- * Interface implemented by custom IRI scheme parsers
+ * A resource writer
  */
-public interface Scheme {
+public interface ResourceContextWriter<C extends ResourceContext<R>, R extends Resource> extends Closeable, Flushable {
 
-    String getName();
-
-    IRI normalize(IRI iri);
-
-    String normalizePath(String path);
-
-    int getDefaultPort();
+    void write(C resourceContext) throws IOException;
 }

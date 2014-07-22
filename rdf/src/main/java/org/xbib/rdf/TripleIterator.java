@@ -31,14 +31,14 @@
  */
 package org.xbib.rdf;
 
+import org.xbib.rdf.simple.SimpleTriple;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import org.xbib.rdf.simple.SimpleTriple;
 
 /**
  * Iterate over a resource and generate statements
- * 
  */
 public class TripleIterator<S extends Identifier, P extends Property, O extends Node>
         implements Iterator<Triple> {
@@ -79,7 +79,7 @@ public class TripleIterator<S extends Identifier, P extends Property, O extends 
             for (O obj : resource.objects(pred)) {
                 list.offer(new SimpleTriple(subj, pred, obj));
                 if (includeResources && obj instanceof Resource) {
-                    list.addAll(unfold((Resource<S,P,O>)obj));
+                    list.addAll(unfold((Resource<S, P, O>) obj));
                 }
             }
         }

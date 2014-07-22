@@ -37,8 +37,8 @@ import org.xbib.iri.IRI;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.rdf.content.DefaultResourceContentBuilder;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleResource;
 import org.xbib.rdf.simple.SimpleResourceContext;
@@ -54,11 +54,11 @@ public class MockIndexWriteTest<S extends Resource<S, P, O>, P extends Property,
         final MockBulkTransportClient es = new MockBulkTransportClient();
         es.newIndex("test");
 
-        final ResourceSink<ResourceContext, Resource> indexer = new ResourceSink(es);
+        final ResourceSink indexer = new ResourceSink(es);
 
         try {
             ResourceContext context = createContext();
-            indexer.output(context, context.getResource(), context.getContentBuilder());
+            indexer.write(context);
         } finally {
             es.shutdown();
         }
@@ -87,7 +87,7 @@ public class MockIndexWriteTest<S extends Resource<S, P, O>, P extends Property,
                 .add("property6", "value6");
         return new SimpleResourceContext()
                 .setNamespaceContext(IRINamespaceContext.getInstance())
-                .setContentBuilder(new DefaultContentBuilder())
+                .setContentBuilder(new DefaultResourceContentBuilder())
                 .switchTo(resource);
     }
 }

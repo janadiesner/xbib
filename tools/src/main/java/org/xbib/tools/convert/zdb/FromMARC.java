@@ -46,8 +46,7 @@ import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.ContentBuilder;
-import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.tools.Converter;
@@ -89,7 +88,9 @@ public final class FromMARC extends Converter {
                 .detectUnknownKeys(settings.getAsBoolean("detect", false))
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
-                        return new MARCElementBuilder().addOutput(new MyContextResourceOutput());
+                        MARCElementBuilder builder = new MARCElementBuilder();
+                        builder.addWriter(new MarcContextResourceOutput());
+                        return builder;
                     }
                 });
 
@@ -124,10 +125,10 @@ public final class FromMARC extends Converter {
         }
     }
 
-    private class MyContextResourceOutput extends CountableContextResourceOutput<ResourceContext, Resource> {
+    private class MarcContextResourceOutput extends AbstractResourceContextWriter<ResourceContext<Resource>, Resource> {
 
         @Override
-        public void output(ResourceContext context, Resource resource, ContentBuilder contentBuilder) throws IOException {
+        public void write(ResourceContext context) throws IOException {
             IRI iri = context.getResource().id();
             context.getResource().id(IRI.builder().scheme("http").host(settings.get("index")).query(settings.get("type"))
                     .fragment(iri.getFragment()).build());

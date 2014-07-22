@@ -115,7 +115,7 @@ public class FromOAI2CSV extends OAIHarvester {
         // TODO
         StringWriter sw = new StringWriter();
         metadataHandler.setHandler(resourceHandler)
-                .setTripleLine(new NTripleWriter(sw));
+                .setTripleWriter(new NTripleWriter(sw));
         return metadataHandler;
     }
 

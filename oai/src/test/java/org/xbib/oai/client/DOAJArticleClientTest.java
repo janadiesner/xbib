@@ -42,7 +42,7 @@ import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.rdf.Property;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleProperty;
@@ -132,10 +132,10 @@ public class DOAJArticleClientTest {
         @Override
         public Property toProperty(Property property) {
             if ("issn".equals(property.id().getSchemeSpecificPart())) {
-                return new SimpleProperty(IRI.builder().curi("dc", "identifier").build());
+                return new SimpleProperty(IRI.builder().curie("dc", "identifier").build());
             }
             if ("eissn".equals(property.id().getSchemeSpecificPart())) {
-                return new SimpleProperty(IRI.builder().curi("dc", "identifier").build());
+                return new SimpleProperty(IRI.builder().curie("dc", "identifier").build());
             }
             return property;
         }

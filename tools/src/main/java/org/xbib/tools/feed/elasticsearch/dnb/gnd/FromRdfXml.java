@@ -41,7 +41,7 @@ import org.xbib.pipeline.PipelineException;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.PipelineRequest;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.rdfxml.RdfXmlReader;
@@ -139,7 +139,7 @@ public class FromRdfXml extends Feeder implements TripleListener {
                         .fragment(gndID)
                         .build();
                 context.getResource().id(doc);
-                sink.output(context, context.getResource(), context.getContentBuilder());
+                sink.write(context);
             }
         } catch (IOException e) {
             logger.error("output failed: {}", e.getMessage(), e);
@@ -162,7 +162,7 @@ public class FromRdfXml extends Feeder implements TripleListener {
     public TripleListener end() {
         if (context.getResource() != null) {
             try {
-                sink.output(context, context.getResource(), context.getContentBuilder());
+                sink.write(context);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }

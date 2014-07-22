@@ -181,20 +181,20 @@ public abstract class CodepointIterator implements Iterator<Codepoint> {
                 if (CharUtils.isHighSurrogate(c1) && position() < limit()) {
                     char c2 = get();
                     if (CharUtils.isLowSurrogate(c2)) {
-                        return new char[] {c1, c2};
+                        return new char[]{c1, c2};
                     } else {
                         throw new InvalidCharacterException(c2);
                     }
                 } else if (CharUtils.isLowSurrogate(c1) && position() > 0) {
                     char c2 = get(position() - 2);
                     if (CharUtils.isHighSurrogate(c2)) {
-                        return new char[] {c1, c2};
+                        return new char[]{c1, c2};
                     } else {
                         throw new InvalidCharacterException(c2);
                     }
                 }
             }
-            return new char[] {get()};
+            return new char[]{get()};
         }
         return null;
     }
@@ -214,25 +214,27 @@ public abstract class CodepointIterator implements Iterator<Codepoint> {
      * surrogate chars
      */
     private char[] peekChars(int pos) throws InvalidCharacterException {
-        if (pos < 0 || pos >= limit())
+        if (pos < 0 || pos >= limit()) {
             return null;
+        }
         char c1 = get(pos);
         if (CharUtils.isHighSurrogate(c1) && pos < limit()) {
             char c2 = get(pos + 1);
             if (CharUtils.isLowSurrogate(c2)) {
-                return new char[] {c1, c2};
+                return new char[]{c1, c2};
             } else {
                 throw new InvalidCharacterException(c2);
             }
         } else if (CharUtils.isLowSurrogate(c1) && pos > 1) {
             char c2 = get(pos - 1);
             if (CharUtils.isHighSurrogate(c2)) {
-                return new char[] {c2, c1};
+                return new char[]{c2, c1};
             } else {
                 throw new InvalidCharacterException(c2);
             }
-        } else
-            return new char[] {c1};
+        } else {
+            return new char[]{c1};
+        }
     }
 
     /**
@@ -258,15 +260,16 @@ public abstract class CodepointIterator implements Iterator<Codepoint> {
 
     private Codepoint toCodepoint(char[] chars) {
         return (chars == null) ? null : (chars.length == 1) ? new Codepoint(chars[0]) : CharUtils
-            .toSupplementary(chars[0], chars[1]);
+                .toSupplementary(chars[0], chars[1]);
     }
 
     /**
      * Set the iterator position
      */
     public void position(int n) {
-        if (n < 0 || n > limit())
+        if (n < 0 || n > limit()) {
             throw new ArrayIndexOutOfBoundsException(n);
+        }
         position = n;
     }
 
@@ -292,8 +295,9 @@ public abstract class CodepointIterator implements Iterator<Codepoint> {
     }
 
     private boolean isNextSurrogate() {
-        if (!hasNext())
+        if (!hasNext()) {
             return false;
+        }
         char c = get(position());
         return CharUtils.isHighSurrogate(c) || CharUtils.isLowSurrogate(c);
     }
@@ -302,8 +306,9 @@ public abstract class CodepointIterator implements Iterator<Codepoint> {
      * Returns true if the char at the specified index is a high surrogate
      */
     public boolean isHigh(int index) {
-        if (index < 0 || index > limit())
+        if (index < 0 || index > limit()) {
             throw new ArrayIndexOutOfBoundsException(index);
+        }
         return CharUtils.isHighSurrogate(get(index));
     }
 
@@ -311,8 +316,9 @@ public abstract class CodepointIterator implements Iterator<Codepoint> {
      * Returns true if the char at the specified index is a low surrogate
      */
     public boolean isLow(int index) {
-        if (index < 0 || index > limit())
+        if (index < 0 || index > limit()) {
             throw new ArrayIndexOutOfBoundsException(index);
+        }
         return CharUtils.isLowSurrogate(get(index));
     }
 
@@ -354,12 +360,13 @@ public abstract class CodepointIterator implements Iterator<Codepoint> {
         }
 
         protected char get() {
-            return (position < limit) ? buffer[position++] : (char)-1;
+            return (position < limit) ? buffer[position++] : (char) -1;
         }
 
         protected char get(int index) {
-            if (index < 0 || index >= limit)
+            if (index < 0 || index >= limit) {
                 throw new ArrayIndexOutOfBoundsException(index);
+            }
             return buffer[index];
         }
     }
@@ -469,8 +476,9 @@ public abstract class CodepointIterator implements Iterator<Codepoint> {
             if (scanningOnly) {
                 try {
                     int cp = peek(position()).getValue();
-                    if (b && cp != -1 && check(cp))
+                    if (b && cp != -1 && check(cp)) {
                         return false;
+                    }
                 } catch (InvalidCharacterException e) {
                     return false;
                 }
@@ -486,8 +494,9 @@ public abstract class CodepointIterator implements Iterator<Codepoint> {
                 if (scanningOnly) {
                     position(position() - 1);
                     return null;
-                } else
+                } else {
                     throw new InvalidCharacterException(v);
+                }
             }
             return cp;
         }
@@ -505,16 +514,18 @@ public abstract class CodepointIterator implements Iterator<Codepoint> {
                     if (scanningOnly) {
                         position(position() - 1);
                         return null;
-                    } else
+                    } else {
                         throw new InvalidCharacterException(chars[0]);
+                    }
                 } else if (chars.length == 2) {
                     int cp = CharUtils.toSupplementary(chars[0], chars[1]).getValue();
                     if (check(cp)) {
                         if (scanningOnly) {
                             position(position() - 2);
                             return null;
-                        } else
+                        } else {
                             throw new InvalidCharacterException(cp);
+                        }
                     }
                 }
             }

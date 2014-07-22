@@ -31,7 +31,6 @@
  */
 package org.xbib.text.language;
 
-import java.util.Locale;
 import org.xbib.text.language.enums.Extlang;
 import org.xbib.text.language.enums.Language;
 import org.xbib.text.language.enums.Region;
@@ -39,33 +38,57 @@ import org.xbib.text.language.enums.Script;
 import org.xbib.text.language.enums.Singleton;
 import org.xbib.text.language.enums.Variant;
 
+import java.util.Locale;
+
 /**
  * A Lang tag subtag
  */
 public final class Subtag implements Cloneable, Comparable<Subtag> {
 
     public enum Type {
-        /** Primary language subtag **/
+        /**
+         * Primary language subtag *
+         */
         PRIMARY,
-        /** Extended Language subtag **/
+        /**
+         * Extended Language subtag *
+         */
         EXTLANG,
-        /** Script subtag **/
+        /**
+         * Script subtag *
+         */
         SCRIPT,
-        /** Region subtag **/
+        /**
+         * Region subtag *
+         */
         REGION,
-        /** Variant subtag **/
+        /**
+         * Variant subtag *
+         */
         VARIANT,
-        /** Singleton subtag **/
+        /**
+         * Singleton subtag *
+         */
         SINGLETON,
-        /** Extension subtag **/
+        /**
+         * Extension subtag *
+         */
         EXTENSION,
-        /** Primary-use subtag **/
+        /**
+         * Primary-use subtag *
+         */
         PRIVATEUSE,
-        /** Grandfathered subtag **/
+        /**
+         * Grandfathered subtag *
+         */
         GRANDFATHERED,
-        /** Wildcard subtag ("*") **/
+        /**
+         * Wildcard subtag ("*") *
+         */
         WILDCARD,
-        /** Simple subtag (ranges) **/
+        /**
+         * Simple subtag (ranges) *
+         */
         SIMPLE
     }
 
@@ -145,8 +168,9 @@ public final class Subtag implements Cloneable, Comparable<Subtag> {
         this.type = type;
         this.name = name;
         this.prev = prev;
-        if (prev != null)
+        if (prev != null) {
             prev.setNext(this);
+        }
     }
 
     Subtag(Type type, String name, Subtag prev, Subtag next) {
@@ -183,8 +207,9 @@ public final class Subtag implements Cloneable, Comparable<Subtag> {
 
     void setNext(Subtag next) {
         this.next = next;
-        if (next != null)
+        if (next != null) {
             next.setPrevious(this);
+        }
     }
 
     /**
@@ -208,12 +233,14 @@ public final class Subtag implements Cloneable, Comparable<Subtag> {
     }
 
     private static String toTitleCase(String string) {
-        if (string == null)
+        if (string == null) {
             return null;
-        if (string.length() == 0)
+        }
+        if (string.length() == 0) {
             return string;
+        }
         char[] chars = string.toLowerCase(Locale.US).toCharArray();
-        chars[0] = (char)(chars[0] - 32);
+        chars[0] = (char) (chars[0] - 32);
         return new String(chars);
     }
 
@@ -226,41 +253,51 @@ public final class Subtag implements Cloneable, Comparable<Subtag> {
     }
 
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        final Subtag other = (Subtag)obj;
-        if (other.getType() == Type.WILDCARD || getType() == Type.WILDCARD)
+        }
+        final Subtag other = (Subtag) obj;
+        if (other.getType() == Type.WILDCARD || getType() == Type.WILDCARD) {
             return true;
+        }
         if (name == null) {
-            if (other.name != null)
+            if (other.name != null) {
                 return false;
-        } else if (!name.equalsIgnoreCase(other.name))
+            }
+        } else if (!name.equalsIgnoreCase(other.name)) {
             return false;
-        if (other.getType() == Type.SIMPLE || getType() == Type.SIMPLE)
+        }
+        if (other.getType() == Type.SIMPLE || getType() == Type.SIMPLE) {
             return true;
+        }
         if (type == null) {
-            if (other.type != null)
+            if (other.type != null) {
                 return false;
-        } else if (!type.equals(other.type))
+            }
+        } else if (!type.equals(other.type)) {
             return false;
+        }
         return true;
     }
 
     public Subtag clone() {
         try {
-            Subtag tag = (Subtag)super.clone();
-            if (getNext() != null)
+            Subtag tag = (Subtag) super.clone();
+            if (getNext() != null) {
                 tag.setNext(getNext().clone());
+            }
             return tag;
         } catch (CloneNotSupportedException e) {
             return new Subtag(type, name, prev != null ? prev.clone() : null, next != null ? next.clone() : null); // not
-                                                                                                                   // going
-                                                                                                                   // to
-                                                                                                                   // happen
+            // going
+            // to
+            // happen
         }
     }
 
@@ -305,17 +342,17 @@ public final class Subtag implements Cloneable, Comparable<Subtag> {
     public <T extends Enum<?>> T getEnum() {
         switch (type) {
             case PRIMARY:
-                return (T)Language.valueOf(this);
+                return (T) Language.valueOf(this);
             case SCRIPT:
-                return (T)Script.valueOf(this);
+                return (T) Script.valueOf(this);
             case REGION:
-                return (T)Region.valueOf(this);
+                return (T) Region.valueOf(this);
             case VARIANT:
-                return (T)Variant.valueOf(this);
+                return (T) Variant.valueOf(this);
             case EXTLANG:
-                return (T)Extlang.valueOf(this);
+                return (T) Extlang.valueOf(this);
             case EXTENSION:
-                return (T)Singleton.valueOf(this);
+                return (T) Singleton.valueOf(this);
             default:
                 return null;
         }

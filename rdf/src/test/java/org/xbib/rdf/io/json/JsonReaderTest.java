@@ -39,7 +39,7 @@ import java.io.StringWriter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.logging.Logger;

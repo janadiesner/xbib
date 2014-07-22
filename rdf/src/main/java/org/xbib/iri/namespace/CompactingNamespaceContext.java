@@ -29,17 +29,20 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.rdf.io;
+package org.xbib.iri.namespace;
 
-import java.io.IOException;
-import java.io.Reader;
+import org.xbib.iri.IRI;
 
-import org.xbib.rdf.Identifier;
-import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
+import java.util.Map;
 
-public interface Triplifier<S extends Identifier, P extends Property, O extends Node> {
+public interface CompactingNamespaceContext {
 
-    Triplifier parse(Reader reader, TripleListener<S, P, O> listener) throws IOException;
-    
+    void addNamespace(String prefix, String namespace);
+
+    void removeNamespace(String prefix);
+
+    Map<String, String> getNamespaces();
+
+    String compact(IRI uri);
+
 }

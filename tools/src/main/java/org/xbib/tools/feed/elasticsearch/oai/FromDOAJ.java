@@ -40,7 +40,7 @@ import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleProperty;
 import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.rdf.types.XSD;
+import org.xbib.rdf.types.XSDResourceIdentifiers;
 import org.xbib.tools.OAIFeeder;
 
 import javax.xml.namespace.QName;
@@ -73,10 +73,10 @@ public class FromDOAJ extends OAIFeeder {
         @Override
         public Property toProperty(Property property) {
             if ("issn".equals(property.id().getSchemeSpecificPart())) {
-                return new SimpleProperty(IRI.builder().curi("dc", "identifier").build());
+                return new SimpleProperty(IRI.builder().curie("dc", "identifier").build());
             }
             if ("eissn".equals(property.id().getSchemeSpecificPart())) {
-                return new SimpleProperty(IRI.builder().curi("dc", "identifier").build());
+                return new SimpleProperty(IRI.builder().curie("dc", "identifier").build());
             }
             return property;
         }
@@ -86,7 +86,7 @@ public class FromDOAJ extends OAIFeeder {
             switch (name.getLocalPart()) {
                 case "identifier": {
                     if (content.startsWith("http://")) {
-                        return new SimpleLiteral(content).type(XSD.ANYURI);
+                        return new SimpleLiteral(content).type(XSDResourceIdentifiers.ANYURI);
                     }
                     if (content.startsWith("issn: ")) {
                         return new SimpleLiteral(content.substring(6)).type(ISSN);

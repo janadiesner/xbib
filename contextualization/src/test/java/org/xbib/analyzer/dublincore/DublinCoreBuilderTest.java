@@ -33,39 +33,43 @@ package org.xbib.analyzer.dublincore;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.keyvalue.KeyValueReader;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.context.ResourceContextWriter;
 
 public class DublinCoreBuilderTest extends Assert {
 
     private final Logger logger = LoggerFactory.getLogger(DublinCoreBuilderTest.class.getName());
 
+    private final AtomicInteger counter = new AtomicInteger();
+
     @Test
     public void testDublinCoreBuilder() throws Exception {
         StringReader sr = new StringReader("100=John Doe\n200=Hello Word\n300=2012\n400=1");
-        CountableContextResourceOutput<DublinCoreContext,Resource> output = new CountableContextResourceOutput<DublinCoreContext, Resource>() {
+        ResourceContextWriter output = new AbstractResourceContextWriter() {
 
             @Override
-            public void output(DublinCoreContext context, Resource resource, ContentBuilder builder) throws IOException {
+            public void write(ResourceContext context) throws IOException {
                 logger.info("resource = {}", context.getResource());
                 counter.incrementAndGet();
             }
 
         };
         
-        DublinCoreBuilder builder = new DublinCoreBuilder().addOutput(output);
+        DublinCoreBuilder builder = new DublinCoreBuilder();
+        builder.addWriter(output);
         DublinCoreElementMapper mapper = new DublinCoreElementMapper("dublincore").start(builder);
         KeyValueReader reader = new KeyValueReader(sr).addListener(mapper);
         while (reader.readLine() != null);
         reader.close();
         mapper.close();
-        assertEquals(output.getCounter() > 0L, true);
+        assertEquals(counter.get() > 0, true);
     }
 }

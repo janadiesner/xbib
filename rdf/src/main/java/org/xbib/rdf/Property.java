@@ -35,10 +35,9 @@ import org.xbib.iri.IRI;
 
 /**
  * An RDF property
- * 
  */
 public interface Property extends Node {
 
-   IRI id();
+    IRI id();
 
 }

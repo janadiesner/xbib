@@ -35,25 +35,25 @@ import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.context.ResourceContextContentBuilder;
 import org.xbib.rdf.context.AbstractResourceContext;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.content.ContentBuilder;
 
 public class SimpleResourceContext<S extends Identifier, P extends Property, O extends Node>
-    extends AbstractResourceContext<Resource<S, P, O>>
-    implements ResourceContext<Resource<S, P, O>> {
+        extends AbstractResourceContext<Resource<S, P, O>>
+        implements ResourceContext<Resource<S, P, O>> {
 
-    private ContentBuilder<ResourceContext<Resource<S, P, O>>, Resource<S, P, O>> contentBuilder;
+    private ResourceContextContentBuilder<ResourceContext<Resource<S, P, O>>, Resource<S, P, O>> resourceContextContentBuilder;
 
     @Override
-    public ResourceContext<Resource<S, P, O>> setContentBuilder(ContentBuilder<ResourceContext<Resource<S, P, O>>, Resource<S, P, O>> contentBuilder) {
-        this.contentBuilder = contentBuilder;
+    public ResourceContext<Resource<S, P, O>> setContentBuilder(ResourceContextContentBuilder<ResourceContext<Resource<S, P, O>>, Resource<S, P, O>> resourceContextContentBuilder) {
+        this.resourceContextContentBuilder = resourceContextContentBuilder;
         return this;
     }
 
     @Override
-    public ContentBuilder<ResourceContext<Resource<S, P, O>>, Resource<S, P, O>> getContentBuilder() {
-        return contentBuilder;
+    public ResourceContextContentBuilder<ResourceContext<Resource<S, P, O>>, Resource<S, P, O>> getContentBuilder() {
+        return resourceContextContentBuilder;
     }
 
     @Override

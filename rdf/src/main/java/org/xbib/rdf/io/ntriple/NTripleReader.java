@@ -31,29 +31,30 @@
  */
 package org.xbib.rdf.io.ntriple;
 
+import org.xbib.iri.IRI;
+import org.xbib.rdf.Identifier;
+import org.xbib.rdf.Node;
+import org.xbib.rdf.Property;
+import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.io.TripleReader;
+import org.xbib.rdf.simple.SimpleFactory;
+import org.xbib.rdf.simple.SimpleTriple;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import org.xbib.iri.IRI;
-import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.simple.SimpleFactory;
-import org.xbib.rdf.Identifier;
-import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
-import org.xbib.rdf.io.Triplifier;
-import org.xbib.rdf.simple.SimpleTriple;
 
 /**
  * Parser for NTriple RDF format
- *
+ * <p>
  * See also the <a href="http://www.w3.org/TR/rdf-testcases/#convert">NTriple
  * specification</a>
  */
 public class NTripleReader<S extends Identifier, P extends Property, O extends Node>
-    implements Triplifier<S,P,O> {
+        implements TripleReader<S, P, O> {
 
     private static final String resourceExpression = "(<[^<]+?>)";
     private static final String literalValueExpression = "(\"([^\"]|\\\")*\")";
@@ -67,7 +68,7 @@ public class NTripleReader<S extends Identifier, P extends Property, O extends N
     public static final String tripleExpression = subjectExpression + "\\s+" + predicateExpression + "\\s+" + objectExpression + "\\s*\\.";
     public static final Pattern NTRIPLE_PATTERN = Pattern.compile(tripleExpression);
     private boolean eof;
-    private final SimpleFactory<S,P,O> simpleFactory = SimpleFactory.getInstance();
+    private final SimpleFactory<S, P, O> simpleFactory = SimpleFactory.getInstance();
 
     @Override
     public NTripleReader parse(Reader reader, TripleListener<S, P, O> listener) throws IOException {

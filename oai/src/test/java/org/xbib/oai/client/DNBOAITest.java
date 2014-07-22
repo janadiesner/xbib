@@ -37,22 +37,10 @@ import java.io.StringWriter;
 import org.testng.annotations.Test;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
-import org.xbib.rdf.context.ResourceContext;
 import org.xbib.util.DateUtil;
-import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
-import org.xbib.oai.xml.MetadataHandler;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.io.rdfxml.RdfXmlReader;
-import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.io.xml.XmlHandler;
-import org.xbib.rdf.simple.SimpleResource;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 public class DNBOAITest {
 

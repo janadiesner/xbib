@@ -104,11 +104,9 @@ public class URL {
 
     /**
      * Removes dot segments from a URL path.
-     * 
-     * @param path
-     *            the path to remove dot segments from.
-     * @param hasAuthority
-     *            true if the URL has an authority, false if not.
+     *
+     * @param path         the path to remove dot segments from.
+     * @param hasAuthority true if the URL has an authority, false if not.
      */
     public static String removeDotSegments(String path, boolean hasAuthority) {
         String rval = "";
@@ -158,10 +156,10 @@ public class URL {
     }
 
     public static String removeBase(Object baseobj, String iri) {
-    	if (baseobj == null) {
-    		return iri;
-    	}
-    	
+        if (baseobj == null) {
+            return iri;
+        }
+
         URL base;
         if (baseobj instanceof String) {
             base = URL.parse((String) baseobj);
@@ -285,9 +283,8 @@ public class URL {
 
     /**
      * Parses the authority for the pre-parsed given URL.
-     * 
-     * @param parsed
-     *            the pre-parsed URL.
+     *
+     * @param parsed the pre-parsed URL.
      */
     private static void parseAuthority(URL parsed) {
         // parse authority for unparsed relative network-path reference

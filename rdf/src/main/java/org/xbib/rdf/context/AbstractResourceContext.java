@@ -4,7 +4,7 @@
  * for additional information regarding copyright ownership.
  *
  * Copyright (C) 2012 Jörg Prante and xbib
- * 
+ *
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU Affero General Public License as published 
  * by the Free Software Foundation; either version 3 of the License, or 
@@ -18,11 +18,11 @@
  * along with this program; if not, see http://www.gnu.org/licenses 
  * or write to the Free Software Foundation, Inc., 51 Franklin Street, 
  * Fifth Floor, Boston, MA 02110-1301 USA.
- * 
+ *
  * The interactive user interfaces in modified source and object code 
  * versions of this program must display Appropriate Legal Notices, 
  * as required under Section 5 of the GNU Affero General Public License.
- * 
+ *
  * In accordance with Section 7(b) of the GNU Affero General Public 
  * License, these Appropriate Legal Notices must retain the display of the 
  * "Powered by xbib" logo. If the display of the logo is not reasonably 
@@ -32,6 +32,7 @@
 package org.xbib.rdf.context;
 
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.io.TripleListener;
@@ -52,7 +53,8 @@ public abstract class AbstractResourceContext<R extends Resource> implements Res
 
     private R resource;
 
-    private Map<Object,R> resourceMap;
+    private Map<Object, R> resourceMap;
+
 
     public ResourceContext<R> newNamespaceContext() {
         this.namespaceContext = IRINamespaceContext.newInstance();
@@ -116,7 +118,7 @@ public abstract class AbstractResourceContext<R extends Resource> implements Res
         }
         IRI iri = triple.subject().id();
         if (!resourceMap.containsKey(iri)) {
-            resourceMap.put(iri, (R)new SimpleResource().id(iri));
+            resourceMap.put(iri, (R) new SimpleResource().id(iri));
         }
         resourceMap.get(iri).add(triple);
         return this;

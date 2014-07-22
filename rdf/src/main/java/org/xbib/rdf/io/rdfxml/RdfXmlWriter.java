@@ -31,44 +31,32 @@
  */
 package org.xbib.rdf.io.rdfxml;
 
+import org.xbib.iri.IRI;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.Literal;
+import org.xbib.rdf.Property;
+import org.xbib.rdf.RDFNS;
+import org.xbib.rdf.Resource;
+import org.xbib.rdf.Triple;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.io.AbstractTripleWriter;
+import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.xml.XMLUtil;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
-import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Identifier;
-import org.xbib.rdf.Literal;
-import org.xbib.rdf.Property;
-import org.xbib.rdf.RDF;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleLine;
-import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.xml.XMLUtil;
-import org.xbib.xml.namespace.XmlNamespaceContext;
-
 /**
  * RDF/XML writer
- *
- * based on RDFXMLWriter Copyright Aduna (http://www.aduna-software.com/) (c)
- * 1997-2006.
- *
  */
-public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O extends Literal<?>>
-        implements RDF, TripleLine<S, P, O> {
+public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O extends Literal<?>, C extends ResourceContext<Resource<S,P,O>>>
+        extends AbstractTripleWriter<S, P, O, C> implements RDFNS {
 
     private final static Logger logger = LoggerFactory.getLogger(RdfXmlWriter.class.getName());
 
     private final Writer writer;
-
-    private SimpleResourceContext<S,P,O> resourceContext;
-
-    private long byteCounter;
-
-    private long idCounter;
 
     private boolean writingStarted;
 
@@ -76,11 +64,9 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
 
     private S lastWrittenSubject;
 
-    private XmlNamespaceContext namespaceContext = XmlNamespaceContext.getDefaultInstance();
-
     public RdfXmlWriter(Writer writer) {
         this.writer = writer;
-        this.resourceContext = new SimpleResourceContext();
+        this.resourceContext = (C)new SimpleResourceContext();
         resourceContext.newResource();
     }
 
@@ -88,17 +74,11 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
         return writer;
     }
 
-    public RdfXmlWriter context(XmlNamespaceContext context) {
-        this.namespaceContext = context;
-        return this;
-    }
-
     @Override
-    public RdfXmlWriter<S,P,O> newIdentifier(IRI iri) {
+    public RdfXmlWriter<S, P, O, C> newIdentifier(IRI iri) {
         if (!iri.equals(resourceContext.getResource().id())) {
             try {
                 write(resourceContext);
-                idCounter++;
                 resourceContext.newResource();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
@@ -109,40 +89,38 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
     }
 
     @Override
-    public RdfXmlWriter<S, P, O> begin() {
+    public RdfXmlWriter<S, P, O, C> begin() {
         return this;
     }
 
     @Override
-    public RdfXmlWriter<S,P,O> triple(Triple<S, P, O> triple) {
+    public RdfXmlWriter<S, P, O, C> triple(Triple<S, P, O> triple) {
         resourceContext.getResource().add(triple);
         return this;
     }
 
     @Override
-    public RdfXmlWriter<S, P, O> end() {
+    public RdfXmlWriter<S, P, O, C> end() {
         return this;
     }
 
     @Override
-    public RdfXmlWriter<S,P,O> startPrefixMapping(String prefix, String uri) {
+    public RdfXmlWriter<S, P, O, C> startPrefixMapping(String prefix, String uri) {
         namespaceContext.addNamespace(prefix, uri);
         return this;
     }
 
     @Override
-    public RdfXmlWriter<S, P, O> endPrefixMapping(String prefix) {
+    public RdfXmlWriter<S, P, O, C> endPrefixMapping(String prefix) {
         // we don't remove name spaces. It's troubling RDF serializations.
-        //namespaceContext.removeNamespace(prefix);
         return this;
     }
 
     @Override
-    public RdfXmlWriter<S, P, O> write(ResourceContext<Resource<S, P, O>> resourceContext) throws IOException {
+    public void write(C resourceContext) throws IOException {
         this.writingStarted = false;
         this.headerWritten = false;
         this.lastWrittenSubject = null;
-        // make RDF name spaces
         for (Map.Entry<String, String> entry : namespaceContext.getNamespaces().entrySet()) {
             handleNamespace(entry.getKey(), entry.getValue());
         }
@@ -152,7 +130,11 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
             writeTriple(t);
         }
         endRDF();
-        return this;
+    }
+
+    @Override
+    public void flush() throws IOException {
+        writer.flush();
     }
 
     private void startRDF() throws IOException {
@@ -164,8 +146,6 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
 
     private void writeHeader() throws IOException {
         try {
-            // This export format needs the RDF namespace to be defined, add a
-            // prefix for it if there isn't one yet.
             setNamespace("rdf", NS_URI, false);
             writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             writeStartOfStartTag(NS_URI, "RDF");
@@ -214,17 +194,12 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
 
     private void setNamespace(String prefix, String name, boolean fixedPrefix) {
         if (headerWritten) {
-            // Header containing namespace declarations has already been written
             return;
         }
         Map map = namespaceContext.getNamespaces();
         if (!map.containsKey(name)) {
-            // Namespace not yet mapped to a prefix, try to give it the specified
-            // prefix
             boolean isLegalPrefix = prefix.length() == 0 || XMLUtil.isNCName(prefix);
             if (!isLegalPrefix || map.containsValue(prefix)) {
-                // Specified prefix is not legal or the prefix is already in use,
-                // generate a legal unique prefix
                 if (fixedPrefix) {
                     if (isLegalPrefix) {
                         throw new IllegalArgumentException("Prefix is already in use: " + prefix);
@@ -245,33 +220,28 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
         }
     }
 
-    private RdfXmlWriter<S, P, O> writeTriple(Triple<S,P,O> triple) {
+    private RdfXmlWriter<S, P, O, C> writeTriple(Triple<S, P, O> triple) {
         try {
             if (!writingStarted) {
-                throw new IOException("Document writing has not yet been started");
+                throw new IOException("document writing has not yet been started");
             }
             S subj = triple.subject();
             P pred = triple.predicate();
             O obj = triple.object();
-            // Verify that an XML namespace-qualified name can be created for the
-            // predicate
             String predString = pred.toString();
             int predSplitIdx = findURISplitIndex(predString);
             if (predSplitIdx == -1) {
-                throw new IOException("Unable to create XML namespace-qualified name for predicate: " + predString);
+                throw new IOException("unable to create XML namespace-qualified name for predicate: " + predString);
             }
             String predNamespace = predString.substring(0, predSplitIdx);
             String predLocalName = predString.substring(predSplitIdx);
             if (!headerWritten) {
                 writeHeader();
             }
-            // SUBJECT
             if (!subj.equals(lastWrittenSubject)) {
                 flushPendingStatements();
-                // Write new subject:
                 writeNewLine();
                 writeStartOfStartTag(NS_URI, "Description");
-                //if (subj.id().getScheme().equals(Identifier.GENID)) {
                 if (subj.isBlank()) {
                     writeAttribute(NS_URI, "nodeID", subj.toString());
                 } else {
@@ -281,30 +251,23 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
                 writeNewLine();
                 lastWrittenSubject = subj;
             }
-            // PREDICATE
             writer.write("\t");
             writeStartOfStartTag(predNamespace, predLocalName);
-            // OBJECT
             if (obj instanceof Resource) {
                 Resource objRes = (Resource) obj;
-                if (objRes instanceof Identifier) {
-                    Identifier bNode = (Identifier) objRes;
-                    writeAttribute(NS_URI, "nodeID", bNode.id().toString());
+                if (objRes.isBlank()) {
+                    writeAttribute(NS_URI, "nodeID", objRes.id().toString());
                 } else {
                     writeAttribute(NS_URI, "resource", objRes.id().toString());
                 }
                 writer.write("/>");
-            } else if (obj instanceof Literal) {
-                Literal objLit = (Literal) obj;
-                // language attribute
-                if (objLit.language() != null) {
-                    writeAttribute("xml:lang", objLit.language());
+            } else if (obj != null) {
+                if (obj.language() != null) {
+                    writeAttribute("xml:lang", obj.language());
                 }
-                // datatype attribute
                 boolean isXMLLiteral = false;
-                IRI datatype = objLit.type();
+                IRI datatype = obj.type();
                 if (datatype != null) {
-                    // Check if datatype is rdf:XMLLiteral
                     isXMLLiteral = datatype.equals(RDF_XMLLITERAL);
                     if (isXMLLiteral) {
                         writeAttribute(NS_URI, "parseType", "Literal");
@@ -313,39 +276,22 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
                     }
                 }
                 writer.write(">");
-                // label
                 if (isXMLLiteral) {
-                    // Write XML literal as plain XML
-                    writer.write(objLit.toString());
+                    writer.write(obj.toString());
                 } else {
-                    writer.write(escapeCharacterData(objLit.toString()));
+                    writer.write(escapeCharacterData(obj.toString()));
                 }
                 writeEndTag(predNamespace, predLocalName);
             }
             writeNewLine();
-            // Don't write </rdf:Description> yet, maybe the next triple
-            // has the same subject.
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return this;
     }
 
-    private void handleComment(String comment)
-            throws IOException {
-        if (!headerWritten) {
-            writeHeader();
-        }
-        flushPendingStatements();
-        writer.write("<!-- ");
-        writer.write(comment);
-        writer.write(" -->");
-        writeNewLine();
-    }
-
     private void flushPendingStatements() throws IOException {
         if (lastWrittenSubject != null) {
-            // The last triple still has to be closed:
             writeEndTag(NS_URI, "Description");
             writeNewLine();
             lastWrittenSubject = null;
@@ -355,7 +301,6 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
     private void writeStartOfStartTag(String namespace, String localName)
             throws IOException {
         String prefix = namespaceContext.getPrefix(namespace);
-
         if (prefix == null) {
             writer.write("<");
             writer.write(localName);
@@ -363,7 +308,6 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
             writer.write(escapeDoubleQuotedAttValue(namespace));
             writer.write("\"");
         } else if (prefix.length() == 0) {
-            // default namespace
             writer.write("<");
             writer.write(localName);
         } else {
@@ -386,8 +330,7 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
             throws IOException {
         String prefix = namespaceContext.getPrefix(namespace);
         if (prefix == null || prefix.length() == 0) {
-            throw new IOException("No prefix has been declared for the namespace used in this attribute: "
-                    + namespace);
+            throw new IOException("No prefix has been declared for the namespace used in this attribute: " + namespace);
         }
         writer.write(" ");
         writer.write(prefix);
@@ -417,12 +360,6 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
         writer.write("\n");
     }
 
-    /**
-     * Escapes any special characters in the supplied text so that it can be
-     * included as character data in an XML document. The characters that are
-     * escaped are <tt>&amp;</tt>, <tt>&lt;</tt>, <tt>&gt;</tt> and <tt>carriage
-     * return (\r)</tt>.
-     */
     private String escapeCharacterData(String text) {
         text = gsub("&", "&amp;", text);
         text = gsub("<", "&lt;", text);
@@ -431,13 +368,6 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
         return text;
     }
 
-    /**
-     * Escapes any special characters in the supplied value so that it can be
-     * used as an double-quoted attribute value in an XML document. The
-     * characters that are escaped are <tt>&amp;</tt>, <tt>&lt;</tt>,
-     * <tt>&gt;</tt>, <tt>tab (\t)</tt>, <tt>carriage return (\r)</tt>, <tt>line
-     * feed (\n)</tt> and <tt>"</tt>.
-     */
     private String escapeDoubleQuotedAttValue(String value) {
         value = escapeAttValue(value);
         value = gsub("\"", "&quot;", value);
@@ -454,77 +384,39 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
         return value;
     }
 
-    /**
-     * Substitute String "old" by String "new" in String "text" everywhere. This
-     * is static util function that I could not place anywhere more appropriate.
-     * The name of this function is from the good-old awk time.
-     *
-     * @param olds The String to be substituted.
-     * @param news The String is the new content.
-     * @param text The String in which the substitution is done.
-     * @return The result String containing the substitutions; if no
-     * substitutions were made, the result is 'text'.
-     */
     private String gsub(String olds, String news, String text) {
         if (olds == null || olds.length() == 0) {
-            // Nothing to substitute.
             return text;
         }
         if (text == null) {
             return null;
         }
-        // Search for any occurences of 'olds'.
         int oldsIndex = text.indexOf(olds);
         if (oldsIndex == -1) {
-            // Nothing to substitute.
             return text;
         }
-        // We're going to do some substitutions.
         StringBuilder buf = new StringBuilder(text.length());
         int prevIndex = 0;
         while (oldsIndex >= 0) {
-            // First, add the text between the previous and the current
-            // occurence.
             buf.append(text.substring(prevIndex, oldsIndex));
-            // Then add the substition pattern
             buf.append(news);
-            // Remember the index for the next loop.
             prevIndex = oldsIndex + olds.length();
-            // Search for the next occurence.
             oldsIndex = text.indexOf(olds, prevIndex);
         }
-        // Add the part after the last occurence.
         buf.append(text.substring(prevIndex));
         return buf.toString();
     }
 
-    /**
-     * Tries to find a point in the supplied URI where this URI can be safely
-     * split into a namespace part and a local name. According to the XML
-     * specifications, a local name must start with a letter or underscore and
-     * can be followed by zero or more 'NCName' characters.
-     *
-     * @param uri The URI to split.
-     * @return The index of the first character of the local name, or
-     * <tt>-1</tt> if the URI can not be split into a namespace and local name.
-     */
     private int findURISplitIndex(String uri) {
         int uriLength = uri.length();
-        // Search last character that is not an NCName character
         int i = uriLength - 1;
         while (i >= 0) {
             char c = uri.charAt(i);
-            // Check for # and / characters explicitly as these
-            // are used as the end of a namespace very frequently
             if (c == '#' || c == '/' || !XMLUtil.isNCNameChar(c)) {
-                // Found it at index i
                 break;
             }
             i--;
         }
-        // Character after the just found non-NCName character could
-        // be an NCName character, but not a letter or underscore.
-        // Skip characters that are not letters or underscores.
         i++;
         while (i < uriLength) {
             char c = uri.charAt(i);
@@ -533,7 +425,6 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
             }
             i++;
         }
-        // Check that a legal split point has been found
         if (i == uriLength) {
             i = -1;
         }

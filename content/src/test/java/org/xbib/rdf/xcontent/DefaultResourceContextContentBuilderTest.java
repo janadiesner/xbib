@@ -9,15 +9,15 @@ import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.DefaultContentBuilder;
+import org.xbib.rdf.content.DefaultResourceContentBuilder;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleResource;
 
-public class DefaultContentBuilderTest<S extends Identifier, P extends Property, O extends Node>
+public class DefaultResourceContextContentBuilderTest<S extends Identifier, P extends Property, O extends Node>
     extends Assert {
 
-    private final Logger logger = Loggers.getLogger(DefaultContentBuilderTest.class);
+    private final Logger logger = Loggers.getLogger(DefaultResourceContextContentBuilderTest.class);
 
     @Test
     public void testSimpleBuilder() throws Exception {
@@ -30,7 +30,7 @@ public class DefaultContentBuilderTest<S extends Identifier, P extends Property,
                 .add("urn:date", l)
                 .add("urn:link", IRI.create("urn:pointer"));
         ResourceContext context = resource.context();
-        DefaultContentBuilder defaultContentBuilder = new DefaultContentBuilder();
+        DefaultResourceContentBuilder defaultContentBuilder = new DefaultResourceContentBuilder();
         String result = defaultContentBuilder.build(context, resource);
         assertEquals("{\"urn:property\":\"Hello World\",\"urn:date\":2013,\"urn:link\":\"urn:pointer\"}", result);
     }
@@ -48,7 +48,7 @@ public class DefaultContentBuilderTest<S extends Identifier, P extends Property,
                 .newResource("urn:embedded")
                 .add("rdf:type", IRI.create("urn:type2"));
         ResourceContext context = resource.context();
-        DefaultContentBuilder defaultContentBuilder = new DefaultContentBuilder();
+        DefaultResourceContentBuilder defaultContentBuilder = new DefaultResourceContentBuilder();
         String result = defaultContentBuilder.build(context, resource);
         assertEquals("{\"urn:property\":\"Hello World\",\"urn:date\":2013,\"rdf:type\":\"urn:type1\",\"urn:embedded\":{\"rdf:type\":\"urn:type2\"}}", result);
     }

@@ -32,26 +32,26 @@
 package org.xbib.rdf.io.json;
 
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
-import org.xbib.rdf.RDF;
+import org.xbib.rdf.RDFNS;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.rdf.context.ResourceContextContentBuilder;
 import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.simple.SimpleResource;
-import org.xbib.rdf.content.ContentBuilder;
 
 import java.io.IOException;
 import java.util.Map;
 
 public class JsonWriter<S extends Identifier, P extends Property, O extends Node>
-        implements TripleListener<S,P,O> {
+        implements TripleListener<S, P, O> {
 
-    private final Logger logger = LoggerFactory.getLogger(JsonWriter.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(JsonWriter.class.getName());
 
     private IRINamespaceContext context;
 
@@ -61,7 +61,7 @@ public class JsonWriter<S extends Identifier, P extends Property, O extends Node
 
     private boolean nsWritten;
 
-    private ContentBuilder contentBuilder;
+    private ResourceContextContentBuilder resourceContextContentBuilder;
 
     private StringBuilder sb;
 
@@ -82,8 +82,8 @@ public class JsonWriter<S extends Identifier, P extends Property, O extends Node
         return this;
     }
 
-    public JsonWriter contentBuilder(ContentBuilder contentBuilder) {
-        this.contentBuilder = contentBuilder;
+    public JsonWriter contentBuilder(ResourceContextContentBuilder resourceContextContentBuilder) {
+        this.resourceContextContentBuilder = resourceContextContentBuilder;
         return this;
     }
 
@@ -94,8 +94,8 @@ public class JsonWriter<S extends Identifier, P extends Property, O extends Node
                 if (!nsWritten) {
                     writeNamespaces();
                 }
-                if (contentBuilder != null) {
-                    contentBuilder.build(resource.context(), resource);
+                if (resourceContextContentBuilder != null) {
+                    resourceContextContentBuilder.build(resource.context(), resource);
                 }
                 idCounter++;
                 resource = new SimpleResource();
@@ -140,7 +140,7 @@ public class JsonWriter<S extends Identifier, P extends Property, O extends Node
         for (Map.Entry<String, String> entry : context.getNamespaces().entrySet()) {
             if (entry.getValue().length() > 0) {
                 String nsURI = entry.getValue().toString();
-                if (!RDF.NS_URI.equals(nsURI)) {
+                if (!RDFNS.NS_URI.equals(nsURI)) {
                     writeNamespace(entry.getKey(), nsURI);
                     nsWritten = true;
                 }

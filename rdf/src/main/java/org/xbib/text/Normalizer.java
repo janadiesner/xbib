@@ -31,8 +31,9 @@
  */
 package org.xbib.text;
 
-import java.io.IOException;
 import org.xbib.text.data.UnicodeCharacterDatabase;
+
+import java.io.IOException;
 
 /**
  * Performs Unicode Normalization (Form D,C,KD and KC)

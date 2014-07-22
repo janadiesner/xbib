@@ -32,7 +32,9 @@
 package org.xbib.xml;
 
 public interface XMLNS {
+
     String NS_PREFIX = "xmlns";
+
     String NS_URI = "http://www.w3.org/2000/xmlns/";
 
 }

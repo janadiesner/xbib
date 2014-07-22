@@ -47,8 +47,7 @@ import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.ContentBuilder;
-import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.tools.Feeder;
 import org.xml.sax.InputSource;
@@ -94,7 +93,9 @@ public final class FromMARC extends Feeder {
                 .detectUnknownKeys(settings.getAsBoolean("detect", false))
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
-                        return new MARCElementBuilder().addOutput(new MyContextResourceOutput());
+                        MARCElementBuilder builder = new MARCElementBuilder();
+                        builder.addWriter(new MarcContextResourceOutput());
+                        return builder;
                     }
                 });
 
@@ -102,7 +103,9 @@ public final class FromMARC extends Feeder {
                 .pipelines(settings.getAsInt("pipelines", 1))
                 .start(new MARCDirectBuilderFactory() {
                     public MARCDirectBuilder newBuilder() {
-                        return new MARCDirectBuilder().addOutput(new MyContextResourceOutput());
+                        MARCDirectBuilder builder = new MARCDirectBuilder();
+                        builder.addWriter(new MarcContextResourceOutput());
+                        return builder;
                     }
                 });
 
@@ -130,18 +133,17 @@ public final class FromMARC extends Feeder {
         if (settings.getAsBoolean("detect", false)) {
             logger.info("unknown keys={}", mapper.unknownKeys());
         }
-        logger.info("sink counter = {}", sink.getCounter());
     }
 
-    private class MyContextResourceOutput extends CountableContextResourceOutput<ResourceContext, Resource> {
+    private class MarcContextResourceOutput extends AbstractResourceContextWriter<ResourceContext<Resource>, Resource> {
 
         @Override
-        public void output(ResourceContext context, Resource resource, ContentBuilder contentBuilder) throws IOException {
+        public void write(ResourceContext context) throws IOException {
             IRI iri = context.getResource().id();
             if (iri != null) {
                 context.getResource().id(IRI.builder().scheme("http").host(settings.get("index")).query(settings.get("type"))
                         .fragment(iri.getFragment()).build());
-                sink.output(context, context.getResource(), contentBuilder);
+                sink.write(context);
             }
         }
     }

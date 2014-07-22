@@ -31,9 +31,10 @@
  */
 package org.xbib.elements.direct;
 
-import org.xbib.rdf.context.ContextResourceOutput;
 import org.xbib.elements.context.ResourceContextFactory;
+import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.context.ResourceContextWriter;
 
 /**
  * Direct builder
@@ -42,7 +43,7 @@ import org.xbib.rdf.context.ResourceContext;
  * @param <V>
  * @param <C>
  */
-public interface DirectBuilder<K, V, C extends ResourceContext> {
+public interface DirectBuilder<K, V, C extends ResourceContext<Resource>> {
 
     void begin();
     
@@ -54,5 +55,5 @@ public interface DirectBuilder<K, V, C extends ResourceContext> {
 
     C context();
 
-    DirectBuilder<K,V,C> addOutput(ContextResourceOutput output);
+    DirectBuilder<K,V,C> addWriter(ResourceContextWriter resourceContextWriter);
 }

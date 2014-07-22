@@ -29,34 +29,17 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.rdf;
+package org.xbib.rdf.io;
 
-import org.xbib.iri.IRI;
+import org.xbib.rdf.Identifier;
+import org.xbib.rdf.Node;
+import org.xbib.rdf.Property;
 
-public interface RDF {
+import java.io.IOException;
+import java.io.Reader;
 
-    String NS_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-    
-    String NS_PREFIX = "rdf";
-    
-    IRI RDF = IRI.create(NS_URI);
-    IRI RDF_RDF = IRI.create(NS_URI + "RDF");
-    IRI RDF_DESCRIPTION = IRI.create(NS_URI + "Description");
-    IRI RDF_ABOUT = IRI.create(NS_URI + "about");
-    IRI RDF_RESOURCE = IRI.create(NS_URI + "resource");
-    IRI RDF_NODE_ID = IRI.create(NS_URI + "nodeID");
-    IRI RDF_ID = IRI.create(NS_URI + "ID");
-    IRI RDF_LI = IRI.create(NS_URI + "li");
-    IRI RDF_TYPE = IRI.create(NS_URI + "type");    
-    IRI RDF_SUBJECT = IRI.create(NS_URI + "subject");    
-    IRI RDF_PREDICATE = IRI.create(NS_URI + "predicate");    
-    IRI RDF_OBJECT = IRI.create(NS_URI + "object");    
-    IRI RDF_STATEMENT = IRI.create(NS_URI + "Statement"); 
-    IRI RDF_XMLLITERAL = IRI.create(NS_URI + "XMLLiteral"); 
-    IRI RDF_NIL = IRI.create(NS_URI + "nil"); 
-    IRI RDF_FIRST = IRI.create(NS_URI + "first"); 
-    IRI RDF_REST = IRI.create(NS_URI + "rest");
-    // non-standard tag for language
-    IRI RDF_LANGUAGE = IRI.create(NS_URI + "language");
+public interface TripleReader<S extends Identifier, P extends Property, O extends Node> {
+
+    TripleReader parse(Reader reader, TripleListener<S, P, O> listener) throws IOException;
 
 }

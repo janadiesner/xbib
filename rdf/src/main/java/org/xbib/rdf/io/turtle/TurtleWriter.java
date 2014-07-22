@@ -31,10 +31,6 @@
  */
 package org.xbib.rdf.io.turtle;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Map;
-import java.util.Stack;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -43,36 +39,34 @@ import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
-import org.xbib.rdf.RDF;
+import org.xbib.rdf.RDFNS;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleLine;
-import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.io.AbstractTripleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Map;
+import java.util.Stack;
+
 /**
- * RDF Turtle serialization
- *
+ * Write RDF Turtle
+ * <p>
  * See <a href="http://www.w3.org/TeamSubmission/turtle/">Turtle - Terse RDF
  * Triple Language</a>
- *
  */
-public class TurtleWriter<S extends Identifier, P extends Property, O extends Node>
-    implements TripleLine<S, P, O> {
+public class TurtleWriter<S extends Identifier, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
+        extends AbstractTripleWriter<S, P, O, C> {
 
-    private final Logger logger = LoggerFactory.getLogger(TurtleWriter.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(TurtleWriter.class.getName());
 
     private final Writer writer;
-
-    private SimpleResourceContext<S,P,O> resourceContext;
 
     private final static char LF = '\n';
 
     private final static char TAB = '\t';
-
-    private IRINamespaceContext context;
 
     private boolean sameResource;
 
@@ -84,35 +78,25 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
 
     private Stack<IRI> embedded;
 
-    private Stack<Triple<S,P,O>> triples;
+    private Stack<Triple<S, P, O>> triples;
 
-    private Triple<S,P,O> triple;
+    private Triple<S, P, O> triple;
 
     private boolean nsWritten;
-
-    private String translatePicaSortMarker;
 
     private StringBuilder namespaceBuilder;
 
     private StringBuilder sb;
 
-    private long byteCounter;
-
-    private long idCounter;
-
     public TurtleWriter(Writer writer) {
         this.writer = writer;
-        this.resourceContext = new SimpleResourceContext();
+        this.resourceContext = (C)new SimpleResourceContext();
         resourceContext.newResource();
-        this.context = IRINamespaceContext.newInstance();
         this.nsWritten = false;
         this.sameResource = false;
         this.sameProperty = false;
         this.triples = new Stack();
         this.embedded = new Stack();
-        this.byteCounter = 0L;
-        this.idCounter = 0L;
-        this.translatePicaSortMarker = null;
         this.namespaceBuilder = new StringBuilder();
         this.sb = new StringBuilder();
     }
@@ -121,30 +105,11 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
         return writer;
     }
 
-    public TurtleWriter setContext(IRINamespaceContext context) {
-        this.context = context;
-        return this;
-    }
-
-    public long getByteCounter() {
-        return byteCounter;
-    }
-
-    public long getIdentifierCounter() {
-        return idCounter;
-    }
-
-    public TurtleWriter translatePicaSortMarker(String marker) {
-        this.translatePicaSortMarker = marker;
-        return this;
-    }
-
     @Override
-    public TurtleWriter<S, P, O> newIdentifier(IRI iri) {
+    public TurtleWriter<S, P, O, C> newIdentifier(IRI iri) {
         if (!iri.equals(resourceContext.getResource().id())) {
             try {
                 write(resourceContext);
-                idCounter++;
                 resourceContext.newResource();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
@@ -155,51 +120,37 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
     }
 
     @Override
-    public TripleListener<S, P, O> end() {
+    public TurtleWriter<S, P, O, C>  end() {
         return this;
     }
 
     @Override
-    public TurtleWriter<S, P, O> triple(Triple triple) {
+    public TurtleWriter<S, P, O, C> triple(Triple triple) {
         resourceContext.getResource().add(triple);
         return this;
     }
 
     @Override
-    public TripleListener<S, P, O> begin() {
+    public TurtleWriter<S, P, O, C> begin() {
         return this;
     }
 
     @Override
-    public TurtleWriter<S, P, O> startPrefixMapping(String prefix, String uri) {
-        context.addNamespace(prefix, uri);
+    public TurtleWriter<S, P, O, C> startPrefixMapping(String prefix, String uri) {
+        namespaceContext.addNamespace(prefix, uri);
         return this;
     }
 
     @Override
-    public TurtleWriter<S, P, O> endPrefixMapping(String prefix) {
-        // nooooo keep it!
-        //context.removeNamespace(prefix);
+    public TurtleWriter<S, P, O, C>  endPrefixMapping(String prefix) {
         return this;
     }
 
-    public void close() {
-        try {
-            // write last resource
-            write(resourceContext);
-            idCounter++;
-            writer.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
-
     @Override
-    public TurtleWriter<S, P, O> write(ResourceContext<Resource<S, P, O>> resourceContext) throws IOException {
+    public void write(C resourceContext) throws IOException {
         for (Triple<S, P, O> spoTriple : resourceContext.getResource()) {
             writeTriple(spoTriple);
         }
-        // close hanging embedded resources
         while (!embedded.isEmpty()) {
             closeEmbeddedResource();
         }
@@ -210,22 +161,24 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
             writer.write(namespaceBuilder.toString());
             writer.write(sb.toString());
         }
-        byteCounter += namespaceBuilder.length();
-        byteCounter += sb.length();
         namespaceBuilder.setLength(0);
         sb.setLength(0);
-        return this;
+    }
+
+    @Override
+    public void flush() throws IOException {
+        writer.flush();
     }
 
     public TurtleWriter writeNamespaces() throws IOException {
-        if (context == null) {
+        if (namespaceContext == null) {
             return this;
         }
         nsWritten = false;
-        for (Map.Entry<String, String> entry : context.getNamespaces().entrySet()) {
+        for (Map.Entry<String, String> entry : namespaceContext.getNamespaces().entrySet()) {
             if (entry.getValue().length() > 0) {
                 String nsURI = entry.getValue().toString();
-                if (!RDF.NS_URI.equals(nsURI)) {
+                if (!RDFNS.NS_URI.equals(nsURI)) {
                     namespaceBuilder.append("@prefix ")
                             .append(entry.getKey())
                             .append(": <")
@@ -242,13 +195,7 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
         return this;
     }
 
-    /**
-     * Write triple
-     *
-     * @param stmt
-     * @throws IOException
-     */
-    public void writeTriple(Triple<S,P,O> stmt) throws IOException {
+    public void writeTriple(Triple<S, P, O> stmt) throws IOException {
         this.triple = stmt;
         S subject = stmt.subject();
         P predicate = stmt.predicate();
@@ -263,7 +210,6 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
                 sb.append(", ");
                 writeObject(object);
             } else {
-                // same subject, predicate changed
                 sb.append(';');
                 sb.append(LF);
                 writeIndent(embedded.size() + 1);
@@ -271,7 +217,6 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
                 writeObject(object);
             }
         } else {
-            // embedded resource switchback?
             IRI iri = embedded.isEmpty() ? null : embedded.peek();
             boolean closeEmbedded = lastSubject != null
                     && lastSubject.isBlank()
@@ -282,13 +227,12 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
                     closeEmbeddedResource();
                 }
             }
-            // continuation (only if last subject is there)
             if (lastSubject != null) {
                 if (sameResource) {
                     if (sameProperty) {
-                        sb.append(','); // values on same line
+                        sb.append(',');
                     } else {
-                        sb.append(';').append(LF); // other property
+                        sb.append(';').append(LF);
                         writeIndent(1);
                         writeIndent(embedded.size());
                     }
@@ -297,17 +241,15 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
                         sb.append(";").append(LF);
                         writeIndent(1);
                     } else if (closeEmbedded) {
-                        sb.append(";").append(LF); // not really cute...
+                        sb.append(";").append(LF);
                         writeIndent(1);
                     }
                     writeIndent(embedded.size());
                 }
             }
-            // don't repeat subject in same resource
             if (!sameResource) {
                 writeSubject(subject);
             }
-            // don't repeat predicate in same property
             if (!sameProperty) {
                 writePredicate(predicate);
             }
@@ -320,16 +262,13 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
             sb.append("<> ");
             return;
         }
-        // do not output blank subjects
         if (!subject.isBlank()) {
-            sb.append('<')
-                .append(subject.toString())
-                .append("> ");
+            sb.append('<').append(subject.toString()).append("> ");
         }
         lastSubject = subject;
     }
 
-    private final static String TYPE = RDF.NS_URI + "type";
+    private final static String TYPE = RDFNS.NS_URI + "type";
 
     private void writePredicate(P predicate) throws IOException {
         if (predicate.id() == null) {
@@ -337,7 +276,7 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
             return;
         }
         String p = predicate.toString();
-        if ("rdf:type".equals(p)|| TYPE.equals(p)) {
+        if ("rdf:type".equals(p) || TYPE.equals(p)) {
             sb.append("a ");
         } else {
             writeURI(predicate.id());
@@ -348,9 +287,8 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
 
     private void writeObject(O object) throws IOException {
         if (object instanceof Resource) {
-            Resource r = (Resource<S,P,O>)object;
+            Resource r = (Resource<S, P, O>) object;
             if (r.isBlank()) {
-                // blank node?
                 openEmbeddedResource(r.id());
                 sameResource = false;
                 sameProperty = false;
@@ -360,7 +298,7 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
         } else if (object instanceof Literal) {
             writeLiteral((Literal<?>) object);
         } else if (object instanceof IdentifiableNode) {
-            writeURI(((IdentifiableNode)object).id());
+            writeURI(((IdentifiableNode) object).id());
         } else {
             throw new IllegalArgumentException("unknown value class: "
                     + (object != null ? object.getClass() : "<null>"));
@@ -381,75 +319,44 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
         sb.append(LF);
         writeIndent(embedded.size());
         sb.append(']');
-        Triple<S,P,O> t = triples.pop();
+        Triple<S, P, O> t = triples.pop();
         lastSubject = t.subject();
         lastPredicate = t.predicate();
-        //IRI iri = ((Identifier)t.object()).id();
         sameResource = lastSubject.equals(triple.subject());
         sameProperty = lastPredicate.equals(triple.predicate());
         return embedded.pop();
     }
 
     private void writeURI(IRI uri) throws IOException {
-        String abbrev = context.compact(uri);
+        String abbrev = namespaceContext.compact(uri);
         if (!abbrev.equals(uri.toString())) {
             sb.append(abbrev);
             return;
         }
-        // URI scheme = namespace prefix in context?
-        if (context.getNamespaceURI(uri.getScheme()) != null) {
+        if (namespaceContext.getNamespaceURI(uri.getScheme()) != null) {
             sb.append(uri.toString());
             return;
         }
-        // Write full URI
-        sb.append('<')
-            .append(encodeURIString(uri.toString()))
-            .append('>');
+        sb.append('<').append(encodeURIString(uri.toString())).append('>');
     }
 
     private void writeLiteral(Literal literal) throws IOException {
-        if (translatePicaSortMarker != null) {
-            literal = recognizeSortOrder(literal, translatePicaSortMarker);
-        }
+        literal = processSortLanguage(literal);
         String value = literal.nativeValue().toString();
         if (value.indexOf('\n') > 0 || value.indexOf('\r') > 0 || value.indexOf('\t') > 0) {
-            // Write label as long string
             sb.append("\"\"\"")
-            .append(encodeLongString(value))
-            .append("\"\"\"");
+                    .append(encodeLongString(value))
+                    .append("\"\"\"");
         } else {
-            // Write label as normal string
             sb.append('\"')
-                .append(encodeString(value))
-                .append('\"');
+                    .append(encodeString(value))
+                    .append('\"');
         }
         if (literal.type() != null) {
-            // Append the literal's type
             sb.append("^^").append(literal.type().toString());
         } else if (literal.language() != null) {
-            // Append the literal's language
             sb.append('@').append(literal.language());
         }
-    }
-
-    /**
-     * see http://www.w3.org/International/articles/language-tags/
-     *
-     * @param literal
-     * @param language
-     * @return
-     */
-    private Literal recognizeSortOrder(Literal literal, String language) {
-        String value = literal.object().toString();
-        if (value.indexOf('@') == 0) {
-            literal.object(value.substring(1));
-        }
-        int pos = value.indexOf(" @"); // PICA mechanical word order marker
-        if (pos > 0) {
-            literal.object('\u0098' + value.substring(0,pos+1) + '\u009c' + value.substring(pos+2))
-                    .language(language);
-        }
-        return literal;
     }
 
     private void writeIndent(int indentLevel) throws IOException {
@@ -474,25 +381,6 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
         return isNameChar(c);
     }
 
-    private boolean isLegalPrefix(String prefix) {
-        if (prefix.length() == 0) {
-            return false;
-        }
-        if (!isPrefixStartChar(prefix.charAt(0))) {
-            return false;
-        }
-        for (int i = 1; i < prefix.length(); i++) {
-            if (!isPrefixChar(prefix.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Encodes the supplied string for inclusion as a 'normal' string in a
-     * Turtle document.
-     */
     private String encodeString(String s) {
         s = gsub("\\", "\\\\", s);
         s = gsub("\t", "\\t", s);
@@ -502,77 +390,39 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
         return s;
     }
 
-    /**
-     * Encodes the supplied string for inclusion as a long string in a Turtle
-     * document.
-     *
-     */
     private String encodeLongString(String s) {
-        // not all double quotes need to be escaped. It suffices to encode
-        // the ones that form sequences of 3 or more double quotes, and the ones
-        // at the end of a string.
         s = gsub("\\", "\\\\", s);
         s = gsub("\"", "\\\"", s);
         return s;
     }
 
-    /**
-     * Encodes the supplied string for inclusion as a (relative) URI in a Turtle
-     * document.
-     *
-     */
     private String encodeURIString(String s) {
         s = gsub("\\", "\\\\", s);
         s = gsub(">", "\\>", s);
         return s;
     }
 
-    /**
-     * Substitute String "old" by String "new" in String "text" everywhere. This
-     * is static util function that I could not place anywhere more appropriate.
-     * The name of this function is from the good-old awk time.
-     *
-     * @param olds The String to be substituted.
-     * @param news The String is the new content.
-     * @param text The String in which the substitution is done.
-     * @return The result String containing the substitutions; if no
-     * substitutions were made, the result is 'text'.
-     */
     private String gsub(String olds, String news, String text) {
         if (olds == null || olds.length() == 0) {
-            // Nothing to substitute.
             return text;
         }
         if (text == null) {
             return null;
         }
-        // Search for any occurences of 'olds'.
         int oldsIndex = text.indexOf(olds);
         if (oldsIndex == -1) {
-            // Nothing to substitute.
             return text;
         }
-        // We're going to do some substitutions.
         StringBuilder buf = new StringBuilder(text.length());
         int prevIndex = 0;
         while (oldsIndex >= 0) {
-            // First, add the text between the previous and the current
-            // occurence.
             buf.append(text.substring(prevIndex, oldsIndex));
-            // Then add the substition pattern
             buf.append(news);
-            // Remember the index for the next loop.
             prevIndex = oldsIndex + olds.length();
-            // Search for the next occurence.
             oldsIndex = text.indexOf(olds, prevIndex);
         }
-        // Add the part after the last occurence.
         buf.append(text.substring(prevIndex));
         return buf.toString();
     }
-
-    /*private boolean isBlank(Identifier id) {
-        return id == null ? false : Identifier.GENID.equals(id.id().getScheme());
-    }*/
 
 }

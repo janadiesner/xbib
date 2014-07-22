@@ -33,7 +33,6 @@ package org.xbib.elements.marc;
 
 import org.xbib.elements.AbstractElementBuilder;
 import org.xbib.elements.context.ResourceContextFactory;
-import org.xbib.rdf.context.ContextResourceOutput;
 import org.xbib.marc.FieldCollection;
 
 /**
@@ -53,14 +52,9 @@ public class MARCElementBuilder
     };
     
     @Override
-    public ResourceContextFactory<MARCContext> contextFactory() {
+    public ResourceContextFactory<MARCContext> resourceContextFactory() {
         return contextFactory;
     }
 
-    @Override
-    public MARCElementBuilder addOutput(ContextResourceOutput output) {
-        super.addOutput(output);
-        return this;
-    }
     
 }

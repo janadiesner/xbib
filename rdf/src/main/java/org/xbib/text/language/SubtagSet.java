@@ -47,8 +47,9 @@ abstract class SubtagSet implements Cloneable, Iterable<Subtag>, Comparable<Subt
     public String toString() {
         StringBuilder buf = new StringBuilder();
         for (Subtag subtag : this) {
-            if (buf.length() > 0)
+            if (buf.length() > 0) {
                 buf.append('-');
+            }
             buf.append(subtag.getName());
         }
         return buf.toString();
@@ -59,9 +60,11 @@ abstract class SubtagSet implements Cloneable, Iterable<Subtag>, Comparable<Subt
     }
 
     public boolean contains(Subtag subtag) {
-        for (Subtag tag : this)
-            if (tag.equals(subtag))
+        for (Subtag tag : this) {
+            if (tag.equals(subtag)) {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -78,26 +81,31 @@ abstract class SubtagSet implements Cloneable, Iterable<Subtag>, Comparable<Subt
     }
 
     public boolean isValid() {
-        for (Subtag subtag : this)
-            if (!subtag.isValid())
+        for (Subtag subtag : this) {
+            if (!subtag.isValid()) {
                 return false;
+            }
+        }
         return true;
     }
 
     @SuppressWarnings("unused")
     public int count() {
         int n = 0;
-        for (Subtag tag : this)
+        for (Subtag tag : this) {
             n++;
+        }
         return n;
     }
 
     public Subtag get(int index) {
-        if (index < 0 || index > count())
+        if (index < 0 || index > count()) {
             throw new IndexOutOfBoundsException();
+        }
         Subtag tag = primary;
-        for (int n = 1; n <= index; n++)
+        for (int n = 1; n <= index; n++) {
             tag = tag.getNext();
+        }
         return tag;
     }
 
@@ -126,26 +134,31 @@ abstract class SubtagSet implements Cloneable, Iterable<Subtag>, Comparable<Subt
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        for (Subtag tag : this)
+        for (Subtag tag : this) {
             result = prime * result + tag.hashCode();
+        }
         return result;
     }
 
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        final Lang other = (Lang)obj;
+        }
+        final Lang other = (Lang) obj;
         return hashCode() == other.hashCode();
     }
 
     public Subtag[] toArray() {
         List<Subtag> tags = new LinkedList<Subtag>();
-        for (Subtag tag : this)
+        for (Subtag tag : this) {
             tags.add(tag);
+        }
         return tags.toArray(new Subtag[tags.size()]);
     }
 
@@ -156,17 +169,20 @@ abstract class SubtagSet implements Cloneable, Iterable<Subtag>, Comparable<Subt
     public int compareTo(SubtagSet o) {
         Iterator<Subtag> i = iterator();
         Iterator<Subtag> e = o.iterator();
-        for (; i.hasNext() && e.hasNext();) {
+        for (; i.hasNext() && e.hasNext(); ) {
             Subtag inext = i.next();
             Subtag enext = e.next();
             int c = inext.compareTo(enext);
-            if (c != 0)
+            if (c != 0) {
                 return c;
+            }
         }
-        if (e.hasNext() && !i.hasNext())
+        if (e.hasNext() && !i.hasNext()) {
             return -1;
-        if (i.hasNext() && !e.hasNext())
+        }
+        if (i.hasNext() && !e.hasNext()) {
             return 1;
+        }
         return 0;
     }
 

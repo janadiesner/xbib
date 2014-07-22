@@ -31,6 +31,24 @@
  */
 package org.xbib.rdf.io.turtle;
 
+import org.xbib.iri.IRI;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.IdentifiableNode;
+import org.xbib.rdf.Identifier;
+import org.xbib.rdf.Literal;
+import org.xbib.rdf.Node;
+import org.xbib.rdf.Property;
+import org.xbib.rdf.Resource;
+import org.xbib.rdf.Triple;
+import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.io.TripleReader;
+import org.xbib.rdf.simple.SimpleFactory;
+import org.xbib.rdf.simple.SimpleLiteral;
+import org.xbib.rdf.simple.SimpleResource;
+import org.xbib.rdf.simple.SimpleTriple;
+import org.xbib.xml.namespace.XmlNamespaceContext;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.PushbackReader;
@@ -39,37 +57,18 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Stack;
 
-import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Identifier;
-import org.xbib.rdf.Literal;
-import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.io.Triplifier;
-import org.xbib.rdf.simple.SimpleFactory;
-import org.xbib.rdf.simple.SimpleLiteral;
-import org.xbib.rdf.IdentifiableNode;
-import org.xbib.rdf.simple.SimpleResource;
-import org.xbib.rdf.simple.SimpleTriple;
-import org.xbib.xml.namespace.XmlNamespaceContext;
-
 /**
  * Turtle - Terse RDF Triple Parser
  *
  * @see <a href="http://www.w3.org/TeamSubmission/turtle/">Turtle - Terse RDF
  * Triple Language</a>
- *
  */
 public class TurtleReader<S extends Identifier, P extends Property, O extends Node>
-        implements Triplifier<S, P, O> {
+        implements TripleReader<S, P, O> {
 
     private final Logger logger = LoggerFactory.getLogger(TurtleReader.class.getName());
 
-    private final SimpleFactory<S,P,O> simpleFactory = SimpleFactory.getInstance();
+    private final SimpleFactory<S, P, O> simpleFactory = SimpleFactory.getInstance();
     /**
      * The base IRI
      */
@@ -175,18 +174,18 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
 
     /**
      * Parse a directive.
-     *
+     * <p>
      * The prefix directive binds a prefix to a namespace URI. It indicates that
      * a qualified name (qname) with that prefix will thereafter be a shorthand
      * for a URI consisting of the concatenation of the namespace identifier and
      * the bit of the qname to the right of the (only allowed) colon.
-     *
+     * <p>
      * The namespace prefix may be empty, in which case the qname starts with a
      * colon. This is known as the default namespace. The empty prefix "" is by
      * default , bound to "#" -- the local namespace of the file. The parser
      * behaves as though there were a @prefix : <#>. just before the file. This
      * means that <#foo> can be written :foo.
-     *
+     * <p>
      * The base directive sets the base URI to be used for the parsing of
      * relative URIs. It takes, itself, a relative URI, so it can be used to
      * change the base URI relative to the previous one.
@@ -501,10 +500,10 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
             r.id(IRI.create("rdf:nil"));
             return r;
         } else {
-            SimpleResource<S,P,O> first = new SimpleResource();
+            SimpleResource<S, P, O> first = new SimpleResource();
             S oldsubject = subject;
             P oldpredicate = predicate;
-            subject = (S)first.id();
+            subject = (S) first.id();
             predicate = simpleFactory.asPredicate("rdf:first");
             parseObject();
             ch = skipWhitespace();
@@ -560,6 +559,7 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
         bnodes.put(nodeID, bnode);
         return bnode;
     }
+
     private final HashMap<String, Identifier> bnodes = new HashMap();
 
     /**
@@ -791,9 +791,8 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
      *
      * @param s An encoded Turtle string.
      * @return The unencoded string.
-     * @exception IllegalArgumentException If the supplied string is not a
-     * correctly encoded Turtle string.
-     *
+     * @throws IllegalArgumentException If the supplied string is not a
+     *                                  correctly encoded Turtle string.
      */
     private String decodeTurtleString(String s) {
         int pos = s.indexOf('\\');
@@ -870,8 +869,8 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
         sb.append(s.substring(i));
         return sb.toString();
     }
-    
-    
+
+
     public static String decode(String s, String encoding) {
         StringBuilder sb = new StringBuilder();
         boolean fragment = false;
@@ -905,5 +904,5 @@ public class TurtleReader<S extends Identifier, P extends Property, O extends No
             throw new Error("encoding " + encoding + " not supported");
         }
     }
-    
+
 }

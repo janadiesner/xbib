@@ -41,7 +41,7 @@ public class InvalidCharacterException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        return "Invalid Character 0x" + Integer.toHexString(input) + "(" + (char)input + ")";
+        return "Invalid Character 0x" + Integer.toHexString(input) + "(" + (char) input + ")";
     }
 
 }

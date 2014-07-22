@@ -44,9 +44,9 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
-import org.xbib.rdf.RDF;
+import org.xbib.rdf.RDFNS;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleResourceContext;
@@ -104,7 +104,7 @@ public class JsonCoins extends Converter {
     private final static IRINamespaceContext context = IRINamespaceContext.newInstance();
 
     static {
-        context.addNamespace(RDF.NS_PREFIX, RDF.NS_URI);
+        context.addNamespace(RDFNS.NS_PREFIX, RDFNS.NS_URI);
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         context.addNamespace("dcterms", "http://purl.org/dc/terms/");
         context.addNamespace("foaf", "http://xmlns.com/foaf/0.1/");
@@ -141,8 +141,8 @@ public class JsonCoins extends Converter {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
         };
-        serializer = new TurtleWriter(new OutputStreamWriter(gzout, "UTF-8"))
-                .setContext(context);
+        serializer = new TurtleWriter(new OutputStreamWriter(gzout, "UTF-8"));
+        serializer.setNamespaceContext(context);
         serializer.writeNamespaces();
 
         FileOutputStream errorfout = new FileOutputStream(outputFilename + "-errors.ttl.gz");
@@ -151,8 +151,8 @@ public class JsonCoins extends Converter {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
         };
-        errorSerializer = new TurtleWriter(new OutputStreamWriter(errorgzout, "UTF-8"))
-                .setContext(context);
+        errorSerializer = new TurtleWriter(new OutputStreamWriter(errorgzout, "UTF-8"));
+        errorSerializer.setNamespaceContext(context);
         errorSerializer.writeNamespaces();
 
         FileOutputStream noserialfout = new FileOutputStream(outputFilename + "-without-serial.ttl.gz");
@@ -161,8 +161,8 @@ public class JsonCoins extends Converter {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
         };
-        missingSerializer = new TurtleWriter(new OutputStreamWriter(noserialgzout, "UTF-8"))
-                .setContext(context);
+        missingSerializer = new TurtleWriter(new OutputStreamWriter(noserialgzout, "UTF-8"));
+        missingSerializer.setNamespaceContext(context);
         missingSerializer.writeNamespaces();
 
         // extra text file for missing serials

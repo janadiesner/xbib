@@ -45,7 +45,7 @@ import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleResourceContext;
 
@@ -86,10 +86,10 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         context.addNamespace("dcterms", "http://purl.org/dc/terms/");
 
         StringWriter sw = new StringWriter();
-        new TurtleWriter(sw)
-            .setContext(context)
-            .writeNamespaces()
-            .write(resourceContext);
+        TurtleWriter writer = new TurtleWriter(sw);
+        writer.setNamespaceContext(context);
+        writer.writeNamespaces();
+        writer.write(resourceContext);
         String s2 = sw.toString().trim();
         assertEquals(s2, s1);
     }
@@ -112,12 +112,14 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         return context;
     }
 
+    @Test
     public void testTurtleWrite() throws Exception {
         ResourceContext<Resource<S, P, O>> resourceContext = createResourceContext2();
         StringWriter sw = new StringWriter();
-        TurtleWriter t = new TurtleWriter(sw)
-                .write(resourceContext);
-        sw.toString().trim();
+        TurtleWriter writer = new TurtleWriter(sw);
+        writer.writeNamespaces();
+        writer.write(resourceContext);
+        logger.info(sw.toString().trim());
     }
 
     private ResourceContext<Resource<S, P, O>> createResourceContext2() {
@@ -146,13 +148,13 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         return context;
     }
 
-
     @Test
     public void testTurtleResourceIndent() throws Exception {
-        ResourceContext<Resource<S, P, O>> resource = createNestedResources();
+        ResourceContext<Resource<S, P, O>> resourceContext = createNestedResources();
         StringWriter sw = new StringWriter();
-        TurtleWriter t = new TurtleWriter(sw)
-                .write(resource);
+        TurtleWriter writer = new TurtleWriter(sw);
+        writer.writeNamespaces();
+        writer.write(resourceContext);
         logger.info(sw.toString().trim());
     }
 

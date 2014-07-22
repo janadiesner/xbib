@@ -139,7 +139,7 @@ class GZIPResponseWrapper extends HttpServletResponseWrapper {
 
     public ServletOutputStream getOutputStream() throws IOException {
         if (writer != null) {
-            throw new IllegalStateException("getWriter() has already been called!");
+            throw new IllegalStateException("getContentBuilder() has already been called!");
         }
 
         if (stream == null)

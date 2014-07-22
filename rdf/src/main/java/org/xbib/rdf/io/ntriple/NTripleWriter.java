@@ -31,9 +31,8 @@
  */
 package org.xbib.rdf.io.ntriple;
 
-import java.io.IOException;
-import java.io.Writer;
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.IdentifiableNode;
@@ -43,67 +42,40 @@ import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleLine;
-import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.io.AbstractTripleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
+
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * NTriple writer
  */
-public class NTripleWriter<S extends Identifier, P extends Property, O extends Node>
-    implements TripleLine<S,P,O> {
+public class NTripleWriter<S extends Identifier, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
+        extends AbstractTripleWriter<S, P, O, C> {
 
     private final static Logger logger = LoggerFactory.getLogger(NTripleWriter.class.getName());
 
     private final static char LF = '\n';
 
-    private final IRINamespaceContext context;
-
     private final Writer writer;
-
-    private SimpleResourceContext<S,P,O> resourceContext;
-
-    private long byteCounter;
-
-    private long idCounter;
-
-    private String translatePicaSortMarker;
 
     public NTripleWriter(Writer writer) {
         this.writer = writer;
-        this.context = IRINamespaceContext.newInstance();
-        this.resourceContext = new SimpleResourceContext();
+        this.resourceContext = (C)new SimpleResourceContext();
         resourceContext.newResource();
-        this.byteCounter = 0L;
-        this.idCounter = 0L;
-        this.translatePicaSortMarker = null;
     }
 
     public Writer getWriter() {
         return writer;
     }
 
-    public long getByteCounter() {
-        return byteCounter;
-    }
-
-    public long getIdentifierCounter() {
-        return idCounter;
-    }
-
-    public NTripleWriter translatePicaSortMarker(String marker) {
-        this.translatePicaSortMarker = marker;
-        return this;
-    }
-
     @Override
-    public NTripleWriter<S,P,O> newIdentifier(IRI iri) {
+    public NTripleWriter<S, P, O, C>  newIdentifier(IRI iri) {
         if (!iri.equals(resourceContext.getResource().id())) {
             try {
                 write(resourceContext);
-                idCounter++;
                 resourceContext.newResource();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
@@ -114,51 +86,41 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
     }
 
     @Override
-    public TripleListener<S, P, O> begin() {
+    public NTripleWriter<S, P, O, C> begin() {
         return this;
     }
 
     @Override
-    public NTripleWriter<S,P,O> triple(Triple<S, P, O> triple) {
+    public NTripleWriter<S, P, O, C> triple(Triple<S, P, O> triple) {
         resourceContext.getResource().add(triple);
         return this;
     }
 
     @Override
-    public TripleListener<S, P, O> end() {
+    public NTripleWriter<S, P, O, C> end() {
         return this;
     }
 
     @Override
-    public NTripleWriter<S,P,O> startPrefixMapping(String prefix, String uri) {
-        context.addNamespace(prefix, uri);
+    public NTripleWriter<S, P, O, C> startPrefixMapping(String prefix, String uri) {
+        namespaceContext.addNamespace(prefix, uri);
         return this;
     }
 
     @Override
-    public NTripleWriter<S, P, O> endPrefixMapping(String prefix) {
+    public NTripleWriter<S, P, O, C> endPrefixMapping(String prefix) {
         // we don't remove name spaces. It's troubling RDF serializations.
-        //context.removeNamespace(prefix);
+        //namespaceContext.removeNamespace(prefix);
         return this;
     }
 
-    public void close() {
-        try {
-            write(resourceContext);
-            idCounter++;
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
-
     @Override
-    public NTripleWriter<S,P,O> write(ResourceContext<Resource<S, P, O>> resourceContext) throws IOException {
+    public void write(C resourceContext) throws IOException {
         if (resourceContext.getResource() != null) {
             StringBuilder sb = new StringBuilder();
             for (Triple<S, P, O> t : resourceContext.getResource()) {
                 sb.append(writeStatement(t));
             }
-            byteCounter += sb.length();
             writer.write(sb.toString());
         } else if (resourceContext.getResources() != null) {
             for (Resource<S, P, O> resource : resourceContext.getResources()) {
@@ -166,11 +128,14 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
                 for (Triple<S, P, O> t : resource) {
                     sb.append(writeStatement(t));
                 }
-                byteCounter += sb.length();
                 writer.write(sb.toString());
             }
         }
-        return this;
+    }
+
+    @Override
+    public void flush() throws IOException {
+        writer.flush();
     }
 
     public String writeStatement(Triple<S, P, O> stmt) throws IOException {
@@ -183,7 +148,7 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
     public String writeSubject(S subject) {
         return subject.isBlank() ?
                 subject.toString() :
-                "<" + escape(subject.toString()) + ">" ;
+                "<" + escape(subject.toString()) + ">";
     }
 
     public String writePredicate(P predicate) {
@@ -204,9 +169,7 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
             return writeSubject(subject);
         } else if (object instanceof Literal) {
             Literal<?> value = (Literal<?>) object;
-            if (translatePicaSortMarker != null) {
-                value = recognizeSortOrder(value, translatePicaSortMarker);
-            }
+            value = processSortLanguage(value);
             String s = "\"" + escape(value.object().toString()) + "\"";
             String lang = value.language();
             IRI type = value.type();
@@ -218,32 +181,12 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
             }
             return s;
         } else if (object instanceof IdentifiableNode) {
-            IdentifiableNode node = (IdentifiableNode)object;
+            IdentifiableNode node = (IdentifiableNode) object;
             return node.isBlank() ?
                     node.toString() :
-                    "<" + escape(node.toString()) + ">" ;
+                    "<" + escape(node.toString()) + ">";
         }
         return "<???>";
-    }
-
-    /**
-     * see http://www.w3.org/International/articles/language-tags/
-     *
-     * @param literal
-     * @param language
-     * @return
-     */
-    private Literal recognizeSortOrder(Literal literal, String language) {
-        String value = literal.object().toString();
-        if (value.indexOf('@') == 0) {
-            literal.object(value.substring(1));
-        }
-        int pos = value.indexOf(" @"); // PICA mechanical word order marker
-        if (pos > 0) {
-            literal.object('\u0098' + value.substring(0,pos+1) + '\u009c' + value.substring(pos+2))
-                    .language(language);
-        }
-        return literal;
     }
 
     private String escape(String buffer) {
@@ -282,4 +225,5 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
         }
         return sb.toString();
     }
+
 }

@@ -34,7 +34,6 @@ package org.xbib.elements.marc.dialects.pica;
 import org.xbib.elements.AbstractElementBuilder;
 import org.xbib.elements.context.ResourceContextFactory;
 import org.xbib.analyzer.dublincore.DublinCoreProperties;
-import org.xbib.rdf.context.ContextResourceOutput;
 import org.xbib.marc.FieldCollection;
 
 public class PicaElementBuilder
@@ -49,14 +48,8 @@ public class PicaElementBuilder
     };
 
     @Override
-    public ResourceContextFactory<PicaContext> contextFactory() {
+    public ResourceContextFactory<PicaContext> resourceContextFactory() {
         return contextFactory;
-    }
-
-    @Override
-    public PicaElementBuilder addOutput(ContextResourceOutput output) {
-        super.addOutput(output);
-        return this;
     }
 
 }

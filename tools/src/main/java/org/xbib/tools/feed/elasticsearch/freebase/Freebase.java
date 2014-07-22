@@ -130,7 +130,7 @@ public class Freebase extends Feeder {
 
         private void flush() {
             try {
-                sink.output(context, context.getResource(), context.getContentBuilder());
+                sink.write(context);
             } catch (IOException e) {
                 logger.error("flush failed: {}", e.getMessage(), e);
             }

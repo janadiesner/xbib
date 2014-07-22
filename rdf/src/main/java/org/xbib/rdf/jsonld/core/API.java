@@ -1,4 +1,3 @@
-
 package org.xbib.rdf.jsonld.core;
 
 import org.xbib.rdf.jsonld.utils.Obj;
@@ -58,10 +57,9 @@ public class API implements Constants {
 
     /**
      * Compaction Algorithm
-     * 
+     * <p>
      * http://json-ld.org/spec/latest/json-ld-api/#compaction-algorithm
-     * 
-     * 
+     *
      * @param activeCtx
      * @param activeProperty
      * @param element
@@ -69,7 +67,7 @@ public class API implements Constants {
      * @return
      */
     public Object compact(Context activeCtx, String activeProperty, Object element,
-            boolean compactArrays) throws JsonLdError {
+                          boolean compactArrays) throws JsonLdError {
         // 2)
         if (element instanceof List) {
             // 2.1)
@@ -303,7 +301,7 @@ public class API implements Constants {
                         // 7.6.5.2)
                         if ("@language".equals(container)
                                 && (compactedItem instanceof Map && ((Map<String, Object>) compactedItem)
-                                        .containsKey("@value"))) {
+                                .containsKey("@value"))) {
                             compactedItem = ((Map<String, Object>) compactedItem).get("@value");
                         }
 
@@ -329,7 +327,7 @@ public class API implements Constants {
                         // 7.6.6.1)
                         final Boolean check = (!compactArrays || "@set".equals(container)
                                 || "@list".equals(container) || "@list".equals(expandedProperty) || "@graph"
-                                    .equals(expandedProperty))
+                                .equals(expandedProperty))
                                 && (!(compactedItem instanceof List));
                         if (check) {
                             final List<Object> tmp = new ArrayList<Object>();
@@ -378,9 +376,9 @@ public class API implements Constants {
 
     /**
      * Expansion Algorithm
-     * 
+     * <p>
      * http://json-ld.org/spec/latest/json-ld-api/#expansion-algorithm
-     * 
+     *
      * @param activeCtx
      * @param activeProperty
      * @param element
@@ -406,7 +404,7 @@ public class API implements Constants {
                 if (("@list".equals(activeProperty) || "@list".equals(activeCtx
                         .getContainer(activeProperty)))
                         && (v instanceof List || (v instanceof Map && ((Map<String, Object>) v)
-                                .containsKey("@list")))) {
+                        .containsKey("@list")))) {
                     throw new JsonLdError(Error.LIST_OF_LISTS, "lists of lists are not permitted.");
                 }
                 // 3.2.3)
@@ -608,7 +606,7 @@ public class API implements Constants {
                                     // 7.4.11.3.3.1.1)
                                     if (item instanceof Map
                                             && (((Map<String, Object>) item).containsKey("@value") || ((Map<String, Object>) item)
-                                                    .containsKey("@list"))) {
+                                            .containsKey("@list"))) {
                                         throw new JsonLdError(Error.INVALID_REVERSE_PROPERTY_VALUE);
                                     }
                                     // 7.4.11.3.3.1.2)
@@ -736,7 +734,7 @@ public class API implements Constants {
                         // 7.10.4.1)
                         if (item instanceof Map
                                 && (((Map<String, Object>) item).containsKey("@value") || ((Map<String, Object>) item)
-                                        .containsKey("@list"))) {
+                                .containsKey("@list"))) {
                             throw new JsonLdError(Error.INVALID_REVERSE_PROPERTY_VALUE);
                         }
                         // 7.10.4.2)
@@ -839,7 +837,7 @@ public class API implements Constants {
                 // 12.1)
                 if (result != null
                         && (result.size() == 0 || result.containsKey("@value") || result
-                                .containsKey("@list"))) {
+                        .containsKey("@list"))) {
                     result = null;
                 }
                 // 12.2)
@@ -864,7 +862,7 @@ public class API implements Constants {
         return expand(activeCtx, null, element);
     }
 
-    /***
+    /**
      * _____ _ _ _ _ _ _ _ _ | ___| | __ _| |_| |_ ___ _ __ / \ | | __ _ ___ _
      * __(_) |_| |__ _ __ ___ | |_ | |/ _` | __| __/ _ \ '_ \ / _ \ | |/ _` |/ _
      * \| '__| | __| '_ \| '_ ` _ \ | _| | | (_| | |_| || __/ | | | / ___ \| |
@@ -882,7 +880,7 @@ public class API implements Constants {
     }
 
     void generateNodeMap(Object element, Map<String, Object> nodeMap, String activeGraph,
-            Object activeSubject, String activeProperty, Map<String, Object> list)
+                         Object activeSubject, String activeProperty, Map<String, Object> list)
             throws JsonLdError {
         // 1)
         if (element instanceof List) {
@@ -978,8 +976,8 @@ public class API implements Constants {
             //node = (Map<String, Object>) graph.get(id);
             // 6.5)
             if (activeSubject instanceof Map) {
-            	// 6.5.1)
-            	JsonLdUtils.mergeValue((Map<String, Object>) graph.get(id), activeProperty, activeSubject);
+                // 6.5.1)
+                JsonLdUtils.mergeValue((Map<String, Object>) graph.get(id), activeProperty, activeSubject);
             }
             // 6.6)
             else if (activeProperty != null) {
@@ -1017,8 +1015,8 @@ public class API implements Constants {
             }
             // 6.9)
             if (elem.containsKey("@reverse")) {
-            	// 6.9.1)
-            	final Map<String, Object> referencedNode = new LinkedHashMap<String, Object>();
+                // 6.9.1)
+                final Map<String, Object> referencedNode = new LinkedHashMap<String, Object>();
                 referencedNode.put("@id", id);
                 // 6.9.2+6.9.4)
                 final Map<String, Object> reverseMap = (Map<String, Object>) elem
@@ -1074,7 +1072,7 @@ public class API implements Constants {
         return generateBlankNodeIdentifier(null);
     }
 
-    /***
+    /**
      * _____ _ _ _ _ _ _ | ___| __ __ _ _ __ ___ (_)_ __ __ _ / \ | | __ _ ___ _
      * __(_) |_| |__ _ __ ___ | |_ | '__/ _` | '_ ` _ \| | '_ \ / _` | / _ \ |
      * |/ _` |/ _ \| '__| | __| '_ \| '_ ` _ \ | _|| | | (_| | | | | | | | | | |
@@ -1107,12 +1105,9 @@ public class API implements Constants {
 
     /**
      * Performs JSON-LD framing.
-     * 
-     * @param input
-     *            the expanded JSON-LD to frame.
-     * @param frame
-     *            the expanded JSON-LD frame to use.
      *
+     * @param input the expanded JSON-LD to frame.
+     * @param frame the expanded JSON-LD frame to use.
      * @return the framed output.
      * @throws
      */
@@ -1146,21 +1141,16 @@ public class API implements Constants {
 
     /**
      * Frames subjects according to the given frame.
-     * 
-     * @param state
-     *            the current framing state.
-     * @param nodes
-     *            the subjects to filter.
-     * @param frame
-     *            the frame.
-     * @param parent
-     *            the parent subject or top-level array.
-     * @param property
-     *            the parent property, initialized to null.
+     *
+     * @param state    the current framing state.
+     * @param nodes    the subjects to filter.
+     * @param frame    the frame.
+     * @param parent   the parent subject or top-level array.
+     * @param property the parent property, initialized to null.
      * @throws org.xbib.rdf.jsonld.core.JsonLdError
      */
     private void frame(FramingContext state, Map<String, Object> nodes, Map<String, Object> frame,
-            Object parent, String property) throws JsonLdError {
+                       Object parent, String property) throws JsonLdError {
 
         // filter out subjects that match the frame
         final Map<String, Object> matches = filterNodes(state, nodes, frame);
@@ -1359,11 +1349,9 @@ public class API implements Constants {
 
     /**
      * Removes an existing embed.
-     * 
-     * @param state
-     *            the current framing state.
-     * @param id
-     *            the @id of the embed to remove.
+     *
+     * @param state the current framing state.
+     * @param id    the @id of the embed to remove.
      */
     private static void removeEmbed(FramingContext state, String id) {
         // get existing embed
@@ -1412,7 +1400,7 @@ public class API implements Constants {
     }
 
     private Map<String, Object> filterNodes(FramingContext state, Map<String, Object> nodes,
-            Map<String, Object> frame) throws JsonLdError {
+                                            Map<String, Object> frame) throws JsonLdError {
         final Map<String, Object> rval = new LinkedHashMap<String, Object>();
         for (final String id : nodes.keySet()) {
             final Map<String, Object> element = (Map<String, Object>) nodes.get(id);
@@ -1424,7 +1412,7 @@ public class API implements Constants {
     }
 
     private boolean filterNode(FramingContext state, Map<String, Object> node,
-            Map<String, Object> frame) throws JsonLdError {
+                               Map<String, Object> frame) throws JsonLdError {
         final Object types = frame.get("@type");
         if (types != null) {
             if (!(types instanceof List)) {
@@ -1461,18 +1449,14 @@ public class API implements Constants {
 
     /**
      * Adds framing output to the given parent.
-     * 
-     * @param state
-     *            the current framing state.
-     * @param parent
-     *            the parent to add to.
-     * @param property
-     *            the parent property.
-     * @param output
-     *            the output to add.
+     *
+     * @param state    the current framing state.
+     * @param parent   the parent to add to.
+     * @param property the parent property.
+     * @param output   the output to add.
      */
     private static void addFrameOutput(FramingContext state, Object parent, String property,
-            Object output) {
+                                       Object output) {
         if (parent instanceof Map) {
             List<Object> prop = (List<Object>) ((Map<String, Object>) parent).get(property);
             if (prop == null) {
@@ -1488,18 +1472,14 @@ public class API implements Constants {
     /**
      * Embeds values for the given subject and property into the given output
      * during the framing algorithm.
-     * 
-     * @param state
-     *            the current framing state.
-     * @param element
-     *            the subject.
-     * @param property
-     *            the property.
-     * @param output
-     *            the output.
+     *
+     * @param state    the current framing state.
+     * @param element  the subject.
+     * @param property the property.
+     * @param output   the output.
      */
     private void embedValues(FramingContext state, Map<String, Object> element, String property,
-            Object output) {
+                             Object output) {
         // embed subject properties in output
         final List<Object> objects = (List<Object>) element.get(property);
         for (Object o : objects) {
@@ -1606,9 +1586,8 @@ public class API implements Constants {
 
     /**
      * Converts RDF statements into JSON-LD.
-     * 
-     * @param dataset
-     *            the RDF statements.
+     *
+     * @param dataset the RDF statements.
      * @throws JsonLdError
      */
     public List<Object> fromRDF(final RDFDataset dataset) throws JsonLdError {
@@ -1779,7 +1758,7 @@ public class API implements Constants {
 
     /**
      * Adds RDF triples for each graph in the given node map to an RDF dataset.
-     * 
+     *
      * @return the RDF dataset.
      * @throws JsonLdError
      */
@@ -1807,7 +1786,6 @@ public class API implements Constants {
 
     /**
      * Performs RDF normalization on the given JSON-LD input.
-     *
      */
     public Object normalize(Map<String, Object> dataset) throws JsonLdError {
         // create quads and map bnodes to their associated quads
@@ -1835,11 +1813,11 @@ public class API implements Constants {
                 }
                 quads.add(quad);
 
-                final String[] attrs = new String[] { "subject", "object", "name" };
+                final String[] attrs = new String[]{"subject", "object", "name"};
                 for (final String attr : attrs) {
                     if (quad.containsKey(attr)
                             && "blank node".equals(((Map<String, Object>) quad.get(attr))
-                                    .get("type"))) {
+                            .get("type"))) {
                         final String id = (String) ((Map<String, Object>) quad.get(attr))
                                 .get("value");
                         if (!bnodes.containsKey(id)) {

@@ -31,6 +31,7 @@
  */
 package org.xbib.tools.feed.elasticsearch.zdb;
 
+import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -42,9 +43,7 @@ import org.xbib.marc.xml.MarcXmlEventConsumer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.ContentBuilder;
-import org.xbib.rdf.context.CountableContextResourceOutput;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.tools.Feeder;
 import org.xbib.tools.util.MarcXmlTarReader;
 
@@ -76,7 +75,9 @@ public final class FromMarcXmlTar extends Feeder {
                 .detectUnknownKeys(settings.getAsBoolean("detect", false))
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
-                        return new MARCElementBuilder().addOutput(new OurContextResourceOutput());
+                        MARCElementBuilder builder = new MARCElementBuilder();
+                        builder.addWriter(new MarcContextResourceOutput());
+                        return builder;
                     }
                 });
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
@@ -102,17 +103,17 @@ public final class FromMarcXmlTar extends Feeder {
         }
     }
 
-    private class OurContextResourceOutput extends CountableContextResourceOutput<ResourceContext, Resource> {
+    private class MarcContextResourceOutput extends AbstractResourceContextWriter<MARCContext, Resource> {
 
         @Override
-        public void output(ResourceContext context, Resource resource, ContentBuilder contentBuilder) throws IOException {
+        public void write(MARCContext context) throws IOException {
             IRI id = context.getResource().id();
             context.getResource().id(IRI.builder()
                     .scheme("http")
                     .host(settings.get("index"))
                     .query(settings.get("type"))
                     .fragment(id.getFragment()).build());
-            sink.output(context, context.getResource(), contentBuilder);
+            sink.write(context);
         }
     }
 

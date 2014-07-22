@@ -52,7 +52,6 @@ public abstract class DublinCoreElement implements Element {
     @Override
     public DublinCoreElement begin() {
         return this;
-        
     }
     
     @Override

@@ -1,13 +1,14 @@
 package org.xbib.rdf.jsonld;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.xbib.rdf.jsonld.utils.ActiveContext;
 import org.xbib.rdf.jsonld.utils.JSONLDUtils;
 import org.xbib.rdf.jsonld.utils.Options;
 import org.xbib.rdf.jsonld.utils.UniqueNamer;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class API implements JsonLd {
 
@@ -171,6 +172,7 @@ public class API implements JsonLd {
     public static Object frame(Object input, Object frame) throws JSONLDProcessingError {
         return frame(input, frame, new Options(""));
     }
+
     /**
      * Performs JSON-LD framing.
      *
@@ -267,17 +269,17 @@ public class API implements JsonLd {
     /**
      * Outputs the RDF statements found in the given JSON-LD object.
      *
-     * @param input         the JSON-LD input.
-     * @param opts          the options to use:
-     *                      [base] the base IRI to use.
-     *                      [format] the format to use to output a string:
-     *                      'application/nquads' for N-Quads (default).
-     *                      [collate] true to output all statements at once (in an array
-     *                      or as a formatted string), false to output one triple at
-     *                      a time (default).
-     *                      [resolver(url, callback(err, jsonCtx))] the URL resolver to use.
+     * @param input                the JSON-LD input.
+     * @param opts                 the options to use:
+     *                             [base] the base IRI to use.
+     *                             [format] the format to use to output a string:
+     *                             'application/nquads' for N-Quads (default).
+     *                             [collate] true to output all statements at once (in an array
+     *                             or as a formatted string), false to output one triple at
+     *                             a time (default).
+     *                             [resolver(url, callback(err, jsonCtx))] the URL resolver to use.
      * @param callback(err,triple) called when a triple is output, with the
-     *                      last triple as null.
+     *                             last triple as null.
      */
     public static void toRDF(Object input, Options opts, JSONLDTripleCallback callback) throws JSONLDProcessingError {
         if (opts == null) {
@@ -307,7 +309,7 @@ public class API implements JsonLd {
     public static Object fromRDF(Object input, JSONLDSerializer serializer) throws JSONLDProcessingError {
         return fromRDF(input, new Options(""), serializer);
     }
-    
+
     public static Object fromRDF(Object input, Options opts, JSONLDSerializer serializer) throws JSONLDProcessingError {
         if (opts == null) {
             return null;
@@ -350,7 +352,7 @@ public class API implements JsonLd {
         Map<String, Object> ctx = new HashMap();
         processor.generateSimplifyContext(expanded, ctx);
 
-        Map<String,Object> tmp = new HashMap();
+        Map<String, Object> tmp = new HashMap();
         tmp.put(JSONLD_CONTEXT, ctx);
 
         // add optimize flag to opts (clone the opts so we don't change the flag for the base processor)

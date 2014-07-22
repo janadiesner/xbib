@@ -25,7 +25,6 @@ public class JSONLDUtils implements JsonLd {
      *
      * @param key the value to check.
      * @param ctx the active context to check against.
-     *
      * @return true if the value is a keyword, false if not.
      */
     public static boolean isKeyword(String key, Map<String, Object> ctx) {
@@ -62,17 +61,17 @@ public class JSONLDUtils implements JsonLd {
      * Adds a value to a subject. If the subject already has the value, it will
      * not be added. If the value is an array, all values in the array will be
      * added.
-     *
+     * <p>
      * Note: If the value is a subject that already exists as a property of the
      * given subject, this method makes no attempt to deeply merge properties.
      * Instead, the value will not be added.
      *
-     * @param subject the subject to add the value to.
-     * @param property the property that relates the value to the subject.
-     * @param value the value to add.
+     * @param subject         the subject to add the value to.
+     * @param property        the property that relates the value to the subject.
+     * @param value           the value to add.
      * @param propertyIsArray true if the property is always an array, false if
-     * not (default: false).
-     * @param allowDuplicate true if the property is a
+     *                        not (default: false).
+     * @param allowDuplicate  true if the property is a
      * @list, false if not (default: false).
      */
     public static void addValue(Map<String, Object> subject, String property, Object value, boolean propertyIsArray, boolean allowDuplicate) {
@@ -116,10 +115,9 @@ public class JSONLDUtils implements JsonLd {
     /**
      * Determines if the given value is a property of the given subject.
      *
-     * @param subject the subject to check.
+     * @param subject  the subject to check.
      * @param property the property to check.
-     * @param value the value to check.
-     *
+     * @param value    the value to check.
      * @return true if the value exists, false if not.
      */
     public static boolean hasValue(Map<String, Object> subject, String property, Object value) {
@@ -156,18 +154,16 @@ public class JSONLDUtils implements JsonLd {
     /**
      * Compares two JSON-LD values for equality. Two JSON-LD values will be
      * considered equal if:
-     *
+     * <p>
      * 1. They are both primitives of the same type and value. 2. They are both
      *
+     * @param v1 the first value.
+     * @param v2 the second value.
+     * @return true if v1 and v2 are considered equal, false if not.
      * @values with the same @value,
      * @type, and
      * @language, OR 3. They both have
      * @ids they are the same.
-     *
-     * @param v1 the first value.
-     * @param v2 the second value.
-     *
-     * @return true if v1 and v2 are considered equal, false if not.
      */
     public static boolean compareValues(Object v1, Object v2) {
         if (v1.equals(v2)) {
@@ -190,21 +186,21 @@ public class JSONLDUtils implements JsonLd {
     }
 
     public static void removeValue(Map<String, Object> subject, String property,
-            Map<String, Object> value) {
+                                   Map<String, Object> value) {
         removeValue(subject, property, value, false);
     }
 
     /**
      * Removes a value from a subject.
      *
-     * @param subject the subject.
-     * @param property the property that relates the value to the subject.
-     * @param value the value to remove.
+     * @param subject         the subject.
+     * @param property        the property that relates the value to the subject.
+     * @param value           the value to remove.
      * @param propertyIsArray true if the property is always an array, false if
-     * not (default: false).
+     *                        not (default: false).
      */
     public static void removeValue(Map<String, Object> subject, String property,
-            Map<String, Object> value, boolean propertyIsArray) {
+                                   Map<String, Object> value, boolean propertyIsArray) {
         // filter out value
         List<Object> values = new ArrayList<Object>();
         if (subject.get(property) instanceof List) {
@@ -232,7 +228,6 @@ public class JSONLDUtils implements JsonLd {
      * Returns true if the given value is a blank node.
      *
      * @param v the value to check.
-     *
      * @return true if the value is a blank node, false if not.
      */
     public static boolean isBlankNode(Object v) {
@@ -254,7 +249,6 @@ public class JSONLDUtils implements JsonLd {
      * Returns true if the given value is a subject with properties.
      *
      * @param v the value to check.
-     *
      * @return true if the value is a subject with properties, false if not.
      */
     public static boolean isSubject(Object v) {
@@ -272,7 +266,6 @@ public class JSONLDUtils implements JsonLd {
      * Returns true if the given value is a subject reference.
      *
      * @param v the value to check.
-     *
      * @return true if the value is a subject reference, false if not.
      */
     public static boolean isSubjectReference(Object v) {
@@ -285,14 +278,13 @@ public class JSONLDUtils implements JsonLd {
     /**
      * Resolves external
      *
+     * @param input the JSON-LD input with possible contexts. resolver (url,
+     *              callback(err, jsonCtx)) the URL resolver to use. callback (err, input)
+     *              called once the operation completes.
+     * @throws org.xbib.rdf.jsonld.JSONLDProcessingError
      * @context URLs using the given URL resolver. Each instance of
      * @context in the input that refers to a URL will be replaced with the JSON
      * @context found at that URL.
-     *
-     * @param input the JSON-LD input with possible contexts. resolver (url,
-     * callback(err, jsonCtx)) the URL resolver to use. callback (err, input)
-     * called once the operation completes.
-     * @throws org.xbib.rdf.jsonld.JSONLDProcessingError
      */
     public static void resolveContextUrls(Object input) throws JSONLDProcessingError {
         resolve(input, new HashMap<String, Object>());
@@ -369,18 +361,16 @@ public class JSONLDUtils implements JsonLd {
     /**
      * Finds all
      *
-     * @context URLs in the given JSON-LD input.
-     *
-     * @param input the JSON-LD input.
-     * @param urls a map of URLs (url => false/
-     * @contexts).
+     * @param input   the JSON-LD input.
+     * @param urls    a map of URLs (url => false/
      * @param replace true to replace the URLs in the given input with the
-     * @contexts from the urls map, false not to.
-     *
      * @return true if new URLs to resolve were found, false if not.
+     * @context URLs in the given JSON-LD input.
+     * @contexts).
+     * @contexts from the urls map, false not to.
      */
     private static boolean findContextUrls(Object input,
-            Map<String, Object> urls, Boolean replace) {
+                                           Map<String, Object> urls, Boolean replace) {
         int count = urls.size();
         if (input instanceof List) {
             for (Object i : (List) input) {
@@ -462,8 +452,8 @@ public class JSONLDUtils implements JsonLd {
         }
         return rval;
     }
-    
-   /**
+
+    /**
      * prepends the iri to the base uri and normalizes that URI
      *
      * @param base
@@ -496,7 +486,7 @@ public class JSONLDUtils implements JsonLd {
                         // make sure we don't remove the first element ""
                         if (i > 1) {
                             tmp = pathelems.remove(i - 1);
-                            i = - 2;
+                            i = -2;
                         } else {
                             --i;
                         }
@@ -519,6 +509,6 @@ public class JSONLDUtils implements JsonLd {
         }
 
     }
-    
-    
+
+
 }

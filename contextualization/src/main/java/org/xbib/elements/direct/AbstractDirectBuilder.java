@@ -31,11 +31,11 @@
  */
 package org.xbib.elements.direct;
 
-import org.xbib.rdf.context.ContextResourceOutput;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.context.ResourceContextWriter;
 
 import java.io.IOException;
 import java.util.List;
@@ -56,7 +56,7 @@ public abstract class AbstractDirectBuilder<K, V, C extends ResourceContext<Reso
 
     private final ThreadLocal<C> contexts = new ThreadLocal<C>();
 
-    private final List<ContextResourceOutput> outputs = newLinkedList();
+    private final List<ResourceContextWriter> writers = newLinkedList();
 
     @Override
     public void begin() {
@@ -69,9 +69,9 @@ public abstract class AbstractDirectBuilder<K, V, C extends ResourceContext<Reso
     public void end() {
         C context = context();
         context.beforeOutput();
-        for (ContextResourceOutput output : outputs) {
+        for (ResourceContextWriter output : writers) {
             try {
-               output.output(context, context.getResource(), context.getContentBuilder());
+               output.write(context);
             } catch (IOException e) {
                 logger.error("output failed: " + e.getMessage(), e);
             }
@@ -85,8 +85,8 @@ public abstract class AbstractDirectBuilder<K, V, C extends ResourceContext<Reso
     }
 
     @Override
-    public AbstractDirectBuilder<K, V, C> addOutput(ContextResourceOutput output) {
-        outputs.add(output);
+    public AbstractDirectBuilder<K, V, C> addWriter(ResourceContextWriter writer) {
+        writers.add(writer);
         return this;
     }
 

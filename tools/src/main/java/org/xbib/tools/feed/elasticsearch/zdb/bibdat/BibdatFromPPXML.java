@@ -47,8 +47,7 @@ import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.ContentBuilder;
-import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.tools.Feeder;
 import org.xml.sax.InputSource;
 
@@ -88,7 +87,9 @@ public final class BibdatFromPPXML extends Feeder {
                 .detectUnknownKeys(settings.getAsBoolean("detect", false))
                 .start(new PicaElementBuilderFactory() {
                     public PicaElementBuilder newBuilder() {
-                        return new PicaElementBuilder().addOutput(new OurContextResourceOutput());
+                        PicaElementBuilder builder = new PicaElementBuilder();
+                        builder.addWriter(new PicaContextResourceOutput());
+                        return builder;
                     }
                 });
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
@@ -140,14 +141,13 @@ public final class BibdatFromPPXML extends Feeder {
         }
     }
 
-    private class OurContextResourceOutput extends CountableContextResourceOutput<PicaContext, Resource> {
+    private class PicaContextResourceOutput extends AbstractResourceContextWriter<PicaContext, Resource> {
 
         @Override
-        public void output(PicaContext context, Resource resource, ContentBuilder contentBuilder) throws IOException {
+        public void write(PicaContext context) throws IOException {
             context.getResource().id(IRI.builder().host(settings.get("index")).query(settings.get("type"))
                     .fragment(context.getID()).build());
-            sink.output(context, context.getResource(), context.getContentBuilder());
-            counter.incrementAndGet();
+            sink.write(context);
         }
 
     }

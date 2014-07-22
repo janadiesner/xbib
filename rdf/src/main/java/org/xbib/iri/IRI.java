@@ -31,13 +31,9 @@
  */
 package org.xbib.iri;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import org.xbib.scheme.HttpScheme;
+import org.xbib.scheme.Scheme;
+import org.xbib.scheme.SchemeRegistry;
 import org.xbib.text.CharUtils;
 import org.xbib.text.CharUtils.Profile;
 import org.xbib.text.InvalidCharacterException;
@@ -45,6 +41,13 @@ import org.xbib.text.Nameprep;
 import org.xbib.text.Normalizer;
 import org.xbib.text.UrlEncoding;
 import org.xbib.text.data.UnicodeCharacterDatabase;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class IRI implements Cloneable, Comparable<IRI> {
 
@@ -69,7 +72,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
     public static class Builder {
 
         protected Scheme schemeClass;
-        private String scheme;
+        private String prefix;
         private String schemeSpecificPart;
         private String authority;
         private String userinfo;
@@ -83,7 +86,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
         }
 
         public Builder scheme(String scheme) {
-            this.scheme = scheme;
+            this.prefix = scheme;
             this.schemeClass = SchemeRegistry.getInstance().getScheme(scheme);
             return this;
         }
@@ -93,16 +96,16 @@ public class IRI implements Cloneable, Comparable<IRI> {
             return this;
         }
 
-        public Builder curi(String scheme, String path) {
-            this.scheme = scheme;
+        public Builder curie(String prefix, String path) {
+            this.prefix = prefix;
             this.path = path;
             return this;
         }
 
-        public Builder curi(String schemeAndPath) {
+        public Builder curie(String schemeAndPath) {
             int pos = schemeAndPath.indexOf(':');
-            this.scheme = pos > 0 ? schemeAndPath.substring(0,pos) : null;
-            this.path = pos > 0 ? schemeAndPath.substring(pos+1) : schemeAndPath;
+            this.prefix = pos > 0 ? schemeAndPath.substring(0, pos) : null;
+            this.path = pos > 0 ? schemeAndPath.substring(pos + 1) : schemeAndPath;
             return this;
         }
 
@@ -143,16 +146,16 @@ public class IRI implements Cloneable, Comparable<IRI> {
 
         public IRI build() {
             return schemeSpecificPart != null ?
-                    new IRI(scheme, schemeSpecificPart, fragment) :
+                    new IRI(prefix, schemeSpecificPart, fragment) :
                     new IRI(schemeClass,
-                    scheme,
-                    authority,
-                    userinfo,
-                    host,
-                    port,
-                    path,
-                    query,
-                    fragment);
+                            prefix,
+                            authority,
+                            userinfo,
+                            host,
+                            port,
+                            path,
+                            query,
+                            fragment);
         }
 
     }
@@ -183,20 +186,20 @@ public class IRI implements Cloneable, Comparable<IRI> {
         parse(CharUtils.stripBidi(iri));
         build();
     }
-    
+
     public IRI(String iri, Normalizer.Form nf) throws IOException {
         this(Normalizer.normalize(CharUtils.stripBidi(iri), nf).toString());
     }
 
     IRI(Scheme schemeClass,
-            String scheme,
-            String authority,
-            String userinfo,
-            String host,
-            int port,
-            String path,
-            String query,
-            String fragment) {
+        String scheme,
+        String authority,
+        String userinfo,
+        String host,
+        int port,
+        String path,
+        String query,
+        String fragment) {
         this.schemeClass = schemeClass;
         this.scheme = scheme;
         this.authority = authority;
@@ -405,19 +408,10 @@ public class IRI implements Cloneable, Comparable<IRI> {
     private String buildASCIIAuthority() {
         if (schemeClass instanceof HttpScheme) {
             StringBuilder buf = new StringBuilder();
-            buildAuthority(buf, getASCIIUserInfo(),  getASCIIHost(), getPort());
+            buildAuthority(buf, getASCIIUserInfo(), getASCIIHost(), getPort());
             return buf.toString();
         } else {
             return UrlEncoding.encode(authority, Profile.AUTHORITY.filter());
-        }
-    }
-
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            return new IRI(toString()); // not going to happen, but we have to
-            // catch it
         }
     }
 
@@ -449,7 +443,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
                 return c;
             }
         }
-        IRI iri = new IRI(null,
+        return new IRI(null,
                 null,
                 null,
                 null,
@@ -458,11 +452,6 @@ public class IRI implements Cloneable, Comparable<IRI> {
                 normalize(cpath.substring(bpath.length())),
                 c.getQuery(),
                 c.getFragment());
-        return iri;
-    }
-
-    public IRI relativize(IRI iri) {
-        return relativize(this, iri);
     }
 
     public boolean isPathAbsolute() {
@@ -500,7 +489,6 @@ public class IRI implements Cloneable, Comparable<IRI> {
         if (b == null) {
             return c;
         }
-
         if (c.isOpaque() || b.isOpaque()) {
             return c;
         }
@@ -508,7 +496,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
             String cfragment = c.getFragment();
             String bfragment = b.getFragment();
             if ((cfragment == null && bfragment == null) || (cfragment != null && cfragment.equals(bfragment))) {
-                return (IRI) b.clone();
+                return b;
             } else {
                 return new IRI(b.schemeClass, b.getScheme(), b.getAuthority(), b.getUserInfo(), b.getHost(), b.getPort(),
                         normalize(b.getPath()), b.getQuery(), cfragment);
@@ -517,16 +505,15 @@ public class IRI implements Cloneable, Comparable<IRI> {
         if (c.isAbsolute()) {
             return c;
         }
-
         Scheme _scheme = b.schemeClass;
         String scheme = b.scheme;
         String query = c.getQuery();
         String fragment = c.getFragment();
-        String userinfo = null;
-        String authority = null;
-        String host = null;
-        int port = -1;
-        String path = null;
+        String userinfo;
+        String authority;
+        String host;
+        int port;
+        String path;
         if (c.getAuthority() == null) {
             authority = b.getAuthority();
             userinfo = b.getUserInfo();
@@ -545,10 +532,6 @@ public class IRI implements Cloneable, Comparable<IRI> {
 
     public IRI normalize() {
         return normalize(this);
-    }
-
-    public static String normalizeString(String iri) {
-        return normalize(new IRI(iri)).toString();
     }
 
     public static IRI normalize(IRI iri) {
@@ -771,6 +754,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
             throw new IRISyntaxException(e);
         }
     }
+
     private static final Pattern IRIPATTERN =
             Pattern.compile("^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\\?([^#]*))?(?:#(.*))?");
     private static final Pattern AUTHORITYPATTERN =

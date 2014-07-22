@@ -44,7 +44,7 @@ import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.rdfxml.RdfXmlReader;
 import org.xbib.rdf.io.xml.XmlHandler;
@@ -139,7 +139,7 @@ public class FromRdfXml extends Feeder {
                         .query(settings.get("type"))
                         .fragment(identifier).build();
                 resourceContext.getResource().id(iri);
-                sink.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
+                sink.write(resourceContext);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }

@@ -8,7 +8,6 @@ import java.util.Map;
 
 /**
  * http://json-ld.org/spec/latest/json-ld-api/#the-jsonldprocessor-interface
- * 
  */
 public class JsonLdProcessor {
 
@@ -229,7 +228,7 @@ public class JsonLdProcessor {
     /**
      * a registry for RDF Parsers (in this case, JSONLDSerializers) used by
      * fromRDF if no specific serializer is specified and options.format is set.
-     * 
+     * <p>
      * TODO: this would fit better in the document loader class
      */
     private static Map<String, RDFParser> rdfParsers = new LinkedHashMap<String, RDFParser>() {
@@ -250,16 +249,14 @@ public class JsonLdProcessor {
 
     /**
      * Converts an RDF dataset to JSON-LD.
-     * 
-     * @param dataset
-     *            a serialized string of RDF in a format specified by the format
-     *            option or an RDF dataset to convert.
+     *
+     * @param dataset a serialized string of RDF in a format specified by the format
+     *                option or an RDF dataset to convert.
      * @param options the options to use: [format] the format if input is not
-     *        an array: 'application/nquads' for N-Quads (default). [useRdfType]
-     *        true to use rdf:type, false to use @type (default: false).
-     *        [useNativeTypes] true to convert XSD types into native types
-     *        (boolean, integer, double), false not to (default: true).
-     * 
+     *                an array: 'application/nquads' for N-Quads (default). [useRdfType]
+     *                true to use rdf:type, false to use @type (default: false).
+     *                [useNativeTypes] true to convert XSD types into native types
+     *                (boolean, integer, double), false not to (default: true).
      */
     public static Object fromRDF(Object dataset, JsonLdOptions options) throws JsonLdError {
         // handle non specified serializer case
@@ -287,7 +284,6 @@ public class JsonLdProcessor {
 
     /**
      * Uses a specific serializer.
-     * 
      */
     public static Object fromRDF(Object input, JsonLdOptions options, RDFParser parser)
             throws JsonLdError {
@@ -318,18 +314,15 @@ public class JsonLdProcessor {
 
     /**
      * Outputs the RDF dataset found in the given JSON-LD object.
-     * 
-     * @param input
-     *            the JSON-LD input.
-     * @param callback
-     *            A callback that is called when the input has been converted to
-     *            Quads (null to use options.format instead).
-     * @param options the options to use: [base] the base IRI to use. [format]
-     *        the format to use to output a string: 'application/nquads' for
-     *        N-Quads (default). [loadContext(url, callback(err, url, result))]
-     *        the context loader.
-     * @param callback
-     *            (err, dataset) called once the operation completes.
+     *
+     * @param input    the JSON-LD input.
+     * @param callback A callback that is called when the input has been converted to
+     *                 Quads (null to use options.format instead).
+     * @param options  the options to use: [base] the base IRI to use. [format]
+     *                 the format to use to output a string: 'application/nquads' for
+     *                 N-Quads (default). [loadContext(url, callback(err, url, result))]
+     *                 the context loader.
+     * @param callback (err, dataset) called once the operation completes.
      */
     public static Object toRDF(Object input, JSONLDTripleCallback callback, JsonLdOptions options)
             throws JsonLdError {
@@ -386,13 +379,12 @@ public class JsonLdProcessor {
     /**
      * Performs RDF dataset normalization on the given JSON-LD input. The output
      * is an RDF dataset unless the 'format' option is used.
-     * 
-     * @param input
-     *            the JSON-LD input to normalize.
+     *
+     * @param input   the JSON-LD input to normalize.
      * @param options the options to use: [base] the base IRI to use. [format]
-     *        the format if output is a string: 'application/nquads' for
-     *        N-Quads. [loadContext(url, callback(err, url, result))] the
-     *        context loader.
+     *                the format if output is a string: 'application/nquads' for
+     *                N-Quads. [loadContext(url, callback(err, url, result))] the
+     *                context loader.
      * @throws JsonLdError
      */
     public static Object normalize(Object input, JsonLdOptions options) throws JsonLdError {

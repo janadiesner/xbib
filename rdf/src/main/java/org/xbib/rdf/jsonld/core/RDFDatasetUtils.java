@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 import static org.xbib.rdf.jsonld.core.JsonLdUtils.isKeyword;
 import static org.xbib.rdf.jsonld.core.JsonLdUtils.isList;
 import static org.xbib.rdf.jsonld.core.JsonLdUtils.isObject;
@@ -20,12 +19,9 @@ public class RDFDatasetUtils implements Constants {
 
     /**
      * Creates an array of RDF triples for the given graph.
-     * 
-     * @param graph
-     *            the graph to create RDF triples for.
-     * @param namer
-     *            a UniqueNamer for assigning blank node names.
-     * 
+     *
+     * @param graph the graph to create RDF triples for.
+     * @param namer a UniqueNamer for assigning blank node names.
      * @return the array of RDF triples for the given graph.
      */
     @Deprecated
@@ -84,20 +80,15 @@ public class RDFDatasetUtils implements Constants {
     /**
      * Converts a @list value into linked list of blank node RDF triples (an RDF
      * collection).
-     * 
-     * @param list
-     *            the @list value.
-     * @param namer
-     *            a UniqueNamer for assigning blank node names.
-     * @param subject
-     *            the subject for the head of the list.
-     * @param predicate
-     *            the predicate for the head of the list.
-     * @param triples
-     *            the array of triples to append to.
+     *
+     * @param list      the @list value.
+     * @param namer     a UniqueNamer for assigning blank node names.
+     * @param subject   the subject for the head of the list.
+     * @param predicate the predicate for the head of the list.
+     * @param triples   the array of triples to append to.
      */
     private static void listToRDF(List<Object> list, UniqueNamer namer,
-            Map<String, Object> subject, Map<String, Object> predicate, List<Object> triples) {
+                                  Map<String, Object> subject, Map<String, Object> predicate, List<Object> triples) {
         final Map<String, Object> first = new LinkedHashMap<String, Object>();
         first.put("type", "IRI");
         first.put("value", RDF_FIRST);
@@ -145,12 +136,9 @@ public class RDFDatasetUtils implements Constants {
     /**
      * Converts a JSON-LD value object to an RDF literal or a JSON-LD string or
      * node object to an RDF resource.
-     * 
-     * @param item
-     *            the JSON-LD value or node object.
-     * @param namer
-     *            the UniqueNamer to use to assign blank node names.
-     * 
+     *
+     * @param item  the JSON-LD value or node object.
+     * @param namer the UniqueNamer to use to assign blank node names.
      * @return the RDF literal or RDF resource.
      */
     private static Object objectToRDF(Object item, UniqueNamer namer) {
@@ -304,8 +292,8 @@ public class RDFDatasetUtils implements Constants {
                 if (m.group(1) == null) {
                     final String hex = m.group(2) != null ? m.group(2) : m.group(3);
                     final int v = Integer.parseInt(hex, 16);// hex =
-                                                            // hex.replaceAll("^(?:00)+",
-                                                            // "");
+                    // hex.replaceAll("^(?:00)+",
+                    // "");
                     if (v > 0xFFFF) {
                         // deal with UTF-32
                         // Integer v = Integer.parseInt(hex, 16);
@@ -325,33 +313,33 @@ public class RDFDatasetUtils implements Constants {
                 } else {
                     final char c = m.group(1).charAt(0);
                     switch (c) {
-                    case 'b':
-                        uni = "\b";
-                        break;
-                    case 'n':
-                        uni = "\n";
-                        break;
-                    case 't':
-                        uni = "\t";
-                        break;
-                    case 'f':
-                        uni = "\f";
-                        break;
-                    case 'r':
-                        uni = "\r";
-                        break;
-                    case '\'':
-                        uni = "'";
-                        break;
-                    case '\"':
-                        uni = "\"";
-                        break;
-                    case '\\':
-                        uni = "\\";
-                        break;
-                    default:
-                        // do nothing
-                        continue;
+                        case 'b':
+                            uni = "\b";
+                            break;
+                        case 'n':
+                            uni = "\n";
+                            break;
+                        case 't':
+                            uni = "\t";
+                            break;
+                        case 'f':
+                            uni = "\f";
+                            break;
+                        case 'r':
+                            uni = "\r";
+                            break;
+                        case '\'':
+                            uni = "'";
+                            break;
+                        case '\"':
+                            uni = "\"";
+                            break;
+                        case '\\':
+                            uni = "\\";
+                            break;
+                        default:
+                            // do nothing
+                            continue;
                     }
                 }
                 final String pat = Pattern.quote(m.group(0));
@@ -368,15 +356,15 @@ public class RDFDatasetUtils implements Constants {
             final char hi = str.charAt(i);
             if (hi <= 0x8 || hi == 0xB || hi == 0xC || (hi >= 0xE && hi <= 0x1F)
                     || (hi >= 0x7F && hi <= 0xA0) || // 0xA0 is end of
-                                                     // non-printable latin-1
-                                                     // supplement
-                                                     // characters
+                    // non-printable latin-1
+                    // supplement
+                    // characters
                     ((hi >= 0x24F // 0x24F is the end of latin extensions
-                    && !Character.isHighSurrogate(hi))
-                    // TODO: there's probably a lot of other characters that
-                    // shouldn't be escaped that
-                    // fall outside these ranges, this is one example from the
-                    // json-ld tests
+                            && !Character.isHighSurrogate(hi))
+                            // TODO: there's probably a lot of other characters that
+                            // shouldn't be escaped that
+                            // fall outside these ranges, this is one example from the
+                            // json-ld tests
                     )) {
                 rval += String.format("\\u%04x", (int) hi);
             } else if (Character.isHighSurrogate(hi)) {
@@ -385,35 +373,35 @@ public class RDFDatasetUtils implements Constants {
                 rval += String.format("\\U%08x", c);
             } else {
                 switch (hi) {
-                case '\b':
-                    rval += "\\b";
-                    break;
-                case '\n':
-                    rval += "\\n";
-                    break;
-                case '\t':
-                    rval += "\\t";
-                    break;
-                case '\f':
-                    rval += "\\f";
-                    break;
-                case '\r':
-                    rval += "\\r";
-                    break;
-                // case '\'':
-                // rval += "\\'";
-                // break;
-                case '\"':
-                    rval += "\\\"";
-                    // rval += "\\u0022";
-                    break;
-                case '\\':
-                    rval += "\\\\";
-                    break;
-                default:
-                    // just put the char as is
-                    rval += hi;
-                    break;
+                    case '\b':
+                        rval += "\\b";
+                        break;
+                    case '\n':
+                        rval += "\\n";
+                        break;
+                    case '\t':
+                        rval += "\\t";
+                        break;
+                    case '\f':
+                        rval += "\\f";
+                        break;
+                    case '\r':
+                        rval += "\\r";
+                        break;
+                    // case '\'':
+                    // rval += "\\'";
+                    // break;
+                    case '\"':
+                        rval += "\\\"";
+                        // rval += "\\u0022";
+                        break;
+                    case '\\':
+                        rval += "\\\\";
+                        break;
+                    default:
+                        // just put the char as is
+                        rval += hi;
+                        break;
                 }
             }
         }
@@ -422,10 +410,8 @@ public class RDFDatasetUtils implements Constants {
 
     /**
      * Parses RDF in the form of N-Quads.
-     * 
-     * @param input
-     *            the N-Quads input to parse.
-     * 
+     *
+     * @param input the N-Quads input to parse.
      * @return an RDF dataset.
      */
     public static RDFDataset parseNQuads(String input) throws JsonLdError {

@@ -33,16 +33,15 @@ package org.xbib.elements.marc;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
-import org.xbib.rdf.Resource;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.content.ContentBuilder;
 import org.xml.sax.InputSource;
 
 import javax.xml.transform.OutputKeys;
@@ -59,6 +58,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MARCElementsTest extends Assert {
 
@@ -86,10 +86,11 @@ public class MARCElementsTest extends Assert {
         InputStream in = getClass().getResourceAsStream("stb-bonn.mrc");
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         Writer w = new OutputStreamWriter(new FileOutputStream("target/DE-369.xml"), "UTF-8");
-        final CountableContextResourceOutput output = new CountableContextResourceOutput<ResourceContext, Resource>() {
+        final AtomicInteger counter = new AtomicInteger();
+        final ResourceContextWriter output = new AbstractResourceContextWriter() {
 
             @Override
-            public void output(ResourceContext context, Resource resource, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
+            public void write(ResourceContext context) throws IOException {
                 IRI iri = IRI.builder().scheme("http")
                         .host("dummy")
                         .query("dummy")
@@ -98,7 +99,6 @@ public class MARCElementsTest extends Assert {
                 StringWriter sw = new StringWriter();
                 TurtleWriter tw = new TurtleWriter(sw);
                 tw.write(context);
-                //logger.debug("out={}", sw.toString());
             }
 
         };
@@ -106,7 +106,9 @@ public class MARCElementsTest extends Assert {
                 .detectUnknownKeys(true)
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
-                        return new MARCElementBuilder().addOutput(output);
+                        MARCElementBuilder builder = new MARCElementBuilder();
+                        builder.addWriter(output);
+                        return builder;
                     }
                 });
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
@@ -123,7 +125,7 @@ public class MARCElementsTest extends Assert {
         mapper.close();
         // check if increment works
         logger.info("unknown elements = {}", mapper.unknownKeys());
-        assertEquals(8676, output.getCounter());
+        assertEquals(8676, counter.get());
     }
 
 }

@@ -32,9 +32,9 @@
 package org.xbib.rdf;
 
 /**
- *  A triple is a group of a subject, a predicate, and an object.
+ * A triple is a group of a subject, a predicate, and an object.
  */
-public interface Triple<S extends Identifier,P extends Property,O> {
+public interface Triple<S extends Identifier, P extends Property, O> {
 
     S subject();
 

@@ -17,8 +17,9 @@
  */
 package org.xbib.text.language.enums;
 
-import java.util.Locale;
 import org.xbib.text.language.Subtag;
+
+import java.util.Locale;
 
 /**
  * Enum constants used to validate language tags
@@ -72,12 +73,14 @@ public enum Extlang {
     }
 
     public static Extlang valueOf(Subtag subtag) {
-        if (subtag == null)
+        if (subtag == null) {
             return null;
-        if (subtag.getType() == Subtag.Type.PRIMARY)
+        }
+        if (subtag.getType() == Subtag.Type.PRIMARY) {
             return valueOf(subtag.getName().toUpperCase(Locale.US));
-        else
+        } else {
             throw new IllegalArgumentException("Wrong subtag type");
+        }
     }
 
 }

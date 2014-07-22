@@ -9,7 +9,7 @@ public class JSONLDProcessingError extends Exception {
     Map details;
 
     public JSONLDProcessingError(String string, Map<String, Object> details) {
-        this. message = string;
+        this.message = string;
         this.details = details;
     }
 

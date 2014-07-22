@@ -18,12 +18,12 @@ public interface JSONLDTripleCallback {
      * Constructs a triple with a Literal object, which may or may not contain a
      * language and/or a datatype.
      *
-     * @param s The Subject URI
-     * @param p The Predicate URI
-     * @param value The literal value
+     * @param s        The Subject URI
+     * @param p        The Predicate URI
+     * @param value    The literal value
      * @param datatype The literal datatype
      * @param language The literal language (NOTE: may be null if not
-     * specified!)
+     *                 specified!)
      * @return The generated triple, or null to force triple generation to stop
      */
     void triple(String s, String p, String value, String datatype, String language);
@@ -37,5 +37,5 @@ public interface JSONLDTripleCallback {
      * @param key
      * @param value
      */
-   void processIgnored(Object parent, String parentId, String key, Object value);
+    void processIgnored(Object parent, String parentId, String key, Object value);
 }

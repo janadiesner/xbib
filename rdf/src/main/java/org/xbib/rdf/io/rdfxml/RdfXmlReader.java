@@ -31,27 +31,20 @@
  */
 package org.xbib.rdf.io.rdfxml;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 import org.xbib.iri.IRI;
 import org.xbib.iri.IRISyntaxException;
+import org.xbib.rdf.IdentifiableNode;
 import org.xbib.rdf.Identifier;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.io.Triplifier;
-import org.xbib.rdf.io.xml.XmlHandler;
-import org.xbib.rdf.simple.SimpleFactory;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
-import org.xbib.rdf.RDF;
-import org.xbib.rdf.IdentifiableNode;
+import org.xbib.rdf.RDFNS;
+import org.xbib.rdf.Triple;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.io.TripleReader;
+import org.xbib.rdf.io.xml.XmlHandler;
+import org.xbib.rdf.simple.SimpleFactory;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleTriple;
 import org.xbib.xml.XMLUtil;
@@ -62,6 +55,14 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
 /**
  * RdfXmlParser is an admittedly convoluted hand-coded SAX parser for RDF/XML.
  * This is designed to be faster than wrapping Jena's parser and should obviate
@@ -69,24 +70,23 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * arbitrarily large RDF/XML files with minimal memory overhead, since unlike
  * Jena it does not have to store and index all the triples it encounters in a
  * model.
- *
+ * <p>
  * Note that the XMLLiteral datatype is not fully supported.
- *
  */
 public class RdfXmlReader<S extends Identifier, P extends Property, O extends Node>
-        implements RDF, Triplifier<S,P,O> {
+        implements RDFNS, TripleReader<S, P, O> {
 
-    private final SimpleFactory<S,P,O> simpleFactory = SimpleFactory.getInstance();
+    private final SimpleFactory<S, P, O> simpleFactory = SimpleFactory.getInstance();
 
     private XmlHandler xmlHandler = new Handler();
 
-    private TripleListener<S,P,O> listener;
+    private TripleListener<S, P, O> listener;
 
     // counter for blank node generation
     private int bn = 0;
 
     @Override
-    public RdfXmlReader parse(Reader reader, TripleListener<S,P,O> listener) throws IOException {
+    public RdfXmlReader parse(Reader reader, TripleListener<S, P, O> listener) throws IOException {
         this.listener = listener;
         try {
             parse(new InputSource(reader));
@@ -94,7 +94,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
             throw new IOException(ex);
         }
         return this;
-    } 
+    }
 
     public RdfXmlReader parse(InputSource source) throws IOException, SAXException {
         parse(XMLReaderFactory.createXMLReader(), source);
@@ -114,7 +114,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
         return this;
     }
 
-    public RdfXmlReader<S,P,O> setHandler(XmlHandler handler) {
+    public RdfXmlReader<S, P, O> setHandler(XmlHandler handler) {
         this.xmlHandler = handler;
         return this;
     }
@@ -123,7 +123,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
         return xmlHandler;
     }
 
-    public XmlHandler getHandler(TripleListener<S,P,O> listener) {
+    public XmlHandler getHandler(TripleListener<S, P, O> listener) {
         if (listener != null) {
             xmlHandler.setListener(listener);
         }
@@ -263,14 +263,14 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
         } catch (IRISyntaxException e) {
             // illegal URI, try repair
             uri = IRI.create(uriString
-                  .replace(" ", "%20")
-                  .replace("\"", "%22")
-                  .replace("[", "%5B")
-                  .replace("]", "%5D")
-                  .replace("<", "%3C")
-                  .replace(">", "%3E")
-                  .replace("|", "%7C")
-                  .replace("`", "%60")
+                            .replace(" ", "%20")
+                            .replace("\"", "%22")
+                            .replace("[", "%5B")
+                            .replace("]", "%5D")
+                            .replace("<", "%3C")
+                            .replace(">", "%3E")
+                            .replace("|", "%7C")
+                            .replace("`", "%60")
             );
         }
         if (uri.isAbsolute()) {
@@ -281,8 +281,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
     }
 
     /**
-     *
-     *  The complicated logic to determine the subject uri ref
+     * The complicated logic to determine the subject uri ref
      */
     private void getSubjectNode(Frame frame, Stack<Frame> stack, Attributes attrs) throws SAXException {
         String about = attrs.getValue(RDF.toString(), "about");
@@ -417,7 +416,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
         }
 
         @Override
-        public void startPrefixMapping (String prefix, String uri)
+        public void startPrefixMapping(String prefix, String uri)
                 throws SAXException {
             if (listener != null) {
                 listener.startPrefixMapping(prefix, uri);
@@ -425,7 +424,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
         }
 
         @Override
-        public void endPrefixMapping (String prefix)
+        public void endPrefixMapping(String prefix)
                 throws SAXException {
             if (listener != null) {
                 listener.endPrefixMapping(prefix);

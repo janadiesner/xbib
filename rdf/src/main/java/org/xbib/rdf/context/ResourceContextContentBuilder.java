@@ -29,45 +29,13 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.iri;
+package org.xbib.rdf.context;
 
-import org.xbib.text.UrlEncoding;
-import org.xbib.text.CharUtils.Profile;
+import org.xbib.rdf.Resource;
 
-class HttpScheme extends AbstractScheme {
+import java.io.IOException;
 
-    static final String NAME = "http";
-    static final int DEFAULT_PORT = 80;
+public interface ResourceContextContentBuilder<C extends ResourceContext<R>, R extends Resource> {
 
-    public HttpScheme() {
-        super(NAME, DEFAULT_PORT);
-    }
-
-    protected HttpScheme(String name, int port) {
-        super(name, port);
-    }
-
-    @Override
-    public IRI normalize(IRI iri) {
-        int port = (iri.getPort() == getDefaultPort()) ? -1 : iri.getPort();
-        String host = iri.getHost();
-        if (host != null) {
-            host = host.toLowerCase();
-        }
-        return IRI.builder()
-                .scheme(iri.getScheme())
-                .userinfo(iri.getUserInfo())
-                .host(host)
-                .port(port)
-                .path(IRI.normalize(iri.getPath()))
-                .query(UrlEncoding.encode(UrlEncoding.decode(iri.getQuery()), Profile.IQUERY.filter()))
-                .fragment(UrlEncoding.encode(UrlEncoding.decode(iri.getFragment()), Profile.IFRAGMENT.filter()))
-                .build();
-    }
-
-    // use the path normalization coded into the IRI class
-    public String normalizePath(String path) {
-        return null;
-    }
-
+    String build(C context, R resource) throws IOException;
 }

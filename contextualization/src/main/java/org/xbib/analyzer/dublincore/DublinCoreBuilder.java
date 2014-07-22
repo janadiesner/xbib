@@ -33,7 +33,6 @@ package org.xbib.analyzer.dublincore;
 
 import org.xbib.elements.AbstractElementBuilder;
 import org.xbib.elements.context.ResourceContextFactory;
-import org.xbib.rdf.context.ContextResourceOutput;
 
 public class DublinCoreBuilder<K,V>
     extends AbstractElementBuilder<K, V, DublinCoreElement, DublinCoreContext> {
@@ -47,15 +46,10 @@ public class DublinCoreBuilder<K,V>
     };
 
     @Override
-    public ResourceContextFactory<DublinCoreContext> contextFactory() {
+    public ResourceContextFactory<DublinCoreContext> resourceContextFactory() {
         return contextFactory;
     }
-    
-    @Override
-    public DublinCoreBuilder addOutput(ContextResourceOutput output) {
-        super.addOutput(output);
-        return this;
-    }
+
     
     @Override
     public void build(DublinCoreElement element, K key, V value) {

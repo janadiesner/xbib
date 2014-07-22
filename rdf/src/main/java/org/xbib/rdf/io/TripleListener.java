@@ -37,17 +37,17 @@ import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Triple;
 
-public interface TripleListener<S extends Identifier,P extends Property,O extends Node> {
+public interface TripleListener<S extends Identifier, P extends Property, O extends Node> {
 
-    TripleListener<S,P,O> begin();
+    TripleListener<S, P, O> begin();
 
-    TripleListener<S,P,O> startPrefixMapping(String prefix, String uri);
+    TripleListener<S, P, O> startPrefixMapping(String prefix, String uri);
 
-    TripleListener<S,P,O> endPrefixMapping(String prefix);
+    TripleListener<S, P, O> endPrefixMapping(String prefix);
 
-    TripleListener<S,P,O> newIdentifier(IRI identifier);
+    TripleListener<S, P, O> newIdentifier(IRI identifier);
 
-    TripleListener<S,P,O> triple(Triple<S, P, O> triple);
+    TripleListener<S, P, O> triple(Triple<S, P, O> triple);
 
-    TripleListener<S,P,O> end();
+    TripleListener<S, P, O> end();
 }

@@ -96,7 +96,7 @@ public final class Medline extends Feeder {
                         .query(settings.get("type"))
                         .fragment(id)
                         .build());
-                sink.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
+                sink.write(resourceContext);
                 id = null;
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);

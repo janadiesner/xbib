@@ -38,9 +38,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.ContentBuilder;
-import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
@@ -88,8 +86,8 @@ public final class FromEZBXML extends Converter {
 
         Writer writer = new FileWriter(settings.get("output"));
 
-        final TurtleWriter turtleWriter = new TurtleWriter(writer)
-                .setContext(namespaceContext);
+        final TurtleWriter turtleWriter = new TurtleWriter(writer);
+        turtleWriter.setNamespaceContext(namespaceContext);
 
         AbstractXmlHandler handler = new EZBHandler(resourceContext)
                 .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/");
@@ -102,10 +100,6 @@ public final class FromEZBXML extends Converter {
             turtleWriter.close();
             writer.close();
         }
-    }
-
-    protected ContentBuilder contentBuilder(IRINamespaceContext namespaceContext) {
-        return new DefaultContentBuilder<>();
     }
 
     class EZBHandler extends AbstractXmlResourceHandler {

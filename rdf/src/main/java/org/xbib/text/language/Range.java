@@ -31,13 +31,14 @@
  */
 package org.xbib.text.language;
 
+import org.xbib.text.language.Subtag.Type;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.xbib.text.language.Subtag.Type;
 
 /**
  * A language range used for matching language tags
@@ -48,8 +49,8 @@ public class Range extends SubtagSet {
 
     /**
      * Create a Language-Range
-     * 
-     * @param range The language-range
+     *
+     * @param range    The language-range
      * @param extended true if this is an extended language range
      */
     public Range(String range, boolean extended) {
@@ -73,8 +74,8 @@ public class Range extends SubtagSet {
 
     /**
      * Create a Language-Range from a Lang tag
-     * 
-     * @param lang The language tag
+     *
+     * @param lang     The language tag
      * @param extended true if this is an extended language-range
      */
     public Range(Lang lang, boolean extended) {
@@ -91,8 +92,9 @@ public class Range extends SubtagSet {
      */
     public Range append(Subtag subtag) {
         Subtag last = null;
-        for (Subtag tag : this)
+        for (Subtag tag : this) {
             last = tag;
+        }
         last.setNext(subtag);
         return this;
     }
@@ -120,8 +122,9 @@ public class Range extends SubtagSet {
         } else {
             List<Subtag> list = new LinkedList<Subtag>();
             for (Subtag tag : this) {
-                if (tag.getType() != Subtag.Type.WILDCARD)
+                if (tag.getType() != Subtag.Type.WILDCARD) {
                     list.add(tag.clone());
+                }
             }
             Subtag primary = null, current = null;
             for (Subtag tag : list) {
@@ -149,8 +152,9 @@ public class Range extends SubtagSet {
     private boolean checkBasic() {
         Subtag current = primary.getNext();
         while (current != null) {
-            if (current.getType() == Subtag.Type.WILDCARD)
+            if (current.getType() == Subtag.Type.WILDCARD) {
                 return false;
+            }
             current = current.getNext();
         }
         return true;
@@ -165,8 +169,8 @@ public class Range extends SubtagSet {
 
     /**
      * True if the lang tag matches this range
-     * 
-     * @param lang The language tage
+     *
+     * @param lang     The language tage
      * @param extended True if extended matching rules should be used
      */
     public boolean matches(String lang, boolean extended) {
@@ -182,50 +186,57 @@ public class Range extends SubtagSet {
 
     /**
      * True if the lang tag matches this range
-     * 
-     * @param lang The language tage
+     *
+     * @param lang     The language tage
      * @param extended True if extended matching rules should be used
      */
     public boolean matches(Lang lang, boolean extended) {
         Iterator<Subtag> i = iterator();
         Iterator<Subtag> e = lang.iterator();
         if (isBasic() && !extended) {
-            if (primary.getType() == Subtag.Type.WILDCARD)
+            if (primary.getType() == Subtag.Type.WILDCARD) {
                 return true;
-            for (; i.hasNext() && e.hasNext();) {
+            }
+            for (; i.hasNext() && e.hasNext(); ) {
                 Subtag in = i.next();
                 Subtag en = e.next();
-                if (!in.equals(en))
+                if (!in.equals(en)) {
                     return false;
+                }
             }
             return true;
         } else {
             Subtag icurrent = i.next();
             Subtag ecurrent = e.next();
-            if (!icurrent.equals(ecurrent))
+            if (!icurrent.equals(ecurrent)) {
                 return false;
+            }
 
             while (i.hasNext()) {
                 icurrent = i.next();
-                while (icurrent.getType() == Subtag.Type.WILDCARD && i.hasNext())
+                while (icurrent.getType() == Subtag.Type.WILDCARD && i.hasNext()) {
                     icurrent = i.next();
+                }
                 // the range ends in a wildcard so it will match everything beyond this point
-                if (icurrent.getType() == Subtag.Type.WILDCARD)
+                if (icurrent.getType() == Subtag.Type.WILDCARD) {
                     return true;
+                }
                 boolean matched = false;
                 while (e.hasNext()) {
                     ecurrent = e.next();
-                    if (extended && (ecurrent.getType().ordinal() < icurrent.getType().ordinal()))
+                    if (extended && (ecurrent.getType().ordinal() < icurrent.getType().ordinal())) {
                         continue;
-                    if (!ecurrent.equals(icurrent))
+                    }
+                    if (!ecurrent.equals(icurrent)) {
                         break;
-                    else {
+                    } else {
                         matched = true;
                         break;
                     }
                 }
-                if (!matched)
+                if (!matched) {
                     return false;
+                }
             }
             return true;
         }
@@ -236,9 +247,11 @@ public class Range extends SubtagSet {
      */
     public Lang[] filter(Lang... lang) {
         List<Lang> langs = new LinkedList<Lang>();
-        for (Lang l : lang)
-            if (matches(l))
+        for (Lang l : lang) {
+            if (matches(l)) {
                 langs.add(l);
+            }
+        }
         return langs.toArray(new Lang[langs.size()]);
     }
 
@@ -247,9 +260,11 @@ public class Range extends SubtagSet {
      */
     public String[] filter(String... lang) {
         List<String> langs = new LinkedList<String>();
-        for (String l : lang)
-            if (matches(l))
+        for (String l : lang) {
+            if (matches(l)) {
                 langs.add(l);
+            }
+        }
         return langs.toArray(new String[langs.size()]);
     }
 
@@ -269,9 +284,9 @@ public class Range extends SubtagSet {
 
     /**
      * True if the lang tag matches the range.
-     * 
-     * @param range The language-range
-     * @param lang The language tag
+     *
+     * @param range    The language-range
+     * @param lang     The language tag
      * @param extended true to use extended match rules
      */
     public static boolean matches(String range, Lang lang, boolean extended) {
@@ -280,9 +295,9 @@ public class Range extends SubtagSet {
 
     /**
      * True if the lang tag matches the range.
-     * 
-     * @param range The language-range
-     * @param lang The language tag
+     *
+     * @param range    The language-range
+     * @param lang     The language tag
      * @param extended true to use extended match rules
      */
     public static boolean matches(String range, Lang lang) {
@@ -291,9 +306,9 @@ public class Range extends SubtagSet {
 
     /**
      * True if the lang tag matches the range.
-     * 
-     * @param range The language-range
-     * @param lang The language tag
+     *
+     * @param range    The language-range
+     * @param lang     The language tag
      * @param extended true to use extended match rules
      */
     public static boolean matches(String range, String lang, boolean extended) {
@@ -302,9 +317,9 @@ public class Range extends SubtagSet {
 
     /**
      * True if the lang tag matches the range.
-     * 
-     * @param range The language-range
-     * @param lang The language tag
+     *
+     * @param range    The language-range
+     * @param lang     The language tag
      * @param extended true to use extended match rules
      */
     public static boolean matches(String range, String lang) {
@@ -319,7 +334,7 @@ public class Range extends SubtagSet {
     private static final Pattern p_range_component = Pattern.compile(range_component);
 
     private static final String language =
-        "((?:[a-zA-Z]{2,3}(?:[-_](?:[a-zA-Z]{3}|\\*)){0,3})|[a-zA-Z]{4}|[a-zA-Z]{5,8}|\\*)";
+            "((?:[a-zA-Z]{2,3}(?:[-_](?:[a-zA-Z]{3}|\\*)){0,3})|[a-zA-Z]{4}|[a-zA-Z]{5,8}|\\*)";
     private static final String script = "((?:[-_](?:[a-zA-Z]{4}|\\*))?)";
     private static final String region = "((?:[-_](?:(?:[a-zA-Z]{2})|(?:[0-9]{3})|\\*))?)";
     private static final String variant = "((?:[-_](?:(?:[a-zA-Z0-9]{5,8})|(?:[0-9][a-zA-Z0-9]{3})|\\*))*)";
@@ -328,7 +343,7 @@ public class Range extends SubtagSet {
     private static final String _privateuse = "((?:[-_](?:" + privateuse + ")+|\\*)?)";
     private static final String langtag = "^" + language + script + region + variant + extension + _privateuse + "$";
     private static final String grandfathered =
-        "^(?:art[-_]lojban|cel[-_]gaulish|en[-_]GB[-_]oed|i[-_]ami|i[-_]bnn|i[-_]default|i[-_]enochian|i[-_]hak|i[-_]klingon|i[-_]lux|i[-_]mingo|i[-_]navajo|i[-_]pwn|i[-_]tao||i[-_]tay|i[-_]tsu|no[-_]bok|no[-_]nyn|sgn[-_]BE[-_]fr|sgn[-_]BE[-_]nl|sgn[-_]CH[-_]de|zh[-_]cmn|zh[-_]cmn[-_]Hans|zh[-_]cmn[-_]Hant|zh[-_]gan|zh[-_]guoyu|zh[-_]hakka|zh[-_]min|zh[-_]min[-_]nan|zh[-_]wuu|zh[-_]xiang|zh[-_]yue)$";
+            "^(?:art[-_]lojban|cel[-_]gaulish|en[-_]GB[-_]oed|i[-_]ami|i[-_]bnn|i[-_]default|i[-_]enochian|i[-_]hak|i[-_]klingon|i[-_]lux|i[-_]mingo|i[-_]navajo|i[-_]pwn|i[-_]tao||i[-_]tay|i[-_]tsu|no[-_]bok|no[-_]nyn|sgn[-_]BE[-_]fr|sgn[-_]BE[-_]nl|sgn[-_]CH[-_]de|zh[-_]cmn|zh[-_]cmn[-_]Hans|zh[-_]cmn[-_]Hant|zh[-_]gan|zh[-_]guoyu|zh[-_]hakka|zh[-_]min|zh[-_]min[-_]nan|zh[-_]wuu|zh[-_]xiang|zh[-_]yue)$";
     private static final Pattern p_privateuse = Pattern.compile("^" + privateuse + "$");
     private static final Pattern p_grandfathered = Pattern.compile(grandfathered);
     private static final Pattern p_extended_range = Pattern.compile(langtag);
@@ -342,8 +357,8 @@ public class Range extends SubtagSet {
 
     /**
      * Parse the language-range
-     * 
-     * @param range The language-range
+     *
+     * @param range    The language-range
      * @param extended true to use extended language rules
      */
     public static Range parse(String range, boolean extended) {
@@ -354,8 +369,8 @@ public class Range extends SubtagSet {
                 String first = m.group(1);
                 String therest = m.group(2);
                 primary =
-                    new Subtag(first.equals("*") ? Subtag.Type.WILDCARD : Subtag.Type.SIMPLE, first
-                        .toLowerCase(Locale.US));
+                        new Subtag(first.equals("*") ? Subtag.Type.WILDCARD : Subtag.Type.SIMPLE, first
+                                .toLowerCase(Locale.US));
                 current = primary;
                 Matcher n = p_range_component.matcher(therest);
                 while (n.find()) {
@@ -413,19 +428,22 @@ public class Range extends SubtagSet {
                         current = new Subtag(tag.equals("*") ? Type.WILDCARD : Type.EXTLANG, tag, current);
                     }
                 }
-                if (script != null && script.length() > 0)
+                if (script != null && script.length() > 0) {
                     current =
-                        new Subtag(script.substring(1).equals("*") ? Type.WILDCARD : Type.SCRIPT, script.substring(1),
-                                   current);
-                if (region != null && region.length() > 0)
+                            new Subtag(script.substring(1).equals("*") ? Type.WILDCARD : Type.SCRIPT, script.substring(1),
+                                    current);
+                }
+                if (region != null && region.length() > 0) {
                     current =
-                        new Subtag(region.substring(1).equals("*") ? Type.WILDCARD : Type.REGION, region.substring(1),
-                                   current);
+                            new Subtag(region.substring(1).equals("*") ? Type.WILDCARD : Type.REGION, region.substring(1),
+                                    current);
+                }
                 if (variant != null && variant.length() > 0) {
                     variant = variant.substring(1);
                     tags = variant.split("-");
-                    for (String tag : tags)
+                    for (String tag : tags) {
                         current = new Subtag(tag.equals("*") ? Type.WILDCARD : Type.VARIANT, tag, current);
+                    }
                 }
                 if (extension != null && extension.length() > 0) {
                     extension = extension.substring(1);
@@ -434,8 +452,8 @@ public class Range extends SubtagSet {
                     for (int i = 1; i < tags.length; i++) {
                         String tag = tags[i];
                         current =
-                            new Subtag(tag.equals("*") ? Type.WILDCARD : tag.length() == 1 ? Type.SINGLETON
-                                : Type.EXTENSION, tag, current);
+                                new Subtag(tag.equals("*") ? Type.WILDCARD : tag.length() == 1 ? Type.SINGLETON
+                                        : Type.EXTENSION, tag, current);
                     }
                 }
                 if (privateuse != null && privateuse.length() > 0) {

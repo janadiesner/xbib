@@ -39,7 +39,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.tools.Converter;
@@ -84,7 +84,8 @@ public class FromEZBWeb extends Converter {
 
         Reader reader = new InputStreamReader(InputService.getInputStream(uri), "UTF-8");
         Writer writer = new FileWriter(settings.get("output"));
-        final TurtleWriter turtle = new TurtleWriter(writer).setContext(context);
+        final TurtleWriter turtle = new TurtleWriter(writer);
+        turtle.setNamespaceContext(context);
         Iterator<String> it = readZDBIDs(reader);
         long counter = 0;
         while (it.hasNext()) {

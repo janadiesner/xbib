@@ -5,13 +5,13 @@ import java.util.regex.Pattern;
 public class Regex {
     //final public static Pattern TRICKY_UTF_CHARS = Pattern.compile(
     // ("1.7".equals(System.getProperty("java.specification.version")) ?
-     //"[\u10000-\\x{EFFFF}]"
+    //"[\u10000-\\x{EFFFF}]"
     //        "[\uD800\uDC00-\uDB7F\uDFFF]" // this seems to work with jdk1.6
-     //       );
+    //       );
     // for ttl
     final public static Pattern PN_CHARS_BASE = Pattern
             .compile("[a-zA-Z]|[\\u00C0-\\u00D6]|[\\u00D8-\\u00F6]|[\\u00F8-\\u02FF]|[\\u0370-\\u037D]|[\\u037F-\\u1FFF]|"
-                    + "[\\u200C-\\u200D]|[\\u2070-\\u218F]|[\\u2C00-\\u2FEF]|[\\u3001-\\uD7FF]|[\\uF900-\\uFDCF]|[\\uFDF0-\\uFFFD]|"
+                            + "[\\u200C-\\u200D]|[\\u2070-\\u218F]|[\\u2C00-\\u2FEF]|[\\u3001-\\uD7FF]|[\\uF900-\\uFDCF]|[\\uFDF0-\\uFFFD]|"
                     /*+TRICKY_UTF_CHARS*/);
     final public static Pattern PN_CHARS_U = Pattern.compile(PN_CHARS_BASE + "|[_]");
     final public static Pattern PN_CHARS = Pattern.compile(PN_CHARS_U

@@ -47,8 +47,7 @@ import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.ContentBuilder;
-import org.xbib.rdf.context.CountableContextResourceOutput;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.tools.Converter;
 import org.xml.sax.InputSource;
@@ -87,7 +86,9 @@ public final class BibdatZDB extends Converter {
                 .detectUnknownKeys(settings.getAsBoolean("detect", false))
                 .start(new PicaElementBuilderFactory() {
                     public PicaElementBuilder newBuilder() {
-                        return new PicaElementBuilder().addOutput(out);
+                        PicaElementBuilder builder = new PicaElementBuilder();
+                        builder.addWriter(out);
+                        return builder;
                     }
                 });
         logger.info("mapper is up, {} elemnents", mapper.map().size());
@@ -126,7 +127,7 @@ public final class BibdatZDB extends Converter {
 
     private final static OurContextResourceOutput out = new OurContextResourceOutput();
 
-    private final static class OurContextResourceOutput extends CountableContextResourceOutput<PicaContext, Resource> {
+    private final static class OurContextResourceOutput extends AbstractResourceContextWriter<PicaContext, Resource> {
 
         File f;
         FileWriter fw;
@@ -141,15 +142,14 @@ public final class BibdatZDB extends Converter {
         }
 
         @Override
-        public void output(PicaContext context, Resource resource, ContentBuilder contentBuilder) throws IOException {
+        public void write(PicaContext context) throws IOException {
             IRI id = IRI.builder().scheme("http").host("xbib.org").path("/pica/zdb/bibdat")
                     .fragment(context.getID()).build();
             context.getResource().id(id);
             writer.write(context);
-            counter.incrementAndGet();
         }
 
-        public void shutdown() throws IOException {
+        public void close() throws IOException {
             if (fw != null) {
                 fw.close();
             }

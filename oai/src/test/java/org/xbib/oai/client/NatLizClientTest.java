@@ -107,7 +107,7 @@ public class NatLizClientTest {
                 p.packet(getWriter().toString());
                 session.write(p);
                 //FileWriter fw = new FileWriter("target/" + getIdentifier() + ".xml");
-                //fw.write(getWriter().toString());
+                //fw.write(getContentBuilder().toString());
                 //fw.close();
             } catch (IOException e) {
                 throw new SAXException(e);

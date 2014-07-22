@@ -34,11 +34,11 @@ package org.xbib.elements;
 import java.io.IOException;
 import java.util.List;
 
-import org.xbib.rdf.context.ContextResourceOutput;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.context.ResourceContextWriter;
 
 import static com.google.common.collect.Lists.newLinkedList;
 
@@ -57,12 +57,11 @@ public abstract class AbstractElementBuilder<K, V, E extends Element, C extends 
 
     private final ThreadLocal<C> contexts = new ThreadLocal<C>();
 
-    private final List<ContextResourceOutput> outputs = newLinkedList();
-
+    private final List<ResourceContextWriter> writers = newLinkedList();
 
     @Override
     public void begin() {
-        C context = contextFactory().newContext();
+        C context = resourceContextFactory().newContext();
         context.switchTo(context.newResource());
         contexts.set(context);
     }
@@ -71,9 +70,9 @@ public abstract class AbstractElementBuilder<K, V, E extends Element, C extends 
     public void end() {
         C context = context();
         context.beforeOutput();
-        for (ContextResourceOutput output : outputs) {
+        for (ResourceContextWriter writer : writers) {
             try {
-               output.output(context, context.getResource(), context.getContentBuilder());
+               writer.write(context);
             } catch (IOException e) {
                 logger.error("output failed: " + e.getMessage(), e);
             }
@@ -87,8 +86,8 @@ public abstract class AbstractElementBuilder<K, V, E extends Element, C extends 
     }
 
     @Override
-    public AbstractElementBuilder<K, V, E, C> addOutput(ContextResourceOutput output) {
-        outputs.add(output);
+    public AbstractElementBuilder<K, V, E, C> addWriter(ResourceContextWriter writer) {
+        writers.add(writer);
         return this;
     }
 

@@ -1,4 +1,3 @@
-
 package org.xbib.rdf.jsonld.core;
 
 import org.xbib.rdf.jsonld.utils.Obj;
@@ -26,7 +25,7 @@ class NormalizeUtils {
     private final JsonLdOptions options;
 
     public NormalizeUtils(List<Object> quads, Map<String, Object> bnodes, UniqueNamer namer,
-            JsonLdOptions options) {
+                          JsonLdOptions options) {
         this.options = options;
         this.quads = quads;
         this.bnodes = bnodes;
@@ -43,7 +42,7 @@ class NormalizeUtils {
         // NOTE: not using the same structure as javascript here to avoid
         // possible stack overflows
         // hash quads for each unnamed bnode
-        for (int hui = 0;; hui++) {
+        for (int hui = 0; ; hui++) {
             if (hui == unnamed.size()) {
                 // done, name blank nodes
                 Boolean named = false;
@@ -77,7 +76,7 @@ class NormalizeUtils {
                     Collections.sort(hashes);
 
                     // process each group
-                    for (int pgi = 0;; pgi++) {
+                    for (int pgi = 0; ; pgi++) {
                         if (pgi == hashes.size()) {
                             // done, create JSON-LD array
                             // return createArray();
@@ -95,7 +94,7 @@ class NormalizeUtils {
                             for (int cai = 0; cai < quads.size(); ++cai) {
                                 final Map<String, Object> quad = (Map<String, Object>) quads
                                         .get(cai);
-                                for (final String attr : new String[] { "subject", "object", "name" }) {
+                                for (final String attr : new String[]{"subject", "object", "name"}) {
                                     if (quad.containsKey(attr)) {
                                         final Map<String, Object> qa = (Map<String, Object>) quad
                                                 .get(attr);
@@ -141,7 +140,7 @@ class NormalizeUtils {
                         // name each group member
                         final List<String> group = duplicates.get(hashes.get(pgi));
                         final List<HashResult> results = new ArrayList<HashResult>();
-                        for (int n = 0;; n++) {
+                        for (int n = 0; ; n++) {
                             if (n == group.size()) {
                                 // name bnodes in hash order
                                 Collections.sort(results, new Comparator<HashResult>() {
@@ -213,18 +212,14 @@ class NormalizeUtils {
      * incorporating all information about its subgraph of bnodes. This method
      * will recursively pick adjacent bnode permutations that produce the
      * lexicographically-least 'path' serializations.
-     * 
-     * @param id
-     *            the ID of the bnode to hash paths for.
-     * @param bnodes
-     *            the map of bnode quads.
-     * @param namer
-     *            the canonical bnode namer.
-     * @param pathNamer
-     *            the namer used to assign names to adjacent bnodes.
+     *
+     * @param id        the ID of the bnode to hash paths for.
+     * @param bnodes    the map of bnode quads.
+     * @param namer     the canonical bnode namer.
+     * @param pathNamer the namer used to assign names to adjacent bnodes.
      */
     private static HashResult hashPaths(String id, Map<String, Object> bnodes, UniqueNamer namer,
-            UniqueNamer pathNamer) {
+                                        UniqueNamer pathNamer) {
         try {
             // create SHA-1 digest
             final MessageDigest md = MessageDigest.getInstance("SHA-1");
@@ -234,12 +229,12 @@ class NormalizeUtils {
             final List<Object> quads = (List<Object>) ((Map<String, Object>) bnodes.get(id))
                     .get("quads");
 
-            for (int hpi = 0;; hpi++) {
+            for (int hpi = 0; ; hpi++) {
                 if (hpi == quads.size()) {
                     // done , hash groups
                     groupHashes = new ArrayList<String>(groups.keySet());
                     Collections.sort(groupHashes);
-                    for (int hgi = 0;; hgi++) {
+                    for (int hgi = 0; ; hgi++) {
                         if (hgi == groupHashes.size()) {
                             final HashResult res = new HashResult();
                             res.hash = encodeHex(md.digest());
@@ -305,7 +300,7 @@ class NormalizeUtils {
                             }
 
                             // does the next recursion
-                            for (int nrn = 0;; nrn++) {
+                            for (int nrn = 0; ; nrn++) {
                                 if (nrn == recurse.size()) {
                                     // return nextPermutation(false);
                                     if (chosenPath == null || path.compareTo(chosenPath) < 0) {
@@ -413,14 +408,10 @@ class NormalizeUtils {
 
     /**
      * Hashes all of the quads about a blank node.
-     * 
-     * @param id
-     *            the ID of the bnode to hash quads for.
-     * @param bnodes
-     *            the mapping of bnodes to quads.
-     * @param namer
-     *            the canonical bnode namer.
-     * 
+     *
+     * @param id     the ID of the bnode to hash quads for.
+     * @param bnodes the mapping of bnodes to quads.
+     * @param namer  the canonical bnode namer.
      * @return the new hash.
      */
     private static String hashQuads(String id, Map<String, Object> bnodes, UniqueNamer namer) {
@@ -448,7 +439,7 @@ class NormalizeUtils {
 
     /**
      * A helper class to sha1 hash all the strings in a collection
-     * 
+     *
      * @param nquads
      * @return
      */
@@ -480,12 +471,9 @@ class NormalizeUtils {
      * A helper function that gets the blank node name from an RDF quad node
      * (subject or object). If the node is a blank node and its value does not
      * match the given blank node ID, it will be returned.
-     * 
-     * @param node
-     *            the RDF quad node.
-     * @param id
-     *            the ID of the blank node to look next to.
-     * 
+     *
+     * @param node the RDF quad node.
+     * @param id   the ID of the blank node to look next to.
      * @return the adjacent blank node name or null if none was found.
      */
     private static String getAdjacentBlankNodeName(Map<String, Object> node, String id) {
@@ -512,7 +500,7 @@ class NormalizeUtils {
 
         /**
          * Returns true if there is another permutation.
-         * 
+         *
          * @return true if there is another permutation, false if not.
          */
         public boolean hasNext() {
@@ -522,7 +510,7 @@ class NormalizeUtils {
         /**
          * Gets the next permutation. Call hasNext() to ensure there is another
          * one first.
-         * 
+         *
          * @return the next permutation.
          */
         public List<String> next() {
@@ -541,7 +529,7 @@ class NormalizeUtils {
                 final Boolean left = this.left.get(element);
                 if ((k == null || element.compareTo(k) > 0)
                         && ((left && i > 0 && element.compareTo(this.list.get(i - 1)) > 0) || (!left
-                                && i < (length - 1) && element.compareTo(this.list.get(i + 1)) > 0))) {
+                        && i < (length - 1) && element.compareTo(this.list.get(i + 1)) > 0))) {
                     k = element;
                     pos = i;
                 }

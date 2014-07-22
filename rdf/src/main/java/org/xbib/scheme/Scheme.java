@@ -29,15 +29,20 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.iri;
+package org.xbib.scheme;
 
-class HttpsScheme extends HttpScheme {
+import org.xbib.iri.IRI;
 
-    static final String NAME = "https";
-    static final int DEFAULT_PORT = 443;
+/**
+ * Interface implemented by custom IRI scheme parsers
+ */
+public interface Scheme {
 
-    public HttpsScheme() {
-        super(NAME, DEFAULT_PORT);
-    }
+    String getName();
 
+    IRI normalize(IRI iri);
+
+    String normalizePath(String path);
+
+    int getDefaultPort();
 }

@@ -29,33 +29,47 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.rdf.content;
+package org.xbib.scheme;
 
-import org.xbib.rdf.Identifier;
-import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.iri.IRI;
+import org.xbib.text.CharUtils.Profile;
+import org.xbib.text.UrlEncoding;
 
-import java.io.IOException;
-import java.util.Date;
+public class HttpScheme extends AbstractScheme {
 
-public interface ContentBuilder<C extends ResourceContext, R extends Resource> {
+    protected static final String NAME = "http";
 
-    ContentBuilder<C,R> timestamp(Date timestamp);
+    protected static final int DEFAULT_PORT = 80;
 
-    ContentBuilder<C,R> message(String message);
+    public HttpScheme() {
+        super(NAME, DEFAULT_PORT);
+    }
 
-    ContentBuilder<C,R> source(String source);
+    protected HttpScheme(String name, int port) {
+        super(name, port);
+    }
 
-    ContentBuilder<C,R> sourceHost(String sourceHost);
+    @Override
+    public IRI normalize(IRI iri) {
+        int port = (iri.getPort() == getDefaultPort()) ? -1 : iri.getPort();
+        String host = iri.getHost();
+        if (host != null) {
+            host = host.toLowerCase();
+        }
+        return IRI.builder()
+                .scheme(iri.getScheme())
+                .userinfo(iri.getUserInfo())
+                .host(host)
+                .port(port)
+                .path(iri.getPath())
+                .query(UrlEncoding.encode(UrlEncoding.decode(iri.getQuery()), Profile.IQUERY.filter()))
+                .fragment(UrlEncoding.encode(UrlEncoding.decode(iri.getFragment()), Profile.IFRAGMENT.filter()))
+                .build();
+    }
 
-    ContentBuilder<C,R> sourcePath(String sorucePath);
+    // use the path normalization coded into the IRI class
+    public String normalizePath(String path) {
+        return null;
+    }
 
-    ContentBuilder<C,R> type(String... type);
-
-    ContentBuilder<C,R> tags(String... tags);
-
-    <S extends Identifier, P extends Property, O extends Node> String build(C context, R resource)
-            throws IOException;
 }

@@ -31,36 +31,31 @@
  */
 package org.xbib.elasticsearch.rdf;
 
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.context.ResourceContextWriter;
 
 import java.io.IOException;
 import java.io.Writer;
 
 /**
  * Write RDF resources as Elasticsearch bulk format
- *
- *
- * @param <C>
- * @param <R>
  */
-public class BulkFormatSink<C extends ResourceContext, R extends Resource>
-        extends CountableContextResourceOutput<C, R> {
+public class BulkFormatWriter implements ResourceContextWriter {
 
-    private final Logger logger = LoggerFactory.getLogger(BulkFormatSink.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(BulkFormatWriter.class.getName());
 
     private Writer writer;
 
-    public BulkFormatSink(Writer writer) {
+    public BulkFormatWriter(Writer writer) {
         this.writer = writer;
     }
 
     @Override
-    public void output(C context, R resource, ContentBuilder<C, R> contentBuilder) throws IOException {
+    public void write(ResourceContext resourceContext) throws IOException {
+        Resource resource = resourceContext.getResource();
         if (resource.id() == null) {
             return;
         }
@@ -99,52 +94,50 @@ public class BulkFormatSink<C extends ResourceContext, R extends Resource>
                 throw new IOException("id must not be null, no fragment set in IRI?");
             }
             StringBuilder sb = new StringBuilder();
-            sb.append("{\"index\":{\"_index\":\"")
-                    .append(index).append("\",\"_type\":\"")
-                    .append(type).append("\",\"_id\":\"")
-                    .append(id).append("\"}}\n")
-                    .append(contentBuilder.build(context, resource))
+            sb.append("{\"index\":{\"_index\":\"").append(index).append("\",\"_type\":\"").append(type).append("\",\"_id\":\"").append(id).append("\"}}\n")
+                    .append(resourceContext.getContentBuilder().build(resourceContext, resource))
                     .append("\n");
             writer.write(sb.toString());
         }
-        counter.incrementAndGet();
     }
 
-    public void flush() {
-        try {
-            writer.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
+    @Override
+    public void flush() throws IOException {
+        writer.flush();
+    }
+
+    @Override
+    public void close() throws IOException {
+        writer.close();
     }
 
     /**
      * The IRI host is interpreted as the Elasticsearch index
      *
-     * @param resource
-     * @return
+     * @param resource the resource
+     * @return the index name
      */
-    protected String makeIndex(R resource) {
+    protected String makeIndex(Resource resource) {
         return resource.id().getHost();
     }
 
     /**
      * The IRI query is interpreted as the Elasticsearch index type
      *
-     * @param resource
-     * @return
+     * @param resource the resource
+     * @return the index type name
      */
-    protected String makeType(R resource) {
+    protected String makeType(Resource resource) {
         return resource.id().getQuery();
     }
 
     /**
      * The IRI fragment is  interpreted as the Elasticsearch document ID
      *
-     * @param resource
-     * @return
+     * @param resource the resource
+     * @return the doc id
      */
-    protected String makeId(R resource) {
+    protected String makeId(Resource resource) {
         String id = resource.id().getFragment();
         if (id == null) {
             id = resource.id().toString();

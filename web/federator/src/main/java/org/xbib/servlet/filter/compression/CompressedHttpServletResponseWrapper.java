@@ -111,7 +111,7 @@ public class CompressedHttpServletResponseWrapper extends WebUtilitiesResponseWr
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         if (getWriterCalled) {
-            throw new IllegalStateException("getWriter() has already been called");
+            throw new IllegalStateException("getContentBuilder() has already been called");
         }
         getOutputStreamCalled = true;
         return getCompressedServletOutputStream();

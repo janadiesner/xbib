@@ -29,12 +29,42 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.elements.direct;
+package org.xbib.scheme;
 
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.iri.IRI;
 
-public interface DirectBuilderFactory<K, V, C extends ResourceContext<Resource>> {
+/**
+ * Base implementation for IRI scheme providers
+ */
+public abstract class AbstractScheme implements Scheme {
 
-     DirectBuilder<K, V, C> newBuilder();
+    protected final String name;
+    protected final int port;
+
+    protected AbstractScheme(String name, int port) {
+        this.name = name;
+        this.port = port;
+    }
+
+    public int getDefaultPort() {
+        return port;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Default return unmodified
+     */
+    public IRI normalize(IRI iri) {
+        return iri;
+    }
+
+    /**
+     * Default return unmodified
+     */
+    public String normalizePath(String path) {
+        return path;
+    }
 }

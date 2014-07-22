@@ -16,7 +16,7 @@ public class UniqueNamer {
     public UniqueNamer(String prefix) {
         this.prefix = prefix;
         this.counter = 0;
-        this.existing = new HashMap<String,String>();
+        this.existing = new HashMap<String, String>();
     }
 
     /**
@@ -36,7 +36,6 @@ public class UniqueNamer {
      * a new name will be generated.
      *
      * @param oldName the old name to get the new name for.
-     *
      * @return the new name.
      */
     public String getName(String oldName) {

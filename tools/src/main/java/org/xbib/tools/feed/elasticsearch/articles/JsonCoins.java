@@ -44,9 +44,9 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
-import org.xbib.rdf.RDF;
+import org.xbib.rdf.RDFNS;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.text.InvalidCharacterException;
@@ -78,7 +78,7 @@ public class JsonCoins extends Feeder {
     private final static IRINamespaceContext context = IRINamespaceContext.newInstance();
 
     static {
-        context.addNamespace(RDF.NS_PREFIX, RDF.NS_URI);
+        context.addNamespace(RDFNS.NS_PREFIX, RDFNS.NS_URI);
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         context.addNamespace("dcterms", "http://purl.org/dc/terms/");
         context.addNamespace("foaf", "http://xmlns.com/foaf/0.1/");
@@ -172,7 +172,7 @@ public class JsonCoins extends Feeder {
                                 .query(indexType)
                                 .fragment(resourceContext.getResource().id().getFragment())
                                 .build());
-                        sink.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
+                        sink.write(resourceContext);
                         resourceCounter.incrementAndGet();
                         resource = null;
                         break;

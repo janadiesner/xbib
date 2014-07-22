@@ -34,7 +34,10 @@ package org.xbib.rdf.io;
 import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
+import org.xbib.rdf.Resource;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.context.ResourceContextWriter;
 
-public interface TripleLine<S extends Identifier,P extends Property,O extends Node>
-    extends TripleListener<S, P, O>, ResourceWriter<S, P, O> {
+public interface TripleWriter<S extends Identifier, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
+        extends TripleListener<S, P, O>, ResourceContextWriter<C, Resource<S,P,O>> {
 }

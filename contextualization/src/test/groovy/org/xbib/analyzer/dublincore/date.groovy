@@ -1,6 +1,11 @@
 package org.xbib.analyzer.dublincore
+
+import org.xbib.elements.ElementBuilder
+
 public class DateElement extends DublinCoreElement {
-    DateElement build(builder, key, value) {
+
+    @Override
+    DateElement build(ElementBuilder builder, key, value) {
         println 'got date ' + value
         return this
     }

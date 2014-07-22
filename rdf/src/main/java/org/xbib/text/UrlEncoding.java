@@ -79,7 +79,7 @@ public final class UrlEncoding {
     }
 
     public static String encode(char[] chars, Filter Filter) {
-        return encode(chars, 0, chars.length, DEFAULT_ENCODING, new Filter[] {Filter});
+        return encode(chars, 0, chars.length, DEFAULT_ENCODING, new Filter[]{Filter});
     }
 
     public static String encode(char[] chars, Filter... filters) {
@@ -91,7 +91,7 @@ public final class UrlEncoding {
     }
 
     public static String encode(char[] chars, String enc, Filter Filter) {
-        return encode(chars, 0, chars.length, enc, new Filter[] {Filter});
+        return encode(chars, 0, chars.length, enc, new Filter[]{Filter});
     }
 
     public static String encode(char[] chars, String enc, Filter... filters) {
@@ -107,7 +107,7 @@ public final class UrlEncoding {
     }
 
     public static String encode(char[] chars, int offset, int length, Filter Filter) {
-        return encode(chars, offset, length, DEFAULT_ENCODING, new Filter[] {Filter});
+        return encode(chars, offset, length, DEFAULT_ENCODING, new Filter[]{Filter});
     }
 
     public static String encode(char[] chars, int offset, int length, Filter... filters) {
@@ -115,12 +115,12 @@ public final class UrlEncoding {
     }
 
     public static String encode(char[] chars, int offset, int length, String enc, Filter Filter) {
-        return encode(chars, offset, length, enc, new Filter[] {Filter});
+        return encode(chars, offset, length, enc, new Filter[]{Filter});
     }
 
     public static String encode(char[] chars, int offset, int length, String enc, Filter... filters) {
         try {
-            return encode((CharSequence)CharBuffer.wrap(chars, offset, length), enc, filters);
+            return encode((CharSequence) CharBuffer.wrap(chars, offset, length), enc, filters);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -130,8 +130,9 @@ public final class UrlEncoding {
         StringBuilder buf = new StringBuilder();
         byte[] chunk = new byte[1024];
         int r = -1;
-        while ((r = in.read(chunk)) > -1)
+        while ((r = in.read(chunk)) > -1) {
             encode(buf, 0, r, chunk);
+        }
         return buf.toString();
     }
 
@@ -140,7 +141,7 @@ public final class UrlEncoding {
     }
 
     public static String encode(InputStream in, String charset, Filter Filter) throws IOException {
-        return encode(in, charset, DEFAULT_ENCODING, new Filter[] {Filter});
+        return encode(in, charset, DEFAULT_ENCODING, new Filter[]{Filter});
     }
 
     public static String encode(InputStream in, String charset, String enc) throws IOException {
@@ -148,7 +149,7 @@ public final class UrlEncoding {
     }
 
     public static String encode(InputStream in, String charset, String enc, Filter Filter) throws IOException {
-        return encode(in, charset, enc, new Filter[] {Filter});
+        return encode(in, charset, enc, new Filter[]{Filter});
     }
 
     public static String encode(InputStream in, String charset, String enc, Filter... filters) throws IOException {
@@ -176,11 +177,11 @@ public final class UrlEncoding {
     }
 
     public static String encode(Reader reader, String enc, Filter Filter) throws IOException {
-        return encode(reader, enc, new Filter[] {Filter});
+        return encode(reader, enc, new Filter[]{Filter});
     }
 
     public static String encode(Reader reader, Filter Filter) throws IOException {
-        return encode(reader, DEFAULT_ENCODING, new Filter[] {Filter});
+        return encode(reader, DEFAULT_ENCODING, new Filter[]{Filter});
     }
 
     public static String encode(Reader reader, Filter... filters) throws IOException {
@@ -188,11 +189,11 @@ public final class UrlEncoding {
     }
 
     public static String encode(Readable readable, String enc, Filter Filter) throws IOException {
-        return encode(readable, enc, new Filter[] {Filter});
+        return encode(readable, enc, new Filter[]{Filter});
     }
 
     public static String encode(Readable readable, Filter Filter) throws IOException {
-        return encode(readable, DEFAULT_ENCODING, new Filter[] {Filter});
+        return encode(readable, DEFAULT_ENCODING, new Filter[]{Filter});
     }
 
     public static String encode(Readable readable, Filter... filters) throws IOException {
@@ -200,7 +201,7 @@ public final class UrlEncoding {
     }
 
     private static void processChars(StringBuilder sb, CharBuffer chars, String enc, Filter... filters)
-        throws IOException {
+            throws IOException {
         for (int n = 0; n < chars.length(); n++) {
             char c = chars.charAt(n);
             if (!CharUtils.isHighSurrogate(c) && check(c, filters)) {
@@ -236,8 +237,9 @@ public final class UrlEncoding {
         StringBuilder sb = new StringBuilder();
         char[] chunk = new char[1024];
         int r = -1;
-        while ((r = reader.read(chunk)) > -1)
+        while ((r = reader.read(chunk)) > -1) {
             processChars(sb, CharBuffer.wrap(chunk, 0, r), enc, filters);
+        }
         return sb.toString();
     }
 
@@ -258,13 +260,14 @@ public final class UrlEncoding {
     }
 
     public static String encode(CharSequence s, Filter Filter) {
-        return encode(s, new Filter[] {Filter});
+        return encode(s, new Filter[]{Filter});
     }
 
     public static String encode(CharSequence s, Filter... filters) {
         try {
-            if (s == null)
+            if (s == null) {
                 return null;
+            }
             return encode(s, "utf-8", filters);
         } catch (UnsupportedEncodingException e) {
             return null; // shouldn't happen
@@ -276,13 +279,14 @@ public final class UrlEncoding {
     }
 
     public static String encode(CharSequence s, int offset, int length, Filter Filter) {
-        return encode(s, offset, length, new Filter[] {Filter});
+        return encode(s, offset, length, new Filter[]{Filter});
     }
 
     public static String encode(CharSequence s, int offset, int length, Filter... filters) {
         try {
-            if (s == null)
+            if (s == null) {
                 return null;
+            }
             return encode(s, offset, length, "utf-8", filters);
         } catch (UnsupportedEncodingException e) {
             return null; // shouldn't happen
@@ -291,22 +295,24 @@ public final class UrlEncoding {
 
     private static boolean check(int codepoint, Filter... filters) {
         for (Filter Filter : filters) {
-            if (Filter.accept(codepoint))
+            if (Filter.accept(codepoint)) {
                 return true;
+            }
         }
         return false;
     }
 
     public static String encode(CharSequence s, int offset, int length, String enc, Filter... filters)
-        throws UnsupportedEncodingException {
+            throws UnsupportedEncodingException {
         int end = Math.min(s.length(), offset + length);
         CharSequence seq = s.subSequence(offset, end);
         return encode(seq, enc, filters);
     }
 
     public static String encode(CharSequence s, String enc, Filter... filters) throws UnsupportedEncodingException {
-        if (s == null)
+        if (s == null) {
             return null;
+        }
         StringBuilder sb = new StringBuilder();
 
         for (int n = 0; n < s.length(); n++) {
@@ -370,7 +376,7 @@ public final class UrlEncoding {
 
         @Override
         public void write(int b) throws IOException {
-            String enc = encode((byte)b);
+            String enc = encode((byte) b);
             out.write(enc.getBytes(DEFAULT_ENCODING));
         }
     }
@@ -395,7 +401,7 @@ public final class UrlEncoding {
         }
 
         public EncodingWriter(Writer out, Filter Filter) {
-            this(out, new Filter[] {Filter});
+            this(out, new Filter[]{Filter});
         }
 
         public EncodingWriter(Writer out, Filter... filters) {
@@ -417,7 +423,7 @@ public final class UrlEncoding {
 
         @Override
         public void write(int b) throws IOException {
-            String enc = encode(new char[] {(char)b}, filters);
+            String enc = encode(new char[]{(char) b}, filters);
             out.write(enc.toCharArray());
         }
 
@@ -442,7 +448,7 @@ public final class UrlEncoding {
             if (c == '%') {
                 int c1 = super.read();
                 int c2 = super.read();
-                return decode((char)c1, (char)c2);
+                return decode((char) c1, (char) c2);
             } else {
                 return c;
             }
@@ -453,7 +459,7 @@ public final class UrlEncoding {
             int n = off;
             int i = -1;
             while ((i = read()) != -1 && n < off + len) {
-                b[n++] = (byte)i;
+                b[n++] = (byte) i;
             }
             return n - off;
         }
@@ -466,8 +472,9 @@ public final class UrlEncoding {
         @Override
         public long skip(long n) throws IOException {
             long i = 0;
-            for (; i < n; i++)
+            for (; i < n; i++) {
                 read();
+            }
             return i;
         }
 
@@ -499,7 +506,7 @@ public final class UrlEncoding {
             if (c == '%') {
                 int c1 = super.read();
                 int c2 = super.read();
-                return decode((char)c1, (char)c2);
+                return decode((char) c1, (char) c2);
             } else {
                 return c;
             }
@@ -510,7 +517,7 @@ public final class UrlEncoding {
             int n = off;
             int i = -1;
             while ((i = read()) != -1 && n < off + len) {
-                b[n++] = (char)i;
+                b[n++] = (char) i;
             }
             return n - off;
         }
@@ -523,19 +530,20 @@ public final class UrlEncoding {
         @Override
         public long skip(long n) throws IOException {
             long i = 0;
-            for (; i < n; i++)
+            for (; i < n; i++) {
                 read();
+            }
             return i;
         }
     }
 
     private static byte decode(char c, int shift) {
-        return (byte)((((c >= '0' && c <= '9') ? c - '0' : (c >= 'A' && c <= 'F') ? c - 'A' + 10
-            : (c >= 'a' && c <= 'f') ? c - 'a' + 10 : -1) & 0xf) << shift);
+        return (byte) ((((c >= '0' && c <= '9') ? c - '0' : (c >= 'A' && c <= 'F') ? c - 'A' + 10
+                : (c >= 'a' && c <= 'f') ? c - 'a' + 10 : -1) & 0xf) << shift);
     }
 
     private static byte decode(char c1, char c2) {
-        return (byte)(decode(c1, 4) | decode(c2, 0));
+        return (byte) (decode(c1, 4) | decode(c2, 0));
     }
 
 }

@@ -32,8 +32,6 @@
 package org.xbib.tools.convert.dnb.gnd;
 
 import org.xbib.io.InputService;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
@@ -77,16 +75,16 @@ public class FromRdfXml extends Converter {
         };
         String marker = settings.get("translatePicaSortMarker");
         if ("turtle".equals(settings.get("format"))) {
-            TurtleWriter turtle = new TurtleWriter(new OutputStreamWriter(out, "UTF-8"))
-                    .translatePicaSortMarker(marker);
+            TurtleWriter turtle = new TurtleWriter(new OutputStreamWriter(out, "UTF-8"));
+            turtle.setSortLanguageTag(marker);
             RdfXmlReader reader = new RdfXmlReader();
             reader.parse(new InputStreamReader(in, "UTF-8"), turtle);
             turtle.close();
             in.close();
             out.close();
         } else if ("ntriples".equals(settings.get("format"))) {
-            NTripleWriter ntriples = new NTripleWriter(new OutputStreamWriter(out, "UTF-8"))
-                    .translatePicaSortMarker(marker);
+            NTripleWriter ntriples = new NTripleWriter(new OutputStreamWriter(out, "UTF-8"));
+            ntriples.setSortLanguageTag(marker);
             RdfXmlReader reader = new RdfXmlReader();
             reader.parse(new InputStreamReader(in, "UTF-8"), ntriples);
             ntriples.close();

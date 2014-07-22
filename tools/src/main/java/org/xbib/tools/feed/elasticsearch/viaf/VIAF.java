@@ -44,7 +44,6 @@ import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.rdfxml.RdfXmlReader;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.tools.Feeder;
-import org.xml.sax.InputSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -172,7 +171,7 @@ public class VIAF extends Feeder {
 
         private void flush() {
             try {
-                sink.output(context, context.getResource(), context.getContentBuilder());
+                sink.write(context);
             } catch (IOException e) {
                 logger.error("flush failed: {}", e.getMessage(), e);
             }

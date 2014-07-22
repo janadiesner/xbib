@@ -26,18 +26,18 @@ public class RDFDataset extends LinkedHashMap<String, Object> implements Constan
 
     public static class Quad extends LinkedHashMap<String, Object> implements Comparable<Quad> {
         public Quad(final String subject, final String predicate, final String object,
-                final String graph) {
+                    final String graph) {
             this(subject, predicate, object.startsWith("_:") ? new BlankNode(object) : new IRI(
                     object), graph);
         }
 
         public Quad(final String subject, final String predicate, final String value,
-                final String datatype, final String language, final String graph) {
+                    final String datatype, final String language, final String graph) {
             this(subject, predicate, new Literal(value, datatype, language), graph);
         }
 
         private Quad(final String subject, final String predicate, final Node object,
-                final String graph) {
+                     final String graph) {
             this(subject.startsWith("_:") ? new BlankNode(subject) : new IRI(subject), new IRI(
                     predicate), object, graph);
         }
@@ -132,10 +132,8 @@ public class RDFDataset extends LinkedHashMap<String, Object> implements Constan
 
         /**
          * Converts an RDF triple object to a JSON-LD object.
-         * 
-         * @param useNativeTypes
-         *            true to output native types, false not to.
-         * 
+         *
+         * @param useNativeTypes true to output native types, false not to.
          * @return the JSON-LD object.
          * @throws JsonLdError
          */
@@ -360,7 +358,7 @@ public class RDFDataset extends LinkedHashMap<String, Object> implements Constan
 
     /**
      * Returns a valid @context containing any namespaces set
-     * 
+     *
      * @return
      */
     public Map<String, Object> getContext() {
@@ -375,7 +373,7 @@ public class RDFDataset extends LinkedHashMap<String, Object> implements Constan
 
     /**
      * parses a @context object and sets any namespaces found within it
-     * 
+     *
      * @param context
      */
     public void parseContext(Map<String, Object> context) {
@@ -406,43 +404,32 @@ public class RDFDataset extends LinkedHashMap<String, Object> implements Constan
 
     /**
      * Adds a triple to the @default graph of this dataset
-     * 
-     * @param s
-     *            the subject for the triple
-     * @param p
-     *            the predicate for the triple
-     * @param value
-     *            the value of the literal object for the triple
-     * @param datatype
-     *            the datatype of the literal object for the triple (null values
-     *            will default to xsd:string)
-     * @param language
-     *            the language of the literal object for the triple (or null)
+     *
+     * @param s        the subject for the triple
+     * @param p        the predicate for the triple
+     * @param value    the value of the literal object for the triple
+     * @param datatype the datatype of the literal object for the triple (null values
+     *                 will default to xsd:string)
+     * @param language the language of the literal object for the triple (or null)
      */
     public void addTriple(final String s, final String p, final String value,
-            final String datatype, final String language) {
+                          final String datatype, final String language) {
         addQuad(s, p, value, datatype, language, "@default");
     }
 
     /**
      * Adds a triple to the specified graph of this dataset
-     * 
-     * @param s
-     *            the subject for the triple
-     * @param p
-     *            the predicate for the triple
-     * @param value
-     *            the value of the literal object for the triple
-     * @param datatype
-     *            the datatype of the literal object for the triple (null values
-     *            will default to xsd:string)
-     * @param graph
-     *            the graph to add this triple to
-     * @param language
-     *            the language of the literal object for the triple (or null)
+     *
+     * @param s        the subject for the triple
+     * @param p        the predicate for the triple
+     * @param value    the value of the literal object for the triple
+     * @param datatype the datatype of the literal object for the triple (null values
+     *                 will default to xsd:string)
+     * @param graph    the graph to add this triple to
+     * @param language the language of the literal object for the triple (or null)
      */
     public void addQuad(final String s, final String p, final String value, final String datatype,
-            final String language, String graph) {
+                        final String language, String graph) {
         if (graph == null) {
             graph = "@default";
         }
@@ -454,13 +441,10 @@ public class RDFDataset extends LinkedHashMap<String, Object> implements Constan
 
     /**
      * Adds a triple to the @default graph of this dataset
-     * 
-     * @param s
-     *            the subject for the triple
-     * @param p
-     *            the predicate for the triple
-     * @param o
-     *            the object for the triple
+     *
+     * @param s the subject for the triple
+     * @param p the predicate for the triple
+     * @param o the object for the triple
      */
     public void addTriple(final String s, final String p, final String o) {
         addQuad(s, p, o, "@default");
@@ -468,15 +452,11 @@ public class RDFDataset extends LinkedHashMap<String, Object> implements Constan
 
     /**
      * Adds a triple to thespecified graph of this dataset
-     * 
-     * @param s
-     *            the subject for the triple
-     * @param p
-     *            the predicate for the triple
-     * @param o
-     *            the object for the triple
-     * @param graph
-     *            the graph to add this triple to
+     *
+     * @param s     the subject for the triple
+     * @param p     the predicate for the triple
+     * @param o     the object for the triple
+     * @param graph the graph to add this triple to
      */
     public void addQuad(final String s, final String p, final String o, String graph) {
         if (graph == null) {
@@ -490,9 +470,8 @@ public class RDFDataset extends LinkedHashMap<String, Object> implements Constan
 
     /**
      * Creates an array of RDF triples for the given graph.
-     * 
-     * @param graph
-     *            the graph to create RDF triples for.
+     *
+     * @param graph the graph to create RDF triples for.
      */
     void graphToRDF(String graphName, Map<String, Object> graph) {
         // 4.2)
@@ -585,10 +564,8 @@ public class RDFDataset extends LinkedHashMap<String, Object> implements Constan
     /**
      * Converts a JSON-LD value object to an RDF literal or a JSON-LD string or
      * node object to an RDF resource.
-     * 
-     * @param item
-     *            the JSON-LD value or node object.
      *
+     * @param item the JSON-LD value or node object.
      * @return the RDF literal or RDF resource.
      */
     private Node objectToRDF(Object item) {

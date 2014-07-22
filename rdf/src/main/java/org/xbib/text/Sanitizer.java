@@ -62,17 +62,19 @@ public class Sanitizer {
     /**
      * Used to sanitize a string. Optionally performs Unicode Form KD normalization on a string to break extended
      * characters down, then replaces non alphanumeric characters with a specified filler replacement.
-     * 
-     * @param slug The source string
+     *
+     * @param slug   The source string
      * @param filler The replacement string
-     * @param lower True if the result should be lowercase
-     * @param form Unicode Normalization form to use (or null)
+     * @param lower  True if the result should be lowercase
+     * @param form   Unicode Normalization form to use (or null)
      */
     public static String sanitize(String slug, String filler, boolean lower, Normalizer.Form form, String pattern) {
-        if (slug == null)
+        if (slug == null) {
             return null;
-        if (lower)
+        }
+        if (lower) {
             slug = slug.toLowerCase();
+        }
         if (form != null) {
             try {
                 slug = Normalizer.normalize(slug, form);
@@ -91,15 +93,15 @@ public class Sanitizer {
     private static final Filter PathNoDelimFilter = new Filter() {
         public boolean accept(int c) {
             return !(CharUtils.isAlphaDigit(c) || c == '-'
-                || c == '.'
-                || c == '_'
-                || c == '~'
-                || c == '&'
-                || c == '='
-                || c == '+'
-                || c == '$'
-                || c == ','
-                || c == ';' || c == '%');
+                    || c == '.'
+                    || c == '_'
+                    || c == '~'
+                    || c == '&'
+                    || c == '='
+                    || c == '+'
+                    || c == '$'
+                    || c == ','
+                    || c == ';' || c == '%');
         }
     };
 }

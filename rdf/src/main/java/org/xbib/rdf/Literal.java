@@ -32,48 +32,51 @@
 package org.xbib.rdf;
 
 import org.xbib.iri.IRI;
-import org.xbib.rdf.types.XSD;
-
-import java.io.Serializable;
+import org.xbib.rdf.types.XSDResourceIdentifiers;
 
 /**
- *  A literal is a value with a type and/or a language
+ * A literal is a value with a type and/or a language
  */
-public interface Literal<O> extends Serializable, Node, XSD {
+public interface Literal<O> extends Node, XSDResourceIdentifiers {
 
     /**
      * Set the value for the literal
-     * @param value 
+     *
+     * @param value the value
      */
     Literal<O> object(O value);
 
     /**
      * Get the value
+     *
      * @return the value
      */
     O object();
 
     /**
      * Set type of the literal
-     * 
-     * @param type 
+     *
+     * @param type the type
      */
     Literal<O> type(IRI type);
-    
+
     /**
      * Get type of the literal
+     *
      * @return the type
      */
     IRI type();
 
     /**
      * Set the lianguage of the literal
-     * @param lang 
+     *
+     * @param lang
      */
     Literal<O> language(String lang);
-    
+
     /**
      * Get language of the literal
+     *
      * @return the language
      */
     String language();

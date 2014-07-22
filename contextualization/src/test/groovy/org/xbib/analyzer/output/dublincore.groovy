@@ -1,12 +1,22 @@
 package org.xbib.analyzer.output
 
-import org.xbib.analyzer.dublincore.DublinCoreContext
-import org.xbib.rdf.context.CountableContextResourceOutput
-import org.xbib.rdf.Resource
-import org.xbib.rdf.content.ContentBuilder
+import org.xbib.rdf.context.ResourceContext
+import org.xbib.rdf.context.ResourceContextWriter
 
-public class DublinCoreOutput extends CountableContextResourceOutput<DublinCoreContext, Resource> {
-    public void output(DublinCoreContext context, Resource resource, ContentBuilder builder) {
-         println 'scripted groovy output, got resource ' + resource
+public class DublinCoreWriter implements ResourceContextWriter {
+
+    @Override
+    void write(ResourceContext resourceContext) throws IOException {
+        println 'scripted groovy output, got resource ' + resourceContext.getResource()
+    }
+
+    @Override
+    void close() throws IOException {
+
+    }
+
+    @Override
+    void flush() throws IOException {
+
     }
 }

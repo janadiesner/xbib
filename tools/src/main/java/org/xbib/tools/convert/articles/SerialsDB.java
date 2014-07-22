@@ -40,7 +40,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.tools.Converter;
@@ -97,7 +97,8 @@ public class SerialsDB extends Converter {
         FileWriter w = new FileWriter(fileName);
 
         resourceContext.setNamespaceContext(context);
-        final TurtleWriter writer = new TurtleWriter(w).setContext(context);
+        final TurtleWriter writer = new TurtleWriter(w);
+        writer.setNamespaceContext(context);
         CSVParser parser = new CSVParser(new InputStreamReader(in, "UTF-8"));
         try {
             int i = 0;

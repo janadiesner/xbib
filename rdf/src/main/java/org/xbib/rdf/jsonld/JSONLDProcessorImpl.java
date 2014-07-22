@@ -1,5 +1,13 @@
 package org.xbib.rdf.jsonld;
 
+import org.xbib.rdf.jsonld.utils.ActiveContext;
+import org.xbib.rdf.jsonld.utils.FramingContext;
+import org.xbib.rdf.jsonld.utils.JSONLDUtils;
+import org.xbib.rdf.jsonld.utils.JSONUtils;
+import org.xbib.rdf.jsonld.utils.Obj;
+import org.xbib.rdf.jsonld.utils.Options;
+import org.xbib.rdf.jsonld.utils.UniqueNamer;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,14 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import org.xbib.rdf.jsonld.utils.ActiveContext;
-import org.xbib.rdf.jsonld.utils.FramingContext;
-import org.xbib.rdf.jsonld.utils.JSONLDUtils;
-import org.xbib.rdf.jsonld.utils.JSONUtils;
-import org.xbib.rdf.jsonld.utils.Obj;
-import org.xbib.rdf.jsonld.utils.Options;
-import org.xbib.rdf.jsonld.utils.UniqueNamer;
 
 public class JSONLDProcessorImpl implements JsonLd {
 
@@ -35,11 +35,11 @@ public class JSONLDProcessorImpl implements JsonLd {
      * Defines a context mapping during context processing.
      *
      * @param activeCtx the current active context.
-     * @param ctx the local context being processed.
-     * @param key the key in the local context to define the mapping for.
-     * @param base the base IRI.
-     * @param defined a map of defining/defined keys to detect cycles and
-     * prevent double definitions.
+     * @param ctx       the local context being processed.
+     * @param key       the key in the local context to define the mapping for.
+     * @param base      the base IRI.
+     * @param defined   a map of defining/defined keys to detect cycles and
+     *                  prevent double definitions.
      * @throws org.xbib.rdf.jsonld.JSONLDProcessingError
      */
     private void defineContextMapping(ActiveContext activeCtx, Map<String, Object> ctx, String key, String base, Map<String, Boolean> defined) throws JSONLDProcessingError {
@@ -257,11 +257,10 @@ public class JSONLDProcessorImpl implements JsonLd {
      * assumed that the value is not a keyword.
      *
      * @param activeCtx the current active context.
-     * @param ctx the local context being processed.
-     * @param value the string value to expand.
-     * @param base the base IRI.
-     * @param defined a map for tracking cycles in context definitions.
-     *
+     * @param ctx       the local context being processed.
+     * @param value     the string value to expand.
+     * @param base      the base IRI.
+     * @param defined   a map for tracking cycles in context definitions.
      * @return the expanded value.
      * @throws org.xbib.rdf.jsonld.JSONLDProcessingError
      */
@@ -340,9 +339,9 @@ public class JSONLDProcessorImpl implements JsonLd {
      * new active context in its callback.
      *
      * @param activeCtx the current active context.
-     * @param localCtx the local context to process. options the options to use:
-     * [resolver(url, callback(err, jsonCtx))] the URL resolver to use. callback
-     * (err, ctx) called once the operation completes.
+     * @param localCtx  the local context to process. options the options to use:
+     *                  [resolver(url, callback(err, jsonCtx))] the URL resolver to use. callback
+     *                  (err, ctx) called once the operation completes.
      * @throws org.xbib.rdf.jsonld.JSONLDProcessingError
      */
     public ActiveContext processContext(ActiveContext activeCtx, Object localCtx) throws JSONLDProcessingError {
@@ -397,9 +396,8 @@ public class JSONLDProcessorImpl implements JsonLd {
      * Processes a local context and returns a new active context.
      *
      * @param activeCtx the current active context.
-     * @param localCtx the local context to process.
-     * @param opts the context processing options.
-     *
+     * @param localCtx  the local context to process.
+     * @param opts      the context processing options.
      * @return the new active context.
      * @throws org.xbib.rdf.jsonld.JSONLDProcessingError
      */
@@ -423,10 +421,9 @@ public class JSONLDProcessorImpl implements JsonLd {
      * prefix, a relative IRI, or an absolute IRI. In any case, the associated
      * absolute IRI will be returned.
      *
-     * @param ctx the active context to use.
+     * @param ctx  the active context to use.
      * @param term the term to expand.
      * @param base the base IRI to use if a relative IRI is detected.
-     *
      * @return the expanded term as an absolute IRI.
      */
     private String expandTerm(ActiveContext ctx, String term, String base) {
@@ -494,7 +491,7 @@ public class JSONLDProcessorImpl implements JsonLd {
         return term;
     }
 
- 
+
     private String expandTerm(ActiveContext ctx, String term) {
         return expandTerm(ctx, term, null);
     }
@@ -503,11 +500,10 @@ public class JSONLDProcessorImpl implements JsonLd {
      * Expands the given value by using the coercion and keyword rules in the
      * given context.
      *
-     * @param ctx the active context to use.
+     * @param ctx      the active context to use.
      * @param property the property the value is associated with.
-     * @param value the value to expand.
-     * @param base the base IRI to use.
-     *
+     * @param value    the value to expand.
+     * @param base     the base IRI to use.
      * @return the expanded value.
      */
     private Object expandValue(ActiveContext ctx, String property, Object value, String base) {
@@ -557,10 +553,9 @@ public class JSONLDProcessorImpl implements JsonLd {
     /**
      * Throws an exception if the given value is not a valid
      *
-     * @type value.
-     *
      * @param v the value to check.
      * @throws org.xbib.rdf.jsonld.JSONLDProcessingError
+     * @type value.
      */
     private boolean validateTypeValue(Object v) throws JSONLDProcessingError {
         // must be a string, subject reference, or empty object
@@ -592,13 +587,12 @@ public class JSONLDProcessorImpl implements JsonLd {
      * Compacts an IRI or keyword into a term or prefix if it can be. If the IRI
      * has an associated value it may be passed.
      *
-     * @param ctx the active context to use.
-     * @param iri the IRI to compact.
+     * @param ctx   the active context to use.
+     * @param iri   the IRI to compact.
      * @param value the value to check or null.
      * @param isKey if this is a key in the object map, or a value of
-     * @type
-     *
      * @return the compacted term, prefix, keyword alias, or the original IRI.
+     * @type
      */
     public static String compactIri(ActiveContext ctx, String iri, Object value, boolean isKey) {
         // can't compact null
@@ -784,10 +778,9 @@ public class JSONLDProcessorImpl implements JsonLd {
      * Ranks a term that is possible choice for compacting an IRI associated
      * with the given value.
      *
-     * @param ctx the active context.
-     * @param term the term to rank.
+     * @param ctx   the active context.
+     * @param term  the term to rank.
      * @param value the associated value.
-     *
      * @return the term rank.
      */
     private static int rankTerm(ActiveContext ctx, String term, Object value) {
@@ -869,14 +862,13 @@ public class JSONLDProcessorImpl implements JsonLd {
      * the element will be removed. All context URLs must have been resolved
      * before calling this method.
      *
-     * @param ctx the context to use.
+     * @param ctx      the context to use.
      * @param property the property for the element, null for none.
-     * @param element the element to expand.
-     *
-     * TODO: options the expansion options. propertyIsList true if the property
-     * is a list, false if not. NOTE: not implemented in the java version as it
-     * seems that it's only (and always) true if property === JSONLD_LIST
-     *
+     * @param element  the element to expand.
+     *                 <p>
+     *                 TODO: options the expansion options. propertyIsList true if the property
+     *                 is a list, false if not. NOTE: not implemented in the java version as it
+     *                 seems that it's only (and always) true if property === JSONLD_LIST
      * @return the expanded value.
      * @throws org.xbib.rdf.jsonld.JSONLDProcessingError
      */
@@ -1096,11 +1088,10 @@ public class JSONLDProcessorImpl implements JsonLd {
     /**
      * Used in the handling of
      *
-     * @language containers
-     *
      * @param value
      * @param lang
      * @return
+     * @language containers
      */
     private Object handleNestedLanguageContainer(Object value, String lang) {
         if (value == null) {
@@ -1140,10 +1131,9 @@ public class JSONLDProcessorImpl implements JsonLd {
      * Recursively compacts an element using the given active context. All
      * values must be in expanded form before this method is called.
      *
-     * @param ctx the active context to use.
+     * @param ctx      the active context to use.
      * @param property the property that points to the element, null for none.
-     * @param element the element to compact.
-     *
+     * @param element  the element to compact.
      * @return the compacted value.
      * @throws org.xbib.rdf.jsonld.JSONLDProcessingError
      */
@@ -1311,8 +1301,7 @@ public class JSONLDProcessorImpl implements JsonLd {
      *
      * @param input the expanded JSON-LD to frame.
      * @param frame the expanded JSON-LD frame to use. options the framing
-     * options.
-     *
+     *              options.
      * @return the framed output.
      * @throws org.xbib.rdf.jsonld.JSONLDProcessingError
      */
@@ -1342,15 +1331,15 @@ public class JSONLDProcessorImpl implements JsonLd {
     /**
      * Frames subjects according to the given frame.
      *
-     * @param state the current framing state.
+     * @param state    the current framing state.
      * @param subjects the subjects to filter.
-     * @param frame the frame.
-     * @param parent the parent subject or top-level array.
+     * @param frame    the frame.
+     * @param parent   the parent subject or top-level array.
      * @param property the parent property, initialized to null.
      * @throws org.xbib.rdf.jsonld.JSONLDProcessingError
      */
     private void frame(FramingContext state, Collection<String> subjects,
-            Object frame, Object parent, String property) throws JSONLDProcessingError {
+                       Object frame, Object parent, String property) throws JSONLDProcessingError {
         // validate the frame
         validateFrame(state, frame);
         // NOTE: once validated we move to the function where the frame is specifically a map
@@ -1358,7 +1347,7 @@ public class JSONLDProcessorImpl implements JsonLd {
     }
 
     private void frame(FramingContext state, Collection<String> subjects,
-            Map<String, Object> frame, Object parent, String property) throws JSONLDProcessingError {
+                       Map<String, Object> frame, Object parent, String property) throws JSONLDProcessingError {
         // filter out subjects that match the frame
         Map<String, Object> matches = filterSubjects(state, subjects, frame);
 
@@ -1523,13 +1512,13 @@ public class JSONLDProcessorImpl implements JsonLd {
      * Embeds values for the given subject and property into the given output
      * during the framing algorithm.
      *
-     * @param state the current framing state.
-     * @param subject the subject.
+     * @param state    the current framing state.
+     * @param subject  the subject.
      * @param property the property.
-     * @param output the output.
+     * @param output   the output.
      */
     private void embedValues(FramingContext state,
-            Map<String, Object> subject, String property, Object output) {
+                             Map<String, Object> subject, String property, Object output) {
         // embed subject properties in output
         Object objects = subject.get(property);
 
@@ -1583,13 +1572,13 @@ public class JSONLDProcessorImpl implements JsonLd {
     /**
      * Adds framing output to the given parent.
      *
-     * @param state the current framing state.
-     * @param parent the parent to add to.
+     * @param state    the current framing state.
+     * @param parent   the parent to add to.
      * @param property the parent property.
-     * @param output the output to add.
+     * @param output   the output to add.
      */
     private static void addFrameOutput(FramingContext state, Object parent,
-            String property, Object output) {
+                                       String property, Object output) {
         if (parent instanceof Map) {
             JSONLDUtils.addValue((Map<String, Object>) parent, property, output, true);
         } else {
@@ -1642,14 +1631,13 @@ public class JSONLDProcessorImpl implements JsonLd {
     /**
      * Returns a map of all of the subjects that match a parsed frame.
      *
-     * @param state the current framing state.
+     * @param state    the current framing state.
      * @param subjects the set of subjects to filter.
-     * @param frame the parsed frame.
-     *
+     * @param frame    the parsed frame.
      * @return all of the matched subjects.
      */
     private static Map<String, Object> filterSubjects(FramingContext state,
-            Collection<String> subjects, Map<String, Object> frame) {
+                                                      Collection<String> subjects, Map<String, Object> frame) {
         // filter subjects in @id order
         Map<String, Object> rval = new HashMap<String, Object>();
         for (String id : subjects) {
@@ -1665,8 +1653,7 @@ public class JSONLDProcessorImpl implements JsonLd {
      * Returns true if the given subject matches the given frame.
      *
      * @param subject the subject to check.
-     * @param frame the frame to check.
-     *
+     * @param frame   the frame to check.
      * @return true if the subject matches, false if not.
      */
     private static boolean filterSubject(Map<String, Object> subject, Map<String, Object> frame) {
@@ -1708,12 +1695,10 @@ public class JSONLDProcessorImpl implements JsonLd {
     /**
      * Removes the
      *
-     * @preserve keywords as the last step of the framing algorithm.
-     *
-     * @param ctx the active context used to compact the input.
+     * @param ctx   the active context used to compact the input.
      * @param input the framed, compacted output.
-     *
      * @return the resulting output.
+     * @preserve keywords as the last step of the framing algorithm.
      */
     public Object removePreserve(ActiveContext ctx, Object input) {
         // recurse through arrays
@@ -1762,12 +1747,12 @@ public class JSONLDProcessorImpl implements JsonLd {
     /**
      * Recursively flattens the subjects in the given JSON-LD expanded input.
      *
-     * @param input the JSON-LD expanded input.
+     * @param input  the JSON-LD expanded input.
      * @param graphs a map of graph name to subject map.
-     * @param graph the name of the current graph.
-     * @param namer the blank node namer.
-     * @param name the name assigned to the current input if it is a bnode.
-     * @param list the list to append to, null for none.
+     * @param graph  the name of the current graph.
+     * @param namer  the blank node namer.
+     * @param name   the name assigned to the current input if it is a bnode.
+     * @param list   the list to append to, null for none.
      */
     private void flatten(Object input, Map<String, Object> graphs, String graph, UniqueNamer namer, String name, List<Object> list) {
         // recurse through array
@@ -1893,14 +1878,11 @@ public class JSONLDProcessorImpl implements JsonLd {
     }
 
 
-
-
     /**
      * Compares two RDF statements for equality.
      *
      * @param s1 the first triple.
      * @param s2 the second triple.
-     *
      * @return true if the statements are the same, false if not.
      */
     public static boolean compareRdfStatements(Map<String, Object> s1, Map<String, Object> s2) {
@@ -1951,8 +1933,8 @@ public class JSONLDProcessorImpl implements JsonLd {
      * Performs RDF normalization on the given JSON-LD input.
      *
      * @param input the expanded JSON-LD object to normalize. options the
-     * normalization options. callback(err, normalized) called once the
-     * operation completes.
+     *              normalization options. callback(err, normalized) called once the
+     *              operation completes.
      */
     public List normalize(Object input) {
         NormalizeCallback cb = new NormalizeCallback();
@@ -1964,13 +1946,13 @@ public class JSONLDProcessorImpl implements JsonLd {
     /**
      * Outputs the RDF statements found in the given JSON-LD element.
      *
-     * @param element the JSON-LD element.
-     * @param namer the UniqueNamer for assigning bnode names.
-     * @param subject the active subject.
-     * @param property the active property.
-     * @param graph the graph name.
-     * @param callback(err, triple) called when a triple is output, with
-     * the last triple as null.
+     * @param element       the JSON-LD element.
+     * @param namer         the UniqueNamer for assigning bnode names.
+     * @param subject       the active subject.
+     * @param property      the active property.
+     * @param graph         the graph name.
+     * @param callback(err,triple) called when a triple is output, with
+     *                      the last triple as null.
      */
     public void toRDF(Object element, UniqueNamer namer, String subject, String property, Object graph, JSONLDTripleCallback callback) {
         CallbackWrapper cbw = new ToRDFCallback(callback);
@@ -1982,13 +1964,13 @@ public class JSONLDProcessorImpl implements JsonLd {
      * Recursively outputs the RDF statements found in the given JSON-LD
      * element.
      *
-     * @param elem the JSON-LD element.
-     * @param namer the UniqueNamer for assigning bnode names.
-     * @param subject the active subject.
-     * @param property the active property.
-     * @param graph the graph name.
-     * @param callback(err, triple) called when a triple is output, with
-     * the last triple as null.
+     * @param elem          the JSON-LD element.
+     * @param namer         the UniqueNamer for assigning bnode names.
+     * @param subject       the active subject.
+     * @param property      the active property.
+     * @param graph         the graph name.
+     * @param callback(err,triple) called when a triple is output, with
+     *                      the last triple as null.
      */
     private void internalToRDF(Object elem, UniqueNamer namer, Object subject, Object property, Object graph, CallbackWrapper callback) {
         if (elem instanceof Map) {
@@ -2176,7 +2158,7 @@ public class JSONLDProcessorImpl implements JsonLd {
      * Converts RDF statements into JSON-LD.
      *
      * @param statements the RDF statements. options the RDF conversion options.
-     * callback(err, output) called once the operation completes.
+     *                   callback(err, output) called once the operation completes.
      * @throws org.xbib.rdf.jsonld.JSONLDProcessingError
      */
     public Object fromRDF(List<Map<String, Object>> statements) throws JSONLDProcessingError {
@@ -2335,14 +2317,14 @@ public class JSONLDProcessorImpl implements JsonLd {
 
         return output;
     }
+
     private final Pattern p = Pattern.compile("^[+-]?[0-9]+((?:\\.?[0-9]+((?:E?[+-]?[0-9]+)|)|))$");
 
     /**
      * Converts an RDF triple object to a JSON-LD object.
      *
      * @param o the RDF triple object to convert. useNativeTypes true to
-     * output native types, false not to.
-     *
+     *          output native types, false not to.
      * @return the JSON-LD object.
      */
     private Object rdfToObject(Map<String, Object> o) {

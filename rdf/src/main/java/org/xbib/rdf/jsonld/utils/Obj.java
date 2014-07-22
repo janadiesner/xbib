@@ -7,7 +7,7 @@ public class Obj {
     /**
      * Used to make getting values from maps embedded in maps embedded in maps
      * easier TODO: roll out the loops for efficiency
-     * 
+     *
      * @param map
      * @param keys
      * @return
@@ -40,7 +40,7 @@ public class Obj {
     }
 
     public static Object put(Object map, String key1, String key2, String key3, String key4,
-            Object value) {
+                             Object value) {
         ((Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) map)
                 .get(key1)).get(key2)).get(key3)).put(key4, value);
         return map;
@@ -62,14 +62,12 @@ public class Obj {
 
     /**
      * A null-safe equals check using v1.equals(v2) if they are both not null.
-     * 
-     * @param v1
-     *            The source object for the equals check.
-     * @param v2
-     *            The object to be checked for equality using the first objects
-     *            equals method.
+     *
+     * @param v1 The source object for the equals check.
+     * @param v2 The object to be checked for equality using the first objects
+     *           equals method.
      * @return True if the objects were both null. True if both objects were not
-     *         null and v1.equals(v2). False otherwise.
+     * null and v1.equals(v2). False otherwise.
      */
     public static boolean equals(Object v1, Object v2) {
         return v1 == null ? v2 == null : v1.equals(v2);

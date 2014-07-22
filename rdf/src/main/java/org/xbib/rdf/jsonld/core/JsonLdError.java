@@ -19,11 +19,12 @@ public class JsonLdError extends Exception {
     }
 
 
-
     public JsonLdError setType(Error error) {
         this.type = error;
         return this;
-    };
+    }
+
+    ;
 
     public Error getType() {
         return type;

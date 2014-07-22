@@ -35,18 +35,18 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.simple.SimpleResource;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An abstract resource
@@ -89,7 +89,7 @@ public abstract class AbstractResource<S extends Identifier, P extends Property,
     }
 
     @Override
-    public Resource<S, P, O> add(Triple<S,P,O> triple) {
+    public Resource<S, P, O> add(Triple<S, P, O> triple) {
         if (triple == null) {
             return this;
         }
@@ -97,12 +97,12 @@ public abstract class AbstractResource<S extends Identifier, P extends Property,
         if (id == null || id.equals(id())) {
             add(triple.predicate(), triple.object());
         } else {
-            Resource<S, P, O> r =  (Resource<S, P, O>)resourceMap.get(id);
+            Resource<S, P, O> r = (Resource<S, P, O>) resourceMap.get(id);
             if (r != null) {
                 return r.add(triple);
             } else {
                 // continue with new resource with new subject
-                return new SimpleResource<S,P,O>().id(id).add(triple);
+                return new SimpleResource<S, P, O>().id(id).add(triple);
             }
         }
         return this;
@@ -119,7 +119,7 @@ public abstract class AbstractResource<S extends Identifier, P extends Property,
 
     @Override
     public Resource<S, P, O> add(P predicate, IRI iri) {
-        return add(predicate, (O)new IdentifiableNode().id(iri));
+        return add(predicate, (O) new IdentifiableNode().id(iri));
     }
 
     @Override
@@ -129,7 +129,7 @@ public abstract class AbstractResource<S extends Identifier, P extends Property,
             attributes.put(predicate, literal);
         }
         return this;
-    }    
+    }
 
     @Override
     public Resource<S, P, O> add(P predicate, Resource<S, P, O> resource) {
@@ -167,9 +167,9 @@ public abstract class AbstractResource<S extends Identifier, P extends Property,
     @Override
     public O literal(P predicate) {
         return attributes.containsKey(predicate) ?
-                (O)attributes.get(predicate).iterator().next() : null;
+                (O) attributes.get(predicate).iterator().next() : null;
     }
-    
+
     @Override
     public Map<P, Collection<Node>> nodeMap() {
         return attributes.asMap();
@@ -192,7 +192,7 @@ public abstract class AbstractResource<S extends Identifier, P extends Property,
                 if (o instanceof Literal) {
                     keep.add(o);
                 } else if (o instanceof IdentifiableNode) {
-                    if (!((IdentifiableNode)o).isBlank()) {
+                    if (!((IdentifiableNode) o).isBlank()) {
                         keep.add(o);
                     }
                 }
@@ -243,16 +243,16 @@ public abstract class AbstractResource<S extends Identifier, P extends Property,
     }
 
     @Override
-    public Map<P, Collection<Resource<S,P,O>>> resources() {
-        Map<P, Collection<Resource<S,P,O>>> map = new HashMap();
+    public Map<P, Collection<Resource<S, P, O>>> resources() {
+        Map<P, Collection<Resource<S, P, O>>> map = new HashMap();
         Multimap<P, Node> filtered = Multimaps.filterValues(attributes, resources);
         // copy resources...
-        for (Map.Entry<P,Collection<Node>> me : filtered.asMap().entrySet()) {
-            Collection<Resource<S,P,O>> c = new ArrayList();
+        for (Map.Entry<P, Collection<Node>> me : filtered.asMap().entrySet()) {
+            Collection<Resource<S, P, O>> c = new ArrayList();
             for (Node n : me.getValue()) {
-                c.add((Resource<S,P,O>)n);
+                c.add((Resource<S, P, O>) n);
             }
-            map.put(me.getKey(),c);
+            map.put(me.getKey(), c);
         }
         return map;
     }

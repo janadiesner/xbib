@@ -31,9 +31,6 @@
  */
 package org.xbib.rdf.simple;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.xbib.iri.IRI;
 import org.xbib.rdf.AbstractResource;
 import org.xbib.rdf.IdentifiableNode;
@@ -47,14 +44,16 @@ import org.xbib.rdf.TripleIterator;
 import org.xbib.rdf.Visitor;
 import org.xbib.rdf.context.ResourceContext;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 /**
  * A simple resource is a sequence of properties and of associated resources.
- *
  */
 public class SimpleResource<S extends Identifier, P extends Property, O extends Node>
         extends AbstractResource<S, P, O> {
 
-    private transient final SimpleFactory<S,P,O> simpleFactory = SimpleFactory.getInstance();
+    private transient final SimpleFactory<S, P, O> simpleFactory = SimpleFactory.getInstance();
 
     private ResourceContext context = new SimpleResourceContext();
 
@@ -70,10 +69,10 @@ public class SimpleResource<S extends Identifier, P extends Property, O extends 
     }
 
     @Override
-    public Resource<S,P,O> newResource(P predicate) {
+    public Resource<S, P, O> newResource(P predicate) {
         IRI blank = new IdentifiableNode().blank().id();
-        Resource<S,P,O> r = new SimpleResource().id(blank);
-        resourceMap.put(blank, (O)r);
+        Resource<S, P, O> r = new SimpleResource().id(blank);
+        resourceMap.put(blank, (O) r);
         attributes.put(predicate, r);
         return r;
     }
@@ -110,7 +109,7 @@ public class SimpleResource<S extends Identifier, P extends Property, O extends 
     public Resource<S, P, O> add(String predicate, Literal value) {
         return add(simpleFactory.asPredicate(predicate), value);
     }
-    
+
     @Override
     public Resource<S, P, O> add(String predicate, IRI externalResource) {
         return add(simpleFactory.asPredicate(predicate), externalResource);
@@ -135,7 +134,7 @@ public class SimpleResource<S extends Identifier, P extends Property, O extends 
     public Resource<S, P, O> add(String predicate, Resource<S, P, O> resource) {
         return add(simpleFactory.asPredicate(predicate), resource);
     }
-    
+
     @Override
     public Collection<O> objects(String predicate) {
         return objects(simpleFactory.asPredicate(predicate));
@@ -152,7 +151,7 @@ public class SimpleResource<S extends Identifier, P extends Property, O extends 
     }
 
     @Override
-    public Iterator<Triple<S,P,O>> propertyIterator() {
+    public Iterator<Triple<S, P, O>> propertyIterator() {
         return new TripleIterator(this, false);
     }
 
@@ -207,6 +206,6 @@ public class SimpleResource<S extends Identifier, P extends Property, O extends 
         return c != null ? c.iterator().hasNext() ?
                 c.iterator().next().toString()
                 : null : null;
-    }    
+    }
 
 }

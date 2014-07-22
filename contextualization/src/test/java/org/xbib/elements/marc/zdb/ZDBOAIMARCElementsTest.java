@@ -36,8 +36,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -46,20 +46,23 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.content.ContentBuilder;
 import org.xml.sax.InputSource;
 
 public class ZDBOAIMARCElementsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ZDBOAIMARCElementsTest.class.getName());
 
+    private final AtomicInteger counter = new AtomicInteger();
+
     public void testOAIElements() throws Exception {
-        final CountableContextResourceOutput output = new CountableContextResourceOutput<ResourceContext, Resource>() {
+        final ResourceContextWriter output = new AbstractResourceContextWriter() {
 
             @Override
-            public void output(ResourceContext context, Resource resource, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
+            public void write(ResourceContext context) throws IOException {
                 Resource r = context.getResource();
                 r.id(IRI.builder().host("myindex").query("mytype").fragment(counter.toString()).build());
                 StringWriter sw = new StringWriter();
@@ -68,11 +71,14 @@ public class ZDBOAIMARCElementsTest {
                 logger.info("out={}", sw.toString());
                 counter.incrementAndGet();
             }
+
         };
         MARCElementMapper mapper = new MARCElementMapper("marc/zdb/bib")
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
-                        return new MARCElementBuilder().addOutput(output);
+                        MARCElementBuilder builder = new MARCElementBuilder();
+                        builder.addWriter(output);
+                        return builder;
                     }
                 });
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
@@ -89,7 +95,6 @@ public class ZDBOAIMARCElementsTest {
         //reader.parse(source);
         br.close();
         mapper.close();
-        logger.info("counter = {}", output.getCounter());
         // assertEquals ...
     }
 

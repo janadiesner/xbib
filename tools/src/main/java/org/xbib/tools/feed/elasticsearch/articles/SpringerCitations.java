@@ -199,7 +199,7 @@ public class SpringerCitations extends Feeder {
                     .query(settings.get("type"))
                     .fragment(resourceContext.getResource().id().getFragment())
                     .build());
-            sink.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
+            sink.write(resourceContext);
         }
     }
 

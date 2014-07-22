@@ -17,8 +17,9 @@
  */
 package org.xbib.text.language.enums;
 
-import java.util.Locale;
 import org.xbib.text.language.Subtag;
+
+import java.util.Locale;
 
 /**
  * Enum constants used to validate language tags
@@ -26,26 +27,26 @@ import org.xbib.text.language.Subtag;
 public enum Variant {
 
     _1606NICT(null, null, "frm", "Late Middle French (to 1606)"), _1694ACAD(null, null, "fr", "Early Modern French"), _1901(
-        null, null, "de", "Traditional German orthography"), _1994(null, null, new String[] {"sl-rozaj",
-                                                                                             "sl-rozaj-biske",
-                                                                                             "sl-rozaj-njiva",
-                                                                                             "sl-rozaj-osojs",
-                                                                                             "sl-rozaj-solba"},
-        "Standardized Resian orthography"), _1996(null, null, "de", "German orthography of 1996"), AREVELA(null, null,
-        "hy", "Eastern Armenian"), AREVMDA(null, null, "hy", "Western Armenian"), BAKU1926(null, null,
-        new String[] {"az", "ba", "crh", "kk", "krc", "ky", "sah", "tk", "tt", "uz"},
-        "Unified Turkic Latin Alphabet (Historical)"), BISKE(null, null, "sl-rozaj",
-        "The San Giorgio dialect of Resian", "The Bila dialect of Resian"), BOONT(null, null, "en", "Boontling"), FONIPA(
-        null, null, (String)null, "International Phonetic Alphabet"), FONUPA(null, null, (String)null,
-        "Uralic Phonetic Alphabet"), LIPAW(null, null, "sl-rozaj", "The Lipovaz dialect of Resian",
-        "The Lipovec dialect of Resian"), MONOTON(null, null, "el", "Monotonic Greek"), NEDIS(null, null, "sl",
-        "Natisone dialect", "Nadiza dialect"), NJIVA(null, null, "sl-rozaj", "The Gniva dialect of Resian",
-        "The Njiva dialect of Resian"), OSOJS(null, null, "sl-rozaj", "The Oseacco dialect of Resian",
-        "The Osojane dialect of Resian"), POLYTON(null, null, "el", "Polytonic Greek"), ROZAJ(null, null, "sl",
-        "Resian", "Resianic", "Rezijan"), SCOTLAND(null, null, "en", "Scottish Standard English"), SCOUSE(null, null,
-        "en", "Scouse"), SOLBA(null, null, "sl-rozaj", "The Stolvizza dialect of Resian",
-        "The Solbica dialect of Resian"), TARASK(null, null, "be", "Belarusian in Taraskievica orthography"), VALENCIA(
-        null, null, "ca", "Valencian");
+            null, null, "de", "Traditional German orthography"), _1994(null, null, new String[]{"sl-rozaj",
+            "sl-rozaj-biske",
+            "sl-rozaj-njiva",
+            "sl-rozaj-osojs",
+            "sl-rozaj-solba"},
+            "Standardized Resian orthography"), _1996(null, null, "de", "German orthography of 1996"), AREVELA(null, null,
+            "hy", "Eastern Armenian"), AREVMDA(null, null, "hy", "Western Armenian"), BAKU1926(null, null,
+            new String[]{"az", "ba", "crh", "kk", "krc", "ky", "sah", "tk", "tt", "uz"},
+            "Unified Turkic Latin Alphabet (Historical)"), BISKE(null, null, "sl-rozaj",
+            "The San Giorgio dialect of Resian", "The Bila dialect of Resian"), BOONT(null, null, "en", "Boontling"), FONIPA(
+            null, null, (String) null, "International Phonetic Alphabet"), FONUPA(null, null, (String) null,
+            "Uralic Phonetic Alphabet"), LIPAW(null, null, "sl-rozaj", "The Lipovaz dialect of Resian",
+            "The Lipovec dialect of Resian"), MONOTON(null, null, "el", "Monotonic Greek"), NEDIS(null, null, "sl",
+            "Natisone dialect", "Nadiza dialect"), NJIVA(null, null, "sl-rozaj", "The Gniva dialect of Resian",
+            "The Njiva dialect of Resian"), OSOJS(null, null, "sl-rozaj", "The Oseacco dialect of Resian",
+            "The Osojane dialect of Resian"), POLYTON(null, null, "el", "Polytonic Greek"), ROZAJ(null, null, "sl",
+            "Resian", "Resianic", "Rezijan"), SCOTLAND(null, null, "en", "Scottish Standard English"), SCOUSE(null, null,
+            "en", "Scouse"), SOLBA(null, null, "sl-rozaj", "The Stolvizza dialect of Resian",
+            "The Solbica dialect of Resian"), TARASK(null, null, "be", "Belarusian in Taraskievica orthography"), VALENCIA(
+            null, null, "ca", "Valencian");
 
     private final String deprecated;
     private final String preferred;
@@ -53,7 +54,7 @@ public enum Variant {
     private final String[] descriptions;
 
     private Variant(String dep, String pref, String prefix, String... desc) {
-        this(dep, pref, new String[] {prefix}, desc);
+        this(dep, pref, new String[]{prefix}, desc);
     }
 
     private Variant(String dep, String pref, String[] prefixes, String... desc) {
@@ -100,15 +101,18 @@ public enum Variant {
     }
 
     public static Variant valueOf(Subtag subtag) {
-        if (subtag == null)
+        if (subtag == null) {
             return null;
+        }
         if (subtag.getType() == Subtag.Type.VARIANT) {
             String name = subtag.getName();
-            if (name.startsWith("1"))
+            if (name.startsWith("1")) {
                 name = "_" + name;
+            }
             return valueOf(name.toUpperCase(Locale.US));
-        } else
+        } else {
             throw new IllegalArgumentException("Wrong subtag type");
+        }
     }
 
 }

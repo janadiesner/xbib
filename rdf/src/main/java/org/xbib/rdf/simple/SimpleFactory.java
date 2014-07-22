@@ -37,51 +37,51 @@ import org.xbib.rdf.IdentifiableProperty;
 import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Property;
-import org.xbib.rdf.RDF;
+import org.xbib.rdf.RDFNS;
 import org.xbib.rdf.Visitor;
-import org.xbib.rdf.types.XSD;
+import org.xbib.rdf.types.XSDResourceIdentifiers;
 
-public final class SimpleFactory<S,P,O> implements XSD {
+public final class SimpleFactory<S, P, O> implements XSDResourceIdentifiers {
 
     private final static transient SimpleFactory instance = new SimpleFactory();
 
     private SimpleFactory() {
     }
-    
-    public static <S,P,O> SimpleFactory<S,P,O> getInstance() {
+
+    public static <S, P, O> SimpleFactory<S, P, O> getInstance() {
         return instance;
     }
-    
+
     public S asSubject(Object subject) {
-        return subject instanceof Identifier ? (S)subject :
-                subject instanceof IRI ? (S)new IdentifiableNode().id((IRI)subject) :
-                (S)new SimpleResource().id(IRI.builder().curi(subject.toString()).build());
+        return subject instanceof Identifier ? (S) subject :
+                subject instanceof IRI ? (S) new IdentifiableNode().id((IRI) subject) :
+                        (S) new SimpleResource().id(IRI.builder().curie(subject.toString()).build());
     }
 
     public P asPredicate(Object predicate) {
         return predicate == null ? null :
-                predicate instanceof Property ? (P)predicate :
-                predicate instanceof IRI ?  (P)new IdentifiableProperty((IRI)predicate) :
-                (P)new IdentifiableProperty(IRI.builder().curi(predicate.toString()).build());
+                predicate instanceof Property ? (P) predicate :
+                        predicate instanceof IRI ? (P) new IdentifiableProperty((IRI) predicate) :
+                                (P) new IdentifiableProperty(IRI.builder().curie(predicate.toString()).build());
     }
 
     public O asObject(Object object) {
         return object == null ? null :
                 object instanceof Literal ? (O) object :
-                object instanceof IRI ? (O) new SimpleResource().id((IRI)object) :
-                (O) new SimpleLiteral(object);
+                        object instanceof IRI ? (O) new SimpleResource().id((IRI) object) :
+                                (O) new SimpleLiteral(object);
     }
 
     public Literal asLiteral(Object literal) {
         return literal == null ? null :
-                literal instanceof Literal ? (Literal)literal :
+                literal instanceof Literal ? (Literal) literal :
                         newLiteral(literal);
     }
 
     public Identifier newBlankNode(String nodeID) {
         return new IdentifiableNode().id(nodeID);
-    }    
-    
+    }
+
     public Literal newLiteral(Object value) {
         Literal l = new SimpleLiteral();
         if (value instanceof Double) {
@@ -100,13 +100,13 @@ public final class SimpleFactory<S,P,O> implements XSD {
             return l.type(BOOLEAN).object(value);
         }
         // auto derive
-        return l.object(value);        
+        return l.object(value);
     }
 
     private final static Property TYPE = new Property() {
         @Override
         public IRI id() {
-            return RDF.RDF_TYPE;
+            return RDFNS.RDF_TYPE;
         }
 
         @Override
@@ -120,14 +120,14 @@ public final class SimpleFactory<S,P,O> implements XSD {
     };
 
     public P rdfType() {
-        return (P)TYPE;
+        return (P) TYPE;
     }
 
     private final static Property LANG = new Property() {
 
         @Override
         public IRI id() {
-            return RDF.RDF_LANGUAGE;
+            return RDFNS.RDF_LANGUAGE;
         }
 
         @Override
@@ -141,7 +141,7 @@ public final class SimpleFactory<S,P,O> implements XSD {
     };
 
     public P rdfLang() {
-        return (P)LANG;
+        return (P) LANG;
     }
 
 }

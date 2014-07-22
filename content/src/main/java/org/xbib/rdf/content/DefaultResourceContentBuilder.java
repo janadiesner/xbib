@@ -33,7 +33,6 @@ package org.xbib.rdf.content;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -43,50 +42,39 @@ import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.iri.CompactingNamespaceContext;
+import org.xbib.iri.namespace.CompactingNamespaceContext;
+import org.xbib.rdf.context.ResourceContextContentBuilder;
+import org.xbib.rdf.context.ResourceContextWriter;
 
 import static com.google.common.collect.Lists.newLinkedList;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
- * A content builder for building XContent from a resource
+ * A default content builder for building XContent from a resource and write it out.
  *
  * @param <C> context type
  * @param <R> resource type
  */
-public class DefaultContentBuilder<C extends ResourceContext<R>, R extends Resource>
-    implements ContentBuilder<C,R> {
+public class DefaultResourceContentBuilder<C extends ResourceContext<R>, R extends Resource>
+    implements ResourceContextContentBuilder<C,R>, ResourceContextWriter {
 
-    public DefaultContentBuilder<C,R> timestamp(Date timestamp) {
+    private XContentBuilder builder;
+
+    public ResourceContextWriter builder(XContentBuilder builder) {
+        this.builder = builder;
         return this;
     }
 
-    public DefaultContentBuilder<C,R> message(String message) {
-        return this;
+    @Override
+    public void write(ResourceContext resourceContext) throws IOException {
+        if (builder != null) {
+            builder.startObject();
+            build(builder, (C) resourceContext, resourceContext.getResource());
+            builder.endObject();
+        }
     }
 
-    public DefaultContentBuilder<C,R> source(String source) {
-        return this;
-    }
-
-    public DefaultContentBuilder<C,R> sourceHost(String sourceHost) {
-        return this;
-    }
-
-    public DefaultContentBuilder<C,R> sourcePath(String sorucePath) {
-        return this;
-    }
-
-    public DefaultContentBuilder<C,R> type(String... type) {
-        return this;
-    }
-
-    public DefaultContentBuilder<C,R> tags(String... tags) {
-        return this;
-    }
-
-    public <S extends Identifier, P extends Property, O extends Node> String build(C context, R resource)
-            throws IOException {
+    public String build(C context, R resource)  throws IOException {
         XContentBuilder builder = jsonBuilder();
         builder.startObject();
         build(builder, context, resource);
@@ -114,7 +102,7 @@ public class DefaultContentBuilder<C extends ResourceContext<R>, R extends Resou
                 if (object instanceof Identifier) {
                     Identifier id = (Identifier) object;
                     if (!id.isBlank()) {
-                        builder.field(context.compact(predicate.id()), id.id().toString()); // ID -> string
+                        builder.field(context.compact(predicate.id()), id.id().toString()); // ID -> string?
                     }
                 } else if (object.nativeValue() != null) {
                     builder.field(context.compact(predicate.id()), object.nativeValue());
@@ -130,7 +118,7 @@ public class DefaultContentBuilder<C extends ResourceContext<R>, R extends Resou
                         if (object instanceof Identifier) {
                             Identifier id = (Identifier) object;
                             if (!id.isBlank()) {
-                                builder.value(id.id().toString()); // IRI -> string
+                                builder.value(id.id().toString()); // IRI -> string?
                             }
                         } else if (object.nativeValue() != null) {
                             // drop null values
@@ -200,4 +188,15 @@ public class DefaultContentBuilder<C extends ResourceContext<R>, R extends Resou
         }
         return nodes;
     }
+
+    @Override
+    public void close() throws IOException {
+
+    }
+
+    @Override
+    public void flush() throws IOException {
+
+    }
+
 }

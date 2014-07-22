@@ -29,20 +29,12 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.rdf.io;
+package org.xbib.xml;
 
-import org.xbib.rdf.Identifier;
-import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
+public interface XML {
 
-import java.io.IOException;
+    String NS_PREFIX = "xml";
 
-/**
- * Resource writer
- */
-public interface ResourceWriter<S extends Identifier, P extends Property, O extends Node> {
+    String NS_URI = " http://www.w3.org/XML/1998/namespace";
 
-    public ResourceWriter write(ResourceContext<Resource<S, P, O>> resourceContext) throws IOException;
 }

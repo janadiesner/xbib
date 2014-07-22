@@ -35,9 +35,9 @@ import org.xbib.iri.IRI;
 import org.xbib.oai.OAIConstants;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleLine;
+import org.xbib.rdf.io.TripleWriter;
 import org.xbib.rdf.io.xml.XmlResourceHandler;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xml.sax.Attributes;
@@ -54,7 +54,7 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
 
     private ResourceContext<Resource> resourceContext;
 
-    private TripleLine tripleLine;
+    private TripleWriter tripleWriter;
 
     private IRINamespaceContext context;
 
@@ -95,8 +95,8 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
     public RdfMetadataHandler setHandler(RdfResourceHandler handler) {
         handler.setDefaultNamespace(NS_PREFIX, NS_URI);
         this.handler = handler;
-        if (tripleLine != null) {
-            handler.setListener(tripleLine);
+        if (tripleWriter != null) {
+            handler.setListener(tripleWriter);
         }
         return this;
     }
@@ -105,10 +105,10 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
         return handler;
     }
 
-    public RdfMetadataHandler setTripleLine(TripleLine tripleLine) {
-        if (tripleLine != null) {
-            handler.setListener(tripleLine);
-            this.tripleLine = tripleLine;
+    public RdfMetadataHandler setTripleWriter(TripleWriter tripleWriter) {
+        if (tripleWriter != null) {
+            handler.setListener(tripleWriter);
+            this.tripleWriter = tripleWriter;
         }
         return this;
     }
@@ -135,8 +135,8 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
             resourceContext.getResource().id(IRI.create(id));
             handler.endDocument();
             try {
-                if (tripleLine != null) {
-                    tripleLine.write(resourceContext);
+                if (tripleWriter != null) {
+                    tripleWriter.write(resourceContext);
                 }
             } catch (IOException e) {
                 throw new SAXException(e);

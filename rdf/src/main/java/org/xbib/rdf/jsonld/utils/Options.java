@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class Options {
     private String base = null;
-    private  Boolean strict = null;
+    private Boolean strict = null;
     public Boolean graph = null;
     public Boolean optimize = null;
     public Map<String, Object> optimizeCtx = null;
@@ -43,8 +43,7 @@ public class Options {
      * Tells the processor to skip over the key specified by "key" any time it encounters it. Objects under this key will not be manipulated by any of the
      * processor functions and no triples will be created using it.
      *
-     * @param key
-     *            The name of the key this processor should ignore.
+     * @param key The name of the key this processor should ignore.
      */
     public Options ignoreKey(String key) {
         ignoredKeys.add(key);
@@ -87,7 +86,7 @@ public class Options {
         rval.useNativeTypes = useNativeTypes;
         rval.useRdfType = useRdfType;
         rval.addBlankNodeIDs = addBlankNodeIDs;
-        for (String key: ignoredKeys) {
+        for (String key : ignoredKeys) {
             rval.ignoreKey(key);
         }
         return rval;

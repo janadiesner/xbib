@@ -35,8 +35,7 @@ package org.xbib.rdf;
 import org.xbib.iri.IRI;
 
 /**
- * An identifiable property 
- * 
+ * An identifiable property
  */
 public class IdentifiableProperty extends IRI implements Identifier, Property {
 
@@ -47,7 +46,7 @@ public class IdentifiableProperty extends IRI implements Identifier, Property {
     public IdentifiableProperty(IRI iri) {
         super(iri);
     }
-    
+
     public static IdentifiableProperty create(IRI iri) {
         return new IdentifiableProperty(iri);
     }
@@ -55,7 +54,7 @@ public class IdentifiableProperty extends IRI implements Identifier, Property {
     public static IdentifiableProperty create(String iri) {
         return new IdentifiableProperty(iri);
     }
-    
+
     @Override
     public IRI id() {
         return this;

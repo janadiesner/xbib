@@ -11,9 +11,9 @@ import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.content.DefaultResourceContentBuilder;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.rdf.content.DefaultContentBuilder;
 
 import java.net.URI;
 
@@ -29,7 +29,7 @@ public class BulkIndexerTest extends Assert {
             es.newIndex("test");
             es.deleteIndex("test");
             ResourceContext context = createContext();
-            new ResourceSink(es).output(context, context.getResource(), context.getContentBuilder());
+            new ResourceSink(es).write(context);
             es.flushIngest();
             es.waitForResponses(TimeValue.timeValueSeconds(30));
             Logger queryLogger = LoggerFactory.getLogger("test", BulkIndexerTest.class.getName());
@@ -50,7 +50,7 @@ public class BulkIndexerTest extends Assert {
     private ResourceContext createContext() {
         ResourceContext context = new SimpleResourceContext()
                 .newNamespaceContext()
-                .setContentBuilder(new DefaultContentBuilder());
+                .setContentBuilder(new DefaultResourceContentBuilder());
         context.getNamespaceContext().addNamespace(ES.NS_PREFIX, ES.NS_URI);
         context.getNamespaceContext().addNamespace("urn", "http://urn");
         context.getNamespaceContext().addNamespace("dc", "http://purl.org/dc/terms/");

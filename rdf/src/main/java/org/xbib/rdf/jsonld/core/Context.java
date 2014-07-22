@@ -1,6 +1,7 @@
 package org.xbib.rdf.jsonld.core;
 
-import static org.xbib.rdf.jsonld.core.JsonLdUtils.compareShortestLeast;
+import org.xbib.rdf.jsonld.utils.Obj;
+import org.xbib.rdf.jsonld.utils.URL;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,13 +10,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.xbib.rdf.jsonld.utils.Obj;
-import org.xbib.rdf.jsonld.utils.URL;
+import static org.xbib.rdf.jsonld.core.JsonLdUtils.compareShortestLeast;
 
 /**
  * A helper class which still stores all the values in a map but gives member
  * variables easily access certain keys
- * 
  */
 public class Context extends LinkedHashMap<String, Object> {
 
@@ -59,9 +58,9 @@ public class Context extends LinkedHashMap<String, Object> {
 
     /**
      * Value Compaction Algorithm
-     * 
+     * <p>
      * http://json-ld.org/spec/latest/json-ld-api/#value-compaction
-     * 
+     *
      * @param activeProperty
      * @param value
      * @return
@@ -108,7 +107,7 @@ public class Context extends LinkedHashMap<String, Object> {
         // 7)
         if (numberMembers == 1
                 && (!(valueValue instanceof String) || !this.containsKey("@language") || (getTermDefinition(
-                        activeProperty).containsKey("@language") && languageMapping == null))) {
+                activeProperty).containsKey("@language") && languageMapping == null))) {
             return valueValue;
         }
         // 8)
@@ -117,9 +116,9 @@ public class Context extends LinkedHashMap<String, Object> {
 
     /**
      * Context Processing Algorithm
-     * 
+     * <p>
      * http://json-ld.org/spec/latest/json-ld-api/#context-processing-algorithms
-     * 
+     *
      * @param localContext
      * @param remoteContexts
      * @return
@@ -247,16 +246,16 @@ public class Context extends LinkedHashMap<String, Object> {
 
     /**
      * Create Term Definition Algorithm
-     * 
+     * <p>
      * http://json-ld.org/spec/latest/json-ld-api/#create-term-definition
-     * 
+     *
      * @param context
      * @param term
      * @param defined
      * @throws JsonLdError
      */
     private void createTermDefinition(Map<String, Object> context, String term,
-            Map<String, Boolean> defined) throws JsonLdError {
+                                      Map<String, Boolean> defined) throws JsonLdError {
         if (defined.containsKey(term)) {
             if (Boolean.TRUE.equals(defined.get(term))) {
                 return;
@@ -274,7 +273,7 @@ public class Context extends LinkedHashMap<String, Object> {
         Object value = context.get(term);
         if (value == null
                 || (value instanceof Map && ((Map<String, Object>) value).containsKey("@id") && ((Map<String, Object>) value)
-                        .get("@id") == null)) {
+                .get("@id") == null)) {
             this.termDefinitions.put(term, null);
             defined.put(term, true);
             return;
@@ -329,7 +328,7 @@ public class Context extends LinkedHashMap<String, Object> {
                 throw new JsonLdError(Error.INVALID_IRI_MAPPING,
                         "Expected String for @reverse value. got "
                                 + (val.get("@reverse") == null ? "null" : val.get("@reverse")
-                                        .getClass()));
+                                .getClass()));
             }
             final String reverse = this.expandIri((String) val.get("@reverse"), false, true,
                     context, defined);
@@ -427,9 +426,9 @@ public class Context extends LinkedHashMap<String, Object> {
 
     /**
      * IRI Expansion Algorithm
-     * 
+     * <p>
      * http://json-ld.org/spec/latest/json-ld-api/#iri-expansion
-     * 
+     *
      * @param value
      * @param relative
      * @param vocab
@@ -439,7 +438,7 @@ public class Context extends LinkedHashMap<String, Object> {
      * @throws JsonLdError
      */
     String expandIri(String value, boolean relative, boolean vocab, Map<String, Object> context,
-            Map<String, Boolean> defined) throws JsonLdError {
+                     Map<String, Boolean> defined) throws JsonLdError {
         // 1)
         if (value == null || JsonLdUtils.isKeyword(value)) {
             return value;
@@ -498,23 +497,18 @@ public class Context extends LinkedHashMap<String, Object> {
 
     /**
      * IRI Compaction Algorithm
-     * 
+     * <p>
      * http://json-ld.org/spec/latest/json-ld-api/#iri-compaction
-     * 
+     * <p>
      * Compacts an IRI or keyword into a term or prefix if it can be. If the IRI
      * has an associated value it may be passed.
-     * 
-     * @param iri
-     *            the IRI to compact.
-     * @param value
-     *            the value to check or null.
-     * @param relativeToVocab
-     *            options for how to compact IRIs: vocab: true to split after
-     * @vocab, false not to.
-     * @param reverse
-     *            true if a reverse property is being compacted, false if not.
-     * 
+     *
+     * @param iri             the IRI to compact.
+     * @param value           the value to check or null.
+     * @param relativeToVocab options for how to compact IRIs: vocab: true to split after
+     * @param reverse         true if a reverse property is being compacted, false if not.
      * @return the compacted term, prefix, keyword alias, or the original IRI.
+     * @vocab, false not to.
      */
     String compactIri(String iri, Object value, boolean relativeToVocab, boolean reverse) {
         // 1)
@@ -663,7 +657,7 @@ public class Context extends LinkedHashMap<String, Object> {
                 if (termDefinitions.containsKey(result)
                         && ((Map<String, Object>) termDefinitions.get(result)).containsKey("@id")
                         && ((Map<String, Object>) value).get("@id").equals(
-                                ((Map<String, Object>) termDefinitions.get(result)).get("@id"))) {
+                        ((Map<String, Object>) termDefinitions.get(result)).get("@id"))) {
                     preferredValues.add("@vocab");
                     preferredValues.add("@id");
                 }
@@ -724,8 +718,8 @@ public class Context extends LinkedHashMap<String, Object> {
             // 5.4)
             if ((compactIRI == null || compareShortestLeast(candidate, compactIRI) < 0)
                     && (!termDefinitions.containsKey(candidate) || (iri
-                            .equals(((Map<String, Object>) termDefinitions.get(candidate))
-                                    .get("@id")) && value == null))) {
+                    .equals(((Map<String, Object>) termDefinitions.get(candidate))
+                            .get("@id")) && value == null))) {
                 compactIRI = candidate;
             }
 
@@ -764,12 +758,12 @@ public class Context extends LinkedHashMap<String, Object> {
 
     /**
      * Inverse Context Creation
-     * 
+     * <p>
      * http://json-ld.org/spec/latest/json-ld-api/#inverse-context-creation
-     * 
+     * <p>
      * Generates an inverse context for use in the compaction algorithm, if not
      * already generated for the given active context.
-     * 
+     *
      * @return the inverse context.
      */
     public Map<String, Object> getInverse() {
@@ -883,19 +877,19 @@ public class Context extends LinkedHashMap<String, Object> {
 
     /**
      * Term Selection
-     * 
+     * <p>
      * http://json-ld.org/spec/latest/json-ld-api/#term-selection
-     * 
+     * <p>
      * This algorithm, invoked via the IRI Compaction algorithm, makes use of an
      * active context's inverse context to find the term that is best used to
      * compact an IRI. Other information about a value associated with the IRI
      * is given, including which container mappings and which type mapping or
      * language mapping would be best used to express the value.
-     * 
+     *
      * @return the selected term.
      */
     private String selectTerm(String iri, List<String> containers, String typeLanguage,
-            List<String> preferredValues) {
+                              List<String> preferredValues) {
         final Map<String, Object> inv = getInverse();
         // 1)
         final Map<String, Object> containerMap = (Map<String, Object>) inv.get(iri);
@@ -927,7 +921,7 @@ public class Context extends LinkedHashMap<String, Object> {
 
     /**
      * Retrieve container mapping.
-     * 
+     *
      * @param property
      * @return
      */
@@ -1035,7 +1029,7 @@ public class Context extends LinkedHashMap<String, Object> {
                     && definition.get("@container") == null
                     && definition.get("@type") == null
                     && (definition.get("@reverse") == null || Boolean.FALSE.equals(definition
-                            .get("@reverse")))) {
+                    .get("@reverse")))) {
                 final String cid = this.compactIri((String) definition.get("@id"));
                 ctx.put(term, term.equals(cid) ? definition.get("@id") : cid);
             } else {

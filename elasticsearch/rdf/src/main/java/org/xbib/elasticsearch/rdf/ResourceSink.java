@@ -34,19 +34,15 @@ package org.xbib.elasticsearch.rdf;
 import java.io.IOException;
 
 import org.xbib.elasticsearch.support.client.Feed;
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.content.ContentBuilder;
+import org.xbib.rdf.context.ResourceContextWriter;
 
 /**
  * Index RDF resources into Elasticsearch
  *
- * @param <C>
- * @param <R>
  */
-public class ResourceSink<C extends ResourceContext, R extends Resource>
-        extends CountableContextResourceOutput<C, R> {
+public class ResourceSink implements ResourceContextWriter {
 
     private final Feed feeder;
 
@@ -55,7 +51,8 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
     }
 
     @Override
-    public void output(C context, R resource, ContentBuilder<C, R> contentBuilder) throws IOException {
+    public void write(ResourceContext context) throws IOException {
+        Resource resource = context.getResource();
         if (resource == null) {
             throw new IllegalArgumentException("resource is null");
         }
@@ -92,13 +89,11 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
             if (id == null) {
                 throw new IOException("id must not be null, no fragment set in IRI?");
             }
-            if (contentBuilder == null) {
+            if (context.getContentBuilder() == null) {
                 throw new IllegalArgumentException("resource content builder is null");
             }
-            feeder.index(index, type, id, contentBuilder.build(context, resource));
-
+            feeder.index(index, type, id, context.getContentBuilder() .build(context, resource));
         }
-        counter.incrementAndGet();
     }
 
     /**
@@ -107,7 +102,7 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
      * @param resource the resource
      * @return the index
      */
-    protected String makeIndex(R resource) {
+    protected String makeIndex(Resource resource) {
         return resource.id().getHost();
     }
 
@@ -117,7 +112,7 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
      * @param resource the resource
      * @return the type
      */
-    protected String makeType(R resource) {
+    protected String makeType(Resource resource) {
         return resource.id().getQuery();
     }
 
@@ -127,11 +122,21 @@ public class ResourceSink<C extends ResourceContext, R extends Resource>
      * @param resource the resource
      * @return the id
      */
-    protected String makeId(R resource) {
+    protected String makeId(Resource resource) {
         String id = resource.id().getFragment();
         if (id == null) {
             id = resource.id().toString();
         }
         return id;
+    }
+
+    @Override
+    public void close() throws IOException {
+        feeder.client().close();
+    }
+
+    @Override
+    public void flush() throws IOException {
+        // ignore
     }
 }

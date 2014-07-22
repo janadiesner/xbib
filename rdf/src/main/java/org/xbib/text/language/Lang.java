@@ -31,6 +31,8 @@
  */
 package org.xbib.text.language;
 
+import org.xbib.text.language.Subtag.Type;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -38,7 +40,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.xbib.text.language.Subtag.Type;
 
 /**
  * Implementation of Language Tags (RFC 5646)
@@ -68,10 +69,12 @@ public final class Lang extends SubtagSet {
             Subtag c = null, primary = new Subtag(Type.PRIMARY, locale.getLanguage());
             String country = locale.getCountry();
             String variant = locale.getVariant();
-            if (country != null)
+            if (country != null) {
                 c = new Subtag(Type.REGION, country, primary);
-            if (variant != null)
+            }
+            if (variant != null) {
                 new Subtag(Type.VARIANT, variant, c);
+            }
             return primary;
         }
     }
@@ -92,12 +95,13 @@ public final class Lang extends SubtagSet {
         Subtag primary = getLanguage();
         Subtag region = getRegion();
         Subtag variant = getVariant();
-        if (variant != null && region != null)
+        if (variant != null && region != null) {
             return new Locale(primary.toString(), region.toString(), variant.toString());
-        else if (region != null)
+        } else if (region != null) {
             return new Locale(primary.toString(), region.toString());
-        else
+        } else {
             return new Locale(primary.toString());
+        }
     }
 
     /**
@@ -307,9 +311,11 @@ public final class Lang extends SubtagSet {
      * Return true if this lang tag contains any deprecated subtags
      */
     public boolean isDeprecated() {
-        for (Subtag tag : this)
-            if (tag.isDeprecated())
+        for (Subtag tag : this) {
+            if (tag.isDeprecated()) {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -319,10 +325,12 @@ public final class Lang extends SubtagSet {
     public Lang getParent() {
         Lang lang = clone();
         Subtag last = null;
-        for (Subtag tag : lang)
+        for (Subtag tag : lang) {
             last = tag;
-        if (last.getPrevious() == null)
+        }
+        if (last.getPrevious() == null) {
             return null;
+        }
         last.getPrevious().setNext(null);
         return lang;
     }
@@ -352,7 +360,7 @@ public final class Lang extends SubtagSet {
     private static final String privateuse = "[xX](?:[-_][a-zA-Z0-9]{2,8})+";
     private static final String _privateuse = "((?:[-_]" + privateuse + ")?)";
     private static final String grandfathered =
-        "^(?:art[-_]lojban|cel[-_]gaulish|en[-_]GB[-_]oed|i[-_]ami|i[-_]bnn|i[-_]default|i[-_]enochian|i[-_]hak|i[-_]klingon|i[-_]lux|i[-_]mingo|i[-_]navajo|i[-_]pwn|i[-_]tao||i[-_]tay|i[-_]tsu|no[-_]bok|no[-_]nyn|sgn[-_]BE[-_]fr|sgn[-_]BE[-_]nl|sgn[-_]CH[-_]de|zh[-_]cmn|zh[-_]cmn[-_]Hans|zh[-_]cmn[-_]Hant|zh[-_]gan|zh[-_]guoyu|zh[-_]hakka|zh[-_]min|zh[-_]min[-_]nan|zh[-_]wuu|zh[-_]xiang|zh[-_]yue)$";
+            "^(?:art[-_]lojban|cel[-_]gaulish|en[-_]GB[-_]oed|i[-_]ami|i[-_]bnn|i[-_]default|i[-_]enochian|i[-_]hak|i[-_]klingon|i[-_]lux|i[-_]mingo|i[-_]navajo|i[-_]pwn|i[-_]tao||i[-_]tay|i[-_]tsu|no[-_]bok|no[-_]nyn|sgn[-_]BE[-_]fr|sgn[-_]BE[-_]nl|sgn[-_]CH[-_]de|zh[-_]cmn|zh[-_]cmn[-_]Hans|zh[-_]cmn[-_]Hant|zh[-_]gan|zh[-_]guoyu|zh[-_]hakka|zh[-_]min|zh[-_]min[-_]nan|zh[-_]wuu|zh[-_]xiang|zh[-_]yue)$";
     private static final String langtag = "^" + language + script + region + variant + extension + _privateuse + "$";
 
     private static final Pattern p_langtag = Pattern.compile(langtag);
@@ -410,15 +418,18 @@ public final class Lang extends SubtagSet {
                     current = new Subtag(Type.EXTLANG, tag, current);
                 }
             }
-            if (script != null && script.length() > 0)
+            if (script != null && script.length() > 0) {
                 current = new Subtag(Type.SCRIPT, script.substring(1), current);
-            if (region != null && region.length() > 0)
+            }
+            if (region != null && region.length() > 0) {
                 current = new Subtag(Type.REGION, region.substring(1), current);
+            }
             if (variant != null && variant.length() > 0) {
                 variant = variant.substring(1);
                 tags = variant.split("-");
-                for (String tag : tags)
+                for (String tag : tags) {
                     current = new Subtag(Type.VARIANT, tag, current);
+                }
             }
             if (extension != null && extension.length() > 0) {
                 extension = extension.substring(1);

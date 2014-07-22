@@ -31,12 +31,12 @@
  */
 package org.xbib.iri;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
 import org.xbib.text.CharUtils;
 import org.xbib.text.CharUtils.Profile;
 import org.xbib.text.Nameprep;
 import org.xbib.text.Punycode;
+
+import java.io.IOException;
 
 /**
  * Provides an Internationized Domain Name implementation
@@ -44,10 +44,6 @@ import org.xbib.text.Punycode;
 public final class IDNA implements Cloneable {
 
     private final String regname;
-
-    public IDNA(java.net.InetAddress addr) {
-        this(addr.getHostName());
-    }
 
     public IDNA(String regname) {
         this.regname = toUnicode(regname);
@@ -65,10 +61,6 @@ public final class IDNA implements Cloneable {
         return toUnicode(regname);
     }
 
-    public java.net.InetAddress getInetAddress() throws UnknownHostException {
-        return java.net.InetAddress.getByName(toASCII());
-    }
-
     @Override
     public int hashCode() {
         final int PRIME = 31;
@@ -79,18 +71,23 @@ public final class IDNA implements Cloneable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        final IDNA other = (IDNA)obj;
+        }
+        final IDNA other = (IDNA) obj;
         if (regname == null) {
-            if (other.regname != null)
+            if (other.regname != null) {
                 return false;
-        } else if (!regname.equals(other.regname))
+            }
+        } else if (!regname.equals(other.regname)) {
             return false;
+        }
         return true;
     }
 
@@ -105,10 +102,10 @@ public final class IDNA implements Cloneable {
 
     public static String toASCII(String regname) {
         try {
-            if (regname == null){
+            if (regname == null) {
                 return null;
             }
-            if (regname.length() == 0){
+            if (regname.length() == 0) {
                 return regname;
             }
             String[] labels = regname.split("\\\u002E");
@@ -117,18 +114,22 @@ public final class IDNA implements Cloneable {
                 label = Nameprep.prep(label);
                 char[] chars = label.toCharArray();
                 CharUtils.verifyNot(chars, Profile.STD3ASCIIRULES);
-                if (chars[0] == '\u002D' || chars[chars.length - 1] == '\u002D')
+                if (chars[0] == '\u002D' || chars[chars.length - 1] == '\u002D') {
                     throw new IOException("ToASCII violation");
-                if (!CharUtils.inRange(chars, (char)0x000, (char)0x007F)) {
-                    if (label.startsWith("xn--"))
+                }
+                if (!CharUtils.inRange(chars, (char) 0x000, (char) 0x007F)) {
+                    if (label.startsWith("xn--")) {
                         throw new IOException("ToASCII violation");
+                    }
                     String pc = "xn--" + Punycode.encode(chars, null);
                     chars = pc.toCharArray();
                 }
-                if (chars.length > 63)
+                if (chars.length > 63) {
                     throw new IOException("ToASCII violation");
-                if (buf.length() > 0)
+                }
+                if (buf.length() > 0) {
                     buf.append('\u002E');
+                }
                 buf.append(chars);
             }
             return buf.toString();
@@ -138,15 +139,17 @@ public final class IDNA implements Cloneable {
     }
 
     public static String toUnicode(String regname) {
-        if (regname == null)
+        if (regname == null) {
             return null;
-        if (regname.length() == 0)
+        }
+        if (regname.length() == 0) {
             return regname;
+        }
         String[] labels = regname.split("\\\u002E");
         StringBuilder buf = new StringBuilder();
         for (String label : labels) {
             char[] chars = label.toCharArray();
-            if (!CharUtils.inRange(chars, (char)0x000, (char)0x007F)) {
+            if (!CharUtils.inRange(chars, (char) 0x000, (char) 0x007F)) {
                 label = Nameprep.prep(label);
                 chars = label.toCharArray();
             }
@@ -154,15 +157,13 @@ public final class IDNA implements Cloneable {
                 label = Punycode.decode(label.substring(4));
                 chars = label.toCharArray();
             }
-            if (buf.length() > 0)
+            if (buf.length() > 0) {
                 buf.append('\u002E');
+            }
             buf.append(chars);
         }
         String check = toASCII(buf.toString());
-        if (check.equalsIgnoreCase(regname))
-            return buf.toString();
-        else
-            return regname;
+        return check.equalsIgnoreCase(regname) ? buf.toString() : regname;
     }
 
 }

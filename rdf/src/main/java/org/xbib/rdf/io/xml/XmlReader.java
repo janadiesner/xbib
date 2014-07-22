@@ -31,19 +31,19 @@
  */
 package org.xbib.rdf.io.xml;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.Reader;
-
 import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.io.Triplifier;
+import org.xbib.rdf.io.TripleReader;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.Reader;
 
 /**
  * An XML reader for parsing XML into triples
@@ -53,7 +53,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @param <O>
  */
 public class XmlReader<S extends Identifier, P extends Property, O extends Node>
-        implements Closeable, Triplifier<S, P, O> {
+        implements Closeable, TripleReader<S, P, O> {
 
     private InputSource source;
 

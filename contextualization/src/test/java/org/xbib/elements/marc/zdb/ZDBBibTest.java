@@ -33,7 +33,6 @@ package org.xbib.elements.marc.zdb;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -46,9 +45,9 @@ import org.xbib.marc.FieldCollection;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.content.ContentBuilder;
 import org.xml.sax.InputSource;
 
 import java.io.BufferedReader;
@@ -58,25 +57,30 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ZDBBibTest extends Assert {
 
     private static final Logger logger = LoggerFactory.getLogger(ZDBBibTest.class.getName());
 
+    final AtomicInteger counter = new AtomicInteger();
+
     @Test
     public void testZDBElements() throws Exception {
-        final CountableContextResourceOutput out = new OurContextResourceOutput();
+        final OurContextResourceOutput out = new OurContextResourceOutput();
         final Charset UTF8 = Charset.forName("UTF-8");
         final Charset ISO88591 = Charset.forName("ISO-8859-1");
         InputStream in = getClass().getResourceAsStream("zdbtitutf8.mrc");
-        //new GZIPInputStream(new FileInputStream(System.getProperty("user.home") + "/Daten/zdb/1302zdbtitgesamt.mrc.gz"));
+            //new GZIPInputStream(new FileInputStream(System.getProperty("user.home") + "/Daten/zdb/1302zdbtitgesamt.mrc.gz"));
         BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591));
         MARCElementMapper mapper = new MARCElementMapper("marc/zdb/bib")
                 .pipelines(Runtime.getRuntime().availableProcessors() * 2)
                 .detectUnknownKeys(true)
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
-                        return new MARCElementBuilder().addOutput(out);
+                        MARCElementBuilder builder = new MARCElementBuilder();
+                        builder.addWriter(out);
+                        return builder;
                     }
                 });
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
@@ -110,16 +114,16 @@ public class ZDBBibTest extends Assert {
         InputSource source = new InputSource(br);
         reader.parse(source);
         mapper.close();
-        logger.info("zdb title counter = {}", out.getCounter());
+        logger.info("zdb title counter = {}", counter.get());
         logger.info("unknown keys = {}", mapper.unknownKeys());
         br.close();
-        assertEquals(out.getCounter(), 8);
+        assertEquals(counter.get(), 8);
     }
 
-    class OurContextResourceOutput extends CountableContextResourceOutput<ResourceContext, Resource> {
+    class OurContextResourceOutput extends AbstractResourceContextWriter {
 
         @Override
-        public void output(ResourceContext context, Resource resource, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
+        public void write(ResourceContext context) throws IOException {
             Resource r = context.getResource();
             r.id(IRI.builder()
                     .scheme("http")

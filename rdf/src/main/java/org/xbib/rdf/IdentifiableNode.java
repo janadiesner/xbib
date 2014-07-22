@@ -31,14 +31,15 @@
  */
 package org.xbib.rdf;
 
-import java.util.concurrent.atomic.AtomicLong;
 import org.xbib.iri.IRI;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * An identifiable node (including blank nodes)
  */
 public class IdentifiableNode implements Identifier, Node {
-    
+
     private final static AtomicLong nodeCounter = new AtomicLong();
 
     private final static String GENID = "genid";
@@ -54,13 +55,13 @@ public class IdentifiableNode implements Identifier, Node {
         id(GENID + nodeCounter.incrementAndGet());
         return this;
     }
-    
+
     @Override
     public IdentifiableNode id(String id) {
-        id(IRI.builder().curi(GENID, id).build());
+        id(IRI.builder().curie(GENID, id).build());
         return this;
     }
-    
+
     @Override
     public IdentifiableNode id(IRI id) {
         this.id = id;
@@ -79,11 +80,9 @@ public class IdentifiableNode implements Identifier, Node {
     @Override
     public String toString() {
         if (id == null) {
-            // blank
             blank();
         }
-        return isBlank() ?
-                PLACEHOLDER + id.getSchemeSpecificPart() : id.toString();
+        return isBlank() ? PLACEHOLDER + id.getSchemeSpecificPart() : id.toString();
     }
 
     @Override
@@ -95,7 +94,7 @@ public class IdentifiableNode implements Identifier, Node {
     public void accept(Visitor visitor) {
         visitor.visit(this);
     }
-    
+
     public static void reset() {
         nodeCounter.set(0L);
     }

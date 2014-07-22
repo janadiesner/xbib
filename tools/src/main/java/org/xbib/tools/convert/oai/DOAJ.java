@@ -32,8 +32,6 @@
 package org.xbib.tools.convert.oai;
 
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
@@ -42,7 +40,7 @@ import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleLiteral;
 import org.xbib.rdf.simple.SimpleProperty;
 import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.rdf.types.XSD;
+import org.xbib.rdf.types.XSDResourceIdentifiers;
 import org.xbib.tools.OAIHarvester;
 
 import javax.xml.namespace.QName;
@@ -76,10 +74,10 @@ public class DOAJ extends OAIHarvester {
         @Override
         public Property toProperty(Property property) {
             if ("issn".equals(property.id().getSchemeSpecificPart())) {
-                return new SimpleProperty(IRI.builder().curi("dc", "identifier").build());
+                return new SimpleProperty(IRI.builder().curie("dc", "identifier").build());
             }
             if ("eissn".equals(property.id().getSchemeSpecificPart())) {
-                return new SimpleProperty(IRI.builder().curi("dc", "identifier").build());
+                return new SimpleProperty(IRI.builder().curie("dc", "identifier").build());
             }
             return property;
         }
@@ -89,7 +87,7 @@ public class DOAJ extends OAIHarvester {
             switch (name.getLocalPart()) {
                 case "identifier": {
                     if (content.startsWith("http://")) {
-                        return new SimpleLiteral(content).type(XSD.ANYURI);
+                        return new SimpleLiteral(content).type(XSDResourceIdentifiers.ANYURI);
                     }
                     if (content.startsWith("issn: ")) {
                         return new SimpleLiteral(content.substring(6)).type(ISSN);

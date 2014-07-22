@@ -38,10 +38,8 @@ import org.xbib.rdf.Visitor;
 
 /**
  * A simple Literal is a value of object type
- *
  */
-public class SimpleLiteral<O extends Object>
-        implements Literal<O>, Comparable<Literal<O>> {
+public class SimpleLiteral<O extends Object> implements Literal<O>, Comparable<Literal<O>> {
 
     private O value;
 

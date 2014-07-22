@@ -29,12 +29,15 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.elements.direct;
+package org.xbib.scheme;
 
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
+class HttpsScheme extends HttpScheme {
 
-public interface DirectBuilderFactory<K, V, C extends ResourceContext<Resource>> {
+    static final String NAME = "https";
+    static final int DEFAULT_PORT = 443;
 
-     DirectBuilder<K, V, C> newBuilder();
+    public HttpsScheme() {
+        super(NAME, DEFAULT_PORT);
+    }
+
 }

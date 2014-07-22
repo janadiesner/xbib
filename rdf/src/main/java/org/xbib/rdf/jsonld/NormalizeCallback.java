@@ -1,5 +1,7 @@
 package org.xbib.rdf.jsonld;
 
+import org.xbib.rdf.jsonld.utils.UniqueNamer;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -8,7 +10,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.xbib.rdf.jsonld.utils.UniqueNamer;
 
 public class NormalizeCallback implements CallbackWrapper {
 
@@ -77,7 +78,7 @@ public class NormalizeCallback implements CallbackWrapper {
     }
 
     private void nameBlankNodes(Map<String, String> unique,
-            Map<String, List<String>> duplicates, List<String> unnamed) {
+                                Map<String, List<String>> duplicates, List<String> unnamed) {
         boolean named = false;
         List<String> hashes = new ArrayList<String>(unique.keySet());
         Collections.sort(hashes);
@@ -126,16 +127,16 @@ public class NormalizeCallback implements CallbackWrapper {
                         // get adjacent bnode
                         String adjbnode =
                                 ("BlankNode".equals(((Map<String, Object>) ((Map<String, Object>) statement).get("subject")).get("interfaceName"))
-                                && !bnode.equals(((Map<String, Object>) ((Map<String, Object>) statement).get("subject")).get("nominalValue")))
-                                ? (String) ((Map<String, Object>) ((Map<String, Object>) statement).get("subject")).get("nominalValue") : null;
+                                        && !bnode.equals(((Map<String, Object>) ((Map<String, Object>) statement).get("subject")).get("nominalValue")))
+                                        ? (String) ((Map<String, Object>) ((Map<String, Object>) statement).get("subject")).get("nominalValue") : null;
                         String direction = null;
                         if (adjbnode != null) {
                             direction = "p";
                         } else {
                             adjbnode =
                                     ("BlankNode".equals(((Map<String, Object>) ((Map<String, Object>) statement).get("object")).get("interfaceName"))
-                                    && !bnode.equals(((Map<String, Object>) ((Map<String, Object>) statement).get("object")).get("nominalValue")))
-                                    ? (String) ((Map<String, Object>) ((Map<String, Object>) statement).get("object")).get("nominalValue") : null;
+                                            && !bnode.equals(((Map<String, Object>) ((Map<String, Object>) statement).get("object")).get("nominalValue")))
+                                            ? (String) ((Map<String, Object>) ((Map<String, Object>) statement).get("object")).get("nominalValue") : null;
                             if (adjbnode != null) {
                                 direction = "r";
                             }
@@ -190,7 +191,7 @@ public class NormalizeCallback implements CallbackWrapper {
             Collections.sort(results, new Comparator<Map<String, Object>>() {
                 @Override
                 public int compare(Map<String, Object> o1,
-                        Map<String, Object> o2) {
+                                   Map<String, Object> o2) {
                     String a = (String) o1.get("hash");
                     String b = (String) o2.get("hash");
                     return a.compareTo(b);
@@ -224,10 +225,9 @@ public class NormalizeCallback implements CallbackWrapper {
     /**
      * Hashes all of the statements about a blank node.
      *
-     * @param id the ID of the bnode to hash statements for.
+     * @param id     the ID of the bnode to hash statements for.
      * @param bnodes the mapping of bnodes to statements.
-     * @param namer the canonical bnode namer.
-     *
+     * @param namer  the canonical bnode namer.
      * @return the new hash.
      */
     private String hashStatements(String id, Map<String, Map<String, Object>> bnodes, UniqueNamer namer) {

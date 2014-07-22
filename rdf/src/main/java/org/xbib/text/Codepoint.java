@@ -68,7 +68,7 @@ public class Codepoint implements Cloneable, Comparable<Codepoint> {
 
     private static int valueFromCharSequence(CharSequence s) {
         if (s.length() == 1) {
-            return (int)s.charAt(0);
+            return (int) s.charAt(0);
         } else if (s.length() > 2) {
             throw new IllegalArgumentException("Too many chars");
         } else {
@@ -82,7 +82,7 @@ public class Codepoint implements Cloneable, Comparable<Codepoint> {
      * Create a codepoint from a single char
      */
     public Codepoint(char value) {
-        this((int)value);
+        this((int) value);
     }
 
     /**
@@ -103,8 +103,9 @@ public class Codepoint implements Cloneable, Comparable<Codepoint> {
      * Create a codepoint from a specific integer value
      */
     public Codepoint(int value) {
-        if (value < 0)
+        if (value < 0) {
             throw new IllegalArgumentException("Invalid Codepoint");
+        }
         this.value = value;
     }
 
@@ -126,14 +127,14 @@ public class Codepoint implements Cloneable, Comparable<Codepoint> {
      * True if this codepoint is a low surrogate
      */
     public boolean isLowSurrogate() {
-        return CharUtils.isLowSurrogate((char)value);
+        return CharUtils.isLowSurrogate((char) value);
     }
 
     /**
      * True if this codepoint is a high surrogate
      */
     public boolean isHighSurrogate() {
-        return CharUtils.isHighSurrogate((char)value);
+        return CharUtils.isHighSurrogate((char) value);
     }
 
     /**
@@ -210,15 +211,19 @@ public class Codepoint implements Cloneable, Comparable<Codepoint> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        final Codepoint other = (Codepoint)obj;
-        if (value != other.value)
+        }
+        final Codepoint other = (Codepoint) obj;
+        if (value != other.value) {
             return false;
+        }
         return true;
     }
 
@@ -229,14 +234,14 @@ public class Codepoint implements Cloneable, Comparable<Codepoint> {
      * (SMP). Plane 2 (20000–2FFFF): Supplementary Ideographic Plane (SIP) Planes 3 to 13 (30000–DFFFF) are
      * unassigned Plane 14 (E0000–EFFFF): Supplementary Special-purpose Plane (SSP) Plane 15 (F0000–FFFFF) reserved
      * for the Private Use Area (PUA) Plane 16 (100000–10FFFF), reserved for the Private Use Area (PUA)
-     **/
+     */
     public int getPlane() {
         return value / (0xFFFF + 1);
     }
 
     public Codepoint clone() {
         try {
-            return (Codepoint)super.clone();
+            return (Codepoint) super.clone();
         } catch (CloneNotSupportedException e) {
             return new Codepoint(value);
         }
@@ -246,8 +251,9 @@ public class Codepoint implements Cloneable, Comparable<Codepoint> {
      * Get the next codepoint
      */
     public Codepoint next() {
-        if (value == 0x10ffff)
+        if (value == 0x10ffff) {
             throw new IndexOutOfBoundsException();
+        }
         return new Codepoint(value + 1);
     }
 
@@ -255,8 +261,9 @@ public class Codepoint implements Cloneable, Comparable<Codepoint> {
      * Get the previous codepoint
      */
     public Codepoint previous() {
-        if (value == 0)
+        if (value == 0) {
             throw new IndexOutOfBoundsException();
+        }
         return new Codepoint(value - 1);
     }
 }

@@ -38,9 +38,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.ContentBuilder;
-import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
@@ -82,8 +80,8 @@ public final class FromEZBXML extends Feeder {
     public void process(URI uri) throws Exception {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
         ResourceContext<Resource> resourceContext = new SimpleResourceContext()
-                .setNamespaceContext(namespaceContext)
-                .setContentBuilder(contentBuilder(namespaceContext));
+                .setNamespaceContext(namespaceContext);
+                //.setContentBuilder(contentBuilder(namespaceContext));
 
         AbstractXmlHandler handler = new EZBHandler(resourceContext)
                 .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/");
@@ -93,10 +91,6 @@ public final class FromEZBXML extends Feeder {
                     .setHandler(handler)
                     .parse(new InputStreamReader(in, "UTF-8"), null);
         in.close();
-    }
-
-    protected ContentBuilder contentBuilder(IRINamespaceContext namespaceContext) {
-        return new DefaultContentBuilder<>();
     }
 
     class EZBHandler extends AbstractXmlResourceHandler {
@@ -133,7 +127,7 @@ public final class FromEZBXML extends Feeder {
             // attach closeResource to output write
             try {
                 if (resourceContext().getResource() != null) {
-                    sink.output(resourceContext(), resourceContext().getResource(), resourceContext().getContentBuilder());
+                    sink.write(resourceContext());
                 } else {
                     logger.warn("no resource to output");
                 }

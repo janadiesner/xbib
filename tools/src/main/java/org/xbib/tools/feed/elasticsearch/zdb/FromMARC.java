@@ -32,6 +32,7 @@
 package org.xbib.tools.feed.elasticsearch.zdb;
 
 import org.xbib.elasticsearch.support.client.Ingest;
+import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -44,9 +45,7 @@ import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.ContentBuilder;
-import org.xbib.rdf.context.CountableContextResourceOutput;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.tools.Feeder;
 import org.xml.sax.InputSource;
 
@@ -91,7 +90,9 @@ public final class FromMARC extends Feeder {
                 .detectUnknownKeys(settings.getAsBoolean("detect", false))
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
-                        return new MARCElementBuilder().addOutput(new MyContextResourceOutput());
+                        MARCElementBuilder builder = new MARCElementBuilder();
+                        builder.addWriter(new MarcContextResourceOutput());
+                        return builder;
                     }
                 });
 
@@ -122,13 +123,12 @@ public final class FromMARC extends Feeder {
         if (settings.getAsBoolean("detect", false)) {
             logger.info("unknown keys={}", mapper.unknownKeys());
         }
-        logger.info("sink counter = {}", sink.getCounter());
     }
 
-    private class MyContextResourceOutput extends CountableContextResourceOutput<ResourceContext, Resource> {
+    private class MarcContextResourceOutput extends AbstractResourceContextWriter<MARCContext, Resource> {
 
         @Override
-        public void output(ResourceContext context, Resource resource, ContentBuilder contentBuilder) throws IOException {
+        public void write(MARCContext context) throws IOException {
             if (context == null || context.getResource() == null) {
                 logger.warn("no resource to output");
                 return;
@@ -136,7 +136,7 @@ public final class FromMARC extends Feeder {
             IRI iri = context.getResource().id();
             context.getResource().id(IRI.builder().scheme("http").host(settings.get("index")).query(settings.get("type"))
                     .fragment(iri.getFragment()).build());
-            sink.output(context, context.getResource(), contentBuilder);
+            sink.write(context);
         }
     }
 

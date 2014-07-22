@@ -36,10 +36,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.text.Normalizer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.rdf.context.CountableContextResourceOutput;
 import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
@@ -49,9 +49,9 @@ import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.content.ContentBuilder;
 import org.xml.sax.InputSource;
 
 public class DNBPICAElementsTest extends Assert {
@@ -68,10 +68,12 @@ public class DNBPICAElementsTest extends Assert {
     @Test
     public void testZdbBib() throws Exception {
 
-        final CountableContextResourceOutput output = new OurContextResourceOutput();
+        final OurContextResourceOutput output = new OurContextResourceOutput();
         final PicaElementBuilderFactory factory = new PicaElementBuilderFactory() {
             public PicaElementBuilder newBuilder() {
-                return new PicaElementBuilder().addOutput(output);
+                PicaElementBuilder builder = new PicaElementBuilder();
+                builder.addWriter(output);
+                return builder;
             }
         };
         final PicaElementMapper mapper = new PicaElementMapper("pica/zdb/bibdat")
@@ -127,10 +129,10 @@ public class DNBPICAElementsTest extends Assert {
         }
     }
 
-    class OurContextResourceOutput extends CountableContextResourceOutput<ResourceContext, Resource> {
+    class OurContextResourceOutput extends AbstractResourceContextWriter {
 
         @Override
-        public void output(ResourceContext context, Resource resource, ContentBuilder<ResourceContext, Resource> builder) throws IOException {
+        public void write(ResourceContext context) throws IOException {
             Resource r = context.getResource();
             IRI id = IRI.builder()
                     .scheme("http")
@@ -144,5 +146,10 @@ public class DNBPICAElementsTest extends Assert {
             logger.debug("out={}", sw.toString());
             counter.incrementAndGet();
         }
-    };
+        public final AtomicInteger counter = new AtomicInteger();
+
+        public int getCounter() {
+            return counter.get();
+        }
+    }
 }

@@ -45,9 +45,10 @@ import org.xbib.oai.client.listrecords.ListRecordsListener;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.ResourceWriter;
+import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.util.DateUtil;
@@ -150,7 +151,7 @@ public abstract class OAIFeeder extends Feeder {
         return new XmlMetadataHandler()
                 .setHandler(rdfResourceHandler)
                 .setResourceContext(rdfResourceHandler.resourceContext())
-                .setResourceWriter(new MyResourceWriter());
+                .setResourceContextWriter(new MyResourceContextWriter());
     }
 
     class XmlMetadataHandler extends MetadataHandler {
@@ -161,7 +162,7 @@ public abstract class OAIFeeder extends Feeder {
 
         ResourceContext resourceContext;
 
-        ResourceWriter resourceWriter;
+        ResourceContextWriter resourceContextWriter;
 
         XmlMetadataHandler() {
             context = IRINamespaceContext.newInstance();
@@ -181,8 +182,8 @@ public abstract class OAIFeeder extends Feeder {
             return this;
         }
 
-        public XmlMetadataHandler setResourceWriter(ResourceWriter resourceWriter) {
-            this.resourceWriter = resourceWriter;
+        public XmlMetadataHandler setResourceContextWriter(ResourceContextWriter resourceContextWriter) {
+            this.resourceContextWriter = resourceContextWriter;
             return this;
         }
 
@@ -201,7 +202,7 @@ public abstract class OAIFeeder extends Feeder {
                         .query(settings.get("type"))
                         .fragment(identifier).build();
                 resourceContext.getResource().id(iri);
-                resourceWriter.write(resourceContext);
+                resourceContextWriter.write(resourceContext);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -233,12 +234,11 @@ public abstract class OAIFeeder extends Feeder {
         }
     }
 
-    class MyResourceWriter implements ResourceWriter {
+    class MyResourceContextWriter extends AbstractResourceContextWriter {
 
         @Override
-        public MyResourceWriter write(ResourceContext resourceContext) throws IOException {
-            sink.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
-            return this;
+        public void write(ResourceContext resourceContext) throws IOException {
+            sink.write(resourceContext);
         }
     }
 

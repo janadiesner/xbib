@@ -38,12 +38,11 @@ import org.xbib.rdf.Triple;
 
 /**
  * A simple triple
- *
  */
 public class SimpleTriple<S extends Identifier, P extends Property, O extends Node>
         implements Triple, Comparable<Triple> {
-    
-    private final SimpleFactory<S,P,O> simpleFactory = SimpleFactory.getInstance();
+
+    private final SimpleFactory<S, P, O> simpleFactory = SimpleFactory.getInstance();
 
     private S subject;
     private P predicate;
@@ -52,16 +51,16 @@ public class SimpleTriple<S extends Identifier, P extends Property, O extends No
     /**
      * Create a new triple
      *
-     * @param subject subject
+     * @param subject   subject
      * @param predicate predicate
-     * @param object object
+     * @param object    object
      */
     public SimpleTriple(S subject, P predicate, O object) {
         this.subject = subject;
         this.predicate = predicate;
         this.object = object;
     }
-    
+
     public SimpleTriple(Object subject, Object predicate, Object object) {
         this.subject = simpleFactory.asSubject(subject);
         this.predicate = simpleFactory.asPredicate(predicate);

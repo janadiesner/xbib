@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.Loggers;
-import org.xbib.rdf.context.IRINamespaceContext;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.text.CharUtils;
@@ -59,15 +59,15 @@ public class OAITest extends Assert {
 
         };
         StringWriter sw = new StringWriter();
-        TurtleWriter t = new TurtleWriter(sw)
-                .setContext(context)
-                .writeNamespaces();
-        xmlHandler.setListener(t)
+        TurtleWriter writer = new TurtleWriter(sw);
+        writer.setNamespaceContext(context);
+        writer.writeNamespaces();
+        xmlHandler.setListener(writer)
             .setDefaultNamespace("oai", "http://www.openarchives.org/OAI/2.0/oai_dc/");
         new XmlReader()
                 .setHandler(xmlHandler)
                 .parse(new InputSource(in));
-        t.close();
+        writer.close();
         String s = sw.toString().trim();
         logger.info(s);
     }
