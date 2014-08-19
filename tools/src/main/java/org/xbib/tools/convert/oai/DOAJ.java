@@ -50,6 +50,11 @@ import javax.xml.namespace.QName;
  */
 public class DOAJ extends OAIHarvester {
 
+    @Override
+    public String getName() {
+        return "oai-doaj-rdf";
+    }
+
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

@@ -41,7 +41,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 
@@ -53,11 +52,9 @@ import java.io.Reader;
  * @param <O>
  */
 public class XmlReader<S extends Identifier, P extends Property, O extends Node>
-        implements Closeable, TripleReader<S, P, O> {
+        implements TripleReader<S, P, O> {
 
-    private InputSource source;
-
-    private TripleListener listener;
+    private TripleListener<S, P, O> listener;
 
     private XmlHandler handler;
 
@@ -88,19 +85,15 @@ public class XmlReader<S extends Identifier, P extends Property, O extends Node>
     public XmlReader parse(Reader reader, TripleListener<S, P, O> listener) throws IOException {
         this.listener = listener;
         try {
-            parse(new InputSource(reader));
+            XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+            parse(xmlReader, new InputSource(reader));
         } catch (SAXException ex) {
             throw new IOException(ex);
         }
         return this;
     }
 
-    public XmlReader parse(InputSource source) throws IOException, SAXException {
-        return parse(XMLReaderFactory.createXMLReader(), source);
-    }
-
-    public XmlReader parse(XMLReader reader, InputSource source) throws IOException, SAXException {
-        this.source = source;
+    private XmlReader parse(XMLReader reader, InputSource source) throws IOException, SAXException {
         if (handler != null) {
             if (listener != null) {
                 handler.setListener(listener);
@@ -111,15 +104,5 @@ public class XmlReader<S extends Identifier, P extends Property, O extends Node>
         reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", validate);
         reader.parse(source);
         return this;
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (source.getByteStream() != null) {
-            source.getByteStream().close();
-        }
-        if (source.getCharacterStream() != null) {
-            source.getCharacterStream().close();
-        }
     }
 }

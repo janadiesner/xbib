@@ -58,10 +58,8 @@ public class ItemGetAction extends AbstractQueryAction {
     @Override
     protected Map<String, Object> createParams(Request request) throws IOException {
         final Map<String, Object> params = new HashMap<>();
-        ILL ill = new ILL(request.getItem());
-        if (!ill.isValid()) {
-            throw new IllegalArgumentException("invalid item");
-        }
+        ILL ill = new ILL().set(request.getItem());
+        ill.normalize().verify();
         long id = ill.getNumber();
         params.put(ITEM_PARAMETER, id);
         params.put(NAME_PARAMETER, request.getUserAttributes().getName());

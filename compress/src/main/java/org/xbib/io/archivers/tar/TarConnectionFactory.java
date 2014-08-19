@@ -15,7 +15,7 @@ public final class TarConnectionFactory implements ConnectionFactory<TarSession>
 
     @Override
     public String getName() {
-        return "tar";
+        return "tarold";
     }
 
     /**

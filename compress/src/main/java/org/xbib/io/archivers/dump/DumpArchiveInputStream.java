@@ -102,12 +102,6 @@ public class DumpArchiveInputStream extends ArchiveInputStream {
                 });
     }
 
-
-    @Override
-    public long getBytesRead() {
-        return raw.getBytesRead();
-    }
-
     /**
      * Return the archive summary information.
      */

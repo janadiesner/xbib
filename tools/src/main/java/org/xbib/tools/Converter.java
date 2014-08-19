@@ -57,7 +57,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 
 public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline<T, R>>
-        extends AbstractPipeline<URIPipelineElement, PipelineException> implements Tool {
+        extends AbstractPipeline<URIPipelineElement, PipelineException> implements Provider {
 
     private final static Logger logger = LoggerFactory.getLogger(Converter.class.getSimpleName());
 

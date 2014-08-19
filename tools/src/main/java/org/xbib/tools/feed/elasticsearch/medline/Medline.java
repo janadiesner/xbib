@@ -58,6 +58,11 @@ public final class Medline extends Feeder {
     private static final SimpleResourceContext resourceContext = new SimpleResourceContext();
 
     @Override
+    public String getName() {
+        return "medline-xml-elasticsearch";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

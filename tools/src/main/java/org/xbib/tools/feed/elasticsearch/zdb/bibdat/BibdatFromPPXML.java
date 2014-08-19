@@ -65,6 +65,11 @@ public final class BibdatFromPPXML extends Feeder {
     private final static Logger logger = LoggerFactory.getLogger(BibdatFromPPXML.class.getSimpleName());
 
     @Override
+    public String getName() {
+        return "bibdat-ppxml-elasticsearch";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

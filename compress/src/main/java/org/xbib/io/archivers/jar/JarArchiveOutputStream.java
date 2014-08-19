@@ -1,9 +1,7 @@
 
 package org.xbib.io.archivers.jar;
 
-import org.xbib.io.archivers.ArchiveEntry;
 import org.xbib.io.archivers.zip.JarMarker;
-import org.xbib.io.archivers.zip.ZipArchiveEntry;
 import org.xbib.io.archivers.zip.ZipArchiveOutputStream;
 
 import java.io.IOException;
@@ -14,7 +12,7 @@ import java.io.OutputStream;
  * which allows the created archive to be used as an executable jar on
  * Solaris.
  */
-public class JarArchiveOutputStream extends ZipArchiveOutputStream {
+public class JarArchiveOutputStream extends ZipArchiveOutputStream<JarArchiveEntry> {
 
     private boolean jarMarkerAdded = false;
 
@@ -22,11 +20,10 @@ public class JarArchiveOutputStream extends ZipArchiveOutputStream {
         super(out);
     }
 
-    // @throws ClassCastException if entry is not an instance of ZipArchiveEntry
     @Override
-    public void putArchiveEntry(ArchiveEntry ze) throws IOException {
+    public void putArchiveEntry(JarArchiveEntry ze) throws IOException {
         if (!jarMarkerAdded) {
-            ((ZipArchiveEntry) ze).addAsFirstExtraField(JarMarker.getInstance());
+            ze.addAsFirstExtraField(JarMarker.getInstance());
             jarMarkerAdded = true;
         }
         super.putArchiveEntry(ze);

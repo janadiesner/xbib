@@ -31,13 +31,11 @@
  */
 package org.xbib.query.cql;
 
-import java.io.Serializable;
-
 /**
  * This is a node interface for the CQL abstract syntax tree
  *
  */
-public interface Node extends Comparable, Serializable {
+public interface Node extends Comparable {
 
     /**
      * Accept a visitor on this node

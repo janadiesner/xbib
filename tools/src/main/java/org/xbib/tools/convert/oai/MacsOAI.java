@@ -37,6 +37,11 @@ import org.xbib.tools.OAIHarvester;
 
 public class MacsOAI extends OAIHarvester {
 
+    @Override
+    public String getName() {
+        return "oai-macs";
+    }
+
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

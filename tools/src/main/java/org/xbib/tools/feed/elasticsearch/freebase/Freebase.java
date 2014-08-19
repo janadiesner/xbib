@@ -59,6 +59,11 @@ public class Freebase extends Feeder {
     private static final Logger logger = LoggerFactory.getLogger(Freebase.class.getName());
 
     @Override
+    public String getName() {
+        return "freebase-turtle-elasticsearch";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

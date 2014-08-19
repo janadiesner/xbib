@@ -54,6 +54,11 @@ public class GeonamesFromZIP extends Converter {
     private final static Logger logger = LoggerFactory.getLogger(GeonamesFromZIP.class.getSimpleName());
 
     @Override
+    public String getName() {
+        return "geonames-tsv";
+    }
+
+    @Override
     protected Converter prepare() throws IOException {
         super.prepare();
         return this;

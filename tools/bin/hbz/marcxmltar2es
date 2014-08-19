@@ -23,5 +23,5 @@ echo '
     "client" : "ingest"
 }
 ' | ${java} \
-    -cp $(pwd)/bin:$(pwd)/lib/tools-1.0.0.Beta2-feeder.jar \
+    -cp $(pwd)/bin:$(pwd)/lib/tools-1.0.0.Beta3-standalone.jar \
     org.xbib.tools.Runner org.xbib.tools.feed.elasticsearch.hbz.FromMarcXmlTar

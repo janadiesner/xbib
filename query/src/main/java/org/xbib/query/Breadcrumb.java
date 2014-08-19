@@ -31,11 +31,9 @@
  */
 package org.xbib.query;
 
-import java.io.Serializable;
-
 /**
  * A bread crumb interface. If an object implements Breadcrumb,
  * it can participate in a breadcrumb trail.
  */
-public interface Breadcrumb extends Comparable<Breadcrumb>, Serializable {
+public interface Breadcrumb extends Comparable<Breadcrumb> {
 }

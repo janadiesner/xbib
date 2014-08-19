@@ -62,11 +62,10 @@ public class VIAF extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(VIAF.class.getSimpleName());
 
-    private static BlockingQueue<String> pump;
-
-    private static ExecutorService pumpService;
-
-
+    @Override
+    public String getName() {
+        return "viaf-es";
+    }
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
@@ -82,12 +81,12 @@ public class VIAF extends Feeder {
         InputStream in = InputService.getInputStream(uri);
         BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         for (int i = 0; i < settings.getAsInt("pumps", 1); i++) {
-            pumpService.submit(new VIAFPipeline());
+            //pumpService.submit(new VIAFPipeline());
         }
         String line;
         long linecounter = 0;
         while ((line = reader.readLine()) != null) {
-            pump.put(line);
+            //pump.put(line);
             linecounter++;
             if (linecounter % 10000 == 0) {
                 logger.info("{}", linecounter);
@@ -95,7 +94,7 @@ public class VIAF extends Feeder {
         }
         in.close();
         for (int i = 0; i < settings.getAsInt("pumps", 1); i++) {
-            pump.put("|");
+            //pump.put("|");
         }
     }
 
@@ -105,7 +104,7 @@ public class VIAF extends Feeder {
         public Boolean call() throws Exception {
             try {
                 while (true) {
-                    String line = pump.take();
+                    String line = null; //pump.take();
                     if ("|".equals(line)) {
                         break;
                     }

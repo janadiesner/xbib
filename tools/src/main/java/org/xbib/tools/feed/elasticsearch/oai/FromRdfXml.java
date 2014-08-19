@@ -67,6 +67,11 @@ public class FromRdfXml extends Feeder {
     private final Logger logger = LoggerFactory.getLogger(FromRdfXml.class.getSimpleName());
 
     @Override
+    public String getName() {
+        return "oai-rdfxml-es";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

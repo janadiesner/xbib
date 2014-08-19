@@ -69,7 +69,9 @@ public class FromSRU extends Converter {
 
     private SRUClient client;
 
-    public FromSRU() {
+    @Override
+    public String getName() {
+        return "zdb-sru";
     }
 
     public FromSRU(boolean b) {

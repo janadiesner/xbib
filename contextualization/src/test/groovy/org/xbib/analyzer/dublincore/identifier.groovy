@@ -5,7 +5,7 @@ import org.xbib.elements.ElementBuilder
 public class IdentifierElement extends DublinCoreElement {
 
     @Override
-    IdentifierElement build(ElementBuilder builder, key, value) {
+    IdentifierElement build(ElementBuilder builder, Object key, Object value) {
         println 'got identifier ' + value
         builder.context().getResource().id(value.toString())
         builder.context().getResource().add("dc:identifier", value.toString())

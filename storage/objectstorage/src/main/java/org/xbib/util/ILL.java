@@ -31,113 +31,78 @@
  */
 package org.xbib.util;
 
-import org.xbib.standardnumber.ISIL;
-import org.xbib.standardnumber.InvalidStandardNumberException;
 import org.xbib.standardnumber.StandardNumber;
-import org.xbib.standardnumber.VerhoeffAlgorithm;
+import org.xbib.standardnumber.check.DihedralGroup;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ILL implements StandardNumber {
+public class ILL implements Comparable<ILL>, StandardNumber {
 
     private final static Pattern ILL_PATTERN = Pattern.compile("[\\p{Alnum}\\-]+");
-    private String original;
-    private String lexicalForm;
-    private boolean valid;
-    private int segmentCount;
+
+    private final static DihedralGroup verhoeff = new DihedralGroup();
+
+    private String value;
+
+    private String formatted;
+
     private String isilPrefix;
+
     private String isilBody;
+
     private int year;
+
     private int number;
+
     private int counter;
-    private String check;
 
-    /**
-     * Creates a new ISSN object.
-     *
-     * @param value
-     */
-    public ILL(String value) {
-        this.original = value;
-        this.lexicalForm = purify(original);
-        if (lexicalForm == null) {
-            throw new IllegalArgumentException("syntax error for ILL number: " + value);
+    @Override
+    public ILL set(CharSequence value) {
+        this.value = value != null ? value.toString() : null;
+        return this;
+    }
+
+    @Override
+    public int compareTo(ILL obj) {
+        return value != null ? value.compareTo((obj.normalizedValue())) : -1;
+    }
+
+    @Override
+    public StandardNumber normalize() {
+        Matcher m = ILL_PATTERN.matcher(value);
+        if (m.find()) {
+            this.value = value.substring(m.start(), m.end());
         }
-        parse();
-        if (!valid && segmentCount == 5) {
-            // add check symbol
-            this.check = VerhoeffAlgorithm.generateVerhoeff(Integer.toString(number));
-            this.lexicalForm += "-" + check;
-            this.valid = true;
+        return this;
+    }
+
+    @Override
+    public StandardNumber verify() throws NumberFormatException {
+        check();
+        return this;
+    }
+
+    @Override
+    public String normalizedValue() {
+        return value;
+    }
+
+    @Override
+    public String format() {
+        if (formatted == null) {
+            this.formatted = value;
         }
+        return formatted;
     }
 
     @Override
-    public String getOriginal() {
-        return original;
+    public ILL checksum() {
+        return this;
     }
 
-    @Override
-    public int compareTo(Object obj) {
-        try {
-            return lexicalForm != null && obj instanceof ILL ? lexicalForm.compareTo(((ILL) obj).getStandardNumberValue()) : -1;
-        } catch (InvalidStandardNumberException ex) {
-            return 0;
-        }
-    }
-
-    /**
-     * Get the acronym of this standard number.
-     *
-     * @return the acronym
-     */
-    @Override
-    public String getAcronym() {
-        return "ILL";
-    }
-
-    /**
-     * Check if standard number is valid
-     *
-     * @return true if ISSN is valid
-     */
-    @Override
-    public boolean isValid() {
-        return valid;
-    }
-
-    /**
-     * Returns the value representation of the standard number
-     *
-     * @return value
-     * @throws InvalidStandardNumberException
-     */
-    @Override
-    public String getStandardNumberValue() throws InvalidStandardNumberException {
-        if (lexicalForm == null) {
-            parse();
-        }
-        return lexicalForm;
-    }
-
-    /**
-     * Returns the printable representation of the standard number
-     *
-     * @return the printable representation
-     * @throws InvalidStandardNumberException
-     */
-    @Override
-    public String getStandardNumberPrintableRepresentation() throws InvalidStandardNumberException {
-        if (isValid()) {
-            return lexicalForm;
-        } else {
-            throw new InvalidStandardNumberException(original);
-        }
-    }
-
-    public ISIL getISIL() throws InvalidStandardNumberException {
-        return new ISIL(isilPrefix + "-" + isilBody);
+    public String getISIL() {
+        return isilPrefix + "-" + isilBody;
     }
 
     public int getYear() {
@@ -152,39 +117,21 @@ public class ILL implements StandardNumber {
         return counter;
     }
 
-    /**
-     * Helper method for cleaning values
-     */
-    private String purify(String s) {
-        Matcher m = ILL_PATTERN.matcher(s);
-        return m.find() ? s.substring(m.start(), m.end()) : null;
-    }
-
-    private void parse() {
-        // segment
-        String[] seg = lexicalForm.split("-");
-        this.segmentCount = seg.length;
-        if (seg.length > 0) {
-            this.isilPrefix = seg[0];
+    private void check() throws NumberFormatException {
+        // segmentize
+        String[] seg = value.split("-");
+        if (seg.length != 6) {
+            throw new NumberFormatException("not a valid number");
         }
-        if (seg.length > 1) {
-            this.isilBody = seg[1];
-        }
-        if (seg.length > 2) {
-            this.year = Integer.parseInt(seg[2]);
-        }
-        if (seg.length > 3) {
-            this.number = Integer.parseInt(seg[3]);
-        }
-        if (seg.length > 4) {
-            this.counter = Integer.parseInt(seg[4]);
-        }
-        if (seg.length > 5) {
-            this.check = seg[5].substring(0, 1);
-            this.valid = check.equals(VerhoeffAlgorithm.generateVerhoeff(Integer.toString(number)));
-        }
-        if (seg.length > 6) {
-            this.valid = false;
+        this.isilPrefix = seg[0];
+        this.isilBody = seg[1];
+        this.year = Integer.parseInt(seg[2]);
+        this.number = Integer.parseInt(seg[3]);
+        this.counter = Integer.parseInt(seg[4]);
+        int check = Integer.parseInt(seg[5].substring(0,1));
+        int v = verhoeff.compute(seg[3]);
+        if (check != v) {
+            throw new NumberFormatException("invalid checksum: number=" + seg[3] + " check=" + check + " computed=" + v);
         }
     }
 }

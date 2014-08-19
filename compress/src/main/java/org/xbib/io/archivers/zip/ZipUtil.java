@@ -1,6 +1,8 @@
 
 package org.xbib.io.archivers.zip;
 
+import org.xbib.io.archivers.encode.ArchiveEntryEncodingHelper;
+
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.zip.CRC32;
@@ -103,13 +105,8 @@ public abstract class ZipUtil {
 
             if (origCRC32 == f.getNameCRC32()) {
                 try {
-                    return ZipEncodingHelper
-                            .UTF8_ZIP_ENCODING.decode(f.getUnicodeName());
+                    return ArchiveEntryEncodingHelper.UTF8_ENCODING.decode(f.getUnicodeName());
                 } catch (IOException ex) {
-                    // UTF-8 unsupported?  should be impossible the
-                    // Unicode*ExtraField must contain some bad bytes
-
-                    // TODO log this anywhere?
                     return null;
                 }
             }

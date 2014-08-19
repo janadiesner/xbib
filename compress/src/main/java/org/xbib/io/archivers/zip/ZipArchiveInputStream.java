@@ -3,6 +3,8 @@ package org.xbib.io.archivers.zip;
 
 import org.xbib.io.archivers.ArchiveEntry;
 import org.xbib.io.archivers.ArchiveInputStream;
+import org.xbib.io.archivers.encode.ArchiveEntryEncoding;
+import org.xbib.io.archivers.encode.ArchiveEntryEncodingHelper;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,7 +43,7 @@ public class ZipArchiveInputStream extends ArchiveInputStream {
     /**
      * The zip encoding to use for filenames and the file comment.
      */
-    private final ZipEncoding zipEncoding;
+    private final ArchiveEntryEncoding archiveEntryEncoding;
 
     /**
      * Whether to look for and use Unicode extra fields.
@@ -111,7 +113,7 @@ public class ZipArchiveInputStream extends ArchiveInputStream {
     private static final long TWO_EXP_32 = ZIP64_MAGIC + 1;
 
     public ZipArchiveInputStream(InputStream inputStream) {
-        this(inputStream, ZipEncodingHelper.UTF8, true);
+        this(inputStream, ArchiveEntryEncodingHelper.UTF8, true);
     }
 
     /**
@@ -138,7 +140,7 @@ public class ZipArchiveInputStream extends ArchiveInputStream {
                                  String encoding,
                                  boolean useUnicodeExtraFields,
                                  boolean allowStoredEntriesWithDataDescriptor) {
-        zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+        archiveEntryEncoding = ArchiveEntryEncodingHelper.getEncoding(encoding);
         this.useUnicodeExtraFields = useUnicodeExtraFields;
         in = new PushbackInputStream(inputStream, buf.buf.length);
         this.allowStoredEntriesWithDataDescriptor =
@@ -177,8 +179,8 @@ public class ZipArchiveInputStream extends ArchiveInputStream {
 
         final GeneralPurposeBit gpFlag = GeneralPurposeBit.parse(lfh, off);
         final boolean hasUTF8Flag = gpFlag.usesUTF8ForNames();
-        final ZipEncoding entryEncoding =
-                hasUTF8Flag ? ZipEncodingHelper.UTF8_ZIP_ENCODING : zipEncoding;
+        final ArchiveEntryEncoding entryEncoding =
+                hasUTF8Flag ? ArchiveEntryEncodingHelper.UTF8_ENCODING : archiveEntryEncoding;
         current.hasDataDescriptor = gpFlag.usesDataDescriptor();
         current.entry.setGeneralPurposeBit(gpFlag);
 
@@ -310,7 +312,6 @@ public class ZipArchiveInputStream extends ArchiveInputStream {
             if ((buf.lengthOfLastRead = in.read(buf.buf)) == -1) {
                 return -1;
             }
-            count(buf.lengthOfLastRead);
             current.bytesReadFromStream += buf.lengthOfLastRead;
         }
 
@@ -398,32 +399,7 @@ public class ZipArchiveInputStream extends ArchiveInputStream {
         throw new IllegalArgumentException();
     }
 
-    /**
-     * Checks if the signature matches what is expected for a zip file.
-     * Does not currently handle self-extracting zips which may have arbitrary
-     * leading content.
-     *
-     * @param signature the bytes to check
-     * @param length    the number of bytes to check
-     * @return true, if this stream is a zip archive stream, false otherwise
-     */
-    public static boolean matches(byte[] signature, int length) {
-        if (length < ZipArchiveOutputStream.LFH_SIG.length) {
-            return false;
-        }
 
-        return checksig(signature, ZipArchiveOutputStream.LFH_SIG) // normal file
-                || checksig(signature, ZipArchiveOutputStream.EOCD_SIG); // empty zip
-    }
-
-    private static boolean checksig(byte[] signature, byte[] expected) {
-        for (int i = 0; i < expected.length; i++) {
-            if (signature[i] != expected[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     /**
      * Closes the current ZIP archive entry and positions the underlying
@@ -497,7 +473,6 @@ public class ZipArchiveInputStream extends ArchiveInputStream {
                 throw new EOFException(
                         "Truncated ZIP entry: " + current.entry.getName());
             } else {
-                count(n);
                 remaining -= n;
             }
         }
@@ -533,7 +508,6 @@ public class ZipArchiveInputStream extends ArchiveInputStream {
             throw new IOException("The stream is closed");
         }
         if ((buf.lengthOfLastRead = in.read(buf.buf)) > 0) {
-            count(buf.lengthOfLastRead);
             inf.setInput(buf.buf, 0, buf.lengthOfLastRead);
         }
     }
@@ -545,7 +519,6 @@ public class ZipArchiveInputStream extends ArchiveInputStream {
             if (x == -1) {
                 throw new EOFException();
             }
-            count(x);
         }
     }
 
@@ -720,6 +693,14 @@ public class ZipArchiveInputStream extends ArchiveInputStream {
             throws IOException {
         ((PushbackInputStream) in).unread(buf, offset, length);
         pushedBackBytes(length);
+    }
+
+    /**
+     * Decrements the counter of already read bytes.
+     *
+     * @param pushedBack the number of bytes pushed back.
+     */
+    protected void pushedBackBytes(long pushedBack) {
     }
 
     /**

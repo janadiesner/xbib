@@ -1,7 +1,14 @@
 
 package org.xbib.io.archivers;
 
+import org.xbib.io.archivers.encode.ArchiveEntryEncoding;
+import org.xbib.io.archivers.encode.ArchiveEntryEncodingHelper;
+
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.util.Locale;
 
 /**
  * Generic Archive utilities
@@ -13,6 +20,128 @@ public class ArchiveUtils {
      */
     private ArchiveUtils() {
     }
+
+    /**
+     * Strips Windows' drive letter as well as any leading slashes,
+     * turns path separators into forward slahes.
+     */
+    public static String normalizeFileName(String fileName, boolean preserveLeadingSlashes) {
+        String osname = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+        if (osname.startsWith("windows")) {
+            if (fileName.length() > 2) {
+                char ch1 = fileName.charAt(0);
+                char ch2 = fileName.charAt(1);
+                if (ch2 == ':' && ((ch1 >= 'a' && ch1 <= 'z') || (ch1 >= 'A' && ch1 <= 'Z'))) {
+                    fileName = fileName.substring(2);
+                }
+            }
+        } else if (osname.contains("netware")) {
+            int colon = fileName.indexOf(':');
+            if (colon != -1) {
+                fileName = fileName.substring(colon + 1);
+            }
+        }
+        fileName = fileName.replace(File.separatorChar, '/');
+        // No absolute pathnames. Windows paths can start with "\\NetworkDrive\",  so we loop on starting /'s.
+        while (!preserveLeadingSlashes && fileName.startsWith("/")) {
+            fileName = fileName.substring(1);
+        }
+        return fileName;
+    }
+
+    public static final ArchiveEntryEncoding DEFAULT_ENCODING = ArchiveEntryEncodingHelper.getEncoding(null);
+
+    public static final ArchiveEntryEncoding FALLBACK_ENCODING = new ArchiveEntryEncoding() {
+        public boolean canEncode(String name) {
+            return true;
+        }
+
+        public ByteBuffer encode(String name) {
+            final int length = name.length();
+            byte[] buf = new byte[length];
+            for (int i = 0; i < length; ++i) {
+                buf[i] = (byte) name.charAt(i);
+            }
+            return ByteBuffer.wrap(buf);
+        }
+
+        public String decode(byte[] buffer) {
+            final int length = buffer.length;
+            StringBuilder result = new StringBuilder(length);
+            for (byte b : buffer) {
+                if (b == 0) {
+                    break;
+                }
+                result.append((char) (b & 0xFF));
+            }
+            return result.toString();
+        }
+    };
+
+    /**
+     * Copy a name into a buffer.
+     * Copies characters from the name into the buffer
+     * starting at the specified offset.
+     * If the buffer is longer than the name, the buffer
+     * is filled with trailing NULs.
+     * If the name is longer than the buffer,
+     * the output is truncated.
+     *
+     * @param name   The header name from which to copy the characters.
+     * @param buf    The buffer where the name is to be stored.
+     * @param offset The starting offset into the buffer
+     * @param length The maximum number of header bytes to copy.
+     * @return The updated offset, i.e. offset + length
+     */
+    public static int formatNameBytes(String name, byte[] buf, final int offset, final int length) {
+        try {
+            return formatNameBytes(name, buf, offset, length, DEFAULT_ENCODING);
+        } catch (IOException ex) {
+            try {
+                return formatNameBytes(name, buf, offset, length, ArchiveUtils.FALLBACK_ENCODING);
+            } catch (IOException ex2) {
+                // impossible
+                throw new RuntimeException(ex2);
+            }
+        }
+    }
+
+    /**
+     * Copy a name into a buffer.
+     * Copies characters from the name into the buffer
+     * starting at the specified offset.
+     * If the buffer is longer than the name, the buffer
+     * is filled with trailing NULs.
+     * If the name is longer than the buffer,
+     * the output is truncated.
+     *
+     * @param name     The header name from which to copy the characters.
+     * @param buf      The buffer where the name is to be stored.
+     * @param offset   The starting offset into the buffer
+     * @param length   The maximum number of header bytes to copy.
+     * @param encoding name of the encoding to use for file names
+     * @return The updated offset, i.e. offset + length
+     */
+    public static int formatNameBytes(String name, byte[] buf, final int offset,
+                                      final int length,
+                                      final ArchiveEntryEncoding encoding)
+            throws IOException {
+        int len = name.length();
+        ByteBuffer b = encoding.encode(name);
+        while (b.limit() > length && len > 0) {
+            b = encoding.encode(name.substring(0, --len));
+        }
+        final int limit = b.limit();
+        System.arraycopy(b.array(), b.arrayOffset(), buf, offset, limit);
+
+        // Pad any remaining output bytes with NUL
+        for (int i = limit; i < length; ++i) {
+            buf[offset + i] = 0;
+        }
+
+        return offset + length;
+    }
+
 
     /**
      * Generates a string containing the name, isDirectory setting and size of an entry.

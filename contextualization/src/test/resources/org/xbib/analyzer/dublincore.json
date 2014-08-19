@@ -1,5 +1,5 @@
 {
-    "Creator" : {
+    /*"Creator" : {
         "_type" : "application/x-groovy",
         "script" : "dublincore/creator.groovy",
         "class" : "creatorElement",
@@ -22,11 +22,11 @@
         "script" : "dublincore/identifier.groovy",
         "class" : "identifierElement",
         "values" : [ "400" ]
-    },
+    },*/
     "Subject" : {
         "_type" : "application/x-ruby",
         "script" : "dublincore/subject.rb",
-        "class" : "subjectELement",
+        "class" : "subjectElement",
         "values" : [ "500" ]
     }
 }

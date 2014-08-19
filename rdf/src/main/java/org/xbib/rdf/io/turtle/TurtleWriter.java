@@ -107,15 +107,15 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
 
     @Override
     public TurtleWriter<S, P, O, C> newIdentifier(IRI iri) {
-        if (!iri.equals(resourceContext.getResource().id())) {
+        if (iri != null && !iri.equals(resourceContext.getResource().id())) {
             try {
                 write(resourceContext);
                 resourceContext.newResource();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
+            resourceContext.getResource().id(iri);
         }
-        resourceContext.getResource().id(iri);
         return this;
     }
 

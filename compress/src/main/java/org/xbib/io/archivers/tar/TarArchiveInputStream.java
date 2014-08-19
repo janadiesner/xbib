@@ -4,8 +4,8 @@ package org.xbib.io.archivers.tar;
 import org.xbib.io.archivers.ArchiveEntry;
 import org.xbib.io.archivers.ArchiveInputStream;
 import org.xbib.io.archivers.ArchiveUtils;
-import org.xbib.io.archivers.zip.ZipEncoding;
-import org.xbib.io.archivers.zip.ZipEncodingHelper;
+import org.xbib.io.archivers.encode.ArchiveEntryEncoding;
+import org.xbib.io.archivers.encode.ArchiveEntryEncodingHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,12 +29,18 @@ public class TarArchiveInputStream extends ArchiveInputStream {
     private static final int BUFFER_SIZE = 8 * 1024;
 
     private boolean hasHitEOF;
+
     private long entrySize;
+
     private long entryOffset;
+
     private byte[] readBuf;
+
     protected final TarBuffer buffer;
+
     private TarArchiveEntry currEntry;
-    private final ZipEncoding encoding;
+
+    private final ArchiveEntryEncoding encoding;
 
     /**
      * Constructor for TarInputStream.
@@ -101,7 +107,7 @@ public class TarArchiveInputStream extends ArchiveInputStream {
         this.buffer = new TarBuffer(is, blockSize, recordSize);
         this.readBuf = null;
         this.hasHitEOF = false;
-        this.encoding = ZipEncodingHelper.getZipEncoding(encoding);
+        this.encoding = ArchiveEntryEncodingHelper.getEncoding(encoding);
     }
 
     /**
@@ -470,11 +476,8 @@ public class TarArchiveInputStream extends ArchiveInputStream {
             byte[] rec = buffer.readRecord();
 
             if (rec == null) {
-                // Unexpected EOF!
-                throw new IOException("unexpected EOF with " + numToRead
-                        + " bytes unread. Occured at byte: " + getBytesRead());
+                throw new IOException("unexpected EOF with " + numToRead + " bytes unread");
             }
-            count(rec.length);
             int sz = numToRead;
             int recLen = rec.length;
 

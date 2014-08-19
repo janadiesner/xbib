@@ -75,6 +75,11 @@ public class FromEZBWeb extends Converter {
     }
 
     @Override
+    public String getName() {
+        return "ezb-web-turtle";
+    }
+
+    @Override
     public void process(URI uri) throws Exception {
         IRINamespaceContext context = IRINamespaceContext.newInstance();
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");

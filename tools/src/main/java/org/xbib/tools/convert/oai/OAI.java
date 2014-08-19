@@ -48,5 +48,8 @@ public class OAI extends OAIHarvester {
             }
         };
     }
-
+    @Override
+    public String getName() {
+        return "oai-tar";
+    }
 }

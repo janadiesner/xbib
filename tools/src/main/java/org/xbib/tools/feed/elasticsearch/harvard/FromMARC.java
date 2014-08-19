@@ -70,6 +70,11 @@ public final class FromMARC extends Feeder {
     private final Charset ISO88591 = Charset.forName("ISO-8859-1");
 
     @Override
+    public String getName() {
+        return "harvard-marc-elasticsearch";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override
@@ -81,7 +86,7 @@ public final class FromMARC extends Feeder {
 
     @Override
     protected Feeder beforeIndexCreation(Ingest ingest) throws IOException {
-        ingest.addMapping("title", FromMARC.class.getResourceAsStream("mapping-title.json"));
+        ingest.mapping("title", FromMARC.class.getResourceAsStream("mapping-title.json"));
         return this;
     }
 

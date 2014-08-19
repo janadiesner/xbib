@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0.Beta4</version>
         <relativePath>../..</relativePath>
     </parent>
 
@@ -23,17 +23,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
-                    <compilerArgument>-Xlint:all,-serial,-unchecked,-path,-rawtypes</compilerArgument>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -64,16 +53,16 @@
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
                     <warName>storage</warName>
-                    <warSourceDirectory>${project.basedir}/src/main/webapp</warSourceDirectory>
-                    <webXml>${project.basedir}/src/main/webapp/WEB-INF/web.xml</webXml>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                    </archive>
-                    <attachClasses>true</attachClasses>
-                    <classesClassifier>classes</classesClassifier>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/webapp/WEB-INF</directory>
+                            <filtering>true</filtering>
+                            <include>jboss-web.xml</include>
+                            <targetPath>/WEB-INF</targetPath>
+                        </resource>
+                    </webResources>
                 </configuration>
             </plugin>
         </plugins>
@@ -82,67 +71,50 @@
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
-            <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.xbib</groupId>
+            <artifactId>util</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>ftp</artifactId>
-            <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>jdbc</artifactId>
-            <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>grouping</artifactId>
-            <version>${project.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
+            <groupId>org.xbib</groupId>
+            <artifactId>standardnumber</artifactId>
         </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-bundle</artifactId>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-multipart</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <!-- jersey dependecies: asm, jackson  -->
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-            <version>3.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet</groupId>
-            <artifactId>mimepull</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-        </dependency>
+
     </dependencies>
 </project>

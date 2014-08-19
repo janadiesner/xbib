@@ -51,10 +51,8 @@ public class ItemUpdateAction extends AbstractUpdateAction {
 
     @Override
     protected Map<String, Object> createParams(Request request) throws IOException {
-        ILL ill = new ILL(request.getItem());
-        if (!ill.isValid()) {
-            throw new IllegalArgumentException("invalid item");
-        }
+        ILL ill = new ILL().set(request.getItem());
+        ill.normalize().verify();
         long number = ill.getNumber();
         final Map<String, Object> params = new HashMap<>();
         params.put(ITEM_PARAMETER, number);

@@ -95,7 +95,10 @@ public class JsonCoins extends Feeder {
 
     private final static SerialsDB serialsdb = new SerialsDB();
 
-    private final static AtomicLong counter = new AtomicLong(0L);
+    @Override
+    public String getName() {
+        return "json-coins-elasticsearch";
+    }
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {

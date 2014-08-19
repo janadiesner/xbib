@@ -31,12 +31,11 @@
  */
 package org.xbib.objectstorage.action;
 
-import org.xbib.date.DateUtil;
 import org.xbib.objectstorage.Action;
 import org.xbib.objectstorage.Request;
 import org.xbib.objectstorage.Response;
 import org.xbib.objectstorage.container.rows.ContainerRow;
-import org.xbib.standardnumber.InvalidStandardNumberException;
+import org.xbib.util.DateUtil;
 import org.xbib.util.ILL;
 
 import java.io.IOException;
@@ -91,13 +90,9 @@ public class ContainerGetAction extends AbstractQueryAction {
             String transaction = result.getString(4);
             String authority = request.getStringParameter(AUTHORITY_PARAMETER, "XX-000");
             String id = authority + "-" + year + "-" + transaction + "-0";
-            try {
-                ILL ill = new ILL(id); // checksum added automatically
-                String item = ill.getStandardNumberPrintableRepresentation();
-                row.setItem(item);
-            } catch (InvalidStandardNumberException ex) {
-                logger.warn(ex.getMessage(), ex);
-            }
+            ILL ill = new ILL().set(id); // checksum added automatically
+            String item = ill.format();
+            row.setItem(item);
             rows.add(row);
         }
         response.setContainerResponse(rows);

@@ -3,6 +3,7 @@ package org.xbib.objectstorage.container;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
 import org.xbib.io.Session;
+import org.xbib.io.ftp.apache.FTPConnection;
 import org.xbib.io.ftp.apache.FTPSession;
 import org.xbib.objectstorage.Action;
 import org.xbib.objectstorage.ItemInfo;
@@ -65,11 +66,10 @@ public class RemoteFileTransferContainer extends AbstractContainer {
         String fileName = info.getKey().getName();
         URL target = new URL(new URL(pathName), fileName);
         URI uri = getBaseURI();
-        Connection<FTPSession> c = ConnectionService
-                .getInstance()
-                .getFactory(uri)
+        Connection<Session> c = ConnectionService.getInstance()
+                .getConnectionFactory(uri)
                 .getConnection(uri);
-        FTPSession session = c.createSession();
+        FTPSession session = (FTPSession)c.createSession();
         session.open(Session.Mode.WRITE);
         // check for exist
         if (!session.exists(fileName)) {

@@ -42,6 +42,7 @@ import org.xbib.pipeline.PipelineProvider;
 import org.xbib.tools.Feeder;
 import org.xbib.util.Strings;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.net.URI;
@@ -59,6 +60,11 @@ public class GeonamesFromZIP extends Feeder {
     private final static Logger logger = LoggerFactory.getLogger(GeonamesFromZIP.class.getSimpleName());
 
     @Override
+    public String getName() {
+        return "geonames-zip";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override
@@ -74,8 +80,8 @@ public class GeonamesFromZIP extends Feeder {
     }
 
     @Override
-    protected GeonamesFromZIP beforeIndexCreation(Ingest output) {
-        output.addMapping(settings.get("type"),
+    protected GeonamesFromZIP beforeIndexCreation(Ingest output) throws IOException {
+        output.mapping(settings.get("type"),
                 "{ \"" + settings.get("type") + "\": { \"properties\" : { \"location\" : { \"type\" : \"geo_point\" } } } }");
         return this;
     }

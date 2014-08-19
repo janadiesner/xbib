@@ -57,6 +57,11 @@ public class Freebase extends Converter {
 
     private final static Logger logger = LoggerFactory.getLogger(Freebase.class.getName());
 
+    @Override
+    public String getName() {
+        return "freebase-turtle-ntriples";
+    }
+
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

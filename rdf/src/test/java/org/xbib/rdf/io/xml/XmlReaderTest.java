@@ -33,6 +33,7 @@ package org.xbib.rdf.io.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import javax.xml.namespace.QName;
 import org.testng.Assert;
@@ -47,7 +48,6 @@ import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.text.CharUtils.Profile;
 import org.xbib.text.UrlEncoding;
-import org.xml.sax.InputSource;
 
 public class XmlReaderTest extends Assert {
 
@@ -98,7 +98,7 @@ public class XmlReaderTest extends Assert {
         xmlHandler.setListener(writer);
         new XmlReader()
                 .setHandler(xmlHandler)
-                .parse(new InputSource(in));
+                .parse(new InputStreamReader(in, "UTF-8"), writer);
         writer.close();
         String s = sw.toString().trim();
         logger.info(s);
@@ -173,7 +173,7 @@ public class XmlReaderTest extends Assert {
                 });
         new XmlReader()
                 .setHandler(xmlHandler)
-                .parse(new InputSource(in));
+                .parse(new InputStreamReader(in, "UTF-8"), null);
     }
 
     @Test
@@ -241,7 +241,7 @@ public class XmlReaderTest extends Assert {
                 });
         new XmlReader()
                 .setHandler(xmlHandler)
-                .parse(new InputSource(in));
+                .parse(new InputStreamReader(in, "UTF-8"), null);
     }
 
 }

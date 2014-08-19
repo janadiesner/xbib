@@ -43,6 +43,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.namespace.QName;
+import java.util.EmptyStackException;
 import java.util.Iterator;
 import java.util.Stack;
 
@@ -137,23 +138,23 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
 
     @Override
     public void endElement(String nsURI, String localname, String qname) throws SAXException {
-        try {
-            QName name = makeQName(nsURI, localname, qname);
-            if (skip(name)) {
-                content.setLength(0);
-                return;
-            }
-            int level = parents.size();
-            parents.pop();
-            identify(name, content(), resourceContext.getResource().id());
-            if (!isResourceDelimiter(name)) {
-                closePredicate(parents.peek(), name, level - lastlevel);
-            }
+        QName name = makeQName(nsURI, localname, qname);
+        if (skip(name)) {
             content.setLength(0);
-            lastlevel = level;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            return;
         }
+        int level = parents.size();
+        parents.pop();
+        identify(name, content(), resourceContext.getResource().id());
+        if (!isResourceDelimiter(name) && !parents.isEmpty()) {
+            try {
+                closePredicate(parents.peek(), name, level - lastlevel);
+            } catch (EmptyStackException e) {
+                logger.warn(e.getMessage() + " for end element " + qname + " " + localname);
+            }
+        }
+        content.setLength(0);
+        lastlevel = level;
     }
 
     @Override

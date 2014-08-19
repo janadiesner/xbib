@@ -3,7 +3,7 @@ package org.xbib.io.archivers.tar;
 
 import org.xbib.io.archivers.ArchiveEntry;
 import org.xbib.io.archivers.ArchiveUtils;
-import org.xbib.io.archivers.zip.ZipEncoding;
+import org.xbib.io.archivers.encode.ArchiveEntryEncoding;
 
 import java.io.File;
 import java.io.IOException;
@@ -339,7 +339,7 @@ public class TarArchiveEntry implements TarConstants, ArchiveEntry {
      * @param encoding  encoding to use for file names
      * @throws IllegalArgumentException if any of the numeric fields have an invalid format
      */
-    public TarArchiveEntry(byte[] headerBuf, ZipEncoding encoding)
+    public TarArchiveEntry(byte[] headerBuf, ArchiveEntryEncoding encoding)
             throws IOException {
         this();
         parseTarHeader(headerBuf, encoding);
@@ -811,7 +811,7 @@ public class TarArchiveEntry implements TarConstants, ArchiveEntry {
      *                 extension for numeric fields if their value doesn't fit in the
      *                 maximum size of standard tar archives
      */
-    public void writeEntryHeader(byte[] outbuf, ZipEncoding encoding,
+    public void writeEntryHeader(byte[] outbuf, ArchiveEntryEncoding encoding,
                                  boolean starMode) throws IOException {
         int offset = 0;
 
@@ -895,12 +895,12 @@ public class TarArchiveEntry implements TarConstants, ArchiveEntry {
      * @throws IllegalArgumentException if any of the numeric fields
      *                                  have an invalid format
      */
-    public void parseTarHeader(byte[] header, ZipEncoding encoding)
+    public void parseTarHeader(byte[] header, ArchiveEntryEncoding encoding)
             throws IOException {
         parseTarHeader(header, encoding, false);
     }
 
-    private void parseTarHeader(byte[] header, ZipEncoding encoding,
+    private void parseTarHeader(byte[] header, ArchiveEntryEncoding encoding,
                                 final boolean oldStyle)
             throws IOException {
         int offset = 0;

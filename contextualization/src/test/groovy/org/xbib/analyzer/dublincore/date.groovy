@@ -5,7 +5,7 @@ import org.xbib.elements.ElementBuilder
 public class DateElement extends DublinCoreElement {
 
     @Override
-    DateElement build(ElementBuilder builder, key, value) {
+    DateElement build(ElementBuilder builder, Object key, Object value) {
         println 'got date ' + value
         return this
     }

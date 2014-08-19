@@ -59,6 +59,11 @@ public final class FromMarcXmlTar extends Feeder {
     private final static Logger logger = LoggerFactory.getLogger(FromMarcXmlTar.class.getName());
 
     @Override
+    public String getName() {
+        return "zdb-marcxmltar-elasticsearch";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class GzipStreamCodec implements StreamCodec<GZIPInputStream, GZIPOutputStream> {
+public class GZIPStreamCodec implements StreamCodec<GZIPInputStream, GZIPOutputStream> {
 
     @Override
     public String getName() {

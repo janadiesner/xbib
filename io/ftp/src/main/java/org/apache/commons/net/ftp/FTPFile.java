@@ -16,7 +16,6 @@
  */
 
 package org.apache.commons.net.ftp;
-import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Formatter;
 
@@ -29,9 +28,8 @@ import java.util.Formatter;
  * @see FTPClient#listFiles
  ***/
 
-public class FTPFile implements Serializable
+public class FTPFile
 {
-    private static final long serialVersionUID = 9010790363003271996L;
 
     /** A constant indicating an FTPFile is a file. ***/
     public static final int FILE_TYPE = 0;

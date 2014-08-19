@@ -193,12 +193,7 @@ public class VanillaChunkDecoder extends ChunkDecoder {
         }
     }
 
-    /*
-     ///////////////////////////////////////////////////////////////////////
-     // Internal methods
-     ///////////////////////////////////////////////////////////////////////
-     */
-    protected static final void copyUpTo32WithSwitch(byte[] in, int inPos, byte[] out, int outPos,
+    protected static void copyUpTo32WithSwitch(byte[] in, int inPos, byte[] out, int outPos,
                                                      int lengthMinusOne) {
         switch (lengthMinusOne) {
             case 31:

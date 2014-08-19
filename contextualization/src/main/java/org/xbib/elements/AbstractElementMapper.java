@@ -39,7 +39,6 @@ import org.xbib.rdf.context.ResourceContext;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;

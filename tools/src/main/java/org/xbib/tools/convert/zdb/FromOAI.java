@@ -78,6 +78,11 @@ public class FromOAI extends Converter {
     }
 
     @Override
+    public String getName() {
+        return "zdb-fromoai";
+    }
+
+    @Override
     protected FromOAI prepare() throws IOException {
         // open output TAR archive
         TarConnectionFactory factory = new TarConnectionFactory();

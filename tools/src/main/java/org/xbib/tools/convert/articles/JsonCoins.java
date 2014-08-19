@@ -103,6 +103,11 @@ public class JsonCoins extends Converter {
 
     private final static IRINamespaceContext context = IRINamespaceContext.newInstance();
 
+    @Override
+    public String getName() {
+        return "json-coins-turtle";
+    }
+
     static {
         context.addNamespace(RDFNS.NS_PREFIX, RDFNS.NS_URI);
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");

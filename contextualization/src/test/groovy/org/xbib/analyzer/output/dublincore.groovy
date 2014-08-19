@@ -7,7 +7,7 @@ public class DublinCoreWriter implements ResourceContextWriter {
 
     @Override
     void write(ResourceContext resourceContext) throws IOException {
-        println 'scripted groovy output, got resource ' + resourceContext.getResource()
+        println 'scripted groovy output'
     }
 
     @Override

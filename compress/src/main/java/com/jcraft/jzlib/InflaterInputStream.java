@@ -36,7 +36,9 @@ import java.io.InputStream;
 
 public class InflaterInputStream extends FilterInputStream {
     protected final Inflater inflater;
-    protected byte[] buf;
+    protected byte[] buf
+
+            ;
 
     private boolean closed = false;
 

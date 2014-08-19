@@ -13,9 +13,11 @@ import java.net.URI;
  */
 public final class ArConnectionFactory implements ConnectionFactory<ArSession> {
 
+    public final static String SUFFIX = "ar";
+
     @Override
     public String getName() {
-        return "ar";
+        return SUFFIX;
     }
 
     /**
@@ -36,4 +38,6 @@ public final class ArConnectionFactory implements ConnectionFactory<ArSession> {
     public boolean canOpen(URI uri) {
         return ArchiveSession.canOpen(uri, getName(), true);
     }
+
+
 }

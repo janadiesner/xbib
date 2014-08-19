@@ -1,4 +1,3 @@
-
 package org.xbib.io.archivers.cpio;
 
 import org.xbib.io.archivers.ArchiveEntry;
@@ -39,8 +38,7 @@ import java.io.InputStream;
  * Note: This implementation should be compatible to cpio 2.5
  */
 
-public class CpioArchiveInputStream extends ArchiveInputStream implements
-        CpioConstants {
+public class CpioArchiveInputStream extends ArchiveInputStream implements CpioConstants {
 
     private boolean closed = false;
 
@@ -159,7 +157,7 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
             } else if (magicString.equals(MAGIC_OLD_ASCII)) {
                 this.entry = readOldAsciiEntry();
             } else {
-                throw new IOException("Unknown magic [" + magicString + "]. Occured at byte: " + getBytesRead());
+                throw new IOException("Unknown magic [" + magicString + "]");
             }
         }
 
@@ -211,8 +209,7 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
             this.entryEOF = true;
             if (this.entry.getFormat() == FORMAT_NEW_CRC
                     && this.crc != this.entry.getChksum()) {
-                throw new IOException("CRC Error. Occured at byte: "
-                        + getBytesRead());
+                throw new IOException("CRC Error");
             }
             return -1; // EOF for this entry
         }
@@ -241,7 +238,6 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         int n = 0;
         while (n < len) {
             int count = this.in.read(b, off + n, len - n);
-            count(count);
             if (count < 0) {
                 throw new EOFException();
             }
@@ -292,7 +288,7 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         String name = readCString((int) namesize);
         ret.setName(name);
         if (mode == 0 && !name.equals(CPIO_TRAILER)) {
-            throw new IOException("Mode 0 only allowed in the trailer. Found entry name: " + name + " Occured at byte: " + getBytesRead());
+            throw new IOException("Mode 0 only allowed in the trailer. Found entry name: " + name);
         }
         skip(ret.getHeaderPadCount());
 
@@ -318,7 +314,7 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         final String name = readCString((int) namesize);
         ret.setName(name);
         if (mode == 0 && !name.equals(CPIO_TRAILER)) {
-            throw new IOException("Mode 0 only allowed in the trailer. Found entry: " + name + " Occured at byte: " + getBytesRead());
+            throw new IOException("Mode 0 only allowed in the trailer. Found entry: " + name);
         }
 
         return ret;
@@ -344,7 +340,7 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         final String name = readCString((int) namesize);
         ret.setName(name);
         if (mode == 0 && !name.equals(CPIO_TRAILER)) {
-            throw new IOException("Mode 0 only allowed in the trailer. Found entry: " + name + "Occured at byte: " + getBytesRead());
+            throw new IOException("Mode 0 only allowed in the trailer. Found entry: " + name);
         }
         skip(ret.getHeaderPadCount());
 
@@ -394,60 +390,4 @@ public class CpioArchiveInputStream extends ArchiveInputStream implements
         return getNextCPIOEntry();
     }
 
-    /**
-     * Checks if the signature matches one of the following magic values:
-     * <p/>
-     * Strings:
-     * <p/>
-     * "070701" - MAGIC_NEW
-     * "070702" - MAGIC_NEW_CRC
-     * "070707" - MAGIC_OLD_ASCII
-     * <p/>
-     * Octal Binary value:
-     * <p/>
-     * 070707 - MAGIC_OLD_BINARY (held as a short) = 0x71C7 or 0xC771
-     */
-    public static boolean matches(byte[] signature, int length) {
-        if (length < 6) {
-            return false;
-        }
-
-        // Check binary values
-        if (signature[0] == 0x71 && (signature[1] & 0xFF) == 0xc7) {
-            return true;
-        }
-        if (signature[1] == 0x71 && (signature[0] & 0xFF) == 0xc7) {
-            return true;
-        }
-
-        // Check Ascii (String) values
-        // 3037 3037 30nn
-        if (signature[0] != 0x30) {
-            return false;
-        }
-        if (signature[1] != 0x37) {
-            return false;
-        }
-        if (signature[2] != 0x30) {
-            return false;
-        }
-        if (signature[3] != 0x37) {
-            return false;
-        }
-        if (signature[4] != 0x30) {
-            return false;
-        }
-        // Check last byte
-        if (signature[5] == 0x31) {
-            return true;
-        }
-        if (signature[5] == 0x32) {
-            return true;
-        }
-        if (signature[5] == 0x37) {
-            return true;
-        }
-
-        return false;
-    }
 }

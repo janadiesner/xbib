@@ -10,9 +10,8 @@ public class GroovyElement implements Element {
 
     Element begin() { return this }
 
-    Element build(ElementBuilder builder, key, value) {
-        println 'Hello World!'
-        builder.context()
+    Element build(ElementBuilder builder, Object key, Object value) {
+        println 'A default build message from GroovyElement!'
         return this
     }
 

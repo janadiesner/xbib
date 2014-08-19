@@ -54,6 +54,11 @@ import java.util.zip.GZIPOutputStream;
 public class FromRdfXml extends Converter {
 
     @Override
+    public String getName() {
+        return "gnd-turtle-ntriples";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

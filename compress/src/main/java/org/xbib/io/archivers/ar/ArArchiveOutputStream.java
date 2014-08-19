@@ -1,4 +1,3 @@
-
 package org.xbib.io.archivers.ar;
 
 import org.xbib.io.archivers.ArchiveEntry;
@@ -12,7 +11,7 @@ import java.io.OutputStream;
 /**
  * Implements the "ar" archive format as an output stream.
  */
-public class ArArchiveOutputStream extends ArchiveOutputStream {
+public class ArArchiveOutputStream extends ArchiveOutputStream<ArArchiveEntry> {
     /**
      * Fail if a long file name is required in the archive.
      */
@@ -75,12 +74,15 @@ public class ArArchiveOutputStream extends ArchiveOutputStream {
     }
 
     @Override
-    public void putArchiveEntry(final ArchiveEntry pEntry) throws IOException {
+    public ArArchiveEntry newArchiveEntry() {
+        return new ArArchiveEntry();
+    }
+
+    @Override
+    public void putArchiveEntry(final ArArchiveEntry pEntry) throws IOException {
         if (finished) {
             throw new IOException("Stream has already been finished");
         }
-
-        ArArchiveEntry pArEntry = (ArArchiveEntry) pEntry;
         if (prevEntry == null) {
             writeArchiveHeader();
         } else {
@@ -93,9 +95,9 @@ public class ArArchiveOutputStream extends ArchiveOutputStream {
             }
         }
 
-        prevEntry = pArEntry;
+        prevEntry = pEntry;
 
-        writeEntryHeader(pArEntry);
+        writeEntryHeader(pEntry);
 
         entryOffset = 0;
         haveUnclosedEntry = true;
@@ -188,7 +190,6 @@ public class ArArchiveOutputStream extends ArchiveOutputStream {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         out.write(b, off, len);
-        count(len);
         entryOffset += len;
     }
 
@@ -205,7 +206,7 @@ public class ArArchiveOutputStream extends ArchiveOutputStream {
     }
 
     @Override
-    public ArchiveEntry createArchiveEntry(File inputFile, String entryName)
+    public ArArchiveEntry createArchiveEntry(File inputFile, String entryName)
             throws IOException {
         if (finished) {
             throw new IOException("Stream has already been finished");

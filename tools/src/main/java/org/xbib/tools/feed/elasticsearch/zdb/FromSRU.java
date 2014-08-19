@@ -81,6 +81,11 @@ public class FromSRU extends Feeder {
         client = SRUClientFactory.newClient();
     }
 
+    @Override
+    public String getName() {
+        return "zdb-sru-elasticsearch";
+    }
+
     protected FromSRU prepare() throws IOException {
         prepareInput();
         prepareOutput();

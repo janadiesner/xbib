@@ -17,7 +17,6 @@
 
 package org.apache.commons.net;
 
-import java.io.Serializable;
 import java.util.EventListener;
 
 import org.apache.commons.net.util.ListenerList;
@@ -33,10 +32,8 @@ import org.apache.commons.net.util.ListenerList;
  * @see ProtocolCommandListener
  ***/
 
-public class ProtocolCommandSupport implements Serializable
+public class ProtocolCommandSupport
 {
-    private static final long serialVersionUID = -8017692739988399978L;
-
     private final Object __source;
     private final ListenerList __listeners;
 

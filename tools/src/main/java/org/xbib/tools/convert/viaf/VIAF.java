@@ -86,6 +86,11 @@ public class VIAF extends Converter {
     }
 
     @Override
+    public String getName() {
+        return "viaf-rdf-ntriple";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

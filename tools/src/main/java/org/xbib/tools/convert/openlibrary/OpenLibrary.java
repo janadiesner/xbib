@@ -58,6 +58,11 @@ public class OpenLibrary extends Converter {
     private final static Logger logger = LoggerFactory.getLogger(OpenLibrary.class.getSimpleName());
 
     @Override
+    public String getName() {
+        return "openlibrary-couchdb-json-ntriples";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

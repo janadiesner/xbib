@@ -50,7 +50,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.queue.QueuePipelineExecutor;
-import org.xbib.tools.Tool;
+import org.xbib.tools.CommandLineInterpreter;
 import org.xbib.tools.merge.zdb.entities.Manifestation;
 import org.xbib.tools.util.SearchHitPipelineElement;
 import org.xbib.util.DateUtil;
@@ -72,7 +72,7 @@ import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
  */
 public class WithCitations
         extends QueuePipelineExecutor<Boolean, Manifestation, WithCitationsPipeline, SearchHitPipelineElement>
-        implements Tool {
+        implements CommandLineInterpreter {
 
     private final static Logger logger = LoggerFactory.getLogger(WithCitations.class.getName());
 
@@ -135,7 +135,7 @@ public class WithCitations
                     .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests",
                             Runtime.getRuntime().availableProcessors()));
 
-            ingest.addSetting(WithCitations.class.getResourceAsStream("transport-client-settings.json"));
+            ingest.setting(WithCitations.class.getResourceAsStream("transport-client-settings.json"));
             ingest.newClient(URI.create(settings.get("target")));
             ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
             // TODO create settings/mappings

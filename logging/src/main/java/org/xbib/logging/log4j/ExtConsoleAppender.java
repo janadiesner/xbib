@@ -213,7 +213,7 @@ public class ExtConsoleAppender extends AbstractOutputStreamAppender<OutputStrea
          * Constructor.
          * @param os The OutputStream.
          * @param type The name of the target.
-         * @param layout A Serializable layout
+         * @param layout a layout
          */
         public FactoryData(final OutputStream os, final String type, final Layout layout) {
             this.os = os;

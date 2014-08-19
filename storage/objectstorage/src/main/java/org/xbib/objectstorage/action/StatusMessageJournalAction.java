@@ -56,10 +56,8 @@ public class StatusMessageJournalAction extends AbstractInsertAction {
 
     @Override
     protected Map<String, Object> createParams(Request request) throws IOException {
-        ILL ill = new ILL(request.getItem());
-        if (!ill.isValid()) {
-            throw new IllegalArgumentException("invalid item");
-        }
+        ILL ill = new ILL().set(request.getItem());
+        ill.normalize().verify();
         InputStream in = itemInfo.getInputStream();
         StringBuilder sb = new StringBuilder();
         byte[] b = new byte[4096];

@@ -1,8 +1,7 @@
-
 package org.xbib.io.archivers.tar;
 
-import org.xbib.io.archivers.zip.ZipEncoding;
-import org.xbib.io.archivers.zip.ZipEncodingHelper;
+import org.xbib.io.archivers.encode.ArchiveEntryEncoding;
+import org.xbib.io.archivers.encode.ArchiveEntryEncodingHelper;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -15,10 +14,9 @@ public class TarUtils {
 
     private static final int BYTE_MASK = 255;
 
-    static final ZipEncoding DEFAULT_ENCODING =
-            ZipEncodingHelper.getZipEncoding(null);
+    static final ArchiveEntryEncoding DEFAULT_ENCODING = ArchiveEntryEncodingHelper.getEncoding(null);
 
-    static final ZipEncoding FALLBACK_ENCODING = new ZipEncoding() {
+    static final ArchiveEntryEncoding FALLBACK_ENCODING = new ArchiveEntryEncoding() {
         public boolean canEncode(String name) {
             return true;
         }
@@ -26,7 +24,6 @@ public class TarUtils {
         public ByteBuffer encode(String name) {
             final int length = name.length();
             byte[] buf = new byte[length];
-
             // copy until end of input or output is reached.
             for (int i = 0; i < length; ++i) {
                 buf[i] = (byte) name.charAt(i);
@@ -37,14 +34,12 @@ public class TarUtils {
         public String decode(byte[] buffer) {
             final int length = buffer.length;
             StringBuilder result = new StringBuilder(length);
-
             for (byte b : buffer) {
                 if (b == 0) { // Trailing null
                     break;
                 }
                 result.append((char) (b & 0xFF)); // Allow for sign-extension
             }
-
             return result.toString();
         }
     };
@@ -255,7 +250,7 @@ public class TarUtils {
      */
     public static String parseName(byte[] buffer, final int offset,
                                    final int length,
-                                   final ZipEncoding encoding)
+                                   final ArchiveEntryEncoding encoding)
             throws IOException {
 
         int len = length;
@@ -319,7 +314,7 @@ public class TarUtils {
      */
     public static int formatNameBytes(String name, byte[] buf, final int offset,
                                       final int length,
-                                      final ZipEncoding encoding)
+                                      final ArchiveEntryEncoding encoding)
             throws IOException {
         int len = name.length();
         ByteBuffer b = encoding.encode(name);

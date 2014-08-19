@@ -31,14 +31,10 @@
  */
 package org.xbib.objectstorage;
 
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
-import com.sun.jersey.multipart.FormDataParam;
-import com.sun.jersey.spi.container.ContainerRequest;
-import org.xbib.date.DateUtil;
-import org.xbib.jersey.filter.PasswordSecurityContext;
+import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.util.DateUtil;
 import org.xbib.util.ExceptionFormatter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -178,8 +174,7 @@ public class API implements Parameter {
         ResponseBuilder builder = new ResponseBuilderImpl();
         Response response = new Response(builder);
         try {
-            Container cnt = adapter.connect(container, getPasswordSecurityContext(securityContext),
-                    uriInfo.getAbsolutePath());
+            Container cnt = adapter.connect(container, securityContext, uriInfo.getAbsolutePath());
             Principal principal = cnt.getPrincipal(securityContext);
             Request request = cnt.newRequest()
                     .setUser(principal.getName())
@@ -214,8 +209,7 @@ public class API implements Parameter {
         ResponseBuilder builder = new ResponseBuilderImpl();
         Response response = new Response(builder);
         try {
-            Container cnt = adapter.connect(container,
-                    getPasswordSecurityContext(securityContext), uriInfo.getAbsolutePath());
+            Container cnt = adapter.connect(container, securityContext, uriInfo.getAbsolutePath());
             Principal principal = cnt.getPrincipal(securityContext);
             Request request = cnt.newRequest()
                     .setUser(principal.getName())
@@ -272,8 +266,7 @@ public class API implements Parameter {
             if (servletRequest.getMethod().equalsIgnoreCase("head")) {
                 return headItem(servletResponse, securityContext, uriInfo, container, item);
             } else {
-                Container cnt = adapter.connect(container,
-                        getPasswordSecurityContext(securityContext), uriInfo.getAbsolutePath());
+                Container cnt = adapter.connect(container, securityContext, uriInfo.getAbsolutePath());
                 Principal principal = cnt.getPrincipal(securityContext);
                 Request request = cnt.newRequest()
                         .setUser(principal.getName())
@@ -306,8 +299,7 @@ public class API implements Parameter {
         ResponseBuilder builder = new ResponseBuilderImpl();
         Response response = new Response(builder);
         try {
-            Container cnt = adapter.connect(container,
-                    getPasswordSecurityContext(securityContext), uriInfo.getAbsolutePath());
+            Container cnt = adapter.connect(container, securityContext, uriInfo.getAbsolutePath());
             Principal principal = cnt.getPrincipal(securityContext);
             Request request = cnt.newRequest()
                     .setUser(principal.getName())
@@ -363,25 +355,6 @@ public class API implements Parameter {
         return processUpload(container, item, state, mimeType, in);
     }
 
-    @POST
-    @Path("/{container}/{item}/{status}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response postItem(
-            @PathParam(CONTAINER_PARAMETER) String container,
-            @PathParam(ITEM_PARAMETER) String item,
-            @PathParam(STATE_PARAMETER) String status,
-            @FormDataParam("file") InputStream in,
-            @FormDataParam("file") FormDataContentDisposition disp) throws IOException {
-        logger.debug("postItem {}", uriInfo.getAbsolutePath());
-        if (disp == null) {
-            return javax.ws.rs.core.Response.serverError().status(Status.BAD_REQUEST).build();
-        }
-        String mimeType = disp.getType();
-        item = disp.getFileName();
-        return processUpload(container, item, status, mimeType, in);
-    }
-
     @DELETE
     @Path("/{container}/{item}")
     public javax.ws.rs.core.Response deleteItem(
@@ -400,8 +373,7 @@ public class API implements Parameter {
         ResponseBuilder builder = new ResponseBuilderImpl();
         Response response = new Response(builder);
         try {
-            Container cnt = adapter.connect(container,
-                    getPasswordSecurityContext(securityContext), uriInfo.getAbsolutePath());
+            Container cnt = adapter.connect(container, securityContext, uriInfo.getAbsolutePath());
             if (!cnt.canUpload(mimeType)) {
                 return javax.ws.rs.core.Response.serverError().status(Status.BAD_REQUEST).build();
             }
@@ -444,15 +416,4 @@ public class API implements Parameter {
         }
     }
 
-    private PasswordSecurityContext getPasswordSecurityContext(SecurityContext securityContext) {
-        // I hate jersey
-        if (securityContext instanceof ContainerRequest) {
-            ContainerRequest cr = (ContainerRequest)securityContext;
-            SecurityContext sc = cr.getSecurityContext();
-            if (sc instanceof PasswordSecurityContext) {
-                return (PasswordSecurityContext)sc;
-            }
-        }
-        return null;
-    }
 }

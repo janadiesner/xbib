@@ -5,7 +5,7 @@
 
     <groupId>org.xbib</groupId>
     <artifactId>xbib</artifactId>
-    <version>1.0.0.Beta3</version>
+    <version>1.0.0.Beta4</version>
 
     <packaging>pom</packaging>
 
@@ -77,8 +77,8 @@
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>dd.MM.yyyy HH:mm</maven.build.timestamp.format>
-        <java.compiler.source>1.7</java.compiler.source>
-        <elasticsearch.support.plugin.version>1.2.2.0</elasticsearch.support.plugin.version>
+        <java.compiler.source>1.8</java.compiler.source>
+        <elasticsearch.support.plugin.version>1.3.0.3</elasticsearch.support.plugin.version>
     </properties>
 
     <build>
@@ -255,7 +255,7 @@
                 <plugin>
                     <groupId>org.wildfly.plugins</groupId>
                     <artifactId>wildfly-maven-plugin</artifactId>
-                    <version>1.0.0.Beta1</version>                
+                    <version>1.0.2.Final</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -412,6 +412,11 @@
             </dependency>
             <dependency>
                 <groupId>org.xbib</groupId>
+                <artifactId>ftp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xbib</groupId>
                 <artifactId>jdbc</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -496,11 +501,6 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.xbib</groupId>
-                <artifactId>elasticsearch-log4j</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.xbib.elasticsearch.plugin</groupId>
                 <artifactId>elasticsearch-support</artifactId>
                 <version>${elasticsearch.support.plugin.version}</version>
@@ -513,32 +513,32 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.3.3</version>
+                <version>2.4.1.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.3.3</version>
+                <version>2.4.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.3.3</version>
+                <version>2.4.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-smile</artifactId>
-                <version>2.3.3</version>
+                <version>2.4.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-yaml</artifactId>
-                <version>2.3.3</version>
+                <version>2.4.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-xml</artifactId>
-                <version>2.3.3</version>
+                <version>2.4.1</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
@@ -578,7 +578,7 @@
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-jaxrs</artifactId>
-                <version>3.0.7.Final</version>
+                <version>3.0.8.Final</version>
             </dependency>
             <dependency>
                 <groupId>com.sleepycat</groupId>
@@ -631,14 +631,9 @@
                 <version>9.5.0.1</version>
             </dependency>
             <dependency>
-                <groupId>oracle</groupId>
-                <artifactId>ojdbc</artifactId>
-                <version>11gR2</version>
-            </dependency>
-            <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
-                <version>2.0.6</version>
+                <version>2.3.6</version>
             </dependency>
             <dependency>
                 <groupId>org.jruby</groupId>
@@ -739,6 +734,8 @@
         <module>web/oai</module>
         
         <module>tools</module>
+
+        <module>storage/objectstorage</module>
 
     </modules>
 

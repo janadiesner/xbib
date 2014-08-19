@@ -1,5 +1,7 @@
-
 package org.xbib.io.archivers.zip;
+
+import org.xbib.io.archivers.encode.ArchiveEntryEncoding;
+import org.xbib.io.archivers.encode.ArchiveEntryEncodingHelper;
 
 import java.io.EOFException;
 import java.io.File;
@@ -93,7 +95,7 @@ public class ZipFile {
     /**
      * The zip encoding to use for filenames and the file comment.
      */
-    private final ZipEncoding zipEncoding;
+    private final ArchiveEntryEncoding archiveEntryEncoding;
 
     /**
      * File name of actual source.
@@ -122,7 +124,7 @@ public class ZipFile {
      * @throws java.io.IOException if an error occurs while reading the file.
      */
     public ZipFile(File f) throws IOException {
-        this(f, ZipEncodingHelper.UTF8);
+        this(f, ArchiveEntryEncodingHelper.UTF8);
     }
 
     /**
@@ -132,7 +134,7 @@ public class ZipFile {
      * @throws java.io.IOException if an error occurs while reading the file.
      */
     public ZipFile(String name) throws IOException {
-        this(new File(name), ZipEncodingHelper.UTF8);
+        this(new File(name), ArchiveEntryEncodingHelper.UTF8);
     }
 
     /**
@@ -176,13 +178,12 @@ public class ZipFile {
             throws IOException {
         this.archiveName = f.getAbsolutePath();
         this.encoding = encoding;
-        this.zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
+        this.archiveEntryEncoding = ArchiveEntryEncodingHelper.getEncoding(encoding);
         this.useUnicodeExtraFields = useUnicodeExtraFields;
         archive = new RandomAccessFile(f, "r");
         boolean success = false;
         try {
-            Map<ZipArchiveEntry, NameAndComment> entriesWithoutUTF8Flag =
-                    populateFromCentralDirectory();
+            Map<ZipArchiveEntry, NameAndComment> entriesWithoutUTF8Flag = populateFromCentralDirectory();
             resolveLocalFileHeaderData(entriesWithoutUTF8Flag);
             success = true;
         } finally {
@@ -427,8 +428,8 @@ public class ZipFile {
 
         final GeneralPurposeBit gpFlag = GeneralPurposeBit.parse(cfh, off);
         final boolean hasUTF8Flag = gpFlag.usesUTF8ForNames();
-        final ZipEncoding entryEncoding =
-                hasUTF8Flag ? ZipEncodingHelper.UTF8_ZIP_ENCODING : zipEncoding;
+        final ArchiveEntryEncoding entryEncoding =
+                hasUTF8Flag ? ArchiveEntryEncodingHelper.UTF8_ENCODING : archiveEntryEncoding;
         ze.setGeneralPurposeBit(gpFlag);
 
         off += SHORT;

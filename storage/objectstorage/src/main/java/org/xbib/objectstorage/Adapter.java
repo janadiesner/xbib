@@ -31,11 +31,11 @@
  */
 package org.xbib.objectstorage;
 
-import org.xbib.jersey.filter.PasswordSecurityContext;
 import org.xbib.objectstorage.action.sql.SQLService;
 
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
+import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.net.URI;
 
@@ -45,7 +45,7 @@ public interface Adapter {
 
     Adapter init();
 
-    Container connect(String containerName, PasswordSecurityContext context, URI baseURI) throws IOException;
+    Container connect(String containerName, SecurityContext context, URI baseURI) throws IOException;
 
     void disconnect(Container container) throws IOException;
 

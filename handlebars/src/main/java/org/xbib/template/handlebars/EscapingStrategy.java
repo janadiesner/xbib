@@ -63,6 +63,16 @@ public interface EscapingStrategy {
     };
 
     /**
+     * No escape
+     */
+    EscapingStrategy NONE = new EscapingStrategy() {
+        @Override
+        public String escape(final CharSequence value) {
+            return value == null ? "" : value.toString();
+        }
+    };
+
+    /**
      * Escape the {@link CharSequence}.
      *
      * @param value the character sequence to be escaped.

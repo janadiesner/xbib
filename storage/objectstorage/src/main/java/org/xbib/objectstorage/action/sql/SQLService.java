@@ -31,9 +31,7 @@
  */
 package org.xbib.objectstorage.action.sql;
 
-import org.xbib.date.DateUtil;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.xbib.util.DateUtil;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;

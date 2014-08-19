@@ -64,9 +64,14 @@ import java.nio.charset.Charset;
  * <p>
  * http://www.zeitschriftendatenbank.de/fileadmin/user_upload/ZDB/pdf/services/Datenlieferdienst_ZDB_EZB_Lizenzdatenformat.pdf
  */
-public final class FromEZBXML extends Converter {
+public class FromEZBXML extends Converter {
 
     private final static Logger logger = LoggerFactory.getLogger(FromEZBXML.class.getSimpleName());
+
+    @Override
+    public String getName() {
+        return "ezbxml-turtle";
+    }
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {

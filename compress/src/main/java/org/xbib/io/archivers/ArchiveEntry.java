@@ -1,4 +1,3 @@
-
 package org.xbib.io.archivers;
 
 import java.util.Date;
@@ -21,12 +20,12 @@ public interface ArchiveEntry {
     String getName();
 
     /**
-     * Set the (uncompressed) entry size in bytes
+     * Set the entry size in bytes
      */
     ArchiveEntry setEntrySize(long size);
 
     /**
-     * The (uncompressed) size of the entry. May be -1 (SIZE_UNKNOWN) if the size is unknown
+     * The size of the entry. May be -1 (SIZE_UNKNOWN) if the size is unknown
      */
     long getEntrySize();
 

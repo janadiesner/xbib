@@ -1,4 +1,3 @@
-
 package org.xbib.io.archivers.jar;
 
 import org.xbib.io.archivers.zip.ZipArchiveEntry;

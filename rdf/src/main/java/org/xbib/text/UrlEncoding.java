@@ -67,7 +67,7 @@ public final class UrlEncoding {
                 byte c = bytes[n];
                 sb.append("%");
                 sb.append(HEX[(c >> 4) & 0x0f]);
-                sb.append(HEX[(c >> 0) & 0x0f]);
+                sb.append(HEX[c & 0x0f]);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

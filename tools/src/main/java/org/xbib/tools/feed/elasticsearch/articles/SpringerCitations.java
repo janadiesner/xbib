@@ -62,6 +62,11 @@ public class SpringerCitations extends Feeder {
     private final static SimpleResourceContext resourceContext = new SimpleResourceContext();
 
     @Override
+    public String getName() {
+        return "springer-elasticsearch";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

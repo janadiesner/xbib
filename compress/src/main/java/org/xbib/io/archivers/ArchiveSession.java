@@ -1,4 +1,3 @@
-
 package org.xbib.io.archivers;
 
 import org.xbib.io.ObjectPacket;
@@ -6,32 +5,30 @@ import org.xbib.io.Packet;
 import org.xbib.io.Session;
 import org.xbib.io.StreamCodecService;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.Date;
 import java.util.Set;
 
-import static org.xbib.io.archivers.ArchiveFactory.createArchiveEntry;
-import static org.xbib.io.archivers.ArchiveFactory.createArchiveInputStream;
-import static org.xbib.io.archivers.ArchiveFactory.createArchiveOutputStream;
-
 /**
- * A basic archive session
+ * Archive session
  */
-public abstract class ArchiveSession<I extends ArchiveInputStream, O extends ArchiveOutputStream> implements Session {
+public abstract class ArchiveSession<I extends ArchiveInputStream, O extends ArchiveOutputStream>
+        implements Session {
 
     private final static StreamCodecService codecFactory = StreamCodecService.getInstance();
 
+    private final static int DEFAULT_INPUT_BUFSIZE = 65536;
+
+    protected int bufferSize = DEFAULT_INPUT_BUFSIZE;
+
     private boolean isOpen;
-
-    protected I in;
-
-    protected O out;
 
     private URI uri;
 
@@ -40,6 +37,11 @@ public abstract class ArchiveSession<I extends ArchiveInputStream, O extends Arc
 
     public ArchiveSession setURI(URI uri) {
         this.uri = uri;
+        return this;
+    }
+
+    public ArchiveSession setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
         return this;
     }
 
@@ -54,21 +56,20 @@ public abstract class ArchiveSession<I extends ArchiveInputStream, O extends Arc
         switch (mode) {
             case READ: {
                 FileInputStream fin;
-                this.in = null;
                 if (scheme.equals(suffix) || part.endsWith("." + suffix)) {
                     fin = createFileInputStream(uri, "." + suffix);
-                    this.in = (I) createArchiveInputStream(suffix, fin);
+                    open(fin);
                 } else {
                     Set<String> codecs = StreamCodecService.getCodecs();
                     for (String codec : codecs) {
                         if (scheme.equals(suffix + codec) || part.endsWith("." + suffix + "." + codec)) {
                             fin = createFileInputStream(uri, "." + suffix + "." + codec);
-                            this.in = (I) createArchiveInputStream(suffix, codecFactory.getCodec(codec).decode(fin));
+                            open(codecFactory.getCodec(codec).decode(fin, bufferSize));
                             break;
                         }
                     }
                 }
-                this.isOpen = in != null;
+                this.isOpen = getInputStream() != null;
                 if (!isOpen) {
                     throw new FileNotFoundException("can't open for input, check existence or access rights: " + uri);
                 }
@@ -76,21 +77,20 @@ public abstract class ArchiveSession<I extends ArchiveInputStream, O extends Arc
             }
             case WRITE: {
                 FileOutputStream fout;
-                this.out = null;
                 if (scheme.equals(suffix) || part.endsWith("." + suffix)) {
                     fout = createFileOutputStream(uri, "." + suffix);
-                    this.out = (O) createArchiveOutputStream(suffix, fout);
+                    open(fout);
                 } else {
                     Set<String> codecs = StreamCodecService.getCodecs();
                     for (String codec : codecs) {
                         if (scheme.equals(suffix + codec) || part.endsWith("." + suffix + "." + codec)) {
                             fout = createFileOutputStream(uri, "." + suffix + "." + codec);
-                            this.out = (O) createArchiveOutputStream(suffix, codecFactory.getCodec(codec).encode(fout));
+                            open(codecFactory.getCodec(codec).encode(fout));
                             break;
                         }
                     }
                 }
-                this.isOpen = out != null;
+                this.isOpen = getOutputStream() != null;
                 if (!isOpen) {
                     throw new FileNotFoundException("can't open for output, check existence or access rights: " + uri);
                 }
@@ -116,12 +116,13 @@ public abstract class ArchiveSession<I extends ArchiveInputStream, O extends Arc
         if (entry == null) {
             return null;
         }
-        ObjectPacket packet = new ObjectPacket();
+        Packet packet = newPacket();
         String name = entry.getName();
         packet.name(name);
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        IOUtils.copy(getInputStream(), bout);
-        packet.packet(new String(bout.toByteArray()));
+        int size = (int)entry.getEntrySize();
+        byte[] b = new byte[size];
+        getInputStream().read(b, 0, size);
+        packet.packet(new String(b));
         return packet;
     }
 
@@ -139,7 +140,7 @@ public abstract class ArchiveSession<I extends ArchiveInputStream, O extends Arc
         byte[] buf = packet.toString().getBytes();
         if (buf.length > 0) {
             String name = packet.name();
-            ArchiveEntry entry = createArchiveEntry(getSuffix());
+            ArchiveEntry entry = getOutputStream().newArchiveEntry();
             entry.setName(name);
             entry.setLastModified(new Date());
             entry.setEntrySize(buf.length);
@@ -157,13 +158,11 @@ public abstract class ArchiveSession<I extends ArchiveInputStream, O extends Arc
         if (!isOpen) {
             return;
         }
-        if (out != null) {
-            out.close();
-            out = null;
+        if (getOutputStream() != null) {
+            getOutputStream().close();
         }
-        if (in != null) {
-            in.close();
-            in = null;
+        if (getInputStream() != null) {
+            getInputStream().close();
         }
         this.isOpen = false;
     }
@@ -198,6 +197,10 @@ public abstract class ArchiveSession<I extends ArchiveInputStream, O extends Arc
     }
 
     protected abstract String getSuffix();
+
+    protected abstract void open(InputStream in) throws IOException;
+
+    protected abstract void open(OutputStream in) throws IOException;
 
     protected abstract I getInputStream();
 

@@ -68,6 +68,11 @@ public final class BibdatFromOAITar extends Feeder {
     private static AtomicLong total = new AtomicLong(0L);
 
     @Override
+    public String getName() {
+        return "zdb-bibdat-oai-tar";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

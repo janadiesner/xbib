@@ -73,6 +73,11 @@ public class SerialsDB extends Converter {
     private final static Map<String, Resource> serials = new ConcurrentHashMap<>();
 
     @Override
+    public String getName() {
+        return "serials-csv-turtle";
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

@@ -63,7 +63,10 @@ public class FromOAI2CSV extends OAIHarvester {
 
     private final static Logger logger = LoggerFactory.getLogger(FromOAI2CSV.class.getName());
 
-    private static CSVGenerator generator;
+    @Override
+    public String getName() {
+        return "zdb-oai-csv";
+    }
 
     @Override
     protected FromOAI2CSV prepare() throws IOException {
@@ -79,7 +82,7 @@ public class FromOAI2CSV extends OAIHarvester {
             URI outputURI = URI.create(settings.get("output"));
             FileOutputStream out = new FileOutputStream(outputURI.getPath());
             OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
-            generator = new CSVGenerator(writer);
+            CSVGenerator generator = new CSVGenerator(writer);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }

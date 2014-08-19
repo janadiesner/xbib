@@ -10,11 +10,11 @@ import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.text.CharUtils;
 import org.xbib.text.UrlEncoding;
-import org.xml.sax.InputSource;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 public class OAITest extends Assert {
@@ -66,7 +66,7 @@ public class OAITest extends Assert {
             .setDefaultNamespace("oai", "http://www.openarchives.org/OAI/2.0/oai_dc/");
         new XmlReader()
                 .setHandler(xmlHandler)
-                .parse(new InputSource(in));
+                .parse(new InputStreamReader(in, "UTF-8"), writer);
         writer.close();
         String s = sw.toString().trim();
         logger.info(s);

@@ -23,18 +23,11 @@ public class ArchiveService {
         }
     }
 
-    public static ArchiveService getInstance() {
-        return instance;
-    }
-
-    public ConnectionFactory getConnectionFactory(String name) {
+    public static ConnectionFactory getConnectionFactory(String name) {
         if (factories.containsKey(name)) {
             return factories.get(name);
         }
         throw new IllegalArgumentException("Connection factory for " + name + " not found in " + factories);
     }
 
-    public static Set<String> getConnectionFactories() {
-        return factories.keySet();
-    }
 }

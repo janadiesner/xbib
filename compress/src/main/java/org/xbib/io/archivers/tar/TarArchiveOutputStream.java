@@ -1,11 +1,9 @@
-
 package org.xbib.io.archivers.tar;
 
-import org.xbib.io.archivers.ArchiveEntry;
 import org.xbib.io.archivers.ArchiveOutputStream;
 import org.xbib.io.archivers.CountingOutputStream;
-import org.xbib.io.archivers.zip.ZipEncoding;
-import org.xbib.io.archivers.zip.ZipEncodingHelper;
+import org.xbib.io.archivers.encode.ArchiveEntryEncoding;
+import org.xbib.io.archivers.encode.ArchiveEntryEncodingHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +18,7 @@ import java.util.Map;
  * Methods are provided to put entries, and then write their contents
  * by writing to this stream using write().
  */
-public class TarArchiveOutputStream extends ArchiveOutputStream {
+public class TarArchiveOutputStream extends ArchiveOutputStream<TarArchiveEntry> {
     /**
      * Fail if a long file name is required in the archive.
      */
@@ -88,12 +86,11 @@ public class TarArchiveOutputStream extends ArchiveOutputStream {
 
     private final OutputStream out;
 
-    private final ZipEncoding encoding;
+    private final ArchiveEntryEncoding encoding;
 
     private boolean addPaxHeadersForNonAsciiNames = false;
 
-    private static final ZipEncoding ASCII =
-            ZipEncodingHelper.getZipEncoding("ASCII");
+    private static final ArchiveEntryEncoding ASCII = ArchiveEntryEncodingHelper.getEncoding("ASCII");
 
     /**
      * Constructor for TarInputStream.
@@ -158,8 +155,7 @@ public class TarArchiveOutputStream extends ArchiveOutputStream {
     public TarArchiveOutputStream(OutputStream os, int blockSize,
                                   int recordSize, String encoding) {
         out = new CountingOutputStream(os);
-        this.encoding = ZipEncodingHelper.getZipEncoding(encoding);
-
+        this.encoding = ArchiveEntryEncodingHelper.getEncoding(encoding);
         this.buffer = new TarBuffer(out, blockSize, recordSize);
         this.assemLen = 0;
         this.assemBuf = new byte[recordSize];
@@ -195,11 +191,6 @@ public class TarArchiveOutputStream extends ArchiveOutputStream {
      */
     public void setAddPaxHeadersForNonAsciiNames(boolean b) {
         addPaxHeadersForNonAsciiNames = b;
-    }
-
-    @Override
-    public long getBytesWritten() {
-        return ((CountingOutputStream) out).getBytesWritten();
     }
 
     /**
@@ -253,6 +244,11 @@ public class TarArchiveOutputStream extends ArchiveOutputStream {
         return buffer.getRecordSize();
     }
 
+    @Override
+    public TarArchiveEntry newArchiveEntry() throws IOException {
+        return new TarArchiveEntry();
+    }
+
     /**
      * Put an entry on the output stream. This writes the entry's
      * header record and positions the output stream for writing
@@ -267,7 +263,7 @@ public class TarArchiveOutputStream extends ArchiveOutputStream {
      * @throws ClassCastException  if archiveEntry is not an instance of TarArchiveEntry
      */
     @Override
-    public void putArchiveEntry(ArchiveEntry archiveEntry) throws IOException {
+    public void putArchiveEntry(TarArchiveEntry archiveEntry) throws IOException {
         if (finished) {
             throw new IOException("Stream has already been finished");
         }
@@ -523,11 +519,8 @@ public class TarArchiveOutputStream extends ArchiveOutputStream {
         out.flush();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public ArchiveEntry createArchiveEntry(File inputFile, String entryName)
+    public TarArchiveEntry createArchiveEntry(File inputFile, String entryName)
             throws IOException {
         if (finished) {
             throw new IOException("Stream has already been finished");

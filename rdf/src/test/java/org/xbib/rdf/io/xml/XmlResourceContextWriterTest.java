@@ -40,39 +40,37 @@ import org.xbib.rdf.Identifier;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.simple.SimpleResource;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.simple.SimpleResourceContext;
 
 public class XmlResourceContextWriterTest<S extends Identifier, P extends Property, O extends Node> extends Assert {
     
     @Test
     public void testXMLResourceWriter() throws Exception {
         IdentifiableNode.reset();
-        Resource<S, P, O> root = new SimpleResource().id(IRI.create("urn:root"));
+        ResourceContext<Resource<S, P, O>> resourceContext = new SimpleResourceContext<>();
+        Resource<S, P, O> root = resourceContext.newResource().id(IRI.create("urn:root"));
         Resource resource = root.newResource("urn:res");
         resource.add("urn:property", "value");
         Resource nestedResource = resource.newResource("urn:nestedresource");
         nestedResource.add("urn:nestedproperty", "nestedvalue");
-        XmlResourceWriter w = new XmlResourceWriter();
         StringWriter sw = new StringWriter();
-        w.toXML(root, sw);
+        XmlWriter w = new XmlWriter(sw);
+        w.write(resourceContext);
         assertEquals("<urn:root><urn:res><urn:property>value</urn:property><urn:nestedresource><urn:nestedproperty>nestedvalue</urn:nestedproperty></urn:nestedresource></urn:res></urn:root>", sw.toString());
     }    
     
     @Test
     public void testResourceXml() throws Exception {
         IdentifiableNode.reset();
-        SimpleResource<S, P, O> parent = new SimpleResource();
+        ResourceContext<Resource<S, P, O>> resourceContext = new SimpleResourceContext<>();
+        Resource<S, P, O> parent = resourceContext.newResource();
         parent.id(IRI.create("urn:doc3"));
         Resource<S, P, O> child = parent.newResource("urn:res");
         child.add("urn:property", "value");
-        XmlResourceWriter xmlrw = new XmlResourceWriter();
-        // parent parent
         StringWriter sw = new StringWriter();
-        xmlrw.toXML(parent, sw);
+        XmlWriter xmlrw = new XmlWriter(sw);
+        xmlrw.write(resourceContext);
         assertEquals("<urn:doc3><urn:res><urn:property>value</urn:property></urn:res></urn:doc3>", sw.toString());
-        // child parent
-        sw = new StringWriter();
-        xmlrw.toXML(child, sw);
-        assertEquals("<genid:genid1><urn:property>value</urn:property></genid:genid1>", sw.toString());
     }
 }

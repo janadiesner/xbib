@@ -45,5 +45,8 @@ public class NatLizOAI extends OAIHarvester {
             }
         };
     }
-
+    @Override
+    public String getName() {
+        return "oai-natliz";
+    }
 }

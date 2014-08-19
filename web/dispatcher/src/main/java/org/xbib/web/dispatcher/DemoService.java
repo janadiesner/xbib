@@ -142,8 +142,7 @@ public class DemoService extends HandlebarsService {
         Dispatcher dispatcher = ApplicationContextListener.dispatcher;
 
         return Response.ok()
-                .entity(getTemplate("html/demo")
-                .apply(makeContext(emptySettings, request, uriInfo, formParams, dispatcher.execute(client, dispatcherRequest))))
+                .entity(getTemplate("html/demo").apply(makeContext(emptySettings, request, uriInfo, formParams, dispatcher.execute(client, dispatcherRequest))))
                 .build();
     }
 

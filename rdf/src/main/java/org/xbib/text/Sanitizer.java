@@ -60,7 +60,7 @@ public class Sanitizer {
     }
 
     /**
-     * Used to sanitize a string. Optionally performs Unicode Form KD normalization on a string to break extended
+     * Used to sanitize a string. Optionally performs Unicode Form KC normalization on a string to break extended
      * characters down, then replaces non alphanumeric characters with a specified filler replacement.
      *
      * @param slug   The source string
@@ -79,6 +79,7 @@ public class Sanitizer {
             try {
                 slug = Normalizer.normalize(slug, form);
             } catch (Exception e) {
+                // ignore
             }
         }
         slug = slug.replaceAll("\\s+", "_");

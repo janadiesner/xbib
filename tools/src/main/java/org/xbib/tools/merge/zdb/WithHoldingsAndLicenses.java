@@ -50,7 +50,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.queue.QueuePipelineExecutor;
-import org.xbib.tools.Tool;
+import org.xbib.tools.CommandLineInterpreter;
 import org.xbib.tools.merge.zdb.entities.BibdatLookup;
 import org.xbib.tools.merge.zdb.entities.BlackListedISIL;
 import org.xbib.tools.merge.zdb.entities.Manifestation;
@@ -79,7 +79,7 @@ import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
  */
 public class WithHoldingsAndLicenses
         extends QueuePipelineExecutor<Boolean, Manifestation, WithHoldingsAndLicensesPipeline, SearchHitPipelineElement>
-        implements Tool {
+        implements CommandLineInterpreter {
 
     private final static Logger logger = LoggerFactory.getLogger(WithHoldingsAndLicenses.class.getSimpleName());
 
@@ -181,14 +181,14 @@ public class WithHoldingsAndLicenses
                 .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests",
                         Runtime.getRuntime().availableProcessors()))
                 .maxRequestWait(TimeValue.parseTimeValue(settings.get("maxWait", "180s"), TimeValue.timeValueSeconds(180)));
-        ingest.addSetting(WithHoldingsAndLicenses.class.getResourceAsStream("transport-client-settings.json"));
+        ingest.setting(WithHoldingsAndLicenses.class.getResourceAsStream("transport-client-settings.json"));
         ingest.newClient(targetURI);
         ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
-        ingest.addSetting(WithHoldingsAndLicenses.class.getResourceAsStream("index-settings.json"));
-        ingest.addMapping("Work", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Work.json"));
-        ingest.addMapping("Manifestation", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Manifestation.json"));
-        ingest.addMapping("Volume", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Volume.json"));
-        ingest.addMapping("Holding", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Holding.json"));
+        ingest.setting(WithHoldingsAndLicenses.class.getResourceAsStream("index-settings.json"));
+        ingest.mapping("Work", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Work.json"));
+        ingest.mapping("Manifestation", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Manifestation.json"));
+        ingest.mapping("Volume", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Volume.json"));
+        ingest.mapping("Holding", WithHoldingsAndLicenses.class.getResourceAsStream("mapping-Holding.json"));
 
         String index = settings.get("index");
         ingest.shards(settings.getAsInt("shards", 3));

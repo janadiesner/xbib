@@ -1,4 +1,3 @@
-
 package org.xbib.io.archivers.ar;
 
 import org.xbib.io.archivers.ArchiveEntry;
@@ -13,6 +12,14 @@ import java.io.InputStream;
  * Implements the "ar" archive format as an input stream.
  */
 public class ArArchiveInputStream extends ArchiveInputStream {
+
+    static final String BSD_LONGNAME_PREFIX = "#1/";
+
+    private static final int BSD_LONGNAME_PREFIX_LEN =
+            BSD_LONGNAME_PREFIX.length();
+
+    private static final String BSD_LONGNAME_PATTERN =
+            "^" + BSD_LONGNAME_PREFIX + "\\d+";
 
     private final InputStream input;
     private long offset = 0;
@@ -68,7 +75,7 @@ public class ArArchiveInputStream extends ArchiveInputStream {
             final byte[] realized = new byte[expected.length];
             final int read = read(realized);
             if (read != expected.length) {
-                throw new IOException("failed to read header. Occured at byte: " + getBytesRead());
+                throw new IOException("failed to read header");
             }
             for (int i = 0; i < expected.length; i++) {
                 if (expected[i] != realized[i]) {
@@ -105,11 +112,11 @@ public class ArArchiveInputStream extends ArchiveInputStream {
             final byte[] realized = new byte[expected.length];
             final int read = read(realized);
             if (read != expected.length) {
-                throw new IOException("failed to read entry trailer. Occured at byte: " + getBytesRead());
+                throw new IOException("failed to read entry trailer");
             }
             for (int i = 0; i < expected.length; i++) {
                 if (expected[i] != realized[i]) {
-                    throw new IOException("invalid entry trailer. not read the content? Occured at byte: " + getBytesRead());
+                    throw new IOException("invalid entry trailer. not read the content?");
                 }
             }
         }
@@ -218,58 +225,10 @@ public class ArArchiveInputStream extends ArchiveInputStream {
             }
         }
         final int ret = this.input.read(b, off, toRead);
-        count(ret);
         offset += (ret > 0 ? ret : 0);
         return ret;
     }
 
-    /**
-     * Checks if the signature matches ASCII "!<arch>" followed by a single LF
-     * control character
-     *
-     * @param signature the bytes to check
-     * @param length    the number of bytes to check
-     * @return true, if this stream is an Ar archive stream, false otherwise
-     */
-    public static boolean matches(byte[] signature, int length) {
-        // 3c21 7261 6863 0a3e
-
-        if (length < 8) {
-            return false;
-        }
-        if (signature[0] != 0x21) {
-            return false;
-        }
-        if (signature[1] != 0x3c) {
-            return false;
-        }
-        if (signature[2] != 0x61) {
-            return false;
-        }
-        if (signature[3] != 0x72) {
-            return false;
-        }
-        if (signature[4] != 0x63) {
-            return false;
-        }
-        if (signature[5] != 0x68) {
-            return false;
-        }
-        if (signature[6] != 0x3e) {
-            return false;
-        }
-        if (signature[7] != 0x0a) {
-            return false;
-        }
-
-        return true;
-    }
-
-    static final String BSD_LONGNAME_PREFIX = "#1/";
-    private static final int BSD_LONGNAME_PREFIX_LEN =
-            BSD_LONGNAME_PREFIX.length();
-    private static final String BSD_LONGNAME_PATTERN =
-            "^" + BSD_LONGNAME_PREFIX + "\\d+";
 
     /**
      * Does the name look like it is a long name (or a name containing
@@ -308,7 +267,6 @@ public class ArArchiveInputStream extends ArchiveInputStream {
         int read = 0, readNow = 0;
         while ((readNow = input.read(name, read, nameLen - read)) >= 0) {
             read += readNow;
-            count(readNow);
             if (read == nameLen) {
                 break;
             }

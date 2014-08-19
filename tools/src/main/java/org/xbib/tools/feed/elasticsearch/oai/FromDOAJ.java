@@ -50,6 +50,11 @@ import javax.xml.namespace.QName;
  */
 public class FromDOAJ extends OAIFeeder {
 
+    @Override
+    public String getName() {
+        return "doaj-es";
+    }
+
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override

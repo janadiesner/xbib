@@ -60,7 +60,7 @@ import java.nio.charset.Charset;
 import java.text.Normalizer;
 
 /**
- * Indexing Zeitschriftendatenbank (ZDB) MARC ISO2709 files
+ * COnverting Zeitschriftendatenbank (ZDB) MARC ISO2709 files
  */
 public final class FromMARC extends Converter {
 
@@ -69,6 +69,11 @@ public final class FromMARC extends Converter {
     private final Charset UTF8 = Charset.forName("UTF-8");
 
     private final Charset ISO88591 = Charset.forName("ISO-8859-1");
+
+    @Override
+    public String getName() {
+        return "zdb-marc-ntriple";
+    }
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {

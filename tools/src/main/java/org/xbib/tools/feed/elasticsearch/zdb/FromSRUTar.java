@@ -65,6 +65,11 @@ public class FromSRUTar extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(FromSRUTar.class.getName());
 
+    @Override
+    public String getName() {
+        return "zdb-srutar-elasticsearch";
+    }
+
     protected FromSRUTar prepare() throws IOException {
         super.prepare();
         return this;

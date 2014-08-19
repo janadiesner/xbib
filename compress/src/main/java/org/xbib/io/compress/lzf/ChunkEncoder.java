@@ -69,12 +69,6 @@ public final class ChunkEncoder {
         return new ChunkEncoder(totalLength, true);
     }
 
-    /*
-     ///////////////////////////////////////////////////////////////////////
-     // Public API
-     ///////////////////////////////////////////////////////////////////////
-     */
-
     /**
      * Method to close once encoder is no longer in use. Note: after calling
      * this method, further calls to {@link #encodeChunk} will fail
@@ -141,7 +135,7 @@ public final class ChunkEncoder {
     protected int tryCompress(byte[] in, int inPos, int inEnd, byte[] out, int outPos) {
         final int[] hashTable = _hashTable;
         ++outPos;
-        int seen = first(in, 0); // past 4 bytes we have seen... (last one is LSB)
+        int seen = first(in, inPos); // past 4 bytes we have seen... (last one is LSB)
         int literals = 0;
         inEnd -= 4;
         final int firstPos = inPos; // so that we won't have back references across block boundary

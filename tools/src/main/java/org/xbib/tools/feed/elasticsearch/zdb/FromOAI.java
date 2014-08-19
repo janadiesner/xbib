@@ -50,5 +50,9 @@ public class FromOAI extends OAIFeeder {
         };
     }
 
+    @Override
+    public String getName() {
+        return "zdb-oai-elasticsearch";
+    }
 
 }
