@@ -82,6 +82,12 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
 
     private TripleListener<S, P, O> listener;
 
+    private final static String RDF_STRING = RDF.toString();
+
+    private final static String NODE_ID = "nodeID";
+
+    private final static String ABOUT = "about";
+
     // counter for blank node generation
     private int bn = 0;
 
@@ -284,21 +290,21 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
      * The complicated logic to determine the subject uri ref
      */
     private void getSubjectNode(Frame frame, Stack<Frame> stack, Attributes attrs) throws SAXException {
-        String about = attrs.getValue(RDF.toString(), "about");
+        String about = attrs.getValue(RDF_STRING, ABOUT);
         if (about != null) {
             frame.node = resolve(about, stack);
             if (listener != null) {
                 listener.newIdentifier(frame.node);
             }
         }
-        String nodeId = attrs.getValue(RDF.toString(), "nodeID");
+        String nodeId = attrs.getValue(RDF_STRING, NODE_ID);
         if (nodeId != null) {
             if (frame.node != null) {
                 throw new SAXException("ambiguous use of rdf:nodeID");
             }
             frame.node = blankNode(nodeId).id();
         }
-        String rdfId = attrs.getValue(RDF.toString(), "ID");
+        String rdfId = attrs.getValue(RDF_STRING, "ID");
         if (rdfId != null) {
             if (frame.node != null) {
                 throw new SAXException("ambiguous use of rdf:ID");
@@ -314,11 +320,11 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
     // the complicated logic to deal with attributes with rdf:resource, nodeID attrs
     private IRI getObjectNode(Stack<Frame> stack, Attributes attrs) throws SAXException {
         IRI node = null;
-        String resource = attrs.getValue(RDF.toString(), "resource");
+        String resource = attrs.getValue(RDF_STRING, "resource");
         if (resource != null) {
             node = resolve(resource, stack);
         }
-        String nodeId = attrs.getValue(RDF.toString(), "nodeID");
+        String nodeId = attrs.getValue(RDF_STRING, NODE_ID);
         if (nodeId != null) {
             if (node != null) {
                 throw new SAXException("ambiguous use of rdf:nodeID");
@@ -334,7 +340,8 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
         out.append("<").append(qn);
         Map<String, String> pfxMap = new HashMap();
         for (int i = -1; i < attrs.getLength(); i++) {
-            String aQn, aNs;
+            String aQn;
+            String aNs;
             if (i < 0) {
                 aQn = qn;
                 aNs = ns;
@@ -456,12 +463,10 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
                             String aQn = attrs.getQName(i);
                             String aUri = attrs.getURI(i) + attrs.getLocalName(i);
                             String aVal = attrs.getValue(i);
-                            if (aUri.startsWith(RDF.toString())
-                                    || aQn.startsWith("xml:")) {
-                                // skip
-                            } else {
-                                yield(frame.node, IRI.create(aUri), aVal);
-                            }
+                            if (!aUri.startsWith(RDF_STRING)
+                                    && !aQn.startsWith("xml:")) {
+                                        yield(frame.node, IRI.create(aUri), aVal);
+                                    }
                         }
                         // is this node the value of some enclosing predicate?
                         if (inPredicate(stack)) {
@@ -481,7 +486,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
                     frame.node = uri;
                     frame.isPredicate = true;
                     // handle reification
-                    String reification = attrs.getValue(RDF.toString(), "ID");
+                    String reification = attrs.getValue(RDF_STRING, "ID");
                     if (reification != null) {
                         frame.reification = IRI.create(getBase(stack) + "#" + reification);
                     }
@@ -500,7 +505,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
                         pcdata = new StringBuilder();
                     }
                     // handle rdf:parseType="resource"
-                    String parseType = attrs.getValue(RDF.toString(), "parseType");
+                    String parseType = attrs.getValue(RDF_STRING, "parseType");
                     if (parseType != null) {
                         if (parseType.equals("Resource")) {
                             object = object == null ? blankNode().id() : object;
@@ -522,7 +527,7 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
                             // which means we shouldn't accumulate pcdata!
                             pcdata = null;
                         } else {// handle datatype
-                            frame.datatype = attrs.getValue(RDF.toString(), "datatype");
+                            frame.datatype = attrs.getValue(RDF_STRING, "datatype");
                         }
                     }
                     // now handle property attributes (if we do this, then this
@@ -532,21 +537,19 @@ public class RdfXmlReader<S extends Identifier, P extends Property, O extends No
                         String aQn = attrs.getQName(i);
                         IRI aUri = IRI.create(attrs.getURI(i) + attrs.getLocalName(i));
                         String aVal = attrs.getValue(i);
-                        if ((!aUri.toString().equals(RDF_TYPE.toString()) && aUri.toString().startsWith(RDF.toString()))
-                                || aQn.startsWith("xml:")) {
-                            // ignore
-                        } else {
-                            if (object == null) {
-                                object = blankNode().id();
-                                yield(ancestorSubject(stack), frame.node, object);
-                            }
-                            if (aUri.equals(RDF_TYPE)) {
-                                yield(object, RDF_TYPE, aVal);
-                            } else {
-                                Literal value = withLanguageTag(new SimpleLiteral(aVal), stack);
-                                yield(object, aUri, value);
-                            }
-                        }
+                        if (((aUri.toString().equals(RDF_TYPE.toString()) || !aUri.toString().startsWith(RDF_STRING)))
+                                && !aQn.startsWith("xml:")) {
+                                    if (object == null) {
+                                        object = blankNode().id();
+                                        yield(ancestorSubject(stack), frame.node, object);
+                                    }
+                                    if (aUri.equals(RDF_TYPE)) {
+                                        yield(object, RDF_TYPE, aVal);
+                                    } else {
+                                        Literal value = withLanguageTag(new SimpleLiteral(aVal), stack);
+                                        yield(object, aUri, value);
+                                    }
+                                }
                     }
                     // if we had to generate a node to hold properties specified
                     // as attributes, then expect an empty element and therefore
