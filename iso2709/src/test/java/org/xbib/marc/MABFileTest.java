@@ -31,6 +31,7 @@
  */
 package org.xbib.marc;
 
+import org.testng.annotations.Test;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -40,7 +41,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,108 +50,30 @@ import java.io.Writer;
 
 public class MABFileTest {
 
-    public void testMABFileISO5426() throws Exception {
-        for (String s : new String[]{
-                    "bnu", 
-                    "din", 
-                    "due", 
-                    "emm", 
-                    "fes", 
-                    "fkl", 
-                    "ghh", 
-                    "hrn",
-                    "kam", 
-                    "kem", 
-                    "kob", 
-                    "kre", 
-                    "mee", 
-                    "moe",
-                    "neu", 
-                    "obe", 
-                    "pad", 
-                    "ree",
-                    "rhe", 
-                    "sdo",
-                    "ste", 
-                    "vie", 
-                    "vlu", 
-                    "voe", 
-                    "wes", 
-                    "wup", 
-                    "xan"
-                }) {
-            InputStream in = new FileInputStream(s + "_2011_november");
-            if (in != null) {
-                FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
-                Writer target = new OutputStreamWriter(out, "UTF-8");
-                InputSource source = new InputSource(new InputStreamReader(in, "ISO-8859-1"));
-                read(source, target);
-                target.flush();
-                target.close();
-            }
-        }
+    /**
+     * Aleph 500 $$ delimited subfields
+     *
+     * @throws IOException
+     * @throws TransformerException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     */
+    @Test
+    public void testDE468() throws IOException, TransformerException, SAXException, ParserConfigurationException {
+        InputStream in = getClass().getResource("/org/xbib/marc/aleph500-subfields.mrc").openStream();
+        FileOutputStream out = new FileOutputStream("/var/tmp/DE-468.xml");
+        Writer target = new OutputStreamWriter(out, "UTF-8");
+        InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
+        execute(source, target);
+        target.flush();
+        target.close();
     }
 
-    public void testMABFileISO88591() throws Exception {
-        for (String s : new String[]{
-                    "aac", // merkwürdiges MAB Diskette, eingerückt
-                    "dor", "hrn", // MAB mit ISO8859-1 und Linefeed
-                    "sol", // MAB-Diskette, aber ohne ###
-                }) {
-            InputStream in = new FileInputStream(s + "_2011_november");
-            if (in != null) {
-                FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
-                Writer target = new OutputStreamWriter(out, "UTF-8");
-                InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
-                read(source, target);
-                target.flush();
-                target.close();
-            }
-        }
-    }
-
-    public void testFileUnknown() throws Exception {
-        for (String s : new String[]{
-                    "bie",
-                    "boc",
-                    "bsa",
-                    "cas",
-                    "die",
-                    "drs",
-                    "dui",
-                    "ess",
-                    "fmt",
-                    "gel",
-                    "gla",
-                    "hag",
-                    "ham",
-                    "her",
-                    "hil",
-                    "ise",
-                    "mgl",
-                    "mhl",
-                    "mob",
-                    "mue",
-                    "pfa",
-                    "rek",
-                    "rvk"
-                }) {
-            InputStream in = new FileInputStream(s + "_2011_november");
-            if (in != null) {
-                FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
-                Writer target = new OutputStreamWriter(out, "UTF-8");
-                InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
-                read(source, target);
-                target.flush();
-                target.close();
-            }
-        }
-    }
-
-    private void read(InputSource source, Writer w) throws IOException, SAXException,
+    private void execute(InputSource source, Writer w) throws IOException, SAXException,
             ParserConfigurationException, TransformerException {
         Iso2709Reader reader = new Iso2709Reader();
         reader.setProperty(Iso2709Reader.FORMAT, "MAB");
+        reader.setProperty(Iso2709Reader.SUBFIELD_DELIMITER, "$$"); // will be automatically quoted before used as pattern
         TransformerFactory tFactory = TransformerFactory.newInstance();
         Transformer transformer = tFactory.newTransformer();
         StreamResult target = new StreamResult(w);

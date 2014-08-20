@@ -79,6 +79,12 @@ public class Iso2709Reader implements XMLReader {
      * The schema property
      */
     public static String SCHEMA = "schema";
+
+    /**
+     * Custom subfield delimiter
+     */
+    public static String SUBFIELD_DELIMITER = null;
+
     /**
      * The SaX service
      */
@@ -218,7 +224,8 @@ public class Iso2709Reader implements XMLReader {
                 .setFormat((String) properties.get(FORMAT))
                 .setType((String) properties.get(TYPE))
                 .setFatalErrors((Boolean)properties.get(FATAL_ERRORS))
-                .setSilentErrors((Boolean)properties.get(SILENT_ERRORS));
+                .setSilentErrors((Boolean)properties.get(SILENT_ERRORS))
+                .setSubfieldDelimiter((String)properties.get(SUBFIELD_DELIMITER));
         
         adapter.parse();
     }

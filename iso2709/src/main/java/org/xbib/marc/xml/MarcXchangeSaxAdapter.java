@@ -34,6 +34,7 @@ package org.xbib.marc.xml;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.regex.Pattern;
 
 import org.xbib.io.field.BufferedFieldStreamReader;
 import org.xbib.io.field.FieldListener;
@@ -107,12 +108,15 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
 
     private boolean silenterrors = false;
 
-    private int buffersize = 8192;
+    private int buffersize = 65536;
+
+    private String subfieldDelimiter = null;
 
     public MarcXchangeSaxAdapter() {
         this.nsUri = NS_URI;
         this.subfieldOpen = false;
         this.recordOpen = false;
+        this.subfieldDelimiter = null;
     }
 
     public MarcXchangeSaxAdapter buffersize(int buffersize) {
@@ -171,6 +175,11 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
         if (normalizer != null) {
             this.normalizer = normalizer;
         }
+        return this;
+    }
+
+    public MarcXchangeSaxAdapter setSubfieldDelimiter(String subfieldDelimiter) {
+        this.subfieldDelimiter = subfieldDelimiter;
         return this;
     }
 
@@ -534,6 +543,10 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                             if (directory.isEmpty()) {
                                 designator = new Field(label, fieldContent.substring(RecordLabel.LENGTH));
                                 if (designator.tag() != null) {
+                                    if (subfieldDelimiter != null) {
+                                        // skip tag if custom subfield delimiter
+                                        designator.data(fieldContent.substring(RecordLabel.LENGTH + 3));
+                                    }
                                     beginDataField(designator);
                                 }
                             }
@@ -559,7 +572,24 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                             throw new InvalidFieldDirectoryException("byte position not found in directory: "
                                     + position + " - is this stream reading using an 8-bit wide encoding?");
                         }
-                        beginDataField(designator);
+                        // custom subfield delimiter? Can be useful if source does not split subfields
+                        // with FieldSeparator.US but with pseudo delimiters like "$$"
+                        if (subfieldDelimiter != null) {
+                            if (!designator.isControlField()) {
+                                designator.data(fieldContent.substring(3));
+                                beginDataField(designator);
+                                // skip tag (3 symbols) plus one indicator symbol in fieldContent
+                                // this is not delimited!
+                                for (String subfield : fieldContent.substring(3).split(Pattern.quote(subfieldDelimiter))) {
+                                    designator.subfieldId(subfield.substring(0, 1));
+                                    designator.data(subfield.substring(1));
+                                    beginSubField(designator);
+                                    endSubField(designator);
+                                }
+                            }
+                        } else {
+                            beginDataField(designator);
+                        }
                         break;
                     case FieldSeparator.US:
                         if (!subfieldOpen) {
