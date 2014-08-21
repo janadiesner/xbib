@@ -425,7 +425,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
             }
             if (designator != null) {
                 String value = designator.data();
-                if (value != null && !value.isEmpty()) {
+                if (value != null && !value.isEmpty() && subfieldDelimiter == null) {
                     value = normalizer.normalize(value);
                     // write data field per default into a subfield with code 'a'
                     AttributesImpl attrs = new AttributesImpl();
@@ -519,15 +519,18 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                 switch (mark) {
                     case FieldSeparator.FS: // start/end file
                         break;
-                    case FieldSeparator.GS: // start/end of group within a stream
+                    case FieldSeparator.GS: {
+                        // start/end of group within a stream
                         if (subfieldOpen) { // close subfield if open
                             subfieldOpen = false;
                             endDataField(null);
                         }
                         endDataField(designator);
                         endRecord(); // close record
-                    // fall through is ok!
-                    case '\u0000': // start of stream
+                        // fall through is ok!
+                    }
+                    case '\u0000': {
+                        // start of stream
                         position = 0;
                         // skip line-feed (OCLC PICA quirk)
                         if (data.charAt(0) == '\n') {
@@ -555,7 +558,8 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                             designator = new Field();
                         }
                         break;
-                    case FieldSeparator.RS:
+                    }
+                    case FieldSeparator.RS: {
                         if (subfieldOpen) {
                             subfieldOpen = false;
                             endDataField(null); // force data field close
@@ -576,13 +580,11 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                         // with FieldSeparator.US but with pseudo delimiters like "$$"
                         if (subfieldDelimiter != null) {
                             if (!designator.isControlField()) {
-                                designator.data(fieldContent.substring(3));
                                 beginDataField(designator);
-                                // skip tag (3 symbols) plus one indicator symbol in fieldContent
-                                // this is not delimited!
-                                for (String subfield : fieldContent.substring(3).split(Pattern.quote(subfieldDelimiter))) {
-                                    designator.subfieldId(subfield.substring(0, 1));
-                                    designator.data(subfield.substring(1));
+                                // tricky: first field has no subfield ID. We set it to blank.
+                                fieldContent = " " + fieldContent.substring(4);
+                                for (String subfield : fieldContent.split(Pattern.quote(subfieldDelimiter))) {
+                                    designator = new Field(label, designator, subfield, true);
                                     beginSubField(designator);
                                     endSubField(designator);
                                 }
@@ -591,7 +593,8 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                             beginDataField(designator);
                         }
                         break;
-                    case FieldSeparator.US:
+                    }
+                    case FieldSeparator.US: {
                         if (!subfieldOpen) {
                             subfieldOpen = true;
                             beginDataField(designator);
@@ -602,6 +605,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                         }
                         endSubField(designator);
                         break;
+                    }
                 }
             } catch (InvalidFieldDirectoryException ex) {
                 // we reciver from invalid field directories
