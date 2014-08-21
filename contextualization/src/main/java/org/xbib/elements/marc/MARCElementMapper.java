@@ -33,13 +33,13 @@ package org.xbib.elements.marc;
 
 import org.xbib.elements.AbstractElementMapper;
 import org.xbib.elements.ElementBuilderFactory;
-import org.xbib.elements.ElementMapper;
 import org.xbib.elements.KeyValueElementPipeline;
 import org.xbib.marc.FieldCollection;
 
+import java.util.Map;
+
 /**
- * A MARC element mapper. It provides MARC pipelines.
- *
+ * A MARC element mapper
  */
 public class MARCElementMapper extends AbstractElementMapper<FieldCollection, String, MARCElement, MARCContext> {
 
@@ -50,6 +50,10 @@ public class MARCElementMapper extends AbstractElementMapper<FieldCollection, St
      */
     public MARCElementMapper(String format) {
         super("/org/xbib/analyzer/", format, new MARCSpecification());
+    }
+
+    public MARCElementMapper(String format, Map<String,Object> params) {
+        super("/org/xbib/analyzer/", format, new MARCSpecification().setParameters(params));
     }
 
     @Override

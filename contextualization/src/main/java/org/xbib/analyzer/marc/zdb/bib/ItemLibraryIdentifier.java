@@ -63,70 +63,8 @@ public class ItemLibraryIdentifier extends MARCElement {
     }
 
     private void createISIL(MARCElementBuilder b, String isil, String provider) {
-        b.context().getResource().newResource(IDENTIFIER)
-                .add("xbib:identifierAuthorityISIL", isil);
-        /*if (provider == null) {
-            provider = defaultProvider;
-        }
-        Authority authority = Authority.hbz;
-        if (provider.startsWith("DE-")) {
-            authority = Authority.ISIL;
-        }
-        b.context().access(new Access().name(provider, authority).library(new Library().library(isil, Authority.ISIL)));
-        */
     }
 
     private void createItemService(MARCElementBuilder b, String itemStatus) {
-        /*LiaContext lia = b.context();
-        String format = "marc";
-        boolean continuing = true;
-        if (itemStatus == null) {
-            // default service
-            lia.getAccess().service(Service.INTER_LIBRARY_LOAN);
-            lia.getAccess().service(Service.COPY);
-            return;
-        }
-        if ("keine ILL".equals(itemStatus) || "keine Fernleihe".equals(itemStatus) || "Nicht ausleihbar".equals(itemStatus)) {
-            lia.getAccess().service(Service.RESTRICTED);
-        } else if ("Neuerwerbung".equals(itemStatus) || "In Bearbeitung".equals(itemStatus) || "Bestellt".equals(itemStatus) || "Neuerwerbungen".equals(itemStatus)) {
-            lia.getAccess().service(Service.IN_PREPARATION);
-        } else if ("Buchbinder".equals(itemStatus)) {
-            lia.getAccess().service(Service.MAINTENANCE);
-        } else if ("Ausgeschieden".equals(itemStatus) || "Ausgesondert".equals(itemStatus) || "Verlust".equals(itemStatus) || "Vermisst".equals(itemStatus) || "Löschen".equals(itemStatus)) {
-            lia.getAccess().service(Service.WITHDRAWN);
-        } else if ("Praesenzbestand".equals(itemStatus) || itemStatus.startsWith("Präsenz")) {
-            lia.getAccess().service(Service.COPY);
-        } else {
-            lia.getAccess().service(Service.INTER_LIBRARY_LOAN);
-            lia.getAccess().service(Service.COPY);
-        }
-        if (continuing) {
-            // well, it's not a "book", but what then? 
-            lia.getAccess().getItems().getLast().type(ItemType.UNKNOWN);
-        }
-        if (format == null) {
-            return;
-        }
-        // adjust transport item
-        if ("microform".equals(format)) {
-            lia.getAccess().getItems().getLast().type(ItemType.MICROFORM);
-        } else if ("game".equals(format)) {
-            lia.getAccess().getItems().getLast().type(ItemType.GAME);
-        } else if ("map".equals(format)) {
-            lia.getAccess().getItems().getLast().type(ItemType.MAP);
-        } else if ("audio".equals(format)) {
-            lia.getAccess().getItems().getLast().type(ItemType.AUDIO);
-        } else if ("electronic".equals(format)) {
-            lia.getAccess().getItems().getLast().type(ItemType.ELECTRONIC_RESOURCE);
-        } else if ("online".equals(format)) {
-            // change transport/delivery preference if an online item is cataloged
-            lia.getAccess().getItems().getLast().type(ItemType.ELECTRONIC_RESOURCE);
-            lia.getAccess().getItems().getLast().transport(TransportMethod.ELECTRONIC);
-            lia.getAccess().getItems().getLast().delivery(DeliveryMethod.ELECTRONIC);
-        } else if (format.matches(".*video.*") && format.matches(".*audio.*")) {
-            lia.getAccess().getItems().getLast().type(ItemType.AUDIO_VISUAL);
-        } else if (format.matches(".*video.*")) {
-            lia.getAccess().getItems().getLast().type(ItemType.VIDEO);
-        }*/
     }
 }

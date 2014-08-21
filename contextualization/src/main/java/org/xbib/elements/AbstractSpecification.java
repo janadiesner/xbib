@@ -50,6 +50,7 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 
 import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newTreeMap;
 
 /**
@@ -63,7 +64,14 @@ public abstract class AbstractSpecification implements Specification {
 
     private final static int DEFAULT_BUFFER_SIZE = 8192;
 
+    private Map<String,Object> params = newHashMap();
+
     public AbstractSpecification() {
+    }
+
+    public AbstractSpecification setParameters(Map<String,Object> params) {
+        this.params = params;
+        return this;
     }
 
     public Map<String,Map> map() {
@@ -102,6 +110,8 @@ public abstract class AbstractSpecification implements Specification {
                 InvocationTargetException {
         for (String key : defs.keySet()) {
             Map<String, Object> struct = defs.get(key);
+            // override static struct map from json with given transient params
+            struct.putAll(params);
             Element element = null;
             Collection<String> values = (Collection<String>) struct.get("values");
             String type = (String) struct.get("_type");

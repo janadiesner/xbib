@@ -38,8 +38,6 @@ import java.util.Map;
 
 public interface Specification {
 
-    Map addSpec(String value, Element element, Map map);
-
     Element getElement(String spec, Map map);
 
     Element getElementBySpec(String spec, Map map);

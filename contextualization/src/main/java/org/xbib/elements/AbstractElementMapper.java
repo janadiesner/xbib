@@ -84,11 +84,11 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
 
     private boolean detectUnknownKeys;
 
-    public AbstractElementMapper(String path, String format, AbstractSpecification specification) {
+    public AbstractElementMapper(String path, String format, Specification specification) {
         this(new URIClassLoader(), path, format, specification);
     }
 
-    public AbstractElementMapper(ClassLoader cl, String path, String format, AbstractSpecification specification) {
+    public AbstractElementMapper(ClassLoader cl, String path, String format, Specification specification) {
         this.specification = specification;
         this.queue = new SynchronousQueue(true);
         this.pipelines = newHashSet();
