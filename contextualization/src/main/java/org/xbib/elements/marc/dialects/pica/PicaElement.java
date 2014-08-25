@@ -60,7 +60,12 @@ public abstract class PicaElement
         this.params = params;
         return this;
     }
-    
+
+    @Override
+    public boolean map(FieldCollection key) {
+        return false;
+    }
+
     @Override
     public Map<String,Object> getSettings() {
         return params;

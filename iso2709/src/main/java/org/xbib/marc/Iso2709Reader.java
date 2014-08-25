@@ -107,6 +107,9 @@ public class Iso2709Reader implements XMLReader {
     private MarcXchangeListener listener;
 
     private ValueNormalizer normalizer;
+
+    private Map<String, Object> map;
+
     /**
      * Properties for this reader
      */
@@ -202,6 +205,15 @@ public class Iso2709Reader implements XMLReader {
     public ValueNormalizer getValueNormalizer() {
         return normalizer;
     }
+
+    public Iso2709Reader setFieldMap(Map<String, Object> map) {
+        this.map = map;
+        return this;
+    }
+
+    public Map<String, Object> getFieldMap() {
+        return map;
+    }
     
     /**
      * Get the MarcXchange Sax service. Useful for inserting MarcXchange data
@@ -215,8 +227,8 @@ public class Iso2709Reader implements XMLReader {
     @Override
     public void parse(InputSource input) throws IOException, SAXException {
         this.adapter = new MarcXchangeSaxAdapter()
-                .buffersize((Integer)properties.get(BUFFER_SIZE))
-                .inputSource(input)
+                .setBuffersize((Integer)properties.get(BUFFER_SIZE))
+                .setInputSource(input)
                 .setContentHandler(contentHandler)
                 .setListener(listener)
                 .setValueNormalizer(normalizer)
@@ -225,8 +237,8 @@ public class Iso2709Reader implements XMLReader {
                 .setType((String) properties.get(TYPE))
                 .setFatalErrors((Boolean)properties.get(FATAL_ERRORS))
                 .setSilentErrors((Boolean)properties.get(SILENT_ERRORS))
-                .setSubfieldDelimiter((String)properties.get(SUBFIELD_DELIMITER));
-        
+                .setSubfieldDelimiter((String)properties.get(SUBFIELD_DELIMITER))
+                .setFieldMap(map);
         adapter.parse();
     }
 

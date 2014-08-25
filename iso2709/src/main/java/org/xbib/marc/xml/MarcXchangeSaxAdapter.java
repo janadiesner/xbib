@@ -34,6 +34,9 @@ package org.xbib.marc.xml;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xbib.io.field.BufferedFieldStreamReader;
@@ -43,6 +46,7 @@ import org.xbib.io.field.FieldStream;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
+import org.xbib.marc.FieldCollection;
 import org.xbib.marc.FieldDirectory;
 import org.xbib.marc.InvalidFieldDirectoryException;
 import org.xbib.marc.MarcXchangeConstants;
@@ -58,9 +62,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- *
  * A Sax adapter for MarcXchange
- *
  */
 public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeListener {
 
@@ -68,11 +70,9 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
 
     private static final AttributesImpl EMPTY_ATTRIBUTES = new AttributesImpl();
 
-    private final FieldListener fieldListener = new Iso2709StreamListener();
+    private ValueNormalizer normalizer = new WithoutNormalizer();
 
-    private ValueNormalizer normalizer = new XMLValueNormalizer();
-
-    private FieldStream stream;
+    private Reader reader;
 
     private char mark = '\u0000';
 
@@ -112,6 +112,8 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
 
     private String subfieldDelimiter = null;
 
+    private Map<String, Object> map;
+
     public MarcXchangeSaxAdapter() {
         this.nsUri = NS_URI;
         this.subfieldOpen = false;
@@ -119,19 +121,17 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
         this.subfieldDelimiter = null;
     }
 
-    public MarcXchangeSaxAdapter buffersize(int buffersize) {
+    public MarcXchangeSaxAdapter setBuffersize(int buffersize) {
         this.buffersize = buffersize;
         return this;
     }
 
-    public MarcXchangeSaxAdapter inputSource(final InputSource source) throws IOException {
+    public MarcXchangeSaxAdapter setInputSource(final InputSource source) throws IOException {
         if (source.getByteStream() != null) {
             String encoding = source.getEncoding() != null ? source.getEncoding() : "ANSEL";
-            Reader reader = new InputStreamReader(source.getByteStream(), encoding);
-            this.stream = new BufferedFieldStreamReader(reader, buffersize, fieldListener);
+            this.reader = new InputStreamReader(source.getByteStream(), encoding);
         } else {
-            Reader reader = source.getCharacterStream();
-            this.stream = new BufferedFieldStreamReader(reader, buffersize, fieldListener);
+            this.reader = source.getCharacterStream();
         }
         return this;
     }
@@ -187,10 +187,17 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
         return id;
     }
 
+    public MarcXchangeSaxAdapter setFieldMap(Map<String, Object> map) {
+        this.map = map;
+        return this;
+    }
+
     /**
      * Parse ISO 2709 and emit SAX events.
      */
     public void parse() throws IOException, SAXException {
+        FieldListener fieldListener = map != null ? new MappedIso2709StreamListener() : new Iso2709StreamListener();
+        FieldStream stream = new BufferedFieldStreamReader(reader, buffersize, fieldListener);
         beginCollection();
         String chunk;
         do {
@@ -426,7 +433,9 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
             if (designator != null) {
                 String value = designator.data();
                 if (value != null && !value.isEmpty() && subfieldDelimiter == null) {
-                    value = normalizer.normalize(value);
+                    if (normalizer != null) {
+                        value = normalizer.normalize(value);
+                    }
                     // write data field per default into a subfield with code 'a'
                     AttributesImpl attrs = new AttributesImpl();
                     attrs.addAttribute(nsUri, CODE, CODE, "CDATA", "a");
@@ -435,7 +444,6 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                         contentHandler.characters(value.toCharArray(), 0, value.length());
                         contentHandler.endElement(nsUri, SUBFIELD, SUBFIELD);
                     }
-                    designator.data(value);
                 }
             }
             if (listener != null) {
@@ -466,11 +474,11 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                 subfieldId = "a"; // fallback
             }
             attrs.addAttribute(nsUri, CODE, CODE, "CDATA", subfieldId);
-            if (contentHandler != null) {
-                contentHandler.startElement(nsUri, SUBFIELD, SUBFIELD, attrs);
-            }
             if (listener != null) {
                 listener.beginSubField(designator);
+            }
+            if (contentHandler != null) {
+                contentHandler.startElement(nsUri, SUBFIELD, SUBFIELD, attrs);
             }
         } catch (Exception ex) {
             if (fatalerrors) {
@@ -490,10 +498,11 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
             if (contentHandler != null) {
                 String value = designator.data();
                 if (!value.isEmpty()) {
-                    value = normalizer.normalize(value);
+                    if (normalizer != null) {
+                        value = normalizer.normalize(value);
+                    }
                     contentHandler.characters(value.toCharArray(), 0, value.length());
                 }
-                designator.data(value);
             }
             if (listener != null) {
                 listener.endSubField(designator);
@@ -541,7 +550,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                             String labelStr = fieldContent.substring(0, RecordLabel.LENGTH);
                             label = new RecordLabel(labelStr.toCharArray());
                             // auto-repair label
-                            leader(label.getFixed());
+                            leader(label.getRecordLabel());
                             directory = new FieldDirectory(label, fieldContent);
                             if (directory.isEmpty()) {
                                 designator = new Field(label, fieldContent.substring(RecordLabel.LENGTH));
@@ -602,8 +611,8 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                         if (designator != null) {
                             designator = new Field(label, designator, fieldContent, true);
                             beginSubField(designator);
+                            endSubField(designator);
                         }
-                        endSubField(designator);
                         break;
                     }
                 }
@@ -622,6 +631,323 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
             if (mark == FieldSeparator.FS) {
                 endDataField(null); // close last data field if not closed already
                 endRecord();
+            }
+        }
+
+    }
+
+    /**
+     * This field listener can map fields according to a given map and organize them into records.
+     * Incoming fields (the subfield list) are processed one by one. At the end of record, the fields are
+     * flushed out to the listener with the mapped version of data fields and subfields.
+     * Data field opening and closing is controlled by the mapped fields.
+     * A repeat counter <code>{r}</code> counts if source fields tag do repeat. The repeat counter
+     * can be interpolated into the mapped field designator.
+     */
+    private class MappedIso2709StreamListener implements FieldListener {
+
+        private FieldCollection field = new FieldCollection();
+
+        private Field previousField;
+
+        private FieldCollection record = new FieldCollection();
+
+        private int repeatCounter;
+
+        @Override
+        public void data(String data) {
+            String fieldContent = data;
+            try {
+                switch (mark) {
+                    case FieldSeparator.FS: // start/end file
+                        break;
+                    case FieldSeparator.GS: {
+                        // start/end of group within a stream
+                        if (subfieldOpen) { // close subfield if open
+                            subfieldOpen = false;
+                            addField(Field.EMPTY); // force data field close event
+                        }
+                        addField(designator);
+                        flushField();
+                        flushRecord();
+                        // fall through is ok!
+                    }
+                    case '\u0000': {
+                        // start of stream
+                        position = 0;
+                        // skip line-feed (OCLC PICA quirk)
+                        if (data.charAt(0) == '\n') {
+                            fieldContent = data.substring(1);
+                        }
+                        if (fieldContent.length() >= RecordLabel.LENGTH) {
+                            String labelStr = fieldContent.substring(0, RecordLabel.LENGTH);
+                            label = new RecordLabel(labelStr.toCharArray());
+                            // auto-repair label
+                            directory = new FieldDirectory(label, fieldContent);
+                            if (directory.isEmpty()) {
+                                designator = new Field(label, fieldContent.substring(RecordLabel.LENGTH));
+                                if (designator.tag() != null) {
+                                    if (subfieldDelimiter != null) {
+                                        // skip tag if custom subfield delimiter
+                                        designator.data(fieldContent.substring(RecordLabel.LENGTH + 3));
+                                    }
+                                    addField(designator);
+                                }
+                            }
+                        } else {
+                            directory = new FieldDirectory(label, fieldContent);
+                            designator = new Field();
+                        }
+                        break;
+                    }
+                    case FieldSeparator.RS: {
+                        if (subfieldOpen) {
+                            subfieldOpen = false;
+                            addField(Field.EMPTY);
+                            flushField();
+                        } else if (designator != null && !designator.isEmpty()) {
+                            if (datafieldOpen) {
+                                addField(designator);
+                                flushField();
+                            }
+                        }
+                        if (directory == null || directory.isEmpty()) {
+                            designator = new Field(label, fieldContent);
+                        } else if (directory.containsKey(position)) {
+                            designator = new Field(label, directory.get(position), fieldContent, false);
+                        } else {
+                            throw new InvalidFieldDirectoryException("byte position not found in directory: "
+                                    + position + " - is this stream reading using an 8-bit wide encoding?");
+                        }
+                        // custom subfield delimiter? Can be useful if source does not split subfields
+                        // with FieldSeparator.US but with pseudo delimiters like "$$"
+                        if (subfieldDelimiter != null) {
+                            if (!designator.isControlField()) {
+                                addField(designator);
+                                // tricky: first field has no subfield ID. We set it to blank.
+                                fieldContent = " " + fieldContent.substring(4);
+                                for (String subfield : fieldContent.split(Pattern.quote(subfieldDelimiter))) {
+                                    designator = new Field(label, designator, subfield, true);
+                                    addField(designator);
+                                }
+                            }
+                            flushField();
+                        } else {
+                            addField(designator);
+                        }
+                        break;
+                    }
+                    case FieldSeparator.US: {
+                        if (!subfieldOpen) {
+                            subfieldOpen = true;
+                            addField(designator);
+                        }
+                        if (designator != null) {
+                            designator = new Field(label, designator, fieldContent, true);
+                            addField(designator);
+                        }
+                        break;
+                    }
+                }
+            } catch (InvalidFieldDirectoryException ex) {
+                // we recover from invalid field directories here
+                logger.warn(ex.getMessage());
+            } finally {
+                position += data.length();
+            }
+        }
+
+        @Override
+        public void mark(char separator) {
+            mark = separator;
+            position++;
+            if (mark == FieldSeparator.FS) {
+                flushRecord();
+            }
+        }
+
+        /**
+         * Adding subfield to the current field.
+         * @param field the subfield
+         */
+        private void addField(Field field) {
+            this.field.add(field);
+        }
+
+        /**
+         * Flushing field. Find a mapping and transform field into the record.
+         */
+        private void flushField() {
+            if (field == null || field.isEmpty()) {
+                return;
+            }
+            Iterator<Field> it = field.iterator();
+            Field dataField = it.next();
+            // is this tag repeated?
+            if (previousField != null  && isRepeat(previousField, dataField)) {
+                repeatCounter++;
+            } else {
+                repeatCounter = 0;
+            }
+            // save field
+            previousField = new Field(dataField);
+            // the heavy lifting, map the field
+            dataField = map(dataField);
+            // we open a new data field only if this field is not the same as the last field in the record
+            if (record.isEmpty()) {
+                record.add(dataField); // this is the first field
+            } else {
+                // the rule is that subfields must not repeat and must be continous. If not, close data field.
+                if (!isContinous(record.peekLast(), dataField)) {
+                    // not same field tag, close old data field and add new data field
+                    record.add(Field.EMPTY);
+                    record.add(dataField);
+                }
+            }
+            while (it.hasNext()) {
+                Field field = it.next();
+                if (Field.EMPTY.equals(field)) {
+                    break;
+                } else if (field.isSubField()) {
+                    // map subfields, do not care for data field wrap
+                    record.add(map(field));
+                }
+            }
+            // do not add the data field here, it is not clear if it continues
+            field = new FieldCollection();
+        }
+
+        /**
+         * Record is complete, can be flushed. Here, the listener events are created.
+         */
+        private void flushRecord() {
+            // make sure there is no field left over
+            flushField();
+            // skip empty record
+            if (record == null || record.isEmpty()) {
+                return;
+            }
+            beginRecord(format, type);
+            leader(label.getRecordLabel());
+            // bookkeeping for toggling beginDataField/endDataField
+            boolean inData = false;
+            for (Field field : record) {
+                if (Field.EMPTY.equals(field)) {
+                    endDataField(null);
+                    inData = false;
+                } else if (field.isSubField()) {
+                    beginSubField(field);
+                    endSubField(field);
+                } else if (field.isControlField()) {
+                    // control fields never have subfields
+                    beginControlField(field);
+                    endControlField(field);
+                } else {
+                    if (inData) {
+                        endDataField(field);
+                        inData = false;
+                    } else {
+                        beginDataField(field);
+                        inData = true;
+                    }
+                }
+            }
+            if (inData) {
+                endDataField(null);
+            }
+            endRecord();
+            // reset all the counters and variables for next record
+            repeatCounter = 0;
+            previousField = null;
+            field = new FieldCollection();
+            record = new FieldCollection();
+        }
+
+        /**
+         * The mapper. Maps a field by the following convention:
+         *
+         * tag : {
+         *   ind : {
+         *       subf : "totag$toind$tosubf"
+         *   }
+         * }
+         *
+         * where toind can be interpolated by repeat counter.
+         *
+         * @param field the field to map from
+         * @return the mpped field
+         */
+        private Field map(Field field) {
+            if (field == null) {
+                return null;
+            }
+            if (map.containsKey(field.tag())) {
+                Object o = map.get(field.tag());
+                if (o instanceof Map) {
+                    Map<String, Object> ind = (Map<String, Object>) o;
+                    if (ind.containsKey(field.indicator())) {
+                        o = ind.get(field.indicator());
+                        if (o instanceof Map) {
+                            Map<String, Object> subf = (Map<String, Object>) o;
+                            String subfieldId = field.isSubField() ? field.subfieldId() : "";
+                            if (subf.containsKey(subfieldId)) {
+                                o = subf.get(subfieldId);
+                                if (o != null) {
+                                    String[] s = o.toString().split("\\$");
+                                    s[1] = interpolate(s[1]);
+                                    // subfield -> subfield, data field -> data field
+                                    if (s.length >= 2) {
+                                        if (field.isSubField()) {
+                                            field.tag(s[0]).indicator(s[1]).subfieldId(s[2]);
+                                        } else {
+                                            field.tag(s[0]).indicator(s[1]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return field;
+        }
+
+        /**
+         * Checks if a field repeats another.
+         * @param previous the previous field
+         * @param next the next field
+         * @return true if field is repeated
+         */
+        private boolean isRepeat(Field previous, Field next) {
+            return previous.tag().equals(next.tag());
+        }
+
+        /**
+         * Checks if field is continuous to the previous field. This means subfield inclusion.
+         * @param previous the previous field
+         * @param next the next field
+         * @return true if field is continuous
+         */
+        private boolean isContinous(Field previous, Field next) {
+            return isRepeat(previous, next)
+                    && ((!previous.isSubField() && !next.isSubField()) ||
+                    (previous.isSubField() && next.isSubField() && previous.subfieldId().compareTo(next.subfieldId()) <= 0));
+        }
+
+        // the repeat counter pattern
+        private final Pattern REP = Pattern.compile("\\{r\\}");
+
+        /**
+         * Interpolate variables.
+         * @param value the input value
+         * @return the interpolated string
+         */
+        private String interpolate(String value) {
+            Matcher m = REP.matcher(value);
+            if (m.find()) {
+                return m.replaceAll(Integer.toString(repeatCounter));
+            } else {
+                return value;
             }
         }
 

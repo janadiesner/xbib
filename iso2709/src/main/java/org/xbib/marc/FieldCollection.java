@@ -182,6 +182,10 @@ public class FieldCollection extends LinkedList<Field> {
         return sb.toString();
     }
 
+    public String getString() {
+        return super.toString();
+    }
+
     public String toString() {
         return toSpec();
     }

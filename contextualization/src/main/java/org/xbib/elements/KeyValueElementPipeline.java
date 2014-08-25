@@ -166,10 +166,6 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
         return counter;
     }
 
-    protected Map map() {
-        return map;
-    }
-
     protected ElementBuilder<K,V,E,C> builder() {
         return builder;
     }

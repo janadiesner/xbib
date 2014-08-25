@@ -71,7 +71,7 @@ public class BufferedFieldStreamReader extends Reader implements FieldStream {
 
     private FieldListener listener;
 
-    private final static int DEFAULT_BUFFER_SIZE = 8192;
+    private final static int DEFAULT_BUFFER_SIZE = 65536;
 
     /**
      * Constructs a new SequentialCharStream on the Reader
@@ -483,7 +483,7 @@ public class BufferedFieldStreamReader extends Reader implements FieldStream {
                 }
             }
             char eod = '\0';
-            StringBuilder result = new StringBuilder(64);
+            StringBuilder result = new StringBuilder(256);
             result.append(buf, pos, count - pos);
             pos = count;
             while (true) {

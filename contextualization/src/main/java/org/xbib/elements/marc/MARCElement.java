@@ -43,11 +43,9 @@ import org.xbib.rdf.Resource;
 
 /**
  * A MARC element
- *
  */
 public abstract class MARCElement
-        implements Element<FieldCollection, String, MARCElementBuilder>,
-        MarcXchangeConstants {
+        implements Element<FieldCollection, String, MARCElementBuilder>, MarcXchangeConstants {
 
     protected static final Logger logger = LoggerFactory.getLogger(MARCElement.class.getName());
 
@@ -62,6 +60,11 @@ public abstract class MARCElement
     @Override
     public Map<String,Object> getSettings() {
         return params;
+    }
+
+    @Override
+    public boolean map(FieldCollection key) {
+        return false;
     }
 
     @Override
@@ -85,9 +88,9 @@ public abstract class MARCElement
      * @param builder the builder
      * @param fields the fields
      * @param value the value
+     * @return true if processing of element should abort at this point, false if it should continue
      */
     public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, FieldCollection fields, String value) {
-        // overridden
         return false;
     }
 
@@ -99,7 +102,6 @@ public abstract class MARCElement
      * @param subfieldType the subfield type
      */
     public boolean field(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, Field field, String subfieldType) {
-        // overridden
         return false;
     }
 
@@ -108,10 +110,6 @@ public abstract class MARCElement
      */
     public String data(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, String resourcePredicate, Resource resource, String property, String value) {
         return value;
-    }
-
-    public void facetize(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, Field field) {
-
     }
 
 }

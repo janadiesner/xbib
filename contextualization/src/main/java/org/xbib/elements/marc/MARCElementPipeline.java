@@ -46,9 +46,8 @@ import java.util.regex.Pattern;
 
 /**
  * A MARC pipeline is a key/value pipeline specifically designed for MARC mapping.
- * It performs the heavy lifting by looking up the structured information in the Element Map
+ * It performs the heavy lifting by looking up the structured information in the element map
  * and processes the MARC fields.
- *
  */
 public class MARCElementPipeline extends KeyValueElementPipeline<FieldCollection, String, MARCElement, MARCContext> {
 
@@ -65,23 +64,38 @@ public class MARCElementPipeline extends KeyValueElementPipeline<FieldCollection
         }
         String key = fields.toSpec();
         MARCElement element = null;
+        // element retrieval
         try {
-            element = (MARCElement) specification.getElement(key, map());
+            element = (MARCElement) specification.getElement(key, getMap());
             // if nothing was found, try tag only
             if (element == null) {
-                element = (MARCElement) specification.getElementBySpec(key, map());
+                element = (MARCElement) specification.getElementBySpec(key, getMap());
             }
         } catch (ClassCastException e) {
             logger.error("not a MARCElement instance for key" + key);
         }
         if (element != null) {
+            // map fields, and repeat element retrieval if a mapping was performed
+            if (element.map(fields)) {
+                key = fields.toSpec();
+                try {
+                    element = (MARCElement) specification.getElement(key, getMap());
+                    // if nothing was found, try tag only
+                    if (element == null) {
+                        element = (MARCElement) specification.getElementBySpec(key, getMap());
+                    }
+                } catch (ClassCastException e) {
+                    logger.error("not a MARCElement instance for key" + key);
+                }
+            }
             // element-based processing
             boolean done = element.fields(this, builder(), fields, value);
             if (done) {
                 return;
             }
+            // add element to resource
             addToResource(builder().context().getResource(), fields, element, value);
-            // build other things like facets
+            // build other things for this element, like facets etc.
             builder().build(element, fields, value);
         } else {
             if (detectUnknownKeys) {
@@ -91,6 +105,7 @@ public class MARCElementPipeline extends KeyValueElementPipeline<FieldCollection
                 }
             }
         }
+        // build no matter if an element was found or not
         builder().build(element, fields, value);
     }
 

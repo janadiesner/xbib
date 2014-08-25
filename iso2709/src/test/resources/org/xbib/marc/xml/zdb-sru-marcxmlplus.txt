@@ -1943,7 +1943,7 @@ leader
 1102 0
 1102 0=(DE-101)983041598
 1102 a
-1102 a=Mauch GesmbH&Co. KG
+1102 a=Mauch GesmbH & Co. KG
 1102 g
 1102 g=Burgkirchen a. d. Alz
 1102 4
@@ -1953,7 +1953,7 @@ leader
 24510a
 24510a=Mauch aktuell
 24510b
-24510b=Informationsschrift der Firma Mauch Ges.m.b.H.&Co. KG
+24510b=Informationsschrift der Firma Mauch Ges.m.b.H. & Co. KG
 24510=
 2603 
 2603 a

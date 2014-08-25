@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
-        <version>1.0.0.Beta4</version>
+        <version>1.0.0.Beta5</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -16,14 +16,42 @@
     <description>XML</description>
 
     <dependencies>
+
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>serializer</artifactId>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
+            <type>jar</type>
+            <optional>true</optional>
+        </dependency>
+
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>woodstox-core-asl</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
             <type>jar</type>
         </dependency>
+
     </dependencies>
 </project>

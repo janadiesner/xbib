@@ -77,6 +77,11 @@ public abstract class AbstractScriptingElement implements Element {
         return settings;
     }
 
+    @Override
+    public boolean map(Object key) {
+        return false;
+    }
+
     public Element getElement(){
         return element;
     }    

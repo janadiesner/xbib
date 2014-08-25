@@ -54,7 +54,14 @@ public interface Element<K,V,B extends ElementBuilder>  {
      * @return the settings
      */
     Map<String,Object> getSettings();
-    
+
+    /**
+     * Map given key to another key
+     * @param key the given key
+     * @return true if key was maped to another key
+     */
+    boolean map(K key);
+
     /**
      * Begin building the element
      */

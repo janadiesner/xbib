@@ -325,7 +325,7 @@ leader
 77208i
 77208i=Beil. zu:
 77208t
-77208t=Akupunktur&Aurikulomedizin
+77208t=Akupunktur & Aurikulomedizin
 77208w
 77208w=(DE-600)2631051-X
 77208w
@@ -517,7 +517,7 @@ leader
 77208i
 77208i=Beil. zu:
 77208t
-77208t=Obst&Garten<Stuttgart>
+77208t=Obst & Garten <Stuttgart>
 77208w
 77208w=(DE-600)123377-4
 77208w
@@ -527,7 +527,7 @@ leader
 78000i
 78000i=Vorg.:
 78000t
-78000t=Pflanzenschutz im Haus- und Kleingarten ...
+78000t=Pflanzenschutz im Haus- und Kleingarten ... 
 78000w
 78000w=(DE-600)2545666-0
 78000w
@@ -963,7 +963,7 @@ leader
 78000i
 78000i=Bis Bd. 5 u.d.T.:
 78000a
-78000a=Katholische Fachhochschule<Mainz>
+78000a=Katholische Fachhochschule <Mainz>
 78000t
 78000t=Schriftenreihe der KFH Mainz
 78000w
@@ -1147,7 +1147,7 @@ leader
 084  =
 24510
 24510a
-24510a=Bericht über die örtliche Prüfung der Eröffnungsbilanz zum 1. Januar ...
+24510a=Bericht über die örtliche Prüfung der Eröffnungsbilanz zum 1. Januar ... 
 24510c
 24510c=Landeshauptstadt Stuttgart, Rechnungsprüfungsamt
 24510=
@@ -1827,7 +1827,7 @@ leader
 040  =
 24510
 24510a
-24510a=Musik&Psyche
+24510a=Musik & Psyche
 24510=
 2603 
 2603 a
@@ -2155,7 +2155,7 @@ leader
 78000i
 78000i=Vorg.:
 78000a
-78000a=Forschungszentrum<Dresden>
+78000a=Forschungszentrum <Dresden>
 78000t
 78000t=FZD-Journal
 78000w
@@ -2285,7 +2285,7 @@ leader
 78000i
 78000i=Vorg.:
 78000a
-78000a=Kreisvolkshochschule des Rhein-Lahn-Kreises<Ems>
+78000a=Kreisvolkshochschule des Rhein-Lahn-Kreises <Ems>
 78000t
 78000t=Programmheft / Kreisvolkshochschule des Rhein-Lahn-Kreises
 78000w
@@ -2383,7 +2383,7 @@ leader
 78000i
 78000i=Vorg.:
 78000a
-78000a=Städtisches Labenwolf-Gymnasium<Nürnberg>
+78000a=Städtisches Labenwolf-Gymnasium <Nürnberg>
 78000t
 78000t=Jahresbericht / Städtisches Labenwolf-Gymnasium Nürnberg
 78000w
@@ -2479,7 +2479,7 @@ leader
 363018
 363018=1.1\x
 36301i
-36301i=2011
+36301i=2011 
 36301=
 546  
 546  a
@@ -2489,7 +2489,7 @@ leader
 77508i
 77508i=Engl. Ausg.
 77508a
-77508a=Prezidentskaja Biblioteka Imeni Borisa Nikolaeviča Elʹzina<Sankt Petersburg>
+77508a=Prezidentskaja Biblioteka Imeni Borisa Nikolaeviča Elʹzina <Sankt Petersburg>
 77508t
 77508t=Annual report / Boris Yeltsin Presidential Library
 77508w
@@ -2737,7 +2737,7 @@ leader
 1102 =
 24510
 24510a
-24510a=Info / Grenzach-Wyhlen
+24510a=Info / Grenzach-Wyhlen 
 24510b
 24510b=amtliches Mitteilungsblatt
 24510=
@@ -4483,7 +4483,7 @@ leader
 78000i
 78000i=Vorg.:
 78000a
-78000a=Forschungszentrum<Dresden>
+78000a=Forschungszentrum <Dresden>
 78000t
 78000t=FZD-Journal  . das Journal des Forschungszentrums Dresden-Rossendorf
 78000w
@@ -5321,7 +5321,7 @@ leader
 78000i
 78000i=Vorg.:
 78000a
-78000a=Diözese<Augsburg>
+78000a=Diözese <Augsburg>
 78000t
 78000t=Katholische SonntagsZeitung für das Bistum Augsburg
 78000w
@@ -5451,7 +5451,7 @@ leader
 78000i
 78000i=Als Vorg. gilt
 78000a
-78000a=Mainova-Aktiengesellschaft<Frankfurt, Main>
+78000a=Mainova-Aktiengesellschaft <Frankfurt, Main>
 78000t
 78000t=Personalbericht ... / Mainova
 78000w

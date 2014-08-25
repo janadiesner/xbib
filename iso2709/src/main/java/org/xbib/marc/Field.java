@@ -38,6 +38,8 @@ import org.xbib.io.field.FieldSortable;
  */
 public class Field implements Comparable<Field> {
 
+    public final static Field EMPTY = new Field();
+
     public final static String ERROR_TAG = "___";
 
     public final static String NULL_TAG = "000";
@@ -286,8 +288,6 @@ public class Field implements Comparable<Field> {
      */
     public Field data(String data) {
         this.data = data;
-        this.sortable = data != null && data.indexOf(FieldSortable.NON_SORTABLE_BEGIN) >= 0 ?
-                data.replaceAll(FieldSortable.NON_SORTABLE_BEGIN + ".*?" + FieldSortable.NON_SORTABLE_END, "") : null;
         return this;
     }
 
@@ -305,16 +305,18 @@ public class Field implements Comparable<Field> {
      * @return the sortable data
      */
     public String dataSortable() {
+        this.sortable = data != null && data.indexOf(FieldSortable.NON_SORTABLE_BEGIN) >= 0 ?
+                data.replaceAll(FieldSortable.NON_SORTABLE_BEGIN + ".*?" + FieldSortable.NON_SORTABLE_END, "") : null;
         return sortable;
     }
 
-    protected String getDesignator() {
+    public String getDesignator() {
         return tag + (indicator != null ? indicator : "") + (subfieldId != null ? subfieldId : "");
     }
 
     @Override
     public String toString() {
-        return tag + (indicator != null ? indicator : "") + (subfieldId != null ? subfieldId : "") + (data != null ? "=" + data : "");
+        return getDesignator() + (data != null ? "=" + data : "");
     }
 
     @Override

@@ -62,23 +62,27 @@ public class ZClientTest {
                     File tmp = File.createTempFile(serviceName, "xml");
                     FileOutputStream out = new FileOutputStream(tmp);
                     Writer w = new OutputStreamWriter(out, "UTF-8");
-                    ZSearchRetrieveRequest request = client.newCQLSearchRetrieveRequest()
-                            .setQuery(query)
-                            .setFrom(from)
-                            .setSize(size);
-                    ZSearchRetrieveResponse response = request.execute();
-                    StylesheetTransformer transformer = new StylesheetTransformer("src/main/resources/xsl");
-                    response.setStylesheetTransformer(transformer).to(w);
-                    transformer.close();
-                    w.close();
+                    if (client != null) {
+                        ZSearchRetrieveRequest request = client.newCQLSearchRetrieveRequest()
+                                .setQuery(query)
+                                .setFrom(from)
+                                .setSize(size);
+                        ZSearchRetrieveResponse response = request.execute();
+                        StylesheetTransformer transformer = new StylesheetTransformer("src/main/resources/xsl");
+                        response.setStylesheetTransformer(transformer).to(w);
+                        transformer.close();
+                        w.close();
+                    }
                     tmp.delete();
                 } finally {
-                    client.close();
+                    if (client != null) {
+                        client.close();
+                    }
                 }
             } catch (Diagnostics d) {
-                d.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+                logger.warn(d.getPlainText(), d);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
         }
     }

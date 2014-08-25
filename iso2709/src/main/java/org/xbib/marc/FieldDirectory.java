@@ -35,8 +35,7 @@ import java.util.TreeMap;
 
 public class FieldDirectory extends TreeMap<Integer, Field> {
 
-    public FieldDirectory(RecordLabel label, String buffer)
-            throws InvalidFieldDirectoryException {
+    public FieldDirectory(RecordLabel label, String buffer) throws InvalidFieldDirectoryException {
         super();
         int directoryLength = label.getBaseAddressOfData() - (RecordLabel.LENGTH + 1);
         // assume that negative values means prohibiting directory access

@@ -57,8 +57,13 @@ public class PicaElementPipeline extends KeyValueElementPipeline<FieldCollection
         }
         logger.debug("pica fields = {} value = {}", fields, value);
         String key = fields.toSpec();
-        PicaElement element = (PicaElement) specification.getElement(key, map());
+        PicaElement element = (PicaElement) specification.getElement(key, getMap());
         if (element != null) {
+            // mapping?
+            if (element.map(fields)) {
+                key = fields.toSpec();
+                element = (PicaElement) specification.getElement(key, getMap());
+            }
             // element-based processing
             element.fields(builder(), fields, value);
             // optional indicator configuration

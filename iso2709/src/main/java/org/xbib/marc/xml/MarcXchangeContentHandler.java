@@ -65,6 +65,8 @@ public class MarcXchangeContentHandler
 
     private boolean isRecordNumber;
 
+    private boolean inData;
+
     public MarcXchangeContentHandler addListener(String type, MarcXchangeListener listener) {
         this.listeners.put(type, listener);
         return this;
@@ -192,6 +194,7 @@ public class MarcXchangeContentHandler
                 break;
             }
             case LEADER: {
+                inData = true;
                 break;
             }
             case CONTROLFIELD: {
@@ -207,6 +210,7 @@ public class MarcXchangeContentHandler
                 Field field = new Field().tag(tag);
                 beginControlField(field);
                 fields.add(field);
+                inData = true;
                 break;
             }
             case DATAFIELD: {
@@ -231,9 +235,10 @@ public class MarcXchangeContentHandler
                         sb.append(indicator);
                     }
                 }
-                Field field = new Field().tag(tag).indicator(sb.toString());
+                Field field = new Field().tag(tag).indicator(sb.toString()).data(null);
                 beginDataField(field);
                 fields.add(field);
+                inData = true;
                 break;
             }
             case SUBFIELD: {
@@ -245,6 +250,7 @@ public class MarcXchangeContentHandler
                 }
                 beginSubField(field);
                 fields.add(field);
+                inData = true;
                 break;
             }
         }
@@ -264,6 +270,7 @@ public class MarcXchangeContentHandler
             }
             case LEADER: {
                 leader(content.toString());
+                inData = false;
                 break;
             }
             case CONTROLFIELD: {
@@ -271,14 +278,17 @@ public class MarcXchangeContentHandler
                     recordNumber = content.toString();
                 }
                 endControlField(fields.removeFirst().data(content.toString()));
+                inData = false;
                 break;
             }
             case DATAFIELD: {
-                endDataField(fields.removeFirst().subfieldId(null).data(content.toString()));
+                endDataField(fields.removeFirst().subfieldId(null).data(""));
+                inData = false;
                 break;
             }
             case SUBFIELD: {
                 endSubField(fields.removeLast().data(content.toString()));
+                inData = false;
                 break;
             }
         }
@@ -287,7 +297,9 @@ public class MarcXchangeContentHandler
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-        content.append(new String(ch, start, length).trim());
+        if (inData) {
+            content.append(new String(ch, start, length));
+        }
     }
 
     @Override

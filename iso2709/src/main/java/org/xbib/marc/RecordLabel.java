@@ -116,7 +116,7 @@ public class RecordLabel {
         this.segmentIdentifierLength = cfix[22] - '0';
     }
 
-    public String getFixed() {
+    public String getRecordLabel() {
         return new String(cfix);
     }
 
@@ -184,7 +184,7 @@ public class RecordLabel {
      * determined in a particular instance, the item should be coded as a
      * serial.
      *
-     * a analytic (component part)
+     * 'a' analytic (component part)
      *
      * bibliographic item that is physically contained in another item such that
      * the location of the component part is dependent upon the physical
@@ -195,7 +195,7 @@ public class RecordLabel {
      * a journal; a continuing column or feature within a journal; a single
      * paper in a collection of conference proceedings.
      *
-     * c collection
+     * 'c' collection
      *
      * bibliographic item that is a made-up collection.
      *
@@ -206,7 +206,7 @@ public class RecordLabel {
      *
      * This code is used only for made-up collections.
      *
-     * m monographic
+     * 'm' monographic
      *
      * bibliographic item complete in one physical part or intended to be
      * completed in a finite number of parts.
@@ -218,7 +218,7 @@ public class RecordLabel {
      * in a series; a complete series of maps, assuming the series was intended
      * to be completed in a finite number of parts; a single globe.
      *
-     * s serial
+     * 's' serial
      *
      * bibliographic item issued in successive parts and intended to be
      * continued indefinitely.
@@ -234,7 +234,7 @@ public class RecordLabel {
     }
 
     /**
-     * Indicator length One numeric digit giving the length of the indicators.
+     * Indicator length is a numeric digit giving the length of the indicators.
      *
      * @return the indicator length
      */
@@ -243,8 +243,7 @@ public class RecordLabel {
     }
 
     /**
-     * One numeric digit giving the length of the subfield identifier; e.g.
-     * '$a'.
+     * A numeric digit giving the length of the subfield identifier
      *
      * @return the subfield identifier length
      */

@@ -39,6 +39,7 @@ import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
 import org.xml.sax.InputSource;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -52,13 +53,12 @@ public class MarcXchangeReaderTest {
     
     @Test
     public void testMarcXMLFromOAI() throws Exception {
-        MarcXchangeReader reader = new MarcXchangeReader();
         final StringBuilder sb = new StringBuilder();
         InputStream in = getClass().getResourceAsStream("zdb-oai-marc.xml");
         if (in == null) {
             throw new IOException("input stream not found");
         }
-        reader.addListener("Bibliographic", new MarcXchangeListener() {
+        MarcXchangeListener listener = new MarcXchangeListener() {
 
             @Override
             public void leader(String label) {
@@ -117,9 +117,11 @@ public class MarcXchangeReaderTest {
                 sb.append("endRecord").append("\n");
             }
 
-        });
-        InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
-        reader.parse(source);
+        };
+
+        MarcXchangeReader reader = new MarcXchangeReader();
+        reader.addListener("Bibliographic", listener);
+        reader.parse(new InputSource(new InputStreamReader(in, "UTF-8")));
         in.close();
 
         InputStreamReader r = new InputStreamReader(getClass().getResourceAsStream("zdb-oai-marc.txt"));

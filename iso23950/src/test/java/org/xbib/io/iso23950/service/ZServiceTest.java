@@ -49,17 +49,17 @@ public class ZServiceTest {
     private final Logger logger = LoggerFactory.getLogger(ZServiceTest.class.getName());
 
     @Test
-    public void testService() throws IOException {
-        for (String serviceName : Arrays.asList("LIBRIS", "LOC", "OBVSG")) {
-            ZService service = ZServiceFactory.getService(serviceName);
-            ZClient client = service.newZClient();
-            FileOutputStream out = new FileOutputStream("target/service-" + service.getURI().getHost() + ".xml");
-            Writer sw = new OutputStreamWriter(out, "UTF-8");
+    public void testService() {
+        try {
+            for (String serviceName : Arrays.asList("LIBRIS", "LOC", "OBVSG")) {
+                ZService service = ZServiceFactory.getService(serviceName);
+                ZClient client = service.newZClient();
+                FileOutputStream out = new FileOutputStream("target/service-" + service.getURI().getHost() + ".xml");
+                Writer sw = new OutputStreamWriter(out, "UTF-8");
                 String query = "@attr 1=4 test";
                 int from = 1;
                 int size = 10;
-                StylesheetTransformer transformer = new StylesheetTransformer("src/main/resources");
-                try {
+                try (StylesheetTransformer transformer = new StylesheetTransformer("src/main/resources")) {
                     ZSearchRetrieveRequest request = client.newPQFSearchRetrieveRequest();
                     request.setQuery(query)
                             .setFrom(from)
@@ -70,10 +70,12 @@ public class ZServiceTest {
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 } finally {
-                    transformer.close();
                     service.close(client);
                 }
-            sw.close();
+                sw.close();
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
         }
     }
 }

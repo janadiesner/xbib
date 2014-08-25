@@ -35,7 +35,6 @@ import java.io.IOException;
 
 /**
  * Exception for broken field directories
- *
  */
 public class InvalidFieldDirectoryException extends IOException {
 

@@ -46,6 +46,11 @@ public class NullElement implements Element {
     }
 
     @Override
+    public boolean map(Object key) {
+        return false;
+    }
+
+    @Override
     public Element begin() {
         return this;
     }
