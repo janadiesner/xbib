@@ -7,32 +7,27 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xml.sax.InputSource;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 import static org.testng.Assert.assertEquals;
 
-public class MarcXchangeContentHandlerTest {
+public class MarcXchangeSRUTest {
 
-    private final Logger logger = LoggerFactory.getLogger(MarcXchangeContentHandlerTest.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(MarcXchangeSRUTest.class.getName());
 
     @Test
     public void testMarcXchangeListener() throws Exception {
         final StringBuilder sb = new StringBuilder();
         InputStream in = getClass().getResourceAsStream("zdb-sru-marcxmlplus.xml");
-        if (in == null) {
-            throw new IOException("input stream not found");
-        }
         MarcXchangeContentHandler handler = new MarcXchangeContentHandler() {
+            @Override
+            public void beginCollection() {
+            }
 
             @Override
-            public void leader(String label) {
-                logger.debug("leader="+label);
-                sb.append("leader").append("\n");
-                sb.append(label).append("\n");
+            public void endCollection() {
             }
 
             @Override
@@ -41,6 +36,13 @@ public class MarcXchangeContentHandlerTest {
                 sb.append("beginRecord").append("\n");
                 sb.append(format).append("\n");
                 sb.append(type).append("\n");
+            }
+
+            @Override
+            public void leader(String label) {
+                logger.debug("leader="+label);
+                sb.append("leader").append("\n");
+                sb.append(label).append("\n");
             }
 
             @Override

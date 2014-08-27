@@ -31,16 +31,21 @@
  */
 package org.xbib.marc.dialects.pica;
 
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchangeListener;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.DTDHandler;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -51,15 +56,15 @@ import java.io.IOException;
  * PICA XML parser
  */
 public class DNBPICAXmlReader
-        extends DefaultHandler implements DNBPICAConstants, MarcXchangeListener {
+        implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler, DNBPICAConstants, MarcXchangeListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(DNBPICAXmlReader.class.getName());
 
     private final SAXParser parser;
 
     private ContentHandler contentHandler;
 
     private MarcXchangeListener listener;
-
-    private InputSource source;
 
     private FieldCollection fields = new FieldCollection();
 
@@ -85,7 +90,8 @@ public class DNBPICAXmlReader
     }
 
     public void parse(InputSource source) throws SAXException, IOException {
-        parser.parse(source, this);
+        parser.getXMLReader().setContentHandler(contentHandler != null ? contentHandler : this);
+        parser.getXMLReader().parse(source);
     }
 
     @Override
@@ -93,6 +99,16 @@ public class DNBPICAXmlReader
         if (listener != null) {
             listener.leader(label);
         }
+    }
+
+    @Override
+    public void beginCollection() {
+
+    }
+
+    @Override
+    public void endCollection() {
+
     }
 
     @Override
@@ -185,7 +201,7 @@ public class DNBPICAXmlReader
     @Override
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
         content.setLength(0);
-        if (!checkNamespace(uri)) {
+        if (!isNamespace(uri)) {
             return;
         }
         switch (localName) {
@@ -244,7 +260,7 @@ public class DNBPICAXmlReader
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (!checkNamespace(uri)) {
+        if (!isNamespace(uri)) {
             content.setLength(0);
             return;
         }
@@ -310,7 +326,38 @@ public class DNBPICAXmlReader
         }
     }
 
-    private boolean checkNamespace(String uri) {
+    @Override
+    public void notationDecl(String name, String publicId, String systemId) throws SAXException {
+
+    }
+
+    @Override
+    public void unparsedEntityDecl(String name, String publicId, String systemId, String notationName) throws SAXException {
+
+    }
+
+    @Override
+    public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+        return null;
+    }
+
+    @Override
+    public void warning(SAXParseException exception) throws SAXException {
+        logger.warn(exception.getMessage(), exception);
+    }
+
+    @Override
+    public void error(SAXParseException exception) throws SAXException {
+        logger.error(exception.getMessage(), exception);
+    }
+
+    @Override
+    public void fatalError(SAXParseException exception) throws SAXException {
+        logger.error(exception.getMessage(), exception);
+    }
+
+    private boolean isNamespace(String uri) {
         return NS_URI.equals(uri);
     }
+
 }

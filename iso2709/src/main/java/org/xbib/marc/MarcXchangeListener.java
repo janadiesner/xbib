@@ -49,62 +49,79 @@ package org.xbib.marc;
  * 
  * Field data is carried only in the end events, where begin events carry
  * information about field indicators and subfield identifiers.
- * 
  */
 public interface MarcXchangeListener {
 
     /**
+     * Begin of a collection
+     */
+    void beginCollection();
+
+    /**
+     * End of a collection
+     */
+    void endCollection();
+
+    /**
      * Begin of a record
+     *
      * @param format the record format
-     * @param type the record type
+     * @param type   the record type
      */
     void beginRecord(String format, String type);
-
-    /**
-     * The leader (or label) of a record
-     * @param label 
-     */
-    void leader(String label);
-
-    /**
-     * A control field begins.
-     * @param field 
-     */
-    void beginControlField(Field field);
-
-    /**
-     * A control field ends.
-     * @param field 
-     */
-    void endControlField(Field field);
-
-    /**
-     * A data field begins
-     * @param field 
-     */
-    void beginDataField(Field field);
-
-    /**
-     * A sub field begins
-     * @param field 
-     */
-    void beginSubField(Field field);
-
-    /**
-     * A sub field ends
-     * @param field 
-     */
-    void endSubField(Field field);
-
-    /**
-     * A data field ends
-     * @param field 
-     */
-    void endDataField(Field field);
 
     /**
      * End of a record
      */
     void endRecord();
+
+    /**
+     * The leader (or label) of a record
+     *
+     * @param label the label
+     */
+    void leader(String label);
+
+    /**
+     * A control field begins.
+     *
+     * @param field the field
+     */
+    void beginControlField(Field field);
+
+    /**
+     * A control field ends.
+     *
+     * @param field the field
+     */
+    void endControlField(Field field);
+
+    /**
+     * A data field begins
+     *
+     * @param field the field
+     */
+    void beginDataField(Field field);
+
+    /**
+     * A data field ends
+     *
+     * @param field the field
+     */
+    void endDataField(Field field);
+
+    /**
+     * A sub field begins
+     *
+     * @param field the field
+     */
+    void beginSubField(Field field);
+
+    /**
+     * A sub field ends
+     *
+     * @param field the field
+     */
+    void endSubField(Field field);
 
 }

@@ -34,7 +34,6 @@ package org.xbib.marc.xml;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xml.sax.Attributes;
@@ -55,31 +54,26 @@ import java.util.Map;
  * The MARC XML ContentHandler can handle MarcXML or MarcXchange input
  * and fires events to a MarcXchange listener
  */
-public class MarcXchangeContentHandler
-        implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler, MarcXchangeConstants, MarcXchangeListener {
+public class MarcXchangeMappingContentHandler
+    extends MarcXchangeFieldMapper
+    implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler, MarcXchangeConstants, MarcXchangeListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(MarcXchangeContentHandler.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(MarcXchangeMappingContentHandler.class.getName());
 
     private Map<String,MarcXchangeListener> listeners = new HashMap<String,MarcXchangeListener>();
 
     private MarcXchangeListener listener;
 
-    private FieldCollection fields = new FieldCollection();
-
     private StringBuilder content = new StringBuilder();
-
-    private String format;
-
-    private String type;
 
     private boolean inData;
 
-    public MarcXchangeContentHandler addListener(String type, MarcXchangeListener listener) {
+    public MarcXchangeMappingContentHandler addListener(String type, MarcXchangeListener listener) {
         this.listeners.put(type, listener);
         return this;
     }
 
-    public MarcXchangeContentHandler setMarcXchangeListener(MarcXchangeListener listener) {
+    public MarcXchangeMappingContentHandler setMarcXchangeListener(MarcXchangeListener listener) {
         this.listeners.put("Bibliographic", listener);
         return this;
     }
@@ -164,18 +158,16 @@ public class MarcXchangeContentHandler
 
     @Override
     public void setDocumentLocator(Locator locator) {
-        // not used yet
+        // not used
     }
 
     @Override
     public void startDocument() throws SAXException {
-        fields.clear();
         content.setLength(0);
     }
 
     @Override
     public void endDocument() throws SAXException {
-
     }
 
     @Override
@@ -191,7 +183,7 @@ public class MarcXchangeContentHandler
     @Override
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
         content.setLength(0);
-        if (!checkNamespace(uri)) {
+        if (!isNamespace(uri)) {
             return;
         }
         switch (localName) {
@@ -208,9 +200,8 @@ public class MarcXchangeContentHandler
                             break;
                     }
                 }
-                this.format = format;
-                this.type = type;
-                beginRecord(format, type);
+                setFormat(format);
+                setType(type);
                 break;
             }
             case LEADER: {
@@ -224,9 +215,7 @@ public class MarcXchangeContentHandler
                         tag = atts.getValue(i);
                     }
                 }
-                Field field = new Field().tag(tag);
-                beginControlField(field);
-                fields.add(field);
+                addField(new Field().tag(tag));
                 inData = true;
                 break;
             }
@@ -252,21 +241,18 @@ public class MarcXchangeContentHandler
                         sb.append(indicator);
                     }
                 }
-                Field field = new Field().tag(tag).indicator(sb.toString()).data(null);
-                beginDataField(field);
-                fields.add(field);
+                addField(new Field().tag(tag).indicator(sb.toString()).data(null));
                 inData = true;
                 break;
             }
             case SUBFIELD: {
-                Field field = new Field(fields.getLast()).subfieldId(null).data(null);
+                Field f = new Field(getField().getLast()).subfieldId(null).data(null);
                 for (int i = 0; i < atts.getLength(); i++) {
                     if (CODE.equals(atts.getLocalName(i))) {
-                        field.subfieldId(atts.getValue(i));
+                        f.subfieldId(atts.getValue(i));
                     }
                 }
-                beginSubField(field);
-                fields.add(field);
+                addField(f);
                 inData = true;
                 break;
             }
@@ -275,33 +261,35 @@ public class MarcXchangeContentHandler
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (!checkNamespace(uri)) {
+        if (!isNamespace(uri)) {
             content.setLength(0);
             return;
         }
         // ignore namespaces, just check local names
         switch (localName) {
             case RECORD: {
-                endRecord();
+                flushRecord();
                 break;
             }
             case LEADER: {
-                leader(content.toString());
+                setRecordLabel(content.toString());
                 inData = false;
                 break;
             }
             case CONTROLFIELD: {
-                endControlField(fields.removeFirst().data(content.toString()));
+                addField(getField().removeFirst().data(content.toString()));
                 inData = false;
+                flushField();
                 break;
             }
             case DATAFIELD: {
-                endDataField(fields.removeFirst().subfieldId(null).data(""));
+                addField(getField().removeFirst().subfieldId(null).data(""));
                 inData = false;
+                flushField();
                 break;
             }
             case SUBFIELD: {
-                endSubField(fields.removeLast().data(content.toString()));
+                addField(getField().removeLast().data(content.toString()));
                 inData = false;
                 break;
             }
@@ -357,15 +345,8 @@ public class MarcXchangeContentHandler
         logger.error(exception.getMessage(), exception);
     }
 
-    public String getFormat() {
-        return format;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    private boolean checkNamespace(String uri) {
+    private boolean isNamespace(String uri) {
         return NS_PREFIX.equals(uri) || MARC21_NS_URI.equals(uri);
     }
+
 }

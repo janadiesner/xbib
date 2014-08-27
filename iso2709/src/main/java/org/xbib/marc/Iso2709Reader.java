@@ -31,6 +31,7 @@
  */
 package org.xbib.marc;
 
+import org.xbib.marc.normalize.ValueNormalizer;
 import org.xbib.marc.xml.MarcXchangeSaxAdapter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;

@@ -103,6 +103,14 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
     }
 
     @Override
+    public void beginCollection() {
+    }
+
+    @Override
+    public void endCollection() {
+    }
+
+    @Override
     public void beginRecord(String format, String type) {
         try {
             begin();

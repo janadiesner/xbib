@@ -34,9 +34,7 @@ package org.xbib.marc.xml;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xbib.io.field.BufferedFieldStreamReader;
@@ -46,13 +44,13 @@ import org.xbib.io.field.FieldStream;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.marc.FieldDirectory;
 import org.xbib.marc.InvalidFieldDirectoryException;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.RecordLabel;
-import org.xbib.marc.ValueNormalizer;
+import org.xbib.marc.normalize.ValueNormalizer;
+import org.xbib.marc.normalize.WithoutNormalizer;
 import org.xbib.xml.XMLNS;
 import org.xbib.xml.XSI;
 
@@ -64,7 +62,8 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * A Sax adapter for MarcXchange
  */
-public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeListener {
+public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
+        implements MarcXchangeConstants, MarcXchangeListener {
 
     private static final Logger logger = LoggerFactory.getLogger(MarcXchangeSaxAdapter.class.getName());
 
@@ -82,7 +81,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
 
     private Field designator;
 
-    private RecordLabel label;
+    private RecordLabel recordLabel;
 
     private boolean datafieldOpen;
 
@@ -91,10 +90,6 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
     private boolean recordOpen;
 
     private String schema;
-
-    private String format;
-
-    private String type;
 
     private String id;
 
@@ -111,8 +106,6 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
     private int buffersize = 65536;
 
     private String subfieldDelimiter = null;
-
-    private Map<String, Object> map;
 
     public MarcXchangeSaxAdapter() {
         this.nsUri = NS_URI;
@@ -152,12 +145,12 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
     }
 
     public MarcXchangeSaxAdapter setFormat(String format) {
-        this.format = format;
+        super.setFormat(format);
         return this;
     }
 
     public MarcXchangeSaxAdapter setType(String type) {
-        this.type = type;
+        super.setType(type);
         return this;
     }
     
@@ -188,7 +181,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
     }
 
     public MarcXchangeSaxAdapter setFieldMap(Map<String, Object> map) {
-        this.map = map;
+        super.setFieldMap(map);
         return this;
     }
 
@@ -196,7 +189,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
      * Parse ISO 2709 and emit SAX events.
      */
     public void parse() throws IOException, SAXException {
-        FieldListener fieldListener = map != null ? new MappedIso2709StreamListener() : new Iso2709StreamListener();
+        FieldListener fieldListener = getFieldMap() != null ? new MappedStreamListener() : new DirectListener();
         FieldStream stream = new BufferedFieldStreamReader(reader, buffersize, fieldListener);
         beginCollection();
         String chunk;
@@ -207,37 +200,55 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
         endCollection();
     }
 
-    public void beginCollection() throws SAXException {
+    @Override
+    public void beginCollection() {
         if (contentHandler == null) {
             return;
         }
-        contentHandler.startDocument();
-        // write schema info
-        AttributesImpl attrs = new AttributesImpl();
-        if ("MARC21".equalsIgnoreCase(schema)) {
-            this.nsUri = MARC21_NS_URI;
-            attrs.addAttribute(XMLNS.NS_URI, XSI.NS_PREFIX,
-                    XMLNS.NS_PREFIX + ":" + XSI.NS_PREFIX, "CDATA", XSI.NS_URI);
-            attrs.addAttribute(XSI.NS_URI, "schemaLocation",
-                    XSI.NS_PREFIX + ":schemaLocation", "CDATA", MARC21_NS_URI + " " + MARC21_SCHEMA);
+        try {
+            contentHandler.startDocument();
+            // write schema info
+            AttributesImpl attrs = new AttributesImpl();
+            if ("MARC21".equalsIgnoreCase(schema)) {
+                this.nsUri = MARC21_NS_URI;
+                attrs.addAttribute(XMLNS.NS_URI, XSI.NS_PREFIX,
+                        XMLNS.NS_PREFIX + ":" + XSI.NS_PREFIX, "CDATA", XSI.NS_URI);
+                attrs.addAttribute(XSI.NS_URI, "schemaLocation",
+                        XSI.NS_PREFIX + ":schemaLocation", "CDATA", MARC21_NS_URI + " " + MARC21_SCHEMA);
 
-        } else {
-            this.nsUri = NS_URI;
-            attrs.addAttribute(XMLNS.NS_URI, XSI.NS_PREFIX,
-                    XMLNS.NS_PREFIX + ":" + XSI.NS_PREFIX, "CDATA", XSI.NS_URI);
-            attrs.addAttribute(XSI.NS_URI, "schemaLocation",
-                    XSI.NS_PREFIX + ":schemaLocation", "CDATA", NS_URI + " " + MARCXCHANGE_SCHEMA);
+            } else {
+                this.nsUri = NS_URI;
+                attrs.addAttribute(XMLNS.NS_URI, XSI.NS_PREFIX,
+                        XMLNS.NS_PREFIX + ":" + XSI.NS_PREFIX, "CDATA", XSI.NS_URI);
+                attrs.addAttribute(XSI.NS_URI, "schemaLocation",
+                        XSI.NS_PREFIX + ":schemaLocation", "CDATA", NS_URI + " " + MARCXCHANGE_SCHEMA);
+            }
+            contentHandler.startPrefixMapping("", nsUri);
+            contentHandler.startElement(nsUri, COLLECTION, COLLECTION, attrs);
+        } catch (Exception ex) {
+            if (fatalerrors) {
+                throw new RuntimeException(ex);
+            } else if (!silenterrors) {
+                logger.warn(designator + ": " + ex.getMessage(), ex);
+            }
         }
-        contentHandler.startPrefixMapping("", nsUri);
-        contentHandler.startElement(nsUri, COLLECTION, COLLECTION, attrs);
     }
 
-    public void endCollection() throws SAXException {
+    @Override
+    public void endCollection() {
         if (contentHandler == null) {
             return;
         }
-        contentHandler.endElement(nsUri, COLLECTION, COLLECTION);
-        contentHandler.endDocument();
+        try {
+            contentHandler.endElement(nsUri, COLLECTION, COLLECTION);
+            contentHandler.endDocument();
+        } catch (Exception ex) {
+            if (fatalerrors) {
+                throw new RuntimeException(ex);
+            } else if (!silenterrors) {
+                logger.warn(designator + ": " + ex.getMessage(), ex);
+            }
+        }
     }
 
     @Override
@@ -519,8 +530,9 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
         }
     }
 
-    private class Iso2709StreamListener implements FieldListener {
+    private class DirectListener implements FieldListener {
 
+        @SuppressWarnings("fallthrough")
         @Override
         public void data(String data) {
             String fieldContent = data;
@@ -546,14 +558,14 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                             fieldContent = data.substring(1);
                         }
                         if (fieldContent.length() >= RecordLabel.LENGTH) {
-                            beginRecord(format, type);
+                            beginRecord(getFormat(), getType());
                             String labelStr = fieldContent.substring(0, RecordLabel.LENGTH);
-                            label = new RecordLabel(labelStr.toCharArray());
+                            recordLabel = new RecordLabel(labelStr.toCharArray());
                             // auto-repair label
-                            leader(label.getRecordLabel());
-                            directory = new FieldDirectory(label, fieldContent);
+                            leader(recordLabel.getRecordLabel());
+                            directory = new FieldDirectory(recordLabel, fieldContent);
                             if (directory.isEmpty()) {
-                                designator = new Field(label, fieldContent.substring(RecordLabel.LENGTH));
+                                designator = new Field(recordLabel, fieldContent.substring(RecordLabel.LENGTH));
                                 if (designator.tag() != null) {
                                     if (subfieldDelimiter != null) {
                                         // skip tag if custom subfield delimiter
@@ -563,7 +575,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                                 }
                             }
                         } else {
-                            directory = new FieldDirectory(label, fieldContent);
+                            directory = new FieldDirectory(recordLabel, fieldContent);
                             designator = new Field();
                         }
                         break;
@@ -578,9 +590,9 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                             }
                         }
                         if (directory == null || directory.isEmpty()) {
-                            designator = new Field(label, fieldContent);
+                            designator = new Field(recordLabel, fieldContent);
                         } else if (directory.containsKey(position)) {
-                            designator = new Field(label, directory.get(position), fieldContent, false);
+                            designator = new Field(recordLabel, directory.get(position), fieldContent, false);
                         } else {
                             throw new InvalidFieldDirectoryException("byte position not found in directory: "
                                     + position + " - is this stream reading using an 8-bit wide encoding?");
@@ -593,7 +605,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                                 // tricky: first field has no subfield ID. We set it to blank.
                                 fieldContent = " " + fieldContent.substring(4);
                                 for (String subfield : fieldContent.split(Pattern.quote(subfieldDelimiter))) {
-                                    designator = new Field(label, designator, subfield, true);
+                                    designator = new Field(recordLabel, designator, subfield, true);
                                     beginSubField(designator);
                                     endSubField(designator);
                                 }
@@ -609,7 +621,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                             beginDataField(designator);
                         }
                         if (designator != null) {
-                            designator = new Field(label, designator, fieldContent, true);
+                            designator = new Field(recordLabel, designator, fieldContent, true);
                             beginSubField(designator);
                             endSubField(designator);
                         }
@@ -644,16 +656,9 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
      * A repeat counter <code>{r}</code> counts if source fields tag do repeat. The repeat counter
      * can be interpolated into the mapped field designator.
      */
-    private class MappedIso2709StreamListener implements FieldListener {
+    private class MappedStreamListener implements FieldListener {
 
-        private FieldCollection field = new FieldCollection();
-
-        private Field previousField;
-
-        private FieldCollection record = new FieldCollection();
-
-        private int repeatCounter;
-
+        @SuppressWarnings("fallthrough")
         @Override
         public void data(String data) {
             String fieldContent = data;
@@ -681,11 +686,11 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                         }
                         if (fieldContent.length() >= RecordLabel.LENGTH) {
                             String labelStr = fieldContent.substring(0, RecordLabel.LENGTH);
-                            label = new RecordLabel(labelStr.toCharArray());
+                            recordLabel = new RecordLabel(labelStr.toCharArray());
                             // auto-repair label
-                            directory = new FieldDirectory(label, fieldContent);
+                            directory = new FieldDirectory(recordLabel, fieldContent);
                             if (directory.isEmpty()) {
-                                designator = new Field(label, fieldContent.substring(RecordLabel.LENGTH));
+                                designator = new Field(recordLabel, fieldContent.substring(RecordLabel.LENGTH));
                                 if (designator.tag() != null) {
                                     if (subfieldDelimiter != null) {
                                         // skip tag if custom subfield delimiter
@@ -695,7 +700,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                                 }
                             }
                         } else {
-                            directory = new FieldDirectory(label, fieldContent);
+                            directory = new FieldDirectory(recordLabel, fieldContent);
                             designator = new Field();
                         }
                         break;
@@ -712,9 +717,9 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                             }
                         }
                         if (directory == null || directory.isEmpty()) {
-                            designator = new Field(label, fieldContent);
+                            designator = new Field(recordLabel, fieldContent);
                         } else if (directory.containsKey(position)) {
-                            designator = new Field(label, directory.get(position), fieldContent, false);
+                            designator = new Field(recordLabel, directory.get(position), fieldContent, false);
                         } else {
                             throw new InvalidFieldDirectoryException("byte position not found in directory: "
                                     + position + " - is this stream reading using an 8-bit wide encoding?");
@@ -727,7 +732,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                                 // tricky: first field has no subfield ID. We set it to blank.
                                 fieldContent = " " + fieldContent.substring(4);
                                 for (String subfield : fieldContent.split(Pattern.quote(subfieldDelimiter))) {
-                                    designator = new Field(label, designator, subfield, true);
+                                    designator = new Field(recordLabel, designator, subfield, true);
                                     addField(designator);
                                 }
                             }
@@ -743,7 +748,7 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                             addField(designator);
                         }
                         if (designator != null) {
-                            designator = new Field(label, designator, fieldContent, true);
+                            designator = new Field(recordLabel, designator, fieldContent, true);
                             addField(designator);
                         }
                         break;
@@ -765,191 +770,5 @@ public class MarcXchangeSaxAdapter implements MarcXchangeConstants, MarcXchangeL
                 flushRecord();
             }
         }
-
-        /**
-         * Adding subfield to the current field.
-         * @param field the subfield
-         */
-        private void addField(Field field) {
-            this.field.add(field);
-        }
-
-        /**
-         * Flushing field. Find a mapping and transform field into the record.
-         */
-        private void flushField() {
-            if (field == null || field.isEmpty()) {
-                return;
-            }
-            Iterator<Field> it = field.iterator();
-            Field dataField = it.next();
-            // is this tag repeated?
-            if (previousField != null  && isRepeat(previousField, dataField)) {
-                repeatCounter++;
-            } else {
-                repeatCounter = 0;
-            }
-            // save field
-            previousField = new Field(dataField);
-            // the heavy lifting, map the field
-            dataField = map(dataField);
-            // we open a new data field only if this field is not the same as the last field in the record
-            if (record.isEmpty()) {
-                record.add(dataField); // this is the first field
-            } else {
-                // the rule is that subfields must not repeat and must be continous. If not, close data field.
-                if (!isContinous(record.peekLast(), dataField)) {
-                    // not same field tag, close old data field and add new data field
-                    record.add(Field.EMPTY);
-                    record.add(dataField);
-                }
-            }
-            while (it.hasNext()) {
-                Field field = it.next();
-                if (Field.EMPTY.equals(field)) {
-                    break;
-                } else if (field.isSubField()) {
-                    // map subfields, do not care for data field wrap
-                    record.add(map(field));
-                }
-            }
-            // do not add the data field here, it is not clear if it continues
-            field = new FieldCollection();
-        }
-
-        /**
-         * Record is complete, can be flushed. Here, the listener events are created.
-         */
-        private void flushRecord() {
-            // make sure there is no field left over
-            flushField();
-            // skip empty record
-            if (record == null || record.isEmpty()) {
-                return;
-            }
-            beginRecord(format, type);
-            leader(label.getRecordLabel());
-            // bookkeeping for toggling beginDataField/endDataField
-            boolean inData = false;
-            for (Field field : record) {
-                if (Field.EMPTY.equals(field)) {
-                    endDataField(null);
-                    inData = false;
-                } else if (field.isSubField()) {
-                    beginSubField(field);
-                    endSubField(field);
-                } else if (field.isControlField()) {
-                    // control fields never have subfields
-                    beginControlField(field);
-                    endControlField(field);
-                } else {
-                    if (inData) {
-                        endDataField(field);
-                        inData = false;
-                    } else {
-                        beginDataField(field);
-                        inData = true;
-                    }
-                }
-            }
-            if (inData) {
-                endDataField(null);
-            }
-            endRecord();
-            // reset all the counters and variables for next record
-            repeatCounter = 0;
-            previousField = null;
-            field = new FieldCollection();
-            record = new FieldCollection();
-        }
-
-        /**
-         * The mapper. Maps a field by the following convention:
-         *
-         * tag : {
-         *   ind : {
-         *       subf : "totag$toind$tosubf"
-         *   }
-         * }
-         *
-         * where toind can be interpolated by repeat counter.
-         *
-         * @param field the field to map from
-         * @return the mpped field
-         */
-        private Field map(Field field) {
-            if (field == null) {
-                return null;
-            }
-            if (map.containsKey(field.tag())) {
-                Object o = map.get(field.tag());
-                if (o instanceof Map) {
-                    Map<String, Object> ind = (Map<String, Object>) o;
-                    if (ind.containsKey(field.indicator())) {
-                        o = ind.get(field.indicator());
-                        if (o instanceof Map) {
-                            Map<String, Object> subf = (Map<String, Object>) o;
-                            String subfieldId = field.isSubField() ? field.subfieldId() : "";
-                            if (subf.containsKey(subfieldId)) {
-                                o = subf.get(subfieldId);
-                                if (o != null) {
-                                    String[] s = o.toString().split("\\$");
-                                    s[1] = interpolate(s[1]);
-                                    // subfield -> subfield, data field -> data field
-                                    if (s.length >= 2) {
-                                        if (field.isSubField()) {
-                                            field.tag(s[0]).indicator(s[1]).subfieldId(s[2]);
-                                        } else {
-                                            field.tag(s[0]).indicator(s[1]);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return field;
-        }
-
-        /**
-         * Checks if a field repeats another.
-         * @param previous the previous field
-         * @param next the next field
-         * @return true if field is repeated
-         */
-        private boolean isRepeat(Field previous, Field next) {
-            return previous.tag().equals(next.tag());
-        }
-
-        /**
-         * Checks if field is continuous to the previous field. This means subfield inclusion.
-         * @param previous the previous field
-         * @param next the next field
-         * @return true if field is continuous
-         */
-        private boolean isContinous(Field previous, Field next) {
-            return isRepeat(previous, next)
-                    && ((!previous.isSubField() && !next.isSubField()) ||
-                    (previous.isSubField() && next.isSubField() && previous.subfieldId().compareTo(next.subfieldId()) <= 0));
-        }
-
-        // the repeat counter pattern
-        private final Pattern REP = Pattern.compile("\\{r\\}");
-
-        /**
-         * Interpolate variables.
-         * @param value the input value
-         * @return the interpolated string
-         */
-        private String interpolate(String value) {
-            Matcher m = REP.matcher(value);
-            if (m.find()) {
-                return m.replaceAll(Integer.toString(repeatCounter));
-            } else {
-                return value;
-            }
-        }
-
     }
 }

@@ -29,48 +29,54 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc;
+package org.xbib.marc.xml;
+
+import org.xbib.marc.MarcXchangeListener;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.IOException;
 
 /**
- * MarcXchange adapter
- *
+ * This mapping MarcXchangeReader reads MarcXML or MarcXchange and fires events to a SAX content handler
+ * or a MarcXchange listener
  */
-public class MarcXchangeAdapter implements MarcXchangeListener {
+public class MarcXchangeMappingReader extends MarcXchangeMappingContentHandler {
 
-    @Override
-    public void leader(String label) {
+    private final SAXParser parser;
+
+    private ContentHandler contentHandler;
+
+    public MarcXchangeMappingReader() throws ParserConfigurationException, SAXException {
+        this(SAXParserFactory.newInstance());
     }
 
-    @Override
-    public void beginRecord(String format, String type) {
+    public MarcXchangeMappingReader(SAXParserFactory factory) throws ParserConfigurationException, SAXException {
+        factory.setNamespaceAware(true);
+        this.parser = factory.newSAXParser();
     }
 
-    @Override
-    public void beginControlField(Field designator) {
+    public void parse(InputSource source) throws SAXException, IOException {
+        parser.getXMLReader().setContentHandler(contentHandler != null ? contentHandler : this);
+        parser.getXMLReader().parse(source);
     }
 
-    @Override
-    public void beginDataField(Field designator) {
+    public MarcXchangeMappingReader setHandler(ContentHandler handler) {
+        this.contentHandler = handler;
+        return this;
     }
 
-    @Override
-    public void beginSubField(Field designator) {
+    public MarcXchangeMappingReader setMarcXchangeListener(MarcXchangeListener listener) {
+        super.setMarcXchangeListener(listener);
+        return this;
     }
 
-    @Override
-    public void endRecord() {
+    public XMLReader getXMLReader() throws SAXException {
+        return parser.getXMLReader();
     }
-
-    @Override
-    public void endControlField(Field designator) {
-    }
-
-    @Override
-    public void endDataField(Field designator) {
-    }
-
-    @Override
-    public void endSubField(Field designator) {
-    }
-
 }

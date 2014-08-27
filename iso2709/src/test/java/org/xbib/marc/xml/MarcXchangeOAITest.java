@@ -39,26 +39,29 @@ import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
 import org.xml.sax.InputSource;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 import static org.testng.Assert.assertEquals;
 
-public class MarcXchangeReaderTest {
+public class MarcXchangeOAITest {
 
-    private final Logger logger = LoggerFactory.getLogger(MarcXchangeReaderTest.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(MarcXchangeOAITest.class.getName());
     
     @Test
     public void testMarcXMLFromOAI() throws Exception {
         final StringBuilder sb = new StringBuilder();
         InputStream in = getClass().getResourceAsStream("zdb-oai-marc.xml");
-        if (in == null) {
-            throw new IOException("input stream not found");
-        }
         MarcXchangeListener listener = new MarcXchangeListener() {
+
+            @Override
+            public void beginCollection() {
+            }
+
+            @Override
+            public void endCollection() {
+            }
 
             @Override
             public void leader(String label) {

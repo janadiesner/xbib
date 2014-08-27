@@ -29,9 +29,9 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc.xml;
+package org.xbib.marc.normalize;
 
-import org.xbib.marc.ValueNormalizer;
+import org.xbib.marc.normalize.ValueNormalizer;
 import org.xbib.xml.XMLUtil;
 
 import java.text.Normalizer;

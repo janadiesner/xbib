@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,8 +56,7 @@ public class MABMapperTest {
     @Test
     public void testMappedDE468() throws IOException, TransformerException, SAXException, ParserConfigurationException {
         InputStream in = getClass().getResource("/org/xbib/marc/aleph500-subfields.mrc").openStream();
-        FileOutputStream out = new FileOutputStream("/var/tmp/DE-468-mapped.xml");
-        Writer target = new OutputStreamWriter(out, "UTF-8");
+        Writer target = new StringWriter();
         InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
         execute(source, target);
         target.flush();

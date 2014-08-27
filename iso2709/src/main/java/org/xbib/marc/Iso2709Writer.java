@@ -75,7 +75,7 @@ public class Iso2709Writer implements Flushable, Closeable {
     }
 
     protected List<Field> newFieldList() {
-        return new LinkedList();
+        return new LinkedList<Field>();
     }
 
     private void reset() {

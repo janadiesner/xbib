@@ -62,6 +62,20 @@ public class MarcXmlEventConsumer implements XMLEventConsumer, MarcXchangeConsta
     }
 
     @Override
+    public void beginCollection() {
+        if (listener != null) {
+            listener.beginCollection();
+        }
+    }
+
+    @Override
+    public void endCollection() {
+        if (listener != null) {
+            listener.endCollection();
+        }
+    }
+
+    @Override
     public void beginRecord(String format, String type) {
         if (listener != null) {
             listener.beginRecord(format, type);

@@ -34,6 +34,7 @@ package org.xbib.marc;
 import org.testng.annotations.Test;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.normalize.ValueNormalizer;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 

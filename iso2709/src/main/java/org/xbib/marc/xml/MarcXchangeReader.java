@@ -32,13 +32,15 @@
 package org.xbib.marc.xml;
 
 import org.xbib.marc.MarcXchangeListener;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.XMLReader;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import java.io.Closeable;
 import java.io.IOException;
 
 /**
@@ -49,7 +51,7 @@ public class MarcXchangeReader extends MarcXchangeContentHandler {
 
     private final SAXParser parser;
 
-    private DefaultHandler contentHandler;
+    private ContentHandler contentHandler;
 
     public MarcXchangeReader() throws ParserConfigurationException, SAXException {
         this(SAXParserFactory.newInstance());
@@ -61,10 +63,11 @@ public class MarcXchangeReader extends MarcXchangeContentHandler {
     }
 
     public void parse(InputSource source) throws SAXException, IOException {
-        parser.parse(source, contentHandler != null ? contentHandler : this);
+        parser.getXMLReader().setContentHandler(contentHandler != null ? contentHandler : this);
+        parser.getXMLReader().parse(source);
     }
 
-    public MarcXchangeReader setHandler(DefaultHandler handler) {
+    public MarcXchangeReader setHandler(ContentHandler handler) {
         this.contentHandler = handler;
         return this;
     }
@@ -72,6 +75,10 @@ public class MarcXchangeReader extends MarcXchangeContentHandler {
     public MarcXchangeReader setMarcXchangeListener(MarcXchangeListener listener) {
         super.setMarcXchangeListener(listener);
         return this;
+    }
+
+    public XMLReader getXMLReader() throws SAXException {
+        return parser.getXMLReader();
     }
 
 }
