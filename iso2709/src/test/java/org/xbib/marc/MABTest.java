@@ -32,64 +32,55 @@
 package org.xbib.marc;
 
 import org.testng.annotations.Test;
+import org.xbib.marc.xml.MarcXchangeWriter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.Writer;
 
 public class MABTest {
-    
-    @Test
-    public void testZDBMAB() throws IOException, SAXException,
-            ParserConfigurationException, TransformerException {
 
+    /**
+     * Broken right now. Needs fix for subfield-less mode.
+     *
+     * @throws IOException
+     * @throws SAXException
+     */
+    @Test
+    public void testZDBMAB() throws IOException, SAXException {
         InputStream in = getClass().getResourceAsStream("1217zdbtit.dat");
-        if (in == null) {
-            throw new IOException("input stream not found");
-        }
         FileOutputStream out = new FileOutputStream("target/zdb.xml");
         try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
-            InputSource source = new InputSource(new InputStreamReader(in, "x-MAB"));
-            read(source, w);
-            w.flush();
+            read(new InputStreamReader(in, "x-MAB"), w);
         }
     }
 
     @Test
-    public void testCreateMABXML() throws IOException, SAXException,
-            ParserConfigurationException, TransformerException {
-        String s ="test.groupstream";
+    public void testCreateMABXML() throws IOException, SAXException {
+        String s = "test.groupstream";
         InputStream in = getClass().getResourceAsStream(s);
-        if (in == null) {
-            throw new IOException("input stream not found");
-        }
         FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
         try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
-            InputSource source = new InputSource(new InputStreamReader(in, "x-MAB"));
-            read(source, w);
-            w.flush();
+            read(new InputStreamReader(in, "x-MAB"), w);
         }
     }
 
-    private void read(InputSource source, Writer w) throws IOException, SAXException,
-            ParserConfigurationException, TransformerException {
+    private void read(Reader source, Writer target) throws IOException, SAXException {
         Iso2709Reader reader = new Iso2709Reader();
         reader.setProperty(Iso2709Reader.FORMAT, "MAB");
         reader.setProperty(Iso2709Reader.TYPE, "Titel");
-        TransformerFactory tFactory = TransformerFactory.newInstance();
-        Transformer transformer = tFactory.newTransformer();
-        StreamResult target = new StreamResult(w);
-        transformer.transform(new SAXSource(reader, source), target);
+        MarcXchangeWriter writer = new MarcXchangeWriter(target);
+        reader.setMarcXchangeListener(writer);
+        writer.startDocument();
+        writer.beginCollection();
+        reader.parse(new InputSource(source));
+        writer.endCollection();
+        writer.endDocument();
     }
 }

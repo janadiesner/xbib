@@ -109,6 +109,10 @@ public class RecordLabel {
         this.recordStatus = cfix[5];
         this.bibliographicLevel = cfix[7]; // should be enum to be typesafe
         this.indicatorLength = cfix[10] - '0';
+
+        // 00588cM2.01200024   000h
+        // 012345678901
+
         this.subfieldIdentifierLength = cfix[11] - '0';
         this.baseAddressOfData = Integer.parseInt(new String(new char[]{cfix[12], cfix[13], cfix[14], cfix[15], cfix[16]}));
         this.dataFieldLength = cfix[20] - '0';
@@ -126,9 +130,19 @@ public class RecordLabel {
      * label itself, the directory, and the variable fields. This data element
      * is normally calculated automatically when the total record is assembled
      * for exchange.
-     *
-     * @return the record length
      */
+
+    public RecordLabel setRecordLength(int length) {
+        this.recordLength = length;
+        String s = Integer.toString(recordLength);
+        String fs = "00000".substring(5 - s.length()) + s;
+        for (int i = 0; i < 5; i++) {
+            cfix[i] = fs.charAt(i);
+        }
+        return this;
+    }
+
+
     public int getRecordLength() {
         return recordLength;
     }
@@ -168,9 +182,13 @@ public class RecordLabel {
      *
      * A record for a published item replacing a pre-publication record, e.g.,
      * CIP.
-     *
-     * @return the record status
      */
+    public RecordLabel setRecordStatus(char recordStatus) {
+        this.recordStatus = recordStatus;
+        cfix[5] = recordStatus;
+        return this;
+    }
+
     public char getRecordStatus() {
         return recordStatus;
     }
@@ -226,27 +244,39 @@ public class RecordLabel {
      * The following are examples of materials which are coded 's': a journal
      * that is still being published; a complete run of a journal that has
      * ceased publication; a newspaper; a monographic series.
-     *
-     * @return the bibliographic level
      */
+    public RecordLabel setBibliographicLevel(char level) {
+        this.bibliographicLevel = level;
+        cfix[7] = level;
+        return this;
+    }
+
     public char getBibliographicLevel() {
         return bibliographicLevel;
     }
 
     /**
      * Indicator length is a numeric digit giving the length of the indicators.
-     *
-     * @return the indicator length
      */
+    public RecordLabel setIndicatorLength(int length) {
+        this.indicatorLength = length;
+        cfix[10] = (char)('0' + length);
+        return this;
+    }
+
     public int getIndicatorLength() {
         return indicatorLength;
     }
 
     /**
      * A numeric digit giving the length of the subfield identifier
-     *
-     * @return the subfield identifier length
      */
+    public RecordLabel setSubfieldIdentifierLength(int subfieldIdentifierLength) {
+        this.subfieldIdentifierLength = subfieldIdentifierLength;
+        cfix[11] = (char)('0' + subfieldIdentifierLength);
+        return this;
+    }
+
     public int getSubfieldIdentifierLength() {
         return subfieldIdentifierLength;
     }
@@ -266,9 +296,17 @@ public class RecordLabel {
      * relative to the first character of the first data field which will be
      * field 001, rather than the beginning of the record. The base address thus
      * gives the base from which the position of each field is calculated.
-     *
-     * @return the base address of data
      */
+    public RecordLabel setBaseAddressOfData(int baseAddressOfData) {
+        this.baseAddressOfData = baseAddressOfData;
+        String s = Integer.toString(baseAddressOfData);
+        String fs = "00000".substring(5 - s.length()) + s;
+        for (int i = 12; i < 17; i++) {
+            cfix[i] = fs.charAt(i-12);
+        }
+        return this;
+    }
+
     public int getBaseAddressOfData() {
         return baseAddressOfData;
     }
@@ -277,36 +315,45 @@ public class RecordLabel {
      * Length of data field A four-digit number showing how many characters are
      * occupied the datafield, including indicators and datafield separator but
      * excluding the record separator code if the datafield is the last field in
-     * the record. The use of 4 characters permits datafields as long as 9,999
+     * the record. The use of 4 characters permits datafields as long as 9999
      * characters.
-     *
-     * @return the length of the data dfield
      */
+    public RecordLabel setDataFieldLength(int length) {
+        this.dataFieldLength = length;
+        cfix[20] = (char)('0' + length);
+        return this;
+    }
+
     public int getDataFieldLength() {
         return dataFieldLength;
     }
 
     /**
-     * A five-digit number giving the position of the first character of the
-     * datafield relative to the base address of data, i.e. the first character
-     * of the first of the datafield
-     *
-     * @return the starting character position length
+     * Length of the starting-character-position portion of each entry
      */
+    public RecordLabel setStartingCharacterPositionLength(int length) {
+        this.startingCharacterPositionLength = length;
+        cfix[21] = (char)('0' + length);
+        return this;
+    }
+
     public int getStartingCharacterPositionLength() {
         return startingCharacterPositionLength;
     }
 
     /**
-     * The segment identifier is a single character (chosen from 0-9 and/or A-Z)
-     * which designates the datafield as being a member of particular segment.
-     *
      * The length of implementation-defined section of each entry in the
      * directory. Of the two characters, one is used for the segment identifier,
      * the other for the occurrence identifier.
      *
      * @return the segment identifier
      */
+    public RecordLabel setSegmentIdentifierLength(int length) {
+        this.segmentIdentifierLength = length;
+        cfix[22] = (char)('0' + length);
+        return this;
+    }
+
     public int getSegmentIdentifierLength() {
         return segmentIdentifierLength;
     }

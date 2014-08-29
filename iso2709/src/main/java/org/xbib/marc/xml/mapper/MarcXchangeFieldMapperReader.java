@@ -29,7 +29,7 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc.xml;
+package org.xbib.marc.xml.mapper;
 
 import org.xbib.marc.MarcXchangeListener;
 import org.xml.sax.ContentHandler;
@@ -43,20 +43,20 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 
 /**
- * This mapping MarcXchangeReader reads MarcXML or MarcXchange and fires events to a SAX content handler
- * or a MarcXchange listener
+ * This MarcXchangeReader reads MarcXML or MarcXchange, maps MarcXchange field to other fields,
+ * and fires events to a MarcXchange listener
  */
-public class MarcXchangeMappingReader extends MarcXchangeMappingContentHandler {
+public class MarcXchangeFieldMapperReader extends MarcXchangeFieldMapperContentHandler {
 
     private final SAXParser parser;
 
     private ContentHandler contentHandler;
 
-    public MarcXchangeMappingReader() throws ParserConfigurationException, SAXException {
+    public MarcXchangeFieldMapperReader() throws ParserConfigurationException, SAXException {
         this(SAXParserFactory.newInstance());
     }
 
-    public MarcXchangeMappingReader(SAXParserFactory factory) throws ParserConfigurationException, SAXException {
+    public MarcXchangeFieldMapperReader(SAXParserFactory factory) throws ParserConfigurationException, SAXException {
         factory.setNamespaceAware(true);
         this.parser = factory.newSAXParser();
     }
@@ -66,12 +66,12 @@ public class MarcXchangeMappingReader extends MarcXchangeMappingContentHandler {
         parser.getXMLReader().parse(source);
     }
 
-    public MarcXchangeMappingReader setHandler(ContentHandler handler) {
+    public MarcXchangeFieldMapperReader setHandler(ContentHandler handler) {
         this.contentHandler = handler;
         return this;
     }
 
-    public MarcXchangeMappingReader setMarcXchangeListener(MarcXchangeListener listener) {
+    public MarcXchangeFieldMapperReader setMarcXchangeListener(MarcXchangeListener listener) {
         super.setMarcXchangeListener(listener);
         return this;
     }

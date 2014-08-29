@@ -35,22 +35,16 @@ import org.testng.annotations.Test;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.normalize.ValueNormalizer;
+import org.xbib.marc.xml.MarcXchangeWriter;
+import org.xbib.xml.XMLUtil;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.nio.charset.Charset;
 
 public class UNIMARCGreekTest {
@@ -62,8 +56,7 @@ public class UNIMARCGreekTest {
     private final Charset UTF8 = Charset.forName("UTF-8");
 
     @Test
-    public void testUNIMARC() throws IOException, SAXException,
-            ParserConfigurationException, TransformerException {
+    public void testUNIMARC() throws IOException, SAXException {
         for (String s : new String[]{
                 "serres.mrc"
         }) {
@@ -74,18 +67,21 @@ public class UNIMARCGreekTest {
                         .setValueNormalizer(new ValueNormalizer() {
                             @Override
                             public String normalize(String value) {
-                                return value == null ? null : new String(value.getBytes(ISO88591), UTF8);
+                                return XMLUtil.clean(new String(value.getBytes(ISO88591), UTF8));
                             }
                         });
-
-                TransformerFactory tFactory = TransformerFactory.newInstance();
-                Transformer transformer = tFactory.newTransformer();
-                InputSource source = new InputSource(r);
                 new File("target").mkdirs();
-                FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
-                Writer w = new OutputStreamWriter(out, UTF8);
-                StreamResult target = new StreamResult(w);
-                transformer.transform(new SAXSource(reader, source), target);
+                FileWriter w = new FileWriter("target/" + s + ".xml");
+                MarcXchangeWriter writer = new MarcXchangeWriter(w);
+                reader.setFormat("UNIMARC").setType("Bibliographic");
+                reader.setMarcXchangeListener(writer);
+                writer.startDocument();
+                writer.beginCollection();
+                reader.parse(new InputSource(r));
+                writer.endCollection();
+                writer.endDocument();
+                logger.error("err?", writer.getException());
+                w.close();
             }
         }
     }

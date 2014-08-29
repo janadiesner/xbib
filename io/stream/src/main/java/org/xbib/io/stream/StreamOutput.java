@@ -168,10 +168,10 @@ public abstract class StreamOutput extends OutputStream {
             } else if (c > 0x07FF) {
                 writeByte((byte) (0xE0 | c >> 12 & 0x0F));
                 writeByte((byte) (0x80 | c >> 6 & 0x3F));
-                writeByte((byte) (0x80 | c >> 0 & 0x3F));
+                writeByte((byte) (0x80 | c & 0x3F));
             } else {
                 writeByte((byte) (0xC0 | c >> 6 & 0x1F));
-                writeByte((byte) (0x80 | c >> 0 & 0x3F));
+                writeByte((byte) (0x80 | c & 0x3F));
             }
         }
     }
@@ -184,14 +184,12 @@ public abstract class StreamOutput extends OutputStream {
         writeLong(Double.doubleToLongBits(v));
     }
 
-
-    private static byte ZERO = 0;
-    private static byte ONE = 1;
-
     /**
      * Writes a boolean.
      */
     public void writeBoolean(boolean b) throws IOException {
+        byte ZERO = 0;
+        byte ONE = 1;
         writeByte(b ? ONE : ZERO);
     }
 
@@ -242,6 +240,7 @@ public abstract class StreamOutput extends OutputStream {
         writeGenericValue(map);
     }
 
+    @SuppressWarnings("unchecked")
     public void writeGenericValue(Object value) throws IOException {
         if (value == null) {
             writeByte((byte) -1);

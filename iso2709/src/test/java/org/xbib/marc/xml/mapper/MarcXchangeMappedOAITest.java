@@ -29,13 +29,14 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc.xml;
+package org.xbib.marc.xml.mapper;
 
 import org.testng.annotations.Test;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.xml.MarcXchangeWriter;
 import org.xml.sax.InputSource;
 
 import java.io.InputStream;
@@ -136,7 +137,7 @@ public class MarcXchangeMappedOAITest {
 
         };
 
-        MarcXchangeMappingReader reader = new MarcXchangeMappingReader();
+        MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader();
         reader.addListener("Bibliographic", listener);
         writer.startDocument();
         writer.beginCollection();
@@ -153,14 +154,9 @@ public class MarcXchangeMappedOAITest {
 
         writer.endCollection();
         writer.endDocument();
-        writer.close();
+        fw.close();
 
         assertNull(writer.getException());
-
-        //InputStreamReader r = new InputStreamReader(getClass().getResourceAsStream("zdb-oai-marc.txt"));
-        //StringWriter w = new StringWriter();
-        //StreamUtil.copy(r, w);
-        //assertEquals(sb.toString(), w.toString());
 
     }
 }

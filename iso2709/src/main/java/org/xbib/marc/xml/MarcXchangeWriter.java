@@ -38,96 +38,143 @@ import org.xbib.marc.MarcXchangeListener;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
-import java.io.Closeable;
-import java.io.Flushable;
+import javax.xml.stream.util.XMLEventConsumer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * The MarcXchangeReader reads MarcXML or MarcXchange and fires events to a SAX content handler
- * or a MarcXchange listener
+ * The MarcXchangeWriter writes MarcXchange events to a StaX XML output stream or writer
  */
-public class MarcXchangeWriter implements Closeable, Flushable, MarcXchangeConstants, MarcXchangeListener {
-
-    public XMLEventWriter writer;
-
-    private final static QName COLLECTION_ELEMENT = new QName(NS_URI, COLLECTION, NS_PREFIX);
-
-    private final static QName RECORD_ELEMENT = new QName(NS_URI, RECORD, NS_PREFIX);
-
-    private final static QName LEADER_ELEMENT = new QName(NS_URI, LEADER, NS_PREFIX);
-
-    private final static QName CONTROLFIELD_ELEMENT = new QName(NS_URI, CONTROLFIELD, NS_PREFIX);
-
-    private final static QName DATAFIELD_ELEMENT = new QName(NS_URI, DATAFIELD, NS_PREFIX);
-
-    private final static QName SUBFIELD_ELEMENT = new QName(NS_URI, SUBFIELD, NS_PREFIX);
+public class MarcXchangeWriter extends MarcXchangeContentHandler
+        implements MarcXchangeConstants, MarcXchangeListener {
 
     private final static XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
     private final static XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 
-    private final static Namespace namespace = eventFactory.createNamespace(NS_PREFIX, NS_URI);
+    private final static QName COLLECTION_ELEMENT = new QName(NS_URI, COLLECTION, "");
+
+    private final static QName RECORD_ELEMENT = new QName(NS_URI, RECORD, "");
+
+    private final static QName LEADER_ELEMENT = new QName(NS_URI, LEADER, "");
+
+    private final static QName CONTROLFIELD_ELEMENT = new QName(NS_URI, CONTROLFIELD, "");
+
+    private final static QName DATAFIELD_ELEMENT = new QName(NS_URI, DATAFIELD, "");
+
+    private final static QName SUBFIELD_ELEMENT = new QName(NS_URI, SUBFIELD, "");
+
+    private final static Namespace namespace = eventFactory.createNamespace("", NS_URI);
 
     private final static Iterator<Namespace> namespaces = Collections.singletonList(namespace).iterator();
 
+    private final static Pattern NUMERIC_TAG = Pattern.compile("\\d\\d\\d");
+
+    private final ReentrantLock lock = new ReentrantLock(true);
+
+    private XMLEventConsumer writer;
+
     private XMLStreamException exception;
 
-    public MarcXchangeWriter(OutputStream out) throws XMLStreamException {
-        this.writer = outputFactory.createXMLEventWriter(out);
+    private boolean documentStarted;
+
+    private boolean schemaWritten;
+
+    public MarcXchangeWriter setMarcXchangeListener(MarcXchangeListener listener) {
+        super.setMarcXchangeListener(listener);
+        return this;
     }
 
-    public MarcXchangeWriter(Writer writer) throws XMLStreamException {
-        this.writer = outputFactory.createXMLEventWriter(writer);
+    public MarcXchangeWriter(OutputStream out) throws IOException {
+        try {
+            this.writer = outputFactory.createXMLEventWriter(out);
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
+        }
     }
 
+    public MarcXchangeWriter(Writer writer) throws IOException {
+        try {
+            this.writer = outputFactory.createXMLEventWriter(writer);
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
+        }
+    }
+
+    public MarcXchangeWriter(XMLEventConsumer consumer) throws IOException {
+        this.writer = consumer;
+    }
+
+    @Override
     public void startDocument() {
         if (exception != null) {
             return;
         }
+        if (documentStarted) {
+            return;
+        }
         try {
             writer.add(eventFactory.createStartDocument("UTF-8", "1.0"));
+            documentStarted = true;
         } catch (XMLStreamException e) {
             exception = e;
         }
     }
 
+    @Override
     public void endDocument() {
         if (exception != null) {
             return;
         }
+        if (!documentStarted) {
+            return;
+        }
         try {
             writer.add(eventFactory.createEndDocument());
+            documentStarted = false;
         } catch (XMLStreamException e) {
             exception = e;
+        } finally {
+            if (lock.isLocked()) {
+                lock.unlock();
+            }
         }
     }
 
     @Override
     public void beginCollection() {
+        super.beginCollection();
         if (exception != null) {
             return;
         }
         try {
-            //Attribute schemaLocation = eventFactory.createAttribute("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI,
-            //        "schemaLocation", f + " http://www");
-            writer.add(eventFactory.createStartElement(COLLECTION_ELEMENT, null, namespaces));
-
+            Iterator<Attribute> attrs = schemaWritten ? null : Arrays.asList(
+                eventFactory.createAttribute("xmlns:xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI),
+                eventFactory.createAttribute("xsi:schemaLocation", NS_URI + " " + MARCXCHANGE_SCHEMALOCATION)
+            ).iterator();
+            writer.add(eventFactory.createStartElement(COLLECTION_ELEMENT, attrs, namespaces));
+            schemaWritten = true;
         } catch (XMLStreamException e) {
             exception = e;
-        }    }
+        }
+    }
 
     @Override
     public void endCollection() {
+        super.endCollection();
         if (exception != null) {
             return;
         }
@@ -140,15 +187,22 @@ public class MarcXchangeWriter implements Closeable, Flushable, MarcXchangeConst
 
     @Override
     public void beginRecord(String format, String type) {
+        super.beginRecord(format, type);
         if (exception != null) {
             return;
         }
+        lock.lock();
         try {
-            Iterator<Attribute> attrs = Arrays.asList(
+            List<Attribute> attrs = Arrays.asList(
                     eventFactory.createAttribute(TYPE, type),
                     eventFactory.createAttribute(FORMAT, format)
-            ).iterator();
-            writer.add(eventFactory.createStartElement(RECORD_ELEMENT, attrs, namespaces));
+            );
+            if (!schemaWritten) {
+                attrs.add(eventFactory.createAttribute("xmlns:xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI));
+                attrs.add(eventFactory.createAttribute("xsi:schemaLocation", NS_URI + " " + MARCXCHANGE_SCHEMALOCATION));
+                schemaWritten = true;
+            }
+            writer.add(eventFactory.createStartElement(RECORD_ELEMENT, attrs.iterator(), namespaces));
         } catch (XMLStreamException e) {
             exception = e;
         }
@@ -156,6 +210,7 @@ public class MarcXchangeWriter implements Closeable, Flushable, MarcXchangeConst
 
     @Override
     public void endRecord() {
+        super.endRecord();
         if (exception != null) {
             return;
         }
@@ -163,11 +218,14 @@ public class MarcXchangeWriter implements Closeable, Flushable, MarcXchangeConst
             writer.add(eventFactory.createEndElement(RECORD_ELEMENT, namespaces));
         } catch (XMLStreamException e) {
             exception = e;
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
     public void leader(String label) {
+        super.leader(label);
         if (exception != null) {
             return;
         }
@@ -182,13 +240,20 @@ public class MarcXchangeWriter implements Closeable, Flushable, MarcXchangeConst
 
     @Override
     public void beginControlField(Field field) {
+        // check if this field is really a control field, if not, switch to data field
+        if (!field.isControlField()) {
+            field.indicator("  "); // two blank indicators
+            beginDataField(field);
+            inData = true;
+            return;
+        }
+        super.beginControlField(field);
         if (exception != null) {
             return;
         }
         try {
             Iterator<Attribute> attrs = Collections.singletonList(eventFactory.createAttribute(TAG, field.tag())).iterator();
             writer.add(eventFactory.createStartElement(CONTROLFIELD_ELEMENT, attrs, namespaces));
-            writer.add(eventFactory.createCharacters(field.data()));
         } catch (XMLStreamException e) {
             exception = e;
         }
@@ -196,10 +261,34 @@ public class MarcXchangeWriter implements Closeable, Flushable, MarcXchangeConst
 
     @Override
     public void endControlField(Field field) {
+        // check if this field is really a control field, if not, switch to data field
+        if (field != null && !field.isControlField()) {
+            if (field.data() != null) {
+                // if non-digit tag, add an "a" as subfield code
+                Matcher m = NUMERIC_TAG.matcher(field.tag());
+                if (m.matches()) {
+                    // if numeric tag, create subfield code from first character in the data, it is already there.
+                    field.subfieldId(field.data().substring(0, 1));
+                    field.data(field.data().substring(1));
+                } else {
+                    field.subfieldId("a");
+                }
+                beginSubField(field);
+                endSubField(field);
+                field.data("");
+            }
+            endDataField(field);
+            inData = false;
+            return;
+        }
+        super.endControlField(field);
         if (exception != null) {
             return;
         }
         try {
+            if (field != null && field.data() != null && !field.data().isEmpty()) {
+                writer.add(eventFactory.createCharacters(field.data()));
+            }
             writer.add(eventFactory.createEndElement(CONTROLFIELD_ELEMENT, namespaces));
         } catch (XMLStreamException e) {
             exception = e;
@@ -208,17 +297,25 @@ public class MarcXchangeWriter implements Closeable, Flushable, MarcXchangeConst
 
     @Override
     public void beginDataField(Field field) {
+        // check if this field is really a data field, if not, switch to control field
+        if (field.isControlField()) {
+            beginControlField(field);
+            inControl = true;
+            return;
+        }
+        // check if indicators are "-". Replace with blank " ".
+        if (field.indicator().contains("-")) {
+            field.indicator(field.indicator().replace('-',' '));
+        }
+        super.beginDataField(field);
         if (exception != null) {
             return;
         }
-        if (field == null) {
-            return;
-        }
         try {
-            // validate attribute values, must not be null
-            String tag = field.tag() != null ? field.tag() : "";
-            String ind1 = field.indicator() != null && field.indicator().length() > 0 ? field.indicator().substring(0,1) : "";
-            String ind2 = field.indicator() != null && field.indicator().length() > 1 ? field.indicator().substring(1,2) : "";
+            // validate attribute values, must not be null, must not be empty
+            String tag = field.tag() != null ? field.tag() : "999";
+            String ind1 = field.indicator() != null && field.indicator().length() > 0 ? field.indicator().substring(0,1) : " ";
+            String ind2 = field.indicator() != null && field.indicator().length() > 1 ? field.indicator().substring(1,2) : " ";
             Iterator<Attribute> attrs = Arrays.asList(
                     eventFactory.createAttribute(TAG, tag),
                     eventFactory.createAttribute(IND + "1", ind1),
@@ -232,6 +329,13 @@ public class MarcXchangeWriter implements Closeable, Flushable, MarcXchangeConst
 
     @Override
     public void endDataField(Field field) {
+        // check if this field is really a data field, if not, switch to control field
+        if (field != null && field.isControlField()) {
+            endControlField(field);
+            inControl = false;
+            return;
+        }
+        super.endDataField(field);
         if (exception != null) {
             return;
         }
@@ -247,6 +351,10 @@ public class MarcXchangeWriter implements Closeable, Flushable, MarcXchangeConst
 
     @Override
     public void beginSubField(Field field) {
+        if (inControl || inLeader) {
+            return;
+        }
+        super.beginSubField(field);
         if (exception != null) {
             return;
         }
@@ -263,11 +371,18 @@ public class MarcXchangeWriter implements Closeable, Flushable, MarcXchangeConst
 
     @Override
     public void endSubField(Field field) {
-        if (exception != null) {
-            return;
-        }
         try {
-            if (field != null) {
+            if (inControl || inLeader) {
+                if (field.data() != null) {
+                    writer.add(eventFactory.createCharacters(field.data()));
+                }
+                return;
+            }
+            super.endSubField(field);
+            if (exception != null) {
+                return;
+            }
+            if (field != null && field.data() != null) {
                 writer.add(eventFactory.createCharacters(field.data()));
             }
             writer.add(eventFactory.createEndElement(SUBFIELD_ELEMENT, namespaces));
@@ -276,23 +391,6 @@ public class MarcXchangeWriter implements Closeable, Flushable, MarcXchangeConst
         }
     }
 
-    @Override
-    public void flush() throws IOException {
-        try {
-            writer.flush();
-        } catch (XMLStreamException e) {
-            throw new IOException(e);
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        try {
-            writer.close();
-        } catch (XMLStreamException e) {
-            throw new IOException(e);
-        }
-    }
 
     public Exception getException() {
         return exception;

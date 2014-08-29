@@ -225,6 +225,24 @@ public class Iso2709Reader implements XMLReader {
         return adapter;
     }
 
+    public Iso2709Reader setFormat(String format) {
+        properties.put(FORMAT, format);
+        return this;
+    }
+
+    public String getFormat() {
+        return (String) properties.get(FORMAT);
+    }
+
+    public Iso2709Reader setType(String type) {
+        properties.put(TYPE, type);
+        return this;
+    }
+
+    public String getType() {
+        return (String) properties.get(TYPE);
+    }
+
     @Override
     public void parse(InputSource input) throws IOException, SAXException {
         this.adapter = new MarcXchangeSaxAdapter()
@@ -234,8 +252,8 @@ public class Iso2709Reader implements XMLReader {
                 .setListener(listener)
                 .setValueNormalizer(normalizer)
                 .setSchema((String) properties.get(SCHEMA))
-                .setFormat((String) properties.get(FORMAT))
-                .setType((String) properties.get(TYPE))
+                .setFormat(getFormat())
+                .setType(getType())
                 .setFatalErrors((Boolean)properties.get(FATAL_ERRORS))
                 .setSilentErrors((Boolean)properties.get(SILENT_ERRORS))
                 .setSubfieldDelimiter((String)properties.get(SUBFIELD_DELIMITER))

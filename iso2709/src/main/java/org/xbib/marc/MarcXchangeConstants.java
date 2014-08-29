@@ -41,7 +41,7 @@ public interface MarcXchangeConstants {
 
     String NS_PREFIX = "mx";
 
-    String MARCXCHANGE_SCHEMA = "http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd";
+    String MARCXCHANGE_SCHEMALOCATION = "http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd";
 
     // element names
 
@@ -73,6 +73,6 @@ public interface MarcXchangeConstants {
 
     String MARC21_NS_URI = "http://www.loc.gov/MARC21/slim";
 
-    String MARC21_SCHEMA = "http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd";
+    String MARC21_SCHEMALOCATION = "http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd";
     
 }

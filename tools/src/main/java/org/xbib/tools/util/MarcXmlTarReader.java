@@ -4,7 +4,7 @@ import org.xbib.io.Packet;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.marc.xml.MarcXmlEventConsumer;
+import org.xbib.marc.xml.MarcXchangeEventConsumer;
 import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.element.LongPipelineElement;
@@ -25,7 +25,7 @@ public class MarcXmlTarReader extends AbstractTarReader {
 
     private MarcXchangeListener listener;
 
-    private MarcXmlEventConsumer consumer;
+    private MarcXchangeEventConsumer consumer;
 
     public MarcXmlTarReader() {
     }
@@ -42,7 +42,7 @@ public class MarcXmlTarReader extends AbstractTarReader {
 
     @Override
     protected void process(Packet packet) throws IOException {
-        MarcXmlEventConsumer consumer = new MarcXmlEventConsumer();
+        MarcXchangeEventConsumer consumer = new MarcXchangeEventConsumer();
         consumer.setListener(listener);
         StringReader sr = new StringReader(packet.toString());
         try {
@@ -55,7 +55,7 @@ public class MarcXmlTarReader extends AbstractTarReader {
         }
     }
 
-    public MarcXmlTarReader setEventConsumer(MarcXmlEventConsumer consumer) {
+    public MarcXmlTarReader setEventConsumer(MarcXchangeEventConsumer consumer) {
         this.consumer = consumer;
         return this;
     }

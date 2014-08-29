@@ -32,15 +32,10 @@
 package org.xbib.marc;
 
 import org.testng.annotations.Test;
+import org.xbib.marc.xml.MarcXchangeWriter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,8 +46,7 @@ import java.io.Writer;
 public class MARCTest {
 
     @Test
-    public void testProperMarc() throws IOException, SAXException,
-            ParserConfigurationException, TransformerException {
+    public void testProperMarc() throws IOException, SAXException {
         for (String s : new String[]{
                     "brkrtest.mrc", "makrtest.mrc", "chabon-loc.mrc", "chabon.mrc", "diacritic4.mrc",
                     "summerland.mrc"
@@ -60,66 +54,79 @@ public class MARCTest {
             InputStream in = getClass().getResourceAsStream(s);
             try (InputStreamReader r = new InputStreamReader(in, "ANSEL")) {
                 Iso2709Reader reader = new Iso2709Reader();
-                TransformerFactory tFactory = TransformerFactory.newInstance();
-                Transformer transformer = tFactory.newTransformer();
-                InputSource source = new InputSource(r);
+                reader.setProperty(Iso2709Reader.FORMAT, "MARC21");
                 FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
                 Writer w = new OutputStreamWriter(out, "UTF-8");
-                StreamResult target = new StreamResult(w);
-                transformer.transform(new SAXSource(reader, source), target);
+                MarcXchangeWriter writer = new MarcXchangeWriter(w);
+                reader.setMarcXchangeListener(writer);
+                writer.startDocument();
+                writer.beginCollection();
+                reader.parse( new InputSource(r));
+                writer.endCollection();
+                writer.endDocument();
+                out.close();
             }
         }
     }
 
     @Test
-    public void testFaultyMarc() throws IOException, SAXException,
-            ParserConfigurationException, TransformerException {
+    public void testFaultyMarc() throws IOException, SAXException {
         for (String s : new String[]{
                      "error.mrc"
                 }) {
             InputStream in = getClass().getResourceAsStream(s);
             try (InputStreamReader r = new InputStreamReader(in, "ANSEL")) {
                 Iso2709Reader reader = new Iso2709Reader();
-                TransformerFactory tFactory = TransformerFactory.newInstance();
-                Transformer transformer = tFactory.newTransformer();
-                InputSource source = new InputSource(r);
+                reader.setProperty(Iso2709Reader.FORMAT, "MARC21");
                 FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
                 Writer w = new OutputStreamWriter(out, "UTF-8");
-                StreamResult target = new StreamResult(w);
-                transformer.transform(new SAXSource(reader, source), target);
+                MarcXchangeWriter writer = new MarcXchangeWriter(w);
+                reader.setMarcXchangeListener(writer);
+                writer.startDocument();
+                writer.beginCollection();
+                reader.parse(new InputSource(r));
+                writer.endCollection();
+                writer.endDocument();
+                out.close();
             }
         }
     }
 
     @Test
-    public void testAMS() throws IOException, SAXException,
-            ParserConfigurationException, TransformerException {
+    public void testAMS() throws IOException, SAXException {
         InputStream in = getClass().getResourceAsStream("amstransactions.mrc");
         try (InputStreamReader r = new InputStreamReader(in, "ANSEL")) {
             Iso2709Reader reader = new Iso2709Reader();
-            TransformerFactory tFactory = TransformerFactory.newInstance();
-            Transformer transformer = tFactory.newTransformer();
-            InputSource source = new InputSource(r);
+            reader.setProperty(Iso2709Reader.FORMAT, "MARC21");
             FileOutputStream out = new FileOutputStream("target/ams.xml");
             Writer w = new OutputStreamWriter(out, "UTF-8");
-            StreamResult target = new StreamResult(w);
-            transformer.transform(new SAXSource(reader, source), target);
+            MarcXchangeWriter writer = new MarcXchangeWriter(w);
+            reader.setMarcXchangeListener(writer);
+            writer.startDocument();
+            writer.beginCollection();
+            reader.parse(new InputSource(r));
+            writer.endCollection();
+            writer.endDocument();
+            out.close();
         }
     }
     
     @Test
-    public void testZDB() throws IOException, SAXException,
-            ParserConfigurationException, TransformerException {
+    public void testZDB() throws IOException, SAXException {
         InputStream in = getClass().getResourceAsStream("zdblokutf8.mrc");
         try (InputStreamReader r = new InputStreamReader(in, "UTF-8")) {
             Iso2709Reader reader = new Iso2709Reader();
-            TransformerFactory tFactory = TransformerFactory.newInstance();
-            Transformer transformer = tFactory.newTransformer();
-            InputSource source = new InputSource(r);
+            reader.setProperty(Iso2709Reader.FORMAT, "MARC21");
             FileOutputStream out = new FileOutputStream("target/zdblokutf8.xml");
             Writer w = new OutputStreamWriter(out, "UTF-8");
-            StreamResult target = new StreamResult(w);
-            transformer.transform(new SAXSource(reader, source), target);
+            MarcXchangeWriter writer = new MarcXchangeWriter(w);
+            reader.setMarcXchangeListener(writer);
+            writer.startDocument();
+            writer.beginCollection();
+            reader.parse(new InputSource(r));
+            writer.endCollection();
+            writer.endDocument();
+            out.close();
         }
     }    
 }

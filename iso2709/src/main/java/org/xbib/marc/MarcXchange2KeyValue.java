@@ -39,7 +39,7 @@ import java.util.List;
 
 /**
  * Convert a MarcXchange stream to a key/value stream. With optional value
- * string transformation.
+ * string transformation
  */
 public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStreamListener<FieldCollection, String> {
 

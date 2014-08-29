@@ -91,17 +91,14 @@ public class BytesArray implements BytesReference {
         return new BytesArray(bytes, offset + from, length);
     }
 
-    
     public StreamInput streamInput() {
         return new BytesStreamInput(bytes, offset, length, false);
     }
 
-    
     public void writeTo(OutputStream os) throws IOException {
         os.write(bytes, offset, length);
     }
 
-    
     public byte[] toBytes() {
         if (offset == 0 && bytes.length == length) {
             return bytes;

@@ -49,10 +49,9 @@ public class MarcXchangeOAITest {
 
     private final Logger logger = LoggerFactory.getLogger(MarcXchangeOAITest.class.getName());
     
-    @Test
+
     public void testMarcXMLFromOAI() throws Exception {
         final StringBuilder sb = new StringBuilder();
-        InputStream in = getClass().getResourceAsStream("zdb-oai-marc.xml");
         MarcXchangeListener listener = new MarcXchangeListener() {
 
             @Override
@@ -122,6 +121,7 @@ public class MarcXchangeOAITest {
 
         };
 
+        InputStream in = getClass().getResourceAsStream("zdb-oai-marc.xml");
         MarcXchangeReader reader = new MarcXchangeReader();
         reader.addListener("Bibliographic", listener);
         reader.parse(new InputSource(new InputStreamReader(in, "UTF-8")));

@@ -39,7 +39,7 @@ import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;
-import org.xbib.marc.xml.MarcXmlEventConsumer;
+import org.xbib.marc.xml.MarcXchangeEventConsumer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
@@ -93,7 +93,7 @@ public final class FromMarcXmlTar extends Feeder {
                     }
                 })
                 .addListener(mapper);
-        final MarcXmlEventConsumer consumer = new MarcXmlEventConsumer()
+        final MarcXchangeEventConsumer consumer = new MarcXchangeEventConsumer()
                 .setListener(kv);
         final MarcXmlTarReader reader = new MarcXmlTarReader()
                 .setURI(uri)

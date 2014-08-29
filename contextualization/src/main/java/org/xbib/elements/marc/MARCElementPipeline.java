@@ -175,6 +175,7 @@ public class MARCElementPipeline extends KeyValueElementPipeline<FieldCollection
                         // fallback to "subfields"
                         vm =  (Map<String, Object>) element.getSettings().get("subfields");
                     }
+                    // TODO not very exact code here. This tries to guess words.
                     int pos = v.indexOf(' '); // code must be non-blank word
                     String vv = pos > 0 ? v.substring(0, pos) : v;
                     // code table lookup

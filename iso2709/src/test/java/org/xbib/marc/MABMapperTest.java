@@ -32,21 +32,16 @@
 package org.xbib.marc;
 
 import org.testng.annotations.Test;
+import org.xbib.marc.xml.MarcXchangeWriter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,17 +49,17 @@ import java.util.Map;
 public class MABMapperTest {
 
     @Test
-    public void testMappedDE468() throws IOException, TransformerException, SAXException, ParserConfigurationException {
+    public void testMappedDE468() throws IOException, SAXException {
         InputStream in = getClass().getResource("/org/xbib/marc/aleph500-subfields.mrc").openStream();
-        Writer target = new StringWriter();
-        InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
+        FileOutputStream out = new FileOutputStream("target/DE-468-mapped.xml");
+        Writer target = new OutputStreamWriter(out, "UTF-8");
+        Reader source = new InputStreamReader(in, "UTF-8");
         execute(source, target);
         target.flush();
         target.close();
     }
 
-    private void execute(InputSource source, Writer w) throws IOException, SAXException,
-            ParserConfigurationException, TransformerException {
+    private void execute(Reader source, Writer target) throws IOException, SAXException {
         Iso2709Reader reader = new Iso2709Reader();
         reader.setProperty(Iso2709Reader.FORMAT, "MAB");
         reader.setProperty(Iso2709Reader.SUBFIELD_DELIMITER, "$$"); // will be automatically quoted before used as pattern
@@ -78,11 +73,18 @@ public class MABMapperTest {
         indicators.put(" ", subfields);
         Map<String,Object> fields = new HashMap();
         fields.put("902", indicators);
-        reader.setFieldMap(fields);
+        reader.setFieldMap(fields); // --> selects field mapper
 
-        TransformerFactory tFactory = TransformerFactory.newInstance();
-        Transformer transformer = tFactory.newTransformer();
-        StreamResult target = new StreamResult(w);
-        transformer.transform(new SAXSource(reader, source), target);
+        reader.setProperty(Iso2709Reader.FORMAT, "MAB");
+        reader.setProperty(Iso2709Reader.SUBFIELD_DELIMITER, "$$"); // will be automatically quoted before used as pattern
+        MarcXchangeWriter writer = new MarcXchangeWriter(target);
+        writer.setFormat("MAB").setType("Bibliographic");
+        reader.setMarcXchangeListener(writer);
+        writer.startDocument();
+        writer.beginCollection();
+        reader.parse(new InputSource(source));
+        writer.endCollection();
+        writer.endDocument();
+
     }
 }

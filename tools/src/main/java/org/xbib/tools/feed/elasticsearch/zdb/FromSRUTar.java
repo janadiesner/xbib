@@ -41,7 +41,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.xml.MarcXchangeContentHandler;
-import org.xbib.marc.xml.MarcXmlEventConsumer;
+import org.xbib.marc.xml.MarcXchangeEventConsumer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
@@ -176,7 +176,7 @@ public class FromSRUTar extends Feeder {
 
         @Override
         protected void process(Packet packet) throws IOException {
-            MarcXmlEventConsumer consumer = new MarcXmlEventConsumer();
+            MarcXchangeEventConsumer consumer = new MarcXchangeEventConsumer();
             consumer.setListener(listener);
             StringReader sr = new StringReader(packet.toString());
             try {

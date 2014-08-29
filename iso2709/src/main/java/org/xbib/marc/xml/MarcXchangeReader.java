@@ -40,7 +40,6 @@ import org.xml.sax.XMLReader;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.io.Closeable;
 import java.io.IOException;
 
 /**
@@ -62,14 +61,14 @@ public class MarcXchangeReader extends MarcXchangeContentHandler {
         this.parser = factory.newSAXParser();
     }
 
+    public MarcXchangeReader setContentHandler(ContentHandler handler) {
+        this.contentHandler = handler;
+        return this;
+    }
+
     public void parse(InputSource source) throws SAXException, IOException {
         parser.getXMLReader().setContentHandler(contentHandler != null ? contentHandler : this);
         parser.getXMLReader().parse(source);
-    }
-
-    public MarcXchangeReader setHandler(ContentHandler handler) {
-        this.contentHandler = handler;
-        return this;
     }
 
     public MarcXchangeReader setMarcXchangeListener(MarcXchangeListener listener) {

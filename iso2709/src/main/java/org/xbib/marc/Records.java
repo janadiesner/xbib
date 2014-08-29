@@ -29,80 +29,30 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.io;
+package org.xbib.marc;
 
-import org.xbib.io.stream.StreamInput;
+import java.util.Spliterators;
+import java.util.function.Consumer;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
-/**
- * A reference to bytes.
- */
-public interface BytesReference {
-
+public class Records extends Spliterators.AbstractSpliterator<FieldCollection> {
     /**
-     * Returns the byte at the specified index. Need to be between 0 and length.
+     * Creates a spliterator reporting the given estimated size and
+     * additionalCharacteristics.
+     *
+     * @param est                       the estimated size of this spliterator if known, otherwise
+     *                                  {@code Long.MAX_VALUE}.
+     * @param additionalCharacteristics properties of this spliterator's
+     *                                  source or elements.  If {@code SIZED} is reported then this
+     *                                  spliterator will additionally report {@code SUBSIZED}.
      */
-    byte get(int index);
+    protected Records(long est, int additionalCharacteristics) {
+        super(est, additionalCharacteristics);
+    }
 
-    /**
-     * The length.
-     */
-    int length();
+    @Override
+    public boolean tryAdvance(Consumer<? super FieldCollection> action) {
+        action.accept(null); //TODO
+        return true;
 
-    /**
-     * Slice the bytes from the <tt>from</tt> index up to <tt>length</tt>.
-     */
-    BytesReference slice(int from, int length);
-
-    /**
-     * A stream input of the bytes.
-     */
-    StreamInput streamInput();
-
-    /**
-     * Writes the bytes directly to the output stream.
-     */
-    void writeTo(OutputStream os) throws IOException;
-
-    /**
-     * Returns the bytes as a single byte array.
-     */
-    byte[] toBytes();
-
-    /**
-     * Returns the bytes as a byte array, possibly sharing the underlying byte buffer.
-     */
-    BytesArray toBytesArray();
-
-    /**
-     * Returns the bytes copied over as a byte array.
-     */
-    BytesArray copyBytesArray();
-
-    /**
-     * Returns the bytes as a channel buffer.
-     */
-    //ChannelBuffer toChannelBuffer();
-
-    /**
-     * Is there an underlying byte array for this bytes reference.
-     */
-    boolean hasArray();
-
-    /**
-     * The underlying byte array (if exists).
-     */
-    byte[] array();
-
-    /**
-     * The offset into the underlying byte array.
-     */
-    int arrayOffset();
-
-    /**
-     * Converts to a string based on utf8.
-     */
-    String toUtf8();
+    }
 }

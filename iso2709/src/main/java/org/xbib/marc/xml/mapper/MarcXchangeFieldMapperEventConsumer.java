@@ -29,7 +29,7 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc.xml;
+package org.xbib.marc.xml.mapper;
 
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
@@ -43,21 +43,73 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
-public class MarcXmlEventConsumer implements XMLEventConsumer, MarcXchangeConstants, MarcXchangeListener {
+/**
+ * The MarcXchange mapping event consumer receives StaX events, maps the MarcXchange fields to
+ * other fields, and fiels MarcXchange events
+ */
+public class MarcXchangeFieldMapperEventConsumer
+    extends MarcXchangeFieldMapper
+    implements XMLEventConsumer, MarcXchangeConstants {
 
     private Stack<Field> stack = new Stack<Field>();
 
+    private Map<String,MarcXchangeListener> listeners = new HashMap<String,MarcXchangeListener>();
+
     private MarcXchangeListener listener;
 
-    private StringBuilder sb = new StringBuilder();
+    private StringBuilder content = new StringBuilder();
 
-    private boolean inRecord = false;
+    private String format = "MARC21";
 
-    public MarcXmlEventConsumer setListener(MarcXchangeListener listener) {
-        this.listener = listener;
+    private String type = "Bibliographic";
+
+    protected boolean inData;
+
+    protected boolean inLeader;
+
+    protected boolean inControl;
+
+    private boolean ignoreNamespace = false;
+
+    private Set<String> validNamespaces = new HashSet<String>() {{
+        add(NS_URI);
+        add(MARC21_NS_URI);
+    }};
+
+    public MarcXchangeFieldMapperEventConsumer addListener(String type, MarcXchangeListener listener) {
+        this.listeners.put(type, listener);
+        return this;
+    }
+
+    public MarcXchangeFieldMapperEventConsumer setMarcXchangeListener(MarcXchangeListener listener) {
+        this.listeners.put("Bibliographic", listener);
+        return this;
+    }
+
+    public MarcXchangeFieldMapperEventConsumer setFormat(String format) {
+        this.format = format;
+        return this;
+    }
+
+    public MarcXchangeFieldMapperEventConsumer setType(String type) {
+        this.type = type;
+        return this;
+    }
+
+    public MarcXchangeFieldMapperEventConsumer setIgnoreNamespace(boolean ignore) {
+        this.ignoreNamespace = ignore;
+        return this;
+    }
+
+    public MarcXchangeFieldMapperEventConsumer addNamespace(String uri) {
+        this.validNamespaces.add(uri);
         return this;
     }
 
@@ -77,6 +129,7 @@ public class MarcXmlEventConsumer implements XMLEventConsumer, MarcXchangeConsta
 
     @Override
     public void beginRecord(String format, String type) {
+        this.listener = listeners.get(type);
         if (listener != null) {
             listener.beginRecord(format, type);
         }
@@ -142,6 +195,10 @@ public class MarcXmlEventConsumer implements XMLEventConsumer, MarcXchangeConsta
     public void add(XMLEvent event) throws XMLStreamException {
         if (event.isStartElement()) {
             StartElement element = (StartElement) event;
+            String uri = element.getName().getNamespaceURI();
+            if (!isNamespace(uri)) {
+                return;
+            }
             String localName = element.getName().getLocalPart();
             Iterator<?> it = element.getAttributes();
             String format = null;
@@ -188,13 +245,32 @@ public class MarcXmlEventConsumer implements XMLEventConsumer, MarcXchangeConsta
                     }
                 }
             }
+            if (format == null) {
+                format = this.format;
+            }
+            if (type == null) {
+                type = this.type;
+            }
             switch (localName) {
-                case SUBFIELD: {
-                    Field f = stack.peek();
-                    Field subfield = new Field(f.tag(), f.indicator(), Character.toString(code));
-                    stack.push(subfield);
-                    beginSubField(subfield);
-                    sb.setLength(0);
+                case COLLECTION: {
+                    beginCollection();
+                    break;
+                }
+                case RECORD:{
+                    setFormat(format);
+                    setType(type);
+                    break;
+                }
+                case LEADER: {
+                    inLeader = true;
+                    break;
+                }
+                case CONTROLFIELD: {
+                    Field field = new Field(tag);
+                    stack.push(field);
+                    addControlField(field);
+                    content.setLength(0);
+                    inControl = true;
                     break;
                 }
                 case DATAFIELD: {
@@ -202,60 +278,94 @@ public class MarcXmlEventConsumer implements XMLEventConsumer, MarcXchangeConsta
                             ? new Field(tag, Character.toString(ind1) + Character.toString(ind2))
                             : new Field(tag, Character.toString(ind1));
                     stack.push(field);
-                    beginDataField(field);
-                    sb.setLength(0);
+                    addDataField(field);
+                    content.setLength(0);
+                    inData = true;
                     break;
                 }
-                case CONTROLFIELD: {
-                    Field field = new Field(tag);
-                    stack.push(field);
-                    beginControlField(field);
-                    sb.setLength(0);
-                    break;
-                }
-                case RECORD:{
-                    if (!inRecord) {
-                        beginRecord(format != null ? format : "MARC21",
-                                type != null ? type : "Bibliographic");
-                        inRecord = true;
+                case SUBFIELD: {
+                    if (inControl || inLeader) {
+                        break;
+                    } else {
+                        Field f = stack.peek();
+                        Field subfield = new Field(f.tag(), f.indicator(), Character.toString(code));
+                        stack.push(subfield);
+                        addDataField(subfield);
+                        content.setLength(0);
+                        break;
                     }
-                    break;
                 }
-            }
-        } else if (event.isCharacters()) {
-            Characters c = (Characters) event;
-            if (!c.isIgnorableWhiteSpace()) {
-                sb.append(c.getData());
+
             }
         } else if (event.isEndElement()) {
             EndElement element = (EndElement) event;
+            String uri = element.getName().getNamespaceURI();
+            if (!isNamespace(uri)) {
+                content.setLength(0);
+                return;
+            }
             String localName = element.getName().getLocalPart();
             switch (localName) {
-                case SUBFIELD: {
-                    endSubField(stack.pop().data(sb.toString()));
-                    break;
-                }
-                case DATAFIELD: {
-                    endDataField(stack.pop()); // no value
-                    break;
-                }
-                case CONTROLFIELD: {
-                    endControlField(stack.pop().data(sb.toString()));
-                    break;
-                }
-                case LEADER: {
-                    leader(sb.toString());
+                case COLLECTION: {
+                    endCollection();
                     break;
                 }
                 case RECORD: {
-                    if (inRecord) {
-                        endRecord();
-                        inRecord = false;
-                    }
+                    flushRecord();
                     break;
                 }
+                case LEADER: {
+                    setRecordLabel(content.toString());
+                    inLeader = false;
+                    break;
+                }
+                case CONTROLFIELD: {
+                    addControlField(stack.pop().data(content.toString()));
+                    inControl = false;
+                    break;
+                }
+                case DATAFIELD: {
+                    addDataField(stack.pop());
+                    flushField();
+                    inData = false;
+                    break;
+                }
+                case SUBFIELD: {
+                    if (inLeader || inControl) {
+                        // repair, move data to controlfield or leader
+                        stack.peek().data(content.toString());
+                        break;
+                    } else {
+                        addDataField(stack.pop().data(content.toString()));
+                        inData = false;
+                        break;
+                    }
+                }
             }
-            sb.setLength(0);
+            content.setLength(0);
+        } else if (event.isCharacters()) {
+            Characters c = (Characters) event;
+            if (!c.isIgnorableWhiteSpace()) {
+                if (inData || inControl || inLeader) {
+                    content.append(c.getData());
+                }
+            }
+        } else if (event.isStartDocument()) {
+            stack.clear();
+            content.setLength(0);
         }
     }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    private boolean isNamespace(String uri) {
+        return !ignoreNamespace && validNamespaces.contains(uri);
+    }
+
 }

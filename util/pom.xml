@@ -30,6 +30,11 @@
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
+            <artifactId>stream</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.xbib</groupId>
             <artifactId>compress</artifactId>
             <type>jar</type>
         </dependency>

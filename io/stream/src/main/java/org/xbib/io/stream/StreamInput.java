@@ -191,7 +191,7 @@ public abstract class StreamInput extends InputStream {
                     chars[charIndex++] = (char) ((c & 0x1F) << 6 | readByte() & 0x3F);
                     break;
                 case 14:
-                    chars[charIndex++] = (char) ((c & 0x0F) << 12 | (readByte() & 0x3F) << 6 | (readByte() & 0x3F) << 0);
+                    chars[charIndex++] = (char) ((c & 0x0F) << 12 | (readByte() & 0x3F) << 6 | readByte() & 0x3F);
                     break;
             }
         }
@@ -239,10 +239,12 @@ public abstract class StreamInput extends InputStream {
         return ret;
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> readMap() throws IOException {
         return (Map<String, Object>) readGenericValue();
     }
 
+    @SuppressWarnings("unchecked")
     public Object readGenericValue() throws IOException {
         byte type = readByte();
         switch (type) {
