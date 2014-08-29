@@ -81,7 +81,8 @@ public class MarcXchangeFieldMapperContentHandler
     private boolean ignoreNamespace = false;
 
     private Set<String> validNamespaces = new HashSet<String>() {{
-        add(NS_URI);
+        add(MARCXCHANGE_V1_NS_URI);
+        add(MARCXCHANGE_V2_NS_URI);
         add(MARC21_NS_URI);
     }};
 

@@ -31,6 +31,8 @@
  */
 package org.xbib.marc.xml;
 
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
@@ -56,6 +58,8 @@ import java.util.Stack;
  */
 public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeConstants, MarcXchangeListener {
 
+    private static final Logger logger = LoggerFactory.getLogger(MarcXchangeContentHandler.class.getName());
+
     private Stack<Field> stack = new Stack<Field>();
 
     private Map<String,MarcXchangeListener> listeners = new HashMap<String,MarcXchangeListener>();
@@ -77,7 +81,8 @@ public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeCo
     private boolean ignoreNamespace = false;
 
     private Set<String> validNamespaces = new HashSet<String>() {{
-        add(NS_URI);
+        add(MARCXCHANGE_V1_NS_URI);
+        add(MARCXCHANGE_V2_NS_URI);
         add(MARC21_NS_URI);
     }};
 
@@ -249,6 +254,7 @@ public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeCo
             if (type == null) {
                 type = this.type;
             }
+            content.setLength(0);
             switch (localName) {
                 case COLLECTION: {
                     beginCollection();
@@ -266,7 +272,6 @@ public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeCo
                     Field field = new Field().tag(tag);
                     stack.push(field);
                     beginControlField(field);
-                    content.setLength(0);
                     inControl = true;
                     break;
                 }
@@ -276,19 +281,18 @@ public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeCo
                             : new Field(tag, Character.toString(ind1));
                     stack.push(field);
                     beginDataField(field);
-                    content.setLength(0);
                     inData = true;
                     break;
                 }
                 case SUBFIELD: {
-                    if (inControl || inLeader) {
+                    if (inControl) {
                         break;
                     } else {
                         Field f = stack.peek();
                         Field subfield = new Field(f.tag(), f.indicator(), Character.toString(code));
                         stack.push(subfield);
                         beginSubField(subfield);
-                        content.setLength(0);
+                        inData = true;
                         break;
                     }
                 }
@@ -297,7 +301,6 @@ public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeCo
             EndElement element = (EndElement) event;
             String uri = element.getName().getNamespaceURI();
             if (!isNamespace(uri)) {
-                content.setLength(0);
                 return;
             }
             String localName = element.getName().getLocalPart();
@@ -327,7 +330,7 @@ public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeCo
                     break;
                 }
                 case SUBFIELD: {
-                    if (inLeader || inControl) {
+                    if (inControl) {
                         // repair, move data to controlfield or leader
                         stack.peek().data(content.toString());
                         break;
@@ -348,7 +351,7 @@ public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeCo
             }
         } else if (event.isStartDocument()) {
             stack.clear();
-            content.setLength(0);
+
         }
     }
 

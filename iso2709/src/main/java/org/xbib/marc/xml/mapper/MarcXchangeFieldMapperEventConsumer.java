@@ -79,7 +79,8 @@ public class MarcXchangeFieldMapperEventConsumer
     private boolean ignoreNamespace = false;
 
     private Set<String> validNamespaces = new HashSet<String>() {{
-        add(NS_URI);
+        add(MARCXCHANGE_V1_NS_URI);
+        add(MARCXCHANGE_V2_NS_URI);
         add(MARC21_NS_URI);
     }};
 
@@ -331,7 +332,7 @@ public class MarcXchangeFieldMapperEventConsumer
                     break;
                 }
                 case SUBFIELD: {
-                    if (inLeader || inControl) {
+                    if (inControl) {
                         // repair, move data to controlfield or leader
                         stack.peek().data(content.toString());
                         break;

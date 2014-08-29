@@ -101,6 +101,8 @@ public class MarcXchangeSingleTest {
         writer.startDocument();
         writer.beginCollection();
 
+
+
         MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader();
         reader.setFormat("AlephXML").setType("Bibliographic");
         reader.addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
@@ -123,6 +125,8 @@ public class MarcXchangeSingleTest {
 
         assertNull(writer.getException());
         sw.close();
+
+        logger.error("err?", writer.getException());
 
     }
 }

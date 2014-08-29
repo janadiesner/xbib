@@ -118,18 +118,19 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
     }
 
     protected void flushField() {
-        if (controlfields == null || datafields == null) {
+        if (controlfields != null && !controlfields.isEmpty()) {
+            // We have a single control field, loop might be unnecessary
+            for (Field controlfield : controlfields) {
+                record.add(controlfield);
+            }
+            // reset controlfields
+            controlfields = new FieldCollection();
+        }
+        if (datafields == null) {
             return;
         }
-        // control fields first to record
-        Iterator<Field> it = controlfields.iterator();
-        while (it.hasNext()) {
-            record.add(it.next());
-        }
-        // reset controlfields
-        controlfields = new FieldCollection();
-        // data fields second
-        it = datafields.iterator();
+        // data fields
+        Iterator<Field> it = datafields.iterator();
         if (!it.hasNext()) {
             return;
         }
@@ -155,8 +156,6 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                 // not same field tag, close old data field and add new data field
                 record.add(Field.EMPTY);
                 record.add(mappedField);
-            } else {
-                //logger.info("{}, mapped, continuos = not writing data field", dataField);
             }
         } else {
             record.add(dataField);

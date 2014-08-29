@@ -110,7 +110,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
     private String subfieldDelimiter = null;
 
     public MarcXchangeSaxAdapter() {
-        this.nsUri = NS_URI;
+        this.nsUri = MARCXCHANGE_V2_NS_URI;
         this.subfieldOpen = false;
         this.recordOpen = false;
         this.subfieldDelimiter = null;
@@ -219,11 +219,11 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                         XSI.NS_PREFIX + ":schemaLocation", "CDATA", MARC21_NS_URI + " " + MARC21_SCHEMALOCATION);
 
             } else {
-                this.nsUri = NS_URI;
+                this.nsUri = MARCXCHANGE_V2_NS_URI;
                 attrs.addAttribute(XMLNS.NS_URI, XSI.NS_PREFIX,
                         XMLNS.NS_PREFIX + ":" + XSI.NS_PREFIX, "CDATA", XSI.NS_URI);
                 attrs.addAttribute(XSI.NS_URI, "schemaLocation",
-                        XSI.NS_PREFIX + ":schemaLocation", "CDATA", NS_URI + " " + MARCXCHANGE_SCHEMALOCATION);
+                        XSI.NS_PREFIX + ":schemaLocation", "CDATA", MARCXCHANGE_V2_NS_URI + " " + MARCXCHANGE_V2_0_SCHEMALOCATION);
             }
             contentHandler.startPrefixMapping("", nsUri);
             contentHandler.startElement(nsUri, COLLECTION, COLLECTION, attrs);
@@ -463,7 +463,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                 listener.endDataField(designator);
             }
             if (contentHandler != null) {
-                contentHandler.endElement(NS_URI, DATAFIELD, DATAFIELD);
+                contentHandler.endElement(nsUri, DATAFIELD, DATAFIELD);
             }
             datafieldOpen = false;
         } catch (Exception ex) {
@@ -521,7 +521,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                 listener.endSubField(designator);
             }
             if (contentHandler != null) {
-                contentHandler.endElement(NS_URI, SUBFIELD, SUBFIELD);
+                contentHandler.endElement(nsUri, SUBFIELD, SUBFIELD);
             }
         } catch (Exception ex) {
             if (fatalerrors) {

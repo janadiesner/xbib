@@ -33,15 +33,24 @@ package org.xbib.marc;
 
 /**
  * ISO/DIS 25577 MarcXchange constants
- *
  */
 public interface MarcXchangeConstants {
 
-    String NS_URI = "info:lc/xmlns/marcxchange-v1";
+    String MARCXCHANGE_NS_PREFIX = "mx";
 
-    String NS_PREFIX = "mx";
+    String MARCXCHANGE_V1_NS_URI = "info:lc/xmlns/marcxchange-v1";
 
-    String MARCXCHANGE_SCHEMALOCATION = "http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd";
+    String MARCXCHANGE_V2_NS_URI = "info:lc/xmlns/marcxchange-v2";
+
+    String MARCXCHANGE_V1_1_SCHEMALOCATION = "http://www.loc.gov/standards/iso25577/marcxchange-1-1.xsd";
+
+    String MARCXCHANGE_V2_0_SCHEMALOCATION = "http://www.loc.gov/standards/iso25577/marcxchange-2-0.xsd";
+
+    // related (strict superset)
+
+    String MARC21_NS_URI = "http://www.loc.gov/MARC21/slim";
+
+    String MARC21_SCHEMALOCATION = "http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd";
 
     // element names
 
@@ -69,10 +78,5 @@ public interface MarcXchangeConstants {
 
     String TYPE = "type";
 
-    // related (strict superset)
 
-    String MARC21_NS_URI = "http://www.loc.gov/MARC21/slim";
-
-    String MARC21_SCHEMALOCATION = "http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd";
-    
 }

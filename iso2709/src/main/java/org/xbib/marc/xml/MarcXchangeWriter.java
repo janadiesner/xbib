@@ -50,7 +50,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,19 +64,23 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
 
     private final static XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 
-    private final static QName COLLECTION_ELEMENT = new QName(NS_URI, COLLECTION, "");
+    private final static String NAMESPACE = MARCXCHANGE_V2_NS_URI;
 
-    private final static QName RECORD_ELEMENT = new QName(NS_URI, RECORD, "");
+    private final static String NAMESPACE_SCHEMA_LOCATION = MARCXCHANGE_V2_0_SCHEMALOCATION;
 
-    private final static QName LEADER_ELEMENT = new QName(NS_URI, LEADER, "");
+    private final static QName COLLECTION_ELEMENT = new QName(NAMESPACE, COLLECTION, "");
 
-    private final static QName CONTROLFIELD_ELEMENT = new QName(NS_URI, CONTROLFIELD, "");
+    private final static QName RECORD_ELEMENT = new QName(NAMESPACE, RECORD, "");
 
-    private final static QName DATAFIELD_ELEMENT = new QName(NS_URI, DATAFIELD, "");
+    private final static QName LEADER_ELEMENT = new QName(NAMESPACE, LEADER, "");
 
-    private final static QName SUBFIELD_ELEMENT = new QName(NS_URI, SUBFIELD, "");
+    private final static QName CONTROLFIELD_ELEMENT = new QName(NAMESPACE, CONTROLFIELD, "");
 
-    private final static Namespace namespace = eventFactory.createNamespace("", NS_URI);
+    private final static QName DATAFIELD_ELEMENT = new QName(NAMESPACE, DATAFIELD, "");
+
+    private final static QName SUBFIELD_ELEMENT = new QName(NAMESPACE, SUBFIELD, "");
+
+    private final static Namespace namespace = eventFactory.createNamespace("", NAMESPACE);
 
     private final static Iterator<Namespace> namespaces = Collections.singletonList(namespace).iterator();
 
@@ -163,7 +166,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         try {
             Iterator<Attribute> attrs = schemaWritten ? null : Arrays.asList(
                 eventFactory.createAttribute("xmlns:xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI),
-                eventFactory.createAttribute("xsi:schemaLocation", NS_URI + " " + MARCXCHANGE_SCHEMALOCATION)
+                eventFactory.createAttribute("xsi:schemaLocation", NAMESPACE + " " + NAMESPACE_SCHEMA_LOCATION)
             ).iterator();
             writer.add(eventFactory.createStartElement(COLLECTION_ELEMENT, attrs, namespaces));
             schemaWritten = true;
@@ -199,7 +202,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
             );
             if (!schemaWritten) {
                 attrs.add(eventFactory.createAttribute("xmlns:xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI));
-                attrs.add(eventFactory.createAttribute("xsi:schemaLocation", NS_URI + " " + MARCXCHANGE_SCHEMALOCATION));
+                attrs.add(eventFactory.createAttribute("xsi:schemaLocation", NAMESPACE + " " + NAMESPACE_SCHEMA_LOCATION));
                 schemaWritten = true;
             }
             writer.add(eventFactory.createStartElement(RECORD_ELEMENT, attrs.iterator(), namespaces));
@@ -391,10 +394,8 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         }
     }
 
-
     public Exception getException() {
         return exception;
     }
-
 
 }

@@ -3,7 +3,7 @@ package org.xbib.io.stream;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.xbib.io.stream.StreamByteBuffer;
+//import org.xbib.io.stream.StreamByteBuffer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,6 +30,7 @@ public class StreamByteBufferTest extends Assert {
         }
     }
 
+    /*
     @Test
     public void testToByteArray() throws IOException {
         StreamByteBuffer byteBuffer = createTestInstance();
@@ -217,4 +218,5 @@ public class StreamByteBufferTest extends Assert {
             }
         }
     }
+    */
 }
