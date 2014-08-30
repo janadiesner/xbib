@@ -40,8 +40,9 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.MarcXchangeContentHandler;
-import org.xbib.marc.xml.MarcXchangeEventConsumer;
+import org.xbib.marc.xml.stream.MarcXchangeReader;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
@@ -120,7 +121,7 @@ public class FromSRUTar extends Feeder {
                 });
 
         final MarcXchange2KeyValue bib = new MarcXchange2KeyValue()
-                .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
+                .transformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);
@@ -129,7 +130,7 @@ public class FromSRUTar extends Feeder {
                 .addListener(bibmapper);
 
         final MarcXchange2KeyValue hol = new MarcXchange2KeyValue()
-                .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
+                .transformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);
@@ -176,8 +177,8 @@ public class FromSRUTar extends Feeder {
 
         @Override
         protected void process(Packet packet) throws IOException {
-            MarcXchangeEventConsumer consumer = new MarcXchangeEventConsumer();
-            consumer.setListener(listener);
+            MarcXchangeReader consumer = new MarcXchangeReader();
+            consumer.setMarcXchangeListener(listener);
             StringReader sr = new StringReader(packet.toString());
             try {
                 XMLEventReader xmlReader = factory.createXMLEventReader(sr);

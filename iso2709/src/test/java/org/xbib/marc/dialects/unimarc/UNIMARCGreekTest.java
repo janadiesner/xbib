@@ -29,13 +29,14 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc;
+package org.xbib.marc.dialects.unimarc;
 
 import org.testng.annotations.Test;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.normalize.ValueNormalizer;
-import org.xbib.marc.xml.MarcXchangeWriter;
+import org.xbib.marc.Iso2709Reader;
+import org.xbib.marc.transformer.StringTransformer;
+import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xbib.xml.XMLUtil;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -57,32 +58,30 @@ public class UNIMARCGreekTest {
 
     @Test
     public void testUNIMARC() throws IOException, SAXException {
-        for (String s : new String[]{
-                "serres.mrc"
-        }) {
-            InputStream in = getClass().getResourceAsStream(s);
-            try (InputStreamReader r = new InputStreamReader(in, ISO88591)) {
+        InputStream in = getClass().getResourceAsStream("serres.mrc");
+        try (InputStreamReader r = new InputStreamReader(in, ISO88591)) {
 
-                final Iso2709Reader reader = new Iso2709Reader()
-                        .setValueNormalizer(new ValueNormalizer() {
-                            @Override
-                            public String normalize(String value) {
-                                return XMLUtil.clean(new String(value.getBytes(ISO88591), UTF8));
-                            }
-                        });
-                new File("target").mkdirs();
-                FileWriter w = new FileWriter("target/" + s + ".xml");
-                MarcXchangeWriter writer = new MarcXchangeWriter(w);
-                reader.setFormat("UNIMARC").setType("Bibliographic");
-                reader.setMarcXchangeListener(writer);
-                writer.startDocument();
-                writer.beginCollection();
-                reader.parse(new InputSource(r));
-                writer.endCollection();
-                writer.endDocument();
+            final Iso2709Reader reader = new Iso2709Reader()
+                    .setTransformer(new StringTransformer() {
+                        @Override
+                        public String transform(String value) {
+                            return XMLUtil.clean(new String(value.getBytes(ISO88591), UTF8));
+                        }
+                    });
+            new File("target").mkdirs();
+            FileWriter w = new FileWriter("target/serres.xml");
+            MarcXchangeWriter writer = new MarcXchangeWriter(w);
+            reader.setFormat("UNIMARC").setType("Bibliographic");
+            reader.setMarcXchangeListener(writer);
+            writer.startDocument();
+            writer.beginCollection();
+            reader.parse(new InputSource(r));
+            writer.endCollection();
+            writer.endDocument();
+            if (writer.getException() != null) {
                 logger.error("err?", writer.getException());
-                w.close();
             }
+            w.close();
         }
     }
 

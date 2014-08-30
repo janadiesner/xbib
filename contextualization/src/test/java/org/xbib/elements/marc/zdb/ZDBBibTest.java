@@ -44,11 +44,11 @@ import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xml.sax.InputSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -84,7 +84,7 @@ public class ZDBBibTest extends Assert {
                     }
                 });
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
+                .transformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(
@@ -111,8 +111,7 @@ public class ZDBBibTest extends Assert {
         Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);
         reader.setProperty(Iso2709Reader.FORMAT, "MARC");
         reader.setProperty(Iso2709Reader.TYPE, "Bibliographic");
-        InputSource source = new InputSource(br);
-        reader.parse(source);
+        reader.parse(br);
         mapper.close();
         logger.info("zdb title counter = {}", counter.get());
         logger.info("unknown keys = {}", mapper.unknownKeys());

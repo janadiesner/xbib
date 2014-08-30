@@ -35,12 +35,14 @@ import org.xbib.marc.MarcXchangeListener;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 /**
  * The MarcXchangeReader reads MarcXML or MarcXchange and fires events to a SAX content handler
@@ -48,36 +50,33 @@ import java.io.IOException;
  */
 public class MarcXchangeReader extends MarcXchangeContentHandler {
 
-    private final SAXParser parser;
-
     private ContentHandler contentHandler;
 
-    public MarcXchangeReader() throws ParserConfigurationException, SAXException {
-        this(SAXParserFactory.newInstance());
+    public void parse(InputStream in) throws IOException {
+        parse(new InputStreamReader(in, "UTF-8"));
     }
 
-    public MarcXchangeReader(SAXParserFactory factory) throws ParserConfigurationException, SAXException {
-        factory.setNamespaceAware(true);
-        this.parser = factory.newSAXParser();
+    public void parse(Reader reader) throws IOException {
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            SAXParser parser = factory.newSAXParser();
+            parser.getXMLReader().setContentHandler(contentHandler != null ? contentHandler : this);
+            parser.getXMLReader().parse(new InputSource(reader));
+        } catch (ParserConfigurationException | SAXException e) {
+            throw new IOException(e);
+        }
     }
 
-    public MarcXchangeReader setContentHandler(ContentHandler handler) {
-        this.contentHandler = handler;
-        return this;
-    }
-
-    public void parse(InputSource source) throws SAXException, IOException {
-        parser.getXMLReader().setContentHandler(contentHandler != null ? contentHandler : this);
-        parser.getXMLReader().parse(source);
-    }
-
+    @Override
     public MarcXchangeReader setMarcXchangeListener(MarcXchangeListener listener) {
         super.setMarcXchangeListener(listener);
         return this;
     }
 
-    public XMLReader getXMLReader() throws SAXException {
-        return parser.getXMLReader();
+    public MarcXchangeReader setContentHandler(ContentHandler handler) {
+        this.contentHandler = handler;
+        return this;
     }
 
 }

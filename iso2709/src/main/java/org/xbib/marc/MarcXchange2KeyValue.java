@@ -32,6 +32,7 @@
 package org.xbib.marc;
 
 import org.xbib.keyvalue.KeyValueStreamListener;
+import org.xbib.marc.transformer.StringTransformer;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -43,24 +44,20 @@ import java.util.List;
  */
 public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStreamListener<FieldCollection, String> {
 
-    public interface FieldDataTransformer {
-
-        String transform(String value);
-    }
-
     private FieldCollection fields;
+
+    private StringTransformer transformer;
 
     private List<KeyValueStreamListener<FieldCollection, String>> listeners =
             new LinkedList<KeyValueStreamListener<FieldCollection, String>>();
 
-    private FieldDataTransformer transformer;
 
     public MarcXchange2KeyValue addListener(KeyValueStreamListener<FieldCollection, String> listener) {
         this.listeners.add(listener);
         return this;
     }
 
-    public MarcXchange2KeyValue transformer(FieldDataTransformer transformer) {
+    public MarcXchange2KeyValue transformer(StringTransformer transformer) {
         this.transformer = transformer;
         return this;
     }
@@ -173,7 +170,7 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
 
     @Override
     public void endDataField(Field field) {
-        // put data into the emitter if the only have one field
+        // put data into the emitter if there is only one field
         String data = field != null ? field.data() : null;
         if (data == null && fields.size() == 1) {
             data = fields.getFirst().data();

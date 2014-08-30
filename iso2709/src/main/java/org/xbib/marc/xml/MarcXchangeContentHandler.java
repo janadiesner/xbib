@@ -34,7 +34,6 @@ package org.xbib.marc.xml;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.RecordLabel;
@@ -53,6 +52,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  * The MarcXchange ContentHandler can handle SaX event input and fires events to a MarcXchange listener
@@ -62,17 +62,17 @@ public class MarcXchangeContentHandler
 
     private static final Logger logger = LoggerFactory.getLogger(MarcXchangeContentHandler.class.getName());
 
+    private Stack<Field> stack = new Stack<Field>();
+
     private Map<String,MarcXchangeListener> listeners = new HashMap<String,MarcXchangeListener>();
 
     private MarcXchangeListener listener;
 
-    private FieldCollection fields = new FieldCollection();
-
     private StringBuilder content = new StringBuilder();
 
-    private String format = "MARC21";
+    private String format = MARC21;
 
-    private String type = "Bibliographic";
+    private String type = BIBLIOGRAPHIC;
 
     protected boolean inData;
 
@@ -94,7 +94,7 @@ public class MarcXchangeContentHandler
     }
 
     public MarcXchangeContentHandler setMarcXchangeListener(MarcXchangeListener listener) {
-        this.listeners.put("Bibliographic", listener);
+        this.listeners.put(BIBLIOGRAPHIC, listener);
         return this;
     }
 
@@ -134,7 +134,7 @@ public class MarcXchangeContentHandler
 
     @Override
     public void beginRecord(String format, String type) {
-        this.listener = listeners.get(type);
+        this.listener = listeners.get(type != null ? type : BIBLIOGRAPHIC);
         if (listener != null) {
             listener.beginRecord(format, type);
         }
@@ -203,7 +203,7 @@ public class MarcXchangeContentHandler
 
     @Override
     public void startDocument() throws SAXException {
-        fields.clear();
+        stack.clear();
         content.setLength(0);
     }
 
@@ -266,8 +266,8 @@ public class MarcXchangeContentHandler
                     }
                 }
                 Field field = new Field().tag(tag);
+                stack.push(field);
                 beginControlField(field);
-                fields.add(field);
                 inControl = true;
                 break;
             }
@@ -294,24 +294,25 @@ public class MarcXchangeContentHandler
                     }
                 }
                 Field field = new Field().tag(tag).indicator(sb.toString()).data(null);
+                stack.push(field);
                 beginDataField(field);
-                fields.add(field);
                 inData = true;
                 break;
             }
             case SUBFIELD: {
-                if (inControl || inLeader) {
-                    // no subfields are allowed in controlfield or leader
+                if (inControl) {
+                    // no subfields are allowed in controlfield
                     break;
                 } else {
-                    Field field = new Field(fields.getLast()).subfieldId(null).data(null);
+                    Field f = stack.peek();
+                    Field subfield = new Field(f);
                     for (int i = 0; i < atts.getLength(); i++) {
                         if (CODE.equals(atts.getLocalName(i))) {
-                            field.subfieldId(atts.getValue(i));
+                            subfield.subfieldId(atts.getValue(i));
                         }
                     }
-                    beginSubField(field);
-                    fields.add(field);
+                    stack.push(subfield);
+                    beginSubField(subfield);
                     inData = true;
                     break;
                 }
@@ -342,22 +343,22 @@ public class MarcXchangeContentHandler
                 break;
             }
             case CONTROLFIELD: {
-                endControlField(fields.removeFirst().data(content.toString()));
+                endControlField(stack.pop().data(content.toString()));
                 inControl = false;
                 break;
             }
             case DATAFIELD: {
-                endDataField(fields.removeFirst().subfieldId(null).data(""));
+                endDataField(stack.pop().subfieldId(null).data(""));
                 inData = false;
                 break;
             }
             case SUBFIELD: {
-                if (inLeader || inControl) {
-                    // repair, move data to controlfield or leader
-                    fields.getLast().data(content.toString());
+                if (inControl) {
+                    // repair, move data to controlfield
+                    stack.peek().data(content.toString());
                     break;
                 } else {
-                    endSubField(fields.removeLast().data(content.toString()));
+                    endSubField(stack.pop().data(content.toString()));
                     inData = false;
                     break;
                 }

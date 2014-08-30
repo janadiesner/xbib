@@ -38,28 +38,16 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
-import org.xbib.marc.normalize.ValueNormalizer;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -81,18 +69,19 @@ public class UNIMARCElementsTest extends Assert {
         writer.close();
         // test the mapper in a MarcXchange listener
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
-        Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);
-        reader.setProperty(Iso2709Reader.FORMAT, "MARC");
-        reader.setProperty(Iso2709Reader.TYPE, "Bibliographic");
-        TransformerFactory tFactory = TransformerFactory.newInstance();
-        Transformer transformer = tFactory.newTransformer();
-        assertNotNull(transformer);
+        Iso2709Reader reader = new Iso2709Reader()
+                .setMarcXchangeListener(kv);
+        //reader.setProperty(Iso2709Reader.FORMAT, "MARC");
+        //reader.setProperty(Iso2709Reader.TYPE, "Bibliographic");
+        //TransformerFactory tFactory = TransformerFactory.newInstance();
+        //Transformer transformer = tFactory.newTransformer();
+        //assertNotNull(transformer);
+
         mapper.close();
     }
 
     @Test
-    public void testUNIMARC() throws IOException, SAXException,
-            ParserConfigurationException, TransformerException {
+    public void testUNIMARC() throws IOException {
         for (String s : new String[]{
                 "/org/xbib/elements/marc/dialects/unimarc/serres.mrc"
         }) {
@@ -126,27 +115,30 @@ public class UNIMARCElementsTest extends Assert {
             MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
 
             final Iso2709Reader reader = new Iso2709Reader()
-                    .setValueNormalizer(new ValueNormalizer() {
+                    .setTransformer(new StringTransformer() {
                         @Override
-                        public String normalize(String value) {
+                        public String transform(String value) {
                             return value == null ? null : new String(value.getBytes(ISO88591), UTF8);
                         }
                     })
                     .setMarcXchangeListener(kv);
-            reader.setProperty(Iso2709Reader.FORMAT, "MARC");
-            reader.setProperty(Iso2709Reader.TYPE, "Bibliographic");
+            reader.setFormat("MARC21");
+            reader.setType("Bibliographic");
+            reader.parse(r);
 
-            TransformerFactory tFactory = TransformerFactory.newInstance();
+/*            TransformerFactory tFactory = TransformerFactory.newInstance();
             Transformer transformer = tFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-            InputSource source = new InputSource(r);
+
             new File("target/" + s).getParentFile().mkdirs();
             FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
             Writer w = new OutputStreamWriter(out, UTF8);
             StreamResult target = new StreamResult(w);
-            transformer.transform(new SAXSource(reader, source), target);
+            transformer.transform(new SAXSource(reader, r), target);
+            */
             mapper.close();
+
             // check if increment works
             logger.info("unknown elements = {}", mapper.unknownKeys());
             assertEquals(51279, counter.get());

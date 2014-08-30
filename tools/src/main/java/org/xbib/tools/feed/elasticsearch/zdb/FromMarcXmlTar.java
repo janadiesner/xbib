@@ -39,7 +39,8 @@ import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchange2KeyValue;
-import org.xbib.marc.xml.MarcXchangeEventConsumer;
+import org.xbib.marc.transformer.StringTransformer;
+import org.xbib.marc.xml.stream.MarcXchangeReader;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
@@ -86,15 +87,15 @@ public final class FromMarcXmlTar extends Feeder {
                     }
                 });
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
+                .transformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);
                     }
                 })
                 .addListener(mapper);
-        final MarcXchangeEventConsumer consumer = new MarcXchangeEventConsumer()
-                .setListener(kv);
+        final MarcXchangeReader consumer = new MarcXchangeReader()
+                .setMarcXchangeListener(kv);
         final MarcXmlTarReader reader = new MarcXmlTarReader()
                 .setURI(uri)
                 .setEventConsumer(consumer);

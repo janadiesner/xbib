@@ -33,7 +33,6 @@ package org.xbib.elements.marc.dialects.pica;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.text.Normalizer;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,11 +47,11 @@ import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xml.sax.InputSource;
 
 public class DNBPICAElementsTest extends Assert {
 
@@ -84,8 +83,7 @@ public class DNBPICAElementsTest extends Assert {
                 .addListener(mapper)
                 .addListener(new OurAdapter());
         final InputStream in = getClass().getResourceAsStream("zdb-oai-bib.xml");
-        final InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
-        new DNBPICAXmlReader().setListener(kv).parse(source);
+        new DNBPICAXmlReader().setListener(kv).parse(in);
         in.close();
         mapper.close();
 
@@ -95,7 +93,7 @@ public class DNBPICAElementsTest extends Assert {
         assertEquals(output.getCounter(), 50);
     }
 
-    class OurTransformer implements MarcXchange2KeyValue.FieldDataTransformer {
+    class OurTransformer implements StringTransformer {
         @Override
         public String transform(String value) {
             return Normalizer.normalize(value, Normalizer.Form.NFKC);

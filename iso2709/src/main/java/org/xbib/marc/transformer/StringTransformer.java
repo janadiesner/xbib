@@ -29,13 +29,9 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.io.stream;
+package org.xbib.marc.transformer;
 
-import java.io.IOException;
+public interface StringTransformer {
 
-public interface Streamable {
-
-    void readFrom(StreamInput in) throws IOException;
-
-    void writeTo(StreamOutput out) throws IOException;
+    String transform(String value);
 }

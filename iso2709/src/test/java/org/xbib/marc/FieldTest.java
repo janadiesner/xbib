@@ -62,6 +62,18 @@ public class FieldTest {
     }
 
     @Test
+    public void testFieldIndicators() {
+        Field f = new Field().tag("100").indicator("01");
+        Field f1 = new Field(f).subfieldId("1");
+        Field f2 = new Field(f).subfieldId("2");
+        FieldCollection c = new FieldCollection();
+        c.add(f);
+        c.add(f1);
+        c.add(f2);
+        assertEquals(c.toSpec(), "100$0$1$12");
+    }
+
+    @Test
     public void testFieldCollection() {
         Field f = new Field().tag("016").indicator("").subfieldId(null).data(null);
         Field f1 = new Field(f).subfieldId("1");

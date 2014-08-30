@@ -32,7 +32,7 @@
 package org.xbib.marc;
 
 import org.testng.annotations.Test;
-import org.xbib.marc.xml.MarcXchangeWriter;
+import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 

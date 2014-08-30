@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
  */
 public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
 
-    private final static Logger logger = LoggerFactory.getLogger(MarcXchangeFieldMapper.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(MarcXchangeFieldMapper.class.getName());
 
     private FieldCollection record = new FieldCollection();
 
@@ -118,14 +118,6 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
     }
 
     protected void flushField() {
-        if (controlfields != null && !controlfields.isEmpty()) {
-            // We have a single control field, loop might be unnecessary
-            for (Field controlfield : controlfields) {
-                record.add(controlfield);
-            }
-            // reset controlfields
-            controlfields = new FieldCollection();
-        }
         if (datafields == null) {
             return;
         }
@@ -152,21 +144,20 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
             record.add(mappedField); // this is the first field
         } else if (mapped) {
             // field was mappped. The rule is that subfields must not repeat and must be continous. If not, close data field.
-            if (!isContinous(record.peekLast(), mappedField)) {
+            if (!isContinous(record.getLast(), mappedField)) {
                 // not same field tag, close old data field and add new data field
                 record.add(Field.EMPTY);
-                record.add(mappedField);
             }
+            record.add(mappedField);
         } else {
+            // not mapped
             record.add(dataField);
         }
         // loop over fields and map them all
         while (it.hasNext()) {
             Field field = it.next();
             if (Field.EMPTY.equals(field)) {
-                break;
-            } else if (field.isSubField()) {
-                record.add(map(field));
+                record.add(field);
             } else {
                 record.add(map(field));
             }
@@ -184,8 +175,16 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         }
         beginRecord(format, type);
         leader(label);
-        // indata is bookkeeping for toggling beginDataField/endDataField
         boolean inData = false;
+        for (Field field : controlfields) {
+            beginControlField(field);
+            endControlField(field);
+        }
+        // Sequence of data fields is:
+        // 1. datafield (open) - optional
+        // 2. subfield list of datafield
+        // 3. datafield (close)
+        // Control fields are skipped.
         for (Field field : record) {
             if (field.isSubField()) {
                 if (!inData) {
@@ -194,25 +193,19 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                 }
                 beginSubField(field);
                 endSubField(field);
-            } else if (field.isControlField()) {
-                // control fields never have subfields
-                beginControlField(field);
-                endControlField(field);
-            } else {
-                if (inData) {
+            } else if (!field.isControlField()) {
+                if (inData || Field.EMPTY.equals(field)) {
                     endDataField(field.data(""));
                     inData = false;
                 } else {
-                    if (!Field.EMPTY.equals(field)) {
-                        beginDataField(field);
-                        inData = true;
-                    }
+                    beginDataField(field);
+                    inData = true;
                 }
             }
         }
-        // broken data structure?
+        // broken field data structure?
         if (inData) {
-            endDataField(null);
+            endDataField(Field.EMPTY);
         }
         endRecord();
         // reset all the counters and variables for next record
@@ -222,7 +215,6 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         controlfields = new FieldCollection();
         record = new FieldCollection();
     }
-
 
     /**
      * The mapper. Maps a field by the following convention:

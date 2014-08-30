@@ -44,11 +44,11 @@ import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xml.sax.InputSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -72,7 +72,6 @@ public class ZDBHolTest extends Assert {
             getClass().getResourceAsStream("zdblokutf8.mrc");
             //new GZIPInputStream(new FileInputStream(System.getProperty("user.home") + "/Daten/zdb/1302zdblokalgesamt.mrc.gz"));
         BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591));
-        InputSource source = new InputSource(br);
         MARCElementBuilderFactory factory = new MARCElementBuilderFactory() {
             public MARCElementBuilder newBuilder() {
                 MARCElementBuilder builder = new MARCElementBuilder();
@@ -84,7 +83,7 @@ public class ZDBHolTest extends Assert {
                 .detectUnknownKeys(true)
                 .start(factory);
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
+                .transformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(
@@ -109,7 +108,7 @@ public class ZDBHolTest extends Assert {
         Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);
         reader.setProperty(Iso2709Reader.FORMAT, "MARC");
         reader.setProperty(Iso2709Reader.TYPE, "Holdings");
-        reader.parse(source);
+        reader.parse(br);
         mapper.close();
         logger.info("zdb holdings counter = {}", out.getCounter());
         logger.info("zdb holdings unknown keys = {}", mapper.unknownKeys());

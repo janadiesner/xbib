@@ -4,7 +4,7 @@ import org.testng.annotations.Test;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
-import org.xbib.marc.xml.mapper.MarcXchangeFieldMapperReader;
+import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xml.sax.InputSource;
 
 import java.io.File;
@@ -94,29 +94,25 @@ public class MarcXchangeSingleTest {
         //StringWriter sw = new StringWriter();
         MarcXchangeWriter writer = new MarcXchangeWriter(sw);
         writer.setFormat("AlephXML").setType("Bibliographic");
-
-        //writer.addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
         writer.setMarcXchangeListener(handler);
 
         writer.startDocument();
         writer.beginCollection();
 
-
-
-        MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader();
+        MarcXchangeReader reader = new MarcXchangeReader();
         reader.setFormat("AlephXML").setType("Bibliographic");
         reader.addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
         reader.setMarcXchangeListener(writer);
         InputStream in = getClass().getResourceAsStream("HT016424175.xml");
-        reader.parse(new InputSource(new InputStreamReader(in, "UTF-8")));
+        reader.parse(in);
         in.close();
 
-        reader = new MarcXchangeFieldMapperReader();
+        reader = new MarcXchangeReader();
         reader.setFormat("AlephXML").setType("Bibliographic");
         reader.addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
         reader.setMarcXchangeListener(writer);
         in = getClass().getResourceAsStream("HT016424175.xml");
-        reader.parse(new InputSource(new InputStreamReader(in, "UTF-8")));
+        reader.parse(in);
         in.close();
 
         writer.endCollection();

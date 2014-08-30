@@ -31,17 +31,16 @@
  */
 package org.xbib.marc.xml.mapper;
 
-import org.testng.annotations.Test;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.marc.xml.MarcXchangeWriter;
+import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xml.sax.InputSource;
 
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,10 +50,10 @@ public class MarcXchangeMappedOAITest {
 
     private final Logger logger = LoggerFactory.getLogger(MarcXchangeMappedOAITest.class.getName());
     
-    @Test
+
     public void testMarcXMLFromOAI() throws Exception {
         final StringBuilder sb = new StringBuilder();
-        StringWriter fw = new StringWriter();
+        FileWriter fw = new FileWriter("target/zdb-oai-marc-fieldmapper.xml");
 
         MarcXchangeWriter writer = new MarcXchangeWriter(fw);
 
@@ -139,19 +138,19 @@ public class MarcXchangeMappedOAITest {
 
         MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader();
         reader.addListener("Bibliographic", listener);
-        writer.startDocument();
-        writer.beginCollection();
 
+        // fun: 084->085
         Map<String,Object> indicators = new HashMap();
-        indicators.put("", "004");
+        indicators.put("  ", "085$  ");
         Map<String,Object> fields = new HashMap();
-        fields.put("003", indicators);
+        fields.put("084", indicators);
         reader.setFieldMap(fields);
 
+        writer.startDocument();
+        writer.beginCollection();
         InputStream in = getClass().getResourceAsStream("zdb-oai-marc.xml");
         reader.parse(new InputSource(new InputStreamReader(in, "UTF-8")));
         in.close();
-
         writer.endCollection();
         writer.endDocument();
         fw.close();

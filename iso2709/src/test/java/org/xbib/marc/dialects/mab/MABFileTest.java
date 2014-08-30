@@ -29,10 +29,11 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc;
+package org.xbib.marc.dialects.mab;
 
 import org.testng.annotations.Test;
-import org.xbib.marc.xml.MarcXchangeWriter;
+import org.xbib.marc.Iso2709Reader;
+import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -54,16 +55,10 @@ public class MABFileTest {
      */
     @Test
     public void testDE468() throws IOException, SAXException {
-        InputStream in = getClass().getResource("/org/xbib/marc/aleph500-subfields.mrc").openStream();
+        InputStream in = getClass().getResource("aleph500-subfields.mrc").openStream();
         FileOutputStream out = new FileOutputStream("target/DE-468.xml");
         Writer target = new OutputStreamWriter(out, "UTF-8");
         Reader source = new InputStreamReader(in, "UTF-8");
-        execute(source, target);
-        target.flush();
-        target.close();
-    }
-
-    private void execute(Reader source, Writer target) throws IOException, SAXException {
         Iso2709Reader reader = new Iso2709Reader();
         reader.setProperty(Iso2709Reader.FORMAT, "MAB");
         reader.setProperty(Iso2709Reader.SUBFIELD_DELIMITER, "$$"); // will be automatically quoted before used as pattern
@@ -75,5 +70,8 @@ public class MABFileTest {
         reader.parse( new InputSource(source));
         writer.endCollection();
         writer.endDocument();
+        target.flush();
+        target.close();
     }
+
 }

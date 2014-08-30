@@ -29,11 +29,12 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc.xml;
+package org.xbib.marc.xml.stream;
 
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.xml.MarcXchangeContentHandler;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -82,13 +83,13 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
 
     private final static Namespace namespace = eventFactory.createNamespace("", NAMESPACE);
 
-    private final static Iterator<Namespace> namespaces = Collections.singletonList(namespace).iterator();
-
     private final static Pattern NUMERIC_TAG = Pattern.compile("\\d\\d\\d");
 
     private final ReentrantLock lock = new ReentrantLock(true);
 
     private XMLEventConsumer writer;
+
+    private Iterator<Namespace> namespaces;
 
     private XMLStreamException exception;
 
@@ -96,14 +97,10 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
 
     private boolean schemaWritten;
 
-    public MarcXchangeWriter setMarcXchangeListener(MarcXchangeListener listener) {
-        super.setMarcXchangeListener(listener);
-        return this;
-    }
-
     public MarcXchangeWriter(OutputStream out) throws IOException {
         try {
             this.writer = outputFactory.createXMLEventWriter(out);
+            this.namespaces = Collections.singletonList(namespace).iterator();
         } catch (XMLStreamException e) {
             throw new IOException(e);
         }
@@ -112,6 +109,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
     public MarcXchangeWriter(Writer writer) throws IOException {
         try {
             this.writer = outputFactory.createXMLEventWriter(writer);
+            this.namespaces = Collections.singletonList(namespace).iterator();
         } catch (XMLStreamException e) {
             throw new IOException(e);
         }
@@ -119,6 +117,12 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
 
     public MarcXchangeWriter(XMLEventConsumer consumer) throws IOException {
         this.writer = consumer;
+        this.namespaces = Collections.singletonList(namespace).iterator();
+    }
+
+    public MarcXchangeWriter setMarcXchangeListener(MarcXchangeListener listener) {
+        super.setMarcXchangeListener(listener);
+        return this;
     }
 
     @Override
@@ -197,8 +201,8 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         lock.lock();
         try {
             List<Attribute> attrs = Arrays.asList(
-                    eventFactory.createAttribute(TYPE, type),
-                    eventFactory.createAttribute(FORMAT, format)
+                eventFactory.createAttribute(FORMAT, getFormat() != null ? getFormat() : format != null ? format : MARC21),
+                eventFactory.createAttribute(TYPE, getType() != null ? getType() : type != null ? type : BIBLIOGRAPHIC)
             );
             if (!schemaWritten) {
                 attrs.add(eventFactory.createAttribute("xmlns:xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI));
@@ -307,7 +311,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
             return;
         }
         // check if indicators are "-". Replace with blank " ".
-        if (field.indicator().contains("-")) {
+        if (field.indicator() != null && field.indicator().contains("-")) {
             field.indicator(field.indicator().replace('-',' '));
         }
         super.beginDataField(field);

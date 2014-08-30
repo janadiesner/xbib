@@ -50,7 +50,6 @@ import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xml.sax.InputSource;
 
 public class ZDBOAIMARCElementsTest {
 
@@ -85,7 +84,6 @@ public class ZDBOAIMARCElementsTest {
                 .addListener(mapper);
         InputStream in = getClass().getResourceAsStream("zdb-oai-marc.xml");
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-        InputSource source = new InputSource(br);
 
         // we need an XML parser here that can produce k/v ...
 

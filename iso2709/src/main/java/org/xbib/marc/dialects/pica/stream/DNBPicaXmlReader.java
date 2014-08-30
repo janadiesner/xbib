@@ -29,12 +29,15 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc.dialects.pica;
+package org.xbib.marc.dialects.pica.stream;
 
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.dialects.pica.DNBPICAConstants;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Characters;
@@ -42,10 +45,14 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Iterator;
 import java.util.Stack;
 
-public class DNBPicaXmlEventConsumer implements XMLEventConsumer, DNBPICAConstants, MarcXchangeListener {
+public class DNBPicaXmlReader implements XMLEventConsumer, DNBPICAConstants, MarcXchangeListener {
 
     private Stack<Field> stack = new Stack<Field>();
 
@@ -55,10 +62,28 @@ public class DNBPicaXmlEventConsumer implements XMLEventConsumer, DNBPICAConstan
 
     private boolean inRecord = false;
 
-    public DNBPicaXmlEventConsumer setListener(MarcXchangeListener listener) {
+    public DNBPicaXmlReader setMarcXchangeListener(MarcXchangeListener listener) {
         this.listener = listener;
         return this;
     }
+
+    public void parse(InputStream in) throws IOException {
+        parse(new InputStreamReader(in, "UTF-8"));
+    }
+
+    public void parse(Reader reader) throws IOException {
+        try {
+            XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            XMLEventReader xmlEventReader = inputFactory.createXMLEventReader(reader);
+            while (xmlEventReader.hasNext()) {
+                add(xmlEventReader.nextEvent());
+            }
+            xmlEventReader.close();
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
+        }
+    }
+
 
     @Override
     public void beginCollection() {

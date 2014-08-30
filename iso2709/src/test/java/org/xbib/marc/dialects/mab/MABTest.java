@@ -29,10 +29,11 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc;
+package org.xbib.marc.dialects.mab;
 
 import org.testng.annotations.Test;
-import org.xbib.marc.xml.MarcXchangeWriter;
+import org.xbib.marc.Iso2709Reader;
+import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -54,7 +55,7 @@ public class MABTest {
      */
     @Test
     public void testZDBMAB() throws IOException, SAXException {
-        InputStream in = getClass().getResourceAsStream("1217zdbtit.dat");
+        InputStream in = getClass().getResource("1217zdbtit.dat").openStream();
         FileOutputStream out = new FileOutputStream("target/zdb.xml");
         try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
             read(new InputStreamReader(in, "x-MAB"), w);
@@ -63,9 +64,8 @@ public class MABTest {
 
     @Test
     public void testCreateMABXML() throws IOException, SAXException {
-        String s = "test.groupstream";
-        InputStream in = getClass().getResourceAsStream(s);
-        FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
+        InputStream in = getClass().getResource("test.groupstream").openStream();
+        FileOutputStream out = new FileOutputStream("target/test.groupstream.xml");
         try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
             read(new InputStreamReader(in, "x-MAB"), w);
         }

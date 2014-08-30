@@ -29,16 +29,16 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc.xml;
+package org.xbib.marc.xml.stream;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.RecordLabel;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Characters;
@@ -46,6 +46,10 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -56,9 +60,8 @@ import java.util.Stack;
 /**
  * The MarcXchange event consumer listens to StaX events and converts them to MarcXchange events
  */
-public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeConstants, MarcXchangeListener {
-
-    private static final Logger logger = LoggerFactory.getLogger(MarcXchangeContentHandler.class.getName());
+public class MarcXchangeReader
+        implements XMLEventConsumer, MarcXchangeConstants, MarcXchangeListener {
 
     private Stack<Field> stack = new Stack<Field>();
 
@@ -68,9 +71,9 @@ public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeCo
 
     private StringBuilder content = new StringBuilder();
 
-    private String format = "MARC21";
+    private String format = MARC21;
 
-    private String type = "Bibliographic";
+    private String type = BIBLIOGRAPHIC;
 
     protected boolean inData;
 
@@ -86,34 +89,51 @@ public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeCo
         add(MARC21_NS_URI);
     }};
 
-    public MarcXchangeEventConsumer addListener(String type, MarcXchangeListener listener) {
+    public MarcXchangeReader addListener(String type, MarcXchangeListener listener) {
         this.listeners.put(type, listener);
         return this;
     }
 
-    public MarcXchangeEventConsumer setMarcXchangeListener(MarcXchangeListener listener) {
-        this.listeners.put("Bibliographic", listener);
+    public MarcXchangeReader setMarcXchangeListener(MarcXchangeListener listener) {
+        this.listeners.put(BIBLIOGRAPHIC, listener);
         return this;
     }
 
-    public MarcXchangeEventConsumer setFormat(String format) {
+    public MarcXchangeReader setFormat(String format) {
         this.format = format;
         return this;
     }
 
-    public MarcXchangeEventConsumer setType(String type) {
+    public MarcXchangeReader setType(String type) {
         this.type = type;
         return this;
     }
 
-    public MarcXchangeEventConsumer setIgnoreNamespace(boolean ignore) {
+    public MarcXchangeReader setIgnoreNamespace(boolean ignore) {
         this.ignoreNamespace = ignore;
         return this;
     }
 
-    public MarcXchangeEventConsumer addNamespace(String uri) {
+    public MarcXchangeReader addNamespace(String uri) {
         this.validNamespaces.add(uri);
         return this;
+    }
+
+    public void parse(InputStream in) throws IOException {
+        parse(new InputStreamReader(in, "UTF-8"));
+    }
+
+    public void parse(Reader reader) throws IOException {
+        try {
+            XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            XMLEventReader xmlEventReader = inputFactory.createXMLEventReader(reader);
+            while (xmlEventReader.hasNext()) {
+                add(xmlEventReader.nextEvent());
+            }
+            xmlEventReader.close();
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
@@ -132,7 +152,7 @@ public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeCo
 
     @Override
     public void beginRecord(String format, String type) {
-        this.listener = listeners.get(type);
+        this.listener = listeners.get(type != null ? type : BIBLIOGRAPHIC);
         if (listener != null) {
             listener.beginRecord(format, type);
         }
@@ -331,7 +351,7 @@ public class MarcXchangeEventConsumer implements XMLEventConsumer, MarcXchangeCo
                 }
                 case SUBFIELD: {
                     if (inControl) {
-                        // repair, move data to controlfield or leader
+                        // repair, move data to controlfield
                         stack.peek().data(content.toString());
                         break;
                     } else {

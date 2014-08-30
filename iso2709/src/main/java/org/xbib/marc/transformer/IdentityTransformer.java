@@ -29,14 +29,12 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc.normalize;
+package org.xbib.marc.transformer;
 
-import org.xbib.marc.normalize.ValueNormalizer;
-
-public class WithoutNormalizer implements ValueNormalizer {
+public class IdentityTransformer implements StringTransformer {
 
     @Override
-    public String normalize(String value) {
+    public String transform(String value) {
         return value;
     }
 

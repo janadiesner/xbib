@@ -29,13 +29,16 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc.xml.mapper;
+package org.xbib.marc.xml.stream.mapper;
 
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.xml.mapper.MarcXchangeFieldMapper;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Characters;
@@ -43,6 +46,10 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -51,10 +58,10 @@ import java.util.Set;
 import java.util.Stack;
 
 /**
- * The MarcXchange mapping event consumer receives StaX events, maps the MarcXchange fields to
- * other fields, and fiels MarcXchange events
+ * The MarcXchange mapping event consumer reads StaX events, maps the MarcXchange fields to
+ * other fields, and fires MarcXchange events
  */
-public class MarcXchangeFieldMapperEventConsumer
+public class MarcXchangeFieldMapperReader
     extends MarcXchangeFieldMapper
     implements XMLEventConsumer, MarcXchangeConstants {
 
@@ -66,9 +73,9 @@ public class MarcXchangeFieldMapperEventConsumer
 
     private StringBuilder content = new StringBuilder();
 
-    private String format = "MARC21";
+    private String format = MARC21;
 
-    private String type = "Bibliographic";
+    private String type = BIBLIOGRAPHIC;
 
     protected boolean inData;
 
@@ -84,34 +91,56 @@ public class MarcXchangeFieldMapperEventConsumer
         add(MARC21_NS_URI);
     }};
 
-    public MarcXchangeFieldMapperEventConsumer addListener(String type, MarcXchangeListener listener) {
+    public MarcXchangeFieldMapperReader addListener(String type, MarcXchangeListener listener) {
         this.listeners.put(type, listener);
         return this;
     }
 
-    public MarcXchangeFieldMapperEventConsumer setMarcXchangeListener(MarcXchangeListener listener) {
-        this.listeners.put("Bibliographic", listener);
+    public MarcXchangeFieldMapperReader setMarcXchangeListener(MarcXchangeListener listener) {
+        this.listeners.put(BIBLIOGRAPHIC, listener);
         return this;
     }
 
-    public MarcXchangeFieldMapperEventConsumer setFormat(String format) {
+    public MarcXchangeFieldMapperReader setFormat(String format) {
         this.format = format;
         return this;
     }
 
-    public MarcXchangeFieldMapperEventConsumer setType(String type) {
+    public MarcXchangeFieldMapperReader setType(String type) {
         this.type = type;
         return this;
     }
 
-    public MarcXchangeFieldMapperEventConsumer setIgnoreNamespace(boolean ignore) {
+    public MarcXchangeFieldMapperReader setIgnoreNamespace(boolean ignore) {
         this.ignoreNamespace = ignore;
         return this;
     }
 
-    public MarcXchangeFieldMapperEventConsumer addNamespace(String uri) {
+    public MarcXchangeFieldMapperReader addNamespace(String uri) {
         this.validNamespaces.add(uri);
         return this;
+    }
+
+    public MarcXchangeFieldMapperReader setFieldMap(Map<String,Object> fieldMap) {
+        super.setFieldMap(fieldMap);
+        return this;
+    }
+
+    public void parse(InputStream in) throws IOException {
+        parse(new InputStreamReader(in, "UTF-8"));
+    }
+
+    public void parse(Reader reader) throws IOException {
+        try {
+            XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            XMLEventReader xmlEventReader = inputFactory.createXMLEventReader(reader);
+            while (xmlEventReader.hasNext()) {
+                add(xmlEventReader.nextEvent());
+            }
+            xmlEventReader.close();
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
@@ -130,7 +159,7 @@ public class MarcXchangeFieldMapperEventConsumer
 
     @Override
     public void beginRecord(String format, String type) {
-        this.listener = listeners.get(type);
+        this.listener = listeners.get(type != null ? type : BIBLIOGRAPHIC);
         if (listener != null) {
             listener.beginRecord(format, type);
         }
@@ -252,6 +281,7 @@ public class MarcXchangeFieldMapperEventConsumer
             if (type == null) {
                 type = this.type;
             }
+            content.setLength(0);
             switch (localName) {
                 case COLLECTION: {
                     beginCollection();
@@ -269,8 +299,6 @@ public class MarcXchangeFieldMapperEventConsumer
                 case CONTROLFIELD: {
                     Field field = new Field(tag);
                     stack.push(field);
-                    addControlField(field);
-                    content.setLength(0);
                     inControl = true;
                     break;
                 }
@@ -279,30 +307,25 @@ public class MarcXchangeFieldMapperEventConsumer
                             ? new Field(tag, Character.toString(ind1) + Character.toString(ind2))
                             : new Field(tag, Character.toString(ind1));
                     stack.push(field);
-                    addDataField(field);
-                    content.setLength(0);
                     inData = true;
                     break;
                 }
                 case SUBFIELD: {
-                    if (inControl || inLeader) {
+                    if (inControl) {
                         break;
                     } else {
                         Field f = stack.peek();
                         Field subfield = new Field(f.tag(), f.indicator(), Character.toString(code));
                         stack.push(subfield);
-                        addDataField(subfield);
-                        content.setLength(0);
+                        inData = true;
                         break;
                     }
                 }
-
             }
         } else if (event.isEndElement()) {
             EndElement element = (EndElement) event;
             String uri = element.getName().getNamespaceURI();
             if (!isNamespace(uri)) {
-                content.setLength(0);
                 return;
             }
             String localName = element.getName().getLocalPart();
@@ -321,13 +344,26 @@ public class MarcXchangeFieldMapperEventConsumer
                     break;
                 }
                 case CONTROLFIELD: {
-                    addControlField(stack.pop().data(content.toString()));
+                    Field f = stack.pop();
+                    if (f.isControlField()) {
+                        addControlField(f.subfieldId(null).data(content.toString()));
+                    } else {
+                        Field data = new Field(f).indicator("  ").subfieldId("a").data(content.toString());
+                        addDataField(data);
+                        addDataField(Field.EMPTY);
+                        flushField();
+                    }
                     inControl = false;
                     break;
                 }
                 case DATAFIELD: {
-                    addDataField(stack.pop());
-                    flushField();
+                    Field f = stack.pop();
+                    if (f.isControlField()) {
+                        //addControlField(f.subfieldId(null).data(content.toString()));
+                    } else {
+                        addDataField(f.subfieldId(null).data(""));
+                        flushField();
+                    }
                     inData = false;
                     break;
                 }
@@ -335,9 +371,15 @@ public class MarcXchangeFieldMapperEventConsumer
                     if (inControl) {
                         // repair, move data to controlfield or leader
                         stack.peek().data(content.toString());
+                        //addControlField(stack.pop());
                         break;
                     } else {
-                        addDataField(stack.pop().data(content.toString()));
+                        Field f = stack.pop().data(content.toString());
+                        if (f.isControlField()) {
+                            addControlField(f);
+                        } else {
+                            addDataField(f);
+                        }
                         inData = false;
                         break;
                     }
@@ -353,7 +395,6 @@ public class MarcXchangeFieldMapperEventConsumer
             }
         } else if (event.isStartDocument()) {
             stack.clear();
-            content.setLength(0);
         }
     }
 

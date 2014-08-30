@@ -5,7 +5,6 @@ import org.xbib.StreamUtil;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
-import org.xml.sax.InputSource;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,7 +16,7 @@ public class MarcXchangeSRUTest {
 
     private final Logger logger = LoggerFactory.getLogger(MarcXchangeSRUTest.class.getName());
 
-
+    @Test
     public void testMarcXchangeListener() throws Exception {
         final StringBuilder sb = new StringBuilder();
         MarcXchangeContentHandler handler = new MarcXchangeContentHandler() {
@@ -88,17 +87,17 @@ public class MarcXchangeSRUTest {
 
         };
 
-        InputStream in = getClass().getResourceAsStream("zdb-sru-marcxmlplus.xml");
+        InputStream in = getClass().getResource("zdb-sru-marcxmlplus.xml").openStream();
         MarcXchangeReader reader = new MarcXchangeReader();
         reader.setContentHandler(handler);
-        InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
-        reader.parse(source);
+        reader.parse(in);
         in.close();
 
-        InputStreamReader r = new InputStreamReader(getClass().getResourceAsStream("zdb-sru-marcxmlplus.txt"));
+        InputStreamReader r = new InputStreamReader(getClass().getResource("zdb-sru-marcxmlplus.txt").openStream());
         StringWriter w = new StringWriter();
         StreamUtil.copy(r, w);
         assertEquals(sb.toString(), w.toString());
+        r.close();
 
     }
 }

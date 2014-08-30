@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  * The MarcXchange mapping content handler can handle MarcXML or MarcXchange input,
@@ -62,15 +63,17 @@ public class MarcXchangeFieldMapperContentHandler
 
     private static final Logger logger = LoggerFactory.getLogger(MarcXchangeFieldMapperContentHandler.class.getName());
 
+    private Stack<Field> stack = new Stack<Field>();
+
     private Map<String,MarcXchangeListener> listeners = new HashMap<String,MarcXchangeListener>();
 
     private MarcXchangeListener listener;
 
     private StringBuilder content = new StringBuilder();
 
-    private String format = "MARC21";
+    private String format = MARC21;
 
-    private String type = "Bibliographic";
+    private String type = BIBLIOGRAPHIC;
 
     private boolean inData;
 
@@ -92,7 +95,7 @@ public class MarcXchangeFieldMapperContentHandler
     }
 
     public MarcXchangeFieldMapperContentHandler setMarcXchangeListener(MarcXchangeListener listener) {
-        this.listeners.put("Bibliographic", listener);
+        this.listeners.put(BIBLIOGRAPHIC, listener);
         return this;
     }
 
@@ -132,7 +135,7 @@ public class MarcXchangeFieldMapperContentHandler
 
     @Override
     public void beginRecord(String format, String type) {
-        this.listener = listeners.get(type);
+        this.listener = listeners.get(type != null ? type : BIBLIOGRAPHIC);
         if (listener != null) {
             listener.beginRecord(format, type);
         }
@@ -263,7 +266,8 @@ public class MarcXchangeFieldMapperContentHandler
                         tag = atts.getValue(i);
                     }
                 }
-                addControlField(new Field().tag(tag));
+                stack.push(new Field().tag(tag));
+                //addControlField(new Field().tag(tag));
                 inControl = true;
                 break;
             }
@@ -289,7 +293,8 @@ public class MarcXchangeFieldMapperContentHandler
                         sb.append(indicator);
                     }
                 }
-                addDataField(new Field().tag(tag).indicator(sb.toString()).data(null));
+                stack.push(new Field().tag(tag).indicator(sb.toString()).data(null));
+                //addDataField(new Field().tag(tag).indicator(sb.toString()).data(null));
                 inData = true;
                 break;
             }
@@ -298,13 +303,14 @@ public class MarcXchangeFieldMapperContentHandler
                     // no subfields are allowed in controlfield
                     break;
                 } else {
-                    Field field = new Field(getDataFields().getLast()).subfieldId(null).data(null);
+                    Field field = new Field(stack.peek().subfieldId(null).data(null));
                     for (int i = 0; i < atts.getLength(); i++) {
                         if (CODE.equals(atts.getLocalName(i))) {
                             field.subfieldId(atts.getValue(i));
                         }
                     }
-                    addDataField(field);
+                    stack.push(field);
+                    //addDataField(field);
                     inData = true;
                     break;
                 }
@@ -334,13 +340,13 @@ public class MarcXchangeFieldMapperContentHandler
                 break;
             }
             case CONTROLFIELD: {
-                getControlFields().peekFirst().data(content.toString());
+                addControlField(stack.pop().data(content.toString()));
                 inControl = false;
                 flushField();
                 break;
             }
             case DATAFIELD: {
-                getDataFields().peekFirst().subfieldId(null).data("");
+                addDataField(stack.pop().subfieldId(null).data(""));
                 inData = false;
                 flushField();
                 break;
@@ -348,10 +354,10 @@ public class MarcXchangeFieldMapperContentHandler
             case SUBFIELD: {
                 if (inControl) {
                     // move subfield content to controlfield content
-                    getControlFields().getLast().data(content.toString());
+                    addControlField(stack.peek().data(content.toString()));
                     break;
                 } else {
-                    getDataFields().peekLast().data(content.toString());
+                    addDataField(stack.pop().data(content.toString()));
                     inData = false;
                     break;
                 }

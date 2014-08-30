@@ -31,6 +31,8 @@
  */
 package org.xbib.marc;
 
+import java.util.Arrays;
+
 /**
  * Record label of ISO 2709 records
  */
@@ -74,8 +76,18 @@ public class RecordLabel {
      * @param label the label
      */
     public RecordLabel(char[] label) {
-        if (label.length != LENGTH) {
-            throw new IllegalArgumentException("record label is not " + LENGTH + " octets long");
+        if (label.length > LENGTH) {
+            label = Arrays.copyOf(label, LENGTH);
+        } else if (label.length < LENGTH) {
+            // append blanks
+            char[] ch = new char[LENGTH - label.length];
+            for (int i = 0; i < ch.length; i++) {
+                ch[i] = ' ';
+            }
+            char[] newLabel = new char[LENGTH];
+            System.arraycopy(label, 0, newLabel, 0, label.length);
+            System.arraycopy(ch, 0, newLabel, label.length, ch.length);
+            label = newLabel;
         }
         System.arraycopy(label, 0, cfix, 0, LENGTH);
         // repair digits if missing

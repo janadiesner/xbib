@@ -44,6 +44,7 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
@@ -115,7 +116,7 @@ public final class FromMARC extends Feeder {
                 });
 
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
+                .transformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(new String(value.getBytes(ISO88591), UTF8),

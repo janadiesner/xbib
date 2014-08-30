@@ -1,11 +1,8 @@
-package org.xbib.marc.xml;
+package org.xbib.marc.xml.stream;
 
 import org.testng.annotations.Test;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.Field;
-import org.xbib.marc.xml.mapper.MarcXchangeFieldMapperReader;
-import org.xml.sax.InputSource;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -14,8 +11,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 
 import static org.testng.Assert.assertNull;
 
@@ -36,7 +31,7 @@ public class MarcXchangeEventConsumerTest {
         writer.startDocument();
         writer.beginCollection();
 
-        MarcXchangeEventConsumer consumer = new MarcXchangeEventConsumer()
+        MarcXchangeReader consumer = new MarcXchangeReader()
                 .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd")
                 .setMarcXchangeListener(writer);
         try (InputStream in = getClass().getResourceAsStream("HT016424175.xml")) {

@@ -124,7 +124,7 @@ public class MarcXchangeOAITest {
         InputStream in = getClass().getResourceAsStream("zdb-oai-marc.xml");
         MarcXchangeReader reader = new MarcXchangeReader();
         reader.addListener("Bibliographic", listener);
-        reader.parse(new InputSource(new InputStreamReader(in, "UTF-8")));
+        reader.parse(in);
         in.close();
 
         InputStreamReader r = new InputStreamReader(getClass().getResourceAsStream("zdb-oai-marc.txt"));

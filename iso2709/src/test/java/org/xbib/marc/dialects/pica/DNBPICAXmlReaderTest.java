@@ -29,18 +29,15 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc.xml;
+package org.xbib.marc.dialects.pica;
 
 import org.testng.annotations.Test;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
-import org.xml.sax.InputSource;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 public class DNBPICAXmlReaderTest {
 
@@ -106,7 +103,7 @@ public class DNBPICAXmlReaderTest {
         };
         DNBPICAXmlReader reader = new DNBPICAXmlReader();
         reader.setListener(listener);
-        reader.parse(new InputSource(new InputStreamReader(in, "UTF-8")));
+        reader.parse(in);
     }
 
 }

@@ -78,5 +78,9 @@ public interface MarcXchangeConstants {
 
     String TYPE = "type";
 
+    String MARC21 = "MARC21";
 
+    String BIBLIOGRAPHIC = "Bibliographic";
+
+    String HOLDINGS = "Holdings";
 }

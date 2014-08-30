@@ -42,13 +42,9 @@ import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xml.sax.InputSource;
 
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -73,8 +69,8 @@ public class MARCElementsTest extends Assert {
         // test mapper in a MarcXchange listener
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
         Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);
-        reader.setProperty(Iso2709Reader.FORMAT, "MARC");
-        reader.setProperty(Iso2709Reader.TYPE, "Bibliographic");
+        reader.setFormat("MARC21");
+        reader.setType("Bibliographic");
         TransformerFactory tFactory = TransformerFactory.newInstance();
         Transformer transformer = tFactory.newTransformer();
         assertNotNull(transformer);
@@ -113,15 +109,10 @@ public class MARCElementsTest extends Assert {
                 });
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
         Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);
-        reader.setProperty(Iso2709Reader.FORMAT, "MARC");
-        reader.setProperty(Iso2709Reader.TYPE, "Bibliographic");
-        TransformerFactory tFactory = TransformerFactory.newInstance();
-        Transformer transformer = tFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-        InputSource source = new InputSource(br);
-        StreamResult target = new StreamResult(w);
-        transformer.transform(new SAXSource(reader, source), target);
+        reader.setFormat("MARC21");
+        reader.setType("Bibliographic");
+        reader.parse(br);
+
         mapper.close();
         // check if increment works
         logger.info("unknown elements = {}", mapper.unknownKeys());

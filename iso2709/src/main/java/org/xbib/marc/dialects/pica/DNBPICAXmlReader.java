@@ -51,6 +51,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 /**
  * PICA XML parser
@@ -60,8 +63,6 @@ public class DNBPICAXmlReader
 
     private static final Logger logger = LoggerFactory.getLogger(DNBPICAXmlReader.class.getName());
 
-    private final SAXParser parser;
-
     private ContentHandler contentHandler;
 
     private MarcXchangeListener listener;
@@ -69,15 +70,6 @@ public class DNBPICAXmlReader
     private FieldCollection fields = new FieldCollection();
 
     private StringBuilder content = new StringBuilder();
-
-    public DNBPICAXmlReader() throws ParserConfigurationException, SAXException {
-        this(SAXParserFactory.newInstance());
-    }
-
-    public DNBPICAXmlReader(SAXParserFactory factory) throws ParserConfigurationException, SAXException {
-        factory.setNamespaceAware(true);
-        this.parser = factory.newSAXParser();
-    }
 
     public DNBPICAXmlReader setContentHandler(ContentHandler handler) {
         this.contentHandler = handler;
@@ -89,9 +81,20 @@ public class DNBPICAXmlReader
         return this;
     }
 
-    public void parse(InputSource source) throws SAXException, IOException {
-        parser.getXMLReader().setContentHandler(contentHandler != null ? contentHandler : this);
-        parser.getXMLReader().parse(source);
+    public void parse(InputStream in) throws IOException {
+        parse(new InputStreamReader(in, "UTF-8"));
+    }
+
+    public void parse(Reader reader) throws IOException {
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            SAXParser parser = factory.newSAXParser();
+            parser.getXMLReader().setContentHandler(contentHandler != null ? contentHandler : this);
+            parser.getXMLReader().parse(new InputSource(reader));
+        } catch (ParserConfigurationException | SAXException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
@@ -103,12 +106,10 @@ public class DNBPICAXmlReader
 
     @Override
     public void beginCollection() {
-
     }
 
     @Override
     public void endCollection() {
-
     }
 
     @Override

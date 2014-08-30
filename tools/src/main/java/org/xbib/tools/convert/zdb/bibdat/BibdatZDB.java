@@ -44,19 +44,18 @@ import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.tools.Converter;
-import org.xml.sax.InputSource;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.text.Normalizer;
 
@@ -98,7 +97,7 @@ public final class BibdatZDB extends Converter {
                 });
         logger.info("mapper is up, {} elemnents", mapper.map().size());
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
+                .transformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);
@@ -121,8 +120,7 @@ public final class BibdatZDB extends Converter {
 
                 });
         InputStream in = InputService.getInputStream(uri);
-        InputSource source = new InputSource(new InputStreamReader(in, "UTF-8"));
-        new DNBPICAXmlReader().setListener(kv).parse(source);
+        new DNBPICAXmlReader().setListener(kv).parse(in);
         in.close();
         mapper.close();
         if (settings.getAsBoolean("detect", false)) {

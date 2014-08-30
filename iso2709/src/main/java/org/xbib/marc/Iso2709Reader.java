@@ -31,7 +31,7 @@
  */
 package org.xbib.marc;
 
-import org.xbib.marc.normalize.ValueNormalizer;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.MarcXchangeSaxAdapter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
@@ -44,13 +44,16 @@ import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * ISO 2709 reader behaving like a SaX XMLReader
  */
-public class Iso2709Reader implements XMLReader {
+public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
 
     /**
      * The format property. Default value is "MARC21"
@@ -107,7 +110,7 @@ public class Iso2709Reader implements XMLReader {
      */
     private MarcXchangeListener listener;
 
-    private ValueNormalizer normalizer;
+    private StringTransformer transformer;
 
     private Map<String, Object> map;
 
@@ -116,8 +119,8 @@ public class Iso2709Reader implements XMLReader {
      */
     private Map<String, Object> properties = new HashMap<String, Object>() {
         {
-            put(FORMAT, "MARC21");
-            put(TYPE, "Bibliographic");
+            put(FORMAT, MARC21);
+            put(TYPE, BIBLIOGRAPHIC);
             put(FATAL_ERRORS, Boolean.FALSE);
             put(SILENT_ERRORS, Boolean.FALSE);
             put(BUFFER_SIZE, 65536);
@@ -198,13 +201,13 @@ public class Iso2709Reader implements XMLReader {
         return listener;
     }
 
-    public Iso2709Reader setValueNormalizer(ValueNormalizer normalizer) {
-        this.normalizer = normalizer;
+    public Iso2709Reader setTransformer(StringTransformer transformer) {
+        this.transformer = transformer;
         return this;
     }
 
-    public ValueNormalizer getValueNormalizer() {
-        return normalizer;
+    public StringTransformer getTransformer() {
+        return transformer;
     }
 
     public Iso2709Reader setFieldMap(Map<String, Object> map) {
@@ -250,7 +253,7 @@ public class Iso2709Reader implements XMLReader {
                 .setInputSource(input)
                 .setContentHandler(contentHandler)
                 .setListener(listener)
-                .setValueNormalizer(normalizer)
+                .setTransformer(transformer)
                 .setSchema((String) properties.get(SCHEMA))
                 .setFormat(getFormat())
                 .setType(getType())
@@ -259,6 +262,18 @@ public class Iso2709Reader implements XMLReader {
                 .setSubfieldDelimiter((String)properties.get(SUBFIELD_DELIMITER))
                 .setFieldMap(map);
         adapter.parse();
+    }
+
+    public void parse(InputStream in) throws IOException {
+        parse(new InputStreamReader(in, "UTF-8"));
+    }
+
+    public void parse(Reader reader) throws IOException {
+        try {
+            parse(new InputSource(reader));
+        } catch (SAXException e) {
+            throw new IOException(e);
+        }
     }
 
     /**

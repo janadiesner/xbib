@@ -42,12 +42,12 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.tools.Feeder;
-import org.xml.sax.InputSource;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -102,7 +102,7 @@ public final class FromMARC extends Feeder {
                 });
 
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
+                .transformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(new String(value.getBytes(ISO88591), UTF8),
@@ -121,8 +121,7 @@ public final class FromMARC extends Feeder {
         reader.setProperty(Iso2709Reader.FATAL_ERRORS, false);
         reader.setProperty(Iso2709Reader.SILENT_ERRORS, true);
         InputStreamReader r = new InputStreamReader(InputService.getInputStream(uri), ISO88591);
-        InputSource source = new InputSource(r);
-        reader.parse(source);
+        reader.parse(r);
         r.close();
         mapper.close();
         if (settings.getAsBoolean("detect", false)) {

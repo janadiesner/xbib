@@ -29,9 +29,15 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc.normalize;
+package org.xbib.marc.transformer;
 
-public interface ValueNormalizer {
+import java.text.Normalizer;
 
-    String normalize(String value);
+public class NormalizeStringTransformer implements StringTransformer {
+
+    @Override
+    public String transform(String value) {
+        return Normalizer.normalize(value, Normalizer.Form.NFC);
+    }
+
 }

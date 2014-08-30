@@ -44,7 +44,8 @@ import org.xbib.marc.Field;
 import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.marc.dialects.pica.DNBPicaXmlEventConsumer;
+import org.xbib.marc.dialects.pica.stream.DNBPicaXmlReader;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
@@ -104,7 +105,7 @@ public final class BibdatFromOAITar extends Feeder {
                     }
                 });
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new MarcXchange2KeyValue.FieldDataTransformer() {
+                .transformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);
@@ -164,8 +165,8 @@ public final class BibdatFromOAITar extends Feeder {
 
         @Override
         protected void process(Packet packet) throws IOException {
-            DNBPicaXmlEventConsumer consumer = new DNBPicaXmlEventConsumer();
-            consumer.setListener(listener);
+            DNBPicaXmlReader consumer = new DNBPicaXmlReader();
+            consumer.setMarcXchangeListener(listener);
             if (logger.isTraceEnabled()) {
                 logger.trace("content = {}", packet.toString());
             }

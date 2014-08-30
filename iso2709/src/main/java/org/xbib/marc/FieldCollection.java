@@ -31,6 +31,7 @@
  */
 package org.xbib.marc;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
@@ -39,7 +40,7 @@ import java.util.TreeMap;
 /**
  * A linked list of ISO 2709 fields
  */
-public class FieldCollection extends LinkedList<Field> {
+public class FieldCollection extends ArrayList<Field> {
 
     public final static FieldCollection FORMAT_KEY = new FieldCollection("FORMAT");
 
@@ -180,6 +181,42 @@ public class FieldCollection extends LinkedList<Field> {
             }
         }
         return sb.toString();
+    }
+
+    public Field getFirst() {
+        return get(0);
+    }
+
+    public Field removeFirst() {
+        return remove(0);
+    }
+
+    public Field getLast() {
+        return isEmpty() ? null : get(size()-1);
+    }
+
+    public Field removeLast() {
+        return remove(size()-1);
+    }
+
+    public void addToFieldCollection(Field field) {
+        // insert sort. Search first occurence where the field tag is higher.
+        if (isEmpty()) {
+            add(0, field);
+        } else {
+            boolean inserted = false;
+            for (int i = 0; i < size(); i++) {
+                Field f = get(i);
+                if (f.compareTo(field) > 0) {
+                    add(i, field);
+                    inserted = true;
+                    break;
+                }
+            }
+            if (!inserted) {
+                add(field);
+            }
+        }
     }
 
     public String getString() {

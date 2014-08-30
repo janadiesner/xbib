@@ -49,8 +49,8 @@ import org.xbib.marc.InvalidFieldDirectoryException;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.RecordLabel;
-import org.xbib.marc.normalize.ValueNormalizer;
-import org.xbib.marc.normalize.WithoutNormalizer;
+import org.xbib.marc.transformer.IdentityTransformer;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.mapper.MarcXchangeFieldMapper;
 import org.xbib.xml.XMLNS;
 import org.xbib.xml.XSI;
@@ -71,7 +71,9 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
 
     private static final AttributesImpl EMPTY_ATTRIBUTES = new AttributesImpl();
 
-    private ValueNormalizer normalizer = new WithoutNormalizer();
+    private static final String CDATA = "CDATA";
+
+    private StringTransformer transformer = new IdentityTransformer();
 
     private Reader reader;
 
@@ -166,9 +168,9 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
         return this;
     }
 
-    public MarcXchangeSaxAdapter setValueNormalizer(ValueNormalizer normalizer) {
-        if (normalizer != null) {
-            this.normalizer = normalizer;
+    public MarcXchangeSaxAdapter setTransformer(StringTransformer transformer) {
+        if (transformer != null) {
+            this.transformer = transformer;
         }
         return this;
     }
@@ -214,16 +216,16 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
             if ("MARC21".equalsIgnoreCase(schema)) {
                 this.nsUri = MARC21_NS_URI;
                 attrs.addAttribute(XMLNS.NS_URI, XSI.NS_PREFIX,
-                        XMLNS.NS_PREFIX + ":" + XSI.NS_PREFIX, "CDATA", XSI.NS_URI);
+                        XMLNS.NS_PREFIX + ":" + XSI.NS_PREFIX, CDATA, XSI.NS_URI);
                 attrs.addAttribute(XSI.NS_URI, "schemaLocation",
-                        XSI.NS_PREFIX + ":schemaLocation", "CDATA", MARC21_NS_URI + " " + MARC21_SCHEMALOCATION);
+                        XSI.NS_PREFIX + ":schemaLocation", CDATA, MARC21_NS_URI + " " + MARC21_SCHEMALOCATION);
 
             } else {
                 this.nsUri = MARCXCHANGE_V2_NS_URI;
                 attrs.addAttribute(XMLNS.NS_URI, XSI.NS_PREFIX,
-                        XMLNS.NS_PREFIX + ":" + XSI.NS_PREFIX, "CDATA", XSI.NS_URI);
+                        XMLNS.NS_PREFIX + ":" + XSI.NS_PREFIX, CDATA, XSI.NS_URI);
                 attrs.addAttribute(XSI.NS_URI, "schemaLocation",
-                        XSI.NS_PREFIX + ":schemaLocation", "CDATA", MARCXCHANGE_V2_NS_URI + " " + MARCXCHANGE_V2_0_SCHEMALOCATION);
+                        XSI.NS_PREFIX + ":schemaLocation", CDATA, MARCXCHANGE_V2_NS_URI + " " + MARCXCHANGE_V2_0_SCHEMALOCATION);
             }
             contentHandler.startPrefixMapping("", nsUri);
             contentHandler.startElement(nsUri, COLLECTION, COLLECTION, attrs);
@@ -260,11 +262,11 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
         }
         try {
             AttributesImpl attrs = new AttributesImpl();
-            if (format != null && !"MARC21".equalsIgnoreCase(schema)) {
-                attrs.addAttribute(nsUri, FORMAT, FORMAT, "CDATA", format);
+            if (format != null && !MARC21.equalsIgnoreCase(schema)) {
+                attrs.addAttribute(nsUri, FORMAT, FORMAT, CDATA, format);
             }
             if (type != null) {
-                attrs.addAttribute(nsUri, TYPE, TYPE, "CDATA", type);
+                attrs.addAttribute(nsUri, TYPE, TYPE, CDATA, type);
             }
             if (contentHandler != null) {
                 contentHandler.startElement(nsUri, RECORD, RECORD, attrs);
@@ -334,7 +336,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
         }
         try {
             AttributesImpl attrs = new AttributesImpl();
-            attrs.addAttribute(nsUri, TAG, TAG, "CDATA", designator.tag());
+            attrs.addAttribute(nsUri, TAG, TAG, CDATA, designator.tag());
             if (contentHandler != null) {
                 contentHandler.startElement(nsUri, CONTROLFIELD, CONTROLFIELD, attrs);
             }
@@ -407,19 +409,19 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                 tag = Field.NULL_TAG; // fallback
                 designator.tag(tag);
             }
-            attrs.addAttribute(nsUri, TAG, TAG, "CDATA", tag);
+            attrs.addAttribute(nsUri, TAG, TAG, CDATA, tag);
             int ind = designator.indicator() != null
                     ? designator.indicator().length() : 0;
             // force at least two default blank indicators if schema is Marc 21
-            if ("MARC21".equalsIgnoreCase(schema)) {
+            if (MARC21.equalsIgnoreCase(schema)) {
                 for (int i = (ind == 0 ? 1 : ind); i <= 2; i++) {
-                    attrs.addAttribute(null, IND + i, IND + i, "CDATA", " ");
+                    attrs.addAttribute(null, IND + i, IND + i, CDATA, " ");
                 }
             }
             // set indicators
             for (int i = 1; i <= ind; i++) {
                 attrs.addAttribute(null, IND + i,
-                        IND + i, "CDATA", designator.indicator().substring(i - 1, i));
+                        IND + i, CDATA, designator.indicator().substring(i - 1, i));
             }
             if (contentHandler != null) {
                 contentHandler.startElement(nsUri, DATAFIELD, DATAFIELD, attrs);
@@ -446,12 +448,10 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
             if (designator != null) {
                 String value = designator.data();
                 if (value != null && !value.isEmpty() && subfieldDelimiter == null) {
-                    if (normalizer != null) {
-                        value = normalizer.normalize(value);
-                    }
+                    value = transformer.transform(value);
                     // write data field per default into a subfield with code 'a'
                     AttributesImpl attrs = new AttributesImpl();
-                    attrs.addAttribute(nsUri, CODE, CODE, "CDATA", "a");
+                    attrs.addAttribute(nsUri, CODE, CODE, CDATA, "a");
                     if (contentHandler != null) {
                         contentHandler.startElement(nsUri, SUBFIELD, SUBFIELD, attrs);
                         contentHandler.characters(value.toCharArray(), 0, value.length());
@@ -486,7 +486,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
             if (subfieldId == null || subfieldId.length() == 0) {
                 subfieldId = "a"; // fallback
             }
-            attrs.addAttribute(nsUri, CODE, CODE, "CDATA", subfieldId);
+            attrs.addAttribute(nsUri, CODE, CODE, CDATA, subfieldId);
             if (listener != null) {
                 listener.beginSubField(designator);
             }
@@ -511,9 +511,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
             if (contentHandler != null) {
                 String value = designator.data();
                 if (value != null && !value.isEmpty()) {
-                    if (normalizer != null) {
-                        value = normalizer.normalize(value);
-                    }
+                    value = transformer.transform(value);
                     contentHandler.characters(value.toCharArray(), 0, value.length());
                 }
             }
@@ -615,9 +613,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                 // tricky: first field has no subfield ID. We set it to blank.
                                 fieldContent = " " + fieldContent.substring(4);
                                 for (String subfield : fieldContent.split(Pattern.quote(subfieldDelimiter))) {
-                                    if (normalizer != null) {
-                                        subfield = normalizer.normalize(subfield);
-                                    }
+                                    subfield = transformer.transform(subfield);
                                     designator = new Field(recordLabel, designator, subfield, true);
                                     beginSubField(designator);
                                     endSubField(designator);
@@ -634,9 +630,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                             beginDataField(designator);
                         }
                         if (designator != null) {
-                            if (normalizer != null) {
-                                fieldContent = normalizer.normalize(fieldContent);
-                            }
+                            fieldContent = transformer.transform(fieldContent);
                             designator = new Field(recordLabel, designator, fieldContent, true);
                             beginSubField(designator);
                             endSubField(designator);
@@ -759,9 +753,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                 // tricky: first field has no subfield ID. We set it to blank.
                                 fieldContent = " " + fieldContent.substring(4);
                                 for (String subfield : fieldContent.split(Pattern.quote(subfieldDelimiter))) {
-                                    if (normalizer != null) {
-                                        subfield = normalizer.normalize(subfield);
-                                    }
+                                    subfield = transformer.transform(subfield);
                                     designator = new Field(recordLabel, designator, subfield, true);
                                     addDataField(designator);
                                 }
@@ -782,9 +774,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                             addDataField(designator);
                         }
                         if (designator != null) {
-                            if (normalizer != null) {
-                                fieldContent = normalizer.normalize(fieldContent);
-                            }
+                            fieldContent = transformer.transform(fieldContent);
                             designator = new Field(recordLabel, designator, fieldContent, true);
                             addDataField(designator);
                         }

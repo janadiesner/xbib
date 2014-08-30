@@ -114,6 +114,16 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Long
     }
 
     @Override
+    public void beginCollection() {
+
+    }
+
+    @Override
+    public void endCollection() {
+
+    }
+
+    @Override
     public void beginRecord(String format, String type) {
         if (listener != null) {
             listener.beginRecord(format, type);
