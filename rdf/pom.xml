@@ -88,10 +88,5 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.xbib</groupId>
-            <artifactId>logging</artifactId>
-            <type>jar</type>
-        </dependency>
     </dependencies>
 </project>

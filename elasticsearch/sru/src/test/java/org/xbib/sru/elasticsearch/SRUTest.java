@@ -31,6 +31,7 @@
  */
 package org.xbib.sru.elasticsearch;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -64,7 +65,8 @@ public class SRUTest {
             .setRecordPacking("xml")
             .setRecordSchema("mods")
             .setPath("/sru/hbz/*");
-        FileWriter w = new FileWriter("target/es." + format);
+        File file = File.createTempFile("es.", "." + format);
+        FileWriter w = new FileWriter(file);
         try {
             SearchRetrieveResponse response = client.searchRetrieve(request);
             StylesheetTransformer transformer = new StylesheetTransformer(

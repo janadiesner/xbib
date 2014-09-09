@@ -176,7 +176,7 @@ public class FromSRU extends Feeder {
                 });
 
         final MarcXchange2KeyValue bib = new MarcXchange2KeyValue()
-                .transformer(new StringTransformer() {
+                .setStringTransformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);
@@ -185,7 +185,7 @@ public class FromSRU extends Feeder {
                 .addListener(bibmapper);
 
         final MarcXchange2KeyValue hol = new MarcXchange2KeyValue()
-                .transformer(new StringTransformer() {
+                .setStringTransformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);

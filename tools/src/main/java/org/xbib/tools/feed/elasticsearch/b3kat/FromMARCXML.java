@@ -116,7 +116,7 @@ public final class FromMARCXML extends Feeder {
                 });
 
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new StringTransformer() {
+                .setStringTransformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(new String(value.getBytes(ISO88591), UTF8),
@@ -132,7 +132,7 @@ public final class FromMARCXML extends Feeder {
         r.close();
         mapper.close();
         if (settings.getAsBoolean("detect", false)) {
-            logger.info("unknown keys={}", mapper.unknownKeys());
+            logger.info("unknown keys={}", mapper.getUnknownKeys());
         }
     }
 

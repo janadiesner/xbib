@@ -35,6 +35,7 @@ import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.xml.MarcXchangeContentHandler;
+import org.xbib.xml.XMLUtil;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -97,6 +98,8 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
 
     private boolean schemaWritten;
 
+    private boolean scrubData;
+
     public MarcXchangeWriter(OutputStream out) throws IOException {
         try {
             this.writer = outputFactory.createXMLEventWriter(out);
@@ -118,6 +121,11 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
     public MarcXchangeWriter(XMLEventConsumer consumer) throws IOException {
         this.writer = consumer;
         this.namespaces = Collections.singletonList(namespace).iterator();
+    }
+
+    public MarcXchangeWriter setScrubData(boolean scrub) {
+        this.scrubData = scrubData;
+        return this;
     }
 
     public MarcXchangeWriter setMarcXchangeListener(MarcXchangeListener listener) {
@@ -320,7 +328,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         }
         try {
             // validate attribute values, must not be null, must not be empty
-            String tag = field.tag() != null ? field.tag() : "999";
+            String tag = field.tag() != null ? field.tag() : Field.ERROR_TAG;
             String ind1 = field.indicator() != null && field.indicator().length() > 0 ? field.indicator().substring(0,1) : " ";
             String ind2 = field.indicator() != null && field.indicator().length() > 1 ? field.indicator().substring(1,2) : " ";
             Iterator<Attribute> attrs = Arrays.asList(
@@ -358,7 +366,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
 
     @Override
     public void beginSubField(Field field) {
-        if (inControl || inLeader) {
+        if (inControl) {
             return;
         }
         super.beginSubField(field);
@@ -366,20 +374,21 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
             return;
         }
         try {
+            String code = field.subfieldId();
+            // safety check against subfields with empty subfield code (!)
             Iterator<Attribute> attrs = Collections.singletonList(
-                    eventFactory.createAttribute(CODE, field.subfieldId())
+                    eventFactory.createAttribute(CODE, code != null && !code.isEmpty() ? code : "a")
             ).iterator();
             writer.add(eventFactory.createStartElement(SUBFIELD_ELEMENT, attrs, namespaces));
         } catch (XMLStreamException e) {
             exception = e;
         }
-
     }
 
     @Override
     public void endSubField(Field field) {
         try {
-            if (inControl || inLeader) {
+            if (inControl) {
                 if (field.data() != null) {
                     writer.add(eventFactory.createCharacters(field.data()));
                 }

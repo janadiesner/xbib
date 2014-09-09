@@ -2,7 +2,7 @@ package org.xbib.analyzer.marc.zdb.bib;
 
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.elements.marc.MARCElementBuilder;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 
 public class Skip extends MARCElement {
     
@@ -16,7 +16,7 @@ public class Skip extends MARCElement {
     }
 
     @Override
-    public Skip build(MARCElementBuilder b, FieldCollection key, String value) {
+    public Skip build(MARCElementBuilder b, DataField key, String value) {
         return this;
     }
 

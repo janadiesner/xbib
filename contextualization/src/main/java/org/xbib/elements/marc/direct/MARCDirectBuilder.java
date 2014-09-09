@@ -34,10 +34,10 @@ package org.xbib.elements.marc.direct;
 import org.xbib.elements.context.ResourceContextFactory;
 import org.xbib.elements.direct.AbstractDirectBuilder;
 import org.xbib.elements.marc.MARCContext;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 
 public class MARCDirectBuilder
-       extends AbstractDirectBuilder<FieldCollection, String, MARCContext> {
+       extends AbstractDirectBuilder<DataField, String, MARCContext> {
 
     private final static ResourceContextFactory<MARCContext> contextFactory = new ResourceContextFactory<MARCContext>() {
 

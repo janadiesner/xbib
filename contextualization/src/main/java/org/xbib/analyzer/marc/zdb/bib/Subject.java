@@ -34,7 +34,7 @@ package org.xbib.analyzer.marc.zdb.bib;
 import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 import org.xbib.rdf.Resource;
 
 public class Subject extends MARCElement {
@@ -45,7 +45,7 @@ public class Subject extends MARCElement {
     }
 
     @Override
-    public String data(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,String predicate, Resource resource, String property, String value) {
+    public String data(ElementBuilder<DataField, String, MARCElement, MARCContext> builder,String predicate, Resource resource, String property, String value) {
         if ("identifier".equals(property)) {
             if (value.startsWith("(DE-588)")) {
                 resource.add("identifierGND", value.substring(8).replaceAll("\\-","").toLowerCase());

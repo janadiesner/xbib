@@ -39,7 +39,7 @@ public class XMLStringTransformer implements StringTransformer {
 
     @Override
     public String transform(String value) {
-        return XMLUtil.clean(Normalizer.normalize(value, Normalizer.Form.NFC));
+        return XMLUtil.sanitizeXml10(Normalizer.normalize(value, Normalizer.Form.NFC)).toString();
     }
 
 }

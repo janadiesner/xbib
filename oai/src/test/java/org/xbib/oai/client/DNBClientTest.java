@@ -31,6 +31,7 @@
  */
 package org.xbib.oai.client;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -104,11 +105,12 @@ public class DNBClientTest {
             }
 
         };
-        FileWriter sw = new FileWriter("target/dnb-bib-pica.xml");
+        File file = File.createTempFile("dnb-bib-pica.",".xml");
+        FileWriter sw = new FileWriter(file);
         do {
             try {
                 request.addHandler(metadataHandler);
-                ListRecordsListener listener = new ListRecordsListener(request);                        ;
+                ListRecordsListener listener = new ListRecordsListener(request);
                 request.prepare().execute(listener).waitFor();
                 if (listener.getResponse() != null) {
                     listener.getResponse().to(sw);

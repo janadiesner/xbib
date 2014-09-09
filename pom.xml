@@ -61,6 +61,8 @@
     </distributionManagement>
 
     <repositories>
+
+
         <repository>
             <id>xbib</id>
             <url>http://xbib.org/repository</url>
@@ -126,6 +128,7 @@
                     <version>2.17</version>
                     <configuration>
                         <skip>false</skip>
+                        <workingDirectory>${project.build.directory}</workingDirectory>
                         <systemPropertyVariables>
                             <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
                         </systemPropertyVariables>
@@ -477,6 +480,11 @@
             </dependency>
             <dependency>
                 <groupId>org.xbib</groupId>
+                <artifactId>rule</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xbib</groupId>
                 <artifactId>elasticsearch-search</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -714,6 +722,7 @@
         <module>iso23950</module>
         <module>opensearch</module>
         <module>syslog</module>
+        <module>rule</module>
 
         <module>io/stream</module>
         <module>io/file</module>

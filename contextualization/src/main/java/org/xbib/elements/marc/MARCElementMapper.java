@@ -34,14 +34,14 @@ package org.xbib.elements.marc;
 import org.xbib.elements.AbstractElementMapper;
 import org.xbib.elements.ElementBuilderFactory;
 import org.xbib.elements.KeyValueElementPipeline;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 
 import java.util.Map;
 
 /**
  * A MARC element mapper
  */
-public class MARCElementMapper extends AbstractElementMapper<FieldCollection, String, MARCElement, MARCContext> {
+public class MARCElementMapper extends AbstractElementMapper<DataField, String, MARCElement, MARCContext> {
 
     /**
      * Instantiate a MARC element mapper.
@@ -74,7 +74,7 @@ public class MARCElementMapper extends AbstractElementMapper<FieldCollection, St
     }
 
     @Override
-    public MARCElementMapper start(ElementBuilderFactory<FieldCollection, String, MARCElement, MARCContext> factory) {
+    public MARCElementMapper start(ElementBuilderFactory<DataField, String, MARCElement, MARCContext> factory) {
         super.start(factory);
         return this;
     }

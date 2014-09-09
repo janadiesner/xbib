@@ -8,6 +8,7 @@ import org.xbib.sru.iso23950.service.ZSRUServiceFactory;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
 import org.xbib.sru.service.SRUService;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -25,7 +26,8 @@ public class PrivateSRUServiceTest {
             try {
                 SRUService service = ZSRUServiceFactory.getService(name);
                 SRUClient client = service.newClient();
-                FileOutputStream out = new FileOutputStream("target/sru-" + service.getURI().getHost() + ".xml");
+                File file = File.createTempFile("sru-" + service.getURI().getHost(), ".xml");
+                FileOutputStream out = new FileOutputStream(file);
                 Writer writer = new OutputStreamWriter(out, "UTF-8");
                 String query = "dc.title = test";
                 int from = 1;
@@ -36,6 +38,7 @@ public class PrivateSRUServiceTest {
                         .setMaximumRecords(size);
                 client.searchRetrieve(request).to(writer);
                 writer.close();
+                out.close();
             } catch (Exception e) {
                 logger.warn(e.getMessage());
             }

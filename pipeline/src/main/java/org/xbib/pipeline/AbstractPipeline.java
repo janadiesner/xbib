@@ -19,6 +19,10 @@ public abstract class AbstractPipeline<R extends PipelineRequest, E extends Pipe
         implements Pipeline<MeterMetric,R>, PipelineRequestListener<MeterMetric,R>,
         PipelineErrorListener<MeterMetric,R,E> {
 
+    private String name;
+
+    private Integer number;
+
     /**
      * A list of request listeners for processing requests
      */
@@ -30,6 +34,24 @@ public abstract class AbstractPipeline<R extends PipelineRequest, E extends Pipe
      */
     private Map<String,PipelineErrorListener<MeterMetric,R,E>> errorListeners =
             new LinkedHashMap<String,PipelineErrorListener<MeterMetric,R,E>>();
+
+    public AbstractPipeline<R,E> setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public AbstractPipeline<R,E> setNumber(Integer number) {
+        this.number = number;
+        return this;
+    }
+
+    public Integer getNumber() {
+        return number;
+    }
 
     private MeterMetric metric;
 

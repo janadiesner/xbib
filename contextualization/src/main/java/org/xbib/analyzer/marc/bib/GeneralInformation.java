@@ -35,8 +35,8 @@ import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 
 import java.util.Map;
 
@@ -62,8 +62,8 @@ public class GeneralInformation extends MARCElement {
      * Example "991118d19612006xx z||p|r ||| 0||||0ger c"
      */
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
-                          FieldCollection fields, String value) {
+    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<DataField, String, MARCElement, MARCContext> builder,
+                          DataField fields, String value) {
 
         if (value.length() != 40) {
             logger.warn("broken GeneralInformation field, length is not 40");

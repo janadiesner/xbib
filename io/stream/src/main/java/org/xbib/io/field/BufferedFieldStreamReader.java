@@ -455,12 +455,8 @@ public class BufferedFieldStreamReader extends Reader implements FieldStream {
         return in;
     }
 
-    public void setListener(FieldListener listener) {
-        this.listener = listener;
-    }
-
     @Override
-    public String readData() throws IOException {
+    public Separable readField() throws IOException {
         synchronized (lock) {
             if (isClosed()) {
                 throw new IOException();
@@ -479,7 +475,13 @@ public class BufferedFieldStreamReader extends Reader implements FieldStream {
                         listener.mark(ch);
                     }
                     pos = charPos + 1;
-                    return res;
+                    switch (ch) {
+                        case FieldSeparator.US : return new UnitField(res);
+                        case FieldSeparator.GS : return new GroupField(res);
+                        case FieldSeparator.RS : return new RecordField(res);
+                        case FieldSeparator.FS : return new FileField(res);
+                    }
+                    throw new IOException();
                 }
             }
             char eod = '\0';
@@ -493,7 +495,17 @@ public class BufferedFieldStreamReader extends Reader implements FieldStream {
                         if (listener != null) {
                             listener.data(s);
                         }
-                        return s;
+                        switch (eod) {
+                            case FieldSeparator.US:
+                                return new UnitField(s);
+                            case FieldSeparator.GS:
+                                return new GroupField(s);
+                            case FieldSeparator.RS:
+                                return new RecordField(s);
+                            case FieldSeparator.FS:
+                                return new FileField(s);
+                        }
+                        throw new IOException();
                     }
                     if (fillbuf() == -1) {
                         if (result.length() > 0 || eod != '\0') {
@@ -501,7 +513,17 @@ public class BufferedFieldStreamReader extends Reader implements FieldStream {
                             if (listener != null) {
                                 listener.data(s);
                             }
-                            return s;
+                            switch (eod) {
+                                case FieldSeparator.US:
+                                    return new UnitField(s);
+                                case FieldSeparator.GS:
+                                    return new GroupField(s);
+                                case FieldSeparator.RS:
+                                    return new RecordField(s);
+                                case FieldSeparator.FS:
+                                    return new FileField(s);
+                            }
+                            return new FileField(s);
                         } else {
                             return null;
                         }
@@ -522,7 +544,12 @@ public class BufferedFieldStreamReader extends Reader implements FieldStream {
                             listener.data(s);
                             listener.mark(eod);
                         }
-                        return s;
+                        switch (eod) {
+                            case FieldSeparator.US : return new UnitField(s);
+                            case FieldSeparator.GS : return new GroupField(s);
+                            case FieldSeparator.RS : return new RecordField(s);
+                            case FieldSeparator.FS : return new FileField(s);
+                        }
                     }
                 }
                 if (eod == '\0') {
@@ -583,9 +610,13 @@ public class BufferedFieldStreamReader extends Reader implements FieldStream {
         return ch == FieldSeparator.FS || ch == FieldSeparator.GS || ch == FieldSeparator.RS || ch == FieldSeparator.US;
     }
 
-    public Stream<String> fields() {
-        Iterator<String> iter = new Iterator<String>() {
-            String nextData = null;
+    public void setListener(FieldListener listener) {
+        this.listener = listener;
+    }
+
+    public Stream<Separable> fields() {
+        Iterator<Separable> iter = new Iterator<Separable>() {
+            Separable nextData = null;
 
             @Override
             public boolean hasNext() {
@@ -593,7 +624,7 @@ public class BufferedFieldStreamReader extends Reader implements FieldStream {
                     return true;
                 } else {
                     try {
-                        nextData = readData();
+                        nextData = readField();
                         return (nextData != null);
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
@@ -602,9 +633,9 @@ public class BufferedFieldStreamReader extends Reader implements FieldStream {
             }
 
             @Override
-            public String next() {
+            public Separable next() {
                 if (nextData != null || hasNext()) {
-                    String data = nextData;
+                    Separable data = nextData;
                     nextData = null;
                     return data;
                 } else {

@@ -33,10 +33,10 @@ package org.xbib.elements.marc.direct;
 
 import org.xbib.elements.direct.DirectBuilderFactory;
 import org.xbib.elements.marc.MARCContext;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 
 public class MARCDirectBuilderFactory
-        implements DirectBuilderFactory<FieldCollection, String, MARCContext> {
+        implements DirectBuilderFactory<DataField, String, MARCContext> {
 
     @Override
     public MARCDirectBuilder newBuilder() {

@@ -36,7 +36,7 @@ import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.logging.Logger;
 import org.xbib.logging.Loggers;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 import org.xbib.rdf.Resource;
 
 public class Title extends MARCElement {
@@ -50,7 +50,7 @@ public class Title extends MARCElement {
     }
 
     @Override
-    public String data(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,String predicate, Resource resource, String property, String value) {
+    public String data(ElementBuilder<DataField, String, MARCElement, MARCContext> builder,String predicate, Resource resource, String property, String value) {
         // let's make "sorting" marker characters visible again
         // 0098 = START OF STRING, 009c = END OF STRING
         // --> 00ac = negation sign

@@ -87,7 +87,7 @@ public final class FromMarcXmlTar extends Feeder {
                     }
                 });
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new StringTransformer() {
+                .setStringTransformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);
@@ -105,7 +105,7 @@ public final class FromMarcXmlTar extends Feeder {
         reader.close();
         mapper.close();
         if (settings.getAsBoolean("detect", false)) {
-            logger.info("unknown keys={}", mapper.unknownKeys());
+            logger.info("unknown keys={}", mapper.getUnknownKeys());
         }
     }
 

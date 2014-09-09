@@ -31,6 +31,8 @@
  */
 package org.xbib.marc;
 
+import java.util.regex.Pattern;
+
 /**
  * ISO/DIS 25577 MarcXchange constants
  */
@@ -83,4 +85,6 @@ public interface MarcXchangeConstants {
     String BIBLIOGRAPHIC = "Bibliographic";
 
     String HOLDINGS = "Holdings";
+
+    Pattern TAG_PATTERN = Pattern.compile("(00[1-9A-Za-z]|0[1-9A-Za-z][0-9A-Za-z]|[1-9A-Za-z][0-9A-Za-z]{2})");
 }

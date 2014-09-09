@@ -40,8 +40,8 @@ public class InheritanceTest {
             Template template = handlebars.compile(name);
             CharSequence result = template.apply(new Object());
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            copy(new FileInputStream(new File("src/test/resources/inheritance/"
-                    + name + ".expected")), out, 1024);
+            InputStream in = getClass().getResourceAsStream("/inheritance/" + name + ".expected");
+            copy(in, out, 1024);
             String expected = new String(out.toByteArray());
             assertEquals(expected, result);
         } catch (HandlebarsException ex) {

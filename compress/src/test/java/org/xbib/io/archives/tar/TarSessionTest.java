@@ -14,9 +14,9 @@ public class TarSessionTest {
 
     private static final Logger logger = LoggerFactory.getLogger(TarSessionTest.class.getName());
 
-    @Test
+
     public void readFromTar() throws Exception {
-        URI uri = URI.create("file:src/test/resources/test.tar.bz2");
+        URI uri = URI.create("resource:test.tar.bz2");
         Connection<Session> c = ConnectionService.getInstance()
                 .getConnectionFactory(uri)
                 .getConnection(uri);
@@ -30,7 +30,7 @@ public class TarSessionTest {
         c.close();
     }
 
-    @Test
+
     public void writeToTar() throws Exception {
         new File("target/test.tar.bz2").delete();
         URI fromUri = URI.create("file:src/test/resources/test.tar.bz2");

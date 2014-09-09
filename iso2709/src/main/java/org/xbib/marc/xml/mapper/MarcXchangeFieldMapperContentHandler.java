@@ -267,7 +267,6 @@ public class MarcXchangeFieldMapperContentHandler
                     }
                 }
                 stack.push(new Field().tag(tag));
-                //addControlField(new Field().tag(tag));
                 inControl = true;
                 break;
             }
@@ -294,7 +293,6 @@ public class MarcXchangeFieldMapperContentHandler
                     }
                 }
                 stack.push(new Field().tag(tag).indicator(sb.toString()).data(null));
-                //addDataField(new Field().tag(tag).indicator(sb.toString()).data(null));
                 inData = true;
                 break;
             }
@@ -310,7 +308,6 @@ public class MarcXchangeFieldMapperContentHandler
                         }
                     }
                     stack.push(field);
-                    //addDataField(field);
                     inData = true;
                     break;
                 }

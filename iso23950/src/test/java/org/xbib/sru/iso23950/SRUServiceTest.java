@@ -31,6 +31,7 @@
  */
 package org.xbib.sru.iso23950;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -61,7 +62,8 @@ public class SRUServiceTest {
         for (String name : Arrays.asList("OBVSG")) {
             logger.info("trying " + name);
             ZSRUService service = ZSRUServiceFactory.getService(name);
-            FileOutputStream out = new FileOutputStream("target/sru-" + service.getURI().getHost() + ".xml");
+            File file = File.createTempFile("sru-" + service.getURI().getHost(), ".xml");
+            FileOutputStream out = new FileOutputStream(file);
             Writer w = new OutputStreamWriter(out, "UTF-8");
                 try {
                     SRUClient client = service.newClient();
@@ -144,6 +146,7 @@ public class SRUServiceTest {
                     logger.error(e.getMessage(), e);
                 }
             w.close();
+            out.close();
         }
     }
 }

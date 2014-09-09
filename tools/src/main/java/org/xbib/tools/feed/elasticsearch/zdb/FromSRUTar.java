@@ -121,7 +121,7 @@ public class FromSRUTar extends Feeder {
                 });
 
         final MarcXchange2KeyValue bib = new MarcXchange2KeyValue()
-                .transformer(new StringTransformer() {
+                .setStringTransformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);
@@ -130,7 +130,7 @@ public class FromSRUTar extends Feeder {
                 .addListener(bibmapper);
 
         final MarcXchange2KeyValue hol = new MarcXchange2KeyValue()
-                .transformer(new StringTransformer() {
+                .setStringTransformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);
@@ -151,11 +151,11 @@ public class FromSRUTar extends Feeder {
         reader.close();
         bibmapper.close();
         if (settings.getAsBoolean("detect", false)) {
-            logger.info("unknown bib keys={}", bibmapper.unknownKeys());
+            logger.info("unknown bib keys={}", bibmapper.getUnknownKeys());
         }
         holmapper.close();
         if (settings.getAsBoolean("detect", false)) {
-            logger.info("unknown hol keys={}", holmapper.unknownKeys());
+            logger.info("unknown hol keys={}", holmapper.getUnknownKeys());
         }
     }
 

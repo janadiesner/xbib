@@ -16,6 +16,10 @@ import java.util.concurrent.Callable;
 public interface Pipeline<T,R extends PipelineRequest>
         extends Callable<T>, Closeable, Iterator<R> {
 
+    Integer getNumber();
+
+    String getName();
+
     /**
      * Return the pipeline metric.
      *

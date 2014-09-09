@@ -70,7 +70,6 @@ public class FieldStreamTest {
         fileCount++;
     }
 
-
     @Test
     public void testStream() throws Exception {
 
@@ -105,16 +104,17 @@ public class FieldStreamTest {
 
         try (FieldStream stream = new BufferedFieldStreamReader(new InputStreamReader(in), 8192, listener)) {
             while (stream.ready()) {
-                stream.readData();
+                Separable sep = stream.readField();
+                logger.info("sep={}", sep.getClass().getSimpleName());
             }
         }
         logger.info("data = {} unit = {} record = {} group = {} file = {}",
                 dataCount, unitCount, recordCount, groupCount, fileCount);
-        
-        assertEquals(dataCount, 380);
+
         assertEquals(unitCount, 23);
-        assertEquals(recordCount, 356);
         assertEquals(groupCount, 10);
+        assertEquals(dataCount, 380);
+        assertEquals(recordCount, 356);
         assertEquals(fileCount, 1);
         
     }

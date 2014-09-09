@@ -34,7 +34,7 @@ package org.xbib.marc.xml.stream;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.marc.RecordLabel;
+import org.xbib.marc.label.RecordLabel;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -46,6 +46,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -83,6 +84,8 @@ public class MarcXchangeReader
 
     private boolean ignoreNamespace = false;
 
+    private Integer bufferSize;
+
     private Set<String> validNamespaces = new HashSet<String>() {{
         add(MARCXCHANGE_V1_NS_URI);
         add(MARCXCHANGE_V2_NS_URI);
@@ -114,6 +117,11 @@ public class MarcXchangeReader
         return this;
     }
 
+    public MarcXchangeReader setBufferSize(Integer bufferSize) {
+        this.bufferSize = bufferSize;
+        return this;
+    }
+
     public MarcXchangeReader addNamespace(String uri) {
         this.validNamespaces.add(uri);
         return this;
@@ -126,6 +134,9 @@ public class MarcXchangeReader
     public void parse(Reader reader) throws IOException {
         try {
             XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            if (bufferSize != null) {
+                reader = new BufferedReader(reader, bufferSize);
+            }
             XMLEventReader xmlEventReader = inputFactory.createXMLEventReader(reader);
             while (xmlEventReader.hasNext()) {
                 add(xmlEventReader.nextEvent());

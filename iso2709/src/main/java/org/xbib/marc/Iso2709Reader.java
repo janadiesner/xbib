@@ -31,6 +31,8 @@
  */
 package org.xbib.marc;
 
+import org.xbib.io.field.BufferedFieldStreamReader;
+import org.xbib.marc.event.FieldEventListener;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.MarcXchangeSaxAdapter;
 import org.xml.sax.ContentHandler;
@@ -56,11 +58,11 @@ import java.util.Map;
 public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
 
     /**
-     * The format property. Default value is "MARC21"
+     * The format property
      */
     public static String FORMAT = "format";
     /**
-     * The type property. Defaylt value is "Bibliographic"
+     * The type property
      */
     public static String TYPE = "type";
 
@@ -75,6 +77,18 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
     public static String SILENT_ERRORS = "silent_errors";
 
     /**
+     * Should the ISO 25577 tags be clean (validateable)?
+     * All erraneous tags will be assigned to "999".
+     * This mode is active by default.
+     */
+    public static String CLEAN_TAGS = "clean_tags";
+
+    /**
+     * Shall all data be XML 1.0 safe?
+     */
+    public static String SCRUB_DATA = "scrub_data";
+
+    /**
      * Buffer size for input stream
      */
     public static String BUFFER_SIZE = "buffer_size";
@@ -85,9 +99,14 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
     public static String SCHEMA = "schema";
 
     /**
-     * Custom subfield delimiter
+     * Subfield delimiter
      */
-    public static String SUBFIELD_DELIMITER = null;
+    public static String SUBFIELD_DELIMITER = "subfield_delimiter";
+
+    /**
+     * Subfield delimiter
+     */
+    public static String SUBFIELD_CODE_LENGTH = "subfield_code_length";
 
     /**
      * The SaX service
@@ -105,14 +124,6 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
     private ErrorHandler errorHandler;
 
     private Map<String, Boolean> features = new HashMap<String, Boolean>();
-    /**
-     * MarcXchange listener
-     */
-    private MarcXchangeListener listener;
-
-    private StringTransformer transformer;
-
-    private Map<String, Object> map;
 
     /**
      * Properties for this reader
@@ -126,6 +137,19 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
             put(BUFFER_SIZE, 65536);
         }
     };
+
+    public Iso2709Reader() {
+        this.adapter = new MarcXchangeSaxAdapter();
+    }
+
+    /**
+     * Get the MarcXchange Sax service. Useful for inserting MarcXchange data
+     * to the MarcXchange listener.
+     * @return the MarcXchange Sax service
+     */
+    public MarcXchangeSaxAdapter getAdapter() {
+        return adapter;
+    }
 
     @Override
     public boolean getFeature(String name) throws SAXNotRecognizedException, SAXNotSupportedException {
@@ -193,39 +217,28 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
      * @return this reader
      */
     public Iso2709Reader setMarcXchangeListener(MarcXchangeListener listener) {
-        this.listener = listener;
+        this.adapter.setMarcXchangeListener(listener);
         return this;
     }
 
-    public MarcXchangeListener getMarcXchangeListener() {
-        return listener;
+    public Iso2709Reader setMarcXchangeListener(String type, MarcXchangeListener listener) {
+        this.adapter.setMarcXchangeListener(type, listener);
+        return this;
     }
 
     public Iso2709Reader setTransformer(StringTransformer transformer) {
-        this.transformer = transformer;
+        this.adapter.setTransformer(transformer);
         return this;
-    }
-
-    public StringTransformer getTransformer() {
-        return transformer;
     }
 
     public Iso2709Reader setFieldMap(Map<String, Object> map) {
-        this.map = map;
+        this.adapter.setFieldMap(map);
         return this;
     }
 
-    public Map<String, Object> getFieldMap() {
-        return map;
-    }
-    
-    /**
-     * Get the MarcXchange Sax service. Useful for inserting MarcXchange data
-     * to the MarcXchange listener.
-     * @return the MarcXchange Sax service
-     */
-    public MarcXchangeSaxAdapter getAdapter() {
-        return adapter;
+    public Iso2709Reader setFieldEventListener(FieldEventListener fieldEventListener) {
+        this.adapter.setFieldEventListener(fieldEventListener);
+        return this;
     }
 
     public Iso2709Reader setFormat(String format) {
@@ -246,24 +259,67 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
         return (String) properties.get(TYPE);
     }
 
-    @Override
-    public void parse(InputSource input) throws IOException, SAXException {
-        this.adapter = new MarcXchangeSaxAdapter()
-                .setBuffersize((Integer)properties.get(BUFFER_SIZE))
-                .setInputSource(input)
+    public Iso2709Reader setSubfieldDelimiter(String delimiter) {
+        properties.put(SUBFIELD_DELIMITER, delimiter);
+        return this;
+    }
+
+    public Iso2709Reader setSubfieldDelimiter(char delimiter) {
+        properties.put(SUBFIELD_DELIMITER, Character.toString(delimiter));
+        return this;
+    }
+
+    public Iso2709Reader setSubfieldCodeLength(Integer subfieldCodeLength) {
+        properties.put(SUBFIELD_CODE_LENGTH, subfieldCodeLength);
+        return this;
+    }
+
+    public Iso2709Reader setCleanTags(Boolean cleanTags) {
+        properties.put(CLEAN_TAGS, cleanTags);
+        return this;
+    }
+
+    public Iso2709Reader setScrubData(Boolean scrubData) {
+        properties.put(SCRUB_DATA, scrubData);
+        return this;
+    }
+
+    private MarcXchangeSaxAdapter setup(MarcXchangeSaxAdapter adapter) {
+        Boolean fatalErrors = properties.get(FATAL_ERRORS) != null ?
+                (properties.get(FATAL_ERRORS) instanceof Boolean ? (Boolean)properties.get(FATAL_ERRORS) :
+                Boolean.parseBoolean((String)properties.get(FATAL_ERRORS))) : null;
+        Boolean silentErrors = properties.get(SILENT_ERRORS) != null ?
+                (properties.get(SILENT_ERRORS) instanceof Boolean ? (Boolean)properties.get(SILENT_ERRORS) :
+                Boolean.parseBoolean((String)properties.get(SILENT_ERRORS))) : null;
+        Boolean cleanTags = properties.get(CLEAN_TAGS) != null ?
+                (properties.get(CLEAN_TAGS) instanceof Boolean ? (Boolean)properties.get(CLEAN_TAGS) :
+                        Boolean.parseBoolean((String)properties.get(CLEAN_TAGS))) : Boolean.TRUE;
+        Boolean scrubData = properties.get(SCRUB_DATA) != null ?
+                (properties.get(SCRUB_DATA) instanceof Boolean ? (Boolean)properties.get(SCRUB_DATA) :
+                        Boolean.parseBoolean((String)properties.get(SCRUB_DATA))) : Boolean.TRUE;
+        Integer subfieldCodeLength = properties.get(SUBFIELD_CODE_LENGTH) != null ?
+                (properties.get(SUBFIELD_CODE_LENGTH) instanceof  Integer ? (Integer) properties.get(SUBFIELD_CODE_LENGTH) :
+                Integer.parseInt((String)properties.get(SUBFIELD_CODE_LENGTH))) : null;
+        return adapter.setBuffersize((Integer)properties.get(BUFFER_SIZE))
                 .setContentHandler(contentHandler)
-                .setListener(listener)
-                .setTransformer(transformer)
                 .setSchema((String) properties.get(SCHEMA))
                 .setFormat(getFormat())
                 .setType(getType())
-                .setFatalErrors((Boolean)properties.get(FATAL_ERRORS))
-                .setSilentErrors((Boolean)properties.get(SILENT_ERRORS))
+                .setFatalErrors(fatalErrors)
+                .setSilentErrors(silentErrors)
                 .setSubfieldDelimiter((String)properties.get(SUBFIELD_DELIMITER))
-                .setFieldMap(map);
-        adapter.parse();
+                .setSubfieldIdLength(subfieldCodeLength)
+                .setCleanTags(cleanTags)
+                .setScrubData(scrubData);
     }
 
+    public BufferedFieldStreamReader stream(InputStream in) throws IOException {
+        return setup(adapter).setInputStream(in).fieldStream();
+    }
+
+    public BufferedFieldStreamReader stream(Reader reader) throws IOException {
+        return setup(adapter).setReader(reader).fieldStream();
+    }
     public void parse(InputStream in) throws IOException {
         parse(new InputStreamReader(in, "UTF-8"));
     }
@@ -274,6 +330,11 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
         } catch (SAXException e) {
             throw new IOException(e);
         }
+    }
+
+    @Override
+    public void parse(InputSource input) throws IOException, SAXException {
+        setup(adapter).setInputSource(input).parse();
     }
 
     /**

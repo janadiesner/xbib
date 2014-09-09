@@ -45,6 +45,9 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.xbib.elements.scripting.ScriptElement;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -61,6 +64,8 @@ public abstract class AbstractSpecification implements Specification {
     private final static Logger logger = LoggerFactory.getLogger(AbstractSpecification.class.getName());
 
     private final static Map<String, Map> maps = newTreeMap();
+
+    private final static ReentrantLock lock = new ReentrantLock();
 
     private final static int DEFAULT_BUFFER_SIZE = 8192;
 
@@ -79,13 +84,31 @@ public abstract class AbstractSpecification implements Specification {
     }
 
     @Override
-    public synchronized Map getElementMap(ClassLoader cl, String path, String format)
+    public Map getElementMap(ClassLoader cl, String path, String format)
             throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
             NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
-        if (!maps.containsKey(format)) {
-            init(cl, path, format);
+        if (maps.containsKey(format)) {
+            return maps.get(format);
         }
-        return maps.get(format);
+        try {
+            if (lock.isLocked()) {
+                try {
+                    logger.info("waiting for initialized spec");
+                    lock.tryLock(30, TimeUnit.SECONDS);
+                    if (maps.containsKey(format)) {
+                        return maps.get(format);
+                    }
+                } catch (InterruptedException e) {
+                    logger.warn("interrupted");
+                }
+            } else {
+                lock.lock();
+            }
+            init(cl, path, format);
+            return maps.get(format);
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void init(ClassLoader cl, String path, String format)
@@ -219,10 +242,6 @@ public abstract class AbstractSpecification implements Specification {
         }
         return packageName;
     }
-
-    /*public String getString(InputStream input, String encoding) throws IOException {
-        return getString(new InputStreamReader(input, encoding));
-    }*/
 
     private String getString(Reader input) throws IOException {
         StringWriter sw = new StringWriter();

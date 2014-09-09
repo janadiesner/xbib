@@ -31,6 +31,8 @@
  */
 package org.xbib.marc;
 
+import org.xbib.marc.label.RecordLabel;
+
 import java.util.TreeMap;
 
 public class FieldDirectory extends TreeMap<Integer, Field> {

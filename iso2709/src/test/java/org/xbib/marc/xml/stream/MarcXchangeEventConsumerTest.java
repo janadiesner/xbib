@@ -22,10 +22,8 @@ public class MarcXchangeEventConsumerTest {
 
     @Test
     public void testMarcXchangeEventConsumer() throws Exception {
-
-        new File("target").mkdirs();
-        FileWriter sw = new FileWriter("target/HT016424175-event.xml");
-        //StringWriter sw = new StringWriter();
+        File file = File.createTempFile("HT016424175-event.", ".xml");
+        FileWriter sw = new FileWriter(file);
         MarcXchangeWriter writer = new MarcXchangeWriter(sw);
         writer.setFormat("AlephXML").setType("Bibliographic");
         writer.startDocument();
@@ -47,11 +45,12 @@ public class MarcXchangeEventConsumerTest {
         writer.endCollection();
         writer.endDocument();
         sw.close();
+        if (writer.getException() != null) {
+            logger.error("err?", writer.getException());
+        }
 
         assertNull(writer.getException());
         sw.close();
-
-        logger.error("err?", writer.getException());
 
     }
 }

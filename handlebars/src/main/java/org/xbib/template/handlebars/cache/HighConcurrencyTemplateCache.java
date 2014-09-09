@@ -32,8 +32,7 @@ public class HighConcurrencyTemplateCache implements TemplateCache {
      *
      * @param cache The concurrent map cache. Required.
      */
-    protected HighConcurrencyTemplateCache(
-            final ConcurrentMap<TemplateSource, Future<Pair<TemplateSource, Template>>> cache) {
+    protected HighConcurrencyTemplateCache(final ConcurrentMap<TemplateSource, Future<Pair<TemplateSource, Template>>> cache) {
         this.cache = notNull(cache, "The cache is required.");
     }
 
@@ -112,7 +111,6 @@ public class HighConcurrencyTemplateCache implements TemplateCache {
                     } else if (source.lastModified() != future.get().getLeft().lastModified()) {
                         evict(source);
                         future = putIfAbsent(source, futureTask);
-                    } else {
                     }
                     Pair<TemplateSource, Template> entry = future.get();
                     return entry.getRight();

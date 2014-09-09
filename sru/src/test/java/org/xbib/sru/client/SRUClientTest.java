@@ -31,6 +31,7 @@
  */
 package org.xbib.sru.client;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -43,8 +44,8 @@ import org.xbib.io.Request;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.MarcXchangeContentHandler;
@@ -62,21 +63,21 @@ public class SRUClientTest {
     public void testServiceSearchRetrieve() throws Exception {
 
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new StringTransformer() {
+                .setStringTransformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);
                     }
                 })
-                .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
+                .addListener(new KeyValueStreamAdapter<DataField, String>() {
                     @Override
-                    public KeyValueStreamAdapter<FieldCollection, String> begin() {
+                    public KeyValueStreamAdapter<DataField, String> begin() {
                         logger.debug("begin object");
                         return this;
                     }
 
                     @Override
-                    public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
+                    public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("begin");
                             for (Field f : key) {
@@ -93,7 +94,7 @@ public class SRUClientTest {
                     }
 
                     @Override
-                    public KeyValueStreamAdapter<FieldCollection, String> end() {
+                    public KeyValueStreamAdapter<DataField, String> end() {
                         logger.debug("end object");
                         return this;
                     }
@@ -106,8 +107,8 @@ public class SRUClientTest {
             String query = "title=linux";
             int from = 1;
             int size = 10;
-            FileOutputStream out = new FileOutputStream("target/sru-service-"
-                    + clientName + ".xml");
+            File file = File.createTempFile("sru-service-" +clientName + ".",".xml");
+            FileOutputStream out = new FileOutputStream(file);
             Writer w = new OutputStreamWriter(out, "UTF-8");
             SearchRetrieveListener listener = new SearchRetrieveResponseAdapter() {
 
@@ -180,6 +181,7 @@ public class SRUClientTest {
             logger.info("http status = {}", response.httpStatus());
             client.close();
             w.close();
+            out.close();
         }
     }
 }

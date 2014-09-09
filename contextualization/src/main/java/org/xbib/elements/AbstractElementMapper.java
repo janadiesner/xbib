@@ -133,7 +133,7 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
         this.factory = factory;
         for (int i = 0; i < numPipelines; i++) {
             KeyValueElementPipeline pipeline = createPipeline(i)
-                    .detectUnknownKeys(detectUnknownKeys);
+                    .setUnknownKeyDetection(detectUnknownKeys);
             pipelines.add(pipeline);
             service.submit(pipeline);
         }
@@ -198,14 +198,17 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
      *
      * @return a printable set of unknown keys
      */
-    public Set<String> unknownKeys() {
-        Set<String> unknownKeys = new TreeSet<String>();
+    public Set<String> getUnknownKeys() {
+        Set<String> set = new TreeSet<String>();
         for (KeyValueElementPipeline p : pipelines()) {
-            for (Object s : p.unknownKeys) {
-                unknownKeys.add("\"" + s + "\"");
+            if (p.getUnknownKeys() != null) {
+                for (Object s : p.getUnknownKeys()) {
+                    // reformat for better copy/paste
+                    set.add("\"" + s + "\"");
+                }
             }
         }
-        return unknownKeys;
+        return set;
     }
 
     public void dump(String format, Writer writer) throws IOException {

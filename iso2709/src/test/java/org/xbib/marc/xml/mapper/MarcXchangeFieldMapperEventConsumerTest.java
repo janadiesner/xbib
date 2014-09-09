@@ -28,12 +28,10 @@ public class MarcXchangeFieldMapperEventConsumerTest {
      * Clean without mapping
      * @throws Exception
      */
-
     @Test
     public void testMarcXchangeCleaner() throws Exception {
-
-        new File("target").mkdirs();
-        FileWriter sw = new FileWriter("target/HT016424175-clean.xml");
+        File file = File.createTempFile("HT016424175-clean.", ".xml");
+        FileWriter sw = new FileWriter(file);
         //StringWriter sw = new StringWriter();
         MarcXchangeWriter writer = new MarcXchangeWriter(sw);
         writer.setFormat("AlephXML").setType("Bibliographic");
@@ -69,10 +67,8 @@ public class MarcXchangeFieldMapperEventConsumerTest {
      */
     @Test
     public void testMarcXchangeFieldMapperEventConsumer() throws Exception {
-
-        new File("target").mkdirs();
-        FileWriter sw = new FileWriter("target/HT016424175-event-fieldmapper.xml");
-        //StringWriter sw = new StringWriter();
+        File file = File.createTempFile("HT016424175-event-fieldmapper.", ".xml");
+        FileWriter sw = new FileWriter(file);
         MarcXchangeWriter writer = new MarcXchangeWriter(sw);
         writer.setFormat("AlephXML").setType("Bibliographic");
         writer.startDocument();

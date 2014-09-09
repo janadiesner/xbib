@@ -33,15 +33,16 @@ package org.xbib.marc;
 
 import org.testng.annotations.Test;
 import org.xbib.marc.xml.stream.MarcXchangeWriter;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 public class MARCTest {
 
@@ -52,20 +53,20 @@ public class MARCTest {
                     "summerland.mrc"
                 }) {
             InputStream in = getClass().getResourceAsStream(s);
+            File file = File.createTempFile(s +".", ".xml");
+            FileOutputStream out = new FileOutputStream(file);
             try (InputStreamReader r = new InputStreamReader(in, "ANSEL")) {
                 Iso2709Reader reader = new Iso2709Reader();
-                reader.setProperty(Iso2709Reader.FORMAT, "MARC21");
-                FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
-                Writer w = new OutputStreamWriter(out, "UTF-8");
-                MarcXchangeWriter writer = new MarcXchangeWriter(w);
+                reader.setFormat(MarcXchangeConstants.MARC21);
+                MarcXchangeWriter writer = new MarcXchangeWriter(out);
                 reader.setMarcXchangeListener(writer);
                 writer.startDocument();
                 writer.beginCollection();
-                reader.parse( new InputSource(r));
+                reader.parse(r);
                 writer.endCollection();
                 writer.endDocument();
-                out.close();
             }
+            out.close();
         }
     }
 
@@ -75,58 +76,70 @@ public class MARCTest {
                      "error.mrc"
                 }) {
             InputStream in = getClass().getResourceAsStream(s);
+            File file = File.createTempFile(s +".", ".xml");
+            FileOutputStream out = new FileOutputStream(file);
             try (InputStreamReader r = new InputStreamReader(in, "ANSEL")) {
                 Iso2709Reader reader = new Iso2709Reader();
-                reader.setProperty(Iso2709Reader.FORMAT, "MARC21");
-                FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
-                Writer w = new OutputStreamWriter(out, "UTF-8");
-                MarcXchangeWriter writer = new MarcXchangeWriter(w);
+                reader.setFormat(MarcXchangeConstants.MARC21);
+                MarcXchangeWriter writer = new MarcXchangeWriter(out);
                 reader.setMarcXchangeListener(writer);
                 writer.startDocument();
                 writer.beginCollection();
-                reader.parse(new InputSource(r));
+                reader.parse(r);
                 writer.endCollection();
                 writer.endDocument();
-                out.close();
+                assertNull(writer.getException());
             }
+            out.close();
         }
     }
 
+    /**
+     * Here we have a true treasure, old ANSEL US-MARC.
+     *
+     * @throws IOException
+     * @throws SAXException
+     */
     @Test
     public void testAMS() throws IOException, SAXException {
-        InputStream in = getClass().getResourceAsStream("amstransactions.mrc");
+        String s = "amstransactions.mrc";
+        InputStream in = getClass().getResourceAsStream(s);
+        File file = File.createTempFile(s +".", ".xml");
+        FileOutputStream out = new FileOutputStream(file);
         try (InputStreamReader r = new InputStreamReader(in, "ANSEL")) {
             Iso2709Reader reader = new Iso2709Reader();
-            reader.setProperty(Iso2709Reader.FORMAT, "MARC21");
-            FileOutputStream out = new FileOutputStream("target/ams.xml");
-            Writer w = new OutputStreamWriter(out, "UTF-8");
-            MarcXchangeWriter writer = new MarcXchangeWriter(w);
+            reader.setFormat(MarcXchangeConstants.MARC21);
+            MarcXchangeWriter writer = new MarcXchangeWriter(out);
             reader.setMarcXchangeListener(writer);
             writer.startDocument();
             writer.beginCollection();
-            reader.parse(new InputSource(r));
+            reader.parse(r);
             writer.endCollection();
             writer.endDocument();
-            out.close();
+            assertNull(writer.getException());
         }
+        out.close();
+        assertTrue(file.length() > 250);
     }
     
     @Test
     public void testZDB() throws IOException, SAXException {
-        InputStream in = getClass().getResourceAsStream("zdblokutf8.mrc");
+        String s = "zdblokutf8.mrc";
+        InputStream in = getClass().getResourceAsStream(s);
+        File file = File.createTempFile(s +".", ".xml");
+        FileOutputStream out = new FileOutputStream(file);
         try (InputStreamReader r = new InputStreamReader(in, "UTF-8")) {
             Iso2709Reader reader = new Iso2709Reader();
-            reader.setProperty(Iso2709Reader.FORMAT, "MARC21");
-            FileOutputStream out = new FileOutputStream("target/zdblokutf8.xml");
-            Writer w = new OutputStreamWriter(out, "UTF-8");
-            MarcXchangeWriter writer = new MarcXchangeWriter(w);
+            reader.setFormat(MarcXchangeConstants.MARC21);
+            MarcXchangeWriter writer = new MarcXchangeWriter(out);
             reader.setMarcXchangeListener(writer);
             writer.startDocument();
             writer.beginCollection();
-            reader.parse(new InputSource(r));
+            reader.parse(r);
             writer.endCollection();
             writer.endDocument();
-            out.close();
+            assertNull(writer.getException());
         }
-    }    
+        out.close();
+    }
 }

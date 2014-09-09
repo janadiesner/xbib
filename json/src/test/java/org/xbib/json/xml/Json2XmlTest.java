@@ -40,6 +40,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -97,7 +98,8 @@ public class Json2XmlTest {
     }
 
     private Writer getOutput(String path) throws IOException {
-        return new OutputStreamWriter(new FileOutputStream("target/" + path), "UTF-8");
+        File file = File.createTempFile(path, ".dat");
+        return new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
     }
 
     private QName root() {

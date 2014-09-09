@@ -36,7 +36,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.marc.RecordLabel;
+import org.xbib.marc.label.RecordLabel;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
@@ -236,13 +236,10 @@ public class MarcXchangeContentHandler
                 String format = null;
                 String type = null;
                 for (int i = 0; i < atts.getLength(); i++) {
-                    switch (atts.getLocalName(i)) {
-                        case FORMAT:
-                            format = atts.getValue(i);
-                            break;
-                        case TYPE:
-                            type = atts.getValue(i);
-                            break;
+                    if (FORMAT.equals(atts.getLocalName(i))) {
+                        format = atts.getValue(i);
+                    } else if (TYPE.equals(atts.getLocalName(i))) {
+                        type = atts.getValue(i);
                     }
                 }
                 if (format == null) {
@@ -300,12 +297,8 @@ public class MarcXchangeContentHandler
                 break;
             }
             case SUBFIELD: {
-                if (inControl) {
-                    // no subfields are allowed in controlfield
-                    break;
-                } else {
-                    Field f = stack.peek();
-                    Field subfield = new Field(f);
+                if (!inControl) {
+                    Field subfield = new Field(stack.peek());
                     for (int i = 0; i < atts.getLength(); i++) {
                         if (CODE.equals(atts.getLocalName(i))) {
                             subfield.subfieldId(atts.getValue(i));

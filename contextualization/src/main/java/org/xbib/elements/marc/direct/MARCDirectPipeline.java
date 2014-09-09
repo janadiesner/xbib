@@ -33,18 +33,18 @@ package org.xbib.elements.marc.direct;
 
 import org.xbib.elements.direct.KeyValueDirectPipeline;
 import org.xbib.elements.marc.MARCContext;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.rdf.Resource;
 
-public class MARCDirectPipeline extends KeyValueDirectPipeline<FieldCollection, String, MARCContext> {
+public class MARCDirectPipeline extends KeyValueDirectPipeline<DataField, String, MARCContext> {
 
     public MARCDirectPipeline(int i) {
         super(i);
     }
 
     @Override
-    protected void build(FieldCollection fields, String value) {
+    protected void build(DataField fields, String value) {
         if (fields == null) {
             return;
         }

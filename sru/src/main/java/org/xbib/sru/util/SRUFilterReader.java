@@ -75,10 +75,11 @@ public class SRUFilterReader extends Iso2709Reader implements MarcXchangeListene
         new MarcXchangeSaxAdapter()
                 .setInputSource(input)
                 .setContentHandler(getContentHandler())
-                .setListener(this)
+                .setMarcXchangeListener(this)
                 .setSchema((String) getProperty(SCHEMA))
                 .setFormat((String) getProperty(FORMAT))
-                .setType((String) getProperty(TYPE)).parse();
+                .setType((String) getProperty(TYPE))
+                .parse();
     }
 
     @Override

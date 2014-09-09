@@ -31,6 +31,9 @@
  */
 package org.xbib.xml;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public final class XMLUtil {
 
     private XMLUtil() {
@@ -267,14 +270,13 @@ public final class XMLUtil {
     }
 
     /**
-     * Clean strings from illegal XML characters.
-     * <p/>
-     * See <http://www.w3.org/TR/2006/REC-xml-20060816/#charsets>
+     * Clean strings from illegal XML 1.0 characters.
+     * See <a href="http://www.w3.org/TR/2006/REC-xml-20060816/#charsets">XML charset</a>
      *
      * @param string string to clean
      * @return the cleaned string
      */
-    public static String clean(CharSequence string) {
+    public static String sanitize(CharSequence string) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0, len = string.length(); i < len; i++) {
             char c = string.charAt(i);
@@ -288,11 +290,17 @@ public final class XMLUtil {
         return sb.toString();
     }
 
-    /*
-     * Copyright Aduna (http://www.aduna-software.com/) (c) 1997-2006.
-     *
-     * Licensed under the Aduna BSD-style license.
-     */
+    private final static Pattern invalidXml10 = Pattern.compile("[^\u0009\n\r\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF]");
+
+    public static CharSequence sanitizeXml10(CharSequence sequence) {
+        if (sequence == null) {
+            return null;
+        }
+        if (sequence.length() == 0) {
+            return sequence;
+        }
+        return invalidXml10.matcher(sequence).replaceAll("\uFFFD");
+    }
 
     /**
      * Checks whether the supplied String is an NCName (Namespace Classified

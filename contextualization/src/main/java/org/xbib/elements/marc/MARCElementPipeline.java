@@ -34,8 +34,8 @@ package org.xbib.elements.marc;
 import org.xbib.elements.KeyValueElementPipeline;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.rdf.Resource;
 
 import java.util.HashMap;
@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
  * It performs the heavy lifting by looking up the structured information in the element map
  * and processes the MARC fields.
  */
-public class MARCElementPipeline extends KeyValueElementPipeline<FieldCollection, String, MARCElement, MARCContext> {
+public class MARCElementPipeline extends KeyValueElementPipeline<DataField, String, MARCElement, MARCContext> {
 
     private final Logger logger = LoggerFactory.getLogger(MARCElementPipeline.class.getName());
 
@@ -58,7 +58,7 @@ public class MARCElementPipeline extends KeyValueElementPipeline<FieldCollection
     }
 
     @Override
-    protected void build(FieldCollection fields, String value) {
+    protected void build(DataField fields, String value) {
         if (fields == null) {
             return;
         }
@@ -98,8 +98,8 @@ public class MARCElementPipeline extends KeyValueElementPipeline<FieldCollection
             // build other things for this element, like facets etc.
             builder().build(element, fields, value);
         } else {
-            if (detectUnknownKeys) {
-                unknownKeys.add(key);
+            if (isUnknownKeyDetectionEnabled()) {
+                addUnknownKey(key);
                 if (logger.isDebugEnabled()) {
                     logger.debug("unknown key detected: {}", fields);
                 }
@@ -110,7 +110,7 @@ public class MARCElementPipeline extends KeyValueElementPipeline<FieldCollection
     }
 
     public void addToResource(Resource resource,
-                              FieldCollection fields,
+                              DataField fields,
                               MARCElement element,
                               String value) {
         // setup

@@ -36,8 +36,6 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.simple.SimpleResource;
 
 import java.util.ArrayList;
@@ -54,8 +52,6 @@ import java.util.Set;
 public abstract class AbstractResource<S extends Identifier, P extends Property, O extends Node>
         extends IdentifiableNode
         implements Resource<S, P, O>, Comparable<Resource<S, P, O>> {
-
-    private final Logger logger = LoggerFactory.getLogger(AbstractResource.class.getName());
 
     protected Multimap<P, Node> attributes = LinkedHashMultimap.create();
 
@@ -201,8 +197,6 @@ public abstract class AbstractResource<S extends Identifier, P extends Property,
             keep.addAll(new LinkedList(resource.objects(predicate)));
             attributes.removeAll(predicate);
             attributes.putAll(predicate, keep);
-        } else {
-            logger.debug("more than one resource for {}", predicate);
         }
     }
 

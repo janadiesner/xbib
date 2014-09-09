@@ -43,8 +43,8 @@ import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
 import org.xbib.marc.transformer.StringTransformer;
@@ -79,7 +79,7 @@ public class DNBPICAElementsTest extends Assert {
                 .detectUnknownKeys(true)
                 .start(factory);
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new OurTransformer())
+                .setStringTransformer(new OurTransformer())
                 .addListener(mapper)
                 .addListener(new OurAdapter());
         final InputStream in = getClass().getResourceAsStream("zdb-oai-bib.xml");
@@ -89,7 +89,7 @@ public class DNBPICAElementsTest extends Assert {
 
         logger.info("counter={}, detected unknown elements = {}",
                 output.getCounter(),
-                mapper.unknownKeys());
+                mapper.getUnknownKeys());
         assertEquals(output.getCounter(), 50);
     }
 
@@ -100,15 +100,15 @@ public class DNBPICAElementsTest extends Assert {
         }
     }
 
-    class OurAdapter extends KeyValueStreamAdapter<FieldCollection, String> {
+    class OurAdapter extends KeyValueStreamAdapter<DataField, String> {
         @Override
-        public KeyValueStreamAdapter<FieldCollection, String> begin() {
+        public KeyValueStreamAdapter<DataField, String> begin() {
             logger.debug("begin object");
             return this;
         }
 
         @Override
-        public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
+        public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
             if (logger.isDebugEnabled()) {
                 logger.debug("begin");
                 for (Field f : key) {
@@ -121,7 +121,7 @@ public class DNBPICAElementsTest extends Assert {
         }
 
         @Override
-        public KeyValueStreamAdapter<FieldCollection, String> end() {
+        public KeyValueStreamAdapter<DataField, String> end() {
             logger.debug("end object");
             return this;
         }

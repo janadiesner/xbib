@@ -33,6 +33,7 @@ package org.xbib.marc;
 
 import org.testng.annotations.Test;
 import org.xbib.io.field.FieldSortable;
+import org.xbib.marc.label.RecordLabel;
 
 import static org.testng.Assert.assertEquals;
 
@@ -66,7 +67,7 @@ public class FieldTest {
         Field f = new Field().tag("100").indicator("01");
         Field f1 = new Field(f).subfieldId("1");
         Field f2 = new Field(f).subfieldId("2");
-        FieldCollection c = new FieldCollection();
+        DataField c = new DataField();
         c.add(f);
         c.add(f1);
         c.add(f2);
@@ -79,11 +80,21 @@ public class FieldTest {
         Field f1 = new Field(f).subfieldId("1");
         Field f2 = new Field(f).subfieldId("2");
         Field f3 = new Field(f).subfieldId("3");
-        FieldCollection c = new FieldCollection();
+        DataField c = new DataField();
         c.add(f);
         c.add(f1);
         c.add(f2);
         c.add(f3);
         assertEquals(c.toSpec(), "016$123");
+    }
+
+    @Test
+    public void testWrongRecordLabel() {
+        String s = "123456789";
+        RecordLabel label = new RecordLabel(s.toCharArray());
+        assertEquals(label.getRecordLabel().length(), RecordLabel.LENGTH);
+        s = "123456789012345678901234567890";
+        label = new RecordLabel(s.toCharArray());
+        assertEquals(label.getRecordLabel().length(), RecordLabel.LENGTH);
     }
 }

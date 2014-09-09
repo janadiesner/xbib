@@ -64,7 +64,7 @@ public abstract class SpecTest {
         Yaml yaml = new Yaml(constructor);
 
         String location = path(loader) + filename;
-        String input = StringUtil.stream2String(new FileInputStream(new File("src/test/resources", location)), -1);
+        String input = StringUtil.stream2String(SpecTest.class.getResource(location).openStream(), -1);
         Map<String, Object> data = (Map<String, Object>) yaml.load(input);
         List<Map<String, Object>> tests =
                 (List<Map<String, Object>>) data.get("tests");

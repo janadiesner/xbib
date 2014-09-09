@@ -32,6 +32,7 @@
 package org.xbib.marc;
 
 import org.xbib.io.field.FieldSortable;
+import org.xbib.marc.label.RecordLabel;
 
 /**
  * A field in ISO 2709 records.
@@ -40,7 +41,7 @@ public class Field implements Comparable<Field> {
 
     public final static Field EMPTY = new Field();
 
-    public final static String ERROR_TAG = "___";
+    public final static String ERROR_TAG = "999";
 
     public final static String NULL_TAG = "000";
 
@@ -132,26 +133,27 @@ public class Field implements Comparable<Field> {
     }
 
     /**
-     * Create field from a given designator and a subfield
+     * Create field from a given designator
      *
      * @param label label
      * @param designator designator
      * @param content content
-     * @param withSubfield subfield
+     * @param asSubfield subfield
      */
-    public Field(RecordLabel label, Field designator, String content, boolean withSubfield) {
+    public Field(RecordLabel label, Field designator, String content, boolean asSubfield) {
         this.tag = designator.tag();
         this.position = designator.position();
         this.length = designator.length();
         int indlen = label.getIndicatorLength();
         int subfieldidlen = label.getSubfieldIdentifierLength();
-        if (withSubfield) {
+        if (asSubfield) {
             this.indicator = designator.indicator();
+            // subfield code length = length of subfield delimiter + length of data lement indentifier (always 2 in MARC)
             if (subfieldidlen > 1 && content.length() > subfieldidlen - 1) {
                 this.subfieldId = content.substring(0, subfieldidlen - 1);
                 data(content.substring(subfieldidlen - 1));
             } else {
-                // no subfield identifier length specified or content is too short
+                // no subfield identifier length specified, or content is too short
                 this.subfieldId = null;
                 data(content);
             }

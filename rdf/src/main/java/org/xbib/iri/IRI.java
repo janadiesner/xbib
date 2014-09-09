@@ -71,6 +71,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
 
     public static class Builder {
 
+        private final static SchemeRegistry registry = SchemeRegistry.getInstance();
         protected Scheme schemeClass;
         private String prefix;
         private String schemeSpecificPart;
@@ -87,7 +88,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
 
         public Builder scheme(String scheme) {
             this.prefix = scheme;
-            this.schemeClass = SchemeRegistry.getInstance().getScheme(scheme);
+            this.schemeClass = registry.getScheme(scheme);
             return this;
         }
 
@@ -176,7 +177,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
     }
 
     public IRI(String scheme, String schemeSpecificPart, String fragment) {
-        this.scheme = scheme;
+        this.scheme = scheme.toLowerCase();
         this.schemeSpecificPart = schemeSpecificPart;
         this.fragment = fragment;
         build();
@@ -201,7 +202,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
         String query,
         String fragment) {
         this.schemeClass = schemeClass;
-        this.scheme = scheme;
+        this.scheme = scheme != null ? scheme.toLowerCase() : null;
         this.authority = authority;
         this.userinfo = userinfo;
         this.host = host;
@@ -350,7 +351,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
     }
 
     public String getScheme() {
-        return (scheme != null) ? scheme.toLowerCase() : null;
+        return scheme;
     }
 
     public String getSchemeSpecificPart() {
@@ -624,10 +625,10 @@ public class IRI implements Cloneable, Comparable<IRI> {
         if (bpath == null && cpath == null) {
             return null;
         }
-        if (bpath == null && cpath != null) {
+        if (bpath == null) {
             return (!cpath.startsWith("/")) ? "/" + cpath : cpath;
         }
-        if (bpath != null && cpath == null) {
+        if (cpath == null) {
             return bpath;
         }
         StringBuilder buf = new StringBuilder("");
@@ -645,6 +646,17 @@ public class IRI implements Cloneable, Comparable<IRI> {
     }
 
     public String toString() {
+        StringBuilder buf = new StringBuilder();
+        String scheme = getScheme();
+        if (scheme != null && scheme.length() != 0) {
+            buf.append(scheme);
+            buf.append(':');
+        }
+        buf.append(getSchemeSpecificPart());
+        return buf.toString();
+    }
+
+    public String toEncodedString() {
         StringBuilder buf = new StringBuilder();
         String scheme = getScheme();
         if (scheme != null && scheme.length() != 0) {

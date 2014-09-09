@@ -44,6 +44,7 @@ import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,7 +65,8 @@ public class UNIMARCElementsTest extends Assert {
     @Test
     public void testSetupOfElements() throws Exception {
         MARCElementMapper mapper = new MARCElementMapper("unimarc/bib").start();
-        Writer writer = new FileWriter("target/unimarc-mapping.json");
+        File file = File.createTempFile("unimarc-mapping.", ".json");
+        Writer writer = new FileWriter(file);
         mapper.dump("unimarc/bib", writer);
         writer.close();
         // test the mapper in a MarcXchange listener
@@ -140,7 +142,7 @@ public class UNIMARCElementsTest extends Assert {
             mapper.close();
 
             // check if increment works
-            logger.info("unknown elements = {}", mapper.unknownKeys());
+            logger.info("unknown elements = {}", mapper.getUnknownKeys());
             assertEquals(51279, counter.get());
             r.close();
         }

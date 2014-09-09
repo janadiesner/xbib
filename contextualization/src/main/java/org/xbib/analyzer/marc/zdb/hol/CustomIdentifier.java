@@ -34,7 +34,7 @@ package org.xbib.analyzer.marc.zdb.hol;
 import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 import org.xbib.rdf.Resource;
 
 public class CustomIdentifier extends org.xbib.analyzer.marc.bib.CustomIdentifier {
@@ -63,7 +63,7 @@ public class CustomIdentifier extends org.xbib.analyzer.marc.bib.CustomIdentifie
      */
 
     @Override
-    public String data(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, String predicate, Resource resource, String property, String value) {
+    public String data(ElementBuilder<DataField, String, MARCElement, MARCContext> builder, String predicate, Resource resource, String property, String value) {
         if ("IdentifierZDB".equals(value) && "type".equals(property)) {
             String v = resource.objects("value").iterator().next().toString();
             resource.add("identifierZDB", v.replaceAll("\\-", "").toLowerCase());

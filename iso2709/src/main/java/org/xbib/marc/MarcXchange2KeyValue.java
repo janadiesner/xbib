@@ -32,6 +32,8 @@
 package org.xbib.marc;
 
 import org.xbib.keyvalue.KeyValueStreamListener;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.transformer.StringTransformer;
 
 import java.io.IOException;
@@ -39,40 +41,40 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Convert a MarcXchange stream to a key/value stream. With optional value
- * string transformation
+ * Convert a MarcXchange stream to a key/value stream
  */
-public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStreamListener<FieldCollection, String> {
+public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStreamListener<DataField, String> {
 
-    private FieldCollection fields;
+    private static final Logger logger = LoggerFactory.getLogger(MarcXchange2KeyValue.class.getName());
+
+    private DataField fields;
 
     private StringTransformer transformer;
 
-    private List<KeyValueStreamListener<FieldCollection, String>> listeners =
-            new LinkedList<KeyValueStreamListener<FieldCollection, String>>();
+    private List<KeyValueStreamListener<DataField, String>> listeners =
+            new LinkedList<KeyValueStreamListener<DataField, String>>();
 
-
-    public MarcXchange2KeyValue addListener(KeyValueStreamListener<FieldCollection, String> listener) {
+    public MarcXchange2KeyValue addListener(KeyValueStreamListener<DataField, String> listener) {
         this.listeners.add(listener);
         return this;
     }
 
-    public MarcXchange2KeyValue transformer(StringTransformer transformer) {
+    public MarcXchange2KeyValue setStringTransformer(StringTransformer transformer) {
         this.transformer = transformer;
         return this;
     }
 
     @Override
-    public KeyValueStreamListener<FieldCollection, String> begin() throws IOException {
-        for (KeyValueStreamListener<FieldCollection, String> listener : listeners) {
+    public KeyValueStreamListener<DataField, String> begin() throws IOException {
+        for (KeyValueStreamListener<DataField, String> listener : listeners) {
             listener.begin();
         }
         return this;
     }
 
     @Override
-    public KeyValueStreamListener<FieldCollection, String> keyValue(FieldCollection key, String value) throws IOException {
-        for (KeyValueStreamListener<FieldCollection, String> listener : listeners) {
+    public KeyValueStreamListener<DataField, String> keyValue(DataField key, String value) throws IOException {
+        for (KeyValueStreamListener<DataField, String> listener : listeners) {
             // we allow null value, but null keys are not passed to the listeners
             if (key != null) {
                 listener.keyValue(key, value);
@@ -82,18 +84,18 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
     }
 
     @Override
-    public KeyValueStreamListener<FieldCollection, String> keys(List<FieldCollection> keys) throws IOException {
+    public KeyValueStreamListener<DataField, String> keys(List<DataField> keys) throws IOException {
         return this;
     }
 
     @Override
-    public KeyValueStreamListener<FieldCollection, String> values(List<String> values) throws IOException {
+    public KeyValueStreamListener<DataField, String> values(List<String> values) throws IOException {
         return this;
     }
 
     @Override
-    public KeyValueStreamListener<FieldCollection, String> end() throws IOException {
-        for (KeyValueStreamListener<FieldCollection, String> listener : listeners) {
+    public KeyValueStreamListener<DataField, String> end() throws IOException {
+        for (KeyValueStreamListener<DataField, String> listener : listeners) {
             listener.end();
         }
         return this;
@@ -112,10 +114,10 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
         try {
             begin();
             if (format != null) {
-                keyValue(FieldCollection.FORMAT_KEY, format);
+                keyValue(DataField.FORMAT_KEY, format);
             }
             if (type != null) {
-                keyValue(FieldCollection.TYPE_KEY, type);
+                keyValue(DataField.TYPE_KEY, type);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -135,7 +137,7 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
     public void leader(String label) {
         try {
             if (label != null) {
-                keyValue(FieldCollection.LEADER_KEY, label);
+                keyValue(DataField.LEADER_KEY, label);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -144,7 +146,7 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
 
     @Override
     public void beginControlField(Field field) {
-        fields = new FieldCollection();
+        fields = new DataField();
         fields.add(field);
     }
 
@@ -164,7 +166,7 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
 
     @Override
     public void beginDataField(Field field) {
-        fields = new FieldCollection();
+        fields = new DataField();
         fields.add(field);
     }
 
@@ -194,16 +196,17 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
 
     @Override
     public void endSubField(Field field) {
-        if (field != null) {
-            // remove last field if there is no sub field (it must be a data field)
-            if (!fields.isEmpty() && !fields.getLast().isSubField()) {
-                fields.removeLast();
-            }            
-            // transform field data?
-            if (transformer != null && field.data() != null) {
-                field.data(transformer.transform(field.data()));
-            }
-            fields.add(field);
+        if (field == null) {
+            return;
         }
+        // hack: remove last field if this is no sub field (it must be a data field)
+        if (!fields.isEmpty() && !fields.getLast().isSubField()) {
+            fields.removeLast();
+        }
+        // transform field data
+        if (transformer != null && field.data() != null) {
+            field.data(transformer.transform(field.data()));
+        }
+        fields.add(field);
     }
 }

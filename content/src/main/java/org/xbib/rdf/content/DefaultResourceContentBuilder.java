@@ -104,7 +104,7 @@ public class DefaultResourceContentBuilder<C extends ResourceContext<R>, R exten
                     if (!id.isBlank()) {
                         builder.field(context.compact(predicate.id()), id.id().toString()); // ID -> string?
                     }
-                } else if (object.nativeValue() != null) {
+                } else if (predicate != null && object.nativeValue() != null) {
                     builder.field(context.compact(predicate.id()), object.nativeValue());
                 }
                 expandField(builder, resourceContext, subject, predicate, object);

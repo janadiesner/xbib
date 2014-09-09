@@ -40,8 +40,8 @@ import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
@@ -84,7 +84,7 @@ public class ZDBBibTest extends Assert {
                     }
                 });
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new StringTransformer() {
+                .setStringTransformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(
@@ -93,9 +93,9 @@ public class ZDBBibTest extends Assert {
                     }
                 })
                 .addListener(mapper)
-                .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
+                .addListener(new KeyValueStreamAdapter<DataField, String>() {
                     @Override
-                    public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
+                    public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("begin");
                             for (Field f : key) {
@@ -114,7 +114,7 @@ public class ZDBBibTest extends Assert {
         reader.parse(br);
         mapper.close();
         logger.info("zdb title counter = {}", counter.get());
-        logger.info("unknown keys = {}", mapper.unknownKeys());
+        logger.info("unknown keys = {}", mapper.getUnknownKeys());
         br.close();
         assertEquals(counter.get(), 8);
     }

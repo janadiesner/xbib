@@ -32,10 +32,10 @@
 package org.xbib.elements.marc;
 
 import org.xbib.elements.ElementBuilderFactory;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 
 public class MARCElementBuilderFactory
-        implements ElementBuilderFactory<FieldCollection, String, MARCElement, MARCContext> {
+        implements ElementBuilderFactory<DataField, String, MARCElement, MARCContext> {
 
     public MARCElementBuilder newBuilder() {
         return new MARCElementBuilder();

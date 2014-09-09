@@ -35,12 +35,14 @@ import org.xbib.marc.MarcXchangeListener;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 /**
  * This MarcXchangeReader reads MarcXML or MarcXchange, maps MarcXchange field to other fields,
@@ -48,22 +50,22 @@ import java.io.IOException;
  */
 public class MarcXchangeFieldMapperReader extends MarcXchangeFieldMapperContentHandler {
 
-    private final SAXParser parser;
-
     private ContentHandler contentHandler;
 
-    public MarcXchangeFieldMapperReader() throws ParserConfigurationException, SAXException {
-        this(SAXParserFactory.newInstance());
+    public void parse(InputStream in) throws IOException {
+        parse(new InputStreamReader(in, "UTF-8"));
     }
 
-    public MarcXchangeFieldMapperReader(SAXParserFactory factory) throws ParserConfigurationException, SAXException {
-        factory.setNamespaceAware(true);
-        this.parser = factory.newSAXParser();
-    }
-
-    public void parse(InputSource source) throws SAXException, IOException {
-        parser.getXMLReader().setContentHandler(contentHandler != null ? contentHandler : this);
-        parser.getXMLReader().parse(source);
+    public void parse(Reader reader) throws IOException {
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            SAXParser parser = factory.newSAXParser();
+            parser.getXMLReader().setContentHandler(contentHandler != null ? contentHandler : this);
+            parser.getXMLReader().parse(new InputSource(reader));
+        } catch (ParserConfigurationException | SAXException e) {
+            throw new IOException(e);
+        }
     }
 
     public MarcXchangeFieldMapperReader setHandler(ContentHandler handler) {
@@ -76,7 +78,4 @@ public class MarcXchangeFieldMapperReader extends MarcXchangeFieldMapperContentH
         return this;
     }
 
-    public XMLReader getXMLReader() throws SAXException {
-        return parser.getXMLReader();
-    }
 }

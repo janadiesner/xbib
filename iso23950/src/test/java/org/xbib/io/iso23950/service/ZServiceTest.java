@@ -38,6 +38,7 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.xml.transform.StylesheetTransformer;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -54,7 +55,8 @@ public class ZServiceTest {
             for (String serviceName : Arrays.asList("LIBRIS", "LOC", "OBVSG")) {
                 ZService service = ZServiceFactory.getService(serviceName);
                 ZClient client = service.newZClient();
-                FileOutputStream out = new FileOutputStream("target/service-" + service.getURI().getHost() + ".xml");
+                File file = File.createTempFile("service-" + service.getURI().getHost(), ".xml");
+                FileOutputStream out = new FileOutputStream(file);
                 Writer sw = new OutputStreamWriter(out, "UTF-8");
                 String query = "@attr 1=4 test";
                 int from = 1;
@@ -73,6 +75,7 @@ public class ZServiceTest {
                     service.close(client);
                 }
                 sw.close();
+                out.close();
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

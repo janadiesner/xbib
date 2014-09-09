@@ -32,10 +32,10 @@
 package org.xbib.elements.marc.dialects.pica;
 
 import org.xbib.elements.ElementBuilderFactory;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 
 public class PicaElementBuilderFactory
-        implements ElementBuilderFactory<FieldCollection, String, PicaElement, PicaContext> {
+        implements ElementBuilderFactory<DataField, String, PicaElement, PicaContext> {
 
     public PicaElementBuilder newBuilder() {
         return new PicaElementBuilder();

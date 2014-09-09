@@ -41,7 +41,7 @@ public final class SchemeRegistry {
 
     private static SchemeRegistry registry;
 
-    public static synchronized SchemeRegistry getInstance() {
+    public static SchemeRegistry getInstance() {
         if (registry == null) {
             registry = new SchemeRegistry();
         }
@@ -57,19 +57,19 @@ public final class SchemeRegistry {
         schemes.put(FtpScheme.NAME, new FtpScheme());
     }
 
-    public synchronized boolean register(String schemeClass) throws ClassNotFoundException, IllegalAccessException,
+    public boolean register(String schemeClass) throws ClassNotFoundException, IllegalAccessException,
             InstantiationException {
         Class<Scheme> klass = (Class<Scheme>) Thread.currentThread().getContextClassLoader().loadClass(schemeClass);
         return register(klass);
     }
 
-    public synchronized boolean register(Class<Scheme> schemeClass) throws IllegalAccessException,
+    public boolean register(Class<Scheme> schemeClass) throws IllegalAccessException,
             InstantiationException {
         Scheme scheme = schemeClass.newInstance();
         return register(scheme);
     }
 
-    public synchronized boolean register(Scheme scheme) {
+    public boolean register(Scheme scheme) {
         String name = scheme.getName();
         if (schemes.get(name) == null) {
             schemes.put(name.toLowerCase(), scheme);

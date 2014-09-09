@@ -31,6 +31,7 @@
  */
 package org.xbib.sru.client;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -59,7 +60,8 @@ public class ClientTest {
                 .setStartRecord(0)
                 .setMaximumRecords(10);
 
-        FileOutputStream out = new FileOutputStream("target/sru-client-bielefeld.xml");
+        File file = File.createTempFile("sru-client-bielefeld",".xml");
+        FileOutputStream out = new FileOutputStream(file);
         Writer writer = new OutputStreamWriter(out, "UTF-8");
         SearchRetrieveListener listener = new SearchRetrieveResponseAdapter() {
 
@@ -132,5 +134,6 @@ public class ClientTest {
         transformer.close();
         client.close();
         writer.close();
+        out.close();
     }
 }

@@ -37,10 +37,11 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.context.ResourceContext;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.BlockingQueue;
 
@@ -67,14 +68,13 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
 
     private long counter;
 
-    protected boolean detectUnknownKeys;
+    private Set<String> unknownKeys;
 
-    protected Set<String> unknownKeys;
+    private boolean unknownKeyDetectionEnabled;
 
     public KeyValueElementPipeline(int i) {
         this.logger = LoggerFactory.getLogger("pipeline" + i);
         this.counter = 0L;
-        this.unknownKeys = new TreeSet<String>();
     }
 
     public KeyValueElementPipeline setSpecification(Specification specification) {
@@ -157,11 +157,6 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
         return true;
     }
 
-    public KeyValueElementPipeline detectUnknownKeys(boolean enabled) {
-        this.detectUnknownKeys = enabled;
-        return this;
-    }
-
     public long getCounter() {
         return counter;
     }
@@ -171,6 +166,27 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
     }
 
     protected void build(K key, V value) {
+    }
+
+    public KeyValueElementPipeline setUnknownKeyDetection(boolean enabled) {
+        this.unknownKeyDetectionEnabled = enabled;
+        return this;
+    }
+
+    public boolean isUnknownKeyDetectionEnabled() {
+        return unknownKeyDetectionEnabled;
+    }
+
+    public void addUnknownKey(String key) {
+        if (unknownKeys == null) {
+            // we allow other threads to read from this set while we write
+            unknownKeys = Collections.synchronizedSet(new HashSet<String>());
+        }
+        unknownKeys.add(key);
+    }
+
+    public Set<String> getUnknownKeys() {
+        return unknownKeys;
     }
 
 }

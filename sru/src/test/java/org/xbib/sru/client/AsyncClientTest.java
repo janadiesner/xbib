@@ -31,12 +31,11 @@
  */
 package org.xbib.sru.client;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Arrays;
-import java.util.Collection;
-import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
 
 import io.netty.channel.ConnectTimeoutException;
@@ -66,7 +65,8 @@ public class AsyncClientTest {
                     .setQuery(query)
                     .setStartRecord(from)
                     .setMaximumRecords(size);
-            FileOutputStream out = new FileOutputStream("target/sru-async-" + request.getURI().getHost() + ".xml");
+            File file = File.createTempFile("sru-async-"+s+".", ".xml");
+            FileOutputStream out = new FileOutputStream(file);
             Writer writer = new OutputStreamWriter(out, "UTF-8");
 
             SearchRetrieveListener listener = new SearchRetrieveResponseAdapter() {
@@ -144,6 +144,7 @@ public class AsyncClientTest {
             }
             transformer.close();
             client.close();
+            out.close();
         }
     }
 }

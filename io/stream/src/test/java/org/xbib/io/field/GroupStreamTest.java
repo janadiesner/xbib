@@ -45,7 +45,7 @@ public class GroupStreamTest {
 
         try (FieldStream stream = new GroupStreamReader(new InputStreamReader(in), 8192, listener)) {
             while (stream.ready()) {
-                String s = stream.readData();
+                stream.readField();
             }
         }
         logger.info("data = {} group = {}", dataCount,  groupCount);

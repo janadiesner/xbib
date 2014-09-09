@@ -35,7 +35,7 @@ import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.elements.marc.MARCElementPipeline;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 
 public class ParentRecordIdentifier extends org.xbib.analyzer.marc.bib.Identifier {
 
@@ -46,8 +46,8 @@ public class ParentRecordIdentifier extends org.xbib.analyzer.marc.bib.Identifie
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
-                          FieldCollection fields, String value) {
+    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<DataField, String, MARCElement, MARCContext> builder,
+                          DataField fields, String value) {
         String predicate = getClass().getSimpleName();
         if (getSettings().containsKey("_predicate")) {
             predicate = (String) getSettings().get("_predicate");

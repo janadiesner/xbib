@@ -36,8 +36,8 @@ import org.xbib.elements.Element;
 import org.xbib.elements.ElementBuilder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.rdf.Resource;
 
@@ -45,7 +45,7 @@ import org.xbib.rdf.Resource;
  * A MARC element
  */
 public abstract class MARCElement
-        implements Element<FieldCollection, String, MARCElementBuilder>, MarcXchangeConstants {
+        implements Element<DataField, String, MARCElementBuilder>, MarcXchangeConstants {
 
     protected static final Logger logger = LoggerFactory.getLogger(MARCElement.class.getName());
 
@@ -63,7 +63,7 @@ public abstract class MARCElement
     }
 
     @Override
-    public boolean map(FieldCollection key) {
+    public boolean map(DataField key) {
         return false;
     }
 
@@ -73,7 +73,7 @@ public abstract class MARCElement
     }
 
     @Override
-    public MARCElement build(MARCElementBuilder builder, FieldCollection key, String value) {
+    public MARCElement build(MARCElementBuilder builder, DataField key, String value) {
         return this;
     }
 
@@ -90,7 +90,7 @@ public abstract class MARCElement
      * @param value the value
      * @return true if processing of element should abort at this point, false if it should continue
      */
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, FieldCollection fields, String value) {
+    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<DataField, String, MARCElement, MARCContext> builder, DataField fields, String value) {
         return false;
     }
 
@@ -101,14 +101,14 @@ public abstract class MARCElement
      * @param field the field
      * @param subfieldType the subfield type
      */
-    public boolean field(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, Field field, String subfieldType) {
+    public boolean field(ElementBuilder<DataField, String, MARCElement, MARCContext> builder, Field field, String subfieldType) {
         return false;
     }
 
     /**
      * Transform field data
      */
-    public String data(ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder, String resourcePredicate, Resource resource, String property, String value) {
+    public String data(ElementBuilder<DataField, String, MARCElement, MARCContext> builder, String resourcePredicate, Resource resource, String property, String value) {
         return value;
     }
 

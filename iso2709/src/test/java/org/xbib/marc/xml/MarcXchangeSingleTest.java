@@ -5,12 +5,10 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.xml.stream.MarcXchangeWriter;
-import org.xml.sax.InputSource;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import static org.testng.Assert.assertNull;
 
@@ -89,8 +87,8 @@ public class MarcXchangeSingleTest {
 
         };
 
-        new File("target").mkdirs();
-        FileWriter sw = new FileWriter("target/HT016424175-out.xml");
+        File file = File.createTempFile("HT016424175-out.", ".xml");
+        FileWriter sw = new FileWriter(file);
         //StringWriter sw = new StringWriter();
         MarcXchangeWriter writer = new MarcXchangeWriter(sw);
         writer.setFormat("AlephXML").setType("Bibliographic");

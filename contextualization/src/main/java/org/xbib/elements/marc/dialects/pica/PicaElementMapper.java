@@ -34,9 +34,9 @@ package org.xbib.elements.marc.dialects.pica;
 import org.xbib.elements.AbstractElementMapper;
 import org.xbib.elements.ElementBuilderFactory;
 import org.xbib.elements.KeyValueElementPipeline;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 
-public class PicaElementMapper extends AbstractElementMapper<FieldCollection, String, PicaElement, PicaContext> {
+public class PicaElementMapper extends AbstractElementMapper<DataField, String, PicaElement, PicaContext> {
 
     public PicaElementMapper(String format) {
         super("/org/xbib/analyzer/", format, new PicaSpecification());
@@ -59,7 +59,7 @@ public class PicaElementMapper extends AbstractElementMapper<FieldCollection, St
     }
 
     @Override
-    public PicaElementMapper start(ElementBuilderFactory<FieldCollection, String, PicaElement, PicaContext> factory) {
+    public PicaElementMapper start(ElementBuilderFactory<DataField, String, PicaElement, PicaContext> factory) {
         super.start(factory);
         return this;
     }

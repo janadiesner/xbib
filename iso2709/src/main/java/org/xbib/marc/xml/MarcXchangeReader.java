@@ -39,6 +39,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -52,12 +53,22 @@ public class MarcXchangeReader extends MarcXchangeContentHandler {
 
     private ContentHandler contentHandler;
 
+    private Integer bufferSize;
+
+    public MarcXchangeReader setBufferSize(Integer bufferSize) {
+        this.bufferSize = bufferSize;
+        return this;
+    }
+
     public void parse(InputStream in) throws IOException {
         parse(new InputStreamReader(in, "UTF-8"));
     }
 
     public void parse(Reader reader) throws IOException {
         try {
+            if (bufferSize != null) {
+                reader = new BufferedReader(reader, bufferSize);
+            }
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setNamespaceAware(true);
             SAXParser parser = factory.newSAXParser();

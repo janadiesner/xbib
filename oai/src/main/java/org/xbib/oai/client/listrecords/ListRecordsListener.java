@@ -96,7 +96,7 @@ public class ListRecordsListener extends NettyHttpResponseListener
         if (result.getContentType().endsWith("xml")) {
             StylesheetTransformer transformer = new StylesheetTransformer("xsl");
             this.filterreader = new ListRecordsFilterReader(request, response);
-            String s = !scrubCharacters ? body.toString() : XMLUtil.clean(body.toString());
+            String s = !scrubCharacters ? body.toString() : XMLUtil.sanitize(body.toString());
             InputSource source = new InputSource(new StringReader(s));
             transformer.setSource(filterreader, source);
             response.setTransformer(transformer);

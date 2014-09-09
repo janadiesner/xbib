@@ -455,7 +455,7 @@ public final class UrlEncoding {
         }
 
         @Override
-        public synchronized int read(byte[] b, int off, int len) throws IOException {
+        public int read(byte[] b, int off, int len) throws IOException {
             int n = off;
             int i = -1;
             while ((i = read()) != -1 && n < off + len) {
@@ -513,7 +513,7 @@ public final class UrlEncoding {
         }
 
         @Override
-        public synchronized int read(char[] b, int off, int len) throws IOException {
+        public int read(char[] b, int off, int len) throws IOException {
             int n = off;
             int i = -1;
             while ((i = read()) != -1 && n < off + len) {

@@ -39,8 +39,8 @@ import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
@@ -100,7 +100,7 @@ public final class FromMARC extends Converter {
                 });
 
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new StringTransformer() {
+                .setStringTransformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(new String(value.getBytes(ISO88591), UTF8),
@@ -125,7 +125,7 @@ public final class FromMARC extends Converter {
         r.close();
         mapper.close();
         if (settings.getAsBoolean("detect", false)) {
-            logger.info("unknown keys={}", mapper.unknownKeys());
+            logger.info("unknown keys={}", mapper.getUnknownKeys());
         }
     }
 
@@ -144,15 +144,15 @@ public final class FromMARC extends Converter {
         }
     }
 
-    private class LoggingAdapter extends KeyValueStreamAdapter<FieldCollection, String> {
+    private class LoggingAdapter extends KeyValueStreamAdapter<DataField, String> {
         @Override
-        public KeyValueStreamAdapter<FieldCollection, String> begin() {
+        public KeyValueStreamAdapter<DataField, String> begin() {
             logger.debug("begin");
             return this;
         }
 
         @Override
-        public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
+        public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
             if (logger.isDebugEnabled()) {
                 for (Field f : key) {
                     logger.debug("tag={} ind={} subf={} data={}",
@@ -163,7 +163,7 @@ public final class FromMARC extends Converter {
         }
 
         @Override
-        public KeyValueStreamAdapter<FieldCollection, String> end() {
+        public KeyValueStreamAdapter<DataField, String> end() {
             logger.debug("end");
             return this;
         }

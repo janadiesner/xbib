@@ -46,6 +46,7 @@ import org.xbib.rdf.io.turtle.TurtleWriter;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -63,7 +64,8 @@ public class MARCElementsTest extends Assert {
     @Test
     public void testSetupOfElements() throws Exception {
         MARCElementMapper mapper = new MARCElementMapper("marc/bib").start();
-        Writer writer = new FileWriter("target/marc-bib-elements.json");
+        File file = File.createTempFile("marc-bib-elements.", ".json");
+        Writer writer = new FileWriter(file);
         mapper.dump("marc/bib", writer);
         writer.close();
         // test mapper in a MarcXchange listener
@@ -81,7 +83,8 @@ public class MARCElementsTest extends Assert {
     public void testStbBonnElements() throws Exception {
         InputStream in = getClass().getResourceAsStream("stb-bonn.mrc");
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-        Writer w = new OutputStreamWriter(new FileOutputStream("target/DE-369.xml"), "UTF-8");
+        File file = File.createTempFile("DE-369.", ".xml");
+        Writer w = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
         final AtomicInteger counter = new AtomicInteger();
         final ResourceContextWriter output = new AbstractResourceContextWriter() {
 
@@ -115,7 +118,7 @@ public class MARCElementsTest extends Assert {
 
         mapper.close();
         // check if increment works
-        logger.info("unknown elements = {}", mapper.unknownKeys());
+        logger.info("unknown elements = {}", mapper.getUnknownKeys());
         assertEquals(8676, counter.get());
     }
 

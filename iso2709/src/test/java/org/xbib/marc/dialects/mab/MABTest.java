@@ -37,6 +37,7 @@ import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +57,8 @@ public class MABTest {
     @Test
     public void testZDBMAB() throws IOException, SAXException {
         InputStream in = getClass().getResource("1217zdbtit.dat").openStream();
-        FileOutputStream out = new FileOutputStream("target/zdb.xml");
+        File file = File.createTempFile("zdb.", ".xml");
+        FileOutputStream out = new FileOutputStream(file);
         try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
             read(new InputStreamReader(in, "x-MAB"), w);
         }
@@ -65,7 +67,8 @@ public class MABTest {
     @Test
     public void testCreateMABXML() throws IOException, SAXException {
         InputStream in = getClass().getResource("test.groupstream").openStream();
-        FileOutputStream out = new FileOutputStream("target/test.groupstream.xml");
+        File file = File.createTempFile("test.groupstream.", ".xml");
+        FileOutputStream out = new FileOutputStream(file);
         try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
             read(new InputStreamReader(in, "x-MAB"), w);
         }
@@ -73,8 +76,8 @@ public class MABTest {
 
     private void read(Reader source, Writer target) throws IOException, SAXException {
         Iso2709Reader reader = new Iso2709Reader();
-        reader.setProperty(Iso2709Reader.FORMAT, "MAB");
-        reader.setProperty(Iso2709Reader.TYPE, "Titel");
+        reader.setFormat("MAB");
+        reader.setType("Titel");
         MarcXchangeWriter writer = new MarcXchangeWriter(target);
         reader.setMarcXchangeListener(writer);
         writer.startDocument();

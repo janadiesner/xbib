@@ -43,8 +43,7 @@ public class HighConcurrencyTemplateCacheTest {
         ConcurrentMap<TemplateSource, Future<Pair<TemplateSource, Template>>> cache =
                 new ConcurrentHashMap<TemplateSource, Future<Pair<TemplateSource, Template>>>();
 
-        TemplateSource source = new URLTemplateSource("/template.hbs", getClass().getResource(
-                "/template.hbs"));
+        TemplateSource source = new URLTemplateSource("/template.hbs", getClass().getResource("/template.hbs"));
 
         Template template = createMock(Template.class);
 
@@ -102,8 +101,7 @@ public class HighConcurrencyTemplateCacheTest {
         ConcurrentMap<TemplateSource, Future<Pair<TemplateSource, Template>>> cache =
                 createMock(ConcurrentHashMap.class);
 
-        TemplateSource source = new URLTemplateSource("/template.hbs", getClass().getResource(
-                "/template.hbs"));
+        TemplateSource source = new URLTemplateSource("/template.hbs", getClass().getResource("/template.hbs"));
 
         Future<Pair<TemplateSource, Template>> future = createMock(Future.class);
         // 1st try interrupt thread
@@ -133,7 +131,7 @@ public class HighConcurrencyTemplateCacheTest {
         ConcurrentMap<TemplateSource, Future<Pair<TemplateSource, Template>>> cache =
                 new ConcurrentHashMap<TemplateSource, Future<Pair<TemplateSource, Template>>>();
 
-        TemplateSource source = source("/template.hbs");
+        TemplateSource source = new URLTemplateSource("/template.hbs", getClass().getResource("/template.hbs"));
 
         Template template = createMock(Template.class);
 
@@ -318,11 +316,5 @@ public class HighConcurrencyTemplateCacheTest {
         new HighConcurrencyTemplateCache(cache).clear();
 
         verify(cache);
-    }
-
-    private TemplateSource source(final String filename) throws IOException {
-        TemplateSource source = new URLTemplateSource(filename, getClass().getResource(
-                filename));
-        return source;
     }
 }

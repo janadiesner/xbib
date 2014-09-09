@@ -65,11 +65,11 @@ public class UNIMARCGreekTest {
                     .setTransformer(new StringTransformer() {
                         @Override
                         public String transform(String value) {
-                            return XMLUtil.clean(new String(value.getBytes(ISO88591), UTF8));
+                            return XMLUtil.sanitizeXml10(new String(value.getBytes(ISO88591), UTF8)).toString();
                         }
                     });
-            new File("target").mkdirs();
-            FileWriter w = new FileWriter("target/serres.xml");
+            File file = File.createTempFile("serres.", ".xml");
+            FileWriter w = new FileWriter(file);
             MarcXchangeWriter writer = new MarcXchangeWriter(w);
             reader.setFormat("UNIMARC").setType("Bibliographic");
             reader.setMarcXchangeListener(writer);

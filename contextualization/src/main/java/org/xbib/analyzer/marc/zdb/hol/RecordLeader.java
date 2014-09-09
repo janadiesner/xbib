@@ -35,7 +35,7 @@ import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.elements.marc.MARCElementPipeline;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 
 import java.util.Map;
 
@@ -60,8 +60,8 @@ public class RecordLeader extends MARCElement {
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
-                          FieldCollection fields, String value) {
+    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<DataField, String, MARCElement, MARCContext> builder,
+                          DataField fields, String value) {
         builder.context().setLabel(value);
         if (codes == null) {
             return false;

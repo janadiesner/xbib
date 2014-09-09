@@ -33,8 +33,8 @@ package org.xbib.marc.dialects.pica;
 
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchangeListener;
 
 import org.xml.sax.Attributes;
@@ -67,7 +67,7 @@ public class DNBPICAXmlReader
 
     private MarcXchangeListener listener;
 
-    private FieldCollection fields = new FieldCollection();
+    private DataField fields = new DataField();
 
     private StringBuilder content = new StringBuilder();
 

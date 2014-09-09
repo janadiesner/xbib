@@ -40,8 +40,8 @@ import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
@@ -68,9 +68,7 @@ public class ZDBHolTest extends Assert {
         final OurContextResourceOutput out = new OurContextResourceOutput();
         final Charset UTF8 = Charset.forName("UTF-8");
         final Charset ISO88591 = Charset.forName("ISO-8859-1");
-        final InputStream in =
-            getClass().getResourceAsStream("zdblokutf8.mrc");
-            //new GZIPInputStream(new FileInputStream(System.getProperty("user.home") + "/Daten/zdb/1302zdblokalgesamt.mrc.gz"));
+        final InputStream in = getClass().getResource("zdblokutf8.mrc").openStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591));
         MARCElementBuilderFactory factory = new MARCElementBuilderFactory() {
             public MARCElementBuilder newBuilder() {
@@ -83,7 +81,7 @@ public class ZDBHolTest extends Assert {
                 .detectUnknownKeys(true)
                 .start(factory);
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new StringTransformer() {
+                .setStringTransformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(
@@ -92,9 +90,9 @@ public class ZDBHolTest extends Assert {
                     }
                 })
                 .addListener(mapper)
-                .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
+                .addListener(new KeyValueStreamAdapter<DataField, String>() {
                     @Override
-                    public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
+                    public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
                         logger.debug("begin");
                         for (Field f : key) {
                             logger.debug("tag={} ind={} subf={} data={}",
@@ -105,13 +103,14 @@ public class ZDBHolTest extends Assert {
                     }
 
                 });
-        Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);
+        Iso2709Reader reader = new Iso2709Reader()
+                .setMarcXchangeListener("Holdings", kv);
         reader.setProperty(Iso2709Reader.FORMAT, "MARC");
         reader.setProperty(Iso2709Reader.TYPE, "Holdings");
         reader.parse(br);
         mapper.close();
         logger.info("zdb holdings counter = {}", out.getCounter());
-        logger.info("zdb holdings unknown keys = {}", mapper.unknownKeys());
+        logger.info("zdb holdings unknown keys = {}", mapper.getUnknownKeys());
         br.close();
         assertEquals(out.getCounter(), 293);
     }

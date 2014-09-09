@@ -34,10 +34,10 @@ package org.xbib.elements.marc.dialects.pica;
 import org.xbib.elements.AbstractElementBuilder;
 import org.xbib.elements.context.ResourceContextFactory;
 import org.xbib.analyzer.dublincore.DublinCoreProperties;
-import org.xbib.marc.FieldCollection;
+import org.xbib.marc.DataField;
 
 public class PicaElementBuilder
-        extends AbstractElementBuilder<FieldCollection, String, PicaElement, PicaContext>
+        extends AbstractElementBuilder<DataField, String, PicaElement, PicaContext>
         implements DublinCoreProperties {
 
     private final ResourceContextFactory<PicaContext> contextFactory = new ResourceContextFactory<PicaContext>() {

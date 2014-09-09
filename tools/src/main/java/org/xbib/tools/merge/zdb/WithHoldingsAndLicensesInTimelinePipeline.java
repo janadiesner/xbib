@@ -152,6 +152,16 @@ public class WithHoldingsAndLicensesInTimelinePipeline implements Pipeline<Boole
         this.volumesIndexType = settings.get("volumesIndexType", "Volume");
     }
 
+    @Override
+    public String getName() {
+        return getClass().getName();
+    }
+
+    @Override
+    public Integer getNumber() {
+        return null;
+    }
+
     public Queue<ClusterBuildContinuation> getBuildQueue() {
         return buildQueue;
     }

@@ -35,8 +35,8 @@ import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 
 import java.util.Map;
 
@@ -48,8 +48,8 @@ public class PhysicalDescriptionCode extends MARCElement {
     }
     
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldCollection, String, MARCElement, MARCContext> builder,
-                          FieldCollection fields, String value) {
+    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<DataField, String, MARCElement, MARCContext> builder,
+                          DataField fields, String value) {
         Map<String,Object> codes = (Map<String,Object>)getSettings().get("codes");
         if (codes != null) {
             // position 0 is the selector

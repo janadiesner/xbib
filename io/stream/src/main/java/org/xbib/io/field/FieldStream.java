@@ -134,7 +134,8 @@ public interface FieldStream extends Closeable {
      *
      * @throws IOException
      */
-    String readData() throws IOException;
+    Separable readField() throws IOException;
+
     /**
      * Get the underlying reader
      * @return the underlying reader

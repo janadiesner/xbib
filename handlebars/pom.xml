@@ -22,7 +22,7 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.1</version>
+                <version>4.3</version>
                 <configuration>
                     <libDirectory>src/main/antlr4</libDirectory>
                     <visitor>true</visitor>
@@ -68,7 +68,7 @@
                 </dependencies>
                 <configuration>
                     <forkMode>once</forkMode>
-                    <!-- powermock/javassist bug with JDK https://issues.jboss.org/browse/JASSIST-228 https://code.google.com/p/powermock/issues/detail?id=504 -->
+                    <!-- noverify: powermock/javassist bug with JDK https://issues.jboss.org/browse/JASSIST-228 https://code.google.com/p/powermock/issues/detail?id=504 -->
                     <argLine>-Duser.language=en -Duser.region=US -noverify</argLine>
                     <includes>
                         <include>**/*Test.java</include>
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
-            <version>4.1</version>
+            <version>4.3</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.abego.treelayout</groupId>

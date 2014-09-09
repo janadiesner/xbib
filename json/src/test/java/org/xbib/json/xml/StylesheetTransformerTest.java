@@ -7,6 +7,7 @@ import org.xml.sax.InputSource;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.sax.SAXSource;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +31,8 @@ public class StylesheetTransformerTest {
         JsonXmlReader reader = new JsonXmlReader()
                 .root(root)
                 .context(context);
-        FileWriter out = new FileWriter("target/dc.json.xml");
+        File file = File.createTempFile("dc.", ".xml");
+        FileWriter out = new FileWriter(file);
         StylesheetTransformer transformer = new StylesheetTransformer(
                 "src/main/resources",
                 "src/main/resources/xsl");

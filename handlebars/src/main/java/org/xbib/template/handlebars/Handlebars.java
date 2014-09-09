@@ -1,4 +1,3 @@
-
 package org.xbib.template.handlebars;
 
 import org.xbib.template.handlebars.cache.NullTemplateCache;
@@ -16,9 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.lang.reflect.Array;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Set;
 

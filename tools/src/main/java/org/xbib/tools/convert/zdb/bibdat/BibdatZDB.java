@@ -40,8 +40,8 @@ import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.marc.MarcXchange2KeyValue;
 import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
 import org.xbib.marc.transformer.StringTransformer;
@@ -97,16 +97,16 @@ public final class BibdatZDB extends Converter {
                 });
         logger.info("mapper is up, {} elemnents", mapper.map().size());
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .transformer(new StringTransformer() {
+                .setStringTransformer(new StringTransformer() {
                     @Override
                     public String transform(String value) {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);
                     }
                 })
                 .addListener(mapper)
-                .addListener(new KeyValueStreamAdapter<FieldCollection, String>() {
+                .addListener(new KeyValueStreamAdapter<DataField, String>() {
                     @Override
-                    public KeyValueStreamAdapter<FieldCollection, String> keyValue(FieldCollection key, String value) {
+                    public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
                         if (logger.isTraceEnabled()) {
                             logger.trace("begin");
                             for (Field f : key) {
@@ -124,7 +124,7 @@ public final class BibdatZDB extends Converter {
         in.close();
         mapper.close();
         if (settings.getAsBoolean("detect", false)) {
-            logger.info("detected unknown elements = {}", mapper.unknownKeys());
+            logger.info("detected unknown elements = {}", mapper.getUnknownKeys());
         }
     }
 

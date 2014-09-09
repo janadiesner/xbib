@@ -33,14 +33,13 @@ package org.xbib.marc;
 
 import org.xbib.io.FastByteArrayOutputStream;
 import org.xbib.io.field.FieldSeparator;
+import org.xbib.marc.label.RecordLabel;
 
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -56,8 +55,30 @@ public class Iso2709Writer implements MarcXchangeListener, Flushable, Closeable 
 
     private final OutputStream out;
 
+    private String format;
+
+    private String type;
+
     public Iso2709Writer(OutputStream out) {
         this.out = out;
+    }
+
+    public Iso2709Writer setFormat(String format) {
+        this.format = format;
+        return this;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public Iso2709Writer setType(String type) {
+        this.type = type;
+        return this;
+    }
+
+    public String getType() {
+        return type;
     }
 
     @Override
@@ -86,7 +107,7 @@ public class Iso2709Writer implements MarcXchangeListener, Flushable, Closeable 
 
     @Override
     public void leader(String label) {
-        records.get().setLabel(label);
+        records.get().setLeader(label);
     }
 
     @Override
@@ -121,44 +142,57 @@ public class Iso2709Writer implements MarcXchangeListener, Flushable, Closeable 
         lock.lock();
         try {
             Record record = records.get();
-            FastByteArrayOutputStream directory = new FastByteArrayOutputStream(2048);
-            FastByteArrayOutputStream fields = new FastByteArrayOutputStream(8192);
-            int pos = 0;
-            for (Field controlfield : record.getControlfields()) {
-                fields.write(controlfield.data().getBytes(UTF8));
-                fields.write(FieldSeparator.RS);
-                directory.write(makeEntry(controlfield.tag(), pos, fields.size() - pos).getBytes(LATIN));
-                pos = fields.size();
-            }
-            for (FieldCollection datafield : record.getDatafields()) {
-                Field f = datafield.getFirst();
-                fields.write(f.indicator().getBytes(LATIN));
-                for (Field subfield : datafield) {
-                    if (subfield.isSubField()) {
-                        fields.write(FieldSeparator.US);
-                        fields.write(subfield.subfieldId().getBytes(LATIN));
-                        fields.write(subfield.data().getBytes(UTF8));
-                    }
-                }
-                fields.write(FieldSeparator.RS);
-                directory.write(makeEntry(f.tag(), pos, fields.size() - pos).getBytes(LATIN));
-                pos = fields.size();
-            }
-            int base = RecordLabel.LENGTH + directory.size();
-            int recordLength = base + fields.size() + 1;
-            RecordLabel recordLabel = record.getLabel() != null ?
-                    new RecordLabel(record.getLabel().toCharArray()) : new RecordLabel();
-            recordLabel.setBaseAddressOfData(base)
-                    .setRecordLength(recordLength);
-            // TODO more recordlabel
-            out.write(recordLabel.getRecordLabel().getBytes(LATIN));
-            directory.writeTo(out);
-            fields.writeTo(out);
+            buildRecord(record);
+            out.write(record.getLabel().getRecordLabel().getBytes(LATIN));
+            record.getDirectoryStream().writeTo(out);
+            record.getFieldStream().writeTo(out);
             out.write(FieldSeparator.GS);
         } finally {
             lock.unlock();
         }
     }
+
+    public void buildRecord(Record record) throws IOException {
+        FastByteArrayOutputStream directory = record.getDirectoryStream();
+        FastByteArrayOutputStream fields = record.getFieldStream();
+        int pos = 0;
+        for (Field controlfield : record.getControlfields()) {
+            fields.write(controlfield.data().getBytes(UTF8));
+            fields.write(FieldSeparator.RS);
+            directory.write(makeEntry(controlfield.tag(), pos, fields.size() - pos).getBytes(LATIN));
+            pos = fields.size();
+        }
+        for (DataField datafield : record.getDatafields()) {
+            Field f = datafield.getFirst();
+            fields.write(f.indicator().getBytes(LATIN));
+            for (Field subfield : datafield) {
+                if (subfield.isSubField()) {
+                    fields.write(FieldSeparator.US);
+                    fields.write(subfield.subfieldId().getBytes(LATIN));
+                    fields.write(subfield.data().getBytes(UTF8));
+                }
+            }
+            fields.write(FieldSeparator.RS);
+            directory.write(makeEntry(f.tag(), pos, fields.size() - pos).getBytes(LATIN));
+            pos = fields.size();
+        }
+        int base = RecordLabel.LENGTH + directory.size();
+        int recordLength = base + fields.size() + 1;
+        buildRecordLabel(record, recordLength, base);
+    }
+
+    public void buildRecordLabel(Record record, int recordLength, int base) {
+        RecordLabel recordLabel = record.getLeader() != null ?
+                new RecordLabel(record.getLeader().toCharArray()) : new RecordLabel();
+        recordLabel.setBaseAddressOfData(base)
+                .setRecordLength(recordLength);
+        // TODO more recordlabel defs
+
+
+        record.setLabel(recordLabel);
+    }
+
+
 
     public void close() throws IOException {
         try {
@@ -187,49 +221,4 @@ public class Iso2709Writer implements MarcXchangeListener, Flushable, Closeable 
         return sb.toString();
     }
 
-    class Record {
-        private String label;
-
-        private List<Field> controlfields;
-
-        private List<FieldCollection> datafields;
-
-        private FieldCollection current;
-
-        public Record() {
-            controlfields = new LinkedList<Field>();
-            datafields = new LinkedList<FieldCollection>();
-        }
-
-        public void setLabel(String label) {
-            this.label = label;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-
-        public List<Field> getControlfields() {
-            return controlfields;
-        }
-
-        public List<FieldCollection> getDatafields() {
-            return datafields;
-        }
-
-        public void newFieldCollection() {
-            this.current = new FieldCollection();
-        }
-
-        public FieldCollection getCurrent() {
-            return current;
-        }
-
-        public void cleanup() {
-            label = null;
-            controlfields = null;
-            datafields = null;
-            current = null;
-        }
-    }
 }

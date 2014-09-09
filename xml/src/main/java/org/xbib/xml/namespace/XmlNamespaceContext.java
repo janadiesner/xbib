@@ -97,7 +97,7 @@ public class XmlNamespaceContext implements NamespaceContext {
         }
     }
 
-    public final synchronized void addNamespace(String prefix, String namespace) {
+    public final void addNamespace(String prefix, String namespace) {
         namespaces.put(prefix, namespace);
         if (prefixes.containsKey(namespace)) {
             prefixes.get(namespace).add(prefix);
@@ -108,7 +108,7 @@ public class XmlNamespaceContext implements NamespaceContext {
         }
     }
 
-    public final synchronized void removeNamespace(String prefix) {
+    public final void removeNamespace(String prefix) {
         prefixes.remove(namespaces.remove(prefix));
     }
 

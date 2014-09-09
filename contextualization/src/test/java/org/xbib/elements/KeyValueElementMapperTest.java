@@ -36,8 +36,8 @@ import org.testng.annotations.Test;
 import org.xbib.elements.marc.MARCSpecification;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -80,7 +80,7 @@ public class KeyValueElementMapperTest extends Assert {
         Field f = new Field().tag("100").indicator("01");
         Field f1 = new Field(f).subfieldId("a").data("Hello");
         Field f2 = new Field(f).subfieldId("b").data("World");
-        FieldCollection c = new FieldCollection();
+        DataField c = new DataField();
         c.add(f);
         c.add(f1);
         c.add(f2);

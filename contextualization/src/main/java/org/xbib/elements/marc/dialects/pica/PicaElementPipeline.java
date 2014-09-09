@@ -35,13 +35,13 @@ import org.xbib.elements.KeyValueElementPipeline;
 import org.xbib.elements.marc.SubfieldValueMapper;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 import org.xbib.rdf.Resource;
 
 import java.util.Map;
 
-public class PicaElementPipeline extends KeyValueElementPipeline<FieldCollection, String, PicaElement, PicaContext> {
+public class PicaElementPipeline extends KeyValueElementPipeline<DataField, String, PicaElement, PicaContext> {
 
     private final Logger logger = LoggerFactory.getLogger(PicaElementPipeline.class.getName());
 
@@ -50,7 +50,7 @@ public class PicaElementPipeline extends KeyValueElementPipeline<FieldCollection
     }
 
     @Override
-    protected void build(FieldCollection fields, String value) {
+    protected void build(DataField fields, String value) {
         if (fields == null) {
             logger.debug("fields is null!");
             return;
@@ -112,8 +112,8 @@ public class PicaElementPipeline extends KeyValueElementPipeline<FieldCollection
                 builder().context().switchTo(resource); // switch back to old resource
             }
         } else {
-            if (detectUnknownKeys) {
-                unknownKeys.add(key);
+            if (isUnknownKeyDetectionEnabled()) {
+                addUnknownKey(key);
                 if (logger.isDebugEnabled()) {
                     logger.debug("unknown key detected: {} {}", fields, value);
                 }

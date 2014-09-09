@@ -34,8 +34,8 @@ package org.xbib.analyzer.pica.zdb.bibdat;
 import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.dialects.pica.PicaContext;
 import org.xbib.elements.marc.dialects.pica.PicaElement;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.FieldCollection;
 
 public class RecordIdentifier extends PicaElement {
 
@@ -46,8 +46,8 @@ public class RecordIdentifier extends PicaElement {
     }
 
     @Override
-    public void fields(ElementBuilder<FieldCollection, String, PicaElement, PicaContext> builder,
-                       FieldCollection fields, String value) {
+    public void fields(ElementBuilder<DataField, String, PicaElement, PicaContext> builder,
+                       DataField fields, String value) {
         for (Field field : fields) {
             builder.context().setID(field.data());
         }
