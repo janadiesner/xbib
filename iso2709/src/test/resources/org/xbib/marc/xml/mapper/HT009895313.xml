@@ -1,0 +1,68 @@
+<collection xmlns="info:lc/xmlns/marcxchange-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="info:lc/xmlns/marcxchange-v2 http://www.loc.gov/standards/iso25577/marcxchange-2-0.xsd">
+    <record format="MarcXchange" type="Bibliographic">
+        <leader>00449vM2.01200024---000h</leader>
+        <controlfield tag="001">HT009895313</controlfield>
+        <controlfield tag="002">19990228</controlfield>
+        <datafield tag="LDR" ind1=" " ind2=" ">
+            <subfield code="a">00449vM2.01200024------h</subfield>
+        </datafield>
+        <datafield tag="FMT" ind1=" " ind2=" ">
+            <subfield code="a">MH</subfield>
+        </datafield>
+        <datafield tag="030" ind1=" " ind2=" ">
+            <subfield code="a">e|1uc||||||17</subfield>
+        </datafield>
+        <datafield tag="036" ind1="a" ind2="1">
+            <subfield code="a">FI</subfield>
+        </datafield>
+        <datafield tag="050" ind1=" " ind2=" ">
+            <subfield code="a">a|||||||||||||</subfield>
+        </datafield>
+        <datafield tag="051" ind1=" " ind2=" ">
+            <subfield code="a">my||||||</subfield>
+        </datafield>
+        <datafield tag="070" ind1=" " ind2="1">
+            <subfield code="a">HBZ/Off</subfield>
+        </datafield>
+        <datafield tag="078" ind1="o" ind2="1">
+            <subfield code="a">retro</subfield>
+        </datafield>
+        <datafield tag="080" ind1=" " ind2="1">
+            <subfield code="a">50</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2="1">
+            <subfield code="p">Rintala, Päivi</subfield>
+            <subfield code="9">(DE-588)151367167</subfield>
+        </datafield>
+        <datafield tag="331" ind1=" " ind2="1">
+            <subfield code="a">Suomen läntä-loppuiset adjetiivit</subfield>
+        </datafield>
+        <datafield tag="359" ind1=" " ind2="1">
+            <subfield code="a">Päivi Rintala</subfield>
+        </datafield>
+        <datafield tag="410" ind1=" " ind2="1">
+            <subfield code="a">Forssa</subfield>
+        </datafield>
+        <datafield tag="425" ind1="a" ind2="1">
+            <subfield code="a">1972</subfield>
+        </datafield>
+        <datafield tag="433" ind1=" " ind2="1">
+            <subfield code="a">270 S. ; 8-o</subfield>
+        </datafield>
+        <datafield tag="501" ind1=" " ind2="1">
+            <subfield code="a">[Suomalaisen kirjalisuuden seuran Toimituksia. 306]. - [Finnische Adjektive, die auf "läntä" enden]</subfield>
+        </datafield>
+        <datafield tag="519" ind1=" " ind2="1">
+            <subfield code="a">Helsinki, Phil. Diss., 1972</subfield>
+        </datafield>
+        <datafield tag="673" ind1="c" ind2="1">
+            <subfield code="a">Helsinki</subfield>
+        </datafield>
+        <datafield tag="SYS" ind1=" " ind2=" ">
+            <subfield code="a">004105264</subfield>
+        </datafield>
+        <datafield tag="088" ind1=" " ind2=" ">
+            <subfield code="a">38</subfield>
+        </datafield>
+    </record>
+</collection>

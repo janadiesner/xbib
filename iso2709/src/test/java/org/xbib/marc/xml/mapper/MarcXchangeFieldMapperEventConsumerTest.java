@@ -85,7 +85,7 @@ public class MarcXchangeFieldMapperEventConsumerTest {
         MarcXchangeFieldMapperReader consumer = new org.xbib.marc.xml.stream.mapper.MarcXchangeFieldMapperReader()
                 .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd")
                 .setMarcXchangeListener(writer)
-                .setFieldMap(fields);
+                .addFieldMap("test", fields);
 
         try (InputStream in = getClass().getResourceAsStream("HT016424175.xml")) {
             XMLEventReader xmlReader = factory.createXMLEventReader(in);

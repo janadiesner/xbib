@@ -134,7 +134,7 @@ public class MarcXchangeMappedOAITest {
         indicators.put("  ", "085$  ");
         Map<String,Object> fields = new HashMap();
         fields.put("084", indicators);
-        reader.setFieldMap(fields);
+        reader.addFieldMap("test", fields);
 
         writer.startDocument();
         writer.beginCollection();

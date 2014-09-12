@@ -165,6 +165,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
     }
 
     public MarcXchangeSaxAdapter setFieldEventListener(FieldEventListener fieldEventListener) {
+        super.setFieldEventListener(fieldEventListener);
         this.fieldEventListener = fieldEventListener;
         return this;
     }
@@ -225,21 +226,22 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
         return id;
     }
 
-    public MarcXchangeSaxAdapter setFieldMap(Map<String, Object> map) {
-        super.setFieldMap(map);
+    public MarcXchangeSaxAdapter addFieldMap(String fieldMapName, Map<String, Object> map) {
+        super.addFieldMap(fieldMapName, map);
         return this;
     }
 
     public BufferedFieldStreamReader fieldStream() {
-        FieldListener fieldListener = getFieldMap() != null ? new MappedStreamListener() : new DirectListener();
-        return new BufferedFieldStreamReader(reader, buffersize, fieldListener);
+        return new BufferedFieldStreamReader(reader, buffersize, new DirectListener());
     }
 
+    public BufferedFieldStreamReader mappedFieldStream() {
+        return new BufferedFieldStreamReader(reader, buffersize,  new MappedStreamListener());
+    }
     /**
-     * Parse ISO 2709 and emit SAX events.
+     * Parse ISO 2709 collection and emit SAX events.
      */
-    public void parse() throws IOException, SAXException {
-        BufferedFieldStreamReader stream = fieldStream();
+    public void parseCollection(BufferedFieldStreamReader stream) throws IOException, SAXException {
         beginCollection();
         Separable separable;
         do {
@@ -647,7 +649,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                         Matcher m = TAG_PATTERN.matcher(designator.tag());
                                         if (!m.matches()) {
                                             if (fieldEventListener != null) {
-                                                fieldEventListener.event(FieldEvent.CLEAN_TAG.setField(designator));
+                                                fieldEventListener.event(FieldEvent.TAG_CLEANED.setField(designator));
                                             }
                                             // switch invalid tag to error tag
                                             designator.tag(Field.ERROR_TAG);
@@ -685,7 +687,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                     Matcher m = TAG_PATTERN.matcher(designator.tag());
                                     if (!m.matches()) {
                                         if (fieldEventListener != null) {
-                                            fieldEventListener.event(FieldEvent.CLEAN_TAG.setField(designator));
+                                            fieldEventListener.event(FieldEvent.TAG_CLEANED.setField(designator));
                                         }
                                         // switch invalid tag to error tag
                                         designator.tag(Field.ERROR_TAG);
@@ -704,7 +706,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                         designator.data(XMLUtil.sanitizeXml10(designator.data()).toString());
                                         if (!old.equals(designator.data())) {
                                             if (fieldEventListener != null) {
-                                                fieldEventListener.event(FieldEvent.SCRUB_DATA.setField(designator));
+                                                fieldEventListener.event(FieldEvent.DATA_SCRUBBED.setField(designator));
                                             }
                                         }
                                     }
@@ -717,7 +719,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                 Matcher m = TAG_PATTERN.matcher(designator.tag());
                                 if (!m.matches()) {
                                     if (fieldEventListener != null) {
-                                        fieldEventListener.event(FieldEvent.CLEAN_TAG.setField(designator));
+                                        fieldEventListener.event(FieldEvent.TAG_CLEANED.setField(designator));
                                     }
                                     // switch invalid tag to error tag
                                     designator.tag(Field.ERROR_TAG);
@@ -734,7 +736,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                 Matcher m = TAG_PATTERN.matcher(designator.tag());
                                 if (!m.matches()) {
                                     if (fieldEventListener != null) {
-                                        fieldEventListener.event(FieldEvent.CLEAN_TAG.setField(designator));
+                                        fieldEventListener.event(FieldEvent.TAG_CLEANED.setField(designator));
                                     }
                                     // switch invalid tag to error tag
                                     designator.tag(Field.ERROR_TAG);
@@ -751,7 +753,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                 designator.data(XMLUtil.sanitizeXml10(designator.data()).toString());
                                 if (!old.equals(designator.data())) {
                                     if (fieldEventListener != null) {
-                                        fieldEventListener.event(FieldEvent.SCRUB_DATA.setField(designator));
+                                        fieldEventListener.event(FieldEvent.DATA_SCRUBBED.setField(designator));
                                     }
                                 }
                             }
@@ -886,7 +888,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                         designator.data(XMLUtil.sanitizeXml10(designator.data()).toString());
                                         if (!old.equals(designator.data())) {
                                             if (fieldEventListener != null) {
-                                                fieldEventListener.event(FieldEvent.SCRUB_DATA.setField(designator));
+                                                fieldEventListener.event(FieldEvent.DATA_SCRUBBED.setField(designator));
                                             }
                                         }
                                     }

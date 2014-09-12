@@ -35,7 +35,7 @@ import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.xml.MarcXchangeContentHandler;
-import org.xbib.xml.XMLUtil;
+import org.xbib.xml.stream.IndentingXMLEventWriter;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -51,20 +51,19 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The MarcXchangeWriter writes MarcXchange events to a StaX XML output stream or writer
+ * The MarcXchangeWriter writes MarcXchange events to a StaX XML output stream or xmlEventConsumer
  */
 public class MarcXchangeWriter extends MarcXchangeContentHandler
         implements MarcXchangeConstants, MarcXchangeListener {
 
     private final static XMLEventFactory eventFactory = XMLEventFactory.newInstance();
-
-    private final static XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 
     private final static String NAMESPACE = MARCXCHANGE_V2_NS_URI;
 
@@ -88,7 +87,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
 
     private final ReentrantLock lock = new ReentrantLock(true);
 
-    private XMLEventConsumer writer;
+    private XMLEventConsumer xmlEventConsumer;
 
     private Iterator<Namespace> namespaces;
 
@@ -96,13 +95,24 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
 
     private boolean documentStarted;
 
+    private boolean collectionStarted;
+
+    private boolean fatalErrors;
+
     private boolean schemaWritten;
 
     private boolean scrubData;
 
     public MarcXchangeWriter(OutputStream out) throws IOException {
+        this(out, false);
+    }
+
+    public MarcXchangeWriter(OutputStream out, boolean indent) throws IOException {
         try {
-            this.writer = outputFactory.createXMLEventWriter(out);
+            XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+            outputFactory.setProperty("com.ctc.wstx.useDoubleQuotesInXmlDecl", Boolean.TRUE);
+            this.xmlEventConsumer = indent ? new IndentingXMLEventWriter(outputFactory.createXMLEventWriter(out))
+                    : outputFactory.createXMLEventWriter(out);
             this.namespaces = Collections.singletonList(namespace).iterator();
         } catch (XMLStreamException e) {
             throw new IOException(e);
@@ -110,8 +120,15 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
     }
 
     public MarcXchangeWriter(Writer writer) throws IOException {
+        this(writer, false);
+    }
+
+    public MarcXchangeWriter(Writer writer, boolean indent) throws IOException {
         try {
-            this.writer = outputFactory.createXMLEventWriter(writer);
+            XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+            outputFactory.setProperty("com.ctc.wstx.useDoubleQuotesInXmlDecl", Boolean.TRUE);
+            this.xmlEventConsumer = indent ? new IndentingXMLEventWriter(outputFactory.createXMLEventWriter(writer))
+                    : outputFactory.createXMLEventWriter(writer);
             this.namespaces = Collections.singletonList(namespace).iterator();
         } catch (XMLStreamException e) {
             throw new IOException(e);
@@ -119,8 +136,13 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
     }
 
     public MarcXchangeWriter(XMLEventConsumer consumer) throws IOException {
-        this.writer = consumer;
+        this.xmlEventConsumer = consumer;
         this.namespaces = Collections.singletonList(namespace).iterator();
+    }
+
+    public MarcXchangeWriter setFatalErrors(boolean fatalErrors) {
+        this.fatalErrors = fatalErrors;
+        return this;
     }
 
     public MarcXchangeWriter setScrubData(boolean scrub) {
@@ -142,10 +164,13 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
             return;
         }
         try {
-            writer.add(eventFactory.createStartDocument("UTF-8", "1.0"));
+            xmlEventConsumer.add(eventFactory.createStartDocument());
             documentStarted = true;
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -158,10 +183,13 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
             return;
         }
         try {
-            writer.add(eventFactory.createEndDocument());
+            xmlEventConsumer.add(eventFactory.createEndDocument());
             documentStarted = false;
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         } finally {
             if (lock.isLocked()) {
                 lock.unlock();
@@ -180,10 +208,14 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
                 eventFactory.createAttribute("xmlns:xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI),
                 eventFactory.createAttribute("xsi:schemaLocation", NAMESPACE + " " + NAMESPACE_SCHEMA_LOCATION)
             ).iterator();
-            writer.add(eventFactory.createStartElement(COLLECTION_ELEMENT, attrs, namespaces));
+            xmlEventConsumer.add(eventFactory.createStartElement(COLLECTION_ELEMENT, attrs, namespaces));
             schemaWritten = true;
+            collectionStarted = true;
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -194,9 +226,15 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
             return;
         }
         try {
-            writer.add(eventFactory.createEndElement(COLLECTION_ELEMENT, namespaces));
+            if (collectionStarted) {
+                xmlEventConsumer.add(eventFactory.createEndElement(COLLECTION_ELEMENT, namespaces));
+                collectionStarted = false;
+            }
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -208,31 +246,36 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         }
         lock.lock();
         try {
-            List<Attribute> attrs = Arrays.asList(
-                eventFactory.createAttribute(FORMAT, getFormat() != null ? getFormat() : format != null ? format : MARC21),
-                eventFactory.createAttribute(TYPE, getType() != null ? getType() : type != null ? type : BIBLIOGRAPHIC)
-            );
+            List<Attribute> attrs = new LinkedList<Attribute>();
+            attrs.add(eventFactory.createAttribute(FORMAT, getFormat() != null ? getFormat() : format != null ? format : MARC21));
+            attrs.add(eventFactory.createAttribute(TYPE, getType() != null ? getType() : type != null ? type : BIBLIOGRAPHIC));
             if (!schemaWritten) {
                 attrs.add(eventFactory.createAttribute("xmlns:xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI));
                 attrs.add(eventFactory.createAttribute("xsi:schemaLocation", NAMESPACE + " " + NAMESPACE_SCHEMA_LOCATION));
                 schemaWritten = true;
             }
-            writer.add(eventFactory.createStartElement(RECORD_ELEMENT, attrs.iterator(), namespaces));
+            xmlEventConsumer.add(eventFactory.createStartElement(RECORD_ELEMENT, attrs.iterator(), namespaces));
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     @Override
     public void endRecord() {
         super.endRecord();
-        if (exception != null) {
-            return;
-        }
         try {
-            writer.add(eventFactory.createEndElement(RECORD_ELEMENT, namespaces));
+            if (exception != null) {
+                return;
+            }
+            xmlEventConsumer.add(eventFactory.createEndElement(RECORD_ELEMENT, namespaces));
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         } finally {
             lock.unlock();
         }
@@ -245,11 +288,14 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
             return;
         }
         try {
-            writer.add(eventFactory.createStartElement(LEADER_ELEMENT, null, namespaces));
-            writer.add(eventFactory.createCharacters(label));
-            writer.add(eventFactory.createEndElement(LEADER_ELEMENT, namespaces));
+            xmlEventConsumer.add(eventFactory.createStartElement(LEADER_ELEMENT, null, namespaces));
+            xmlEventConsumer.add(eventFactory.createCharacters(label));
+            xmlEventConsumer.add(eventFactory.createEndElement(LEADER_ELEMENT, namespaces));
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -268,9 +314,12 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         }
         try {
             Iterator<Attribute> attrs = Collections.singletonList(eventFactory.createAttribute(TAG, field.tag())).iterator();
-            writer.add(eventFactory.createStartElement(CONTROLFIELD_ELEMENT, attrs, namespaces));
+            xmlEventConsumer.add(eventFactory.createStartElement(CONTROLFIELD_ELEMENT, attrs, namespaces));
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -302,11 +351,14 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         }
         try {
             if (field != null && field.data() != null && !field.data().isEmpty()) {
-                writer.add(eventFactory.createCharacters(field.data()));
+                xmlEventConsumer.add(eventFactory.createCharacters(field.data()));
             }
-            writer.add(eventFactory.createEndElement(CONTROLFIELD_ELEMENT, namespaces));
+            xmlEventConsumer.add(eventFactory.createEndElement(CONTROLFIELD_ELEMENT, namespaces));
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -336,9 +388,12 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
                     eventFactory.createAttribute(IND + "1", ind1),
                     eventFactory.createAttribute(IND + "2", ind2)
             ).iterator();
-            writer.add(eventFactory.createStartElement(DATAFIELD_ELEMENT, attrs, namespaces));
+            xmlEventConsumer.add(eventFactory.createStartElement(DATAFIELD_ELEMENT, attrs, namespaces));
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -356,11 +411,14 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         }
         try {
             if (field != null && field.data() != null && !field.data().isEmpty()) {
-                writer.add(eventFactory.createCharacters(field.data()));
+                xmlEventConsumer.add(eventFactory.createCharacters(field.data()));
             }
-            writer.add(eventFactory.createEndElement(DATAFIELD_ELEMENT, namespaces));
+            xmlEventConsumer.add(eventFactory.createEndElement(DATAFIELD_ELEMENT, namespaces));
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -379,9 +437,12 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
             Iterator<Attribute> attrs = Collections.singletonList(
                     eventFactory.createAttribute(CODE, code != null && !code.isEmpty() ? code : "a")
             ).iterator();
-            writer.add(eventFactory.createStartElement(SUBFIELD_ELEMENT, attrs, namespaces));
+            xmlEventConsumer.add(eventFactory.createStartElement(SUBFIELD_ELEMENT, attrs, namespaces));
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -390,7 +451,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         try {
             if (inControl) {
                 if (field.data() != null) {
-                    writer.add(eventFactory.createCharacters(field.data()));
+                    xmlEventConsumer.add(eventFactory.createCharacters(field.data()));
                 }
                 return;
             }
@@ -399,11 +460,14 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
                 return;
             }
             if (field != null && field.data() != null) {
-                writer.add(eventFactory.createCharacters(field.data()));
+                xmlEventConsumer.add(eventFactory.createCharacters(field.data()));
             }
-            writer.add(eventFactory.createEndElement(SUBFIELD_ELEMENT, namespaces));
+            xmlEventConsumer.add(eventFactory.createEndElement(SUBFIELD_ELEMENT, namespaces));
         } catch (XMLStreamException e) {
             exception = e;
+            if (fatalErrors) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

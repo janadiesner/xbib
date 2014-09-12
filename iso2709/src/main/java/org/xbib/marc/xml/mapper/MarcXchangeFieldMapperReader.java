@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Map;
 
 /**
  * This MarcXchangeReader reads MarcXML or MarcXchange, maps MarcXchange field to other fields,
@@ -51,6 +52,18 @@ import java.io.Reader;
 public class MarcXchangeFieldMapperReader extends MarcXchangeFieldMapperContentHandler {
 
     private ContentHandler contentHandler;
+
+    @Override
+    public MarcXchangeFieldMapperReader addFieldMap(String fieldMapName, Map<String,Object> fieldMap) {
+        super.addFieldMap(fieldMapName, fieldMap);
+        return this;
+    }
+
+    @Override
+    public MarcXchangeFieldMapperReader setMarcXchangeListener(MarcXchangeListener listener) {
+        super.setMarcXchangeListener(listener);
+        return this;
+    }
 
     public void parse(InputStream in) throws IOException {
         parse(new InputStreamReader(in, "UTF-8"));
@@ -73,9 +86,5 @@ public class MarcXchangeFieldMapperReader extends MarcXchangeFieldMapperContentH
         return this;
     }
 
-    public MarcXchangeFieldMapperReader setMarcXchangeListener(MarcXchangeListener listener) {
-        super.setMarcXchangeListener(listener);
-        return this;
-    }
 
 }

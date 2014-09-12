@@ -34,6 +34,8 @@ package org.xbib.marc.xml.stream;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.event.RecordEvent;
+import org.xbib.marc.event.RecordEventListener;
 import org.xbib.marc.label.RecordLabel;
 
 import javax.xml.namespace.QName;
@@ -84,6 +86,8 @@ public class MarcXchangeReader
 
     private boolean ignoreNamespace = false;
 
+    private RecordEventListener recordEventListener;
+
     private Integer bufferSize;
 
     private Set<String> validNamespaces = new HashSet<String>() {{
@@ -92,7 +96,7 @@ public class MarcXchangeReader
         add(MARC21_NS_URI);
     }};
 
-    public MarcXchangeReader addListener(String type, MarcXchangeListener listener) {
+    public MarcXchangeReader setMarcXchangeListener(String type, MarcXchangeListener listener) {
         this.listeners.put(type, listener);
         return this;
     }
@@ -124,6 +128,11 @@ public class MarcXchangeReader
 
     public MarcXchangeReader addNamespace(String uri) {
         this.validNamespaces.add(uri);
+        return this;
+    }
+
+    public MarcXchangeReader setRecordEventLlistener(RecordEventListener recordEventListener) {
+        this.recordEventListener = recordEventListener;
         return this;
     }
 
@@ -293,6 +302,9 @@ public class MarcXchangeReader
                 }
                 case RECORD: {
                     beginRecord(format, type);
+                    if (recordEventListener != null) {
+                        recordEventListener.event(RecordEvent.START);
+                    }
                     break;
                 }
                 case LEADER: {

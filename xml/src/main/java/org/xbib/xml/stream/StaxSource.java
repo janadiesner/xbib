@@ -22,12 +22,12 @@ import javax.xml.transform.sax.SAXSource;
  * the specified {@link javax.xml.stream.XMLStreamReader} or
  * {@link javax.xml.stream.XMLEventReader} for use by applications that
  * expext a {@link javax.xml.transform.Source}.
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * The fact that StAXSource derives from SAXSource is an implementation
  * detail. Thus in general applications are strongly discouraged from
  * accessing methods defined on SAXSource. In particular:
- * <p/>
+ * <p>
  * <ul>
  * <li> The setXMLReader and setInputSource methods shall never be called.
  * <li> The XMLReader object obtained by the getXMLReader method shall
@@ -37,10 +37,10 @@ import javax.xml.transform.sax.SAXSource;
  * be used only for being parsed by the XMLReader object returned by
  * the getXMLReader method.</li>
  * </ul>
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * Example:
- * <p/>
+ * <p>
  * <pre>
  * // create a StAXSource
  * XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(new FileReader(args[0]));
@@ -63,7 +63,7 @@ public class StaxSource extends SAXSource {
     /**
      * Creates a new {@link javax.xml.transform.Source} for the given
      * {@link XMLStreamReader}.
-     * <p/>
+     * <p>
      * The XMLStreamReader must be pointing at either a
      * {@link javax.xml.stream.XMLStreamConstants#START_DOCUMENT} or
      * {@link javax.xml.stream.XMLStreamConstants#START_ELEMENT} event.

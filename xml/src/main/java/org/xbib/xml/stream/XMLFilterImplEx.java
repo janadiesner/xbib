@@ -1,4 +1,3 @@
-
 package org.xbib.xml.stream;
 
 import org.xml.sax.SAXException;

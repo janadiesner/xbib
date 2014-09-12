@@ -31,11 +31,27 @@
  */
 package org.xbib.marc.event;
 
-public interface Change {
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
-    Change setChange(Object prev, Object next);
+public class RecordEventLogger implements RecordEventListener {
 
-    Object getPrev();
+    private final static Logger logger = LoggerFactory.getLogger(RecordEventLogger.class.getName());
 
-    Object getNext();
+    private String level = "info";
+
+    public RecordEventLogger(String level) {
+        this.level = level;
+    }
+
+    @Override
+    public void event(RecordEvent event) {
+        switch (level) {
+            case "warn" : logger.warn("{}", event); break;
+            case "error" : logger.error("{}", event); break;
+            case "info" : logger.info("{}", event); break;
+            case "debug" : logger.debug("{}", event); break;
+            case "trace" : logger.trace("{}", event); break;
+        }
+    }
 }

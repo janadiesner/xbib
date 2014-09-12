@@ -31,11 +31,7 @@
  */
 package org.xbib.marc.event;
 
-public interface Change {
+public interface RecordEventListener {
 
-    Change setChange(Object prev, Object next);
-
-    Object getPrev();
-
-    Object getNext();
+    public void event(RecordEvent event);
 }

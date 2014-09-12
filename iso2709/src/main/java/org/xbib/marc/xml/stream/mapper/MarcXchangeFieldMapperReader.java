@@ -34,6 +34,8 @@ package org.xbib.marc.xml.stream.mapper;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.event.RecordEvent;
+import org.xbib.marc.event.RecordEventListener;
 import org.xbib.marc.xml.mapper.MarcXchangeFieldMapper;
 
 import javax.xml.namespace.QName;
@@ -46,10 +48,12 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -85,13 +89,17 @@ public class MarcXchangeFieldMapperReader
 
     private boolean ignoreNamespace = false;
 
+    private RecordEventListener recordEventListener;
+
+    private Integer bufferSize;
+
     private Set<String> validNamespaces = new HashSet<String>() {{
         add(MARCXCHANGE_V1_NS_URI);
         add(MARCXCHANGE_V2_NS_URI);
         add(MARC21_NS_URI);
     }};
 
-    public MarcXchangeFieldMapperReader addListener(String type, MarcXchangeListener listener) {
+    public MarcXchangeFieldMapperReader setMarcXchangeListener(String type, MarcXchangeListener listener) {
         this.listeners.put(type, listener);
         return this;
     }
@@ -121,8 +129,20 @@ public class MarcXchangeFieldMapperReader
         return this;
     }
 
-    public MarcXchangeFieldMapperReader setFieldMap(Map<String,Object> fieldMap) {
-        super.setFieldMap(fieldMap);
+
+    public MarcXchangeFieldMapperReader setBufferSize(Integer bufferSize) {
+        this.bufferSize = bufferSize;
+        return this;
+    }
+
+    @Override
+    public MarcXchangeFieldMapperReader addFieldMap(String fieldMapName, Map<String,Object> fieldMap) {
+        super.addFieldMap(fieldMapName, fieldMap);
+        return this;
+    }
+
+    public MarcXchangeFieldMapperReader setRecordEventLlistener(RecordEventListener recordEventListener) {
+        this.recordEventListener = recordEventListener;
         return this;
     }
 
@@ -133,6 +153,9 @@ public class MarcXchangeFieldMapperReader
     public void parse(Reader reader) throws IOException {
         try {
             XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            if (bufferSize != null) {
+                reader = new BufferedReader(reader, bufferSize);
+            }
             XMLEventReader xmlEventReader = inputFactory.createXMLEventReader(reader);
             while (xmlEventReader.hasNext()) {
                 add(xmlEventReader.nextEvent());
@@ -287,9 +310,12 @@ public class MarcXchangeFieldMapperReader
                     beginCollection();
                     break;
                 }
-                case RECORD:{
+                case RECORD: {
                     setFormat(format);
                     setType(type);
+                    if (recordEventListener != null) {
+                        recordEventListener.event(RecordEvent.START);
+                    }
                     break;
                 }
                 case LEADER: {
@@ -348,6 +374,7 @@ public class MarcXchangeFieldMapperReader
                     if (f.isControlField()) {
                         addControlField(f.subfieldId(null).data(content.toString()));
                     } else {
+                        // conversion from datafield
                         Field data = new Field(f).indicator("  ").subfieldId("a").data(content.toString());
                         addDataField(data);
                         addDataField(Field.EMPTY);
@@ -358,9 +385,7 @@ public class MarcXchangeFieldMapperReader
                 }
                 case DATAFIELD: {
                     Field f = stack.pop();
-                    if (f.isControlField()) {
-                        //addControlField(f.subfieldId(null).data(content.toString()));
-                    } else {
+                    if (!f.isControlField()) {
                         addDataField(f.subfieldId(null).data(""));
                         flushField();
                     }
@@ -371,7 +396,6 @@ public class MarcXchangeFieldMapperReader
                     if (inControl) {
                         // repair, move data to controlfield or leader
                         stack.peek().data(content.toString());
-                        //addControlField(stack.pop());
                         break;
                     } else {
                         Field f = stack.pop().data(content.toString());

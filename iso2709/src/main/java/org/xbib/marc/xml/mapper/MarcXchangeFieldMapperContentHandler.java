@@ -89,7 +89,7 @@ public class MarcXchangeFieldMapperContentHandler
         add(MARC21_NS_URI);
     }};
 
-    public MarcXchangeFieldMapperContentHandler addListener(String type, MarcXchangeListener listener) {
+    public MarcXchangeFieldMapperContentHandler setMarcXchangeListener(String type, MarcXchangeListener listener) {
         this.listeners.put(type, listener);
         return this;
     }

@@ -40,6 +40,7 @@ import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.event.FieldEventLogger;
 import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xml.sax.SAXException;
 
@@ -86,7 +87,8 @@ public class DE468MABTest extends StreamTester {
         writer.endCollection();
         writer.endDocument();
         out.close();
-        assertStream(getClass().getResource("DE-468.xml").openStream(), new FileInputStream(file));
+        assertStream(getClass().getResource("DE-468.xml").openStream(),
+                new FileInputStream(file));
     }
 
     @Test
@@ -96,8 +98,10 @@ public class DE468MABTest extends StreamTester {
         FileOutputStream out = new FileOutputStream(file);
         Iso2709Reader reader = new Iso2709Reader();
         reader.setFormat("MAB");
-        // Set delimiter. Will be automatically quoted before used as split pattern.
+
+        // custom subfield delimiter. Will be automatically quoted before used as split pattern.
         reader.setSubfieldDelimiter("$$");
+        // fix subfield code length
         reader.setSubfieldCodeLength(2);
 
         // 902$ $ 9 -> 689$00$a0
@@ -112,7 +116,9 @@ public class DE468MABTest extends StreamTester {
         Map<String,Object> fields = new HashMap();
         fields.put("902", indicators);
 
-        reader.setFieldMap(fields); // --> selects field mapper
+        reader.addFieldMap("test", fields); // --> selects field mapper
+
+        reader.setFieldEventListener(new FieldEventLogger("info"));
 
         MarcXchangeWriter writer = new MarcXchangeWriter(out);
         writer.setFormat("MARC21").setType("Bibliographic");
@@ -123,7 +129,8 @@ public class DE468MABTest extends StreamTester {
         writer.endCollection();
         writer.endDocument();
         out.close();
-        assertStream(getClass().getResource("DE-468-mapped.xml").openStream(), new FileInputStream(file));
+        assertStream(getClass().getResource("DE-468-mapped.xml").openStream(),
+                new FileInputStream(file));
     }
 
     @Test
@@ -186,7 +193,7 @@ public class DE468MABTest extends StreamTester {
         Map<String,Object> fields = new HashMap();
         fields.put("700", indicators);
 
-        reader.setFieldMap(fields);
+        reader.addFieldMap("test", fields);
 
         MarcXchangeWriter writer = new MarcXchangeWriter(out);
         writer.setFormat("MARC21").setType("Bibliographic");
@@ -198,7 +205,8 @@ public class DE468MABTest extends StreamTester {
         writer.endDocument();
         out.close();
 
-        //assertStream(getClass().getResource("DE-468-killed-fields.xml").openStream(), new FileInputStream(file));
+        assertStream(getClass().getResource("DE-468-killed-fields.xml").openStream(),
+                new FileInputStream(file));
     }
 
 }

@@ -31,11 +31,10 @@
  */
 package org.xbib.marc.event;
 
-public interface Change {
+public interface Cause {
 
-    Change setChange(Object prev, Object next);
+    Cause setCause(String cause);
 
-    Object getPrev();
+    String getCause();
 
-    Object getNext();
 }

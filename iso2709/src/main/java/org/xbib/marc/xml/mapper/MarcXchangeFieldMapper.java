@@ -39,15 +39,20 @@ import org.xbib.marc.event.FieldEvent;
 import org.xbib.marc.event.FieldEventListener;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * The MarcXchange field mapper parses MarcXchange fields one by one,
- * with the capability to map fields to other ones or even remove them.
+ * with the capability to map fields to other ones, or even remove them.
  */
 public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
+
+    private final static String RECORD_NUMBER_FIELD = "001";
+
+    private final static String EMPTY = "";
 
     private DataField record = new DataField();
 
@@ -65,7 +70,7 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
 
     private String label;
 
-    private Map<String, Object> map;
+    private Map<String, Map<String, Object>> maps;
 
     private FieldEventListener fieldEventListener;
 
@@ -87,13 +92,16 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         return type;
     }
 
-    public MarcXchangeFieldMapper setFieldMap(Map<String, Object> map) {
-        this.map = map;
+    public MarcXchangeFieldMapper addFieldMap(String fieldMapName, Map<String, Object> map) {
+        if (maps == null) {
+            maps = new LinkedHashMap<String, Map<String, Object>>();
+        }
+        maps.put(fieldMapName, map);
         return this;
     }
 
-    public Map<String, Object> getFieldMap() {
-        return map;
+    public Map<String, Object> getFieldMap(String fieldMapName) {
+        return maps.get(fieldMapName);
     }
 
     public MarcXchangeFieldMapper setFieldEventListener(FieldEventListener fieldEventListener) {
@@ -104,22 +112,25 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
     protected void setRecordLabel(String label) {
         RecordLabel recordLabel = new RecordLabel(label.toCharArray());
         this.label = recordLabel.getRecordLabel();
-        if (this.label.equals(label) && fieldEventListener != null) {
-            fieldEventListener.event(FieldEvent.RECORD_LABEL_CHANGE.setChange(label, this.label));
+        if (!this.label.equals(label) && fieldEventListener != null) {
+            fieldEventListener.event(FieldEvent.RECORD_LABEL_CHANGED.setChange(label, this.label));
         }
     }
 
     protected void addControlField(Field field) {
         // there is one controlfield rule, only 1 occurence of 001 allowed
-        if ("001".equals(field.tag())) {
+        if (RECORD_NUMBER_FIELD.equals(field.tag())) {
             for (Field f : controlfields) {
-                if ("001".equals(f.tag())) {
+                if (RECORD_NUMBER_FIELD.equals(f.tag())) {
                     // already exist, drop this new 001 field
                     if (fieldEventListener != null) {
-                        fieldEventListener.event(FieldEvent.DOUBLE_RECORD_NUMBER.setField(field));
+                        fieldEventListener.event(FieldEvent.RECORD_NUMBER_MULTIPLE.setField(field));
                     }
                     return;
                 }
+            }
+            if (fieldEventListener != null) {
+                fieldEventListener.event(FieldEvent.RECORD_NUMBER.setField(field));
             }
         }
         this.controlfields.add(field);
@@ -143,12 +154,18 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
             return;
         }
         Field datafield = it.next();
-        // if field is empty, advance to next field
-        if (datafield.equals(Field.EMPTY)) {
-            datafield = it.hasNext() ? it.next() : null;
+        // if field is empty, advance to next non-empty field
+        while (datafield.equals(Field.EMPTY) && it.hasNext()) {
+            datafield = it.next();
         }
         // we reject fields that are are single and have no data to map
-        if (datafield == null || (datafields.size() == 1 && (datafield.data() == null || datafield.data().isEmpty()))) {
+        if (datafields.size() == 1 && (datafield.data() == null || datafield.data().isEmpty())) {
+            return;
+        }
+        // we reject fields that would result in empty datafields: last field was a datafield without data, this field also
+        // This can happen when subfields are removed.
+        if (!datafield.isSubField() && datafield.data().isEmpty() &&
+                !record.isEmpty() && !record.getLast().isSubField() && record.getLast().data().isEmpty()) {
             return;
         }
         if (isRepeat(previousField, datafield)) {
@@ -209,7 +226,14 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         // 3. datafield (close)
         // Control fields are skipped.
         for (Field field : record) {
-            if (field.isSubField()) {
+            if (field.equals(Field.EMPTY)) {
+                // close tag if tag  is open
+                if (inData) {
+                    // ensure no data field has content (for XML)
+                    endDataField(field.data(EMPTY));
+                    inData = false;
+                }
+            } else if (field.isSubField()) {
                 if (!inData) {
                     beginDataField(field);
                     inData = true;
@@ -217,9 +241,9 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                 beginSubField(field);
                 endSubField(field);
             } else if (!field.isControlField()) {
-                if (inData || Field.EMPTY.equals(field)) {
+                if (inData) {
                     // ensure no data field has content (for XML)
-                    endDataField(field.data(""));
+                    endDataField(field.data(EMPTY));
                     inData = false;
                 } else {
                     beginDataField(field);
@@ -229,7 +253,7 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         }
         // forgotten close data field?
         if (inData) {
-            endDataField(new Field(record.getLast()).subfieldId(null).data(""));
+            endDataField(new Field(record.getLast()).subfieldId(null).data(EMPTY));
         }
         endRecord();
         // reset all the counters and variables for next record
@@ -258,59 +282,78 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
      */
     @SuppressWarnings("unchecked")
     protected Field map(Field field) {
-        if (map == null) {
-            return field;
-        }
         if (field == null) {
             return null;
         }
-        if (map.containsKey(field.tag())) {
-            Object o = map.get(field.tag());
-            if (o == null) {
-                // value null means remove this field
-                return Field.EMPTY;
+        if (maps == null) {
+            return field;
+        }
+        for (String fieldMapName : maps.keySet()) {
+            Map<String,Object> map = maps.get(fieldMapName);
+            if (map == null) {
+                continue;
             }
-            if (o instanceof Map) {
-                if (field.isControlField()) {
-                    Map<String, Object> subf = (Map<String, Object>) o;
-                    if (subf.containsKey("")) {
-                        o = subf.get("");
-                        if (o != null) {
-                            String[] s = o.toString().split("\\$");
-                            if (s.length >= 2) {
-                                s[1] = interpolate(s[1]);
-                                field.tag(s[0]).indicator(s[1]);
-                            } else if (s.length == 1) {
-                                field.tag(s[0]);
+            if (map.containsKey(field.tag())) {
+                Object o = map.get(field.tag());
+                if (o == null) {
+                    // value null means remove this field
+                    if (fieldEventListener != null) {
+                        fieldEventListener.event(FieldEvent.FIELD_DROPPED.setField(field).setCause(fieldMapName));
+                    }
+                    return Field.EMPTY;
+                }
+                if (o instanceof Map) {
+                    if (field.isControlField()) {
+                        Map<String, Object> subf = (Map<String, Object>) o;
+                        if (subf.containsKey(EMPTY)) {
+                            o = subf.get(EMPTY);
+                            if (o != null) {
+                                if (fieldEventListener != null) {
+                                    fieldEventListener.event(FieldEvent.FIELD_MAPPED.setField(field).setCause(fieldMapName));
+                                }
+                                String[] s = o.toString().split("\\$");
+                                if (s.length >= 2) {
+                                    s[1] = interpolate(s[1]);
+                                    field.tag(s[0]).indicator(s[1]);
+                                } else if (s.length == 1) {
+                                    field.tag(s[0]);
+                                }
                             }
                         }
-                    }
-                } else {
-                    Map<String, Object> ind = (Map<String, Object>) o;
-                    if (ind.containsKey(field.indicator())) {
-                        o = ind.get(field.indicator());
-                        if (o == null) {
-                            return Field.EMPTY;
-                        }
-                        if (o instanceof Map) {
-                            Map<String, Object> subf = (Map<String, Object>) o;
-                            String subfieldId = field.isSubField() ? field.subfieldId() : "";
-                            if (subf.containsKey(subfieldId)) {
-                                o = subf.get(subfieldId);
-                                if (o == null) {
-                                    return Field.EMPTY;
-                                } else {
-                                    String[] s = o.toString().split("\\$");
-                                    if (s.length >= 2) {
-                                        s[1] = interpolate(s[1]);
-                                        // subfield -> subfield, data field -> data field
-                                        if (field.isSubField()) {
-                                            field.tag(s[0]).indicator(s[1]).subfieldId(s[2]);
-                                        } else {
-                                            field.tag(s[0]).indicator(s[1]);
+                    } else {
+                        Map<String, Object> ind = (Map<String, Object>) o;
+                        if (ind.containsKey(field.indicator())) {
+                            o = ind.get(field.indicator());
+                            if (o == null) {
+                                return Field.EMPTY;
+                            }
+                            if (o instanceof Map) {
+                                Map<String, Object> subf = (Map<String, Object>) o;
+                                // datafield uses same config as subfield "a" (for convenience) if there is no config for empty string
+                                String subfieldId = field.isSubField() ? field.subfieldId() : subf.containsKey(EMPTY) ? EMPTY : "a";
+                                if (subf.containsKey(subfieldId)) {
+                                    o = subf.get(subfieldId);
+                                    if (o == null) {
+                                        if (fieldEventListener != null) {
+                                            fieldEventListener.event(FieldEvent.FIELD_DROPPED.setField(field).setCause(fieldMapName));
                                         }
-                                    } else if (s.length == 1) {
-                                        field.tag(s[0]);
+                                        return Field.EMPTY;
+                                    } else {
+                                        if (fieldEventListener != null) {
+                                            fieldEventListener.event(FieldEvent.FIELD_MAPPED.setField(field).setCause(fieldMapName));
+                                        }
+                                        String[] s = o.toString().split("\\$");
+                                        if (s.length >= 2) {
+                                            s[1] = interpolate(s[1]);
+                                            // subfield -> subfield, data field -> data field
+                                            if (field.isSubField()) {
+                                                field.tag(s[0]).indicator(s[1]).subfieldId(s[2]);
+                                            } else {
+                                                field.tag(s[0]).indicator(s[1]);
+                                            }
+                                        } else if (s.length == 1) {
+                                            field.tag(s[0]);
+                                        }
                                     }
                                 }
                             }

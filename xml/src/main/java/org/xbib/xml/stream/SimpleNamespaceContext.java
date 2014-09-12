@@ -1,4 +1,3 @@
-
 package org.xbib.xml.stream;
 
 import javax.xml.XMLConstants;

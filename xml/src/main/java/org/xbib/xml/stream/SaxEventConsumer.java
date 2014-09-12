@@ -1,8 +1,5 @@
-
 package org.xbib.xml.stream;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.ErrorHandler;
@@ -28,7 +25,7 @@ import java.util.Iterator;
 
 /**
  * Receive and convert StAX events to SAX events.
- *
+ * <p>
  * It's a modification of the code from XMLEventReaderToContentHandler that can be used as
  * {@link XMLEventConsumer} since SAX result is not supported by standard {@link javax.xml.stream.XMLOutputFactory}.
  */

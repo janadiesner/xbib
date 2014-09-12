@@ -372,14 +372,6 @@ public class RecordLabel {
 
     @Override
     public String toString() {
-        return "Record Label definitions:" + " record length = " + recordLength
-                + " record status = " + recordStatus
-                + " bibliographic level = " + bibliographicLevel
-                + " indicator length = " + indicatorLength
-                + " subfield identifier length = " + subfieldIdentifierLength
-                + " base address of data = " + baseAddressOfData
-                + " data field length = " + dataFieldLength
-                + " starting character position length = " + startingCharacterPositionLength
-                + " segment identifier length = " + segmentIdentifierLength;
+        return new String(cfix);
     }
 }

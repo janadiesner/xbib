@@ -108,6 +108,8 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
      */
     public static String SUBFIELD_CODE_LENGTH = "subfield_code_length";
 
+    public static String FIELDMAPPER = "field_mapper";
+
     /**
      * The SaX service
      */
@@ -231,9 +233,14 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
         return this;
     }
 
-    public Iso2709Reader setFieldMap(Map<String, Object> map) {
-        this.adapter.setFieldMap(map);
+    public Iso2709Reader addFieldMap(String fieldMapName, Map<String, Object> fieldMap) {
+        this.adapter.addFieldMap(fieldMapName, fieldMap);
+        properties.put(FIELDMAPPER, Boolean.TRUE);
         return this;
+    }
+
+    public boolean isFieldMapped() {
+        return properties.get(FIELDMAPPER) != null;
     }
 
     public Iso2709Reader setFieldEventListener(FieldEventListener fieldEventListener) {
@@ -317,9 +324,18 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
         return setup(adapter).setInputStream(in).fieldStream();
     }
 
+    public BufferedFieldStreamReader mappedStream(InputStream in) throws IOException {
+        return setup(adapter).setInputStream(in).mappedFieldStream();
+    }
+
     public BufferedFieldStreamReader stream(Reader reader) throws IOException {
         return setup(adapter).setReader(reader).fieldStream();
     }
+
+    public BufferedFieldStreamReader mappedStream(Reader reader) throws IOException {
+        return setup(adapter).setReader(reader).mappedFieldStream();
+    }
+
     public void parse(InputStream in) throws IOException {
         parse(new InputStreamReader(in, "UTF-8"));
     }
@@ -334,7 +350,8 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
 
     @Override
     public void parse(InputSource input) throws IOException, SAXException {
-        setup(adapter).setInputSource(input).parse();
+        setup(adapter).setInputSource(input)
+                .parseCollection(isFieldMapped() ? adapter.mappedFieldStream() : adapter.fieldStream());
     }
 
     /**

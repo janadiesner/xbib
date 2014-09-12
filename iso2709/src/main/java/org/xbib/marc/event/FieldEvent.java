@@ -33,12 +33,35 @@ package org.xbib.marc.event;
 
 import org.xbib.marc.Field;
 
-public enum FieldEvent implements Change {
+public enum FieldEvent implements Cause, Change {
 
-    CLEAN_TAG,
-    SCRUB_DATA,
-    DOUBLE_RECORD_NUMBER,
-    RECORD_LABEL_CHANGE {
+    TAG_CLEANED,
+    DATA_SCRUBBED,
+    RECORD_NUMBER,
+    RECORD_NUMBER_MULTIPLE,
+    FIELD_DROPPED {
+        private String cause;
+        public FieldEvent setCause(String cause) {
+            this.cause = cause;
+            return this;
+        }
+
+        public String getCause() {
+            return cause;
+        }
+    },
+    FIELD_MAPPED {
+        private String cause;
+        public FieldEvent setCause(String cause) {
+            this.cause = cause;
+            return this;
+        }
+
+        public String getCause() {
+            return cause;
+        }
+    },
+    RECORD_LABEL_CHANGED {
         private Object prev;
         private Object next;
         public FieldEvent setChange(Object prev, Object next) {
@@ -72,6 +95,14 @@ public enum FieldEvent implements Change {
         return field;
     }
 
+    public FieldEvent setCause(String cause) {
+        return this;
+    }
+
+    public String getCause() {
+        return null;
+    }
+
     public FieldEvent setChange(Object prev, Object next) {
         return this;
     }
@@ -82,5 +113,53 @@ public enum FieldEvent implements Change {
 
     public Object getNext() {
         return null;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[Event:").append(this.name());
+        if (getField() != null) {
+            sb.append(':').append(getField());
+        }
+        if (getCause() != null) {
+            sb.append(":cause=").append(getCause());
+        }
+        if (getPrev() != null) {
+            sb.append(":prev=").append(getPrev());
+        }
+        if (getNext() != null) {
+            sb.append(":next=").append(getNext());
+        }
+        sb.append(']');
+        return sb.toString();
+    }
+
+    public String toJSON() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\"event\":\"").append(this.name()).append("\"");
+        if (getField() != null) {
+            sb.append(",\"field\":\"").append(getField()).append("\"");
+        }
+        if (getCause() != null) {
+            sb.append(",\"cause\":\"").append(getCause()).append("\"");
+        }
+        if (getPrev() != null) {
+            sb.append(",\"prev\":\"").append(getPrev()).append("\"");
+        }
+        if (getNext() != null) {
+            sb.append(",\"next\":\"").append(getNext()).append("\"");
+        }
+        sb.append('}');
+        return sb.toString();
+    }
+
+    public String toTSV() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.name()).append('\t')
+        .append(getField() != null ? getField() : "").append('\t')
+        .append(getCause() != null ? getCause() : "").append('\t')
+        .append(getPrev() != null ? getPrev() : "").append('\t')
+        .append(getNext() != null ? getNext() : "");
+        return sb.toString();
     }
 }
