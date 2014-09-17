@@ -37,7 +37,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * An ISO 2709 data field, consisting of a list of subfields
+ * An ISO 2709 data field, consisting of a list of subfields.
+ *
+ * It is also possible to store a list of ISO 2709 data fields into this class.
  */
 public class DataField extends ArrayList<Field> {
 
@@ -160,7 +162,7 @@ public class DataField extends ArrayList<Field> {
     }
 
     public String toSpec() {
-        // a better (faster) method would be insert sort
+        // a better (faster) method would be something like insert sort
         Map<String,String[]> m = new TreeMap<String,String[]>();
         makePattern(m);
         StringBuilder sb = new StringBuilder();
@@ -196,26 +198,6 @@ public class DataField extends ArrayList<Field> {
 
     public Field removeLast() {
         return remove(size()-1);
-    }
-
-    public void addToFieldCollection(Field field) {
-        // insert sort. Search first occurence where the field tag is higher.
-        if (isEmpty()) {
-            add(0, field);
-        } else {
-            boolean inserted = false;
-            for (int i = 0; i < size(); i++) {
-                Field f = get(i);
-                if (f.compareTo(field) > 0) {
-                    add(i, field);
-                    inserted = true;
-                    break;
-                }
-            }
-            if (!inserted) {
-                add(field);
-            }
-        }
     }
 
     public String getString() {

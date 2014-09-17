@@ -53,7 +53,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -128,7 +127,6 @@ public class MarcXchangeFieldMapperReader
         this.validNamespaces.add(uri);
         return this;
     }
-
 
     public MarcXchangeFieldMapperReader setBufferSize(Integer bufferSize) {
         this.bufferSize = bufferSize;
@@ -323,8 +321,7 @@ public class MarcXchangeFieldMapperReader
                     break;
                 }
                 case CONTROLFIELD: {
-                    Field field = new Field(tag);
-                    stack.push(field);
+                    stack.push(new Field(tag));
                     inControl = true;
                     break;
                 }

@@ -55,7 +55,8 @@ import java.util.Set;
 import java.util.Stack;
 
 /**
- * The MarcXchange ContentHandler can handle SaX event input and fires events to a MarcXchange listener
+ * The Sax-ContentHandler-based MarcXchange handler can handle SaX event input
+ * and fires events to a MarcXchange listener
  */
 public class MarcXchangeContentHandler
         implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler, MarcXchangeConstants, MarcXchangeListener {

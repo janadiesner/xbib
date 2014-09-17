@@ -46,24 +46,12 @@ import java.io.Reader;
 import java.util.Map;
 
 /**
- * This MarcXchangeReader reads MarcXML or MarcXchange, maps MarcXchange field to other fields,
+ * This Sax-ContentHandler-based MarcXchangeReader reads MarcXML or MarcXchange, maps MarcXchange field to other fields,
  * and fires events to a MarcXchange listener
  */
 public class MarcXchangeFieldMapperReader extends MarcXchangeFieldMapperContentHandler {
 
     private ContentHandler contentHandler;
-
-    @Override
-    public MarcXchangeFieldMapperReader addFieldMap(String fieldMapName, Map<String,Object> fieldMap) {
-        super.addFieldMap(fieldMapName, fieldMap);
-        return this;
-    }
-
-    @Override
-    public MarcXchangeFieldMapperReader setMarcXchangeListener(MarcXchangeListener listener) {
-        super.setMarcXchangeListener(listener);
-        return this;
-    }
 
     public void parse(InputStream in) throws IOException {
         parse(new InputStreamReader(in, "UTF-8"));
@@ -81,10 +69,30 @@ public class MarcXchangeFieldMapperReader extends MarcXchangeFieldMapperContentH
         }
     }
 
+    @Override
+    public MarcXchangeFieldMapperReader addFieldMap(String fieldMapName, Map<String,Object> fieldMap) {
+        super.addFieldMap(fieldMapName, fieldMap);
+        return this;
+    }
+
+    @Override
+    public MarcXchangeFieldMapperReader setMarcXchangeListener(MarcXchangeListener listener) {
+        super.setMarcXchangeListener(listener);
+        return this;
+    }
+
+    public MarcXchangeFieldMapperReader addNamespace(String uri) {
+        super.addNamespace(uri);
+        return this;
+    }
+
+    /**
+     * Override content handler
+     * @param handler the new content handler
+     * @return this reader
+     */
     public MarcXchangeFieldMapperReader setHandler(ContentHandler handler) {
         this.contentHandler = handler;
         return this;
     }
-
-
 }

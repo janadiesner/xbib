@@ -170,6 +170,14 @@ public class Field implements Comparable<Field> {
         }
     }
 
+    public Field setEmpty() {
+        this.tag = null;
+        this.indicator = null;
+        this.subfieldId = null;
+        this.data = null;
+        return this;
+    }
+
     /**
      * Returns true if this field has a defined tag and data.
      * @return true if tag is not null and data is not null and data is not empty

@@ -34,8 +34,6 @@ package org.xbib.marc.dialects.mab;
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
@@ -56,8 +54,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DE468MABTest extends StreamTester {
-
-    private final Logger logger = LoggerFactory.getLogger(DE468MABTest.class.getName());
 
     /**
      * DE-468 delivers "MAB in MARC" with UTF-8, subfield delimiter "$$", but subfield code length 2 (not 3).
@@ -106,11 +102,11 @@ public class DE468MABTest extends StreamTester {
 
         // 902$ $ 9 -> 689$00$a0
         Map<String,Object> subfields = new HashMap();
-        subfields.put("", "689$0{r}");
-        subfields.put(" ", "689$0{r}$a");
-        subfields.put("a", "689$0{r}$a");
-        subfields.put("9", "689$0{r}$0");
-        subfields.put("h", "689$0{r}$h");
+        subfields.put("", ">689$0{r}");
+        subfields.put(" ", "-689$0{r}$a");
+        subfields.put("a", "-689$0{r}$a");
+        subfields.put("9", "-689$0{r}$0");
+        subfields.put("h", "-689$0{r}$h");
         Map<String,Object> indicators = new HashMap();
         indicators.put(" ", subfields);
         Map<String,Object> fields = new HashMap();
@@ -177,7 +173,7 @@ public class DE468MABTest extends StreamTester {
     }
 
     @Test
-    public void testFieldKillerDE468() throws IOException, SAXException {
+    public void testFieldDropperDE468() throws IOException, SAXException {
         InputStream in = getClass().getResource("aleph500-subfields.mrc").openStream();
         File file = File.createTempFile("DE-468-killed-fields.", ".xml");
         FileOutputStream out = new FileOutputStream(file);
@@ -187,13 +183,19 @@ public class DE468MABTest extends StreamTester {
         reader.setSubfieldDelimiter("$$");
         reader.setSubfieldCodeLength(2);
 
-        // kill all "700$g" fields
+        // drop all "700$g" fields
+        Map<String,Object> subf = new HashMap();
+        subf.put("", null);
+        subf.put(" ", null);
+        subf.put("a", null);
         Map<String,Object> indicators = new HashMap();
         indicators.put("g", null);
         Map<String,Object> fields = new HashMap();
         fields.put("700", indicators);
 
-        reader.addFieldMap("test", fields);
+        reader.addFieldMap("dropper", fields);
+
+        reader.setFieldEventListener(new FieldEventLogger("info"));
 
         MarcXchangeWriter writer = new MarcXchangeWriter(out);
         writer.setFormat("MARC21").setType("Bibliographic");

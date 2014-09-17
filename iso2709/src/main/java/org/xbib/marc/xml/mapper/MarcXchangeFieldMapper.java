@@ -31,6 +31,8 @@
  */
 package org.xbib.marc.xml.mapper;
 
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
@@ -49,6 +51,8 @@ import java.util.regex.Pattern;
  * with the capability to map fields to other ones, or even remove them.
  */
 public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
+
+    private final Logger logger = LoggerFactory.getLogger(MarcXchangeFieldMapper.class.getName());
 
     private final static String RECORD_NUMBER_FIELD = "001";
 
@@ -176,32 +180,38 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         // save field
         previousField = new Field(datafield);
         // the heavy lifting, map the field
-        Field mappedField = map(datafield);
-        boolean mapped = !datafield.getDesignator().equals(mappedField.getDesignator());
-        // open a new data field.
-        // if mapped, check if this field is not the same as the last field in the record
-        if (record.isEmpty()) {
-            record.add(mappedField); // this is the first field
-        } else if (mapped) {
-            // field was mappped. The rule is that subfields must not repeat and must be continous.
-            // If not, close data field.
-            if (!isContinous(record.getLast(), mappedField)) {
-                // not same field tag, close old data field and add new data field
-                record.add(Field.EMPTY);
+        Operation op = map(datafield);
+        if (op.equals(Operation.OPEN)) {
+            record.add(Field.EMPTY);
+        }
+        if (op.equals(Operation.KEEP)) {
+            // inject datafield "open" event if subfield tag has changed
+            if (!record.isEmpty() && record.getLast().isSubField() && datafield.isSubField()
+                    && !record.getLast().tag().equals(datafield.tag())) {
+                record.add(new Field(datafield).subfieldId(null));
             }
-            record.add(mappedField);
-        } else {
-            // not mapped
+        }
+        if (!op.equals(Operation.SKIP)) {
             record.add(datafield);
         }
-        // loop over fields and map them all
-        Field field = null;
+        // loop over subfields and map them all
+        Field subfield;
         while (it.hasNext()) {
-            field = it.next();
-            if (Field.EMPTY.equals(field)) {
-                record.add(field);
+            subfield = it.next();
+            if (Field.EMPTY.equals(subfield)) {
+                record.add(subfield);
             } else {
-                record.add(map(field));
+                Operation subfieldOp = map(subfield);
+                if (subfieldOp != Operation.SKIP) {
+                    if (op.equals(Operation.OPEN) || op.equals(Operation.APPEND)) {
+                        // when mapped, there can be "close" datafield events, skip them
+                        if (subfield.isSubField()) {
+                            record.add(subfield);
+                        }
+                    } else {
+                        record.add(subfield);
+                    }
+                }
             }
         }
         // reset datafields
@@ -215,7 +225,6 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         }
         beginRecord(format, type);
         leader(label);
-        boolean inData = false;
         for (Field field : controlfields) {
             beginControlField(field);
             endControlField(field);
@@ -225,9 +234,11 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         // 2. subfield list of datafield
         // 3. datafield (close)
         // Control fields are skipped.
+        boolean inData = false;
+        Field last = null;
         for (Field field : record) {
             if (field.equals(Field.EMPTY)) {
-                // close tag if tag  is open
+                // close tag if tag is open
                 if (inData) {
                     // ensure no data field has content (for XML)
                     endDataField(field.data(EMPTY));
@@ -250,6 +261,7 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                     inData = true;
                 }
             }
+            last = field;
         }
         // forgotten close data field?
         if (inData) {
@@ -281,12 +293,12 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
      * @return the mpped field
      */
     @SuppressWarnings("unchecked")
-    protected Field map(Field field) {
+    protected Operation map(Field field) {
         if (field == null) {
             return null;
         }
         if (maps == null) {
-            return field;
+            return Operation.APPEND;
         }
         for (String fieldMapName : maps.keySet()) {
             Map<String,Object> map = maps.get(fieldMapName);
@@ -300,7 +312,8 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                     if (fieldEventListener != null) {
                         fieldEventListener.event(FieldEvent.FIELD_DROPPED.setField(field).setCause(fieldMapName));
                     }
-                    return Field.EMPTY;
+                    field.setEmpty();
+                    return Operation.SKIP;
                 }
                 if (o instanceof Map) {
                     if (field.isControlField()) {
@@ -311,13 +324,16 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                                 if (fieldEventListener != null) {
                                     fieldEventListener.event(FieldEvent.FIELD_MAPPED.setField(field).setCause(fieldMapName));
                                 }
-                                String[] s = o.toString().split("\\$");
+                                Operation op = ">".equals(o.toString().substring(0,1)) ? Operation.OPEN :
+                                        "<".equals(o.toString().substring(0,1)) ? Operation.CLOSE : Operation.APPEND;
+                                String[] s = o.toString().substring(1).split("\\$");
                                 if (s.length >= 2) {
                                     s[1] = interpolate(s[1]);
                                     field.tag(s[0]).indicator(s[1]);
                                 } else if (s.length == 1) {
                                     field.tag(s[0]);
                                 }
+                                return op;
                             }
                         }
                     } else {
@@ -325,7 +341,8 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                         if (ind.containsKey(field.indicator())) {
                             o = ind.get(field.indicator());
                             if (o == null) {
-                                return Field.EMPTY;
+                                field.setEmpty();
+                                return Operation.SKIP;
                             }
                             if (o instanceof Map) {
                                 Map<String, Object> subf = (Map<String, Object>) o;
@@ -337,12 +354,15 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                                         if (fieldEventListener != null) {
                                             fieldEventListener.event(FieldEvent.FIELD_DROPPED.setField(field).setCause(fieldMapName));
                                         }
-                                        return Field.EMPTY;
+                                        field.setEmpty();
+                                        return Operation.SKIP;
                                     } else {
                                         if (fieldEventListener != null) {
                                             fieldEventListener.event(FieldEvent.FIELD_MAPPED.setField(field).setCause(fieldMapName));
                                         }
-                                        String[] s = o.toString().split("\\$");
+                                        Operation op = ">".equals(o.toString().substring(0,1)) ? Operation.OPEN :
+                                                "<".equals(o.toString().substring(0,1)) ? Operation.CLOSE : Operation.APPEND;
+                                        String[] s = o.toString().substring(1).split("\\$");
                                         if (s.length >= 2) {
                                             s[1] = interpolate(s[1]);
                                             // subfield -> subfield, data field -> data field
@@ -354,6 +374,7 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                                         } else if (s.length == 1) {
                                             field.tag(s[0]);
                                         }
+                                        return op;
                                     }
                                 }
                             }
@@ -362,7 +383,7 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                 }
             }
         }
-        return field;
+        return Operation.KEEP;
     }
 
     /**
@@ -373,18 +394,6 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
      */
     protected boolean isRepeat(Field previous, Field next) {
         return previous != null && next != null && previous.tag() != null && previous.tag().equals(next.tag());
-    }
-
-    /**
-     * Checks if field is continuous to the previous field. This means subfield inclusion.
-     * @param previous the previous field
-     * @param next the next field
-     * @return true if field is continuous
-     */
-    protected boolean isContinous(Field previous, Field next) {
-        return isRepeat(previous, next)
-                && ((!previous.isSubField() && !next.isSubField()) ||
-                (previous.isSubField() && next.isSubField() && previous.subfieldId().compareTo(next.subfieldId()) <= 0));
     }
 
     // the repeat counter pattern
@@ -402,6 +411,10 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         } else {
             return value;
         }
+    }
+
+    enum Operation {
+        KEEP, APPEND, OPEN, CLOSE, SKIP
     }
 
 }
