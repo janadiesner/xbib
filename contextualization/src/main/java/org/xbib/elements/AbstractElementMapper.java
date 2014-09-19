@@ -44,7 +44,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -82,7 +81,7 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
 
     private int numPipelines;
 
-    private boolean detectUnknownKeys;
+    private UnmappedKeyListener<K> listener;
 
     public AbstractElementMapper(String path, String format, Specification specification) {
         this(new URIClassLoader(), path, format, specification);
@@ -108,8 +107,8 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
         return this;
     }
 
-    public ElementMapper<K,V,E,C> detectUnknownKeys(boolean enabled) {
-        this.detectUnknownKeys = enabled;
+    public ElementMapper<K,V,E,C> setListener(UnmappedKeyListener<K> listener) {
+        this.listener = listener;
         return this;
     }
 
@@ -132,8 +131,8 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
         }
         this.factory = factory;
         for (int i = 0; i < numPipelines; i++) {
-            KeyValueElementPipeline pipeline = createPipeline(i)
-                    .setUnknownKeyDetection(detectUnknownKeys);
+            KeyValueElementPipeline<K,V,E,C> pipeline = createPipeline(i)
+                    .setListener(listener);
             pipelines.add(pipeline);
             service.submit(pipeline);
         }
@@ -193,28 +192,10 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
         return this;
     }
 
-    /**
-     * Helper method for diagnosing unknown keys.
-     *
-     * @return a printable set of unknown keys
-     */
-    public Set<String> getUnknownKeys() {
-        Set<String> set = new TreeSet<String>();
-        for (KeyValueElementPipeline p : pipelines()) {
-            if (p.getUnknownKeys() != null) {
-                for (Object s : p.getUnknownKeys()) {
-                    // reformat for better copy/paste
-                    set.add("\"" + s + "\"");
-                }
-            }
-        }
-        return set;
-    }
-
     public void dump(String format, Writer writer) throws IOException {
         specification.dump(format, writer);
     }
 
-    protected abstract KeyValueElementPipeline createPipeline(int i);
+    protected abstract KeyValueElementPipeline<K,V,E,C> createPipeline(int i);
 
 }

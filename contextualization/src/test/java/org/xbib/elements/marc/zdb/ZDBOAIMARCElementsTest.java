@@ -44,7 +44,7 @@ import org.xbib.elements.marc.MARCElementMapper;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;

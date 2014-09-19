@@ -42,7 +42,7 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
-import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.dialects.pica.stream.DNBPicaXmlReader;
 import org.xbib.marc.transformer.StringTransformer;

@@ -4,6 +4,7 @@ import org.testng.annotations.Test;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 
 import java.io.InputStream;
 

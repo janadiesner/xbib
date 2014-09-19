@@ -48,6 +48,7 @@ import javax.xml.stream.util.XMLEventConsumer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -383,12 +384,11 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
             String tag = field.tag() != null ? field.tag() : Field.ERROR_TAG;
             String ind1 = field.indicator() != null && field.indicator().length() > 0 ? field.indicator().substring(0,1) : " ";
             String ind2 = field.indicator() != null && field.indicator().length() > 1 ? field.indicator().substring(1,2) : " ";
-            Iterator<Attribute> attrs = Arrays.asList(
-                    eventFactory.createAttribute(TAG, tag),
-                    eventFactory.createAttribute(IND + "1", ind1),
-                    eventFactory.createAttribute(IND + "2", ind2)
-            ).iterator();
-            xmlEventConsumer.add(eventFactory.createStartElement(DATAFIELD_ELEMENT, attrs, namespaces));
+            List<Attribute> attrs = new ArrayList<Attribute>(3);
+            attrs.add(eventFactory.createAttribute(TAG, tag));
+            attrs.add(eventFactory.createAttribute(IND + "1", ind1));
+            attrs.add(eventFactory.createAttribute(IND + "2", ind2));
+            xmlEventConsumer.add(eventFactory.createStartElement(DATAFIELD_ELEMENT, attrs.iterator(), namespaces));
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
@@ -434,10 +434,9 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         try {
             String code = field.subfieldId();
             // safety check against subfields with empty subfield code (!)
-            Iterator<Attribute> attrs = Collections.singletonList(
-                    eventFactory.createAttribute(CODE, code != null && !code.isEmpty() ? code : "a")
-            ).iterator();
-            xmlEventConsumer.add(eventFactory.createStartElement(SUBFIELD_ELEMENT, attrs, namespaces));
+            List<Attribute> attrs = new ArrayList<Attribute>(1);
+            attrs.add(eventFactory.createAttribute(CODE, code != null && !code.isEmpty() ? code : "a"));
+            xmlEventConsumer.add(eventFactory.createStartElement(SUBFIELD_ELEMENT, attrs.iterator(), namespaces));
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {

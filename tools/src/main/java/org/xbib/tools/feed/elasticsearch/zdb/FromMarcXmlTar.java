@@ -38,7 +38,7 @@ import org.xbib.elements.marc.MARCElementMapper;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.stream.MarcXchangeReader;
 import org.xbib.pipeline.Pipeline;

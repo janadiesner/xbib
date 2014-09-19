@@ -29,11 +29,14 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc;
+package org.xbib.marc.keyvalue;
 
 import org.xbib.keyvalue.KeyValueStreamListener;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
+import org.xbib.marc.Field;
+import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.transformer.StringTransformer;
 
 import java.io.IOException;
@@ -153,7 +156,6 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
     @Override
     public void endControlField(Field field) {
         String data = field != null ? field.data() : null;
-        // transform field data?
         if (transformer != null && data != null) {
             data = transformer.transform(data);
         }
@@ -172,16 +174,7 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
 
     @Override
     public void endDataField(Field field) {
-        // put data into the emitter if there is only one field
         String data = field != null ? field.data() : null;
-        if (data == null && fields.size() == 1) {
-            data = fields.getFirst().data();
-        }
-        // transform field data?
-        if (transformer != null && data != null) {
-            data = transformer.transform(data);
-        }
-        // emit fields as key/value
         try {
             keyValue(fields, data);
         } catch (IOException e) {
@@ -198,10 +191,6 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
     public void endSubField(Field field) {
         if (field == null) {
             return;
-        }
-        // hack: remove last field if this is no sub field (it must be a data field)
-        if (!fields.isEmpty() && !fields.getLast().isSubField()) {
-            fields.removeLast();
         }
         // transform field data
         if (transformer != null && field.data() != null) {

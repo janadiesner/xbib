@@ -112,11 +112,8 @@ public class PicaElementPipeline extends KeyValueElementPipeline<DataField, Stri
                 builder().context().switchTo(resource); // switch back to old resource
             }
         } else {
-            if (isUnknownKeyDetectionEnabled()) {
-                addUnknownKey(key);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("unknown key detected: {} {}", fields, value);
-                }
+            if (getListener() != null) {
+                getListener().unknown(fields);
             }
         }
         builder().build(element, fields, value);

@@ -33,11 +33,13 @@ package org.xbib.elements.marc;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.xbib.elements.UnmappedKeyListener;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.Iso2709Reader;
-import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
@@ -52,6 +54,9 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class UNIMARCElementsTest extends Assert {
@@ -105,8 +110,14 @@ public class UNIMARCElementsTest extends Assert {
                 }
 
             };
+            final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
             MARCElementMapper mapper = new MARCElementMapper("marc/bib")
-                    .detectUnknownKeys(true)
+                    .setListener(new UnmappedKeyListener<DataField>() {
+                        @Override
+                        public void unknown(DataField key) {
+                            unmapped.add(key.toSpec());
+                        }
+                    })
                     .start(new MARCElementBuilderFactory() {
                         public MARCElementBuilder newBuilder() {
                             MARCElementBuilder builder = new MARCElementBuilder();
@@ -142,7 +153,7 @@ public class UNIMARCElementsTest extends Assert {
             mapper.close();
 
             // check if increment works
-            logger.info("unknown elements = {}", mapper.getUnknownKeys());
+            logger.info("unknown elements = {}", unmapped);
             assertEquals(51279, counter.get());
             r.close();
         }

@@ -37,16 +37,13 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.context.ResourceContext;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * A key/value pipeline for threaded processing of elements
+ * A key/value pipeline for threaded processing of key/value streams
  *
  * @param <K>
  * @param <V>
@@ -68,16 +65,14 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
 
     private long counter;
 
-    private Set<String> unknownKeys;
-
-    private boolean unknownKeyDetectionEnabled;
+    private UnmappedKeyListener<K> listener;
 
     public KeyValueElementPipeline(int i) {
         this.logger = LoggerFactory.getLogger("pipeline" + i);
         this.counter = 0L;
     }
 
-    public KeyValueElementPipeline setSpecification(Specification specification) {
+    public KeyValueElementPipeline<K,V,E,C> setSpecification(Specification specification) {
         this.specification = specification;
         return this;
     }
@@ -86,7 +81,7 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
         return specification;
     }
 
-    public KeyValueElementPipeline setMap(Map map) {
+    public KeyValueElementPipeline<K,V,E,C> setMap(Map map) {
         this.map = map;
         return this;
     }
@@ -95,7 +90,7 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
         return map;
     }
 
-    public KeyValueElementPipeline setQueue(BlockingQueue<List<KeyValue<K,V>>> queue) {
+    public KeyValueElementPipeline<K,V,E,C> setQueue(BlockingQueue<List<KeyValue<K,V>>> queue) {
         this.queue = queue;
         return this;
     }
@@ -104,7 +99,7 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
         return queue;
     }
 
-    public KeyValueElementPipeline setElementBuilder(ElementBuilder<K,V,E,C> builder) {
+    public KeyValueElementPipeline<K,V,E,C> setElementBuilder(ElementBuilder<K,V,E,C> builder) {
         this.builder = builder;
         return this;
     }
@@ -168,25 +163,13 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
     protected void build(K key, V value) {
     }
 
-    public KeyValueElementPipeline setUnknownKeyDetection(boolean enabled) {
-        this.unknownKeyDetectionEnabled = enabled;
+    public KeyValueElementPipeline<K,V,E,C> setListener(UnmappedKeyListener<K> listener) {
+        this.listener = listener;
         return this;
     }
 
-    public boolean isUnknownKeyDetectionEnabled() {
-        return unknownKeyDetectionEnabled;
-    }
-
-    public void addUnknownKey(String key) {
-        if (unknownKeys == null) {
-            // we allow other threads to read from this set while we write
-            unknownKeys = Collections.synchronizedSet(new HashSet<String>());
-        }
-        unknownKeys.add(key);
-    }
-
-    public Set<String> getUnknownKeys() {
-        return unknownKeys;
+    public UnmappedKeyListener<K> getListener() {
+        return listener;
     }
 
 }

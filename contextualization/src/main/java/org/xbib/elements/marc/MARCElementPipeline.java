@@ -98,11 +98,8 @@ public class MARCElementPipeline extends KeyValueElementPipeline<DataField, Stri
             // build other things for this element, like facets etc.
             builder().build(element, fields, value);
         } else {
-            if (isUnknownKeyDetectionEnabled()) {
-                addUnknownKey(key);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("unknown key detected: {}", fields);
-                }
+            if (getListener() != null) {
+                getListener().unknown(fields);
             }
         }
         // build no matter if an element was found or not

@@ -37,7 +37,7 @@ import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
-import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.event.FieldEventLogger;
 import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xml.sax.SAXException;
@@ -137,6 +137,7 @@ public class DE468MABTest extends StreamTester {
         reader.setSubfieldDelimiter("$$");
         reader.setSubfieldCodeLength(2);
 
+        File file = File.createTempFile("DE-468-keyvalue.", ".txt");
         StringWriter sw = new StringWriter();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                 .addListener(new KeyValueStreamAdapter<DataField, String>() {
@@ -168,8 +169,11 @@ public class DE468MABTest extends StreamTester {
         reader.parse(in);
         in.close();
         sw.close();
+        FileWriter fw = new FileWriter(file);
+        fw.write(sw.toString());
+        fw.close();
         assertStream(getClass().getResource("DE-468-keyvalue.txt").openStream(),
-                new ByteArrayInputStream(sw.toString().getBytes()));
+                new FileInputStream(file));
     }
 
     @Test

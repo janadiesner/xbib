@@ -693,7 +693,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                         designator.tag(Field.ERROR_TAG);
                                     }
                                 }
-                                beginDataField(designator);
+                                beginDataField(designator.data(""));
                                 datafieldOpen = true;
                                 // tricky: first field has no subfield ID. We set it to blank.
                                 // tag len = 3 ind len = 1

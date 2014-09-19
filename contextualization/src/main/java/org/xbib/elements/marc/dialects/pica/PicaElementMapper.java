@@ -34,6 +34,7 @@ package org.xbib.elements.marc.dialects.pica;
 import org.xbib.elements.AbstractElementMapper;
 import org.xbib.elements.ElementBuilderFactory;
 import org.xbib.elements.KeyValueElementPipeline;
+import org.xbib.elements.UnmappedKeyListener;
 import org.xbib.marc.DataField;
 
 public class PicaElementMapper extends AbstractElementMapper<DataField, String, PicaElement, PicaContext> {
@@ -45,11 +46,6 @@ public class PicaElementMapper extends AbstractElementMapper<DataField, String, 
     @Override
     public PicaElementMapper pipelines(int pipelines) {
         super.pipelines(pipelines);
-        return this;
-    }
-
-    public PicaElementMapper detectUnknownKeys(boolean enabled) {
-        super.detectUnknownKeys(enabled);
         return this;
     }
 
@@ -65,13 +61,19 @@ public class PicaElementMapper extends AbstractElementMapper<DataField, String, 
     }
 
     @Override
-    protected KeyValueElementPipeline createPipeline(int i) {
+    protected KeyValueElementPipeline<DataField, String, PicaElement, PicaContext> createPipeline(int i) {
         PicaElementPipeline picaPipeline =  new PicaElementPipeline(i);
         picaPipeline.setSpecification(specification)
                 .setQueue(queue)
                 .setElementBuilder(factory.newBuilder())
                 .setMap(map);
         return picaPipeline;
+    }
+
+    @Override
+    public PicaElementMapper setListener(UnmappedKeyListener<DataField> listener) {
+        super.setListener(listener);
+        return this;
     }
 
 }

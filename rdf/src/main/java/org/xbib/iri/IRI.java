@@ -52,21 +52,37 @@ import java.util.regex.Pattern;
 public class IRI implements Cloneable, Comparable<IRI> {
 
     protected Scheme schemeClass;
+
     private String scheme;
+
     private String schemeSpecificPart;
+
     private String authority;
+
     private String userinfo;
+
     private String host;
+
     private int port = -1;
+
     private String path;
+
     private String query;
+
     private String fragment;
+
     private String a_schemeSpecificPart;
+
     private String a_host;
+
     private String a_fragment;
+
     private String a_path;
+
     private String a_query;
+
     private String a_userinfo;
+
     private String a_authority;
 
     public static class Builder {

@@ -33,6 +33,7 @@ package org.xbib.elements.marc.zdb;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.xbib.elements.UnmappedKeyListener;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -43,7 +44,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
-import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.AbstractResourceContextWriter;
@@ -57,6 +58,9 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ZDBBibTest extends Assert {
@@ -73,9 +77,15 @@ public class ZDBBibTest extends Assert {
         InputStream in = getClass().getResourceAsStream("zdbtitutf8.mrc");
             //new GZIPInputStream(new FileInputStream(System.getProperty("user.home") + "/Daten/zdb/1302zdbtitgesamt.mrc.gz"));
         BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591));
+        final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         MARCElementMapper mapper = new MARCElementMapper("marc/zdb/bib")
                 .pipelines(Runtime.getRuntime().availableProcessors() * 2)
-                .detectUnknownKeys(true)
+                .setListener(new UnmappedKeyListener<DataField>() {
+                    @Override
+                    public void unknown(DataField key) {
+                        unmapped.add(key.toSpec());
+                    }
+                })
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
                         MARCElementBuilder builder = new MARCElementBuilder();
@@ -114,7 +124,7 @@ public class ZDBBibTest extends Assert {
         reader.parse(br);
         mapper.close();
         logger.info("zdb title counter = {}", counter.get());
-        logger.info("unknown keys = {}", mapper.getUnknownKeys());
+        logger.info("unknown keys = {}", unmapped);
         br.close();
         assertEquals(counter.get(), 8);
     }

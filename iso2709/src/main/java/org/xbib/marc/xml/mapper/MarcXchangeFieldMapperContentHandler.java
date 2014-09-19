@@ -214,6 +214,7 @@ public class MarcXchangeFieldMapperContentHandler
     @Override
     public void startDocument() throws SAXException {
         content.setLength(0);
+        stack.clear();
     }
 
     @Override

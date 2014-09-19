@@ -34,6 +34,7 @@ package org.xbib.elements.marc;
 import org.xbib.elements.AbstractElementMapper;
 import org.xbib.elements.ElementBuilderFactory;
 import org.xbib.elements.KeyValueElementPipeline;
+import org.xbib.elements.UnmappedKeyListener;
 import org.xbib.marc.DataField;
 
 import java.util.Map;
@@ -62,12 +63,6 @@ public class MARCElementMapper extends AbstractElementMapper<DataField, String, 
         return this;
     }
 
-    @Override
-    public MARCElementMapper detectUnknownKeys(boolean enabled) {
-        super.detectUnknownKeys(enabled);
-        return this;
-    }
-
     public MARCElementMapper start() {
         super.start(new MARCElementBuilderFactory());
         return this;
@@ -80,13 +75,19 @@ public class MARCElementMapper extends AbstractElementMapper<DataField, String, 
     }
 
     @Override
-    protected KeyValueElementPipeline createPipeline(int i) {
+    protected KeyValueElementPipeline<DataField, String, MARCElement, MARCContext> createPipeline(int i) {
         MARCElementPipeline pipeline = new MARCElementPipeline(i);
         pipeline.setElementBuilder(factory.newBuilder())
                 .setSpecification(specification)
                 .setQueue(queue)
                 .setMap(map);
         return pipeline;
+    }
+
+    @Override
+    public MARCElementMapper setListener(UnmappedKeyListener<DataField> listener) {
+        super.setListener(listener);
+        return this;
     }
 
 }

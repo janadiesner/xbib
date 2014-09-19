@@ -31,8 +31,6 @@
  */
 package org.xbib.marc.xml.mapper;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
@@ -51,8 +49,6 @@ import java.util.regex.Pattern;
  * with the capability to map fields to other ones, or even remove them.
  */
 public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
-
-    private final Logger logger = LoggerFactory.getLogger(MarcXchangeFieldMapper.class.getName());
 
     private final static String RECORD_NUMBER_FIELD = "001";
 
@@ -146,10 +142,18 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
 
     /**
      * Flush a single data field by taking the designator and push it to the destination record field.
-     * Set up mapper and iterate over subfields.
+     * If mapping exist, set up mapping process, and iterate over subfield mappings.
      */
     protected void flushField() {
         if (datafields == null || datafields.isEmpty()) {
+            return;
+        }
+        // optimization: if no mappings exist, simply add all fields as they are
+        if (maps == null || maps.isEmpty()) {
+            for (Field field : datafields) {
+                record.add(field);
+            }
+            datafields = new DataField();
             return;
         }
         // data fields
@@ -161,16 +165,6 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         // if field is empty, advance to next non-empty field
         while (datafield.equals(Field.EMPTY) && it.hasNext()) {
             datafield = it.next();
-        }
-        // we reject fields that are are single and have no data to map
-        if (datafields.size() == 1 && (datafield.data() == null || datafield.data().isEmpty())) {
-            return;
-        }
-        // we reject fields that would result in empty datafields: last field was a datafield without data, this field also
-        // This can happen when subfields are removed.
-        if (!datafield.isSubField() && datafield.data().isEmpty() &&
-                !record.isEmpty() && !record.getLast().isSubField() && record.getLast().data().isEmpty()) {
-            return;
         }
         if (isRepeat(previousField, datafield)) {
             repeatCounter++;
@@ -235,7 +229,6 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         // 3. datafield (close)
         // Control fields are skipped.
         boolean inData = false;
-        Field last = null;
         for (Field field : record) {
             if (field.equals(Field.EMPTY)) {
                 // close tag if tag is open
@@ -246,7 +239,8 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                 }
             } else if (field.isSubField()) {
                 if (!inData) {
-                    beginDataField(field);
+                    // ensure that emission of data field does not contain subfield ID or data
+                    beginDataField(new Field(field).subfieldId(null).data(""));
                     inData = true;
                 }
                 beginSubField(field);
@@ -257,11 +251,10 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                     endDataField(field.data(EMPTY));
                     inData = false;
                 } else {
-                    beginDataField(field);
+                    beginDataField(new Field(field).subfieldId(null).data(""));
                     inData = true;
                 }
             }
-            last = field;
         }
         // forgotten close data field?
         if (inData) {
@@ -297,8 +290,9 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         if (field == null) {
             return null;
         }
+        // safe guard
         if (maps == null) {
-            return Operation.APPEND;
+            return Operation.KEEP;
         }
         for (String fieldMapName : maps.keySet()) {
             Map<String,Object> map = maps.get(fieldMapName);

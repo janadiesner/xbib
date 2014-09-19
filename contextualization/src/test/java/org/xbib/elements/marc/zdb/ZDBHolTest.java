@@ -33,6 +33,7 @@ package org.xbib.elements.marc.zdb;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.xbib.elements.UnmappedKeyListener;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -43,7 +44,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
-import org.xbib.marc.MarcXchange2KeyValue;
+import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.AbstractResourceContextWriter;
@@ -57,6 +58,9 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ZDBHolTest extends Assert {
@@ -77,8 +81,15 @@ public class ZDBHolTest extends Assert {
                 return builder;
             }
         };
+        final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         MARCElementMapper mapper = new MARCElementMapper("marc/zdb/hol")
-                .detectUnknownKeys(true)
+                .setListener(new UnmappedKeyListener<DataField>() {
+                    @Override
+                    public void unknown(DataField key) {
+                        unmapped.add(key.toSpec());
+                        logger.warn("unknown key: {}", key);
+                    }
+                })
                 .start(factory);
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                 .setStringTransformer(new StringTransformer() {
@@ -110,7 +121,7 @@ public class ZDBHolTest extends Assert {
         reader.parse(br);
         mapper.close();
         logger.info("zdb holdings counter = {}", out.getCounter());
-        logger.info("zdb holdings unknown keys = {}", mapper.getUnknownKeys());
+        logger.info("zdb holdings unknown keys = {}", unmapped);
         br.close();
         assertEquals(out.getCounter(), 293);
     }
