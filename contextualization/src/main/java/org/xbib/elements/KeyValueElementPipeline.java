@@ -35,6 +35,8 @@ package org.xbib.elements;
 import org.xbib.keyvalue.KeyValue;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.event.EventListener;
+import org.xbib.marc.event.FieldEvent;
 import org.xbib.rdf.context.ResourceContext;
 
 import java.util.List;
@@ -66,6 +68,8 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
     private long counter;
 
     private UnmappedKeyListener<K> listener;
+
+    private EventListener<FieldEvent> fieldEventListener;
 
     public KeyValueElementPipeline(int i) {
         this.logger = LoggerFactory.getLogger("pipeline" + i);
@@ -170,6 +174,15 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
 
     public UnmappedKeyListener<K> getListener() {
         return listener;
+    }
+
+    public KeyValueElementPipeline<K,V,E,C> setFieldEventListener(EventListener<FieldEvent> fieldEventListener) {
+        this.fieldEventListener = fieldEventListener;
+        return this;
+    }
+
+    public EventListener getFieldEventListener() {
+        return fieldEventListener;
     }
 
 }

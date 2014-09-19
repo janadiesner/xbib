@@ -31,6 +31,7 @@
  */
 package org.xbib.tools.feed.elasticsearch.zdb;
 
+import org.xbib.elements.UnmappedKeyListener;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
@@ -38,6 +39,7 @@ import org.xbib.elements.marc.MARCElementMapper;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.stream.MarcXchangeReader;
@@ -51,6 +53,9 @@ import org.xbib.tools.util.MarcXmlTarReader;
 import java.io.IOException;
 import java.net.URI;
 import java.text.Normalizer;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Elasticsearch indexer for Zeitschriftendatenbank (ZDB) MARC-XML tar archive files
@@ -76,9 +81,18 @@ public final class FromMarcXmlTar extends Feeder {
 
     @Override
     public void process(URI uri) throws Exception {
+        final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         final MARCElementMapper mapper = new MARCElementMapper(settings.get("elements"))
                 .pipelines(settings.getAsInt("pipelines", 1))
-                .detectUnknownKeys(settings.getAsBoolean("detect", false))
+                .setListener(new UnmappedKeyListener<DataField>() {
+                    @Override
+                    public void unknown(DataField key) {
+                        logger.warn("unmapped field {}", key.toSpec());
+                        if ((settings.getAsBoolean("detect", false))) {
+                            unmapped.add("\"" + key.toSpec() + "\"");
+                        }
+                    }
+                })
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
                         MARCElementBuilder builder = new MARCElementBuilder();
@@ -105,7 +119,7 @@ public final class FromMarcXmlTar extends Feeder {
         reader.close();
         mapper.close();
         if (settings.getAsBoolean("detect", false)) {
-            logger.info("unknown keys={}", mapper.getUnknownKeys());
+            logger.info("unknown keys={}", unmapped);
         }
     }
 

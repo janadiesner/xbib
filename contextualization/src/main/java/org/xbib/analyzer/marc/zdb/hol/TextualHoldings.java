@@ -82,7 +82,7 @@ public class TextualHoldings extends MARCElement {
                           DataField fields, String value) {
         for (Field field : fields) {
             builder.context().getResource().add("textualholdings", field.data());
-            if (field.subfieldId().equals("a")) {
+            if ("a".equals(field.subfieldId())) {
                 Resource r = builder.context().getResource().newResource("holdings");
                 Resource parsedHoldings = EnumerationAndChronology.parse(field.data(), r, getMovingwallPatterns());
                 if (!parsedHoldings.isEmpty()) {

@@ -31,7 +31,7 @@
  */
 package org.xbib.marc.event;
 
-public interface RecordEventListener {
+public interface EventListener<E extends Event> {
 
-    public void event(RecordEvent event);
+    public void receive(E event);
 }

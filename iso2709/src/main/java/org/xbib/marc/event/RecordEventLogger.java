@@ -34,7 +34,7 @@ package org.xbib.marc.event;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 
-public class RecordEventLogger implements RecordEventListener {
+public class RecordEventLogger implements EventListener<RecordEvent> {
 
     private final static Logger logger = LoggerFactory.getLogger(RecordEventLogger.class.getName());
 
@@ -45,7 +45,7 @@ public class RecordEventLogger implements RecordEventListener {
     }
 
     @Override
-    public void event(RecordEvent event) {
+    public void receive(RecordEvent event) {
         switch (level) {
             case "warn" : logger.warn("{}", event); break;
             case "error" : logger.error("{}", event); break;

@@ -53,7 +53,7 @@ import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.label.RecordLabel;
 import org.xbib.marc.event.FieldEvent;
-import org.xbib.marc.event.FieldEventListener;
+import org.xbib.marc.event.EventListener;
 import org.xbib.marc.transformer.IdentityTransformer;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.mapper.MarcXchangeFieldMapper;
@@ -105,7 +105,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
 
     private MarcXchangeListener listener;
 
-    private FieldEventListener fieldEventListener;
+    private EventListener<FieldEvent> fieldEventListener;
 
     private boolean fatalerrors = false;
 
@@ -164,7 +164,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
         return this;
     }
 
-    public MarcXchangeSaxAdapter setFieldEventListener(FieldEventListener fieldEventListener) {
+    public MarcXchangeSaxAdapter setFieldEventListener(EventListener<FieldEvent> fieldEventListener) {
         super.setFieldEventListener(fieldEventListener);
         this.fieldEventListener = fieldEventListener;
         return this;
@@ -649,7 +649,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                         Matcher m = TAG_PATTERN.matcher(designator.tag());
                                         if (!m.matches()) {
                                             if (fieldEventListener != null) {
-                                                fieldEventListener.event(FieldEvent.TAG_CLEANED.setField(designator));
+                                                fieldEventListener.receive(FieldEvent.TAG_CLEANED.setField(designator));
                                             }
                                             // switch invalid tag to error tag
                                             designator.tag(Field.ERROR_TAG);
@@ -687,7 +687,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                     Matcher m = TAG_PATTERN.matcher(designator.tag());
                                     if (!m.matches()) {
                                         if (fieldEventListener != null) {
-                                            fieldEventListener.event(FieldEvent.TAG_CLEANED.setField(designator));
+                                            fieldEventListener.receive(FieldEvent.TAG_CLEANED.setField(designator));
                                         }
                                         // switch invalid tag to error tag
                                         designator.tag(Field.ERROR_TAG);
@@ -706,7 +706,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                         designator.data(XMLUtil.sanitizeXml10(designator.data()).toString());
                                         if (!old.equals(designator.data())) {
                                             if (fieldEventListener != null) {
-                                                fieldEventListener.event(FieldEvent.DATA_SCRUBBED.setField(designator));
+                                                fieldEventListener.receive(FieldEvent.DATA_SCRUBBED.setField(designator));
                                             }
                                         }
                                     }
@@ -719,7 +719,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                 Matcher m = TAG_PATTERN.matcher(designator.tag());
                                 if (!m.matches()) {
                                     if (fieldEventListener != null) {
-                                        fieldEventListener.event(FieldEvent.TAG_CLEANED.setField(designator));
+                                        fieldEventListener.receive(FieldEvent.TAG_CLEANED.setField(designator));
                                     }
                                     // switch invalid tag to error tag
                                     designator.tag(Field.ERROR_TAG);
@@ -736,7 +736,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                 Matcher m = TAG_PATTERN.matcher(designator.tag());
                                 if (!m.matches()) {
                                     if (fieldEventListener != null) {
-                                        fieldEventListener.event(FieldEvent.TAG_CLEANED.setField(designator));
+                                        fieldEventListener.receive(FieldEvent.TAG_CLEANED.setField(designator));
                                     }
                                     // switch invalid tag to error tag
                                     designator.tag(Field.ERROR_TAG);
@@ -753,7 +753,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                 designator.data(XMLUtil.sanitizeXml10(designator.data()).toString());
                                 if (!old.equals(designator.data())) {
                                     if (fieldEventListener != null) {
-                                        fieldEventListener.event(FieldEvent.DATA_SCRUBBED.setField(designator));
+                                        fieldEventListener.receive(FieldEvent.DATA_SCRUBBED.setField(designator));
                                     }
                                 }
                             }
@@ -888,7 +888,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                         designator.data(XMLUtil.sanitizeXml10(designator.data()).toString());
                                         if (!old.equals(designator.data())) {
                                             if (fieldEventListener != null) {
-                                                fieldEventListener.event(FieldEvent.DATA_SCRUBBED.setField(designator));
+                                                fieldEventListener.receive(FieldEvent.DATA_SCRUBBED.setField(designator));
                                             }
                                         }
                                     }

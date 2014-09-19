@@ -35,6 +35,8 @@ import org.xbib.classloader.uri.URIClassLoader;
 import org.xbib.keyvalue.KeyValue;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.event.FieldEvent;
+import org.xbib.marc.event.EventListener;
 import org.xbib.rdf.context.ResourceContext;
 
 import java.io.IOException;
@@ -83,6 +85,8 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
 
     private UnmappedKeyListener<K> listener;
 
+    private EventListener<FieldEvent> fieldEventListener;
+
     public AbstractElementMapper(String path, String format, Specification specification) {
         this(new URIClassLoader(), path, format, specification);
     }
@@ -112,6 +116,11 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
         return this;
     }
 
+    public ElementMapper<K,V,E,C> setFieldEventListener(EventListener<FieldEvent> fieldEventListener) {
+        this.fieldEventListener = fieldEventListener;
+        return this;
+    }
+
     @Override
     public Collection<KeyValueElementPipeline> pipelines() {
         return pipelines;
@@ -132,7 +141,8 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
         this.factory = factory;
         for (int i = 0; i < numPipelines; i++) {
             KeyValueElementPipeline<K,V,E,C> pipeline = createPipeline(i)
-                    .setListener(listener);
+                    .setListener(listener)
+                    .setFieldEventListener(fieldEventListener);
             pipelines.add(pipeline);
             service.submit(pipeline);
         }

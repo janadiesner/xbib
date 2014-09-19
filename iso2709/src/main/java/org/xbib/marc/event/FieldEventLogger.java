@@ -34,7 +34,7 @@ package org.xbib.marc.event;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 
-public class FieldEventLogger implements FieldEventListener {
+public class FieldEventLogger implements EventListener<FieldEvent> {
 
     private final static Logger logger = LoggerFactory.getLogger(FieldEventLogger.class.getName());
 
@@ -45,7 +45,7 @@ public class FieldEventLogger implements FieldEventListener {
     }
 
     @Override
-    public void event(FieldEvent event) {
+    public void receive(FieldEvent event) {
         switch (level) {
             case "warn" : logger.warn("{}", event); break;
             case "error" : logger.error("{}", event); break;

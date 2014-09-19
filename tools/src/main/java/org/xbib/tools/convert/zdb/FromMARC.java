@@ -31,6 +31,7 @@
  */
 package org.xbib.tools.convert.zdb;
 
+import org.xbib.elements.UnmappedKeyListener;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -58,6 +59,9 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * COnverting Zeitschriftendatenbank (ZDB) MARC ISO2709 files
@@ -88,9 +92,18 @@ public final class FromMARC extends Converter {
     @Override
     public void process(URI uri) throws Exception {
 
+        final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         final MARCElementMapper mapper = new MARCElementMapper(settings.get("elements"))
                 .pipelines(settings.getAsInt("pipelines", 1))
-                .detectUnknownKeys(settings.getAsBoolean("detect", false))
+                .setListener(new UnmappedKeyListener<DataField>() {
+                    @Override
+                    public void unknown(DataField key) {
+                        logger.warn("unmapped field {}", key.toSpec());
+                        if ((settings.getAsBoolean("detect", false))) {
+                            unmapped.add("\"" + key.toSpec() + "\"");
+                        }
+                    }
+                })
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
                         MARCElementBuilder builder = new MARCElementBuilder();
@@ -125,7 +138,7 @@ public final class FromMARC extends Converter {
         r.close();
         mapper.close();
         if (settings.getAsBoolean("detect", false)) {
-            logger.info("unknown keys={}", mapper.getUnknownKeys());
+            logger.info("unknown keys={}", unmapped);
         }
     }
 

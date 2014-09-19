@@ -31,7 +31,5 @@
  */
 package org.xbib.marc.event;
 
-public interface FieldEventListener {
-
-    public void event(FieldEvent event);
+public interface Event extends Cause, Change {
 }

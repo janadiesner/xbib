@@ -36,7 +36,7 @@ import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.label.RecordLabel;
 import org.xbib.marc.event.FieldEvent;
-import org.xbib.marc.event.FieldEventListener;
+import org.xbib.marc.event.EventListener;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -72,7 +72,7 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
 
     private Map<String, Map<String, Object>> maps;
 
-    private FieldEventListener fieldEventListener;
+    private EventListener<FieldEvent> eventListener;
 
     public MarcXchangeFieldMapper setFormat(String format) {
         this.format = format;
@@ -104,16 +104,16 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         return maps.get(fieldMapName);
     }
 
-    public MarcXchangeFieldMapper setFieldEventListener(FieldEventListener fieldEventListener) {
-        this.fieldEventListener = fieldEventListener;
+    public MarcXchangeFieldMapper setFieldEventListener(EventListener<FieldEvent> eventListener) {
+        this.eventListener = eventListener;
         return this;
     }
 
     protected void setRecordLabel(String label) {
         RecordLabel recordLabel = new RecordLabel(label.toCharArray());
         this.label = recordLabel.getRecordLabel();
-        if (!this.label.equals(label) && fieldEventListener != null) {
-            fieldEventListener.event(FieldEvent.RECORD_LABEL_CHANGED.setChange(label, this.label));
+        if (!this.label.equals(label) && eventListener != null) {
+            eventListener.receive(FieldEvent.RECORD_LABEL_CHANGED.setChange(label, this.label));
         }
     }
 
@@ -123,14 +123,14 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
             for (Field f : controlfields) {
                 if (RECORD_NUMBER_FIELD.equals(f.tag())) {
                     // already exist, drop this new 001 field
-                    if (fieldEventListener != null) {
-                        fieldEventListener.event(FieldEvent.RECORD_NUMBER_MULTIPLE.setField(field));
+                    if (eventListener != null) {
+                        eventListener.receive(FieldEvent.RECORD_NUMBER_MULTIPLE.setField(field));
                     }
                     return;
                 }
             }
-            if (fieldEventListener != null) {
-                fieldEventListener.event(FieldEvent.RECORD_NUMBER.setField(field));
+            if (eventListener != null) {
+                eventListener.receive(FieldEvent.RECORD_NUMBER.setField(field));
             }
         }
         this.controlfields.add(field);
@@ -303,8 +303,8 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                 Object o = map.get(field.tag());
                 if (o == null) {
                     // value null means remove this field
-                    if (fieldEventListener != null) {
-                        fieldEventListener.event(FieldEvent.FIELD_DROPPED.setField(field).setCause(fieldMapName));
+                    if (eventListener != null) {
+                        eventListener.receive(FieldEvent.FIELD_DROPPED.setField(field).setCause(fieldMapName));
                     }
                     field.setEmpty();
                     return Operation.SKIP;
@@ -315,8 +315,8 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                         if (subf.containsKey(EMPTY)) {
                             o = subf.get(EMPTY);
                             if (o != null) {
-                                if (fieldEventListener != null) {
-                                    fieldEventListener.event(FieldEvent.FIELD_MAPPED.setField(field).setCause(fieldMapName));
+                                if (eventListener != null) {
+                                    eventListener.receive(FieldEvent.FIELD_MAPPED.setField(field).setCause(fieldMapName));
                                 }
                                 Operation op = ">".equals(o.toString().substring(0,1)) ? Operation.OPEN :
                                         "<".equals(o.toString().substring(0,1)) ? Operation.CLOSE : Operation.APPEND;
@@ -345,14 +345,14 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
                                 if (subf.containsKey(subfieldId)) {
                                     o = subf.get(subfieldId);
                                     if (o == null) {
-                                        if (fieldEventListener != null) {
-                                            fieldEventListener.event(FieldEvent.FIELD_DROPPED.setField(field).setCause(fieldMapName));
+                                        if (eventListener != null) {
+                                            eventListener.receive(FieldEvent.FIELD_DROPPED.setField(field).setCause(fieldMapName));
                                         }
                                         field.setEmpty();
                                         return Operation.SKIP;
                                     } else {
-                                        if (fieldEventListener != null) {
-                                            fieldEventListener.event(FieldEvent.FIELD_MAPPED.setField(field).setCause(fieldMapName));
+                                        if (eventListener != null) {
+                                            eventListener.receive(FieldEvent.FIELD_MAPPED.setField(field).setCause(fieldMapName));
                                         }
                                         Operation op = ">".equals(o.toString().substring(0,1)) ? Operation.OPEN :
                                                 "<".equals(o.toString().substring(0,1)) ? Operation.CLOSE : Operation.APPEND;

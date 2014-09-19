@@ -34,6 +34,7 @@ package org.xbib.tools.feed.elasticsearch.zdb;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.unit.TimeValue;
 import org.xbib.elasticsearch.rdf.ResourceSink;
+import org.xbib.elements.UnmappedKeyListener;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
 import org.xbib.elements.marc.MARCElementMapper;
@@ -41,6 +42,7 @@ import org.xbib.io.Request;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.marc.DataField;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.MarcXchangeContentHandler;
@@ -66,6 +68,9 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.text.Normalizer;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FromSRU extends Feeder {
@@ -153,9 +158,18 @@ public class FromSRU extends Feeder {
 
         final OurContextResourceOutput holout = new OurContextResourceOutput().setIndex(holIndex).setType(holType);
 
+        final Set<String> unmappedbib = Collections.synchronizedSet(new TreeSet<String>());
         final MARCElementMapper bibmapper = new MARCElementMapper("marc/zdb/bib")
                 .pipelines(settings.getAsInt("pipelines", 1))
-                .detectUnknownKeys(settings.getAsBoolean("detect", false))
+                .setListener(new UnmappedKeyListener<DataField>() {
+                    @Override
+                    public void unknown(DataField key) {
+                        logger.warn("unmapped field {}", key.toSpec());
+                        if ((settings.getAsBoolean("detect", false))) {
+                            unmappedbib.add("\"" + key.toSpec() + "\"");
+                        }
+                    }
+                })
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
                         MARCElementBuilder builder = new MARCElementBuilder();
@@ -164,9 +178,18 @@ public class FromSRU extends Feeder {
                     }
                 });
 
+        final Set<String> unmappedhol = Collections.synchronizedSet(new TreeSet<String>());
         final MARCElementMapper holmapper = new MARCElementMapper("marc/zdb/hol")
                 .pipelines(settings.getAsInt("pipelines", 1))
-                .detectUnknownKeys(settings.getAsBoolean("detect", false))
+                .setListener(new UnmappedKeyListener<DataField>() {
+                    @Override
+                    public void unknown(DataField key) {
+                        logger.warn("unmapped field {}", key.toSpec());
+                        if ((settings.getAsBoolean("detect", false))) {
+                            unmappedbib.add("\"" + key.toSpec() + "\"");
+                        }
+                    }
+                })
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
                         MARCElementBuilder builder = new MARCElementBuilder();

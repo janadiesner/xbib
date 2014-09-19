@@ -31,6 +31,7 @@
  */
 package org.xbib.tools.feed.elasticsearch.zdb.bibdat;
 
+import org.xbib.elements.UnmappedKeyListener;
 import org.xbib.elements.marc.dialects.pica.PicaContext;
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilder;
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilderFactory;
@@ -55,6 +56,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.Normalizer;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Index bib addresses into Elasticsearch
@@ -86,9 +90,18 @@ public final class BibdatFromPPXML extends Feeder {
 
     @Override
     public void process(URI uri) throws Exception {
+        final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         PicaElementMapper mapper = new PicaElementMapper("pica/zdb/bib")
                 .pipelines(settings.getAsInt("pipelines", 1))
-                .detectUnknownKeys(settings.getAsBoolean("detect", false))
+                .setListener(new UnmappedKeyListener<DataField>() {
+                    @Override
+                    public void unknown(DataField key) {
+                        logger.warn("unmapped field {}", key.toSpec());
+                        if ((settings.getAsBoolean("detect", false))) {
+                            unmapped.add("\"" + key.toSpec() + "\"");
+                        }
+                    }
+                })
                 .start(new PicaElementBuilderFactory() {
                     public PicaElementBuilder newBuilder() {
                         PicaElementBuilder builder = new PicaElementBuilder();
@@ -140,7 +153,7 @@ public final class BibdatFromPPXML extends Feeder {
         in.close();
         mapper.close();
         if (settings.getAsBoolean("detect", false)) {
-            logger.info("detected unknown elements = {}", mapper.getUnknownKeys());
+            logger.info("detected unmapped elements = {}", unmapped);
         }
     }
 

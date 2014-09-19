@@ -32,7 +32,7 @@
 package org.xbib.marc;
 
 import org.xbib.io.field.BufferedFieldStreamReader;
-import org.xbib.marc.event.FieldEventListener;
+import org.xbib.marc.event.EventListener;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.MarcXchangeSaxAdapter;
 import org.xml.sax.ContentHandler;
@@ -243,8 +243,8 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
         return properties.get(FIELDMAPPER) != null;
     }
 
-    public Iso2709Reader setFieldEventListener(FieldEventListener fieldEventListener) {
-        this.adapter.setFieldEventListener(fieldEventListener);
+    public Iso2709Reader setFieldEventListener(EventListener eventListener) {
+        this.adapter.setFieldEventListener(eventListener);
         return this;
     }
 

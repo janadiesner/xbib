@@ -33,7 +33,7 @@ package org.xbib.marc.event;
 
 import org.xbib.marc.Field;
 
-public enum FieldEvent implements Cause, Change {
+public enum FieldEvent implements Event {
 
     TAG_CLEANED,
     DATA_SCRUBBED,

@@ -37,7 +37,7 @@ import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.event.RecordEvent;
-import org.xbib.marc.event.RecordEventListener;
+import org.xbib.marc.event.EventListener;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
@@ -85,7 +85,7 @@ public class MarcXchangeFieldMapperContentHandler
 
     private boolean ignoreNamespace = false;
 
-    private RecordEventListener recordEventListener;
+    private EventListener<RecordEvent> recordEventListener;
 
     private Set<String> validNamespaces = new HashSet<String>() {{
         add(MARCXCHANGE_V1_NS_URI);
@@ -123,7 +123,7 @@ public class MarcXchangeFieldMapperContentHandler
         return this;
     }
 
-    public MarcXchangeFieldMapperContentHandler setRecordEventLlistener(RecordEventListener recordEventListener) {
+    public MarcXchangeFieldMapperContentHandler setRecordEventLlistener(EventListener<RecordEvent> recordEventListener) {
         this.recordEventListener = recordEventListener;
         return this;
     }
@@ -293,7 +293,7 @@ public class MarcXchangeFieldMapperContentHandler
                 setFormat(format);
                 setType(type);
                 if (recordEventListener != null) {
-                    recordEventListener.event(RecordEvent.START);
+                    recordEventListener.receive(RecordEvent.START);
                 }
                 break;
             }

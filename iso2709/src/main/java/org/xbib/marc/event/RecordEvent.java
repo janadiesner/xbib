@@ -31,7 +31,37 @@
  */
 package org.xbib.marc.event;
 
-public enum RecordEvent {
+public enum RecordEvent implements Event {
 
     START
+    ;
+
+    private String cause;
+
+    public RecordEvent setCause(String cause) {
+        this.cause = cause;
+        return this;
+    }
+
+    public String getCause() {
+        return cause;
+    }
+
+    private Object prev;
+    private Object next;
+
+    public RecordEvent setChange(Object prev, Object next) {
+        this.prev = prev;
+        this.next = next;
+        return this;
+    }
+
+    public Object getPrev() {
+        return prev;
+    }
+
+    public Object getNext() {
+        return next;
+    }
+
 }

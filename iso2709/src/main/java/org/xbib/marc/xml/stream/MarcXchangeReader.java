@@ -35,7 +35,7 @@ import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.event.RecordEvent;
-import org.xbib.marc.event.RecordEventListener;
+import org.xbib.marc.event.EventListener;
 import org.xbib.marc.label.RecordLabel;
 
 import javax.xml.namespace.QName;
@@ -86,7 +86,7 @@ public class MarcXchangeReader
 
     private boolean ignoreNamespace = false;
 
-    private RecordEventListener recordEventListener;
+    private EventListener<RecordEvent> recordEventListener;
 
     private Integer bufferSize;
 
@@ -131,7 +131,7 @@ public class MarcXchangeReader
         return this;
     }
 
-    public MarcXchangeReader setRecordEventLlistener(RecordEventListener recordEventListener) {
+    public MarcXchangeReader setRecordEventLlistener(EventListener<RecordEvent> recordEventListener) {
         this.recordEventListener = recordEventListener;
         return this;
     }
@@ -303,7 +303,7 @@ public class MarcXchangeReader
                 case RECORD: {
                     beginRecord(format, type);
                     if (recordEventListener != null) {
-                        recordEventListener.event(RecordEvent.START);
+                        recordEventListener.receive(RecordEvent.START);
                     }
                     break;
                 }
