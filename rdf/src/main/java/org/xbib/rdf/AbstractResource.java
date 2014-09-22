@@ -135,8 +135,8 @@ public abstract class AbstractResource<S extends Identifier, P extends Property,
         if (resource.id() == null) {
             resource.id(super.id());
             Resource<S, P, O> r = newResource(predicate);
-            for (Triple<S, P, O> aResource : resource) {
-                r.add(aResource);
+            for (Triple<S, P, O> triple : resource) {
+                r.add(triple);
             }
         } else {
             attributes.put(predicate, resource);

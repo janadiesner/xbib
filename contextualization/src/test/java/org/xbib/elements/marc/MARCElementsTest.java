@@ -129,7 +129,7 @@ public class MARCElementsTest extends Assert {
 
         mapper.close();
         // check if increment works
-        logger.info("unknown elements = {}", unmapped);
+        logger.info("unmapped elements = {}", unmapped);
         assertEquals(8676, counter.get());
     }
 
