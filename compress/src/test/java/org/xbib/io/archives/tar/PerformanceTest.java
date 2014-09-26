@@ -6,13 +6,12 @@ import org.xbib.io.ConnectionService;
 import org.xbib.io.Packet;
 import org.xbib.io.Session;
 import org.xbib.io.StreamCodecService;
-import org.xbib.io.archivers.tar2.TarArchiveInputEntry;
-import org.xbib.io.archivers.tar2.TarArchiveInputStream;
-import org.xbib.io.archivers.tar2.TarSession;
+import org.xbib.io.archive.tar2.TarArchiveInputEntry;
+import org.xbib.io.archive.tar2.TarArchiveInputStream;
+import org.xbib.io.archive.tar2.TarSession;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.URI;
 import java.util.zip.GZIPInputStream;
 

@@ -36,7 +36,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
 import org.xbib.io.InputService;
-import org.xbib.io.archivers.file.Finder;
+import org.xbib.io.archive.file.Finder;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;

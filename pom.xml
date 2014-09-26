@@ -80,7 +80,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>dd.MM.yyyy HH:mm</maven.build.timestamp.format>
         <java.compiler.source>1.8</java.compiler.source>
-        <elasticsearch.support.plugin.version>1.3.0.3</elasticsearch.support.plugin.version>
+        <elasticsearch.support.plugin.version>1.3.2.0</elasticsearch.support.plugin.version>
     </properties>
 
     <build>

@@ -31,23 +31,23 @@
  */
 package org.xbib.elasticsearch.search;
 
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.xbib.common.settings.Settings;
 import org.xbib.elasticsearch.support.client.search.SearchClient;
-
-import java.net.URI;
 
 /**
  * Some support for Common Query Language with Elasticsearch
  */
 public class SearchSupport extends SearchClient {
 
-    @Override
     public SearchSupport newClient() {
-        this.newClient(findURI());
+        this.newClient(findSettings());
         return this;
     }
 
-    public SearchSupport newClient(URI uri) {
-        super.newClient(uri);
+    public SearchSupport newClient(Settings settings) {
+        super.newClient(ImmutableSettings.settingsBuilder()
+                .put(settings.getAsMap()).build());
         return this;
     }
 

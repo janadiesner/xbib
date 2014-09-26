@@ -2,8 +2,8 @@ package org.xbib.io.archives.zip;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.io.archivers.zip.ZipArchiveEntry;
-import org.xbib.io.archivers.zip.ZipArchiveInputStream;
+import org.xbib.io.archive.zip.ZipArchiveEntry;
+import org.xbib.io.archive.zip.ZipArchiveInputStream;
 
 import java.io.InputStream;
 

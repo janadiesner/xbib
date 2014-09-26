@@ -36,6 +36,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -115,10 +116,14 @@ public class WithCitations
 
     @Override
     public void run() throws Exception {
-        URI sourceURI = URI.create(settings.get("source"));
         this.serialIndex = settings.get("serialIndex");
         this.serialType = settings.get("serialType");
-        SearchClient search = new SearchClient().newClient(sourceURI);
+        SearchClient search = new SearchClient().newClient(ImmutableSettings.settingsBuilder()
+                .put("cluster.name", settings.get("source.cluster"))
+                .put("host", settings.get("source.host"))
+                .put("port", settings.getAsInt("source.port", 9300))
+                .put("sniff", settings.getAsBoolean("source.sniff", false))
+                .build());
         try {
             this.service = this;
             this.client = search.client();
@@ -136,7 +141,12 @@ public class WithCitations
                             Runtime.getRuntime().availableProcessors()));
 
             ingest.setting(WithCitations.class.getResourceAsStream("transport-client-settings.json"));
-            ingest.newClient(URI.create(settings.get("target")));
+            ingest.newClient(ImmutableSettings.settingsBuilder()
+                    .put("cluster.name", settings.get("target.cluster"))
+                    .put("host", settings.get("target.host"))
+                    .put("port", settings.getAsInt("target.port", 9300))
+                    .put("sniff", settings.getAsBoolean("target.sniff", false))
+                    .build());
             ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
             // TODO create settings/mappings
             //.setting(MergeWithLicenses.class.getResourceAsStream("index-settings.json"))

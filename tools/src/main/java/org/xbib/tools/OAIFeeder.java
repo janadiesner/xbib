@@ -32,6 +32,7 @@
 package org.xbib.tools;
 
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
+import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.xbib.elasticsearch.rdf.ResourceSink;
 import org.xbib.io.NullWriter;
@@ -72,7 +73,6 @@ public abstract class OAIFeeder extends Feeder {
 
     @Override
     protected OAIFeeder prepare() throws IOException {
-        URI esURI = URI.create(settings.get("elasticsearch"));
         String index = settings.get("index");
         String type = settings.get("type");
         Integer shards = settings.getAsInt("shards", 1);
@@ -85,7 +85,12 @@ public abstract class OAIFeeder extends Feeder {
         output.maxActionsPerBulkRequest(maxbulkactions)
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
                 .maxRequestWait(TimeValue.parseTimeValue(maxtimewait, TimeValue.timeValueSeconds(60)))
-                .newClient(esURI);
+                .newClient(ImmutableSettings.settingsBuilder()
+                        .put("cluster.name", settings.get("elasticsearch.cluster"))
+                        .put("host", settings.get("elasticsearch.host"))
+                        .put("port", settings.getAsInt("elasticsearch.port", 9300))
+                        .put("sniff", settings.getAsBoolean("elasticsearch.sniff", false))
+                        .build());
         output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         beforeIndexCreation(output);
         output.shards(shards).replica(replica).newIndex(index).startBulk(index);

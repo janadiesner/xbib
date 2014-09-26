@@ -4,7 +4,7 @@ import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
 import org.xbib.io.Packet;
 import org.xbib.io.Session;
-import org.xbib.io.archivers.tar.TarSession;
+import org.xbib.io.archive.tar.TarSession;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.metric.MeterMetric;

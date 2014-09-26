@@ -49,7 +49,6 @@ import org.xbib.util.FormatUtil;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.URI;
 import java.text.NumberFormat;
 
 public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T, R>>
@@ -84,7 +83,6 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
     @Override
     protected Feeder<T, R, P> prepare() throws IOException {
         super.prepare();
-        URI esURI = URI.create(settings.get("elasticsearch"));
         String index = settings.get("index");
         String type = settings.get("type");
         Integer shards = settings.getAsInt("shards", 1);
@@ -97,7 +95,7 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
         output.maxActionsPerBulkRequest(maxbulkactions)
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
                 .maxRequestWait(TimeValue.parseTimeValue(maxtimewait, TimeValue.timeValueSeconds(60)))
-                .newClient(esURI);
+                .newClient(settings.getAsMap());
         output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         beforeIndexCreation(output);
         output.shards(shards)

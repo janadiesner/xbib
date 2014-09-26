@@ -36,6 +36,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -63,7 +64,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
@@ -155,7 +155,6 @@ public class WithHoldingsAndLicensesInTimeline
     @Override
     public void run() throws Exception {
         logger.info("run starts");
-        URI sourceURI = URI.create(settings.get("source"));
         this.sourceTitleIndex = settings.get("bibIndex");
         this.sourceTitleType = settings.get("bibType");
         if (Strings.isNullOrEmpty(sourceTitleIndex)) {
@@ -164,10 +163,12 @@ public class WithHoldingsAndLicensesInTimeline
         if (Strings.isNullOrEmpty(sourceTitleType)) {
             throw new IllegalArgumentException("no bibType parameter given");
         }
-
-        URI targetURI = URI.create(settings.get("target"));
-
-        SearchClient search = new SearchClient().newClient(sourceURI);
+        SearchClient search = new SearchClient().newClient(ImmutableSettings.settingsBuilder()
+                .put("cluster.name", settings.get("source.cluster"))
+                .put("host", settings.get("source.host"))
+                .put("port", settings.getAsInt("source.port", 9300))
+                .put("sniff", settings.getAsBoolean("source.sniff", false))
+                .build());
         this.service = this;
         this.client = search.client();
         this.size = settings.getAsInt("scrollSize", 10);
@@ -185,7 +186,12 @@ public class WithHoldingsAndLicensesInTimeline
                         Runtime.getRuntime().availableProcessors()))
                 .maxRequestWait(TimeValue.parseTimeValue(settings.get("maxWait", "180s"), TimeValue.timeValueSeconds(180)));
         ingest.setting(WithHoldingsAndLicensesInTimeline.class.getResourceAsStream("transport-client-settings.json"));
-        ingest.newClient(targetURI);
+        ingest.newClient(ImmutableSettings.settingsBuilder()
+                .put("cluster.name", settings.get("target.cluster"))
+                .put("host", settings.get("target.host"))
+                .put("port", settings.getAsInt("target.port", 9300))
+                .put("sniff", settings.getAsBoolean("target.sniff", false))
+                .build());
         ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         ingest.setting(WithHoldingsAndLicensesInTimeline.class.getResourceAsStream("index-settings.json"));
         ingest.mapping("Work", WithHoldingsAndLicensesInTimeline.class.getResourceAsStream("mapping-Work.json"));

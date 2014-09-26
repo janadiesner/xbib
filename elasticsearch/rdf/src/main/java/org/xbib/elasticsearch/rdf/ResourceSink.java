@@ -33,7 +33,7 @@ package org.xbib.elasticsearch.rdf;
 
 import java.io.IOException;
 
-import org.xbib.elasticsearch.support.client.Feed;
+import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.context.ResourceContextWriter;
@@ -44,9 +44,9 @@ import org.xbib.rdf.context.ResourceContextWriter;
  */
 public class ResourceSink implements ResourceContextWriter {
 
-    private final Feed feeder;
+    private final Ingest feeder;
 
-    public ResourceSink(final Feed feeder) {
+    public ResourceSink(final Ingest feeder) {
         this.feeder = feeder;
     }
 

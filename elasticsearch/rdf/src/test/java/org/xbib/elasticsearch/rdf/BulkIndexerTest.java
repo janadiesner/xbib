@@ -3,6 +3,8 @@ package org.xbib.elasticsearch.rdf;
 import org.elasticsearch.common.unit.TimeValue;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.xbib.common.settings.ImmutableSettings;
+import org.xbib.common.settings.Settings;
 import org.xbib.elasticsearch.search.SearchSupport;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
@@ -15,8 +17,6 @@ import org.xbib.rdf.content.DefaultResourceContentBuilder;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.simple.SimpleResourceContext;
 
-import java.net.URI;
-
 public class BulkIndexerTest extends Assert {
 
     private static final Logger logger = LoggerFactory.getLogger(BulkIndexerTest.class.getName());
@@ -24,24 +24,27 @@ public class BulkIndexerTest extends Assert {
     @Test
     public void testBulkIndexerWithSingleResourceAndCQLSearch() throws Exception {
         try {
+            Settings settings = ImmutableSettings.settingsBuilder()
+                    .put("host", "localhost")
+                    .put("port", 9200)
+                    .put("cluster.name", "test")
+                    .build();
             final Ingest es = new IngestTransportClient()
-                    .newClient(URI.create("es://localhost:9300?es.cluster.name=test"));
+                    .newClient(settings.getAsMap());
             es.newIndex("test");
             es.deleteIndex("test");
             ResourceContext context = createContext();
             new ResourceSink(es).write(context);
             es.flushIngest();
             es.waitForResponses(TimeValue.timeValueSeconds(30));
-            Logger queryLogger = LoggerFactory.getLogger("test", BulkIndexerTest.class.getName());
             // check if IRI path "document" worked
             new SearchSupport()
-                    .newClient(URI.create("es://localhost:9300?es.cluster.name=test"))
+                    .newClient(settings.getAsMap())
                     .newSearchRequest()
                     .from(0)
                     .size(10)
-                    .cql("Hello")
-                    .execute(queryLogger);
-            //es.deleteIndex();
+                    .query("Hello")
+                    .execute();
         } catch (Exception e) {
             logger.warn(e.getMessage());
         }

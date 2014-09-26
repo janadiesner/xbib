@@ -32,7 +32,7 @@
 package org.xbib.tools;
 
 import org.xbib.common.settings.Settings;
-import org.xbib.io.archivers.file.Finder;
+import org.xbib.io.archive.file.Finder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.metric.MeterMetric;
