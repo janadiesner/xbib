@@ -1986,4 +1986,8 @@ tag=902 indicator=  subfield=null data=
 tag=902 indicator=  subfield=  data=Intelligenz
 tag=902 indicator=  subfield=9 data=(DE-588)4027251-5
 end
+begin
+tag=902 indicator=  subfield=null data=
+tag=902 indicator=  subfield=  data=Online-Publikation
+end
 end object

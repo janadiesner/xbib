@@ -49,8 +49,12 @@ import org.xbib.util.FormatUtil;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.URI;
 import java.text.NumberFormat;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -89,6 +93,23 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
     }
 
     protected Converter<T, R, P> prepare() throws IOException {
+        // check if running is allowed only on a configured host
+        if (settings.get("runhost") != null) {
+            boolean found = false;
+            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+            for (NetworkInterface netint : Collections.list(nets)) {
+                Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+                for (InetAddress addr : Collections.list(inetAddresses)) {
+                    if (addr.getHostName().equals(settings.get("runhost"))) {
+                        found = true;
+                    }
+                }
+            }
+            if (!found) {
+                logger.error("configured run host {} not found, exiting", settings.get("runhost"));
+                System.exit(1);
+            }
+        }
         if (settings.get("uri") != null) {
             input = new ConcurrentLinkedQueue<URI>();
             input.add(URI.create(settings.get("uri")));

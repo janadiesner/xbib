@@ -29,65 +29,26 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.servlet.filter.common;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
+package org.xbib.io.field;
 
-/**
- * Common Simple Servlet Response stream using ByteArrayOutputStream
- *
- */
-public class WebUtilitiesResponseOutputStream extends ServletOutputStream {
+import java.io.Reader;
 
-    private ByteArrayOutputStream byteArrayOutputStream;
+public class LineFeedStreamReader extends BufferedFieldStreamReader {
 
-    public WebUtilitiesResponseOutputStream(WebUtilitiesResponseWrapper wrapper) {
-        byteArrayOutputStream = new ByteArrayOutputStream();
+    public LineFeedStreamReader(Reader in) {
+        super(in);
     }
 
-    @Override
-    public void write(int b) throws IOException {
-        byteArrayOutputStream.write(b);
+    public LineFeedStreamReader(Reader in, FieldListener listener) {
+        super(in, listener);
     }
 
-    @Override
-    public void close() throws IOException {
-        byteArrayOutputStream.close();
+    public LineFeedStreamReader(Reader in, int bufsize, FieldListener listener) {
+        super(in, bufsize, listener);
     }
 
-    @Override
-    public void flush() throws IOException {
-        byteArrayOutputStream.flush();
-    }
-
-    @Override
-    public void write(byte[] b, int off, int len) throws IOException {
-        byteArrayOutputStream.write(b, off, len);
-    }
-
-    @Override
-    public void write(byte[] b) throws IOException {
-        byteArrayOutputStream.write(b);
-    }
-
-    public ByteArrayOutputStream getByteArrayOutputStream() {
-        return byteArrayOutputStream;
-    }
-
-    void reset() {
-        byteArrayOutputStream.reset();
-    }
-
-    @Override
-    public boolean isReady() {
-        return true;
-    }
-
-    @Override
-    public void setWriteListener(WriteListener writeListener) {
-
+    protected boolean isSeparator(char ch) {
+        return ch == '\n';
     }
 }

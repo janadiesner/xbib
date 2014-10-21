@@ -33,6 +33,7 @@ package org.xbib.servlet.filter.compression;
 
 import java.io.IOException;
 import java.io.InputStream;
+import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
 final class CompressedServletInputStream extends ServletInputStream {
@@ -107,4 +108,18 @@ final class CompressedServletInputStream extends ServletInputStream {
         }
     }
 
+    @Override
+    public boolean isFinished() {
+        return closed;
+    }
+
+    @Override
+    public boolean isReady() {
+        return true;
+    }
+
+    @Override
+    public void setReadListener(ReadListener readListener) {
+
+    }
 }

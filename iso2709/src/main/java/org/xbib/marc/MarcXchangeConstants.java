@@ -38,6 +38,8 @@ import java.util.regex.Pattern;
  */
 public interface MarcXchangeConstants {
 
+    String MARCXCHANGE = "MarcXchange";
+
     String MARCXCHANGE_NS_PREFIX = "mx";
 
     String MARCXCHANGE_V1_NS_URI = "info:lc/xmlns/marcxchange-v1";

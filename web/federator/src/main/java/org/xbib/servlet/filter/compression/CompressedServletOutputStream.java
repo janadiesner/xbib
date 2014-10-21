@@ -35,6 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 public class CompressedServletOutputStream extends ServletOutputStream {
 
@@ -183,5 +184,15 @@ public class CompressedServletOutputStream extends ServletOutputStream {
 
     boolean isCancelled() {
         return cancelled;
+    }
+
+    @Override
+    public boolean isReady() {
+        return true;
+    }
+
+    @Override
+    public void setWriteListener(WriteListener writeListener) {
+
     }
 }

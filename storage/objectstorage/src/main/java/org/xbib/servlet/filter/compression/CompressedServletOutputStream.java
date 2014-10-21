@@ -32,6 +32,7 @@
 package org.xbib.servlet.filter.compression;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -183,5 +184,15 @@ public class CompressedServletOutputStream extends ServletOutputStream {
 
     boolean isCancelled() {
         return cancelled;
+    }
+
+    @Override
+    public boolean isReady() {
+        return true;
+    }
+
+    @Override
+    public void setWriteListener(WriteListener writeListener) {
+
     }
 }

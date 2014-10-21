@@ -31,6 +31,8 @@
  */
 package org.xbib.marc.xml.stream;
 
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
@@ -63,6 +65,8 @@ import java.util.regex.Pattern;
  */
 public class MarcXchangeWriter extends MarcXchangeContentHandler
         implements MarcXchangeConstants, MarcXchangeListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(MarcXchangeWriter.class.getName());
 
     private final static XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
@@ -278,7 +282,9 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
                 throw new RuntimeException(e);
             }
         } finally {
-            lock.unlock();
+            if (lock.isLocked()) {
+                lock.unlock();
+            }
         }
     }
 
@@ -286,6 +292,9 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
     public void leader(String label) {
         super.leader(label);
         if (exception != null) {
+            return;
+        }
+        if (label == null) {
             return;
         }
         try {
@@ -371,7 +380,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
             inControl = true;
             return;
         }
-        // check if indicators are "-". Replace with blank " ".
+        // check if indicators are "-". Replace with blank.
         if (field.indicator() != null && field.indicator().contains("-")) {
             field.indicator(field.indicator().replace('-',' '));
         }
@@ -381,14 +390,16 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         }
         try {
             // validate attribute values, must not be null, must not be empty
-            String tag = field.tag() != null ? field.tag() : Field.ERROR_TAG;
-            String ind1 = field.indicator() != null && field.indicator().length() > 0 ? field.indicator().substring(0,1) : " ";
-            String ind2 = field.indicator() != null && field.indicator().length() > 1 ? field.indicator().substring(1,2) : " ";
-            List<Attribute> attrs = new ArrayList<Attribute>(3);
-            attrs.add(eventFactory.createAttribute(TAG, tag));
-            attrs.add(eventFactory.createAttribute(IND + "1", ind1));
-            attrs.add(eventFactory.createAttribute(IND + "2", ind2));
-            xmlEventConsumer.add(eventFactory.createStartElement(DATAFIELD_ELEMENT, attrs.iterator(), namespaces));
+            if (field.tag() != null) {
+                String tag = field.tag();
+                String ind1 = field.indicator() != null && field.indicator().length() > 0 ? field.indicator().substring(0, 1) : " ";
+                String ind2 = field.indicator() != null && field.indicator().length() > 1 ? field.indicator().substring(1, 2) : " ";
+                List<Attribute> attrs = new ArrayList<Attribute>(3);
+                attrs.add(eventFactory.createAttribute(TAG, tag));
+                attrs.add(eventFactory.createAttribute(IND + "1", ind1));
+                attrs.add(eventFactory.createAttribute(IND + "2", ind2));
+                xmlEventConsumer.add(eventFactory.createStartElement(DATAFIELD_ELEMENT, attrs.iterator(), namespaces));
+            }
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
@@ -411,7 +422,12 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         }
         try {
             if (field != null && field.data() != null && !field.data().isEmpty()) {
+                // create subfield "a" with data
+                List<Attribute> attrs = new ArrayList<Attribute>(1);
+                attrs.add(eventFactory.createAttribute(CODE, "a"));
+                xmlEventConsumer.add(eventFactory.createStartElement(SUBFIELD_ELEMENT, attrs.iterator(), namespaces));
                 xmlEventConsumer.add(eventFactory.createCharacters(field.data()));
+                xmlEventConsumer.add(eventFactory.createEndElement(SUBFIELD_ELEMENT, namespaces));
             }
             xmlEventConsumer.add(eventFactory.createEndElement(DATAFIELD_ELEMENT, namespaces));
         } catch (XMLStreamException e) {

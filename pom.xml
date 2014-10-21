@@ -516,42 +516,42 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>17.0</version>
+                <version>18.0</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.4.1.1</version>
+                <version>2.4.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.4.1</version>
+                <version>2.4.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.4.1</version>
+                <version>2.4.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-smile</artifactId>
-                <version>2.4.1</version>
+                <version>2.4.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-yaml</artifactId>
-                <version>2.4.1</version>
+                <version>2.4.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-xml</artifactId>
-                <version>2.4.1</version>
+                <version>2.4.3</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
                 <artifactId>woodstox-core-asl</artifactId>
-                <version>4.2.1</version>
+                <version>4.4.1</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
@@ -561,7 +561,7 @@
             <dependency>
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
-                <version>2.1</version>
+                <version>2.5</version>
             </dependency>
             <dependency>
                 <groupId>commons-dbcp</groupId>
@@ -571,12 +571,12 @@
             <dependency>
                 <groupId>com.yammer.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
-                <version>2.2.0</version>
+                <version>3.0.0-BETA1</version>
             </dependency>            
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
-                <version>3.0.1</version>
+                <version>3.1.0</version>
             </dependency>
             <dependency>
                 <groupId>javax.ws.rs</groupId>
@@ -586,12 +586,12 @@
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-jaxrs</artifactId>
-                <version>3.0.8.Final</version>
+                <version>3.0.9.Final</version>
             </dependency>
             <dependency>
                 <groupId>com.sleepycat</groupId>
                 <artifactId>je</artifactId>
-                <version>4.1.21</version>
+                <version>5.0.73</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -606,12 +606,12 @@
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-slf4j-impl</artifactId>
-                <version>2.0</version>
+                <version>2.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-core</artifactId>
-                <version>2.0</version>
+                <version>2.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
@@ -626,17 +626,17 @@
             <dependency>
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
-                <version>2.7.1</version>
+                <version>2.7.2</version>
             </dependency>
             <dependency>
                 <groupId>xalan</groupId>
                 <artifactId>serializer</artifactId>
-                <version>2.7.1</version>
+                <version>2.7.2</version>
             </dependency>
             <dependency>
                 <groupId>net.sf.saxon</groupId>
                 <artifactId>Saxon-HE</artifactId>
-                <version>9.5.0.1</version>
+                <version>9.6.0-1</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
@@ -646,7 +646,7 @@
             <dependency>
                 <groupId>org.jruby</groupId>
                 <artifactId>jruby-complete</artifactId>
-                <version>1.7.1</version>
+                <version>1.7.16</version>
             </dependency>
             <dependency>
                 <groupId>org.jvnet</groupId>
@@ -656,7 +656,7 @@
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.7.0</version>
+                <version>1.9.4</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.abdera</groupId>

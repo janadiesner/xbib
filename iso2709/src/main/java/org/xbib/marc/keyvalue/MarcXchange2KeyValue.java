@@ -48,8 +48,6 @@ import java.util.List;
  */
 public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStreamListener<DataField, String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(MarcXchange2KeyValue.class.getName());
-
     private DataField fields;
 
     private StringTransformer transformer;

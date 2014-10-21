@@ -68,7 +68,7 @@ public abstract class AbstractDirectBuilder<K, V, C extends ResourceContext<Reso
     @Override
     public void end() {
         C context = context();
-        context.beforeOutput();
+        // no before ouput
         for (ResourceContextWriter output : writers) {
             try {
                output.write(context);
@@ -76,7 +76,7 @@ public abstract class AbstractDirectBuilder<K, V, C extends ResourceContext<Reso
                 logger.error("output failed: " + e.getMessage(), e);
             }
         }
-        context.afterOutput();
+        // no after output
     }
 
     @Override

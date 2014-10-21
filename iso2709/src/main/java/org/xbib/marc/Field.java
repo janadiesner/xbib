@@ -88,6 +88,7 @@ public class Field implements Comparable<Field> {
         this.tag = tag;
         this.indicator = indicator;
         this.subfieldId = subfieldId;
+        this.data = null;
         this.sortable = null;
         this.position = -1;
         this.length = -1;
@@ -97,6 +98,7 @@ public class Field implements Comparable<Field> {
         this.tag = tag;
         this.indicator = null;
         this.subfieldId = null;
+        this.data = null;
         this.position = position;
         this.length = length;
     }
@@ -107,7 +109,7 @@ public class Field implements Comparable<Field> {
         this.subfieldId = field.subfieldId();
         this.position = field.position();
         this.length = field.length();
-        // data is undefined
+        this.data = field.data();
     }
 
     /**
@@ -121,12 +123,18 @@ public class Field implements Comparable<Field> {
         if (isControlField()) {
             this.indicator = null;
             this.subfieldId = null;
-            data(rawContent.length() <= 3 ? rawContent.substring(3) : rawContent);
+            if (rawContent.length() > 3) {
+                data(rawContent.substring(3));
+            }
         } else {
-            int indlen = label.getIndicatorLength();
-            this.indicator = rawContent.length() > 2 + indlen ? rawContent.substring(3, 3 + indlen) : null;
-            this.subfieldId = null; // no subfield
-            data(rawContent.length() > 2 + indlen ? rawContent.substring(3 + indlen) : null);
+            if (label != null) {
+                int indlen = label.getIndicatorLength();
+                this.indicator = rawContent.length() > 2 + indlen ? rawContent.substring(3, 3 + indlen) : null;
+                this.subfieldId = null; // assume datafield
+                data(rawContent.length() > 2 + indlen ? rawContent.substring(3 + indlen) : null);
+            } else {
+                data(rawContent.substring(3));
+            }
         }
         this.position = -1;
         this.length = -1;

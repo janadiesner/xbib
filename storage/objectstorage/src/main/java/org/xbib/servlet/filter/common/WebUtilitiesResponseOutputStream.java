@@ -32,6 +32,7 @@
 package org.xbib.servlet.filter.common;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -78,5 +79,15 @@ public class WebUtilitiesResponseOutputStream extends ServletOutputStream {
 
     void reset() {
         byteArrayOutputStream.reset();
+    }
+
+    @Override
+    public boolean isReady() {
+        return true;
+    }
+
+    @Override
+    public void setWriteListener(WriteListener writeListener) {
+
     }
 }

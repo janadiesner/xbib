@@ -39,39 +39,41 @@ public class FieldDirectory extends TreeMap<Integer, Field> {
 
     public FieldDirectory(RecordLabel label, String buffer) throws InvalidFieldDirectoryException {
         super();
-        int directoryLength = label.getBaseAddressOfData() - (RecordLabel.LENGTH + 1);
-        // assume that negative values means prohibiting directory access
-        if (directoryLength > 0
-                && label.getDataFieldLength() > 0
-                && label.getStartingCharacterPositionLength() > 0
-                && label.getSegmentIdentifierLength() >= 0) {
-            int keylength = 3;
-            // directory entry size = key length (fixed at 3)
-            // plus data field length
-            // plus starting character position length
-            // plus segment identifier length
-            int entrysize = keylength
-                    + label.getDataFieldLength()
-                    + label.getStartingCharacterPositionLength()
-                    + label.getSegmentIdentifierLength();
-            if (directoryLength % entrysize != 0) {
-                throw new InvalidFieldDirectoryException("invalid ISO 2709 directory length: "
-                        + directoryLength + ", definitions in record label: "
-                        + " data field length = " + label.getDataFieldLength()
-                        + " starting character position length = " + label.getStartingCharacterPositionLength()
-                        + " segment identifier length = " + label.getSegmentIdentifierLength());
-            }
-            for (int i = RecordLabel.LENGTH; i < RecordLabel.LENGTH + directoryLength; i += entrysize) {
-                String key = buffer.substring(i, i + keylength);
-                try {
-                    int l = i + keylength + label.getDataFieldLength();
-                    int length = Integer.parseInt(buffer.substring(i + keylength, l));
-                    int position = label.getBaseAddressOfData()
-                            + Integer.parseInt(buffer.substring(l, l + label.getStartingCharacterPositionLength()));
-                    Field field = new Field(key, position, length);
-                    put(position, field);
-                } catch (NumberFormatException e) {
-                    throw new InvalidFieldDirectoryException("directory corrupt? key = " + key + " length = " + directoryLength);
+        if (label != null) {
+            int directoryLength = label.getBaseAddressOfData() - (RecordLabel.LENGTH + 1);
+            // assume that negative values means prohibiting directory access
+            if (directoryLength > 0
+                    && label.getDataFieldLength() > 0
+                    && label.getStartingCharacterPositionLength() > 0
+                    && label.getSegmentIdentifierLength() >= 0) {
+                int keylength = 3;
+                // directory entry size = key length (fixed at 3)
+                // plus data field length
+                // plus starting character position length
+                // plus segment identifier length
+                int entrysize = keylength
+                        + label.getDataFieldLength()
+                        + label.getStartingCharacterPositionLength()
+                        + label.getSegmentIdentifierLength();
+                if (directoryLength % entrysize != 0) {
+                    throw new InvalidFieldDirectoryException("invalid ISO 2709 directory length: "
+                            + directoryLength + ", definitions in record label: "
+                            + " data field length = " + label.getDataFieldLength()
+                            + " starting character position length = " + label.getStartingCharacterPositionLength()
+                            + " segment identifier length = " + label.getSegmentIdentifierLength());
+                }
+                for (int i = RecordLabel.LENGTH; i < RecordLabel.LENGTH + directoryLength; i += entrysize) {
+                    String key = buffer.substring(i, i + keylength);
+                    try {
+                        int l = i + keylength + label.getDataFieldLength();
+                        int length = Integer.parseInt(buffer.substring(i + keylength, l));
+                        int position = label.getBaseAddressOfData()
+                                + Integer.parseInt(buffer.substring(l, l + label.getStartingCharacterPositionLength()));
+                        Field field = new Field(key, position, length);
+                        put(position, field);
+                    } catch (NumberFormatException e) {
+                        throw new InvalidFieldDirectoryException("directory corrupt? key = " + key + " length = " + directoryLength);
+                    }
                 }
             }
         }

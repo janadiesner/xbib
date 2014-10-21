@@ -48,12 +48,6 @@ import java.io.Writer;
 
 public class MABTest {
 
-    /**
-     * Broken right now. Needs fix for subfield-less mode.
-     *
-     * @throws IOException
-     * @throws SAXException
-     */
     @Test
     public void testZDBMAB() throws IOException, SAXException {
         InputStream in = getClass().getResource("1217zdbtit.dat").openStream();

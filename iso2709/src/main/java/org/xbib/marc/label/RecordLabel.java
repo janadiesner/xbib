@@ -68,6 +68,7 @@ public class RecordLabel {
      *
      */
     public RecordLabel() {
+        this(new char[]{});
     }
 
     /**
@@ -79,7 +80,7 @@ public class RecordLabel {
         if (label.length > LENGTH) {
             label = Arrays.copyOf(label, LENGTH);
         } else if (label.length < LENGTH) {
-            // append blanks
+            // fill with blanks
             char[] ch = new char[LENGTH - label.length];
             for (int i = 0; i < ch.length; i++) {
                 ch[i] = ' ';
@@ -143,7 +144,6 @@ public class RecordLabel {
      * is normally calculated automatically when the total record is assembled
      * for exchange.
      */
-
     public RecordLabel setRecordLength(int length) {
         this.recordLength = length;
         String s = Integer.toString(recordLength);
