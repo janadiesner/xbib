@@ -31,6 +31,7 @@
  */
 package org.xbib.elasticsearch.rdf;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 import org.xbib.elasticsearch.support.client.Ingest;
@@ -42,7 +43,7 @@ import org.xbib.rdf.context.ResourceContextWriter;
  * Index RDF resources into Elasticsearch
  *
  */
-public class ResourceSink implements ResourceContextWriter {
+public class ResourceSink implements ResourceContextWriter, Closeable {
 
     private final Ingest feeder;
 
@@ -89,10 +90,7 @@ public class ResourceSink implements ResourceContextWriter {
             if (id == null) {
                 throw new IOException("id must not be null, no fragment set in IRI?");
             }
-            if (context.getContentBuilder() == null) {
-                throw new IllegalArgumentException("resource content builder is null");
-            }
-            feeder.index(index, type, id, context.getContentBuilder() .build(context, resource));
+            feeder.index(index, type, id, context.build(resource));
         }
     }
 
@@ -135,8 +133,4 @@ public class ResourceSink implements ResourceContextWriter {
         feeder.client().close();
     }
 
-    @Override
-    public void flush() throws IOException {
-        // ignore
-    }
 }

@@ -47,8 +47,8 @@ import org.xbib.rdf.Node;
 import org.xbib.rdf.RDFNS;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.simple.SimpleLiteral;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.memory.MemoryLiteral;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.text.InvalidCharacterException;
 import org.xbib.tools.Feeder;
 import org.xbib.tools.convert.articles.SerialsDB;
@@ -141,7 +141,7 @@ public class JsonCoins extends Feeder {
         if (in == null) {
             throw new IOException("unable to open " + uri);
         }
-        final SimpleResourceContext resourceContext = new SimpleResourceContext();
+        final MemoryResourceContext resourceContext = new MemoryResourceContext();
         resourceContext.setNamespaceContext(context);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, UTF8))) {
             JsonParser parser = jsonFactory.createParser(reader);
@@ -383,7 +383,7 @@ public class JsonCoins extends Feeder {
                     }
                     case "rft.date": {
                         year = v;
-                        Literal l = new SimpleLiteral(v).type(Literal.GYEAR);
+                        Literal l = new MemoryLiteral(v).type(Literal.GYEAR);
                         r.add("prism:publicationDate", l);
                         break;
                     }

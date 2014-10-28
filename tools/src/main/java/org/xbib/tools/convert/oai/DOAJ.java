@@ -37,9 +37,9 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.simple.SimpleLiteral;
-import org.xbib.rdf.simple.SimpleProperty;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.memory.MemoryLiteral;
+import org.xbib.rdf.memory.MemoryProperty;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.types.XSDResourceIdentifiers;
 import org.xbib.tools.OAIHarvester;
 
@@ -68,7 +68,7 @@ public class DOAJ extends OAIHarvester {
         return resourceHandler;
     }
 
-    private final static RdfResourceHandler resourceHandler = new DOAJResourceHandler(new SimpleResourceContext());
+    private final static RdfResourceHandler resourceHandler = new DOAJResourceHandler(new MemoryResourceContext());
 
     private static class DOAJResourceHandler extends RdfResourceHandler {
 
@@ -79,10 +79,10 @@ public class DOAJ extends OAIHarvester {
         @Override
         public Property toProperty(Property property) {
             if ("issn".equals(property.id().getSchemeSpecificPart())) {
-                return new SimpleProperty(IRI.builder().curie("dc", "identifier").build());
+                return new MemoryProperty(IRI.builder().curie("dc", "identifier").build());
             }
             if ("eissn".equals(property.id().getSchemeSpecificPart())) {
-                return new SimpleProperty(IRI.builder().curie("dc", "identifier").build());
+                return new MemoryProperty(IRI.builder().curie("dc", "identifier").build());
             }
             return property;
         }
@@ -92,27 +92,27 @@ public class DOAJ extends OAIHarvester {
             switch (name.getLocalPart()) {
                 case "identifier": {
                     if (content.startsWith("http://")) {
-                        return new SimpleLiteral(content).type(XSDResourceIdentifiers.ANYURI);
+                        return new MemoryLiteral(content).type(XSDResourceIdentifiers.ANYURI);
                     }
                     if (content.startsWith("issn: ")) {
-                        return new SimpleLiteral(content.substring(6)).type(ISSN);
+                        return new MemoryLiteral(content.substring(6)).type(ISSN);
                     }
                     if (content.startsWith("eissn: ")) {
-                        return new SimpleLiteral(content.substring(7)).type(EISSN);
+                        return new MemoryLiteral(content.substring(7)).type(EISSN);
                     }
                     break;
                 }
                 case "subject": {
                     if (content.startsWith("LCC: ")) {
-                        return new SimpleLiteral(content.substring(5)).type(LCCN);
+                        return new MemoryLiteral(content.substring(5)).type(LCCN);
                     }
                     break;
                 }
                 case "issn": {
-                    return new SimpleLiteral(content.substring(0, 4) + "-" + content.substring(4)).type(ISSN);
+                    return new MemoryLiteral(content.substring(0, 4) + "-" + content.substring(4)).type(ISSN);
                 }
                 case "eissn": {
-                    return new SimpleLiteral(content.substring(0, 4) + "-" + content.substring(4)).type(EISSN);
+                    return new MemoryLiteral(content.substring(0, 4) + "-" + content.substring(4)).type(EISSN);
                 }
             }
             return super.toObject(name, content);

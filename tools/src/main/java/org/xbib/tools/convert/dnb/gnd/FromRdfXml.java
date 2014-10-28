@@ -35,7 +35,7 @@ import org.xbib.io.InputService;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.io.rdfxml.RdfXmlReader;
+import org.xbib.rdf.io.rdfxml.RdfXmlParser;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.tools.Converter;
 
@@ -82,7 +82,7 @@ public class FromRdfXml extends Converter {
         if ("turtle".equals(settings.get("format"))) {
             TurtleWriter turtle = new TurtleWriter(new OutputStreamWriter(out, "UTF-8"));
             turtle.setSortLanguageTag(marker);
-            RdfXmlReader reader = new RdfXmlReader();
+            RdfXmlParser reader = new RdfXmlParser();
             reader.parse(new InputStreamReader(in, "UTF-8"), turtle);
             turtle.close();
             in.close();
@@ -90,7 +90,7 @@ public class FromRdfXml extends Converter {
         } else if ("ntriples".equals(settings.get("format"))) {
             NTripleWriter ntriples = new NTripleWriter(new OutputStreamWriter(out, "UTF-8"));
             ntriples.setSortLanguageTag(marker);
-            RdfXmlReader reader = new RdfXmlReader();
+            RdfXmlParser reader = new RdfXmlParser();
             reader.parse(new InputStreamReader(in, "UTF-8"), ntriples);
             ntriples.close();
             in.close();

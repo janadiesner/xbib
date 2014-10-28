@@ -35,7 +35,7 @@ import org.xbib.analyzer.dublincore.DublinCoreContext;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.simple.SimpleResource;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.util.DateUtil;
 
 import java.util.Date;
@@ -53,7 +53,7 @@ public class MARCContext extends DublinCoreContext {
 
     @Override
     public Resource newResource() {
-        return new SimpleResource();
+        return new MemoryResource();
     }
 
     public MARCContext setLabel(String label) {
@@ -85,7 +85,7 @@ public class MARCContext extends DublinCoreContext {
      * @return this context
      */
     @Override
-    public ResourceContext<Resource> beforeOutput() {
+    public ResourceContext<Resource> beforeBuild() {
         if (getResource() == null) {
             return this;
         }

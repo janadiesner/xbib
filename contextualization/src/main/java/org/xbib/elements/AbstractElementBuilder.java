@@ -69,7 +69,7 @@ public abstract class AbstractElementBuilder<K, V, E extends Element, C extends 
     @Override
     public void end() {
         C context = context();
-        context.beforeOutput();
+        context.beforeBuild();
         for (ResourceContextWriter writer : writers) {
             try {
                writer.write(context);
@@ -77,7 +77,7 @@ public abstract class AbstractElementBuilder<K, V, E extends Element, C extends 
                 logger.error("output failed: " + e.getMessage(), e);
             }
         }
-        context.afterOutput();
+        context.afterBuild();
     }
 
     @Override

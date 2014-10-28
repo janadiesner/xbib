@@ -54,7 +54,7 @@ public class VIAFRdfXmlReaderTest {
         }
         StringWriter sw = new StringWriter();
         TurtleWriter writer  = new TurtleWriter(sw);
-        RdfXmlReader reader = new RdfXmlReader();
+        RdfXmlParser reader = new RdfXmlParser();
         reader.parse(new InputStreamReader(in, "UTF-8"), writer);
         writer.close();
         logger.info(sw.toString());

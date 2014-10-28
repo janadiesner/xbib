@@ -36,16 +36,16 @@ import org.xbib.rdf.context.ResourceContext;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * A Resource is an iterable over statements of subjects, predicates, and
  * objects, based upon Literal. It has predicate multimaps for associated
  * resources and local properties.
  */
-public interface Resource<S extends Identifier, P extends Property, O extends Node>
-        extends Identifier, Node, Iterable<Triple<S, P, O>> {
+public interface Resource<S extends Identifiable, P extends Property, O extends Node>
+        extends Identifiable, Node, Iterable<Triple<S, P, O>> {
 
     /**
      * Set the identifier of this resource
@@ -192,7 +192,6 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
      */
     Resource<S, P, O> add(String predicate, Collection literals);
 
-
     /**
      * Add another resource to this resource
      *
@@ -212,18 +211,11 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
     Resource<S, P, O> a(IRI externalResource);
 
     /**
-     * Return the map of nodes attached to the properties of this resource.
-     *
-     * @return the map of nodes
+     * Return stream of resources for this predicate
+     * @param predicate the predicate
+     * @return
      */
-    Map<P, Collection<Node>> nodeMap();
-
-    /**
-     * Return the map of resources attached to this resource.
-     *
-     * @return the map of resources
-     */
-    Map<P, Collection<Resource<S, P, O>>> resources();
+    Stream<Node> resources(P predicate);
 
     /**
      * Create an anonymous resource and associate it with this resource. If the
@@ -255,13 +247,13 @@ public interface Resource<S extends Identifier, P extends Property, O extends No
      */
     Resource<S, P, O> newResource(String predicate);
 
+
     /**
-     * Return the set of predicates for a given subject
+     * Return the set of predicates
      *
-     * @param subject subject
      * @return set of predicates
      */
-    Set<P> predicateSet(S subject);
+    Set<P> predicates();
 
     /**
      * Return object set for a given predicate

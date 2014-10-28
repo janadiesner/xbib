@@ -50,8 +50,8 @@ import org.xbib.marc.xml.MarcXchangeContentHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.sru.client.SRUClient;
 import org.xbib.sru.client.SRUClientFactory;
 import org.xbib.sru.searchretrieve.SearchRetrieveListener;
@@ -307,7 +307,7 @@ public class FromSRU extends Feeder {
         return this;
     }
 
-    private class OurContextResourceOutput extends AbstractResourceContextWriter<ResourceContext<Resource>, Resource> {
+    private class OurContextResourceOutput implements ResourceContextWriter<ResourceContext<Resource>, Resource> {
 
         String index;
 

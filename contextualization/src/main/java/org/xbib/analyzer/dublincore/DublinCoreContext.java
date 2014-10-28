@@ -32,41 +32,36 @@
 package org.xbib.analyzer.dublincore;
 
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.DefaultResourceContentBuilder;
-import org.xbib.rdf.context.ResourceContextContentBuilder;
-import org.xbib.rdf.context.AbstractResourceContext;
+import org.xbib.rdf.content.DefaultContentBuilder;
+import org.xbib.rdf.context.ContentBuilder;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.simple.SimpleResource;
+import org.xbib.rdf.memory.MemoryResource;
+import org.xbib.rdf.memory.MemoryResourceContext;
 
 public class DublinCoreContext
-        extends AbstractResourceContext<Resource>
+        extends MemoryResourceContext<Resource>
         implements ResourceContext<Resource>, DublinCoreElements {
 
-    private ResourceContextContentBuilder<ResourceContext<Resource>, Resource> resourceContextContentBuilder = new DefaultResourceContentBuilder();
+    private ContentBuilder<ResourceContext<Resource>, Resource> contentBuilder = new DefaultContentBuilder();
 
     @Override
-    public ResourceContext<Resource> setContentBuilder(ResourceContextContentBuilder<ResourceContext<Resource>, Resource> resourceContextContentBuilder) {
-        this.resourceContextContentBuilder = resourceContextContentBuilder;
+    public ResourceContext<Resource> setContentBuilder(ContentBuilder<ResourceContext<Resource>, Resource> contentBuilder) {
+        this.contentBuilder = contentBuilder;
         return this;
-    }
-
-    @Override
-    public ResourceContextContentBuilder<ResourceContext<Resource>, Resource> getContentBuilder() {
-        return resourceContextContentBuilder;
     }
 
     @Override
     public Resource newResource() {
-        return new SimpleResource();
+        return new MemoryResource();
     }
 
     @Override
-    public ResourceContext<Resource> beforeOutput() {
+    public ResourceContext<Resource> beforeBuild() {
         return this;
     }
 
     @Override
-    public ResourceContext<Resource> afterOutput() {
+    public ResourceContext<Resource> afterBuild() {
         return this;
     }
 }

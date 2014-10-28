@@ -31,14 +31,38 @@
  */
 package org.xbib.rdf;
 
+import org.xbib.iri.IRI;
+
 /**
  * A triple is a group of a subject, a predicate, and an object.
  */
-public interface Triple<S extends Identifier, P extends Property, O> {
+public interface Triple<S extends Identifiable, P extends Property, O extends Node> {
+
+    Triple<S, P, O> subject(S subject);
 
     S subject();
 
+    Triple<S, P, O> predicate(P predicate);
+
     P predicate();
 
+    Triple<S, P, O> object(O object);
+
     O object();
+
+    interface Builder<S extends Identifiable, P extends Property, O extends Node> {
+
+        Builder<S, P, O> begin();
+
+        Builder<S, P, O> startPrefixMapping(String prefix, String uri);
+
+        Builder<S, P, O> endPrefixMapping(String prefix);
+
+        Builder<S, P, O> newIdentifier(IRI identifier);
+
+        Builder<S, P, O> triple(Triple<S, P, O> triple);
+
+        Builder<S, P, O> end();
+    }
+
 }

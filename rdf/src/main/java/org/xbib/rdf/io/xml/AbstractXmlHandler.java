@@ -37,7 +37,6 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -60,7 +59,7 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
 
     private final Stack<QName> parents = new Stack<QName>();
 
-    private TripleListener listener;
+    private Triple.Builder builder;
 
     private String defaultPrefix;
 
@@ -83,8 +82,9 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
         return this;
     }
 
-    public AbstractXmlHandler setListener(TripleListener listener) {
-        this.listener = listener;
+    @Override
+    public AbstractXmlHandler setBuilder(Triple.Builder builder) {
+        this.builder = builder;
         return this;
     }
 
@@ -199,11 +199,11 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
         if (empty) {
             return;
         }
-        if (listener != null) {
-            listener.newIdentifier(resourceContext.getResource().id());
+        if (builder != null) {
+            builder.newIdentifier(resourceContext.getResource().id());
             Iterator<Triple> it = resourceContext.getResource().iterator();
             while (it.hasNext()) {
-                listener.triple(it.next());
+                builder.triple(it.next());
             }
         }
     }

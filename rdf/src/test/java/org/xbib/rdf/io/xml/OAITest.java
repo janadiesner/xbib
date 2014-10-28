@@ -6,8 +6,8 @@ import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.Loggers;
 import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.text.CharUtils;
 import org.xbib.text.UrlEncoding;
 
@@ -19,7 +19,7 @@ import java.io.StringWriter;
 
 public class OAITest extends Assert {
 
-    private final Logger logger = Loggers.getLogger(OAITest.class);
+    private final Logger logger = Loggers.getLogger(OAITest.class.getName());
 
     @Test
     public void testOAIListRecords() throws Exception {
@@ -33,7 +33,7 @@ public class OAITest extends Assert {
         context.addNamespace("oaidc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
 
-        final SimpleResourceContext resourceContext = new SimpleResourceContext();
+        final MemoryResourceContext resourceContext = new MemoryResourceContext();
         resourceContext.setNamespaceContext(context);
 
         XmlHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {
@@ -62,9 +62,9 @@ public class OAITest extends Assert {
         TurtleWriter writer = new TurtleWriter(sw);
         writer.setNamespaceContext(context);
         writer.writeNamespaces();
-        xmlHandler.setListener(writer)
+        xmlHandler.setBuilder(writer)
             .setDefaultNamespace("oai", "http://www.openarchives.org/OAI/2.0/oai_dc/");
-        new XmlReader()
+        new XmlParser()
                 .setHandler(xmlHandler)
                 .parse(new InputStreamReader(in, "UTF-8"), writer);
         writer.close();

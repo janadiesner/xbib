@@ -46,7 +46,7 @@ import org.xbib.marc.xml.stream.MarcXchangeReader;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.AbstractResourceContextWriter;
+import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.tools.Feeder;
 import org.xbib.tools.util.MarcXmlTarReader;
 
@@ -123,7 +123,7 @@ public final class FromMarcXmlTar extends Feeder {
         }
     }
 
-    private class MarcContextResourceOutput extends AbstractResourceContextWriter<MARCContext, Resource> {
+    private class MarcContextResourceOutput implements ResourceContextWriter<MARCContext, Resource> {
 
         @Override
         public void write(MARCContext context) throws IOException {

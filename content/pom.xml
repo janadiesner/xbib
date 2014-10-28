@@ -17,6 +17,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>stream</artifactId>
             <type>jar</type>

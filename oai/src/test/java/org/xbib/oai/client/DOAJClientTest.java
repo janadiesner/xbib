@@ -34,6 +34,7 @@ package org.xbib.oai.client;
 import org.testng.annotations.Test;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
+import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
@@ -42,7 +43,6 @@ import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.simple.SimpleLiteral;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -107,17 +107,17 @@ public class DOAJClientTest {
             String s = name.getLocalPart();
             if (s.equals("identifier")) {
                 if (content.startsWith("http://")) {
-                    return new SimpleLiteral(content).type(IRI.create("xsd:anyUri"));
+                    return new MemoryLiteral(content).type(IRI.create("xsd:anyUri"));
                 }
                 if (content.startsWith("issn: ")) {
-                    return new SimpleLiteral(content.substring(6)).type(ISSN);
+                    return new MemoryLiteral(content.substring(6)).type(ISSN);
                 }
                 if (content.startsWith("eissn: ")) {
-                    return new SimpleLiteral(content.substring(7)).type(EISSN);
+                    return new MemoryLiteral(content.substring(7)).type(EISSN);
                 }
             } else if (s.equals("subject")) {
                 if (content.startsWith("LCC: ")) {
-                    return new SimpleLiteral(content.substring(5)).type(LCCN);
+                    return new MemoryLiteral(content.substring(5)).type(LCCN);
                 }
             }
             return content;

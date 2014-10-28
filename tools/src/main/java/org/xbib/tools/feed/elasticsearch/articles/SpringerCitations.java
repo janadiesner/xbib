@@ -40,8 +40,8 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.simple.SimpleLiteral;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.memory.MemoryLiteral;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.tools.Feeder;
 
 import java.io.BufferedReader;
@@ -59,7 +59,7 @@ public class SpringerCitations extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(SpringerCitations.class.getSimpleName());
 
-    private final static SimpleResourceContext resourceContext = new SimpleResourceContext();
+    private final static MemoryResourceContext resourceContext = new MemoryResourceContext();
 
     @Override
     public String getName() {
@@ -183,7 +183,7 @@ public class SpringerCitations extends Feeder {
             for (String a : author) {
                 r.add("dc:creator", a);
             }
-            r.add("prism:publicationDate", new SimpleLiteral(year).type(Literal.GYEAR));
+            r.add("prism:publicationDate", new MemoryLiteral(year).type(Literal.GYEAR));
             r.newResource(FRBR_EMBODIMENT)
                     .a(FABIO_PERIODICAL_VOLUME)
                     .add("prism:volume", volume);

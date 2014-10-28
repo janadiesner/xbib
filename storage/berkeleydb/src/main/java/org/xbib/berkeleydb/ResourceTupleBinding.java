@@ -33,7 +33,7 @@ import org.xbib.rdf.Statement;
 import org.xbib.rdf.io.StatementListener;
 import org.xbib.rdf.io.turtle.TurtleReader;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.simple.SimpleResource;
+import org.xbib.rdf.memory.SimpleResource;
 
 /**
  * A tuple-binding for resources in a Berkeley DB

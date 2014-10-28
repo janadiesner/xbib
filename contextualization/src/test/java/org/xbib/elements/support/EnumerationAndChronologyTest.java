@@ -8,9 +8,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.util.DateUtil;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.simple.SimpleResource;
 
 public class EnumerationAndChronologyTest extends Assert {
 
@@ -114,7 +114,7 @@ public class EnumerationAndChronologyTest extends Assert {
     public void testMovingwall() {
         Pattern[] p = new Pattern[]{Pattern.compile("Letzte (\\d+) Jg")};
         String s = "Letzte 10 Jg.";
-        Resource r = EnumerationAndChronology.parse(s, new SimpleResource(), p);
+        Resource r = EnumerationAndChronology.parse(s, new MemoryResource(), p);
         Set<Integer> d = EnumerationAndChronology.dates(r.id(), r);
         // yeah, moving wall
         Set<Integer> set = new TreeSet();

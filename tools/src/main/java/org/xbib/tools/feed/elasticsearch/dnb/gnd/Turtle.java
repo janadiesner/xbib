@@ -40,11 +40,10 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.content.DefaultResourceContentBuilder;
+import org.xbib.rdf.content.DefaultContentBuilder;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.io.turtle.TurtleReader;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.io.turtle.TurtleParser;
 import org.xbib.tools.Feeder;
 
 import java.io.IOException;
@@ -94,43 +93,43 @@ public class Turtle extends Feeder {
         namespaceContext.addNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         namespaceContext.addNamespace("skos", "http://www.w3.org/2004/02/skos/core#");
 
-        ResourceContext context = new SimpleResourceContext();
-        context.setContentBuilder(new DefaultResourceContentBuilder<>());
+        ResourceContext context = new MemoryResourceContext();
+        context.setContentBuilder(new DefaultContentBuilder<>());
         context.setNamespaceContext(namespaceContext);
 
         IRI id = IRI.builder().scheme("http").host("d-nb.info").path("/gnd/").build();
-        TurtleReader reader = new TurtleReader().setBaseIRI(id).context(namespaceContext);
+        TurtleParser reader = new TurtleParser().setBaseIRI(id).context(namespaceContext);
         InputStream in = InputService.getInputStream(uri);
-        reader.parse(new InputStreamReader(in, "UTF-8"), new MyTripleListener(context));
+        reader.parse(new InputStreamReader(in, "UTF-8"), new MyTripleBuilder(context));
     }
 
-    class MyTripleListener implements TripleListener {
+    class MyTripleBuilder implements Triple.Builder {
 
         private ResourceContext resourceContext;
 
         private String gndID;
 
-        MyTripleListener(ResourceContext resourceContext) {
+        MyTripleBuilder(ResourceContext resourceContext) {
             this.resourceContext = resourceContext;
         }
 
         @Override
-        public TripleListener begin() {
+        public Triple.Builder begin() {
             return this;
         }
 
         @Override
-        public TripleListener startPrefixMapping(String prefix, String uri) {
+        public Triple.Builder startPrefixMapping(String prefix, String uri) {
             return this;
         }
 
         @Override
-        public TripleListener endPrefixMapping(String prefix) {
+        public Triple.Builder endPrefixMapping(String prefix) {
             return this;
         }
 
         @Override
-        public TripleListener newIdentifier(IRI uri) {
+        public Triple.Builder newIdentifier(IRI uri) {
             try {
                 if (resourceContext.getResource() != null) {
                     // set ES feed IRI
@@ -153,7 +152,7 @@ public class Turtle extends Feeder {
         }
 
         @Override
-        public TripleListener triple(Triple triple) {
+        public Triple.Builder triple(Triple triple) {
             if (triple.predicate().toString().endsWith("gndIdentifier")) {
                 gndID = triple.object().toString();
             }
@@ -162,7 +161,7 @@ public class Turtle extends Feeder {
         }
 
         @Override
-        public TripleListener end() {
+        public Triple.Builder end() {
             if (resourceContext.getResource() != null) {
                 try {
                     sink.write(resourceContext);

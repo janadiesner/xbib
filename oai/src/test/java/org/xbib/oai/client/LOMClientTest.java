@@ -42,12 +42,12 @@ import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.oai.xml.XmlMetadataHandler;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.DefaultResourceContentBuilder;
+import org.xbib.rdf.content.DefaultContentBuilder;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.xml.XmlHandler;
-import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.util.DateUtil;
 import org.xbib.xml.XMLNS;
 import org.xbib.xml.XSI;
@@ -92,8 +92,8 @@ public class LOMClientTest {
 
     protected MetadataHandler xmlMetadataHandler() {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
-        ResourceContext<Resource> resourceContext = new SimpleResourceContext()
-                .setContentBuilder(new DefaultResourceContentBuilder())
+        ResourceContext<Resource> resourceContext = new MemoryResourceContext()
+                .setContentBuilder(new DefaultContentBuilder())
                 .setNamespaceContext(namespaceContext);
         resourceContext.setNamespaceContext(IRINamespaceContext.getInstance());
         RdfResourceHandler handler = new RdfResourceHandler(resourceContext);

@@ -31,8 +31,8 @@
  */
 package org.xbib.rdf.io.xml;
 
+import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
 import org.xml.sax.EntityResolver;
@@ -46,7 +46,7 @@ public interface XmlHandler
 
     XmlHandler setDefaultNamespace(String prefix, String uri);
 
-    XmlHandler setListener(TripleListener listener);
+    XmlHandler setBuilder(Triple.Builder builder);
 
     ResourceContext resourceContext();
 }

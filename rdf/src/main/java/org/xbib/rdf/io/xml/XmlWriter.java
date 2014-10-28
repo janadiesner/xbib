@@ -35,22 +35,23 @@ import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Identifier;
+import org.xbib.rdf.Identifiable;
+import org.xbib.rdf.Property;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.AbstractTripleWriter;
+import org.xbib.rdf.context.ResourceContextWriter;
 
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.util.XMLEventConsumer;
+import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Iterator;
@@ -58,19 +59,22 @@ import java.util.Iterator;
 /**
  * Write resource as XML to stream
  */
-public class XmlWriter<S extends Identifier, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
-        extends AbstractTripleWriter<S, P, O, C> {
+public class XmlWriter<S extends Identifiable, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
+        implements ResourceContextWriter<C, Resource<S,P,O>>, Triple.Builder<S, P, O>, Closeable, Flushable {
 
     private final static Logger logger = LoggerFactory.getLogger(XmlWriter.class.getName());
 
     private final Writer writer;
 
-    private NamespaceContext context = IRINamespaceContext.getInstance();
-
     private final static XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 
     private final static XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
+    private IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
+
+    private C resourceContext;
+
+    private String sortLangTag;
     public XmlWriter(Writer writer) {
        this.writer = writer;
     }
@@ -79,8 +83,26 @@ public class XmlWriter<S extends Identifier, P extends Property, O extends Node,
         return writer;
     }
 
+
     @Override
-    public XmlWriter<S, P, O, C>  newIdentifier(IRI iri) {
+    public void close() throws IOException {
+        // write last resource
+        write(resourceContext);
+    }
+
+    public XmlWriter<S, P, O, C> setNamespaceContext(IRINamespaceContext context) {
+        this.namespaceContext = context;
+        return this;
+    }
+
+    public XmlWriter<S, P, O, C>  setSortLanguageTag(String languageTag) {
+        this.sortLangTag = languageTag;
+        return this;
+    }
+
+
+    @Override
+    public XmlWriter<S, P, O, C> newIdentifier(IRI iri) {
         if (!iri.equals(resourceContext.getResource().id())) {
             try {
                 write(resourceContext);
@@ -122,11 +144,6 @@ public class XmlWriter<S extends Identifier, P extends Property, O extends Node,
         return this;
     }
 
-    public XmlWriter setNamespaceContext(NamespaceContext context) {
-        this.context = context;
-        return this;
-    }
-
     @Override
     public void write(C resourceContext) throws IOException {
         Resource<S,P,O> resource = resourceContext.getResource();
@@ -135,7 +152,7 @@ public class XmlWriter<S extends Identifier, P extends Property, O extends Node,
             IRI resourceURI = resource.id();
             String nsPrefix = resourceURI.getScheme();
             String name = resourceURI.getSchemeSpecificPart();
-            String nsURI = context.getNamespaceURI(nsPrefix);
+            String nsURI = namespaceContext.getNamespaceURI(nsPrefix);
             writeResource(xew, resource, new QName(nsURI, name, nsPrefix));
             xew.close();
         } catch (XMLStreamException e) {
@@ -173,7 +190,7 @@ public class XmlWriter<S extends Identifier, P extends Property, O extends Node,
         O object = triple.object();
         String nsPrefix = predicate.id().getScheme();
         String name = predicate.id().getSchemeSpecificPart();
-        String nsURI = context.getNamespaceURI(nsPrefix);
+        String nsURI = namespaceContext.getNamespaceURI(nsPrefix);
         if (object instanceof Resource) {
             writeResource(consumer, (Resource<S, P, O>) object, new QName(nsURI, name, nsPrefix));
         } else if (object instanceof Literal) {
@@ -185,5 +202,10 @@ public class XmlWriter<S extends Identifier, P extends Property, O extends Node,
             throw new XMLStreamException("can't write object class: " + object.getClass().getName());
         }
 
+    }
+
+    @Override
+    public void flush() throws IOException {
+       writer.flush();
     }
 }

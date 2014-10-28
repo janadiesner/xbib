@@ -47,11 +47,10 @@ import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.xml.XmlHandler;
-import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.util.DateUtil;
 import org.xbib.util.URIUtil;
 import org.xml.sax.Attributes;
@@ -147,7 +146,7 @@ public abstract class OAIFeeder extends Feeder {
     }
 
     protected RdfResourceHandler rdfResourceHandler() {
-        SimpleResourceContext resourceContext = new SimpleResourceContext();
+        MemoryResourceContext resourceContext = new MemoryResourceContext();
         return new RdfResourceHandler(resourceContext);
     }
 
@@ -239,7 +238,7 @@ public abstract class OAIFeeder extends Feeder {
         }
     }
 
-    class MyResourceContextWriter extends AbstractResourceContextWriter {
+    class MyResourceContextWriter implements ResourceContextWriter {
 
         @Override
         public void write(ResourceContext resourceContext) throws IOException {

@@ -37,9 +37,8 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.io.TripleListener;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.simple.SimpleResource;
+import org.xbib.rdf.memory.MemoryResource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,7 +58,7 @@ public class GNDRdfXmlReaderTest {
         }
         StringWriter sw = new StringWriter();
         TurtleWriter writer  = new TurtleWriter(sw);
-        RdfXmlReader reader = new RdfXmlReader();
+        RdfXmlParser reader = new RdfXmlParser();
         reader.parse(new InputStreamReader(in, "UTF-8"), writer);
         writer.close();
         logger.info("gnd = {}", sw.toString());
@@ -73,31 +72,31 @@ public class GNDRdfXmlReaderTest {
             throw new IOException("file " + filename + " not found");
         }
         TripleContentBuilder tripleContentBuilder = new TripleContentBuilder();
-        RdfXmlReader reader = new RdfXmlReader();
+        RdfXmlParser reader = new RdfXmlParser();
         reader.parse(new InputStreamReader(in, "UTF-8"), tripleContentBuilder);
     }
 
-    class TripleContentBuilder implements TripleListener {
+    class TripleContentBuilder implements Triple.Builder {
 
         Resource resource;
 
         @Override
-        public TripleListener begin() {
+        public Triple.Builder begin() {
             return this;
         }
 
         @Override
-        public TripleListener startPrefixMapping(String prefix, String uri) {
+        public Triple.Builder startPrefixMapping(String prefix, String uri) {
             return this;
         }
 
         @Override
-        public TripleListener endPrefixMapping(String prefix) {
+        public Triple.Builder endPrefixMapping(String prefix) {
             return this;
         }
 
         @Override
-        public TripleListener newIdentifier(IRI identifier) {
+        public Triple.Builder newIdentifier(IRI identifier) {
             try {
                 if (resource != null) {
                     output(resource);
@@ -105,13 +104,13 @@ public class GNDRdfXmlReaderTest {
             } catch (IOException e) {
                 //
             }
-            resource = new SimpleResource();
+            resource = new MemoryResource();
             resource.id(identifier);
             return this;
         }
 
         @Override
-        public TripleListener triple(Triple triple) {
+        public Triple.Builder triple(Triple triple) {
             logger.info("{} {} {} -> {} {} {}",
                     triple.subject().getClass(),
                     triple.predicate().getClass(),
@@ -125,7 +124,7 @@ public class GNDRdfXmlReaderTest {
         }
 
         @Override
-        public TripleListener end() {
+        public Triple.Builder end() {
             try {
                 if (resource != null) {
                     output(resource);

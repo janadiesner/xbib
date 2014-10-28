@@ -39,12 +39,12 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.content.DefaultResourceContentBuilder;
+import org.xbib.rdf.content.DefaultContentBuilder;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
-import org.xbib.rdf.io.xml.XmlReader;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.io.xml.XmlParser;
 import org.xbib.tools.Feeder;
 import org.xbib.util.URIUtil;
 import org.xml.sax.SAXException;
@@ -85,15 +85,15 @@ public final class EZBXML extends Feeder {
     @Override
     public void process(URI uri) throws Exception {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
-        ResourceContext<Resource> resourceContext = new SimpleResourceContext();
+        ResourceContext<Resource> resourceContext = new MemoryResourceContext();
         resourceContext.setNamespaceContext(namespaceContext);
-        resourceContext.setContentBuilder(new DefaultResourceContentBuilder<>());
+        resourceContext.setContentBuilder(new DefaultContentBuilder<>());
 
         AbstractXmlHandler handler = new EZBHandler(resourceContext)
                 .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/");
 
         InputStream in = InputService.getInputStream(uri);
-        new XmlReader().setNamespaces(false)
+        new XmlParser().setNamespaces(false)
                     .setHandler(handler)
                     .parse(new InputStreamReader(in, "UTF-8"), null);
         in.close();

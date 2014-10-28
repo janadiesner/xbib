@@ -73,12 +73,6 @@ public class RdfResourceHandler extends AbstractXmlResourceHandler implements OA
         // do nothing
     }
 
-    /**
-     * Convert text input from OAI metadata here.
-     * @param parent
-     * @param content
-     * @return
-     */
     public Object toObject(QName parent, String content) {
         return content;
     }

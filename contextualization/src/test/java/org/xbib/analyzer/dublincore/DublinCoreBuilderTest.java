@@ -40,7 +40,6 @@ import org.testng.annotations.Test;
 import org.xbib.keyvalue.KeyValueReader;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.context.ResourceContextWriter;
 
@@ -53,7 +52,7 @@ public class DublinCoreBuilderTest extends Assert {
     // TODO groovy/jruby are broken
     public void testDublinCoreBuilder() throws Exception {
         StringReader sr = new StringReader("100=John Doe\n200=Hello Word\n300=2012\n400=1");
-        ResourceContextWriter output = new AbstractResourceContextWriter() {
+        ResourceContextWriter output = new ResourceContextWriter() {
 
             @Override
             public void write(ResourceContext context) throws IOException {

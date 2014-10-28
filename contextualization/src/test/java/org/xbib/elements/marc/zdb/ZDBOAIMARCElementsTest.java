@@ -46,7 +46,6 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
@@ -58,7 +57,7 @@ public class ZDBOAIMARCElementsTest {
     private final AtomicInteger counter = new AtomicInteger();
 
     public void testOAIElements() throws Exception {
-        final ResourceContextWriter output = new AbstractResourceContextWriter() {
+        final ResourceContextWriter output = new ResourceContextWriter() {
 
             @Override
             public void write(ResourceContext context) throws IOException {

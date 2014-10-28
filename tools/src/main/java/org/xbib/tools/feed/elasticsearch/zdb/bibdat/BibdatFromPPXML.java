@@ -49,7 +49,7 @@ import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.AbstractResourceContextWriter;
+import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.tools.Feeder;
 
 import java.io.IOException;
@@ -157,7 +157,7 @@ public final class BibdatFromPPXML extends Feeder {
         }
     }
 
-    private class PicaContextResourceOutput extends AbstractResourceContextWriter<PicaContext, Resource> {
+    private class PicaContextResourceOutput implements ResourceContextWriter<PicaContext, Resource> {
 
         @Override
         public void write(PicaContext context) throws IOException {

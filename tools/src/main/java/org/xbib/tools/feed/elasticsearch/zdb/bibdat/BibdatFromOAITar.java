@@ -50,7 +50,7 @@ import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.AbstractResourceContextWriter;
+import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.tools.Feeder;
 import org.xbib.tools.util.AbstractTarReader;
 
@@ -196,7 +196,7 @@ public final class BibdatFromOAITar extends Feeder {
 
     }
 
-    private class OurContextResourceOutput extends AbstractResourceContextWriter<PicaContext, Resource> {
+    private class OurContextResourceOutput implements ResourceContextWriter<PicaContext, Resource> {
 
         @Override
         public void write(PicaContext context) throws IOException {

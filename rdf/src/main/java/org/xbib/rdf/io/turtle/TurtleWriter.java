@@ -32,20 +32,23 @@
 package org.xbib.rdf.io.turtle;
 
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.IdentifiableNode;
-import org.xbib.rdf.Identifier;
+import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.memory.MemoryNode;
+import org.xbib.rdf.Identifiable;
+import org.xbib.rdf.Property;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
 import org.xbib.rdf.RDFNS;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.AbstractTripleWriter;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.memory.MemoryResourceContext;
 
+import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
@@ -57,8 +60,8 @@ import java.util.Stack;
  * See <a href="http://www.w3.org/TeamSubmission/turtle/">Turtle - Terse RDF
  * Triple Language</a>
  */
-public class TurtleWriter<S extends Identifier, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
-        extends AbstractTripleWriter<S, P, O, C> {
+public class TurtleWriter<S extends Identifiable, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
+        implements ResourceContextWriter<C, Resource<S,P,O>>, Triple.Builder<S, P, O>, Closeable, Flushable {
 
     private final static Logger logger = LoggerFactory.getLogger(TurtleWriter.class.getName());
 
@@ -90,7 +93,7 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
 
     public TurtleWriter(Writer writer) {
         this.writer = writer;
-        this.resourceContext = (C)new SimpleResourceContext();
+        this.resourceContext = (C)new MemoryResourceContext();
         resourceContext.newResource();
         this.nsWritten = false;
         this.sameResource = false;
@@ -103,6 +106,28 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
 
     public Writer getWriter() {
         return writer;
+    }
+
+    protected IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
+
+    protected C resourceContext;
+
+    private String sortLangTag;
+
+    @Override
+    public void close() throws IOException {
+        // write last resource
+        write(resourceContext);
+    }
+
+    public TurtleWriter<S, P, O, C>  setNamespaceContext(IRINamespaceContext context) {
+        this.namespaceContext = context;
+        return this;
+    }
+
+    public TurtleWriter<S, P, O, C>  setSortLanguageTag(String languageTag) {
+        this.sortLangTag = languageTag;
+        return this;
     }
 
     @Override
@@ -297,8 +322,8 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
             }
         } else if (object instanceof Literal) {
             writeLiteral((Literal<?>) object);
-        } else if (object instanceof IdentifiableNode) {
-            writeURI(((IdentifiableNode) object).id());
+        } else if (object instanceof MemoryNode) {
+            writeURI(((MemoryNode) object).id());
         } else {
             throw new IllegalArgumentException("unknown value class: "
                     + (object != null ? object.getClass() : "<null>"));
@@ -342,7 +367,8 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
 
     private void writeLiteral(Literal literal) throws IOException {
         literal = processSortLanguage(literal);
-        String value = literal.nativeValue().toString();
+        //String value = literal.value().toString();
+        String value = literal.object().toString();
         if (value.indexOf('\n') > 0 || value.indexOf('\r') > 0 || value.indexOf('\t') > 0) {
             sb.append("\"\"\"")
                     .append(encodeLongString(value))
@@ -425,4 +451,32 @@ public class TurtleWriter<S extends Identifier, P extends Property, O extends No
         return buf.toString();
     }
 
+
+    /**
+     *
+     * Process a literal according to given sort language (e.g. mechanical word order, sort area).
+     *
+     * see http://www.w3.org/International/articles/language-tags/
+     *
+     * @param literal the literal
+     * @return the process literal
+     */
+    protected Literal processSortLanguage(Literal literal) {
+        if (literal == null) {
+            return null;
+        }
+        if (sortLangTag == null) {
+            return literal;
+        }
+        // we assume we have only one sort language. Search for '@' symbol.
+        String value = literal.object().toString();
+        // ignore if on position 0
+        int pos = value.indexOf(" @");
+        if (pos == 0) {
+            literal.object(value.substring(1));
+        } else if (pos > 0) {
+            literal.object('\u0098' + value.substring(0, pos + 1) + '\u009c' + value.substring(pos + 2)).language(sortLangTag);
+        }
+        return literal;
+    }
 }

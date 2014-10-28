@@ -41,16 +41,12 @@ import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Identifier;
-import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.memory.MemoryResourceContext;
 
-public class TurtleTest<S extends Identifier, P extends Property, O extends Node>
-        extends Assert {
+public class TurtleTest<R extends Resource> extends Assert {
 
     private final Logger logger = LoggerFactory.getLogger(TurtleTest.class.getName());
 
@@ -59,7 +55,7 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         IRINamespaceContext context = IRINamespaceContext.newInstance();
         context.addNamespace("gnd", "http://d-nb.info/gnd/");
         InputStream in = getClass().getResourceAsStream("GND.ttl");
-        TurtleReader reader = new TurtleReader().setBaseIRI(IRI.create("http://d-nb.info/gnd/"))
+        TurtleParser reader = new TurtleParser().setBaseIRI(IRI.create("http://d-nb.info/gnd/"))
                 .context(context);
         reader.parse(new InputStreamReader(in, "UTF-8"), null);
     }
@@ -79,7 +75,7 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         }
         reader.close();
         String s1 = sb.toString().trim();
-        ResourceContext<Resource<S, P, O>> resourceContext = createResourceContext();
+        ResourceContext<R> resourceContext = createResourceContext();
 
         IRINamespaceContext context = IRINamespaceContext.newInstance();
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
@@ -94,9 +90,9 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         assertEquals(s2, s1);
     }
 
-    private ResourceContext<Resource<S, P, O>> createResourceContext() {
-        SimpleResourceContext<S, P, O> context = new SimpleResourceContext();
-        Resource<S, P, O> resource = context.newResource();
+    private ResourceContext<R> createResourceContext() {
+        MemoryResourceContext<R> context = new MemoryResourceContext();
+        R resource = context.newResource();
         resource.id(IRI.create("urn:doc1"));
         resource.add("dc:creator", "Smith");
         resource.add("dc:creator", "Jones");
@@ -114,7 +110,7 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
 
     @Test
     public void testTurtleWrite() throws Exception {
-        ResourceContext<Resource<S, P, O>> resourceContext = createResourceContext2();
+        ResourceContext<R> resourceContext = createResourceContext2();
         StringWriter sw = new StringWriter();
         TurtleWriter writer = new TurtleWriter(sw);
         writer.writeNamespaces();
@@ -122,9 +118,9 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         logger.info(sw.toString().trim());
     }
 
-    private ResourceContext<Resource<S, P, O>> createResourceContext2() {
-        SimpleResourceContext<S, P, O> context = new SimpleResourceContext();
-        Resource<S, P, O> r = context.newResource();
+    private ResourceContext<R> createResourceContext2() {
+        MemoryResourceContext<R> context = new MemoryResourceContext();
+        R r = context.newResource();
         r.id(IRI.create("urn:res"))
                 .add("dc:title", "Hello")
                 .add("dc:title", "World")
@@ -136,13 +132,13 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
                 .add("dc:subject", "sequence")
                 .add("http://purl.org/dc/terms/place", "Köln");
         // sequence optimized for turtle output
-        Resource<S, P, O> r1 = r.newResource("urn:res1")
+        Resource r1 = r.newResource("urn:res1")
                 .add("property1", "value1")
                 .add("property2", "value2");
-        Resource<S, P, O> r2 = r.newResource("urn:res2")
+        Resource r2 = r.newResource("urn:res2")
                 .add("property3", "value3")
                 .add("property4", "value4");
-        Resource<S, P, O> r3 = r.newResource("urn:res3")
+        Resource r3 = r.newResource("urn:res3")
                 .add("property5", "value5")
                 .add("property6", "value6");
         return context;
@@ -150,7 +146,7 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
 
     @Test
     public void testTurtleResourceIndent() throws Exception {
-        ResourceContext<Resource<S, P, O>> resourceContext = createNestedResources();
+        ResourceContext<R> resourceContext = createNestedResources();
         StringWriter sw = new StringWriter();
         TurtleWriter writer = new TurtleWriter(sw);
         writer.writeNamespaces();
@@ -158,9 +154,9 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
         logger.info(sw.toString().trim());
     }
 
-    private ResourceContext<Resource<S, P, O>> createNestedResources() {
-        SimpleResourceContext<S, P, O> context = new SimpleResourceContext();
-        Resource<S, P, O> r = context.newResource();
+    private ResourceContext<R> createNestedResources() {
+        MemoryResourceContext<R> context = new MemoryResourceContext();
+        R r = context.newResource();
         r.id(IRI.create("urn:res"))
                 .add("dc:title", "Hello")
                 .add("dc:title", "World")
@@ -172,13 +168,13 @@ public class TurtleTest<S extends Identifier, P extends Property, O extends Node
                 .add("dc:subject", "sequence")
                 .add("http://purl.org/dc/terms/place", "Köln");
         // sequence optimized for turtle output
-        Resource<S, P, O> r1 = r.newResource("urn:res1")
+        Resource r1 = r.newResource("urn:res1")
                 .add("property1", "value1")
                 .add("property2", "value2");
-        Resource<S, P, O> r2 = r1.newResource("urn:res2")
+        Resource r2 = r1.newResource("urn:res2")
                 .add("property3", "value3")
                 .add("property4", "value4");
-        Resource<S, P, O> r3 = r.newResource("urn:res3")
+        Resource r3 = r.newResource("urn:res3")
                 .add("property5", "value5")
                 .add("property6", "value6");
         return context;

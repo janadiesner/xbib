@@ -47,7 +47,7 @@ public class RdfXmlReaderTest {
         if (in == null) {
             throw new IOException("file " + filename + " not found");
         }
-        RdfXmlReader reader = new RdfXmlReader();
+        RdfXmlParser reader = new RdfXmlParser();
         StringWriter sw = new StringWriter();
         TurtleWriter turtle = new TurtleWriter(sw);
         reader.parse(new InputStreamReader(in, "UTF-8"), turtle);

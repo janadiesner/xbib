@@ -32,8 +32,6 @@
 package org.xbib.marc.keyvalue;
 
 import org.xbib.keyvalue.KeyValueStreamListener;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.DataField;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
@@ -173,6 +171,11 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
     @Override
     public void endDataField(Field field) {
         String data = field != null ? field.data() : null;
+        // if we have data in a data field, move them to a subfield with subfield ID "a"
+        if (field != null && data != null && !data.isEmpty()) {
+            field.subfieldId("a");
+            endSubField(field);
+        }
         try {
             keyValue(fields, data);
         } catch (IOException e) {

@@ -32,18 +32,23 @@
 package org.xbib.rdf.io.rdfxml;
 
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.Identifiable;
 import org.xbib.rdf.Literal;
+import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.RDFNS;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.AbstractTripleWriter;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.xml.XMLUtil;
 
+import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
@@ -51,8 +56,8 @@ import java.util.Map;
 /**
  * RDF/XML writer
  */
-public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O extends Literal<?>, C extends ResourceContext<Resource<S,P,O>>>
-        extends AbstractTripleWriter<S, P, O, C> implements RDFNS {
+public class RdfXmlWriter<S extends Identifiable, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
+        implements ResourceContextWriter<C, Resource<S,P,O>>, Triple.Builder<S, P, O>, Closeable, Flushable, RDFNS {
 
     private final static Logger logger = LoggerFactory.getLogger(RdfXmlWriter.class.getName());
 
@@ -66,12 +71,34 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
 
     public RdfXmlWriter(Writer writer) {
         this.writer = writer;
-        this.resourceContext = (C)new SimpleResourceContext();
+        this.resourceContext = (C)new MemoryResourceContext();
         resourceContext.newResource();
     }
 
     public Writer getWriter() {
         return writer;
+    }
+
+    private IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
+
+    private C resourceContext;
+
+    private String sortLangTag;
+
+    @Override
+    public void close() throws IOException {
+        // write last resource
+        write(resourceContext);
+    }
+
+    public RdfXmlWriter<S, P, O, C> setNamespaceContext(IRINamespaceContext context) {
+        this.namespaceContext = context;
+        return this;
+    }
+
+    public RdfXmlWriter<S, P, O, C> setSortLanguageTag(String languageTag) {
+        this.sortLangTag = languageTag;
+        return this;
     }
 
     @Override
@@ -261,12 +288,13 @@ public class RdfXmlWriter<S extends Resource<?, ?, ?>, P extends Property, O ext
                     writeAttribute(NS_URI, "resource", objRes.id().toString());
                 }
                 writer.write("/>");
-            } else if (obj != null) {
-                if (obj.language() != null) {
-                    writeAttribute("xml:lang", obj.language());
+            } else if (obj instanceof Literal) {
+                Literal l = (Literal)obj;
+                if (l.language() != null) {
+                    writeAttribute("xml:lang", l.language());
                 }
                 boolean isXMLLiteral = false;
-                IRI datatype = obj.type();
+                IRI datatype = l.type();
                 if (datatype != null) {
                     isXMLLiteral = datatype.equals(RDF_XMLLITERAL);
                     if (isXMLLiteral) {

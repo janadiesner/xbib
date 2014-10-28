@@ -34,9 +34,8 @@ package org.xbib.rdf;
 /**
  * Node
  */
-public interface Node {
+public interface Node<O> {
 
-    Object nativeValue();
+    O value();
 
-    void accept(Visitor visitor);
 }

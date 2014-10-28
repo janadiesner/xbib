@@ -34,6 +34,8 @@ package org.xbib.oai.client;
 import org.testng.annotations.Test;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
+import org.xbib.rdf.memory.MemoryLiteral;
+import org.xbib.rdf.memory.MemoryProperty;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
@@ -44,8 +46,6 @@ import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.rdf.Property;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.simple.SimpleLiteral;
-import org.xbib.rdf.simple.SimpleProperty;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -132,10 +132,10 @@ public class DOAJArticleClientTest {
         @Override
         public Property toProperty(Property property) {
             if ("issn".equals(property.id().getSchemeSpecificPart())) {
-                return new SimpleProperty(IRI.builder().curie("dc", "identifier").build());
+                return new MemoryProperty(IRI.builder().curie("dc", "identifier").build());
             }
             if ("eissn".equals(property.id().getSchemeSpecificPart())) {
-                return new SimpleProperty(IRI.builder().curie("dc", "identifier").build());
+                return new MemoryProperty(IRI.builder().curie("dc", "identifier").build());
             }
             return property;
         }
@@ -143,10 +143,10 @@ public class DOAJArticleClientTest {
         @Override
         public Object toObject(QName name, String content) {
             if ("issn".equals(name.getLocalPart())) {
-                return new SimpleLiteral(content.substring(0,4) + "-" + content.substring(4)).type(ISSN);
+                return new MemoryLiteral(content.substring(0,4) + "-" + content.substring(4)).type(ISSN);
             }
             if ("eissn".equals(name.getLocalPart())) {
-                return new SimpleLiteral(content.substring(0,4) + "-" + content.substring(4)).type(EISSN);
+                return new MemoryLiteral(content.substring(0,4) + "-" + content.substring(4)).type(EISSN);
             }
             return content;
         }

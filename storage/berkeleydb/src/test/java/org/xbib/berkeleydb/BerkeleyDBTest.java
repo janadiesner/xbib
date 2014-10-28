@@ -29,7 +29,7 @@ import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.simple.SimpleResource;
+import org.xbib.rdf.memory.SimpleResource;
 
 public class BerkeleyDBTest<S extends Identifier, P extends Property, O extends Node> {
 

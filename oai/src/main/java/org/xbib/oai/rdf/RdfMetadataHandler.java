@@ -37,9 +37,9 @@ import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleWriter;
+import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.xml.XmlResourceHandler;
-import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -54,7 +54,7 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
 
     private ResourceContext<Resource> resourceContext;
 
-    private TripleWriter tripleWriter;
+    private ResourceContextWriter resourceContextWriter;
 
     private IRINamespaceContext context;
 
@@ -71,7 +71,7 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
 
     public RdfMetadataHandler(IRINamespaceContext context) {
         this.context = context;
-        this.resourceContext = new SimpleResourceContext();
+        this.resourceContext = new MemoryResourceContext();
         resourceContext.setNamespaceContext(context);
         resourceContext.newResource();
         // set up our default handler
@@ -95,8 +95,8 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
     public RdfMetadataHandler setHandler(RdfResourceHandler handler) {
         handler.setDefaultNamespace(NS_PREFIX, NS_URI);
         this.handler = handler;
-        if (tripleWriter != null) {
-            handler.setListener(tripleWriter);
+        if (resourceContextWriter != null) {
+            //handler.setBuilder(resourceContextWriter);
         }
         return this;
     }
@@ -105,10 +105,10 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
         return handler;
     }
 
-    public RdfMetadataHandler setTripleWriter(TripleWriter tripleWriter) {
-        if (tripleWriter != null) {
-            handler.setListener(tripleWriter);
-            this.tripleWriter = tripleWriter;
+    public RdfMetadataHandler setResourceContextWriter(ResourceContextWriter resourceContextWriter) {
+        if (resourceContextWriter != null) {
+            this.resourceContextWriter = resourceContextWriter;
+            //handler.setBuilder(resourceContextWriter);
         }
         return this;
     }
@@ -135,8 +135,8 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
             resourceContext.getResource().id(IRI.create(id));
             handler.endDocument();
             try {
-                if (tripleWriter != null) {
-                    tripleWriter.write(resourceContext);
+                if (resourceContextWriter != null) {
+                    resourceContextWriter.write(resourceContext);
                 }
             } catch (IOException e) {
                 throw new SAXException(e);

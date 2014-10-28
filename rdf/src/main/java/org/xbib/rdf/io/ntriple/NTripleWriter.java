@@ -35,25 +35,27 @@ import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.IdentifiableNode;
-import org.xbib.rdf.Identifier;
+import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.memory.MemoryNode;
+import org.xbib.rdf.Identifiable;
+import org.xbib.rdf.Property;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.AbstractTripleWriter;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.memory.MemoryResourceContext;
 
+import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
 
 /**
  * NTriple writer
  */
-public class NTripleWriter<S extends Identifier, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
-        extends AbstractTripleWriter<S, P, O, C> {
+public class NTripleWriter<S extends Identifiable, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
+        implements ResourceContextWriter<C, Resource<S,P,O>>, Triple.Builder<S, P, O>, Closeable, Flushable {
 
     private final static Logger logger = LoggerFactory.getLogger(NTripleWriter.class.getName());
 
@@ -61,9 +63,16 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
 
     private final Writer writer;
 
+    private IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
+
+    private C resourceContext;
+
+    private String sortLangTag;
+
+
     public NTripleWriter(Writer writer) {
         this.writer = writer;
-        this.resourceContext = (C)new SimpleResourceContext();
+        this.resourceContext = (C)new MemoryResourceContext();
         resourceContext.newResource();
     }
 
@@ -72,7 +81,23 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
     }
 
     @Override
-    public NTripleWriter<S, P, O, C>  newIdentifier(IRI iri) {
+    public void close() throws IOException {
+        // write last resource
+        write(resourceContext);
+    }
+
+    public NTripleWriter<S, P, O, C> setNamespaceContext(IRINamespaceContext context) {
+        this.namespaceContext = context;
+        return this;
+    }
+
+    public NTripleWriter<S, P, O, C> setSortLanguageTag(String languageTag) {
+        this.sortLangTag = languageTag;
+        return this;
+    }
+
+    @Override
+    public NTripleWriter<S, P, O, C> newIdentifier(IRI iri) {
         if (!iri.equals(resourceContext.getResource().id())) {
             try {
                 write(resourceContext);
@@ -180,8 +205,8 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
                 return s + "^^<" + escape(type.toString()) + ">";
             }
             return s;
-        } else if (object instanceof IdentifiableNode) {
-            IdentifiableNode node = (IdentifiableNode) object;
+        } else if (object instanceof MemoryNode) {
+            MemoryNode node = (MemoryNode) object;
             return node.isBlank() ?
                     node.toString() :
                     "<" + escape(node.toString()) + ">";
@@ -224,6 +249,35 @@ public class NTripleWriter<S extends Identifier, P extends Property, O extends N
             }
         }
         return sb.toString();
+    }
+
+
+    /**
+     *
+     * Process a literal according to given sort language (e.g. mechanical word order, sort area).
+     *
+     * see http://www.w3.org/International/articles/language-tags/
+     *
+     * @param literal the literal
+     * @return the process literal
+     */
+    protected Literal processSortLanguage(Literal literal) {
+        if (literal == null) {
+            return null;
+        }
+        if (sortLangTag == null) {
+            return literal;
+        }
+        // we assume we have only one sort language. Search for '@' symbol.
+        String value = literal.object().toString();
+        // ignore if on position 0
+        int pos = value.indexOf(" @");
+        if (pos == 0) {
+            literal.object(value.substring(1));
+        } else if (pos > 0) {
+            literal.object('\u0098' + value.substring(0, pos + 1) + '\u009c' + value.substring(pos + 2)).language(sortLangTag);
+        }
+        return literal;
     }
 
 }

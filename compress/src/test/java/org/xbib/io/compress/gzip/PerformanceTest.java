@@ -14,7 +14,6 @@ public class PerformanceTest {
 
     private final static String path = "/Users/joerg/import/hbz/vk/20140816/clob-20140815-20140816.tar.gz";
 
-    @Test
     public void test1() throws Exception {
         int buffersize = 4096;
         long t0 = System.nanoTime();
@@ -34,7 +33,6 @@ public class PerformanceTest {
         System.err.println("gzip test1 c=" + counter + " t=" + (t1 - t0) / 1000000);
     }
 
-    @Test
     public void test2() throws Exception {
         int buffersize = 65536;
         long t0 = System.nanoTime();
@@ -54,7 +52,6 @@ public class PerformanceTest {
         System.err.println("gzip test2 c=" + counter + " t=" + (t1 - t0) / 1000000);
     }
 
-    @Test
     public void test3() throws Exception {
         int buffersize = 4096;
         long t0 = System.nanoTime();
@@ -80,7 +77,6 @@ public class PerformanceTest {
         System.err.println("gzip test3 c=" + counter + " t=" + (t1 - t0) / 1000000);
     }
 
-    @Test
     public void test4() throws Exception {
         int buffersize = 65536;
         long t0 = System.nanoTime();

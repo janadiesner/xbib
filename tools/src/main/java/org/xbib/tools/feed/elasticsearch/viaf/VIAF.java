@@ -40,9 +40,8 @@ import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.io.rdfxml.RdfXmlReader;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.io.rdfxml.RdfXmlParser;
 import org.xbib.tools.Feeder;
 
 import java.io.BufferedReader;
@@ -51,9 +50,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URI;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 
 /**
  * VIAF indexer to Elasticsearch
@@ -109,7 +106,7 @@ public class VIAF extends Feeder {
                         break;
                     }
                     final ElasticBuilder builder = new ElasticBuilder();
-                    RdfXmlReader rdfxml = new RdfXmlReader();
+                    RdfXmlParser rdfxml = new RdfXmlParser();
                     rdfxml.parse(new StringReader(line), builder);
                     builder.close();
                 }
@@ -121,9 +118,9 @@ public class VIAF extends Feeder {
         }
     }
 
-    private final ResourceContext context = new SimpleResourceContext();
+    private final ResourceContext context = new MemoryResourceContext();
 
-    private class ElasticBuilder implements TripleListener {
+    private class ElasticBuilder implements Triple.Builder {
 
         private Resource resource;
 
@@ -132,17 +129,17 @@ public class VIAF extends Feeder {
         }
 
         @Override
-        public TripleListener begin() {
+        public Triple.Builder begin() {
             return this;
         }
 
         @Override
-        public TripleListener startPrefixMapping(String prefix, String uri) {
+        public Triple.Builder startPrefixMapping(String prefix, String uri) {
             return this;
         }
 
         @Override
-        public TripleListener endPrefixMapping(String prefix) {
+        public Triple.Builder endPrefixMapping(String prefix) {
             return this;
         }
 
@@ -160,7 +157,7 @@ public class VIAF extends Feeder {
         }
 
         @Override
-        public TripleListener end() {
+        public Triple.Builder end() {
             return this;
         }
 

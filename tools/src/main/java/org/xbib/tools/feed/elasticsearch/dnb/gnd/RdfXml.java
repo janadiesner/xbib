@@ -40,11 +40,10 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Triple;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.content.DefaultResourceContentBuilder;
+import org.xbib.rdf.content.DefaultContentBuilder;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.io.rdfxml.RdfXmlReader;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.io.rdfxml.RdfXmlParser;
 import org.xbib.tools.Feeder;
 
 import java.io.IOException;
@@ -101,42 +100,42 @@ public class RdfXml extends Feeder {
         namespaceContext.addNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         namespaceContext.addNamespace("skos", "http://www.w3.org/2004/02/skos/core#");
         namespaceContext.addNamespace("geosparql", "http://www.opengis.net/ont/geosparql#");
-        ResourceContext context = new SimpleResourceContext();
-        context.setContentBuilder(new DefaultResourceContentBuilder<>());
+        ResourceContext context = new MemoryResourceContext();
+        context.setContentBuilder(new DefaultContentBuilder<>());
         context.setNamespaceContext(namespaceContext);
         InputStream in = InputService.getInputStream(uri);
-        RdfXmlReader reader = new RdfXmlReader();
-        reader.parse(new InputStreamReader(in, "UTF-8"), new MyTripleListener(context));
+        RdfXmlParser reader = new RdfXmlParser();
+        reader.parse(new InputStreamReader(in, "UTF-8"), new MyTripleBuilder(context));
         in.close();
     }
 
-    class MyTripleListener implements TripleListener {
+    class MyTripleBuilder implements Triple.Builder {
 
         private ResourceContext resourceContext;
 
         private String gndID;
 
-        MyTripleListener(ResourceContext resourceContext) {
+        MyTripleBuilder(ResourceContext resourceContext) {
             this.resourceContext = resourceContext;
         }
 
         @Override
-        public TripleListener begin() {
+        public Triple.Builder begin() {
             return this;
         }
 
         @Override
-        public TripleListener startPrefixMapping(String prefix, String uri) {
+        public Triple.Builder startPrefixMapping(String prefix, String uri) {
             return this;
         }
 
         @Override
-        public TripleListener endPrefixMapping(String prefix) {
+        public Triple.Builder endPrefixMapping(String prefix) {
             return this;
         }
 
         @Override
-        public TripleListener newIdentifier(IRI iri) {
+        public Triple.Builder newIdentifier(IRI iri) {
             // push currrent context before moving to next resource
             try {
                 if (resourceContext.getResource() != null) {
@@ -159,7 +158,7 @@ public class RdfXml extends Feeder {
         }
 
         @Override
-        public TripleListener triple(Triple triple) {
+        public Triple.Builder triple(Triple triple) {
             if (triple.predicate().toString().endsWith("gndIdentifier")) {
                 gndID = triple.object().toString();
             }
@@ -168,7 +167,7 @@ public class RdfXml extends Feeder {
         }
 
         @Override
-        public TripleListener end() {
+        public Triple.Builder end() {
             if (resourceContext.getResource() != null) {
                 try {
                     sink.write(resourceContext);

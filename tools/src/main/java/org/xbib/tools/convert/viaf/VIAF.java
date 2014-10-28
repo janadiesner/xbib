@@ -37,7 +37,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.io.rdfxml.RdfXmlReader;
+import org.xbib.rdf.io.rdfxml.RdfXmlParser;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.tools.Converter;
 
@@ -133,7 +133,7 @@ public class VIAF extends Converter {
                     if ("|".equals(line)) {
                         break;
                     }
-                    RdfXmlReader rdfxml = new RdfXmlReader();
+                    RdfXmlParser rdfxml = new RdfXmlParser();
                     rdfxml.parse(new StringReader(line), settings.getAsBoolean("ntriples", false) ?
                          new NTripleWriter(fileWriter) : new TurtleWriter(fileWriter));
                 }

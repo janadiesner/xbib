@@ -38,7 +38,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.io.turtle.TurtleReader;
+import org.xbib.rdf.io.turtle.TurtleParser;
 import org.xbib.tools.Converter;
 
 import java.io.FileOutputStream;
@@ -84,7 +84,7 @@ public class Freebase extends Converter {
             }
         };
         NTripleWriter writer = new NTripleWriter(new OutputStreamWriter(out, "UTF-8"));
-        new TurtleReader().setBaseIRI(IRI.create(settings.get("base")))
+        new TurtleParser().setBaseIRI(IRI.create(settings.get("base")))
                 .parse(new InputStreamReader(in, "UTF-8"), writer);
         in.close();
     }

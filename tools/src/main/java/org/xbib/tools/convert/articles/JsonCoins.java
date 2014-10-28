@@ -47,9 +47,9 @@ import org.xbib.rdf.Node;
 import org.xbib.rdf.RDFNS;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.memory.MemoryLiteral;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.simple.SimpleLiteral;
-import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.text.InvalidCharacterException;
 import org.xbib.tools.Converter;
 import org.xbib.util.Entities;
@@ -83,7 +83,7 @@ public class JsonCoins extends Converter {
 
     protected final static JsonFactory jsonFactory = new JsonFactory();
 
-    protected final static SimpleResourceContext resourceContext = new SimpleResourceContext();
+    protected final static MemoryResourceContext resourceContext = new MemoryResourceContext();
 
     private static TurtleWriter serializer;
 
@@ -436,7 +436,7 @@ public class JsonCoins extends Converter {
                         break;
                     }
                     case "rft.date": {
-                        Literal l = new SimpleLiteral(v).type(Literal.GYEAR);
+                        Literal l = new MemoryLiteral(v).type(Literal.GYEAR);
                         r.add("prism:publicationDate", l);
                         break;
                     }

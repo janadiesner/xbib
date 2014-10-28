@@ -40,8 +40,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 
@@ -51,7 +51,7 @@ public class JsonReaderTest extends Assert {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonReaderTest.class.getName());
 
-    final SimpleResourceContext resourceContext = new SimpleResourceContext();
+    final MemoryResourceContext resourceContext = new MemoryResourceContext();
 
     @Test
     public void testGenericJsonReader() throws Exception {
@@ -98,8 +98,8 @@ public class JsonReaderTest extends Assert {
         };
         StringWriter sw = new StringWriter();
         TurtleWriter t = new TurtleWriter(sw);
-        //jsonHandler.setListener(t);
-        new JsonReader()
+        //jsonHandler.setBuilder(t);
+        new JsonParser()
                 .setHandler(jsonHandler)
                 .root(new QName("http://purl.org/dc/elements/1.1/", "root", "dc"))
                 .parse(new InputStreamReader(in, "UTF-8"), t);

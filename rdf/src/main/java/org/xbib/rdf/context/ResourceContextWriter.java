@@ -33,14 +33,12 @@ package org.xbib.rdf.context;
 
 import org.xbib.rdf.Resource;
 
-import java.io.Closeable;
-import java.io.Flushable;
 import java.io.IOException;
 
 /**
  * A resource writer
  */
-public interface ResourceContextWriter<C extends ResourceContext<R>, R extends Resource> extends Closeable, Flushable {
+public interface ResourceContextWriter<C extends ResourceContext<R>, R extends Resource> {
 
     void write(C resourceContext) throws IOException;
 }

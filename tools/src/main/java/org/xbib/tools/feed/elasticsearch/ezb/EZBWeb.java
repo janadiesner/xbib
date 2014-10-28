@@ -42,8 +42,8 @@ import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.tools.Feeder;
 
 import java.io.BufferedReader;
@@ -85,7 +85,7 @@ public class EZBWeb extends Feeder {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
         namespaceContext.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         namespaceContext.addNamespace("xbib", "http://xbib.org/elements/1.0/");
-        ResourceContext<Resource> resourceContext = new SimpleResourceContext()
+        ResourceContext<Resource> resourceContext = new MemoryResourceContext()
                 //.setContentBuilder(contentBuilder(namespaceContext))
                 .setNamespaceContext(namespaceContext);
 

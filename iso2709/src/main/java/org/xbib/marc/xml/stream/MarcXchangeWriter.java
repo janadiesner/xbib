@@ -422,7 +422,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         }
         try {
             if (field != null && field.data() != null && !field.data().isEmpty()) {
-                // create subfield "a" with data
+                // if we have data in a datafield, create subfield "a" with data
                 List<Attribute> attrs = new ArrayList<Attribute>(1);
                 attrs.add(eventFactory.createAttribute(CODE, "a"));
                 xmlEventConsumer.add(eventFactory.createStartElement(SUBFIELD_ELEMENT, attrs.iterator(), namespaces));

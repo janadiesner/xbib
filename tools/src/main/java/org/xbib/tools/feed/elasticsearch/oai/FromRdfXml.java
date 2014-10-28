@@ -45,10 +45,9 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Triple;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.io.rdfxml.RdfXmlReader;
+import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.io.rdfxml.RdfXmlParser;
 import org.xbib.rdf.io.xml.XmlHandler;
-import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.tools.Feeder;
 import org.xbib.util.DateUtil;
 import org.xml.sax.Attributes;
@@ -95,7 +94,7 @@ public class FromRdfXml extends Feeder {
                 .setFrom(from, OAIDateResolution.DAY)
                 .setUntil(until, OAIDateResolution.DAY);
         //ResourceBuilder builder = new ResourceBuilder();
-        RdfXmlReader reader = new RdfXmlReader(); // .setTripleListener(builder);
+        RdfXmlParser reader = new RdfXmlParser(); // .setTripleListener(builder);
         MetadataHandler metadataHandler = new OAIMetadataHandler(reader.getHandler());
         request.addHandler(metadataHandler);
         ListRecordsListener listener = new ListRecordsListener(request);
@@ -114,7 +113,7 @@ public class FromRdfXml extends Feeder {
         client.close();
     }
 
-    private final SimpleResourceContext resourceContext = new SimpleResourceContext();
+    private final MemoryResourceContext resourceContext = new MemoryResourceContext();
 
     private class OAIMetadataHandler extends MetadataHandler {
 
@@ -176,20 +175,20 @@ public class FromRdfXml extends Feeder {
         }
     }
 
-    private class ResourceBuilder implements TripleListener {
+    private class ResourceBuilder implements Triple.Builder {
 
         @Override
-        public TripleListener begin() {
+        public Triple.Builder begin() {
             return this;
         }
 
         @Override
-        public TripleListener startPrefixMapping(String prefix, String uri) {
+        public Triple.Builder startPrefixMapping(String prefix, String uri) {
             return this;
         }
 
         @Override
-        public TripleListener endPrefixMapping(String prefix) {
+        public Triple.Builder endPrefixMapping(String prefix) {
             return this;
         }
 
@@ -205,7 +204,7 @@ public class FromRdfXml extends Feeder {
         }
 
         @Override
-        public TripleListener end() {
+        public Triple.Builder end() {
             return this;
         }
     }

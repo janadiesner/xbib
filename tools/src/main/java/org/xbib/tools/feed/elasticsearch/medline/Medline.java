@@ -37,10 +37,10 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
-import org.xbib.rdf.io.xml.XmlReader;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.io.xml.XmlParser;
 import org.xbib.tools.Feeder;
 
 import javax.xml.namespace.QName;
@@ -55,7 +55,7 @@ public final class Medline extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(Medline.class.getSimpleName());
 
-    private static final SimpleResourceContext resourceContext = new SimpleResourceContext();
+    private static final MemoryResourceContext resourceContext = new MemoryResourceContext();
 
     @Override
     public String getName() {
@@ -77,7 +77,7 @@ public final class Medline extends Feeder {
         AbstractXmlHandler handler = new Handler()
                 .setDefaultNamespace("ml", "http://www.nlm.nih.gov/medline");
         InputStream in = InputService.getInputStream(uri);
-        new XmlReader().setNamespaces(false)
+        new XmlParser().setNamespaces(false)
                 .setHandler(handler)
                 .parse(new InputStreamReader(in, "UTF-8"), null);
         in.close();

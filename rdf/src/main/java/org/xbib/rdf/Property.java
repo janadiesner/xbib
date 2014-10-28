@@ -31,13 +31,9 @@
  */
 package org.xbib.rdf;
 
-import org.xbib.iri.IRI;
-
 /**
- * An RDF property
+ * A property
  */
-public interface Property extends Node {
-
-    IRI id();
+public interface Property extends Identifiable, Node {
 
 }

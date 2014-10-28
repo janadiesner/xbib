@@ -35,21 +35,23 @@ import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Identifier;
-import org.xbib.rdf.Node;
+import org.xbib.rdf.Identifiable;
 import org.xbib.rdf.Property;
+import org.xbib.rdf.Node;
 import org.xbib.rdf.RDFNS;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContextContentBuilder;
-import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.simple.SimpleResource;
+import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.memory.MemoryResource;
 
+import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
 import java.util.Map;
 
-public class JsonWriter<S extends Identifier, P extends Property, O extends Node>
-        implements TripleListener<S, P, O> {
+public class JsonWriter<S extends Identifiable, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
+        implements ResourceContextWriter<C, Resource<S,P,O>>, Triple.Builder<S, P, O>, Closeable, Flushable {
 
     private final static Logger logger = LoggerFactory.getLogger(JsonWriter.class.getName());
 
@@ -61,8 +63,6 @@ public class JsonWriter<S extends Identifier, P extends Property, O extends Node
 
     private boolean nsWritten;
 
-    private ResourceContextContentBuilder resourceContextContentBuilder;
-
     private StringBuilder sb;
 
     private long byteCounter;
@@ -72,7 +72,7 @@ public class JsonWriter<S extends Identifier, P extends Property, O extends Node
     public JsonWriter() {
         this.context = IRINamespaceContext.newInstance();
         this.nsWritten = false;
-        this.resource = new SimpleResource();
+        this.resource = new MemoryResource();
         this.sb = new StringBuilder();
         this.translatePicaSortMarker = null;
     }
@@ -82,8 +82,25 @@ public class JsonWriter<S extends Identifier, P extends Property, O extends Node
         return this;
     }
 
-    public JsonWriter contentBuilder(ResourceContextContentBuilder resourceContextContentBuilder) {
-        this.resourceContextContentBuilder = resourceContextContentBuilder;
+    private IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
+
+    private C resourceContext;
+
+    private String sortLangTag;
+
+    @Override
+    public void close() throws IOException {
+        // write last resource
+        write(resourceContext);
+    }
+
+    public JsonWriter<S, P, O, C> setNamespaceContext(IRINamespaceContext context) {
+        this.namespaceContext = context;
+        return this;
+    }
+
+    public JsonWriter<S, P, O, C> setSortLanguageTag(String languageTag) {
+        this.sortLangTag = languageTag;
         return this;
     }
 
@@ -94,11 +111,9 @@ public class JsonWriter<S extends Identifier, P extends Property, O extends Node
                 if (!nsWritten) {
                     writeNamespaces();
                 }
-                if (resourceContextContentBuilder != null) {
-                    resourceContextContentBuilder.build(resource.context(), resource);
-                }
+                // TODO
                 idCounter++;
-                resource = new SimpleResource();
+                resource = new MemoryResource();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -108,27 +123,27 @@ public class JsonWriter<S extends Identifier, P extends Property, O extends Node
     }
 
     @Override
-    public TripleListener<S, P, O> begin() {
+    public Triple.Builder<S, P, O> begin() {
         return this;
     }
 
     @Override
-    public TripleListener<S, P, O> startPrefixMapping(String prefix, String uri) {
+    public Triple.Builder<S, P, O> startPrefixMapping(String prefix, String uri) {
         return this;
     }
 
     @Override
-    public TripleListener<S, P, O> endPrefixMapping(String prefix) {
+    public Triple.Builder<S, P, O> endPrefixMapping(String prefix) {
         return this;
     }
 
     @Override
-    public TripleListener<S, P, O> triple(Triple<S, P, O> triple) {
+    public Triple.Builder<S, P, O> triple(Triple<S, P, O> triple) {
         return this; // TODO
     }
 
     @Override
-    public TripleListener<S, P, O> end() {
+    public Triple.Builder<S, P, O> end() {
         return this;
     }
 
@@ -154,4 +169,13 @@ public class JsonWriter<S extends Identifier, P extends Property, O extends Node
 
     }
 
+    @Override
+    public void flush() throws IOException {
+
+    }
+
+    @Override
+    public void write(C resourceContext) throws IOException {
+
+    }
 }

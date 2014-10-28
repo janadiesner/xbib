@@ -41,9 +41,8 @@ import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
-import org.xbib.rdf.io.turtle.TurtleReader;
-import org.xbib.rdf.simple.SimpleResourceContext;
+import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.io.turtle.TurtleParser;
 import org.xbib.tools.Feeder;
 
 import java.io.IOException;
@@ -78,16 +77,16 @@ public class Freebase extends Feeder {
         InputStream in = InputService.getInputStream(uri);
         ElasticBuilder builder = new ElasticBuilder(sink);
         IRI base = IRI.create(settings.get("base"));
-        new TurtleReader().setBaseIRI(base)
+        new TurtleParser().setBaseIRI(base)
                 .parse(new InputStreamReader(in, "UTF-8"), builder);
         in.close();
     }
 
-    private class ElasticBuilder implements TripleListener {
+    private class ElasticBuilder implements Triple.Builder {
 
         private final ResourceSink sink;
 
-        private final ResourceContext context = new SimpleResourceContext();
+        private final ResourceContext context = new MemoryResourceContext();
 
         private Resource resource;
 
@@ -101,17 +100,17 @@ public class Freebase extends Feeder {
         }
 
         @Override
-        public TripleListener begin() {
+        public Triple.Builder begin() {
             return this;
         }
 
         @Override
-        public TripleListener startPrefixMapping(String prefix, String uri) {
+        public Triple.Builder startPrefixMapping(String prefix, String uri) {
             return this;
         }
 
         @Override
-        public TripleListener endPrefixMapping(String prefix) {
+        public Triple.Builder endPrefixMapping(String prefix) {
             return this;
         }
 
@@ -129,7 +128,7 @@ public class Freebase extends Feeder {
         }
 
         @Override
-        public TripleListener end() {
+        public Triple.Builder end() {
             return this;
         }
 

@@ -47,8 +47,8 @@ import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 
 import java.io.BufferedReader;
@@ -126,7 +126,7 @@ public class ZDBHolTest extends Assert {
         assertEquals(out.getCounter(), 293);
     }
 
-    class OurContextResourceOutput extends AbstractResourceContextWriter {
+    class OurContextResourceOutput implements ResourceContextWriter {
 
         @Override
         public void write(ResourceContext context) throws IOException {

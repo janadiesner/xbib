@@ -498,7 +498,9 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
             if (!datafieldOpen) {
                 return;
             }
-            String value = designator != null ? designator.data() : lastDataField != null ? lastDataField.data() : null;
+            String value = designator != null ? designator.data() :
+                    lastDataField != null && !lastDataField.isSubField() ?
+                    lastDataField.data() : null;
             if (value != null && !value.isEmpty() && subfieldDelimiter == null) {
                 // datafield carries data. Write as subfield with code a.
                 value = transformer.transform(value);
@@ -512,7 +514,9 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                 }
             }
             if (listener != null) {
-                listener.endDataField(designator != null ? designator : lastDataField);
+                listener.endDataField(designator != null ? designator :
+                        lastDataField != null && !lastDataField.isSubField() ?
+                        lastDataField : null);
             }
             if (contentHandler != null) {
                 contentHandler.endElement(nsUri, DATAFIELD, DATAFIELD);

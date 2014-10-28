@@ -33,19 +33,15 @@ package org.xbib.rdf.context;
 
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.ResourceFactory;
-import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.Triple;
 
+import java.io.IOException;
 import java.util.Collection;
 
-/**
- * A Resource context.
- * <p>
- * Resource contexts are useful when many resources are stored together
- * and common information about processing must be maintained,
- * for example, creation, building, and output.
- */
-public interface ResourceContext<R extends Resource> extends ResourceFactory<R>, TripleListener {
+
+public interface ResourceContext<R extends Resource> extends Triple.Builder {
+
+    R newResource();
 
     /**
      * Get collected resource
@@ -87,25 +83,24 @@ public interface ResourceContext<R extends Resource> extends ResourceFactory<R>,
     /**
      * Set content builder
      *
-     * @param writer the writer
+     * @param builder the content builder
      * @return the current resource context
      */
-    ResourceContext<R> setContentBuilder(ResourceContextContentBuilder<ResourceContext<R>, R> writer);
+    ResourceContext<R> setContentBuilder(ContentBuilder<ResourceContext<R>, R> builder);
 
-    /**
-     * Get content builder
-     *
-     * @return
-     */
-    ResourceContextContentBuilder<ResourceContext<R>, R> getContentBuilder();
+    ResourceContext<R> setWriter(ResourceContextWriter writer);
 
     /**
      * Prepare the context for output.
      *
      * @return this context
      */
-    ResourceContext<R> beforeOutput();
+    ResourceContext<R> beforeBuild();
 
-    ResourceContext<R> afterOutput();
+    ResourceContext<R> afterBuild();
+
+    String build(R resource) throws IOException;
+
+    void write() throws IOException;
 
 }

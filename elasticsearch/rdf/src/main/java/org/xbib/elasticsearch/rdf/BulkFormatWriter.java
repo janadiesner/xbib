@@ -37,13 +37,15 @@ import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.context.ResourceContextWriter;
 
+import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
 
 /**
  * Write RDF resources as Elasticsearch bulk format
  */
-public class BulkFormatWriter implements ResourceContextWriter {
+public class BulkFormatWriter implements ResourceContextWriter, Flushable, Closeable {
 
     private final Logger logger = LoggerFactory.getLogger(BulkFormatWriter.class.getName());
 
@@ -95,7 +97,7 @@ public class BulkFormatWriter implements ResourceContextWriter {
             }
             StringBuilder sb = new StringBuilder();
             sb.append("{\"index\":{\"_index\":\"").append(index).append("\",\"_type\":\"").append(type).append("\",\"_id\":\"").append(id).append("\"}}\n")
-                    .append(resourceContext.getContentBuilder().build(resourceContext, resource))
+                    .append(resourceContext.build(resource))
                     .append("\n");
             writer.write(sb.toString());
         }

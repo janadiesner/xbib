@@ -75,16 +75,16 @@ public class SisisFieldStreamReader extends LineFeedStreamReader {
             String number = line.substring(0, pos);
             String value = line.substring(pos + 1);
             String ind2 = " ";
-            // number can have a counter for counting repetitions
+            // number can have a counter for field repetitions
             pos = number.indexOf('.');
             if (pos > 0) {
                 ind2 = number.substring(pos + 3, pos + 4); // drop pos+1, pos+2 (always "0"?)
                 number = number.substring(0, pos);
             }
-            // number is always four characters, take the last three, the first character is "indicator 1"
+            // number is always four characters, take the last three and make the first character to "indicator 1"
             String ind1 = number.substring(0,1);
             number = number.substring(1,4);
-            char sep = number.equals(lastNumber) ? FieldSeparator.US : FieldSeparator.RS;
+            char sep = FieldSeparator.RS;
             String data;
             // special field 9999 means "end of record" (group delimiter)
             if ("999".equals(number)) {
@@ -98,12 +98,12 @@ public class SisisFieldStreamReader extends LineFeedStreamReader {
                     if (!" ".equals(ind2)) {
                         // move fields out of controlfield area "000"-"009" to "900-909" plus ind2="9"
                         // if there is a numbering, to avoid validation errors
-                        data = sep == FieldSeparator.US ? value : "9" + number.substring(1,3) + "9" + ind2 + value;
+                        data = "9" + number.substring(1,3) + "9" + ind2 + value;
                     } else {
-                        data = sep == FieldSeparator.US ? value : number + value;
+                        data = number + value;
                     }
                 } else {
-                    data = sep == FieldSeparator.US ? value : number + ind1 + ind2 + value;
+                    data = number + ind1 + ind2 + value;
                 }
                 listener.mark(sep);
                 listener.data(data);

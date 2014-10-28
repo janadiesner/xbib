@@ -35,13 +35,15 @@ import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.Node;
+import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.io.TripleListener;
+import org.xbib.rdf.memory.MemoryProperty;
+import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryTriple;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.simple.SimpleResourceContext;
-import org.xbib.rdf.simple.SimpleTriple;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,9 +62,9 @@ public class EuropeanaEDMReaderTest {
             throw new IOException("file " + filename + " not found");
         }
 
-        SimpleResourceContext resourceContext = new SimpleResourceContext();
+        MemoryResourceContext resourceContext = new MemoryResourceContext();
 
-        RdfXmlReader reader = new RdfXmlReader();
+        RdfXmlParser reader = new RdfXmlParser();
         reader.parse(new InputStreamReader(in, "UTF-8"), new GeoJSONFilter(resourceContext));
 
         StringWriter sw = new StringWriter();
@@ -72,58 +74,59 @@ public class EuropeanaEDMReaderTest {
         logger.info("output=" + sw.toString());
     }
 
-    class GeoJSONFilter implements TripleListener {
+    class GeoJSONFilter implements Triple.Builder {
 
         ResourceContext<Resource> resourceContext;
 
-        String lat;
+        Node lat = null;
 
-        String lon;
+        Node lon = null;
 
         GeoJSONFilter(ResourceContext<Resource> resourceContext) {
             this.resourceContext = resourceContext;
         }
 
         @Override
-        public TripleListener begin() {
+        public Triple.Builder begin() {
             return this;
         }
 
         @Override
-        public TripleListener startPrefixMapping(String prefix, String uri) {
+        public Triple.Builder startPrefixMapping(String prefix, String uri) {
             return this;
         }
 
         @Override
-        public TripleListener endPrefixMapping(String prefix) {
+        public Triple.Builder endPrefixMapping(String prefix) {
             return this;
         }
 
         @Override
-        public TripleListener newIdentifier(IRI identifier) {
+        public Triple.Builder newIdentifier(IRI identifier) {
             return this;
         }
 
         @Override
-        public TripleListener triple(Triple triple) {
+        public Triple.Builder triple(Triple triple) {
             resourceContext.triple(triple);
-            if (triple.predicate().id().toString().equals(GEO_LAT.toString())) {
-                lat = triple.object().toString();
-            } else if (triple.predicate().id().toString().equals(GEO_LON.toString())) {
-                lon = triple.object().toString();
+            if (triple.predicate().id().equals(GEO_LAT)) {
+                lat = triple.object();
             }
-            if (lat != null  && lon != null) {
+            if (triple.predicate().id().equals(GEO_LON)) {
+                lon = triple.object();
+            }
+            if (lat != null && lon != null) {
                 // create GeoJSON
-                resourceContext.triple(new SimpleTriple(triple.subject(), "location", lon));
-                resourceContext.triple(new SimpleTriple(triple.subject(), "location", lat));
+                resourceContext.triple(new MemoryTriple(triple.subject(), location, lon));
                 lon = null;
+                resourceContext.triple(new MemoryTriple(triple.subject(), location, lat));
                 lat = null;
             }
             return this;
         }
 
         @Override
-        public TripleListener end() {
+        public Triple.Builder end() {
             return this;
         }
     }
@@ -131,6 +134,8 @@ public class EuropeanaEDMReaderTest {
     private final static IRI GEO_LAT = IRI.create("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
 
     private final static IRI GEO_LON = IRI.create("http://www.w3.org/2003/01/geo/wgs84_pos#long");
+
+    private final static Property location = new MemoryProperty(IRI.create("location"));
 
 
 }

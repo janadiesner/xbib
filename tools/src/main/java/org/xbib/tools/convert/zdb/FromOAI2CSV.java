@@ -41,8 +41,8 @@ import org.xbib.oai.xml.XmlMetadataHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Property;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.tools.OAIHarvester;
 import org.xml.sax.SAXException;
 
@@ -118,7 +118,7 @@ public class FromOAI2CSV extends OAIHarvester {
         // TODO
         StringWriter sw = new StringWriter();
         metadataHandler.setHandler(resourceHandler)
-                .setTripleWriter(new NTripleWriter(sw));
+                .setResourceContextWriter(new NTripleWriter(sw));
         return metadataHandler;
     }
 
@@ -131,7 +131,7 @@ public class FromOAI2CSV extends OAIHarvester {
     private static class OAIResourceHandler extends RdfResourceHandler {
 
         public OAIResourceHandler() {
-            super(new SimpleResourceContext());
+            super(new MemoryResourceContext());
         }
 
         @Override

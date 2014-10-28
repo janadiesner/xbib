@@ -181,7 +181,7 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
         if (op.equals(Operation.KEEP)) {
             // inject datafield "open" event if subfield tag has changed
             if (!record.isEmpty() && record.getLast().isSubField() && datafield.isSubField()
-                    && !record.getLast().tag().equals(datafield.tag())) {
+                    && !datafield.tag().equals(record.getLast().tag())) {
                 record.add(new Field(datafield).subfieldId(null));
             }
         }

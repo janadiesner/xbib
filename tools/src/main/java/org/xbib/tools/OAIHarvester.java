@@ -48,9 +48,9 @@ import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.oai.xml.XmlMetadataHandler;
+import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.simple.SimpleResourceContext;
 import org.xbib.util.DateUtil;
 import org.xbib.util.URIUtil;
 import org.xml.sax.SAXException;
@@ -145,7 +145,7 @@ public abstract class OAIHarvester extends Converter {
         final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();
         metadataHandler.setHandler(resourceHandler)
-                .setTripleWriter(new TurtleWriter(writer));
+                .setResourceContextWriter(new TurtleWriter(writer));
         return metadataHandler;
     }
 
@@ -153,12 +153,12 @@ public abstract class OAIHarvester extends Converter {
         final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();
         metadataHandler.setHandler(resourceHandler)
-                .setTripleWriter(new NTripleWriter(writer));
+                .setResourceContextWriter(new NTripleWriter(writer));
         return metadataHandler;
     }
 
     protected RdfResourceHandler rdfResourceHandler() {
-        return new RdfResourceHandler(new SimpleResourceContext());
+        return new RdfResourceHandler(new MemoryResourceContext());
     }
 
     protected class XmlPacketHandler extends XmlMetadataHandler {

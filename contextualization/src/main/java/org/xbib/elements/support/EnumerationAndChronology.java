@@ -32,17 +32,16 @@
 package org.xbib.elements.support;
 
 import org.xbib.iri.IRI;
+import org.xbib.rdf.Property;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.util.DateUtil;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.simple.SimpleResource;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -171,7 +170,7 @@ public class EnumerationAndChronology {
     }
 
     public static Resource parse(String values) {
-        return parse(values, new SimpleResource(), null);
+        return parse(values, new MemoryResource(), null);
     }
 
     public static Resource parse(String values, Resource resource, Pattern[] movingwalls) {
@@ -179,7 +178,7 @@ public class EnumerationAndChronology {
             return resource;
         }
         for (String value : values.split(";")) {
-            boolean found = false;
+            boolean found;
             // first, check dates in parentheses
             for (Pattern p : p4a) {
                 Matcher m = p.matcher(value);
@@ -785,55 +784,57 @@ public class EnumerationAndChronology {
     }
 
     public static Set<Integer> dates(IRI id, Resource resource) {
-        Set<Integer> dates = newTreeSet();
-        Map m = resource.resources();
-        for (Collection<Resource> groups : (Iterable<Collection<Resource>>) m.values()) {
-            for (Resource group : groups) {
-                Object begindate = group.literal("begindate");
-                Object enddate = group.literal("enddate");
-                Object open = group.literal("open");
-                List<Integer> starts;
-                int start = -1;
-                if (begindate != null) {
-                    starts = fractionDate(begindate.toString());
-                    dates.addAll(starts);
-                    start = starts.get(0);
-                }
-                int end = -1;
-                List<Integer> ends;
-                if (enddate != null) {
-                    ends = fractionDate(enddate.toString());
-                    dates.addAll(ends);
-                    end = ends.get(0);
-                }
-                if (open != null) {
-                    end = DateUtil.getYear();
-                }
-                // add years from interval
-                if (start >= 0 && end >= 0) {
-                    if (start > DateUtil.getYear() || end > DateUtil.getYear()) {
-                        logger.warn("future dates in {}: {},{} (from {},{})",
-                                id, start, end, begindate, enddate);
-                    } else if (end - start > 250) {
-                        logger.warn("too many years in {}: {}-{} (from {},{})",
-                                id, start, end, begindate, enddate);
-                        // RDA: 1500
-                        // Acta eruditorum: 1682
-                        // Phil. Trans.: 1655 (but not in print)
-                    } else if (start < 1500 || end < 1500) {
-                        logger.warn("too early in {}: {},{} ({},{})",
-                                id, start, end, begindate, enddate);
-                    } else {
-                        for (int i = start; i <= end; i++) {
-                            dates.add(i);
+        final Set<Integer> dates = newTreeSet();
+        for (Object obj : resource.predicates()) {
+            resource.resources((Property) obj).forEach(new Consumer() {
+                @Override
+                public void accept(Object o) {
+                    Resource group = (Resource)o;
+                    Object begindate = group.literal("begindate");
+                    Object enddate = group.literal("enddate");
+                    Object open = group.literal("open");
+                    List<Integer> starts;
+                    int start = -1;
+                    if (begindate != null) {
+                        starts = fractionDate(begindate.toString());
+                        dates.addAll(starts);
+                        start = starts.get(0);
+                    }
+                    int end = -1;
+                    List<Integer> ends;
+                    if (enddate != null) {
+                        ends = fractionDate(enddate.toString());
+                        dates.addAll(ends);
+                        end = ends.get(0);
+                    }
+                    if (open != null) {
+                        end = DateUtil.getYear();
+                    }
+                    // add years from interval
+                    if (start >= 0 && end >= 0) {
+                        if (start > DateUtil.getYear() || end > DateUtil.getYear()) {
+                            logger.warn("future dates in {}: {},{} (from {},{})",
+                                    id, start, end, begindate, enddate);
+                        } else if (end - start > 250) {
+                            logger.warn("too many years in {}: {}-{} (from {},{})",
+                                    id, start, end, begindate, enddate);
+                            // RDA: 1500
+                            // Acta eruditorum: 1682
+                            // Phil. Trans.: 1655 (but not in print)
+                        } else if (start < 1500 || end < 1500) {
+                            logger.warn("too early in {}: {},{} ({},{})",
+                                    id, start, end, begindate, enddate);
+                        } else {
+                            for (int i = start; i <= end; i++) {
+                                dates.add(i);
+                            }
                         }
                     }
+                    if (dates.size() > 250) {
+                        logger.warn("too many dates in {}: {}", id, dates.size());
+                    }
                 }
-                if (dates.size() > 250) {
-                    logger.warn("too many dates in {}: {}", id, dates.size());
-                    break;
-                }
-            }
+            });
         }
         return dates;
     }

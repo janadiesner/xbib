@@ -49,7 +49,7 @@ import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.AbstractResourceContextWriter;
+import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.tools.Converter;
 
@@ -143,7 +143,7 @@ public final class BibdatZDB extends Converter {
 
     private final static OurContextResourceOutput out = new OurContextResourceOutput();
 
-    private final static class OurContextResourceOutput extends AbstractResourceContextWriter<PicaContext, Resource> {
+    private final static class OurContextResourceOutput implements ResourceContextWriter<PicaContext, Resource> {
 
         File f;
         FileWriter fw;

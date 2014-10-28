@@ -41,7 +41,6 @@ import org.xbib.marc.DataField;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
-import org.xbib.rdf.context.AbstractResourceContextWriter;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
@@ -95,7 +94,7 @@ public class UNIMARCElementsTest extends Assert {
             InputStream in = getClass().getResourceAsStream(s);
             InputStreamReader r = new InputStreamReader(in, ISO88591);
             final AtomicInteger counter = new AtomicInteger();
-            final ResourceContextWriter output = new AbstractResourceContextWriter() {
+            final ResourceContextWriter output = new ResourceContextWriter() {
 
                 @Override
                 public void write(ResourceContext context) throws IOException {

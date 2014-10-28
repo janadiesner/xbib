@@ -19,7 +19,6 @@ public class PerformanceTest {
 
     private final static String path = "/Users/joerg/import/hbz/vk/20140816/clob-20140815-20140816.tar.gz";
 
-    @Test
     public void test1() throws Exception {
         int buffersize = 4096;
         long t0 = System.nanoTime();
@@ -37,7 +36,6 @@ public class PerformanceTest {
         System.err.println("tar test1 delta c=" + counter + " t=" + (t1 - t0) / 1000000);
     }
 
-    @Test
     public void test2() throws Exception {
         int buffersize = 4096;
         long t0 = System.nanoTime();
@@ -56,7 +54,6 @@ public class PerformanceTest {
         System.err.println("tar test2 delta c=" + counter + " t=" + (t1 - t0) / 1000000);
     }
 
-    @Test
     public void test3() throws Exception {
         int buffersize = 1024*1024;
         long t0 = System.nanoTime();
@@ -75,7 +72,6 @@ public class PerformanceTest {
         System.err.println("tar test3 delta c=" + counter + " t=" + (t1 - t0) / 1000000);
     }
 
-    @Test
     public void test4() throws Exception {
         int buffersize = 1024*1024;
         long t0 = System.nanoTime();
@@ -94,7 +90,6 @@ public class PerformanceTest {
         System.err.println("tar test4 delta c=" + counter + " t=" + (t1 - t0) / 1000000);
     }
 
-    @Test
     public void test5() throws Exception {
         URI uri = URI.create("file:" + path);
         Connection<Session> c = ConnectionService.getInstance()
@@ -115,7 +110,6 @@ public class PerformanceTest {
         System.err.println("tar test5 delta c=" + counter + " t=" + (t1 - t0) / 1000000);
     }
 
-    @Test
     public void test6() throws Exception {
         int buffersize = 65536;
         URI uri = URI.create("file:" + path);
@@ -138,7 +132,6 @@ public class PerformanceTest {
         System.err.println("tar test6 delta c=" + counter + " t=" + (t1 - t0) / 1000000);
     }
 
-    @Test
     public void test7() throws Exception {
         long t0 = System.nanoTime();
         URI uri = URI.create("file:" + path);
