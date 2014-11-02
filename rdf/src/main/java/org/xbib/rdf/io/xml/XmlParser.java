@@ -52,9 +52,9 @@ import java.io.Reader;
  * @param <O>
  */
 public class XmlParser<S extends Identifiable, P extends Property, O extends Node>
-        implements Parser<S, P, O> {
+        implements Parser {
 
-    private Triple.Builder<S, P, O> builder;
+    private Triple.Builder builder;
 
     private XmlHandler handler;
 
@@ -82,7 +82,7 @@ public class XmlParser<S extends Identifiable, P extends Property, O extends Nod
     }
 
     @Override
-    public XmlParser parse(Reader reader, Triple.Builder<S, P, O> builder) throws IOException {
+    public XmlParser parse(Reader reader, Triple.Builder builder) throws IOException {
         this.builder = builder;
         try {
             XMLReader xmlReader = XMLReaderFactory.createXMLReader();

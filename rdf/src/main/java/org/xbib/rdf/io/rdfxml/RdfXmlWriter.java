@@ -35,11 +35,10 @@ import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Identifiable;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
-import org.xbib.rdf.RDFNS;
+import org.xbib.rdf.RdfConstants;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
@@ -56,8 +55,8 @@ import java.util.Map;
 /**
  * RDF/XML writer
  */
-public class RdfXmlWriter<S extends Identifiable, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
-        implements ResourceContextWriter<C, Resource<S,P,O>>, Triple.Builder<S, P, O>, Closeable, Flushable, RDFNS {
+public class RdfXmlWriter<C extends ResourceContext<Resource>>
+        implements ResourceContextWriter<C, Resource>, Triple.Builder, Closeable, Flushable, RdfConstants {
 
     private final static Logger logger = LoggerFactory.getLogger(RdfXmlWriter.class.getName());
 
@@ -67,7 +66,11 @@ public class RdfXmlWriter<S extends Identifiable, P extends Property, O extends 
 
     private boolean headerWritten;
 
-    private S lastWrittenSubject;
+    private Resource lastWrittenSubject;
+
+    private IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
+
+    private C resourceContext;
 
     public RdfXmlWriter(Writer writer) {
         this.writer = writer;
@@ -79,30 +82,19 @@ public class RdfXmlWriter<S extends Identifiable, P extends Property, O extends 
         return writer;
     }
 
-    private IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
-
-    private C resourceContext;
-
-    private String sortLangTag;
-
     @Override
     public void close() throws IOException {
         // write last resource
         write(resourceContext);
     }
 
-    public RdfXmlWriter<S, P, O, C> setNamespaceContext(IRINamespaceContext context) {
+    public RdfXmlWriter<C> setNamespaceContext(IRINamespaceContext context) {
         this.namespaceContext = context;
         return this;
     }
 
-    public RdfXmlWriter<S, P, O, C> setSortLanguageTag(String languageTag) {
-        this.sortLangTag = languageTag;
-        return this;
-    }
-
     @Override
-    public RdfXmlWriter<S, P, O, C> newIdentifier(IRI iri) {
+    public RdfXmlWriter<C> newIdentifier(IRI iri) {
         if (!iri.equals(resourceContext.getResource().id())) {
             try {
                 write(resourceContext);
@@ -116,29 +108,29 @@ public class RdfXmlWriter<S extends Identifiable, P extends Property, O extends 
     }
 
     @Override
-    public RdfXmlWriter<S, P, O, C> begin() {
+    public RdfXmlWriter<C> begin() {
         return this;
     }
 
     @Override
-    public RdfXmlWriter<S, P, O, C> triple(Triple<S, P, O> triple) {
+    public RdfXmlWriter<C> triple(Triple triple) {
         resourceContext.getResource().add(triple);
         return this;
     }
 
     @Override
-    public RdfXmlWriter<S, P, O, C> end() {
+    public RdfXmlWriter<C> end() {
         return this;
     }
 
     @Override
-    public RdfXmlWriter<S, P, O, C> startPrefixMapping(String prefix, String uri) {
+    public RdfXmlWriter<C> startPrefixMapping(String prefix, String uri) {
         namespaceContext.addNamespace(prefix, uri);
         return this;
     }
 
     @Override
-    public RdfXmlWriter<S, P, O, C> endPrefixMapping(String prefix) {
+    public RdfXmlWriter<C> endPrefixMapping(String prefix) {
         // we don't remove name spaces. It's troubling RDF serializations.
         return this;
     }
@@ -153,7 +145,7 @@ public class RdfXmlWriter<S extends Identifiable, P extends Property, O extends 
         }
         startRDF();
         writeHeader();
-        for (Triple<S, P, O> t : resourceContext.getResource()) {
+        for (Triple t : resourceContext.getResource().triples()) {
             writeTriple(t);
         }
         endRDF();
@@ -247,14 +239,14 @@ public class RdfXmlWriter<S extends Identifiable, P extends Property, O extends 
         }
     }
 
-    private RdfXmlWriter<S, P, O, C> writeTriple(Triple<S, P, O> triple) {
+    private RdfXmlWriter<C> writeTriple(Triple triple) {
         try {
             if (!writingStarted) {
                 throw new IOException("document writing has not yet been started");
             }
-            S subj = triple.subject();
-            P pred = triple.predicate();
-            O obj = triple.object();
+            Resource subj = triple.subject();
+            Property pred = triple.predicate();
+            Node obj = triple.object();
             String predString = pred.toString();
             int predSplitIdx = findURISplitIndex(predString);
             if (predSplitIdx == -1) {
@@ -269,7 +261,7 @@ public class RdfXmlWriter<S extends Identifiable, P extends Property, O extends 
                 flushPendingStatements();
                 writeNewLine();
                 writeStartOfStartTag(NS_URI, "Description");
-                if (subj.isBlank()) {
+                if (subj.isEmbedded()) {
                     writeAttribute(NS_URI, "nodeID", subj.toString());
                 } else {
                     writeAttribute(NS_URI, "about", subj.toString());
@@ -282,7 +274,7 @@ public class RdfXmlWriter<S extends Identifiable, P extends Property, O extends 
             writeStartOfStartTag(predNamespace, predLocalName);
             if (obj instanceof Resource) {
                 Resource objRes = (Resource) obj;
-                if (objRes.isBlank()) {
+                if (objRes.isEmbedded()) {
                     writeAttribute(NS_URI, "nodeID", objRes.id().toString());
                 } else {
                     writeAttribute(NS_URI, "resource", objRes.id().toString());

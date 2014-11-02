@@ -32,20 +32,17 @@
 package org.xbib.rdf;
 
 import org.xbib.iri.IRI;
-import org.xbib.rdf.context.ResourceContext;
 
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * A Resource is an iterable over statements of subjects, predicates, and
  * objects, based upon Literal. It has predicate multimaps for associated
  * resources and local properties.
  */
-public interface Resource<S extends Identifiable, P extends Property, O extends Node>
-        extends Identifiable, Node, Iterable<Triple<S, P, O>> {
+public interface Resource extends Identifiable, Node {
 
     /**
      * Set the identifier of this resource
@@ -54,35 +51,14 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @return this resource
      */
     @Override
-    Resource<S, P, O> id(IRI id);
+    Resource id(IRI id);
 
     /**
-     * Set resource context
+     * Is resource ID local/embedded?
      *
-     * @param context context
+     * @return true if embedded, otherwise false
      */
-    Resource<S, P, O> context(ResourceContext context);
-
-    /**
-     * Get resource context
-     *
-     * @return the resource context
-     */
-    ResourceContext context();
-
-    /**
-     * Set the subject of this resource
-     *
-     * @param subject subject
-     */
-    Resource<S, P, O> subject(S subject);
-
-    /**
-     * Get subject of this resource
-     *
-     * @return the subject
-     */
-    S subject();
+    boolean isEmbedded();
 
     /**
      * Add a property to this resource with a string object value
@@ -91,7 +67,7 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param object    an object in its string representation form
      * @return the new resource with the property added
      */
-    Resource<S, P, O> add(P predicate, O object);
+    Resource add(Property predicate, Node object);
 
     /**
      * Add a property to this resource with a string object value
@@ -100,7 +76,7 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param object    an object in its string representation form
      * @return the new resource with the property added
      */
-    Resource<S, P, O> add(P predicate, String object);
+    Resource add(Property predicate, String object);
 
     /**
      * Add a property to this resource
@@ -109,7 +85,9 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param number    an integer
      * @return the new resource with the property added
      */
-    Resource<S, P, O> add(P predicate, Integer number);
+    Resource add(Property predicate, Integer number);
+
+    Resource add(Property predicate, Boolean number);
 
     /**
      * Add a property to this resource
@@ -118,25 +96,25 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param literal   a literal
      * @return the new resource with the property added
      */
-    Resource<S, P, O> add(P predicate, Literal<O> literal);
+    Resource add(Property predicate, Literal literal);
 
     /**
      * Add a property to this resource
      *
      * @param predicate        a predicate identifier
-     * @param externalResource external resource IRI
+     * @param resource external resource IRI
      * @return the new resource with the property added
      */
-    Resource<S, P, O> add(P predicate, IRI externalResource);
+    Resource add(Property predicate, IRI resource);
 
     /**
      * Add a property to this resource
      *
      * @param predicate a predicate identifier
-     * @param literals  literals
+     * @param objects  objects
      * @return the new resource with the property added
      */
-    Resource<S, P, O> add(P predicate, Collection literals);
+    Resource add(Property predicate, List<Node> objects);
 
     /**
      * Add another resource to this resource
@@ -145,7 +123,7 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param resource  resource
      * @return the new resource with the resource added
      */
-    Resource<S, P, O> add(P predicate, Resource<S, P, O> resource);
+    Resource add(Property predicate, Resource resource);
 
     /**
      * Add a property to this resource.
@@ -154,7 +132,7 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param object    an object in its string representation form
      * @return the new resource with the property added
      */
-    Resource<S, P, O> add(String predicate, String object);
+    Resource add(String predicate, String object);
 
     /**
      * Add a property to this resource
@@ -163,7 +141,9 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param number    an integer
      * @return the new resource with the property added
      */
-    Resource<S, P, O> add(String predicate, Integer number);
+    Resource add(String predicate, Integer number);
+
+    Resource add(String predicate, Boolean number);
 
     /**
      * Add a property to this resource.
@@ -172,7 +152,7 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param literal   an object in its string representation form
      * @return the new resource with the property added
      */
-    Resource<S, P, O> add(String predicate, Literal literal);
+    Resource add(String predicate, Literal literal);
 
     /**
      * Add a property to this resource
@@ -181,16 +161,16 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param externalResource external resource
      * @return the new resource with the property added
      */
-    Resource<S, P, O> add(String predicate, IRI externalResource);
+    Resource add(String predicate, IRI externalResource);
 
     /**
      * Add a property to this resource
      *
      * @param predicate predicate
-     * @param literals  literals
+     * @param objects  objects
      * @return the new resource with the property added
      */
-    Resource<S, P, O> add(String predicate, Collection literals);
+    Resource add(String predicate, List<Node> objects);
 
     /**
      * Add another resource to this resource
@@ -199,7 +179,7 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param resource  resource
      * @return the new resource with the resource added
      */
-    Resource<S, P, O> add(String predicate, Resource<S, P, O> resource);
+    Resource add(String predicate, Resource resource);
 
     /**
      * Setting the type of the resource.
@@ -208,14 +188,14 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param externalResource external resource
      * @return this resource
      */
-    Resource<S, P, O> a(IRI externalResource);
+    Resource a(IRI externalResource);
 
     /**
-     * Return stream of resources for this predicate
+     * Return list of resources for this predicate
      * @param predicate the predicate
-     * @return
+     * @return list of resources
      */
-    Stream<Node> resources(P predicate);
+    List<Resource> resources(IRI predicate);
 
     /**
      * Create an anonymous resource and associate it with this resource. If the
@@ -225,7 +205,7 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param predicate the predicate ID for the resource
      * @return the new anonymous resource
      */
-    Resource<S, P, O> newResource(IRI predicate);
+    Resource newResource(IRI predicate);
 
     /**
      * Create an anonymous resource and associate it with this resource. If the
@@ -235,7 +215,7 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param predicate the predicate ID for the reesource
      * @return the new anonymous reesource
      */
-    Resource<S, P, O> newResource(P predicate);
+    Resource newResource(Property predicate);
 
     /**
      * Create an anonymous resource and associate it with this resource. If the
@@ -245,15 +225,30 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param predicate the predicate ID for the resource
      * @return the new anonymous resource
      */
-    Resource<S, P, O> newResource(String predicate);
+    Resource newResource(String predicate);
 
+    Resource newSubject(Object subject);
+
+    Property newPredicate(Object predicate);
+
+    Node newObject(Object object);
+
+    Literal newLiteral(Object value);
 
     /**
      * Return the set of predicates
      *
      * @return set of predicates
      */
-    Set<P> predicates();
+    Set<IRI> predicates();
+
+    /**
+     * Return object list for a given predicate
+     *
+     * @param predicate predicate
+     * @return set of objects
+     */
+    Collection<Node> objects(IRI predicate);
 
     /**
      * Return object set for a given predicate
@@ -261,52 +256,34 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      * @param predicate predicate
      * @return set of objects
      */
-    Collection<O> objects(P predicate);
+    Collection<Node> objects(String predicate);
 
-    /**
-     * Return object set for a given predicate
-     *
-     * @param predicate predicate
-     * @return set of objects
-     */
-    Collection<O> objects(String predicate);
+    List<Literal> literals(IRI predicate);
 
-    /**
-     * Return literal for this predicate
-     *
-     * @param predicate predicate
-     * @return literal
-     */
-    O literal(P predicate);
+    List<Resource> embeddedResources(IRI predicate);
 
-    /**
-     * Return literal for this predicate
-     *
-     * @param predicate predicate
-     * @return literal
-     */
-    O literal(String predicate);
+    List<Resource> linkedResources(IRI predicate);
 
     /**
      * Add a triple to this resource
      *
      * @param triple triple
      */
-    Resource<S, P, O> add(Triple<S, P, O> triple);
+    Resource add(Triple triple);
 
     /**
      * Get iterator over triples
      *
      * @return statements
      */
-    Iterator<Triple<S, P, O>> iterator();
+    List<Triple> triples();
 
     /**
      * Get iterator over triples thats are properties of this resource
      *
      * @return iterator over triple
      */
-    Iterator<Triple<S, P, O>> propertyIterator();
+    List<Triple> properties();
 
     /**
      * Compact a predicate. Under the predicate, there is a single blank node
@@ -316,7 +293,7 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
      *
      * @param predicate the predicate
      */
-    void compactPredicate(P predicate);
+    void compactPredicate(IRI predicate);
 
     /**
      * Remove all properties and resources from this resource
@@ -338,7 +315,7 @@ public interface Resource<S extends Identifiable, P extends Property, O extends 
     /**
      * Set marker for resource deletion
      */
-    Resource<S, P, O> setDeleted(boolean delete);
+    Resource setDeleted(boolean delete);
 
     /**
      * Check if marker for resource deletion is set

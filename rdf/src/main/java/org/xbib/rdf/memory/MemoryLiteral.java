@@ -37,39 +37,31 @@ import org.xbib.rdf.Literal;
 /**
  * A simple Literal is a value of object type
  */
-public class MemoryLiteral<O extends Object> implements Literal<O>, Comparable<Literal<O>> {
+public class MemoryLiteral implements Literal, Comparable<Literal> {
 
-    private O value;
+    private Object value;
 
     private IRI type;
 
     private String lang;
 
-    public MemoryLiteral() {
-    }
-
-    public MemoryLiteral(O value) {
+    public MemoryLiteral(Object value) {
         this.value = value;
     }
 
-    public MemoryLiteral(O value, String lang) {
+    public MemoryLiteral(Object value, String lang) {
         this.value = value;
         this.lang = lang;
     }
 
     @Override
-    public MemoryLiteral<O> object(O value) {
+    public MemoryLiteral object(Object value) {
         this.value = value;
         return this;
     }
 
     @Override
-    public O object() {
-        return value;
-    }
-
-    @Override
-    public MemoryLiteral<O> type(IRI type) {
+    public MemoryLiteral type(IRI type) {
         this.type = type;
         return this;
     }
@@ -80,7 +72,7 @@ public class MemoryLiteral<O extends Object> implements Literal<O>, Comparable<L
     }
 
     @Override
-    public MemoryLiteral<O> language(String lang) {
+    public MemoryLiteral language(String lang) {
         this.lang = lang;
         return this;
     }
@@ -91,7 +83,7 @@ public class MemoryLiteral<O extends Object> implements Literal<O>, Comparable<L
     }
 
     @Override
-    public int compareTo(Literal<O> that) {
+    public int compareTo(Literal that) {
         if (this == that) {
             return 0;
         }
@@ -132,16 +124,15 @@ public class MemoryLiteral<O extends Object> implements Literal<O>, Comparable<L
     }
 
     @Override
-    public Object value() {
+    public Object object() {
+        if (type == null) {
+            return value;
+        }
         if (value == null) {
             return null;
         }
         String s = value.toString();
-        if (type == null) {
-            return s;
-        }
-        String s1 = type.toString();
-        switch (s1) {
+        switch (type.toString()) {
             case "xsd:long":
                 return Long.parseLong(s);
             case "xsd:int":

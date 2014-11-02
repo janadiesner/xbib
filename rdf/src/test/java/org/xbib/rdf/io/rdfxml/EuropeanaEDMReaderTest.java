@@ -32,9 +32,8 @@
 package org.xbib.rdf.io.rdfxml;
 
 import org.testng.annotations.Test;
+import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
@@ -45,14 +44,13 @@ import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.memory.MemoryTriple;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
-public class EuropeanaEDMReaderTest {
-
-    private final Logger logger = LoggerFactory.getLogger(EuropeanaEDMReaderTest.class.getName());
+public class EuropeanaEDMReaderTest extends StreamTester {
 
     @Test
     public void testEuropeana() throws Exception {
@@ -70,9 +68,16 @@ public class EuropeanaEDMReaderTest {
         StringWriter sw = new StringWriter();
         NTripleWriter writer = new NTripleWriter(sw);
         writer.write(resourceContext);
-
-        logger.info("output=" + sw.toString());
+        sw.close();
+        assertStream(getClass().getResource("edm.nt").openStream(),
+                new ByteArrayInputStream(sw.toString().getBytes()));
     }
+
+    private final static IRI GEO_LAT = IRI.create("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
+
+    private final static IRI GEO_LON = IRI.create("http://www.w3.org/2003/01/geo/wgs84_pos#long");
+
+    private final static Property location = new MemoryProperty(IRI.create("location"));
 
     class GeoJSONFilter implements Triple.Builder {
 
@@ -130,12 +135,5 @@ public class EuropeanaEDMReaderTest {
             return this;
         }
     }
-
-    private final static IRI GEO_LAT = IRI.create("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
-
-    private final static IRI GEO_LON = IRI.create("http://www.w3.org/2003/01/geo/wgs84_pos#long");
-
-    private final static Property location = new MemoryProperty(IRI.create("location"));
-
 
 }

@@ -33,16 +33,15 @@ package org.xbib.rdf.io.rdfxml;
 
 import org.xbib.iri.IRI;
 import org.xbib.iri.IRISyntaxException;
-import org.xbib.rdf.memory.MemoryFactory;
+import org.xbib.rdf.RdfConstants;
+import org.xbib.rdf.Resource;
 import org.xbib.rdf.memory.MemoryLiteral;
-import org.xbib.rdf.memory.MemoryNode;
-import org.xbib.rdf.Identifiable;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
-import org.xbib.rdf.RDFNS;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.rdf.memory.MemoryTriple;
 import org.xbib.rdf.Parser;
 import org.xbib.rdf.io.xml.XmlHandler;
@@ -72,26 +71,19 @@ import java.util.Stack;
  * <p>
  * Note that the XMLLiteral datatype is not fully supported.
  */
-public class RdfXmlParser<S extends Identifiable, P extends Property, O extends Node>
-        implements RDFNS, Parser<S, P, O> {
+public class RdfXmlParser implements RdfConstants, Parser {
 
-    private final MemoryFactory<S, P, O> memoryFactory = MemoryFactory.getInstance();
+    private final static Resource resource = new MemoryResource();
 
     private XmlHandler xmlHandler = new Handler();
 
-    private Triple.Builder<S, P, O> builder;
-
-    private final static String RDF_STRING = RDF.toString();
-
-    private final static String NODE_ID = "nodeID";
-
-    private final static String ABOUT = "about";
+    private Triple.Builder builder;
 
     // counter for blank node generation
     private int bn = 0;
 
     @Override
-    public RdfXmlParser parse(Reader reader, Triple.Builder<S, P, O> builder) throws IOException {
+    public RdfXmlParser parse(Reader reader, Triple.Builder builder) throws IOException {
         this.builder = builder;
         try {
             parse(new InputSource(reader));
@@ -119,7 +111,7 @@ public class RdfXmlParser<S extends Identifiable, P extends Property, O extends 
         return this;
     }
 
-    public RdfXmlParser<S, P, O> setHandler(XmlHandler handler) {
+    public RdfXmlParser setHandler(XmlHandler handler) {
         this.xmlHandler = handler;
         return this;
     }
@@ -128,23 +120,16 @@ public class RdfXmlParser<S extends Identifiable, P extends Property, O extends 
         return xmlHandler;
     }
 
-    public XmlHandler getHandler(Triple.Builder<S, P, O> builder) {
-        if (builder != null) {
-            xmlHandler.setBuilder(builder);
-        }
-        return xmlHandler;
-    }
-
     private void yield(Object s, Object p, Object o) {
-        yield(new MemoryTriple(memoryFactory.newSubject(s), memoryFactory.newPredicate(p), memoryFactory.newObject(o)));
+        yield(new MemoryTriple(resource.newSubject(s), resource.newPredicate(p), resource.newObject(o)));
     }
 
-    private void yield(S s, P p, O o) {
-        yield(new MemoryTriple(s, p, o));
-    }
+    //private void yield(S s, P p, O o) {
+    //    yield(new MemoryTriple(s, p, o));
+    //}
 
     // produce a triple for the listener
-    private void yield(Triple<S, P, O> t) {
+    private void yield(Triple t) {
         if (builder != null) {
             builder.triple(t);
         }
@@ -249,12 +234,12 @@ public class RdfXmlParser<S extends Identifiable, P extends Property, O extends 
         }
     }
 
-    private Identifiable blankNode() {
-        return new MemoryNode().blank("b" + (bn++));
+    private Resource blankNode() {
+        return new MemoryResource().blank("b" + (bn++));
     }
 
-    private Identifiable blankNode(String s) {
-        return new MemoryNode().blank(s);
+    private Resource blankNode(String s) {
+        return new MemoryResource().blank(s);
     }
 
     /*
@@ -386,7 +371,7 @@ public class RdfXmlParser<S extends Identifiable, P extends Property, O extends 
         String datatype = null; // a predicate's datatype
         IRI reification = null; // when reifying, the triple's uriRef
         List<IRI> collection = null; // for parseType=Collection, the items
-        Triple<S, P, O> collectionHead = null; // for parseType=Collection, the head triple
+        Triple collectionHead = null; // for parseType=Collection, the head triple
         boolean isSubject = false; // is there a subject at this frame
         boolean isPredicate = false; // is there a predicate at this frame
         boolean isCollection = false; // is the predicate at this frame a collection
@@ -515,9 +500,9 @@ public class RdfXmlParser<S extends Identifiable, P extends Property, O extends 
                         } else if (parseType.equals("Collection")) {
                             frame.isCollection = true;
                             frame.collection = new LinkedList();
-                            S s = memoryFactory.newSubject(ancestorSubject(stack));
-                            P p = memoryFactory.newPredicate(frame.node);
-                            O o = memoryFactory.newObject(blankNode());
+                            Resource s = resource.newSubject(ancestorSubject(stack));
+                            Property p = resource.newPredicate(frame.node);
+                            Node o = resource.newObject(blankNode());
                             frame.collectionHead = new MemoryTriple(s, p, o);
                             pcdata = null;
                         } else if (parseType.equals("Literal")) {
@@ -590,7 +575,7 @@ public class RdfXmlParser<S extends Identifiable, P extends Property, O extends 
                             // in this case, the value of this property is rdf:nil
                             yield(ppFrame.collectionHead.subject(),
                                     ppFrame.collectionHead.predicate(),
-                                    memoryFactory.newObject(RDF_NIL));
+                                    resource.newObject(RDF_NIL));
                         } else {
                             yield(ppFrame.collectionHead);
                             Object prevNode = null;

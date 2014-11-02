@@ -34,8 +34,8 @@ package org.xbib.rdf;
 import java.io.IOException;
 import java.io.Reader;
 
-public interface Parser<S extends Identifiable, P extends Property, O extends Node> {
+public interface Parser {
 
-    Parser parse(Reader reader, Triple.Builder<S, P, O> listener) throws IOException;
+    Parser parse(Reader reader, Triple.Builder builder) throws IOException;
 
 }

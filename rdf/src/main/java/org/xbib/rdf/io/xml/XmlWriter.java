@@ -54,13 +54,13 @@ import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * Write resource as XML to stream
  */
-public class XmlWriter<S extends Identifiable, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
-        implements ResourceContextWriter<C, Resource<S,P,O>>, Triple.Builder<S, P, O>, Closeable, Flushable {
+public class XmlWriter<S extends Identifiable, P extends Property, O extends Node, C extends ResourceContext<Resource>>
+        implements ResourceContextWriter<C, Resource>, Triple.Builder, Closeable, Flushable {
 
     private final static Logger logger = LoggerFactory.getLogger(XmlWriter.class.getName());
 
@@ -121,7 +121,7 @@ public class XmlWriter<S extends Identifiable, P extends Property, O extends Nod
     }
 
     @Override
-    public XmlWriter<S, P, O, C> triple(Triple<S, P, O> triple) {
+    public XmlWriter<S, P, O, C> triple(Triple triple) {
         resourceContext.getResource().add(triple);
         return this;
     }
@@ -146,7 +146,7 @@ public class XmlWriter<S extends Identifiable, P extends Property, O extends Nod
 
     @Override
     public void write(C resourceContext) throws IOException {
-        Resource<S,P,O> resource = resourceContext.getResource();
+        Resource resource = resourceContext.getResource();
         try {
             XMLEventWriter xew = outputFactory.createXMLEventWriter(writer);
             IRI resourceURI = resource.id();
@@ -160,12 +160,11 @@ public class XmlWriter<S extends Identifiable, P extends Property, O extends Nod
         }
     }
 
-    private void writeResource(XMLEventConsumer consumer, Resource<S, P, O> resource, QName parent)
+    private void writeResource(XMLEventConsumer consumer, Resource resource, QName parent)
             throws XMLStreamException {
         boolean startElementWritten = false;
-        Iterator<Triple<S, P, O>> it = resource.propertyIterator();
-        while (it.hasNext()) {
-            Triple<S, P, O> triple = it.next();
+        List<Triple> triples = resource.properties();
+        for (Triple triple : triples) {
             if (!startElementWritten) {
                 if (parent != null) {
                     consumer.add(eventFactory.createStartElement(parent, null, null));
@@ -184,15 +183,15 @@ public class XmlWriter<S extends Identifiable, P extends Property, O extends Nod
         }
     }
 
-    private void write(XMLEventConsumer consumer, Triple<S, P, O> triple)
+    private void write(XMLEventConsumer consumer, Triple triple)
             throws XMLStreamException {
-        P predicate = triple.predicate();
-        O object = triple.object();
+        Property predicate = triple.predicate();
+        Node object = triple.object();
         String nsPrefix = predicate.id().getScheme();
         String name = predicate.id().getSchemeSpecificPart();
         String nsURI = namespaceContext.getNamespaceURI(nsPrefix);
         if (object instanceof Resource) {
-            writeResource(consumer, (Resource<S, P, O>) object, new QName(nsURI, name, nsPrefix));
+            writeResource(consumer, (Resource) object, new QName(nsURI, name, nsPrefix));
         } else if (object instanceof Literal) {
             String literal = ((Literal) object).object().toString();
             consumer.add(eventFactory.createStartElement(nsPrefix, nsURI, name));

@@ -32,33 +32,33 @@
 package org.xbib.rdf;
 
 import org.xbib.iri.IRI;
-import org.xbib.rdf.types.XSDResourceIdentifiers;
+import org.xbib.rdf.types.XSDIdentifiers;
 
 /**
  * A literal is a value with a type and/or a language
  */
-public interface Literal<O> extends Node, XSDResourceIdentifiers {
+public interface Literal extends Node, XSDIdentifiers {
 
     /**
-     * Set the value for the literal
+     * Set value for the literal
      *
      * @param value the value
      */
-    Literal<O> object(O value);
+    Literal object(Object value);
 
     /**
      * Get the value
      *
      * @return the value
      */
-    O object();
+    Object object();
 
     /**
      * Set type of the literal
      *
      * @param type the type
      */
-    Literal<O> type(IRI type);
+    Literal type(IRI type);
 
     /**
      * Get type of the literal
@@ -68,11 +68,11 @@ public interface Literal<O> extends Node, XSDResourceIdentifiers {
     IRI type();
 
     /**
-     * Set the lianguage of the literal
+     * Set the language of the literal
      *
-     * @param lang
+     * @param language the W3C language tag
      */
-    Literal<O> language(String lang);
+    Literal language(String language);
 
     /**
      * Get language of the literal

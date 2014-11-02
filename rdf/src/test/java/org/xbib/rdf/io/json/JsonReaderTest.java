@@ -36,8 +36,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.memory.MemoryResourceContext;
@@ -47,7 +47,7 @@ import org.xbib.logging.LoggerFactory;
 
 import javax.xml.namespace.QName;
 
-public class JsonReaderTest extends Assert {
+public class JsonReaderTest extends StreamTester {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonReaderTest.class.getName());
 
@@ -75,22 +75,17 @@ public class JsonReaderTest extends Assert {
 
             @Override
             public boolean isResourceDelimiter(QName name) {
-                //return "oai_dc".equals(name.getLocalPart());
                 return false;
             }
 
             @Override
             public boolean skip(QName name) {
-                // skip dc:dc element
-                //return "dc".equals(name.getLocalPart());
                 return false;
             }
 
             @Override
             public void identify(QName name, String value, IRI identifier) {
                 if (identifier == null) {
-                    // make sure we can build an opaque IRI, whatever is out there
-                   // String s = UrlEncoding.encode(value, CharUtils.Profile.SCHEMESPECIFICPART.filter());
                     resourceContext.getResource().id(IRI.create("id:doc1"));
                 }
             }
@@ -98,7 +93,7 @@ public class JsonReaderTest extends Assert {
         };
         StringWriter sw = new StringWriter();
         TurtleWriter t = new TurtleWriter(sw);
-        //jsonHandler.setBuilder(t);
+        jsonHandler.setBuilder(t);
         new JsonParser()
                 .setHandler(jsonHandler)
                 .root(new QName("http://purl.org/dc/elements/1.1/", "root", "dc"))

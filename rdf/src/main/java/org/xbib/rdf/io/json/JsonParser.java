@@ -33,9 +33,6 @@ package org.xbib.rdf.io.json;
 
 import org.xbib.json.xml.JsonSaxAdapter;
 import org.xbib.rdf.Parser;
-import org.xbib.rdf.Property;
-import org.xbib.rdf.Literal;
-import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xml.sax.SAXException;
@@ -45,10 +42,9 @@ import java.io.IOException;
 import java.io.Reader;
 
 /**
- * A triplifier for JSON (not JSON-LD)
+ * A parser for generic JSON (not JSON-LD)
  */
-public class JsonParser<S extends Resource<S, P, O>, P extends Property, O extends Literal<O>>
-        implements Parser<S, P, O> {
+public class JsonParser implements Parser {
 
     private XmlHandler handler;
 
@@ -72,7 +68,7 @@ public class JsonParser<S extends Resource<S, P, O>, P extends Property, O exten
     }
 
     @Override
-    public JsonParser parse(Reader reader, Triple.Builder<S, P, O> builder) throws IOException {
+    public JsonParser parse(Reader reader, Triple.Builder builder) throws IOException {
         if (handler != null) {
             if (builder != null) {
                 handler.setBuilder(builder);

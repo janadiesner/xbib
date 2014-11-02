@@ -35,11 +35,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.rdf.Identifiable;
-import org.xbib.rdf.Property;
+import org.xbib.iri.IRI;
+import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
@@ -82,66 +81,67 @@ public class DefaultContentBuilder<C extends ResourceContext<R>, R extends Resou
         return builder.string();
     }
 
-    protected <S extends Identifiable, P extends Property, O extends Node> void build(XContentBuilder builder, C resourceContext, Resource<S, P, O> resource)
+    protected void build(XContentBuilder builder, C resourceContext, Resource resource)
             throws IOException {
         if (resource == null) {
             return;
         }
         CompactingNamespaceContext context = resourceContext.getNamespaceContext();
-        S subject = resource.subject();
-        for (P predicate : resource.predicates()) {
-            Collection<O> values = resource.objects(predicate);
+        // first, the values
+        for (IRI predicate : resource.predicates()) {
+            Collection<Node> values = resource.objects(predicate);
             if (values == null) {
                 throw new IllegalArgumentException("can't build property value set for predicate URI " + predicate);
             }
             // drop values with size 0 silently
             if (values.size() == 1) {
                 // single value
-                O object = values.iterator().next();
-                if (object instanceof Identifiable) {
-                    Identifiable id = (Identifiable) object;
-                    if (!id.isBlank()) {
-                        builder.field(context.compact(predicate.id()), id.id().toString()); // ID -> string?
+                Node object = values.iterator().next();
+                if (object instanceof Resource) {
+                    Resource id = (Resource) object;
+                    if (!id.isEmbedded()) {
+                        builder.field(context.compact(predicate), id.id().toString());
                     }
-                } else if (predicate != null && object.value() != null) {
-                    builder.field(context.compact(predicate.id()), object.value());
+                } else {
+                    Object o = ((Literal)object).object();
+                    if (o != null) {
+                        builder.field(context.compact(predicate), o);
+                    }
                 }
-                expandField(builder, resourceContext, subject, predicate, object);
                 // drop null value
             } else if (values.size() > 1) {
                 // array of values
-                Collection<O> properties = filterBlankNodes(values);
+                Collection<Node> properties = filterNodes(values);
                 if (!properties.isEmpty()) {
-                    builder.startArray(context.compact(predicate.id()));
-                    for (O object : properties) {
-                        if (object instanceof Identifiable) {
-                            Identifiable id = (Identifiable) object;
-                            if (!id.isBlank()) {
-                                builder.value(id.id().toString()); // IRI -> string?
+                    builder.startArray(context.compact(predicate));
+                    for (Node object : properties) {
+                        if (object instanceof Resource) {
+                            Resource id = (Resource) object;
+                            if (!id.isEmbedded()) {
+                                builder.value(id.id().toString());
                             }
-                        } else if (object.value() != null) {
+                        } else {
                             // drop null values
-                            builder.value(object.value());
+                            Object o = ((Literal)object).object();
+                            if (o != null) {
+                                builder.value(o);
+                            }
                         }
-                        expandValue(builder, resourceContext, subject, predicate, object);
                     }
                     builder.endArray();
                 }
             }
         }
         // then, iterate over resources
-        //Map<P, Collection<Resource<S, P, O>>> m = resource.resources();
-        for (P predicate : resource.predicates()) {
-            //Collection<Resource<S, P, O>> resources = m.get(predicate);
-            Stream<Node> nodes = resource.resources(predicate);
-            final List<XContentBuilder> list = new LinkedList();
-            nodes.forEach(node -> {
-                Resource<S, P, O> child = (Resource<S, P, O>) node;
-                if (child.isBlank()) {
+        for (IRI predicate : resource.predicates()) {
+            List<Resource> resources = resource.resources(predicate);
+            final List<XContentBuilder> list = new LinkedList<XContentBuilder>();
+            resources.forEach(node -> {
+                if (node.isEmbedded()) {
                     try {
                         XContentBuilder resBuilder = jsonBuilder();
                         resBuilder.startObject();
-                        build(resBuilder, resourceContext, child);
+                        build(resBuilder, resourceContext, node);
                         resBuilder.endObject();
                         list.add(resBuilder);
                     } catch (IOException e) {
@@ -150,56 +150,23 @@ public class DefaultContentBuilder<C extends ResourceContext<R>, R extends Resou
                 }
             });
             if (list.size() == 1) {
-                builder.field(context.compact(predicate.id()));
+                builder.field(context.compact(predicate));
                 builder.value(list.get(0));
             } else if (list.size() > 1) {
-                builder.startArray(context.compact(predicate.id()));
+                builder.startArray(context.compact(predicate));
                 builder.copy(list);
                 builder.endArray();
             }
-
-            /*if (resources.size() == 1) {
-                // single resource, check if resource is embedded
-                Resource<S, P, O> res = resources.iterator().next();
-                if (res.isBlank()) {
-                    builder.startObject(context.compact(predicate.id()));
-                    build(builder, resourceContext, res);
-                    builder.endObject();
-                }
-            } else if (resources.size() > 1) {
-                // build array of resources
-                for (Resource<S, P, O> child : resources) {
-                    if (child.isBlank()) {
-                        XContentBuilder resBuilder = jsonBuilder();
-                        resBuilder.startObject();
-                        build(resBuilder, resourceContext, child);
-                        resBuilder.endObject();
-                        list.add(resBuilder);
-                    }
-                }
-                if (!list.isEmpty()) {
-                    builder.startArray(context.compact(predicate.id()));
-                    builder.copy(list);
-                    builder.endArray();
-                }
-            }*/
         }
     }
 
-    protected <S extends Identifiable, P extends Property, O extends Node>
-        void expandField(XContentBuilder builder, ResourceContext<R> context, S subject, P predicate, O object) throws IOException {
-    }
-
-    protected <S extends Identifiable, P extends Property, O extends Node>
-        void expandValue(XContentBuilder builder, ResourceContext<R> context, S subject, P predicate, O object) throws IOException {
-    }
-
-    private <O extends Node> Collection<O> filterBlankNodes(Collection<O> objects) {
-        Collection<O> nodes = new LinkedList();
+    private <O extends Node> Collection<O> filterNodes(Collection<O> objects) {
+        Collection<O> nodes = new LinkedList<O>();
         for (O object : objects) {
-            if (object instanceof Identifiable) {
-                Identifiable id = (Identifiable)object;
-                if (id.isBlank()) {
+            // drop embedded node ids
+            if (object instanceof Resource) {
+                Resource id = (Resource)object;
+                if (id.isEmbedded()) {
                     continue;
                 }
             }

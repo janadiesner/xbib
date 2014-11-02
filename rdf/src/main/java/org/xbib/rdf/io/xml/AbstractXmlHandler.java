@@ -44,6 +44,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import javax.xml.namespace.QName;
 import java.util.EmptyStackException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -201,9 +202,9 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
         }
         if (builder != null) {
             builder.newIdentifier(resourceContext.getResource().id());
-            Iterator<Triple> it = resourceContext.getResource().iterator();
-            while (it.hasNext()) {
-                builder.triple(it.next());
+            List<Triple> list = resourceContext.getResource().triples();
+            for (Triple triple : list) {
+                builder.triple(triple);
             }
         }
     }

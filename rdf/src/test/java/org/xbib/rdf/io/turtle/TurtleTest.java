@@ -32,23 +32,22 @@
 package org.xbib.rdf.io.turtle;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.memory.MemoryResourceContext;
 
-public class TurtleTest<R extends Resource> extends Assert {
+import static org.testng.Assert.assertEquals;
 
-    private final Logger logger = LoggerFactory.getLogger(TurtleTest.class.getName());
+public class TurtleTest<R extends Resource> extends StreamTester {
 
     @Test
     public void testTurtleGND() throws Exception {
@@ -64,7 +63,7 @@ public class TurtleTest<R extends Resource> extends Assert {
     public void testTurtleReader() throws Exception {
         StringBuilder sb = new StringBuilder();
         String filename = "turtle-demo.ttl";
-        InputStream in = getClass().getResourceAsStream(filename);
+        InputStream in = getClass().getResource(filename).openStream();
         if (in == null) {
             throw new IOException("file " + filename + " not found");
         }
@@ -86,8 +85,12 @@ public class TurtleTest<R extends Resource> extends Assert {
         writer.setNamespaceContext(context);
         writer.writeNamespaces();
         writer.write(resourceContext);
+        writer.close();
+        sw.close();
+
         String s2 = sw.toString().trim();
         assertEquals(s2, s1);
+
     }
 
     private ResourceContext<R> createResourceContext() {
@@ -102,7 +105,7 @@ public class TurtleTest<R extends Resource> extends Assert {
                 .add("dc:creator", "Jörg Prante")
                 .add("dc:date", "2009");
         resource.add("dc:title", "A sample title");
-        r = resource.newResource("dcterms:isPartOf")
+        resource.newResource("dcterms:isPartOf")
                 .add("dc:title", "another")
                 .add("dc:title", "title");
         return context;
@@ -115,7 +118,9 @@ public class TurtleTest<R extends Resource> extends Assert {
         TurtleWriter writer = new TurtleWriter(sw);
         writer.writeNamespaces();
         writer.write(resourceContext);
-        logger.info(sw.toString().trim());
+        sw.close();
+        assertStream(getClass().getResource("turtle-test.ttl").openStream(),
+                new ByteArrayInputStream(sw.toString().getBytes()));
     }
 
     private ResourceContext<R> createResourceContext2() {
@@ -131,14 +136,13 @@ public class TurtleTest<R extends Resource> extends Assert {
                 .add("dc:subject", "a")
                 .add("dc:subject", "sequence")
                 .add("http://purl.org/dc/terms/place", "Köln");
-        // sequence optimized for turtle output
-        Resource r1 = r.newResource("urn:res1")
+        r.newResource("urn:res1")
                 .add("property1", "value1")
                 .add("property2", "value2");
-        Resource r2 = r.newResource("urn:res2")
+        r.newResource("urn:res2")
                 .add("property3", "value3")
                 .add("property4", "value4");
-        Resource r3 = r.newResource("urn:res3")
+        r.newResource("urn:res3")
                 .add("property5", "value5")
                 .add("property6", "value6");
         return context;
@@ -151,7 +155,9 @@ public class TurtleTest<R extends Resource> extends Assert {
         TurtleWriter writer = new TurtleWriter(sw);
         writer.writeNamespaces();
         writer.write(resourceContext);
-        logger.info(sw.toString().trim());
+        sw.close();
+        assertStream(getClass().getResource("turtle-indent.ttl").openStream(),
+                new ByteArrayInputStream(sw.toString().getBytes()));
     }
 
     private ResourceContext<R> createNestedResources() {
@@ -167,14 +173,13 @@ public class TurtleTest<R extends Resource> extends Assert {
                 .add("dc:subject", "a")
                 .add("dc:subject", "sequence")
                 .add("http://purl.org/dc/terms/place", "Köln");
-        // sequence optimized for turtle output
         Resource r1 = r.newResource("urn:res1")
                 .add("property1", "value1")
                 .add("property2", "value2");
-        Resource r2 = r1.newResource("urn:res2")
+        r1.newResource("urn:res2")
                 .add("property3", "value3")
                 .add("property4", "value4");
-        Resource r3 = r.newResource("urn:res3")
+        r.newResource("urn:res3")
                 .add("property5", "value5")
                 .add("property6", "value6");
         return context;

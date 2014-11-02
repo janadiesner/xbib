@@ -32,6 +32,7 @@
 package org.xbib.rdf.io.rdfxml;
 
 import org.testng.annotations.Test;
+import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -40,12 +41,13 @@ import org.xbib.rdf.Triple;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.memory.MemoryResource;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
-public class GNDRdfXmlReaderTest {
+public class GNDRdfXmlReaderTest extends StreamTester {
 
     private final Logger logger = LoggerFactory.getLogger(GNDRdfXmlReaderTest.class.getName());
 
@@ -61,7 +63,9 @@ public class GNDRdfXmlReaderTest {
         RdfXmlParser reader = new RdfXmlParser();
         reader.parse(new InputStreamReader(in, "UTF-8"), writer);
         writer.close();
-        logger.info("gnd = {}", sw.toString());
+        sw.close();
+        assertStream(getClass().getResource("gnd.ttl").openStream(),
+                new ByteArrayInputStream(sw.toString().getBytes()));
     }
 
     @Test
@@ -111,14 +115,14 @@ public class GNDRdfXmlReaderTest {
 
         @Override
         public Triple.Builder triple(Triple triple) {
-            logger.info("{} {} {} -> {} {} {}",
+            /*logger.info("{} {} {} -> {} {} {}",
                     triple.subject().getClass(),
                     triple.predicate().getClass(),
                     triple.object().getClass(),
                     triple.subject(),
                     triple.predicate(),
                     triple.object()
-                    );
+                    );*/
             resource.add(triple);
             return this;
         }
@@ -136,7 +140,7 @@ public class GNDRdfXmlReaderTest {
         }
 
         private void output(Resource resource) throws IOException {
-            logger.info("{}", resource);
+            logger.info("output = {}", resource);
         }
     }
 

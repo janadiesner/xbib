@@ -31,22 +31,21 @@
  */
 package org.xbib.rdf.memory;
 
-import org.xbib.rdf.Identifiable;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Node;
+import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 
 /**
  * A simple triple
  */
-public class MemoryTriple<S extends Identifiable, P extends Property, O extends Node>
-        implements Triple<S, P, O>, Comparable<Triple> {
+public class MemoryTriple implements Triple, Comparable<Triple> {
 
-    private S subject;
+    private Resource subject;
 
-    private P predicate;
+    private Property predicate;
 
-    private O object;
+    private Node object;
 
     /**
      * Create a new triple
@@ -55,41 +54,41 @@ public class MemoryTriple<S extends Identifiable, P extends Property, O extends 
      * @param predicate predicate
      * @param object    object
      */
-    public MemoryTriple(S subject, P predicate, O object) {
+    public MemoryTriple(Resource subject, Property predicate, Node object) {
         this.subject = subject;
         this.predicate = predicate;
         this.object = object;
     }
 
-    public Triple<S, P, O> subject(S subject) {
+    public Triple subject(Resource subject) {
         this.subject = subject;
         return this;
     }
 
     @Override
-    public S subject() {
+    public Resource subject() {
         return subject;
     }
 
     @Override
-    public Triple<S, P, O> predicate(P predicate) {
+    public Triple predicate(Property predicate) {
         this.predicate = predicate;
         return null;
     }
 
     @Override
-    public P predicate() {
+    public Property predicate() {
         return predicate;
     }
 
     @Override
-    public Triple<S, P, O> object(O object) {
+    public Triple object(Node object) {
         this.object = object;
         return this;
     }
 
     @Override
-    public O object() {
+    public Node object() {
         return object;
     }
 
@@ -116,7 +115,7 @@ public class MemoryTriple<S extends Identifiable, P extends Property, O extends 
         if (getClass() != obj.getClass()) {
             return false;
         }
-        return compareTo((Triple<S, P, O>) obj) == 0;
+        return compareTo((Triple) obj) == 0;
     }
 
     @Override

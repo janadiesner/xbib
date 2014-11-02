@@ -34,7 +34,6 @@ package org.xbib.rdf.io.turtle;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Identifiable;
 import org.xbib.rdf.Parser;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Literal;
@@ -42,10 +41,9 @@ import org.xbib.rdf.Node;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.memory.MemoryLiteral;
-import org.xbib.rdf.memory.MemoryNode;
 import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.rdf.memory.MemoryTriple;
-import org.xbib.rdf.memory.MemoryFactory;
+import org.xbib.rdf.types.XSDIdentifiers;
 import org.xbib.xml.namespace.XmlNamespaceContext;
 
 import java.io.EOFException;
@@ -62,12 +60,14 @@ import java.util.Stack;
  * @see <a href="http://www.w3.org/TeamSubmission/turtle/">Turtle - Terse RDF
  * Triple Language</a>
  */
-public class TurtleParser<S extends Identifiable, P extends Property, O extends Node>
-        implements Parser<S, P, O> {
+public class TurtleParser implements Parser {
 
-    private final Logger logger = LoggerFactory.getLogger(TurtleParser.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(TurtleParser.class.getName());
 
-    private final MemoryFactory<S, P, O> memoryFactory = MemoryFactory.getInstance();
+    private final static Resource resource = new MemoryResource();
+
+    private final HashMap<String, Node> bnodes = new HashMap();
+
     /**
      * The base IRI
      */
@@ -79,20 +79,20 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
     /**
      * The parsed subject
      */
-    private S subject;
+    private Resource subject;
     /**
      * The parsed predicate
      */
-    private P predicate;
+    private Property predicate;
     /**
      * The parsed object
      */
-    private O object;
+    private Node object;
     /**
      * The last subject parsed, for sending record events. A collection of
      * triples with same subject in sequence is assumed a record.
      */
-    private S lastsubject;
+    private Resource lastsubject;
     /**
      * String builder for parsing
      */
@@ -104,17 +104,13 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
     /**
      * Stack for resource statements
      */
-    private Stack<Triple<S, P, O>> triples;
-    /**
-     * Counter for parsed triples
-     */
-    private long tripleCounter;
+    private Stack<Triple> triples;
     /**
      * The namespace context
      */
     private XmlNamespaceContext context = XmlNamespaceContext.getDefaultInstance();
 
-    private Triple.Builder<S, P, O> builder;
+    private Triple.Builder builder;
 
     private boolean strict = false;
 
@@ -136,12 +132,12 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
      * @throws IOException if stream can not be parsed
      */
     @Override
-    public TurtleParser parse(Reader reader, Triple.Builder<S, P, O> builder) throws IOException {
+    public TurtleParser parse(Reader reader, Triple.Builder builder) throws IOException {
         this.reader = new PushbackReader(reader, 2);
         this.builder = builder;
         this.sb = new StringBuilder();
         this.eof = false;
-        this.triples = new Stack<Triple<S, P, O>>();
+        this.triples = new Stack<Triple>();
         if (builder != null) {
             builder.begin();
         }
@@ -155,7 +151,6 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
                     parseDirective();
                 } else {
                     parseTriple();
-                    tripleCounter++;
                 }
             }
         } finally {
@@ -165,10 +160,6 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
             }
         }
         return this;
-    }
-
-    public long getTripleCounter() {
-        return tripleCounter;
     }
 
     /**
@@ -270,32 +261,32 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
     private void parseSubject() throws IOException {
         char ch = peek();
         if (ch == '(') {
-            subject = (S) parseCollection();
+            subject = parseCollection();
         } else if (ch == '[') {
-            subject = (S) parseBlankNode();
+            subject = (Resource) parseBlankNode();
         } else {
-            O value = parseValue();
+            Node value = parseValue();
             if (value instanceof Resource) {
-                subject = (S) value;
+                subject = (Resource) value;
             } else {
                 throw new IOException(baseIRI + ": illegal subject value: '" + value + "' (" + value.getClass() + ")");
             }
         }
     }
 
-    private P parsePredicate() throws IOException {
+    private Property parsePredicate() throws IOException {
         char ch = read();
         if (ch == 'a') {
             char ch2 = read();
             if (isWhitespace(ch2)) {
-                return memoryFactory.newPredicate("rdf:type");
+                return resource.newPredicate("rdf:type");
             }
             reader.unread(ch2);
         }
         reader.unread(ch);
-        O obj = parseValue();
+        Node obj = parseValue();
         if (obj instanceof Resource) {
-            return memoryFactory.newPredicate(obj.toString());
+            return resource.newPredicate(obj.toString());
         } else {
             throw new IOException(baseIRI + ": illegal predicate value: " + obj);
         }
@@ -309,14 +300,14 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
     private void parseObject() throws IOException {
         char ch = peek();
         if (ch == '(') {
-            object = (O) parseCollection();
+            object = parseCollection();
         } else if (ch == '[') {
-            object = (O) parseBlankNode();
+            object = parseBlankNode();
         } else {
             object = parseValue();
         }
         Triple stmt = new MemoryTriple(subject, predicate, object);
-        if (subject instanceof Identifiable) {
+        if (subject instanceof Resource) {
             // Push triples with blank node subjects on stack.
             // The idea for having ordered getResource properties is:
             // All getResource property triples should be serialized
@@ -339,7 +330,7 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
                 builder.triple(stmt);
             }
             while (!triples.isEmpty()) {
-                Triple<S, P, O> s = triples.pop();
+                Triple s = triples.pop();
                 if (builder != null) {
                     builder.triple(s);
                 }
@@ -347,20 +338,20 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
         }
     }
 
-    private O parseValue() throws IOException {
+    private Node parseValue() throws IOException {
         char ch = peek();
         if (ch == '<') {
-            return (O) new MemoryResource().id(parseURI());
+            return new MemoryResource().id(parseURI());
         } else if (ch == ':' || isPrefixStartChar(ch)) {
             return parseQNameOrBoolean();
         } else if (ch == '_') {
-            return (O) parseNodeID();
+            return parseNodeID();
         } else if (ch == '(') {
-            return (O) parseCollection();
+            return parseCollection();
         } else if (ch == '"') {
-            return (O) parseQuotedLiteral();
+            return parseQuotedLiteral();
         } else if (Character.isDigit(ch) || ch == '.' || ch == '+' || ch == '-') {
-            return (O) parseNumber();
+            return parseNumber();
         } else if ((int) ch == 65535) {
             throw new EOFException();
         } else {
@@ -410,7 +401,7 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
      * @return qualified name URI
      * @throws IOException
      */
-    private O parseQNameOrBoolean() throws IOException {
+    private Node parseQNameOrBoolean() throws IOException {
         char ch = read();
         if (ch != ':' && !isPrefixStartChar(ch)) {
             throw new IOException(baseIRI + ": expected colon or letter, not: '" + ch + "'");
@@ -429,7 +420,7 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
             if (ch != ':') {
                 String value = sb.toString();
                 if (value.equals("true") || value.equals("false")) {
-                    return (O) memoryFactory.newLiteral(value).type(IRI.create("xsd:boolean"));
+                    return resource.newLiteral(value).type(XSDIdentifiers.BOOLEAN);
                 }
             }
             validate(ch, ':');
@@ -450,27 +441,27 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
         }
         reader.unread(ch);
         // namespace is already resolved
-        return (O) new MemoryResource().id(IRI.create(ns + sb));
+        return new MemoryResource().id(IRI.create(ns + sb));
     }
 
     /**
      * Parse blank node, with or without a node ID
      *
-     * @return
+     * @return node
      * @throws IOException
      */
-    private Identifiable parseBlankNode() throws IOException {
+    private Node parseBlankNode() throws IOException {
         char ch = peek();
         if (ch == '_') {
             return parseNodeID();
         } else if (ch == '[') {
             reader.read();
-            Identifiable bnode = new MemoryNode();
+            MemoryResource bnode = new MemoryResource();
             ch = read();
             if (ch != ']') {
-                S oldsubject = subject;
-                P oldpredicate = predicate;
-                subject = (S) bnode;
+                Resource oldsubject = subject;
+                Property oldpredicate = predicate;
+                subject = bnode;
                 skipWhitespace();
                 parsePredicateObjectList();
                 skipWhitespace();
@@ -490,37 +481,37 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
      * @return the collection as a resource
      * @throws IOException
      */
-    private Resource<S, P, O> parseCollection() throws IOException {
+    private Resource parseCollection() throws IOException {
         validate(reader.read(), '(');
         char ch = skipWhitespace();
         if (ch == ')') {
             reader.read();
-            MemoryResource<S, P, O> r = new MemoryResource();
+            MemoryResource r = new MemoryResource();
             r.id(IRI.create("rdf:nil"));
             return r;
         } else {
-            MemoryResource<S, P, O> first = new MemoryResource();
-            S oldsubject = subject;
-            P oldpredicate = predicate;
-            subject = (S) first.id();
-            predicate = memoryFactory.newPredicate("rdf:first");
+            MemoryResource first = new MemoryResource();
+            Resource oldsubject = subject;
+            Property oldpredicate = predicate;
+            subject = first;
+            predicate = resource.newPredicate("rdf:first");
             parseObject();
             ch = skipWhitespace();
-            Node blanknode = new MemoryNode().id(first.id());
+            MemoryResource blanknode = new MemoryResource().id(first.id());
             while (ch != ')') {
-                Node value = new MemoryNode();
+                MemoryResource value = new MemoryResource();
                 if (builder != null) {
-                    builder.triple(new MemoryTriple((Identifiable)blanknode, memoryFactory.newPredicate("rdf:rest"), value));
+                    builder.triple(new MemoryTriple(blanknode, resource.newPredicate("rdf:rest"), value));
                 }
-                subject = (S) value;
+                subject = value;
                 blanknode = value;
                 parseObject();
                 ch = skipWhitespace();
             }
             reader.read();
             if (builder != null) {
-                Node value = new MemoryNode().id(IRI.create("rdf:null"));
-                builder.triple(new MemoryTriple((Identifiable)blanknode, memoryFactory.newPredicate("rdf:rest"), value));
+                Node value = new MemoryResource().id(IRI.create("rdf:null"));
+                builder.triple(new MemoryTriple(blanknode, resource.newPredicate("rdf:rest"), value));
             }
             subject = oldsubject;
             predicate = oldpredicate;
@@ -531,10 +522,10 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
     /**
      * Parse node ID
      *
-     * @return
+     * @return the node
      * @throws IOException
      */
-    private Identifiable parseNodeID() throws IOException {
+    private Node parseNodeID() throws IOException {
         validate(reader.read(), '_');
         validate(reader.read(), ':');
         char ch = read();
@@ -549,16 +540,14 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
         }
         reader.unread(ch);
         String nodeID = sb.toString();
-        Identifiable bnode = bnodes.get(nodeID);
+        Node bnode = bnodes.get(nodeID);
         if (bnode != null) {
             return bnode;
         }
-        bnode = new MemoryNode().blank(nodeID);
+        bnode = new MemoryResource().blank(nodeID);
         bnodes.put(nodeID, bnode);
         return bnode;
     }
-
-    private final HashMap<String, Identifiable> bnodes = new HashMap();
 
     /**
      * Parse a literal
@@ -566,7 +555,7 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
      * @return the literal
      * @throws IOException
      */
-    private Literal<O> parseQuotedLiteral() throws IOException {
+    private Literal parseQuotedLiteral() throws IOException {
         String value = parseQuotedString();
         char ch = peek();
         if (ch == '@') {
@@ -658,7 +647,7 @@ public class TurtleParser<S extends Identifiable, P extends Property, O extends 
         return sb.substring(0, sb.length() - 3);
     }
 
-    private Literal<O> parseNumber() throws IOException {
+    private Literal parseNumber() throws IOException {
         sb.setLength(0);
         IRI datatype = IRI.create("xsd:integer");
         char ch = read();

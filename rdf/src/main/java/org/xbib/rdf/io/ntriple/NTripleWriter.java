@@ -36,8 +36,6 @@ import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.context.ResourceContextWriter;
-import org.xbib.rdf.memory.MemoryNode;
-import org.xbib.rdf.Identifiable;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
@@ -54,8 +52,8 @@ import java.io.Writer;
 /**
  * NTriple writer
  */
-public class NTripleWriter<S extends Identifiable, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
-        implements ResourceContextWriter<C, Resource<S,P,O>>, Triple.Builder<S, P, O>, Closeable, Flushable {
+public class NTripleWriter<C extends ResourceContext<Resource>>
+        implements ResourceContextWriter<C, Resource>, Triple.Builder, Closeable, Flushable {
 
     private final static Logger logger = LoggerFactory.getLogger(NTripleWriter.class.getName());
 
@@ -86,18 +84,18 @@ public class NTripleWriter<S extends Identifiable, P extends Property, O extends
         write(resourceContext);
     }
 
-    public NTripleWriter<S, P, O, C> setNamespaceContext(IRINamespaceContext context) {
+    public NTripleWriter<C> setNamespaceContext(IRINamespaceContext context) {
         this.namespaceContext = context;
         return this;
     }
 
-    public NTripleWriter<S, P, O, C> setSortLanguageTag(String languageTag) {
+    public NTripleWriter<C> setSortLanguageTag(String languageTag) {
         this.sortLangTag = languageTag;
         return this;
     }
 
     @Override
-    public NTripleWriter<S, P, O, C> newIdentifier(IRI iri) {
+    public NTripleWriter<C> newIdentifier(IRI iri) {
         if (!iri.equals(resourceContext.getResource().id())) {
             try {
                 write(resourceContext);
@@ -111,29 +109,29 @@ public class NTripleWriter<S extends Identifiable, P extends Property, O extends
     }
 
     @Override
-    public NTripleWriter<S, P, O, C> begin() {
+    public NTripleWriter<C> begin() {
         return this;
     }
 
     @Override
-    public NTripleWriter<S, P, O, C> triple(Triple<S, P, O> triple) {
+    public NTripleWriter<C> triple(Triple triple) {
         resourceContext.getResource().add(triple);
         return this;
     }
 
     @Override
-    public NTripleWriter<S, P, O, C> end() {
+    public NTripleWriter<C> end() {
         return this;
     }
 
     @Override
-    public NTripleWriter<S, P, O, C> startPrefixMapping(String prefix, String uri) {
+    public NTripleWriter<C> startPrefixMapping(String prefix, String uri) {
         namespaceContext.addNamespace(prefix, uri);
         return this;
     }
 
     @Override
-    public NTripleWriter<S, P, O, C> endPrefixMapping(String prefix) {
+    public NTripleWriter<C> endPrefixMapping(String prefix) {
         // we don't remove name spaces. It's troubling RDF serializations.
         //namespaceContext.removeNamespace(prefix);
         return this;
@@ -143,14 +141,14 @@ public class NTripleWriter<S extends Identifiable, P extends Property, O extends
     public void write(C resourceContext) throws IOException {
         if (resourceContext.getResource() != null) {
             StringBuilder sb = new StringBuilder();
-            for (Triple<S, P, O> t : resourceContext.getResource()) {
+            for (Triple t : resourceContext.getResource().triples()) {
                 sb.append(writeStatement(t));
             }
             writer.write(sb.toString());
         } else if (resourceContext.getResources() != null) {
-            for (Resource<S, P, O> resource : resourceContext.getResources()) {
+            for (Resource resource : resourceContext.getResources()) {
                 StringBuilder sb = new StringBuilder();
-                for (Triple<S, P, O> t : resource) {
+                for (Triple t : resource.triples()) {
                     sb.append(writeStatement(t));
                 }
                 writer.write(sb.toString());
@@ -163,37 +161,29 @@ public class NTripleWriter<S extends Identifiable, P extends Property, O extends
         writer.flush();
     }
 
-    public String writeStatement(Triple<S, P, O> stmt) throws IOException {
-        S subj = stmt.subject();
-        P pred = stmt.predicate();
-        O obj = stmt.object();
+    public String writeStatement(Triple stmt) throws IOException {
+        Resource subj = stmt.subject();
+        Property pred = stmt.predicate();
+        Node obj = stmt.object();
         return new StringBuilder().append(writeSubject(subj)).append(" ").append(writePredicate(pred)).append(" ").append(writeObject(obj)).append(" .").append(LF).toString();
     }
 
-    public String writeSubject(S subject) {
-        return subject.isBlank() ?
+    public String writeSubject(Resource subject) {
+        return subject.isEmbedded() ?
                 subject.toString() :
                 "<" + escape(subject.toString()) + ">";
     }
 
-    public String writePredicate(P predicate) {
-        /*if (predicate.id().getScheme() == null && nullPredicate !=null) {
-            IRI iri = IRI.builder()
-                    .scheme(nullPredicate.getScheme())
-                    .host(nullPredicate.getHost())
-                    .path(nullPredicate.getPath() + "/" + predicate.id().getSchemeSpecificPart())
-                    .build();
-            return "<" + escape(iri.toString()) + ">";
-        }*/
+    public String writePredicate(Property predicate) {
         return "<" + escape(predicate.id().toString()) + ">";
     }
 
-    public String writeObject(O object) {
+    public String writeObject(Node object) {
         if (object instanceof Resource) {
-            S subject = ((Resource<S, P, O>) object).subject();
+            Resource subject = (Resource) object;
             return writeSubject(subject);
         } else if (object instanceof Literal) {
-            Literal<?> value = (Literal<?>) object;
+            Literal value = (Literal) object;
             value = processSortLanguage(value);
             String s = "\"" + escape(value.object().toString()) + "\"";
             String lang = value.language();
@@ -205,12 +195,12 @@ public class NTripleWriter<S extends Identifiable, P extends Property, O extends
                 return s + "^^<" + escape(type.toString()) + ">";
             }
             return s;
-        } else if (object instanceof MemoryNode) {
-            MemoryNode node = (MemoryNode) object;
-            return node.isBlank() ?
+        } /*else if (object instanceof MemoryIdentifiable) {
+            MemoryIdentifiable node = (MemoryIdentifiable) object;
+            return node.isEmbedded() ?
                     node.toString() :
                     "<" + escape(node.toString()) + ">";
-        }
+        }*/
         return "<???>";
     }
 

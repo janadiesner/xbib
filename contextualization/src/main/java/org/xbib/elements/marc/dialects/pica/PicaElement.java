@@ -34,9 +34,7 @@ package org.xbib.elements.marc.dialects.pica;
 import org.xbib.analyzer.pica.zdb.bibdat.LibraryAddressProperties;
 import org.xbib.elements.Element;
 import org.xbib.elements.ElementBuilder;
-import org.xbib.analyzer.dublincore.DublinCoreProperties;
 import org.xbib.analyzer.dublincore.DublinCoreTerms;
-import org.xbib.analyzer.dublincore.DublinCoreTermsProperties;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.DataField;
@@ -46,9 +44,7 @@ import java.util.Map;
 
 public abstract class PicaElement
         implements Element<DataField, String, PicaElementBuilder>,
-        DublinCoreProperties, 
-        DublinCoreTerms, 
-        DublinCoreTermsProperties,
+        DublinCoreTerms,
         LibraryAddressProperties {
 
     protected static final Logger logger = LoggerFactory.getLogger(PicaElement.class.getName());

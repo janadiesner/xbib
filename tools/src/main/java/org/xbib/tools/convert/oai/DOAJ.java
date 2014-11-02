@@ -40,7 +40,7 @@ import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.rdf.memory.MemoryProperty;
 import org.xbib.rdf.memory.MemoryResourceContext;
-import org.xbib.rdf.types.XSDResourceIdentifiers;
+import org.xbib.rdf.types.XSDIdentifiers;
 import org.xbib.tools.OAIHarvester;
 
 import javax.xml.namespace.QName;
@@ -92,7 +92,7 @@ public class DOAJ extends OAIHarvester {
             switch (name.getLocalPart()) {
                 case "identifier": {
                     if (content.startsWith("http://")) {
-                        return new MemoryLiteral(content).type(XSDResourceIdentifiers.ANYURI);
+                        return new MemoryLiteral(content).type(XSDIdentifiers.ANYURI);
                     }
                     if (content.startsWith("issn: ")) {
                         return new MemoryLiteral(content.substring(6)).type(ISSN);

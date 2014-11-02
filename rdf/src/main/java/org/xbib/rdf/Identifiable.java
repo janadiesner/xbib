@@ -52,11 +52,4 @@ public interface Identifiable {
      */
     Identifiable id(IRI identifier);
 
-    /**
-     * Is identifier local/embedded?
-     *
-     * @return true if blank, otherwise false
-     */
-    boolean isBlank();
-
 }

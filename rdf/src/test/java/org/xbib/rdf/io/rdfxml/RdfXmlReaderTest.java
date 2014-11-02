@@ -31,14 +31,16 @@
  */
 package org.xbib.rdf.io.rdfxml;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import org.testng.annotations.Test;
+import org.xbib.helper.StreamTester;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 
-public class RdfXmlReaderTest {
+public class RdfXmlReaderTest extends StreamTester {
 
     @Test
     public void testReader() throws Exception {
@@ -49,8 +51,14 @@ public class RdfXmlReaderTest {
         }
         RdfXmlParser reader = new RdfXmlParser();
         StringWriter sw = new StringWriter();
-        TurtleWriter turtle = new TurtleWriter(sw);
-        reader.parse(new InputStreamReader(in, "UTF-8"), turtle);
+        TurtleWriter writer = new TurtleWriter(sw);
+        reader.parse(new InputStreamReader(in, "UTF-8"), writer);
+        writer.close();
+        sw.close();
+        assertStream(getClass().getResource("rdfxml.ttl").openStream(),
+                new ByteArrayInputStream(sw.toString().getBytes()));
+
+
     }
 
 

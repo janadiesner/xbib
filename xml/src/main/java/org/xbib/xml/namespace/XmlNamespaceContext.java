@@ -38,7 +38,6 @@ import javax.xml.namespace.NamespaceContext;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -54,9 +53,10 @@ public class XmlNamespaceContext implements NamespaceContext {
 
     private static final String DEFAULT_RESOURCE = "org.xbib.xml.namespaces";
 
-    private final SortedMap<String, String> namespaces = new TreeMap();
+    // sort namespace by length in descending order, useful for compacting prefix
+    private final SortedMap<String, String> namespaces = new TreeMap<String, String>();
 
-    private final SortedMap<String, Set<String>> prefixes = new TreeMap();
+    private final SortedMap<String, Set<String>> prefixes = new TreeMap<String, Set<String>>();
 
     protected XmlNamespaceContext() {
     }
@@ -74,11 +74,10 @@ public class XmlNamespaceContext implements NamespaceContext {
         return DEFAULT_RESOURCE;
     }
 
-
     /**
      * Empty namespace context.
      *
-     * @return
+     * @return an XML namespace context
      */
     public static XmlNamespaceContext newInstance() {
         return new XmlNamespaceContext();
@@ -97,7 +96,7 @@ public class XmlNamespaceContext implements NamespaceContext {
         }
     }
 
-    public final void addNamespace(String prefix, String namespace) {
+    public void addNamespace(String prefix, String namespace) {
         namespaces.put(prefix, namespace);
         if (prefixes.containsKey(namespace)) {
             prefixes.get(namespace).add(prefix);
@@ -108,11 +107,11 @@ public class XmlNamespaceContext implements NamespaceContext {
         }
     }
 
-    public final void removeNamespace(String prefix) {
+    public void removeNamespace(String prefix) {
         prefixes.remove(namespaces.remove(prefix));
     }
 
-    public Map<String, String> getNamespaces() {
+    public SortedMap<String, String> getNamespaces() {
         return namespaces;
     }
 

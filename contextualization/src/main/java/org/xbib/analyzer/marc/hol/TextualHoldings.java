@@ -87,7 +87,9 @@ public class TextualHoldings extends MARCElement {
                 Resource parsedHoldings = EnumerationAndChronology.parse(field.data(), r, getMovingwallPatterns());
                 if (!parsedHoldings.isEmpty()) {
                     Set<Integer> dates = EnumerationAndChronology.dates(builder.context().getResource().id(), parsedHoldings);
-                    builder.context().getResource().add("dates", dates);
+                    for (Integer date : dates) {
+                        builder.context().getResource().add("dates", date);
+                    }
                 } else {
                     logger.debug("no dates found in field " + field);
                 }

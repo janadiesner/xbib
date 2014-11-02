@@ -38,61 +38,96 @@ import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.types.XSDIdentifiers;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.stream.Stream;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
- * A simple resource is a sequence of properties and of associated resources.
+ * A resource is a sequence of properties and of associated resources.
  */
-public class MemoryResource<S extends Identifiable, P extends Property, O extends Node>
-        extends MemoryNode
-        implements Resource<S, P, O>, Comparable<Resource<S, P, O>> {
+public class MemoryResource implements Comparable<Identifiable>, Resource, XSDIdentifiers {
 
-    private transient final MemoryFactory<S, P, O> memoryFactory = MemoryFactory.getInstance();
+    private final static AtomicLong nodeID = new AtomicLong();
 
-    private ResourceContext context = new MemoryResourceContext();
+    private final static String GENID = "genid";
 
-    private MultiMap<P, Node> attributes = new LinkedHashMultiMap<P, Node>();
+    private final static String PLACEHOLDER = "_:";
 
-    private Map<IRI, O> resources = new LinkedHashMap<IRI, O>();
+    private final static IRI DELETED = IRI.builder().curie("_deleted").build();
 
-    private S subject;
+    private final MultiMap<IRI, Node> attributes = new LinkedHashMultiMap<IRI, Node>();
 
-    private boolean deleted;
+    private final Map<IRI, Resource> children = new LinkedHashMap<IRI, Resource>();
+
+    private IRI id;
 
     @Override
-    public MemoryResource<S, P, O> id(IRI identifier) {
-        super.id(identifier);
-        this.subject = (S) new MemoryNode().id(identifier);
+    public MemoryResource id(IRI id) {
+        this.id = id;
         return this;
     }
 
     @Override
-    public Resource<S, P, O> subject(S subject) {
-        this.subject = subject;
-        return this;
-    }
-
-    public Resource<S, P, O> subject(IRI subject) {
-        this.subject = (S) new MemoryNode().id(subject);
-        return this;
+    public IRI id() {
+        return id;
     }
 
     @Override
-    public S subject() {
-        return subject;
+    public int compareTo(Identifiable o) {
+        return id == null ? -1 : id.toString().compareTo(o.id().toString());
     }
 
     @Override
-    public Resource<S, P, O> add(Triple<S, P, O> triple) {
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj instanceof Identifiable && ((Identifiable) obj).id().equals(id);
+    }
+
+    public MemoryResource blank() {
+        id(IRI.builder().curie(GENID, "b" + next()).build());
+        return this;
+    }
+
+    public MemoryResource blank(String id) {
+        id(IRI.builder().curie(GENID, id).build());
+        return this;
+    }
+
+    public boolean isEmbedded() {
+        return GENID.equals(id().getScheme());
+    }
+
+    public static void reset() {
+        nodeID.set(0L);
+    }
+
+    public static long next() {
+        return nodeID.incrementAndGet();
+    }
+
+    @Override
+    public String toString() {
+        if (id() == null) {
+            blank();
+        }
+        return isEmbedded() ? PLACEHOLDER + id().getSchemeSpecificPart() : id().toString();
+    }
+
+    @Override
+    public Resource add(Triple triple) {
         if (triple == null) {
             return this;
         }
@@ -100,77 +135,121 @@ public class MemoryResource<S extends Identifiable, P extends Property, O extend
         if (id == null || id.equals(id())) {
             add(triple.predicate(), triple.object());
         } else {
-            Resource<S, P, O> r = (Resource<S, P, O>) resources.get(id);
+            Resource r = children.get(id);
             if (r != null) {
                 return r.add(triple);
             } else {
-                // continue with new resource with new subject
-                return new MemoryResource<S, P, O>().id(id).add(triple);
+                // nothing found, continue with a new resource with new subject
+                return new MemoryResource().id(id).add(triple);
             }
         }
         return this;
     }
 
     @Override
-    public Resource<S, P, O> add(P predicate, O object) {
-        attributes.put(predicate, object);
-        if (object instanceof MemoryNode) {
-            resources.put(((MemoryNode) object).id(), object);
+    public Resource add(Property predicate, Node object) {
+        attributes.put(predicate.id(), object);
+        if (object instanceof Resource) {
+            Resource r = (Resource)object;
+            children.put(r.id(), r);
         }
         return this;
     }
 
     @Override
-    public Resource<S, P, O> add(P predicate, IRI iri) {
-        return add(predicate, (O) new MemoryNode().id(iri));
+    public Resource add(Property predicate, IRI iri) {
+        return add(predicate, new MemoryResource().id(iri));
     }
 
     @Override
-    public Resource<S, P, O> add(P predicate, Literal<O> literal) {
-        // drop null literals silently
-        if (literal != null) {
-            attributes.put(predicate, literal);
+    public Resource add(Property predicate, Literal literal) {
+        if (predicate != null && literal != null) {
+            attributes.put(predicate.id(), literal);
         }
         return this;
     }
 
     @Override
-    public Resource<S, P, O> add(P predicate, Resource<S, P, O> resource) {
+    public Resource add(Property predicate, Resource resource) {
         if (resource == null) {
             return this;
         }
         if (resource.id() == null) {
-            resource.id(super.id());
-            Resource<S, P, O> r = newResource(predicate);
-            for (Triple<S, P, O> triple : resource) {
-                r.add(triple);
-            }
+            resource.id(id());
+            Resource r = newResource(predicate);
+            resource.triples().forEach(r::add);
         } else {
-            attributes.put(predicate, resource);
+            attributes.put(predicate.id(), resource);
         }
         return this;
     }
 
+    public Resource remove(Property predicate) {
+        if (predicate == null || predicate.id() == null) {
+            return this;
+        }
+        // check if child resource exists for any of the objects under this predicate and remove it
+        embeddedResources(predicate.id()).forEach(resource -> children.remove(resource.id()));
+        attributes.remove(predicate.id());
+        return this;
+    }
+
+    public Resource remove(Property predicate, Node object) {
+        if (predicate == null || predicate.id() == null) {
+            return this;
+        }
+        return this;
+    }
+
+
     @Override
-    public Resource<S, P, O> a(IRI externalResource) {
+    public Resource a(IRI externalResource) {
         add("rdf:type", externalResource);
         return this;
     }
 
     @Override
-    public Set<P> predicates() {
+    public Set<IRI> predicates() {
         return attributes.keySet();
     }
 
     @Override
-    public Collection<O> objects(P predicate) {
-        return (Collection<O>) attributes.get(predicate);
+    public Collection<Node> objects(IRI predicate) {
+        return attributes.get(predicate);
     }
 
     @Override
-    public O literal(P predicate) {
-        return attributes.containsKey(predicate) ?
-                (O) attributes.get(predicate).iterator().next() : null;
+    public List<Literal> literals(IRI predicate) {
+        return attributes.get(predicate).stream()
+                .filter(n -> n instanceof Literal)
+                .map(Literal.class::cast)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Resource> resources(IRI predicate) {
+        return attributes.get(predicate).stream()
+                .filter(n -> n instanceof Resource)
+                .map(Resource.class::cast)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Resource> embeddedResources(IRI predicate) {
+        return attributes.get(predicate).stream()
+                .filter(n -> n instanceof Resource)
+                .map(Resource.class::cast)
+                .filter(Resource::isEmbedded)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Resource> linkedResources(IRI predicate) {
+        return attributes.get(predicate).stream()
+                .filter(n -> n instanceof Resource)
+                .map(Resource.class::cast)
+                .filter(n -> !n.isEmbedded())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -182,23 +261,23 @@ public class MemoryResource<S extends Identifiable, P extends Property, O extend
      * @param predicate the predicate
      */
     @Override
-    public void compactPredicate(P predicate) {
-        Stream<Node> stream = resources(predicate);
-        Iterator<Node> it = stream.iterator();
-        Resource<S, P, O> resource = (Resource<S, P, O>) it.next();
+    public void compactPredicate(IRI predicate) {
+        List<Resource> resources = resources(predicate);
+        Iterator<Resource> it = resources.iterator();
+        Resource resource = it.next();
         if (!it.hasNext()) {
-            Collection<Node> newResource = new LinkedList();
-            for (O o : objects(predicate)) {
-                if (o instanceof Literal) {
-                    newResource.add(o);
-                } else if (o instanceof MemoryNode) {
-                    if (!((MemoryNode) o).isBlank()) {
-                        newResource.add(o);
+            List<Node> newResource = new ArrayList<Node>();
+            for (Node node : objects(predicate)) {
+                if (node instanceof Literal) {
+                    newResource.add(node);
+                } else if (node instanceof Resource) {
+                    if (!((Resource) node).isEmbedded()) {
+                        newResource.add(node);
                     }
                 }
             }
-            newResource.addAll(new LinkedList(resource.objects(predicate)));
-            attributes.removeAll(predicate);
+            newResource.addAll(new ArrayList(resource.objects(predicate)));
+            attributes.remove(predicate);
             attributes.putAll(predicate, newResource);
         }
     }
@@ -219,212 +298,186 @@ public class MemoryResource<S extends Identifiable, P extends Property, O extend
     }
 
     @Override
-    public Resource<S, P, O> setDeleted(boolean delete) {
-        this.deleted = delete;
+    public Resource setDeleted(boolean delete) {
+        attributes.remove(DELETED);
+        attributes.put(DELETED, new MemoryLiteral(delete));
         return this;
     }
 
     @Override
     public boolean isDeleted() {
-        return deleted;
+        Literal literal = (Literal) attributes.get(DELETED);
+        return (literal.object() instanceof Boolean && (Boolean) literal.object());
     }
 
     @Override
-    public String toString() {
-        return "<" + (super.id() != null ? super.id() : "") + ">";
-    }
-
-    @Override
-    public Stream<Node> resources(P predicate) {
-        return attributes.get(predicate).stream().filter(n -> n instanceof Resource);
-    }
-
-    @Override
-    public MemoryResource<S, P, O> context(ResourceContext context) {
-        this.context = context;
-        return this;
-    }
-
-    @Override
-    public ResourceContext context() {
-        return context;
-    }
-
-    @Override
-    public Resource<S, P, O> newResource(P predicate) {
-        IRI blank = new MemoryNode().blank().id();
-        Resource<S, P, O> r = new MemoryResource<S,P,O>().id(blank);
-        resources.put(blank, (O) r);
-        attributes.put(predicate, r);
+    public Resource newResource(Property predicate) {
+        Resource r = new MemoryResource().blank();
+        children.put(r.id(), r);
+        attributes.put(predicate.id(), r);
         return r;
     }
 
     @Override
-    public Resource<S, P, O> add(P predicate, String value) {
-        return add(predicate, memoryFactory.newLiteral(value));
+    public Resource newResource(IRI predicate) {
+        return newResource(newPredicate(predicate));
     }
 
     @Override
-    public Resource<S, P, O> add(P predicate, Integer value) {
-        return add(predicate, memoryFactory.newLiteral(value));
+    public Resource newResource(String predicate) {
+        return newResource(newPredicate(predicate));
     }
 
     @Override
-    public Resource<S, P, O> add(P predicate, Collection literals) {
-        for (Object object : literals) {
-            add(predicate, memoryFactory.newLiteral(object));
+    public Resource add(Property predicate, String value) {
+        return add(predicate, newLiteral(value));
+    }
+
+    @Override
+    public Resource add(Property predicate, Integer value) {
+        return add(predicate, newLiteral(value));
+    }
+
+    @Override
+    public Resource add(Property predicate, Boolean value) {
+        return add(predicate, newLiteral(value));
+    }
+
+    @Override
+    public Resource add(Property predicate, List<Node> objects) {
+        for (Node object : objects) {
+            add(predicate, newLiteral(object));
         }
         return this;
     }
 
     @Override
-    public Resource<S, P, O> add(String predicate, String value) {
-        return add(memoryFactory.newPredicate(predicate), value);
+    public Resource add(String predicate, String value) {
+        return add(newPredicate(predicate), value);
     }
 
     @Override
-    public Resource<S, P, O> add(String predicate, Integer value) {
-        return add(memoryFactory.newPredicate(predicate), value);
+    public Resource add(String predicate, Integer value) {
+        return add(newPredicate(predicate), value);
     }
 
     @Override
-    public Resource<S, P, O> add(String predicate, Literal value) {
-        return add(memoryFactory.newPredicate(predicate), value);
+    public Resource add(String predicate, Boolean value) {
+        return add(newPredicate(predicate), value);
     }
 
     @Override
-    public Resource<S, P, O> add(String predicate, IRI externalResource) {
-        return add(memoryFactory.newPredicate(predicate), externalResource);
+    public Resource add(String predicate, Literal value) {
+        return add(newPredicate(predicate), value);
     }
 
     @Override
-    public Resource<S, P, O> add(String predicate, Collection literals) {
-        return add(memoryFactory.newPredicate(predicate), literals);
+    public Resource add(String predicate, IRI externalResource) {
+        return add(newPredicate(predicate), externalResource);
     }
 
     @Override
-    public Resource<S, P, O> newResource(IRI predicate) {
-        return newResource(memoryFactory.newPredicate(predicate));
+    public Resource add(String predicate, List<Node> objects) {
+        return add(newPredicate(predicate), objects);
     }
 
     @Override
-    public Resource<S, P, O> newResource(String predicate) {
-        return newResource(memoryFactory.newPredicate(predicate));
+    public Resource add(String predicate, Resource resource) {
+        return add(newPredicate(predicate), resource);
     }
 
     @Override
-    public Resource<S, P, O> add(String predicate, Resource<S, P, O> resource) {
-        return add(memoryFactory.newPredicate(predicate), resource);
+    public Collection<Node> objects(String predicate) {
+        return objects(newPredicate(predicate).id());
     }
 
     @Override
-    public Collection<O> objects(String predicate) {
-        return objects(memoryFactory.newPredicate(predicate));
+    public List<Triple> triples() {
+        return new Triples(this, true).list();
     }
 
     @Override
-    public O literal(String predicate) {
-        return literal(memoryFactory.newPredicate(predicate));
+    public List<Triple> properties() {
+        return new Triples(this, false).list();
     }
 
-    @Override
-    public Iterator<Triple<S, P, O>> iterator() {
-        return new TripleIterator(this, true);
+    public Resource newSubject(Object subject) {
+        return subject == null ? null :
+                subject instanceof Resource ? (Resource) subject :
+                        subject instanceof IRI ? new MemoryResource().id((IRI) subject) :
+                                new MemoryResource().id(IRI.builder().curie(subject.toString()).build());
     }
 
-    @Override
-    public Iterator<Triple<S, P, O>> propertyIterator() {
-        return new TripleIterator(this, false);
+    public Property newPredicate(Object predicate) {
+        return predicate == null ? null :
+                predicate instanceof Property ? (Property) predicate :
+                        predicate instanceof IRI ? new MemoryProperty((IRI) predicate) :
+                                new MemoryProperty(IRI.builder().curie(predicate.toString()).build());
     }
 
-    @Override
-    public int compareTo(Resource<S, P, O> o) {
-        return id() == null ? -1 : id().toString().compareTo(o.id().toString());
+    public Node newObject(Object object) {
+        return object == null ? null :
+                object instanceof Literal ? (Node) object :
+                        object instanceof IRI ? new MemoryResource().id((IRI) object) :
+                                new MemoryLiteral(object);
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 67 * hash + (id() != null ? id().hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj != null && getClass() == obj.getClass();
-    }
-
-    public Resource<S, P, O> type(IRI type) {
-        add(memoryFactory.rdfType(), type);
-        return this;
-    }
-
-    public IRI type() {
-        Collection<Node> c = attributes.get(memoryFactory.rdfType());
-        if (c != null) {
-            return ((Identifiable)c.iterator().next()).id();
+    public Literal newLiteral(Object value) {
+        if (value == null) {
+            return null;
         }
-        return null;
+        if (value instanceof Literal) {
+            return (Literal) value;
+        }
+        if (value instanceof Double) {
+            return new MemoryLiteral(value).type(DOUBLE);
+        }
+        if (value instanceof Float) {
+            return new MemoryLiteral(value).type(FLOAT);
+        }
+        if (value instanceof Long) {
+            return new MemoryLiteral(value).type(LONG);
+        }
+        if (value instanceof Integer) {
+            return new MemoryLiteral(value).type(INT);
+        }
+        if (value instanceof Boolean) {
+            return new MemoryLiteral(value).type(BOOLEAN);
+        }
+        // untyped
+        return new MemoryLiteral(value);
     }
 
-    public Resource<S, P, O> language(String lang) {
-        add(memoryFactory.rdfLang(), lang);
-        return this;
-    }
+    class Triples {
 
-    public String language() {
-        Collection<Node> c = attributes.get(memoryFactory.rdfLang());
-        return c != null ? c.iterator().hasNext() ?
-                c.iterator().next().toString()
-                : null : null;
-    }
+        private final List<Triple> triples;
 
-    class TripleIterator<S extends Identifiable, P extends Property, O extends Node>
-            implements Iterator<Triple> {
+        private final boolean recursive;
 
-        private final LinkedList<Triple> triples;
-        private final boolean includeResources;
-
-        public TripleIterator(Resource<S, P, O> resource, boolean includeResources) {
-            this.includeResources = includeResources;
+        public Triples(Resource resource, boolean recursive) {
+            this.recursive = recursive;
             this.triples = unfold(resource);
         }
 
-        @Override
-        public boolean hasNext() {
-            return !triples.isEmpty();
+        public List<Triple> list() {
+            return triples;
         }
 
-        @Override
-        public Triple next() {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-            return triples.poll();
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        private LinkedList<Triple> unfold(Resource<S, P, O> resource) {
-            LinkedList<Triple> list = new LinkedList();
+        private List<Triple> unfold(Resource resource) {
+            List<Triple> list = new ArrayList<Triple>();
             if (resource == null) {
                 return list;
             }
-            S subj = resource.subject();
-            for (P pred : resource.predicates()) {
-                for (O obj : resource.objects(pred)) {
-                    list.offer(new MemoryTriple(subj, pred, obj));
-                    if (includeResources && obj instanceof Resource) {
-                        list.addAll(unfold((Resource<S, P, O>) obj));
+            for (IRI pred : resource.predicates()) {
+                for (Node obj : resource.objects(pred)) {
+                    list.add(new MemoryTriple(resource, new MemoryProperty(pred), obj));
+                    if (recursive && obj instanceof Resource) {
+                        list.addAll(unfold((Resource) obj));
                     }
                 }
             }
             return list;
         }
-
     }
 
 }

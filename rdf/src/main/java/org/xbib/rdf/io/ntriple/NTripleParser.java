@@ -32,12 +32,12 @@
 package org.xbib.rdf.io.ntriple;
 
 import org.xbib.iri.IRI;
-import org.xbib.rdf.Identifiable;
 import org.xbib.rdf.Parser;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Node;
+import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.memory.MemoryFactory;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.rdf.memory.MemoryTriple;
 
 import java.io.BufferedReader;
@@ -53,8 +53,9 @@ import java.util.regex.PatternSyntaxException;
  * See also the <a href="http://www.w3.org/TR/rdf-testcases/#convert">NTriple
  * specification</a>
  */
-public class NTripleParser<S extends Identifiable, P extends Property, O extends Node>
-        implements Parser<S, P, O> {
+public class NTripleParser implements Parser {
+
+    private final static Resource resource = new MemoryResource();
 
     private static final String resourceExpression = "(<[^<]+?>)";
     private static final String literalValueExpression = "(\"([^\"]|\\\")*\")";
@@ -68,10 +69,9 @@ public class NTripleParser<S extends Identifiable, P extends Property, O extends
     public static final String tripleExpression = subjectExpression + "\\s+" + predicateExpression + "\\s+" + objectExpression + "\\s*\\.";
     public static final Pattern NTRIPLE_PATTERN = Pattern.compile(tripleExpression);
     private boolean eof;
-    private final MemoryFactory<S, P, O> memoryFactory = MemoryFactory.getInstance();
 
     @Override
-    public NTripleParser parse(Reader reader, Triple.Builder<S, P, O> listener) throws IOException {
+    public NTripleParser parse(Reader reader, Triple.Builder listener) throws IOException {
         this.eof = false;
         try (BufferedReader br = new BufferedReader(reader)) {
             while (!eof) {
@@ -111,7 +111,7 @@ public class NTripleParser<S extends Identifiable, P extends Property, O extends
      * 20   language with @
      * 21	language without @
      */
-    private void parseLine(String line, Triple.Builder<S, P, O> listener) throws IOException {
+    private void parseLine(String line, Triple.Builder listener) throws IOException {
         if (line == null) {
             eof = true;
             return;
@@ -121,41 +121,41 @@ public class NTripleParser<S extends Identifiable, P extends Property, O extends
             return;
         }
         Matcher matcher = NTRIPLE_PATTERN.matcher(s);
-        S subject;
-        P predicate;
-        O object;
+        Resource subject;
+        Property predicate;
+        Node object;
         if (!matcher.matches()) {
             throw new PatternSyntaxException("The given pattern " + tripleExpression + " doesn't match the expression:", s, -1);
         }
         // subject
         if (matcher.group(2) != null) {
-            subject = (S) memoryFactory.newBlankNode(matcher.group(1));
+            subject = new MemoryResource().blank(matcher.group(1));  //resource.newEmbeddedNode(matcher.group(1));
         } else {
             // getResource node
             String subj = matcher.group(1);
             IRI subjURI = IRI.create(subj.substring(1, subj.length() - 1));
-            subject = memoryFactory.newSubject(subjURI);
+            subject = resource.newSubject(subjURI);
         }
         // predicate
         String p = matcher.group(4);
-        predicate = (P) IRI.create(p.substring(1, p.length() - 1));
+        predicate = resource.newPredicate(IRI.create(p.substring(1, p.length() - 1)));
         // object
         if (matcher.group(7) != null) {
             // anonymous node
-            object = (O) memoryFactory.newBlankNode(matcher.group(6));
+            object =  new MemoryResource().blank(matcher.group(6));  // resource.newBlankNode(matcher.group(6));
         } else if (matcher.group(8) != null) {
             // getResource node
             String obj = matcher.group(6);
-            object = memoryFactory.newObject(IRI.create(obj.substring(1, obj.length() - 1)));
+            object = resource.newObject(IRI.create(obj.substring(1, obj.length() - 1)));
         } else {
             // literal node
             // 10 is without quotes or apostrophs
             // with quotes or apostrophes. to have the value without them you need to look at groups 12 and 15
             String literal = matcher.group(10);
-            object = (O) memoryFactory.newLiteral(literal);
+            object = resource.newLiteral(literal);
         }
         if (listener != null) {
-            listener.triple(new MemoryTriple<S, P, O>(subject, predicate, object));
+            listener.triple(new MemoryTriple(subject, predicate, object));
         }
     }
 }

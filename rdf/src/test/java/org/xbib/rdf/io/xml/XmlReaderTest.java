@@ -31,28 +31,27 @@
  */
 package org.xbib.rdf.io.xml;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import javax.xml.namespace.QName;
-import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.Loggers;
 import org.xbib.rdf.Triple;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryNode;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.text.CharUtils.Profile;
 import org.xbib.text.UrlEncoding;
 
-public class XmlReaderTest extends Assert {
+import static org.testng.Assert.assertEquals;
 
-    private final Logger logger = Loggers.getLogger(XmlReaderTest.class.getName());
+public class XmlReaderTest extends StreamTester {
 
     @Test
     public void testOAIDC() throws Exception {
@@ -101,9 +100,10 @@ public class XmlReaderTest extends Assert {
                 .setHandler(xmlHandler)
                 .parse(new InputStreamReader(in, "UTF-8"), writer);
         writer.close();
-        String s = sw.toString().trim();
-        logger.info(s);
-        assertEquals(s.length(), 2115);
+        sw.close();
+
+        assertStream(getClass().getResource("dc.ttl").openStream(),
+                new ByteArrayInputStream(sw.toString().getBytes()));
     }
 
     @Test
@@ -120,8 +120,7 @@ public class XmlReaderTest extends Assert {
 
             @Override
             public boolean isResourceDelimiter(QName name) {
-                return false; // only one resource
-                //return "oai_dc".equals(name.getLocalPart());
+                return false;
             }
 
             @Override
@@ -134,8 +133,6 @@ public class XmlReaderTest extends Assert {
             @Override
             public boolean skip(QName name) {
                 return false;
-                // skip dc:dc element
-                //return "dc".equals(name.getLocalPart());
             }
 
         };
@@ -173,12 +170,13 @@ public class XmlReaderTest extends Assert {
                         return this;
                     }
                 });
-        MemoryNode.reset();
+        MemoryResource.reset();
         new XmlParser()
                 .setHandler(xmlHandler)
                 .parse(new InputStreamReader(in, "UTF-8"), null);
-        logger.info("triples={}", triples);
-        assertEquals("[id:1 xml:dates <genid:b1>, _:b1 xml:date 2001, _:b1 xml:date 2002, _:b1 xml:date 2003]", triples.toString());
+        assertEquals(triples.toString(),
+                "[id:1 xml:dates _:b1, _:b1 xml:date 2001, _:b1 xml:date 2002, _:b1 xml:date 2003]"
+        );
     }
 
     @Test
@@ -245,11 +243,12 @@ public class XmlReaderTest extends Assert {
                         return this;
                     }
                 });
-        MemoryNode.reset();
+        MemoryResource.reset();
         new XmlParser()
                 .setHandler(xmlHandler)
                 .parse(new InputStreamReader(in, "UTF-8"), null);
-        logger.info("triple = {}", triples);
+        assertEquals( triples.toString(),
+                "[id:1 xml:dates _:b1, _:b1 xml:date _:b2, _:b2 xml:@href 1, _:b1 xml:date _:b4, _:b4 xml:@href 2, _:b1 xml:date _:b6, _:b6 xml:@href 3, _:b1 xml:date _:b8, _:b8 xml:hello World]");
 
     }
 

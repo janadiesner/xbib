@@ -29,73 +29,40 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.rdf.memory;
+package org.xbib.rdf;
 
 import org.xbib.iri.IRI;
-import org.xbib.rdf.Identifiable;
-import org.xbib.rdf.Node;
+import org.xbib.xml.XMLNS;
 
-import java.util.concurrent.atomic.AtomicLong;
+public interface RdfConstants {
 
-/**
- * An in-memory identifiable node (including blank nodes)
- */
-public class MemoryNode implements Identifiable, Node {
+    String NS_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
-    private final static AtomicLong nodeID = new AtomicLong();
+    String NS_PREFIX = "rdf";
 
-    private final static String GENID = "genid";
+    IRI RDF = IRI.create(NS_URI);
+    IRI RDF_RDF = IRI.create(NS_URI + "RDF");
+    IRI RDF_DESCRIPTION = IRI.create(NS_URI + "Description");
+    IRI RDF_ABOUT = IRI.create(NS_URI + "about");
+    IRI RDF_RESOURCE = IRI.create(NS_URI + "resource");
+    IRI RDF_NODE_ID = IRI.create(NS_URI + "nodeID");
+    IRI RDF_ID = IRI.create(NS_URI + "ID");
+    IRI RDF_LI = IRI.create(NS_URI + "li");
+    IRI RDF_TYPE = IRI.create(NS_URI + "type");
+    IRI RDF_SUBJECT = IRI.create(NS_URI + "subject");
+    IRI RDF_PREDICATE = IRI.create(NS_URI + "predicate");
+    IRI RDF_OBJECT = IRI.create(NS_URI + "object");
+    IRI RDF_STATEMENT = IRI.create(NS_URI + "Statement");
+    IRI RDF_XMLLITERAL = IRI.create(NS_URI + "XMLLiteral");
+    IRI RDF_NIL = IRI.create(NS_URI + "nil");
+    IRI RDF_FIRST = IRI.create(NS_URI + "first");
+    IRI RDF_REST = IRI.create(NS_URI + "rest");
+    IRI RDF_LANGUAGE = IRI.create(XMLNS.NS_PREFIX + "lang");
 
-    private final static String PLACEHOLDER = "_:";
+    String RDF_STRING = RDF.toString();
 
-    private IRI id;
+    String NODE_ID = "nodeID";
 
-    public MemoryNode() {
-    }
+    String ABOUT = "about";
 
-    public MemoryNode blank(String id) {
-        id(IRI.builder().curie(GENID, id).build());
-        return this;
-    }
-
-    public MemoryNode blank() {
-        id(IRI.builder().curie(GENID, "b" + next()).build());
-        return this;
-    }
-
-    @Override
-    public MemoryNode id(IRI id) {
-        this.id = id;
-        return this;
-    }
-
-    @Override
-    public IRI id() {
-        return id;
-    }
-
-    public boolean isBlank() {
-        return GENID.equals(id.getScheme());
-    }
-
-    @Override
-    public String toString() {
-        if (id == null) {
-            blank();
-        }
-        return isBlank() ? PLACEHOLDER + id.getSchemeSpecificPart() : id.toString();
-    }
-
-    @Override
-    public Object value() {
-        return id;
-    }
-
-    public static void reset() {
-        nodeID.set(0L);
-    }
-
-    public static long next() {
-        return nodeID.incrementAndGet();
-    }
 }

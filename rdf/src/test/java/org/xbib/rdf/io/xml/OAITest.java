@@ -1,10 +1,8 @@
 package org.xbib.rdf.io.xml;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.Loggers;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
@@ -12,14 +10,13 @@ import org.xbib.text.CharUtils;
 import org.xbib.text.UrlEncoding;
 
 import javax.xml.namespace.QName;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
-public class OAITest extends Assert {
-
-    private final Logger logger = Loggers.getLogger(OAITest.class.getName());
+public class OAITest extends StreamTester {
 
     @Test
     public void testOAIListRecords() throws Exception {
@@ -59,6 +56,7 @@ public class OAITest extends Assert {
 
         };
         StringWriter sw = new StringWriter();
+        //FileWriter sw = new FileWriter("oai.ttl");
         TurtleWriter writer = new TurtleWriter(sw);
         writer.setNamespaceContext(context);
         writer.writeNamespaces();
@@ -68,7 +66,8 @@ public class OAITest extends Assert {
                 .setHandler(xmlHandler)
                 .parse(new InputStreamReader(in, "UTF-8"), writer);
         writer.close();
-        String s = sw.toString().trim();
-        logger.info(s);
+        sw.close();
+        assertStream(getClass().getResource("oai.ttl").openStream(),
+                new ByteArrayInputStream(sw.toString().getBytes()));
     }
 }

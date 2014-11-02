@@ -31,12 +31,11 @@
  */
 package org.xbib.rdf.io.xml;
 
-import org.xbib.rdf.memory.MemoryNode;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryFactory;
+import org.xbib.rdf.memory.MemoryResource;
 
 import javax.xml.namespace.QName;
 import java.util.Stack;
@@ -47,7 +46,7 @@ import java.util.Stack;
 public abstract class AbstractXmlResourceHandler
         extends AbstractXmlHandler implements XmlResourceHandler {
 
-    private final MemoryFactory memoryFactory = MemoryFactory.getInstance();
+    private final static Resource resource = new MemoryResource();
 
     private final Stack<Resource> stack = new Stack<Resource>();
 
@@ -77,7 +76,7 @@ public abstract class AbstractXmlResourceHandler
      */
     @Override
     public void openPredicate(QName parent, QName name, int level) {
-        Property p = toProperty((Property) memoryFactory.newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
+        Property p = toProperty(resource.newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
         stack.push(stack.peek().newResource(p));
     }
 
@@ -87,7 +86,7 @@ public abstract class AbstractXmlResourceHandler
 
     @Override
     public void closePredicate(QName parent, QName name, int level) {
-        Property p = toProperty((Property) memoryFactory.newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
+        Property p = toProperty(resource.newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
         Resource r = stack.pop();
         if (level < 0) {
             // it's a Resource
@@ -100,13 +99,13 @@ public abstract class AbstractXmlResourceHandler
             if (s != null) {
                 // compact predicate because it has only a single value
                 if (!stack.isEmpty()) {
-                    Object o = memoryFactory.newObject(toObject(name, s));
+                    Object o = resource.newObject(toObject(name, s));
                     if (o instanceof Literal) {
                         r.add(p, (Literal) o);
-                    } else if (o instanceof MemoryNode) {
-                        r.add(p, (MemoryNode) o);
+                    } else if (o instanceof Resource) {
+                        r.add(p, (Resource) o);
                     }
-                    stack.peek().compactPredicate(p);
+                    stack.peek().compactPredicate(p.id());
                 }
             }
         }

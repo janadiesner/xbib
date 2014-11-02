@@ -33,12 +33,10 @@ package org.xbib.elements.marc.dialects.pica;
 
 import org.xbib.elements.AbstractElementBuilder;
 import org.xbib.elements.context.ResourceContextFactory;
-import org.xbib.analyzer.dublincore.DublinCoreProperties;
 import org.xbib.marc.DataField;
 
 public class PicaElementBuilder
-        extends AbstractElementBuilder<DataField, String, PicaElement, PicaContext>
-        implements DublinCoreProperties {
+        extends AbstractElementBuilder<DataField, String, PicaElement, PicaContext> {
 
     private final ResourceContextFactory<PicaContext> contextFactory = new ResourceContextFactory<PicaContext>() {
         @Override

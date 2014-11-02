@@ -35,21 +35,18 @@ import java.io.StringWriter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
-import org.xbib.rdf.memory.MemoryNode;
-import org.xbib.rdf.Identifiable;
-import org.xbib.rdf.Property;
-import org.xbib.rdf.Node;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.rdf.memory.MemoryResourceContext;
 
-public class XmlResourceContextWriterTest<S extends Identifiable, P extends Property, O extends Node> extends Assert {
+public class XmlResourceContextWriterTest extends Assert {
     
     @Test
     public void testXMLResourceWriter() throws Exception {
-        MemoryNode.reset();
-        ResourceContext<Resource<S, P, O>> resourceContext = new MemoryResourceContext<>();
-        Resource<S, P, O> root = resourceContext.newResource().id(IRI.create("urn:root"));
+        MemoryResource.reset();
+        ResourceContext<Resource> resourceContext = new MemoryResourceContext<>();
+        Resource root = resourceContext.newResource().id(IRI.create("urn:root"));
         Resource resource = root.newResource("urn:res");
         resource.add("urn:property", "value");
         Resource nestedResource = resource.newResource("urn:nestedresource");
@@ -62,11 +59,11 @@ public class XmlResourceContextWriterTest<S extends Identifiable, P extends Prop
     
     @Test
     public void testResourceXml() throws Exception {
-        MemoryNode.reset();
-        ResourceContext<Resource<S, P, O>> resourceContext = new MemoryResourceContext<>();
-        Resource<S, P, O> parent = resourceContext.newResource();
+        MemoryResource.reset();
+        ResourceContext<Resource> resourceContext = new MemoryResourceContext<>();
+        Resource parent = resourceContext.newResource();
         parent.id(IRI.create("urn:doc3"));
-        Resource<S, P, O> child = parent.newResource("urn:res");
+        Resource child = parent.newResource("urn:res");
         child.add("urn:property", "value");
         StringWriter sw = new StringWriter();
         XmlWriter xmlrw = new XmlWriter(sw);

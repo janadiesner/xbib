@@ -32,31 +32,30 @@
 package org.xbib.rdf.io.rdfxml;
 
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.xbib.helper.StreamTester;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
-public class VIAFRdfXmlReaderTest {
-
-    private final Logger logger = LoggerFactory.getLogger(VIAFRdfXmlReaderTest.class.getName());
+public class VIAFRdfXmlReaderTest extends StreamTester {
 
     @Test
-    public void testGND() throws Exception {
-        String filename = "/org/xbib/rdf/io/rdfxml/VIAF.rdf";
-        InputStream in = getClass().getResourceAsStream(filename);
+    public void testVIAF() throws Exception {
+        InputStream in = getClass().getResource("VIAF.rdf").openStream();
         if (in == null) {
-            throw new IOException("file " + filename + " not found");
+            throw new IOException("VIAF.rdf not found");
         }
         StringWriter sw = new StringWriter();
         TurtleWriter writer  = new TurtleWriter(sw);
         RdfXmlParser reader = new RdfXmlParser();
         reader.parse(new InputStreamReader(in, "UTF-8"), writer);
         writer.close();
-        logger.info(sw.toString());
+        sw.close();
+        assertStream(getClass().getResource("viaf.ttl").openStream(),
+                new ByteArrayInputStream(sw.toString().getBytes()));
     }
 }

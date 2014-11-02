@@ -33,7 +33,7 @@ package org.xbib.rdf.types;
 
 import org.xbib.iri.IRI;
 
-public interface XSDResourceIdentifiers {
+public interface XSDIdentifiers {
 
     IRI STRING = IRI.create("xsd:string");
 

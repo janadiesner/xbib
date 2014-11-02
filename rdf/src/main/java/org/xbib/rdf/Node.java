@@ -32,10 +32,8 @@
 package org.xbib.rdf;
 
 /**
- * Node
+ * Node marker interface
  */
-public interface Node<O> {
-
-    O value();
+public interface Node {
 
 }

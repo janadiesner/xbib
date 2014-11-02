@@ -51,6 +51,8 @@ import java.util.regex.Pattern;
 
 public class IRI implements Cloneable, Comparable<IRI> {
 
+    private final static SchemeRegistry registry = SchemeRegistry.getInstance();
+
     protected Scheme schemeClass;
 
     private String scheme;
@@ -87,7 +89,6 @@ public class IRI implements Cloneable, Comparable<IRI> {
 
     public static class Builder {
 
-        private final static SchemeRegistry registry = SchemeRegistry.getInstance();
         protected Scheme schemeClass;
         private String prefix;
         private String schemeSpecificPart;
@@ -177,17 +178,12 @@ public class IRI implements Cloneable, Comparable<IRI> {
 
     }
 
-    IRI() {
-    }
-
     public IRI(IRI iri) {
-        // shortcut
         fromIRI(iri);
         build();
     }
 
     public IRI(URI uri) {
-        // shortcut
         fromURI(uri);
         build();
     }
@@ -205,7 +201,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
     }
 
     public IRI(String iri, Normalizer.Form nf) throws IOException {
-        this(Normalizer.normalize(CharUtils.stripBidi(iri), nf).toString());
+        this(Normalizer.normalize(CharUtils.stripBidi(iri), nf));
     }
 
     IRI(Scheme schemeClass,
@@ -793,15 +789,6 @@ public class IRI implements Cloneable, Comparable<IRI> {
         Nameprep.prep("");
     }
 
-    /**
-     * Returns a new IRI with a trailing slash appended to the path, if
-     * necessary
-     */
-    public IRI trailingSlash() {
-        return new IRI(schemeClass, scheme, authority, userinfo, host, port, path.endsWith("/") ? path : path + "/", query,
-                fragment);
-    }
-
     @Override
     public int compareTo(IRI that) {
         int c;
@@ -851,7 +838,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
         return compare(this.fragment, that.fragment);
     }
 
-    private static int compare(String s, String t) {
+    private int compare(String s, String t) {
         if (s == t) {
             return 0;
         }
@@ -866,7 +853,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
         }
     }
 
-    private static int compareIgnoringCase(String s, String t) {
+    private int compareIgnoringCase(String s, String t) {
         if (s == t) {
             return 0;
         }

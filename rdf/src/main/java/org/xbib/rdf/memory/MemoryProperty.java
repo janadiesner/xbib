@@ -51,14 +51,4 @@ public class MemoryProperty extends IRI implements Property {
         return this;
     }
 
-    @Override
-    public boolean isBlank() {
-        return false;
-    }
-
-    @Override
-    public Object value() {
-        return this;
-    }
-
 }

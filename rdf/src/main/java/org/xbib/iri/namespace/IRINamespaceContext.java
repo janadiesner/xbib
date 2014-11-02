@@ -34,13 +34,18 @@ package org.xbib.iri.namespace;
 import org.xbib.iri.IRI;
 import org.xbib.xml.namespace.XmlNamespaceContext;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public final class IRINamespaceContext extends XmlNamespaceContext implements CompactingNamespaceContext {
 
     private static IRINamespaceContext instance;
+
+    private List<String> namespaces;
 
     private IRINamespaceContext() {
     }
@@ -69,6 +74,16 @@ public final class IRINamespaceContext extends XmlNamespaceContext implements Co
         return new IRINamespaceContext();
     }
 
+    public void addNamespace(String prefix, String namespace) {
+        super.addNamespace(prefix, namespace);
+        namespaces = new ArrayList<String>(getNamespaces().values());
+        Collections.sort(namespaces, (s1, s2) -> {
+            Integer l1 = s1.length();
+            Integer l2 = s2.length();
+            return -l1.compareTo(l2);
+        });
+    }
+
     /**
      * Abbreviate an URI with a full namespace URI to a short form URI with help of
      * the prefix in this namespace context.
@@ -86,11 +101,13 @@ public final class IRINamespaceContext extends XmlNamespaceContext implements Co
         // drop fragment (useful for resource counters in fragments)
         final String s = dropfragment
                 ? new IRI(uri.getScheme(), uri.getSchemeSpecificPart(), null).toString() : uri.toString();
-        // we assume we have a rather short set of name spaces (~ 10-20)
-        // otherwise, a binary search in an ordered key set would be more efficient.
-        for (final String ns : getNamespaces().values()) {
-            if (s.startsWith(ns)) {
-                return new StringBuilder().append(getPrefix(ns)).append(':').append(s.substring(ns.length())).toString();
+
+        // search from longest to shortest namespace prefix
+        if (namespaces != null) {
+            for (String ns : namespaces) {
+                if (s.startsWith(ns)) {
+                    return getPrefix(ns) + ':' + s.substring(ns.length());
+                }
             }
         }
         return s;

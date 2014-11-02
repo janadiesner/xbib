@@ -32,12 +32,15 @@
 package org.xbib.rdf.io.ntriple;
 
 import java.io.StringWriter;
-import org.testng.Assert;
+
 import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.types.XSDIdentifiers;
+
+import static org.testng.Assert.assertEquals;
 
 public class NTripleTest<R extends Resource> {
 
@@ -54,11 +57,13 @@ public class NTripleTest<R extends Resource> {
         R resource = context.newResource();
         resource.id(IRI.create("urn:doc1"));
         resource.add("http://purl.org/dc/elements/1.1/date",
-                new MemoryLiteral("2010").type(IRI.create("http://www.w3.org/2001/XMLSchema#integer")));
+                new MemoryLiteral("2010")
+                        .type(XSDIdentifiers.INTEGER));
+                        //.type(IRI.create("http://www.w3.org/2001/XMLSchema#integer")));
         StringWriter w = new StringWriter();
         NTripleWriter t = new NTripleWriter(w);
         t.write(context);
-        Assert.assertEquals( w.toString(), "<urn:doc1> <http://purl.org/dc/elements/1.1/date> \"2010\"^^<http://www.w3.org/2001/XMLSchema#integer> .\n");
+        assertEquals(w.toString(), "<urn:doc1> <http://purl.org/dc/elements/1.1/date> \"2010\"^^<xsd:integer> .\n");
     }
 
     private MemoryResourceContext<R> createResourceContext() {

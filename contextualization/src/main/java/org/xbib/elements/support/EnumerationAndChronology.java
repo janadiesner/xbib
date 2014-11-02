@@ -32,6 +32,7 @@
 package org.xbib.elements.support;
 
 import org.xbib.iri.IRI;
+import org.xbib.rdf.Node;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.util.DateUtil;
@@ -39,6 +40,7 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -785,14 +787,19 @@ public class EnumerationAndChronology {
 
     public static Set<Integer> dates(IRI id, Resource resource) {
         final Set<Integer> dates = newTreeSet();
-        for (Object obj : resource.predicates()) {
-            resource.resources((Property) obj).forEach(new Consumer() {
+        for (IRI iri : resource.predicates()) {
+            resource.resources(iri).forEach(new Consumer<Resource>() {
                 @Override
-                public void accept(Object o) {
-                    Resource group = (Resource)o;
-                    Object begindate = group.literal("begindate");
-                    Object enddate = group.literal("enddate");
-                    Object open = group.literal("open");
+                public void accept(Resource group) {
+                    Collection<Node> begindateCollection = group.objects("begindate");
+                    Object begindate = begindateCollection != null && !begindateCollection.isEmpty() ?
+                            begindateCollection.iterator().next() : null;
+                    Collection<Node> enddateCollection = group.objects("enddate");
+                    Object enddate = enddateCollection != null && !enddateCollection.isEmpty() ?
+                            enddateCollection.iterator().next() : null;
+                    Collection<Node> openCollection = group.objects("open");
+                    Object open = openCollection != null && !openCollection.isEmpty() ?
+                            openCollection.iterator().next() : null;
                     List<Integer> starts;
                     int start = -1;
                     if (begindate != null) {

@@ -38,7 +38,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Identifiable;
 import org.xbib.rdf.Property;
 import org.xbib.rdf.Node;
-import org.xbib.rdf.RDFNS;
+import org.xbib.rdf.RdfConstants;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.context.ResourceContext;
@@ -50,43 +50,29 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.util.Map;
 
-public class JsonWriter<S extends Identifiable, P extends Property, O extends Node, C extends ResourceContext<Resource<S,P,O>>>
-        implements ResourceContextWriter<C, Resource<S,P,O>>, Triple.Builder<S, P, O>, Closeable, Flushable {
+public class JsonWriter<S extends Identifiable, P extends Property, O extends Node, C extends ResourceContext<Resource>>
+        implements ResourceContextWriter<C, Resource>, Triple.Builder, Closeable, Flushable {
 
     private final static Logger logger = LoggerFactory.getLogger(JsonWriter.class.getName());
 
-    private IRINamespaceContext context;
-
     private Resource resource;
-
-    private String translatePicaSortMarker;
 
     private boolean nsWritten;
 
     private StringBuilder sb;
-
-    private long byteCounter;
-
-    private long idCounter;
-
-    public JsonWriter() {
-        this.context = IRINamespaceContext.newInstance();
-        this.nsWritten = false;
-        this.resource = new MemoryResource();
-        this.sb = new StringBuilder();
-        this.translatePicaSortMarker = null;
-    }
-
-    public JsonWriter translatePicaSortMarker(String marker) {
-        this.translatePicaSortMarker = marker;
-        return this;
-    }
 
     private IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
 
     private C resourceContext;
 
     private String sortLangTag;
+
+    public JsonWriter() {
+        this.nsWritten = false;
+        this.resource = new MemoryResource();
+        this.sb = new StringBuilder();
+    }
+
 
     @Override
     public void close() throws IOException {
@@ -112,7 +98,6 @@ public class JsonWriter<S extends Identifiable, P extends Property, O extends No
                     writeNamespaces();
                 }
                 // TODO
-                idCounter++;
                 resource = new MemoryResource();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
@@ -123,39 +108,39 @@ public class JsonWriter<S extends Identifiable, P extends Property, O extends No
     }
 
     @Override
-    public Triple.Builder<S, P, O> begin() {
+    public Triple.Builder begin() {
         return this;
     }
 
     @Override
-    public Triple.Builder<S, P, O> startPrefixMapping(String prefix, String uri) {
+    public Triple.Builder startPrefixMapping(String prefix, String uri) {
         return this;
     }
 
     @Override
-    public Triple.Builder<S, P, O> endPrefixMapping(String prefix) {
+    public Triple.Builder endPrefixMapping(String prefix) {
         return this;
     }
 
     @Override
-    public Triple.Builder<S, P, O> triple(Triple<S, P, O> triple) {
+    public Triple.Builder triple(Triple triple) {
         return this; // TODO
     }
 
     @Override
-    public Triple.Builder<S, P, O> end() {
+    public Triple.Builder end() {
         return this;
     }
 
     public JsonWriter writeNamespaces() throws IOException {
-        if (context == null) {
+        if (namespaceContext == null) {
             return this;
         }
         nsWritten = false;
-        for (Map.Entry<String, String> entry : context.getNamespaces().entrySet()) {
+        for (Map.Entry<String, String> entry : namespaceContext.getNamespaces().entrySet()) {
             if (entry.getValue().length() > 0) {
                 String nsURI = entry.getValue().toString();
-                if (!RDFNS.NS_URI.equals(nsURI)) {
+                if (!RdfConstants.NS_URI.equals(nsURI)) {
                     writeNamespace(entry.getKey(), nsURI);
                     nsWritten = true;
                 }
@@ -166,12 +151,10 @@ public class JsonWriter<S extends Identifiable, P extends Property, O extends No
 
     private void writeNamespace(String prefix, String name) throws IOException {
         // TODO
-
     }
 
     @Override
     public void flush() throws IOException {
-
     }
 
     @Override

@@ -44,7 +44,7 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
-import org.xbib.rdf.RDFNS;
+import org.xbib.rdf.RdfConstants;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.memory.MemoryLiteral;
@@ -78,7 +78,7 @@ public class JsonCoins extends Feeder {
     private final static IRINamespaceContext context = IRINamespaceContext.newInstance();
 
     static {
-        context.addNamespace(RDFNS.NS_PREFIX, RDFNS.NS_URI);
+        context.addNamespace(RdfConstants.NS_PREFIX, RdfConstants.NS_URI);
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         context.addNamespace("dcterms", "http://purl.org/dc/terms/");
         context.addNamespace("foaf", "http://xmlns.com/foaf/0.1/");
