@@ -1,0 +1,724 @@
+beginRecord
+AlephXML
+Bibliographic
+leader
+00000-M2.01200024---000h
+LDR
+LDRa=------M2.01200024------h
+FMT
+FMTa=MH
+001 1
+001 1=HT016424175
+002a1
+002a1=20100705
+026 1
+026 1a
+026 1a=HBZHT016424175
+026 1
+030
+030a=a|1uc||||||1|
+036a1
+036a1a
+036a1a=DE
+036a1
+037b1
+037b1a
+037b1a=lat
+037b1
+050
+050a=a|||||||||||||
+051
+051a=am||||||
+070 1
+070 1a
+070 1a=575
+070 1
+080 1
+080 1a
+080 1a=60
+080 1
+100 1
+100 1p
+100 1p=Hildegardis
+100 1c
+100 1c=Bingensis
+100 1d
+100 1d=1098-1179
+100 19
+100 19=(DE-588)118550993
+100 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=Heilige, 1098-1179
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=Sankt
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=Sancta
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=Abbatissa
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegarde
+101 1c
+101 1c=Sainte
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Ildegarda
+101 1c
+101 1c=de Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=de Monte Sancti Ruperti
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=die Heilige
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=de Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardt
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Bingen, Hildegard <<von>>
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=of Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=Sancta Abatissa
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Ildegarda
+101 1c
+101 1c=Santa
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Ildegarda
+101 1c
+101 1c=Sant'
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=Abbess
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=Heilige
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegarde
+101 1c
+101 1c=de Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Ildegarda
+101 1c
+101 1c=di Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=Abatissa
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegarda
+101 1c
+101 1c=di Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegarda
+101 1c
+101 1c=de Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=Bingeniläinen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Childegard
+101 1c
+101 1c=ot Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Bingen, Childegard <<ot>>
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Bingen, Hildegarde <<de>>
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=von Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis von Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=Sainte
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=de Alemannia
+101 1d
+101 1d=1098-1179
+101 1
+104b1
+104b1p
+104b1p=Escot, Pozzi
+104b1d
+104b1d=1933-
+104b1b
+104b1b=[Bearb.]
+104b19
+104b19=(DE-588)128917687
+104b1
+105 1
+105 1p
+105 1p=Pozzi Escot, Olga
+105 1d
+105 1d=1933-
+105 1
+304b1
+304b1a
+304b1a=Unde quocumque
+304b1
+331 1
+331 1a
+331 1a=Unde quocumque
+331 1
+334 1
+334 1a
+334 1a=Musikdruck
+334 1
+359 1
+359 1a
+359 1a=Hildegard von Bingen
+359 1
+425 1
+425 1a
+425 1a=c 1994
+425 1
+425a1
+425a1a
+425a1a=1994
+425a1
+503a1
+503a1a
+503a1a=Transkription der mittelalterlichen Neumen in moderne Notation
+503a1
+516 1
+516 1a
+516 1a=Melodien mit unterlegtem Text
+516 1
+590 1
+590 1a
+590 1a=<<The>> Ursula Antiphons ... [Musikdruck]
+590 1
+591 1
+591 1a
+591 1a=Hildegard von Bingen
+591 1
+594 1
+594 1a
+594 1a=[Kassel]
+594 1
+595 1
+595 1a
+595 1a=1994
+595 1
+599 1
+599 1a
+599 1a=HT016424145
+599 1
+SYS
+SYSa=018117852
+endRecord
+beginRecord
+AlephXML
+Bibliographic
+leader
+00000-M2.01200024---000h
+LDR
+LDRa=------M2.01200024------h
+FMT
+FMTa=MH
+001 1
+001 1=HT016424175
+002a1
+002a1=20100705
+026 1
+026 1a
+026 1a=HBZHT016424175
+026 1
+030
+030a=a|1uc||||||1|
+036a1
+036a1a
+036a1a=DE
+036a1
+037b1
+037b1a
+037b1a=lat
+037b1
+050
+050a=a|||||||||||||
+051
+051a=am||||||
+070 1
+070 1a
+070 1a=575
+070 1
+080 1
+080 1a
+080 1a=60
+080 1
+100 1
+100 1p
+100 1p=Hildegardis
+100 1c
+100 1c=Bingensis
+100 1d
+100 1d=1098-1179
+100 19
+100 19=(DE-588)118550993
+100 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=Heilige, 1098-1179
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=Sankt
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=Sancta
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=Abbatissa
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegarde
+101 1c
+101 1c=Sainte
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Ildegarda
+101 1c
+101 1c=de Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=de Monte Sancti Ruperti
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=die Heilige
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=de Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardt
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Bingen, Hildegard <<von>>
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=of Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=Sancta Abatissa
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Ildegarda
+101 1c
+101 1c=Santa
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Ildegarda
+101 1c
+101 1c=Sant'
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=Abbess
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=Heilige
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegarde
+101 1c
+101 1c=de Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Ildegarda
+101 1c
+101 1c=di Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=Abatissa
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegarda
+101 1c
+101 1c=di Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegarda
+101 1c
+101 1c=de Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=Bingeniläinen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Childegard
+101 1c
+101 1c=ot Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Bingen, Childegard <<ot>>
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Bingen, Hildegarde <<de>>
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=von Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis von Bingen
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegard
+101 1c
+101 1c=Sainte
+101 1d
+101 1d=1098-1179
+101 1
+101 1
+101 1p
+101 1p=Hildegardis
+101 1c
+101 1c=de Alemannia
+101 1d
+101 1d=1098-1179
+101 1
+104b1
+104b1p
+104b1p=Escot, Pozzi
+104b1d
+104b1d=1933-
+104b1b
+104b1b=[Bearb.]
+104b19
+104b19=(DE-588)128917687
+104b1
+105 1
+105 1p
+105 1p=Pozzi Escot, Olga
+105 1d
+105 1d=1933-
+105 1
+304b1
+304b1a
+304b1a=Unde quocumque
+304b1
+331 1
+331 1a
+331 1a=Unde quocumque
+331 1
+334 1
+334 1a
+334 1a=Musikdruck
+334 1
+359 1
+359 1a
+359 1a=Hildegard von Bingen
+359 1
+425 1
+425 1a
+425 1a=c 1994
+425 1
+425a1
+425a1a
+425a1a=1994
+425a1
+503a1
+503a1a
+503a1a=Transkription der mittelalterlichen Neumen in moderne Notation
+503a1
+516 1
+516 1a
+516 1a=Melodien mit unterlegtem Text
+516 1
+590 1
+590 1a
+590 1a=<<The>> Ursula Antiphons ... [Musikdruck]
+590 1
+591 1
+591 1a
+591 1a=Hildegard von Bingen
+591 1
+594 1
+594 1a
+594 1a=[Kassel]
+594 1
+595 1
+595 1a
+595 1a=1994
+595 1
+599 1
+599 1a
+599 1a=HT016424145
+599 1
+SYS
+SYSa=018117852
+endRecord
