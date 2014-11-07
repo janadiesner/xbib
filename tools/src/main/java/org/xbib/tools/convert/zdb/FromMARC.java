@@ -40,16 +40,16 @@ import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.tools.Converter;
 
@@ -95,19 +95,19 @@ public final class FromMARC extends Converter {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         final MARCElementMapper mapper = new MARCElementMapper(settings.get("elements"))
                 .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<DataField>() {
+                .setListener(new UnmappedKeyListener<FieldList>() {
                     @Override
-                    public void unknown(DataField key) {
-                        logger.warn("unmapped field {}", key.toSpec());
+                    public void unknown(FieldList key) {
+                        logger.warn("unmapped field {}", key);
                         if ((settings.getAsBoolean("detect", false))) {
-                            unmapped.add("\"" + key.toSpec() + "\"");
+                            unmapped.add("\"" + key + "\"");
                         }
                     }
                 })
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
                         MARCElementBuilder builder = new MARCElementBuilder();
-                        builder.addWriter(new MarcContextResourceOutput());
+                        builder.addWriter(new MarcContextOutput());
                         return builder;
                     }
                 });
@@ -132,7 +132,6 @@ public final class FromMARC extends Converter {
             reader.setProperty(Iso2709Reader.TYPE, "Holdings");
         }
         reader.setProperty(Iso2709Reader.FATAL_ERRORS, false);
-        reader.setProperty(Iso2709Reader.SILENT_ERRORS, true);
         InputStreamReader r = new InputStreamReader(InputService.getInputStream(uri), ISO88591);
         reader.parse(r);
         r.close();
@@ -142,10 +141,10 @@ public final class FromMARC extends Converter {
         }
     }
 
-    private class MarcContextResourceOutput implements ResourceContextWriter<ResourceContext<Resource>, Resource> {
+    private class MarcContextOutput implements ContextWriter<Context<Resource>, Resource> {
 
         @Override
-        public void write(ResourceContext context) throws IOException {
+        public void write(Context context) throws IOException {
             IRI iri = context.getResource().id();
             context.getResource().id(IRI.builder().scheme("http").host(settings.get("index")).query(settings.get("type"))
                     .fragment(iri.getFragment()).build());
@@ -157,15 +156,15 @@ public final class FromMARC extends Converter {
         }
     }
 
-    private class LoggingAdapter extends KeyValueStreamAdapter<DataField, String> {
+    private class LoggingAdapter extends KeyValueStreamAdapter<FieldList, String> {
         @Override
-        public KeyValueStreamAdapter<DataField, String> begin() {
+        public KeyValueStreamAdapter<FieldList, String> begin() {
             logger.debug("begin");
             return this;
         }
 
         @Override
-        public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
+        public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
             if (logger.isDebugEnabled()) {
                 for (Field f : key) {
                     logger.debug("tag={} ind={} subf={} data={}",
@@ -176,7 +175,7 @@ public final class FromMARC extends Converter {
         }
 
         @Override
-        public KeyValueStreamAdapter<DataField, String> end() {
+        public KeyValueStreamAdapter<FieldList, String> end() {
             logger.debug("end");
             return this;
         }

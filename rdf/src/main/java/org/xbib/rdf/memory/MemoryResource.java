@@ -32,29 +32,26 @@
 package org.xbib.rdf.memory;
 
 import org.xbib.iri.IRI;
-import org.xbib.rdf.Identifiable;
-import org.xbib.rdf.Property;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
+import org.xbib.rdf.RdfConstants;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.types.XSDIdentifiers;
+import org.xbib.rdf.XSDResourceIdentifiers;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
  * A resource is a sequence of properties and of associated resources.
  */
-public class MemoryResource implements Comparable<Identifiable>, Resource, XSDIdentifiers {
+public class MemoryResource implements Resource, Comparable<Resource>, XSDResourceIdentifiers {
 
     private final static AtomicLong nodeID = new AtomicLong();
 
@@ -62,17 +59,22 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
 
     private final static String PLACEHOLDER = "_:";
 
-    private final static IRI DELETED = IRI.builder().curie("_deleted").build();
-
     private final MultiMap<IRI, Node> attributes = new LinkedHashMultiMap<IRI, Node>();
 
     private final Map<IRI, Resource> children = new LinkedHashMap<IRI, Resource>();
 
     private IRI id;
 
+    private boolean embedded;
+
+    private boolean deleted;
+
     @Override
     public MemoryResource id(IRI id) {
         this.id = id;
+        if (id != null) {
+            embedded = GENID.equals(id.getScheme());
+        }
         return this;
     }
 
@@ -82,32 +84,38 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
     }
 
     @Override
-    public int compareTo(Identifiable o) {
-        return id == null ? -1 : id.toString().compareTo(o.id().toString());
+    public int compareTo(Resource r) {
+        return id == null ? -1 : id.toString().compareTo(r.id().toString());
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return id != null ? id.hashCode() : -1;
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && obj instanceof Identifiable && ((Identifiable) obj).id().equals(id);
+        return id != null && obj != null && obj instanceof Resource && id.equals(((Resource) obj).id());
     }
 
     public MemoryResource blank() {
         id(IRI.builder().curie(GENID, "b" + next()).build());
+        this.embedded = true;
         return this;
     }
 
     public MemoryResource blank(String id) {
         id(IRI.builder().curie(GENID, id).build());
+        this.embedded = true;
         return this;
     }
 
     public boolean isEmbedded() {
-        return GENID.equals(id().getScheme());
+        return embedded;
+    }
+
+    public boolean isVisible() {
+        return !embedded;
     }
 
     public static void reset() {
@@ -123,7 +131,7 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
         if (id() == null) {
             blank();
         }
-        return isEmbedded() ? PLACEHOLDER + id().getSchemeSpecificPart() : id().toString();
+        return embedded ? PLACEHOLDER + id().getSchemeSpecificPart() : id().toString();
     }
 
     @Override
@@ -147,30 +155,30 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
     }
 
     @Override
-    public Resource add(Property predicate, Node object) {
-        attributes.put(predicate.id(), object);
+    public Resource add(IRI predicate, Node object) {
+        attributes.put(predicate, object);
         if (object instanceof Resource) {
-            Resource r = (Resource)object;
+            Resource r = (Resource) object;
             children.put(r.id(), r);
         }
         return this;
     }
 
     @Override
-    public Resource add(Property predicate, IRI iri) {
+    public Resource add(IRI predicate, IRI iri) {
         return add(predicate, new MemoryResource().id(iri));
     }
 
     @Override
-    public Resource add(Property predicate, Literal literal) {
+    public Resource add(IRI predicate, Literal literal) {
         if (predicate != null && literal != null) {
-            attributes.put(predicate.id(), literal);
+            attributes.put(predicate, literal);
         }
         return this;
     }
 
     @Override
-    public Resource add(Property predicate, Resource resource) {
+    public Resource add(IRI predicate, Resource resource) {
         if (resource == null) {
             return this;
         }
@@ -179,32 +187,139 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
             Resource r = newResource(predicate);
             resource.triples().forEach(r::add);
         } else {
-            attributes.put(predicate.id(), resource);
+            attributes.put(predicate, resource);
         }
         return this;
     }
 
-    public Resource remove(Property predicate) {
-        if (predicate == null || predicate.id() == null) {
+    @Override
+    public Resource add(IRI predicate, String value) {
+        return add(predicate, newLiteral(value));
+    }
+
+    @Override
+    public Resource add(IRI predicate, Integer value) {
+        return add(predicate, newLiteral(value));
+    }
+
+    @Override
+    public Resource add(IRI predicate, Boolean value) {
+        return add(predicate, newLiteral(value));
+    }
+
+    @Override
+    public Resource add(IRI predicate, List list) {
+        for (Object object : list) {
+            if (object instanceof Map) {
+                add(predicate, (Map) object);
+            } else if (object instanceof List) {
+                add(predicate, (List) object);
+            } else if (object instanceof Resource) {
+                add(predicate, (Resource) object);
+            } else {
+                add(predicate, newLiteral(object));
+            }
+        }
+        return this;
+    }
+
+    @Override
+    public Resource add(IRI predicate, Map map) {
+        Resource r = newResource(predicate);
+        for (Object pred : map.keySet()) {
+            Object obj = map.get(pred);
+            if (obj instanceof Map) {
+                r.add(newPredicate(pred), (Map) obj);
+            } else if (obj instanceof List) {
+                r.add(newPredicate(pred), (List) obj);
+            } else if (obj instanceof Resource) {
+                r.add(newPredicate(pred), (Resource) obj);
+            } else {
+                r.add(newPredicate(pred), newLiteral(obj));
+            }
+        }
+        return this;
+    }
+
+    @Override
+    public Resource add(String predicate, String value) {
+        return add(newPredicate(predicate), value);
+    }
+
+    @Override
+    public Resource add(String predicate, Integer value) {
+        return add(newPredicate(predicate), value);
+    }
+
+    @Override
+    public Resource add(String predicate, Boolean value) {
+        return add(newPredicate(predicate), value);
+    }
+
+    @Override
+    public Resource add(String predicate, Literal value) {
+        return add(newPredicate(predicate), value);
+    }
+
+    @Override
+    public Resource add(String predicate, IRI externalResource) {
+        return add(newPredicate(predicate), externalResource);
+    }
+
+    @Override
+    public Resource add(String predicate, Resource resource) {
+        return add(newPredicate(predicate), resource);
+    }
+
+    @Override
+    public Resource add(String predicate, Map map) {
+        return add(newPredicate(predicate), map);
+    }
+
+    @Override
+    public Resource add(String predicate, List list) {
+        return add(newPredicate(predicate), list);
+    }
+
+    @Override
+    public Resource add(Map map) {
+        for (Object pred : map.keySet()) {
+            Object obj = map.get(pred);
+            if (obj instanceof Map) {
+                Resource r = newResource(newPredicate(pred));
+                r.add((Map) obj);
+            } else if (obj instanceof List) {
+                add(newPredicate(pred), (List) obj);
+            } else if (obj instanceof Resource) {
+                add(newPredicate(pred), (Resource) obj);
+            } else {
+                add(newPredicate(pred), newLiteral(obj));
+            }
+        }
+        return this;
+    }
+
+    public Resource remove(IRI predicate) {
+        if (predicate == null) {
             return this;
         }
         // check if child resource exists for any of the objects under this predicate and remove it
-        embeddedResources(predicate.id()).forEach(resource -> children.remove(resource.id()));
-        attributes.remove(predicate.id());
+        embeddedResources(predicate).forEach(resource -> children.remove(resource.id()));
+        attributes.remove(predicate);
         return this;
     }
 
-    public Resource remove(Property predicate, Node object) {
-        if (predicate == null || predicate.id() == null) {
+    public Resource remove(IRI predicate, Node object) {
+        if (predicate == null) {
             return this;
         }
+        attributes.remove(predicate, object);
         return this;
     }
-
 
     @Override
     public Resource a(IRI externalResource) {
-        add("rdf:type", externalResource);
+        add(newPredicate(RdfConstants.RDF_TYPE), externalResource);
         return this;
     }
 
@@ -216,6 +331,11 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
     @Override
     public Collection<Node> objects(IRI predicate) {
         return attributes.get(predicate);
+    }
+
+    @Override
+    public Collection<Node> objects(String predicate) {
+        return attributes.get(newPredicate(predicate));
     }
 
     @Override
@@ -252,33 +372,27 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<Node> visibleObjects(IRI predicate) {
+        return attributes.get(predicate).stream()
+                .filter(Node::isVisible)
+                .collect(Collectors.toList());
+    }
+
     /**
-     * Compact a predicate. Under the predicate, there is a single blank node
-     * object with a single value for the same predicate. In such case, the
-     * blank node can be removed and the single value can be promoted to the
-     * predicate.
+     * Compact a predicate with a single blank node object.
+     * If there is a single blank node object with values for the same predicate, the
+     * blank node can be dropped and the values can be promoted to the predicate.
      *
      * @param predicate the predicate
      */
     @Override
     public void compactPredicate(IRI predicate) {
-        List<Resource> resources = resources(predicate);
-        Iterator<Resource> it = resources.iterator();
-        Resource resource = it.next();
-        if (!it.hasNext()) {
-            List<Node> newResource = new ArrayList<Node>();
-            for (Node node : objects(predicate)) {
-                if (node instanceof Literal) {
-                    newResource.add(node);
-                } else if (node instanceof Resource) {
-                    if (!((Resource) node).isEmbedded()) {
-                        newResource.add(node);
-                    }
-                }
-            }
-            newResource.addAll(new ArrayList(resource.objects(predicate)));
-            attributes.remove(predicate);
-            attributes.putAll(predicate, newResource);
+        List<Resource> resources = embeddedResources(predicate);
+        if (resources.size() == 1) {
+            Resource r = resources.get(0);
+            attributes.remove(predicate, r);
+            attributes.putAll(predicate, r.objects(predicate));
         }
     }
 
@@ -298,29 +412,22 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
     }
 
     @Override
-    public Resource setDeleted(boolean delete) {
-        attributes.remove(DELETED);
-        attributes.put(DELETED, new MemoryLiteral(delete));
+    public Resource setDeleted(boolean deleted) {
+        this.deleted = deleted;
         return this;
     }
 
     @Override
     public boolean isDeleted() {
-        Literal literal = (Literal) attributes.get(DELETED);
-        return (literal.object() instanceof Boolean && (Boolean) literal.object());
-    }
-
-    @Override
-    public Resource newResource(Property predicate) {
-        Resource r = new MemoryResource().blank();
-        children.put(r.id(), r);
-        attributes.put(predicate.id(), r);
-        return r;
+        return deleted;
     }
 
     @Override
     public Resource newResource(IRI predicate) {
-        return newResource(newPredicate(predicate));
+        Resource r = new MemoryResource().blank();
+        children.put(r.id(), r);
+        attributes.put(predicate, r);
+        return r;
     }
 
     @Override
@@ -328,68 +435,6 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
         return newResource(newPredicate(predicate));
     }
 
-    @Override
-    public Resource add(Property predicate, String value) {
-        return add(predicate, newLiteral(value));
-    }
-
-    @Override
-    public Resource add(Property predicate, Integer value) {
-        return add(predicate, newLiteral(value));
-    }
-
-    @Override
-    public Resource add(Property predicate, Boolean value) {
-        return add(predicate, newLiteral(value));
-    }
-
-    @Override
-    public Resource add(Property predicate, List<Node> objects) {
-        for (Node object : objects) {
-            add(predicate, newLiteral(object));
-        }
-        return this;
-    }
-
-    @Override
-    public Resource add(String predicate, String value) {
-        return add(newPredicate(predicate), value);
-    }
-
-    @Override
-    public Resource add(String predicate, Integer value) {
-        return add(newPredicate(predicate), value);
-    }
-
-    @Override
-    public Resource add(String predicate, Boolean value) {
-        return add(newPredicate(predicate), value);
-    }
-
-    @Override
-    public Resource add(String predicate, Literal value) {
-        return add(newPredicate(predicate), value);
-    }
-
-    @Override
-    public Resource add(String predicate, IRI externalResource) {
-        return add(newPredicate(predicate), externalResource);
-    }
-
-    @Override
-    public Resource add(String predicate, List<Node> objects) {
-        return add(newPredicate(predicate), objects);
-    }
-
-    @Override
-    public Resource add(String predicate, Resource resource) {
-        return add(newPredicate(predicate), resource);
-    }
-
-    @Override
-    public Collection<Node> objects(String predicate) {
-        return objects(newPredicate(predicate).id());
-    }
 
     @Override
     public List<Triple> triples() {
@@ -401,6 +446,7 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
         return new Triples(this, false).list();
     }
 
+    @Override
     public Resource newSubject(Object subject) {
         return subject == null ? null :
                 subject instanceof Resource ? (Resource) subject :
@@ -408,20 +454,22 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
                                 new MemoryResource().id(IRI.builder().curie(subject.toString()).build());
     }
 
-    public Property newPredicate(Object predicate) {
+    @Override
+    public IRI newPredicate(Object predicate) {
         return predicate == null ? null :
-                predicate instanceof Property ? (Property) predicate :
-                        predicate instanceof IRI ? new MemoryProperty((IRI) predicate) :
-                                new MemoryProperty(IRI.builder().curie(predicate.toString()).build());
+                predicate instanceof IRI ? (IRI) predicate :
+                        IRI.builder().curie(predicate.toString()).build();
     }
 
+    @Override
     public Node newObject(Object object) {
         return object == null ? null :
-                object instanceof Literal ? (Node) object :
+                object instanceof Literal ? (Literal) object :
                         object instanceof IRI ? new MemoryResource().id((IRI) object) :
                                 new MemoryLiteral(object);
     }
 
+    @Override
     public Literal newLiteral(Object value) {
         if (value == null) {
             return null;
@@ -448,15 +496,24 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
         return new MemoryLiteral(value);
     }
 
+    public List<Triple> find(IRI predicate, Literal literal) {
+        return new Triples(this, predicate, literal).list();
+    }
+
     class Triples {
 
         private final List<Triple> triples;
 
         private final boolean recursive;
 
-        public Triples(Resource resource, boolean recursive) {
+        Triples(Resource resource, boolean recursive) {
             this.recursive = recursive;
             this.triples = unfold(resource);
+        }
+
+        Triples(Resource resource, IRI predicate, Literal literal) {
+            this.recursive = true;
+            this.triples = find(resource, predicate, literal);
         }
 
         public List<Triple> list() {
@@ -464,15 +521,39 @@ public class MemoryResource implements Comparable<Identifiable>, Resource, XSDId
         }
 
         private List<Triple> unfold(Resource resource) {
-            List<Triple> list = new ArrayList<Triple>();
+            List<Triple> list = new ArrayList<Triple>(32);
             if (resource == null) {
                 return list;
             }
             for (IRI pred : resource.predicates()) {
                 for (Node obj : resource.objects(pred)) {
-                    list.add(new MemoryTriple(resource, new MemoryProperty(pred), obj));
+                    list.add(new MemoryTriple(resource, pred, obj));
                     if (recursive && obj instanceof Resource) {
                         list.addAll(unfold((Resource) obj));
+                    }
+                }
+            }
+            return list;
+        }
+
+        private List<Triple> find(Resource resource, IRI predicate, Literal literal) {
+            List<Triple> list = new ArrayList<Triple>();
+            if (resource == null) {
+                return list;
+            }
+            if (resource.predicates().contains(predicate)) {
+                for (Node node : resource.objects(predicate)) {
+                    if (literal.equals(node)) {
+                        list.add(new MemoryTriple(resource, predicate, node));
+                        return list;
+                    }
+                }
+            } else {
+                for (IRI pred : resource.predicates()) {
+                    for (Node obj : resource.objects(pred)) {
+                        if (obj instanceof Resource) {
+                            list.addAll(find((Resource) obj, predicate, literal));
+                        }
                     }
                 }
             }

@@ -32,13 +32,13 @@
 package org.xbib.marc.xml.mapper;
 
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.xbib.helper.StreamTester;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.xml.stream.MarcXchangeWriter;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -46,14 +46,12 @@ import java.util.Map;
 
 import static org.testng.Assert.assertNull;
 
-public class MarcXchangeMappedOAITest {
-
-    private final Logger logger = LoggerFactory.getLogger(MarcXchangeMappedOAITest.class.getName());
+public class MarcXchangeMappedOAITest extends StreamTester {
 
     @Test
     public void testMarcXMLFromOAI() throws Exception {
         final StringBuilder sb = new StringBuilder();
-        File file = File.createTempFile("zdb-oai-marc-fieldmapper.", ".xml");
+        File file = File.createTempFile("zdb-oai-marc-fieldmapper.", ".txt");
         FileWriter fw = new FileWriter(file);
         MarcXchangeWriter writer = new MarcXchangeWriter(fw);
 
@@ -69,7 +67,6 @@ public class MarcXchangeMappedOAITest {
 
             @Override
             public void beginRecord(String format, String type) {
-                logger.debug("beginRecord format=" + format + " type=" + type);
                 sb.append("beginRecord").append("\n");
                 sb.append(format).append("\n");
                 sb.append(type).append("\n");
@@ -77,50 +74,42 @@ public class MarcXchangeMappedOAITest {
 
             @Override
             public void leader(String label) {
-                logger.debug("leader=" + label);
                 sb.append("leader").append("\n");
                 sb.append(label).append("\n");
             }
 
             @Override
             public void beginControlField(Field field) {
-                logger.debug("beginControlField field=" + field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void endControlField(Field field) {
-                logger.debug("endControlField field=" + field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void beginDataField(Field field) {
-                logger.debug("beginDataField field=" + field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void endDataField(Field field) {
-                logger.debug("endDataField field=" + field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void beginSubField(Field field) {
-                logger.debug("beginSubField field=" + field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void endSubField(Field field) {
-                logger.debug("endsubField field=" + field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void endRecord() {
-                logger.debug("endRecord");
                 sb.append("endRecord").append("\n");
             }
 
@@ -129,10 +118,10 @@ public class MarcXchangeMappedOAITest {
         MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader();
         reader.setMarcXchangeListener(writer);
 
-        // fun: 084->085
-        Map<String,Object> indicators = new HashMap();
+        // just for fun: 084->085
+        Map<String,Object> indicators = new HashMap<String, Object>();
         indicators.put("  ", "085$  ");
-        Map<String,Object> fields = new HashMap();
+        Map<String,Object> fields = new HashMap<String, Object>();
         fields.put("084", indicators);
         reader.addFieldMap("test", fields);
 
@@ -146,6 +135,9 @@ public class MarcXchangeMappedOAITest {
         fw.close();
 
         assertNull(writer.getException());
+
+        assertStream(getClass().getResource("zdb-oai-marc-fieldmapper-keyvalue.txt").openStream(),
+                new FileInputStream(file));
 
     }
 }

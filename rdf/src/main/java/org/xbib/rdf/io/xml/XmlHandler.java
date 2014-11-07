@@ -31,8 +31,8 @@
  */
 package org.xbib.rdf.io.xml;
 
+import org.xbib.rdf.Context;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
 import org.xml.sax.EntityResolver;
@@ -48,5 +48,5 @@ public interface XmlHandler
 
     XmlHandler setBuilder(Triple.Builder builder);
 
-    ResourceContext resourceContext();
+    Context resourceContext();
 }

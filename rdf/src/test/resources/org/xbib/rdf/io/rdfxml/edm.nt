@@ -143,6 +143,7 @@ _:b6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives.
 <europeana19141918:place/82b65aa6bfee748bc96b41967b9c78e2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/82b65aa6bfee748bc96b41967b9c78e2> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "53.095224" .
 <europeana19141918:place/82b65aa6bfee748bc96b41967b9c78e2> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "12.130077" .
+<europeana19141918:place/82b65aa6bfee748bc96b41967b9c78e2> <location> "53.095224,12.130077" .
 <europeana19141918:place/82b65aa6bfee748bc96b41967b9c78e2> <http://www.w3.org/2004/02/skos/core#prefLabel> "Mesendorf/Ostprignitz" .
 <europeana19141918:timespan/f0890bf877df9a627ec735a722fac4ce> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/f0890bf877df9a627ec735a722fac4ce> <http://www.europeana.eu/schemas/edm/begin> "1914-08-27" .
@@ -278,6 +279,7 @@ _:b11 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/0b0f44c7806783aed153119af35e7041> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/0b0f44c7806783aed153119af35e7041> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "52.56193" .
 <europeana19141918:place/0b0f44c7806783aed153119af35e7041> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "13.445490000000063" .
+<europeana19141918:place/0b0f44c7806783aed153119af35e7041> <location> "52.56193,13.445490000000063" .
 <europeana19141918:place/0b0f44c7806783aed153119af35e7041> <http://www.w3.org/2004/02/skos/core#prefLabel> "Berlin" .
 <europeana19141918:timespan/5e657a9a5ad217cbc89c9d17a817a44e> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/5e657a9a5ad217cbc89c9d17a817a44e> <http://www.europeana.eu/schemas/edm/begin> "1914" .
@@ -336,6 +338,7 @@ _:b16 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/d3cba5800353946a1937a46788bc9bae> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/d3cba5800353946a1937a46788bc9bae> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "53.5012276" .
 <europeana19141918:place/d3cba5800353946a1937a46788bc9bae> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "18.753272899999956" .
+<europeana19141918:place/d3cba5800353946a1937a46788bc9bae> <location> "53.5012276,18.753272899999956" .
 <europeana19141918:place/d3cba5800353946a1937a46788bc9bae> <http://www.w3.org/2004/02/skos/core#prefLabel> "Graudenz" .
 <europeana19141918:timespan/596426f2e631549ead782fc6d3b2bff3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/596426f2e631549ead782fc6d3b2bff3> <http://www.europeana.eu/schemas/edm/begin> "1918" .
@@ -406,6 +409,7 @@ _:b21 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/ea39803b204e5ef4474840acc3b6159d> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/ea39803b204e5ef4474840acc3b6159d> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "49.2584142" .
 <europeana19141918:place/ea39803b204e5ef4474840acc3b6159d> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "4.0320021" .
+<europeana19141918:place/ea39803b204e5ef4474840acc3b6159d> <location> "49.2584142,4.0320021" .
 <europeana19141918:place/ea39803b204e5ef4474840acc3b6159d> <http://www.w3.org/2004/02/skos/core#prefLabel> "Reims" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/5766/99.5766.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/5766/99.5766.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-05-20 09:20:37 UTC" .
@@ -499,6 +503,7 @@ _:b31 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/467da014fa8e0f0b98fbae41c170ac3b> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/467da014fa8e0f0b98fbae41c170ac3b> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "47.901153208295646" .
 <europeana19141918:place/467da014fa8e0f0b98fbae41c170ac3b> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "7.3546600341796875" .
+<europeana19141918:place/467da014fa8e0f0b98fbae41c170ac3b> <location> "47.901153208295646,7.3546600341796875" .
 <europeana19141918:place/467da014fa8e0f0b98fbae41c170ac3b> <http://www.w3.org/2004/02/skos/core#prefLabel> "Reguisheim, Landkreis Gebweiler (Elsa\u00DF)" .
 <europeana19141918:timespan/a8c93efa801e1077130f8f91b3cfa0f5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/a8c93efa801e1077130f8f91b3cfa0f5> <http://www.europeana.eu/schemas/edm/begin> "1915-12-02" .
@@ -547,6 +552,7 @@ _:b36 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/0b1add1e3b79d9a5477a65dde11043c0> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/0b1add1e3b79d9a5477a65dde11043c0> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.30443311306082" .
 <europeana19141918:place/0b1add1e3b79d9a5477a65dde11043c0> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "13.111495971679688" .
+<europeana19141918:place/0b1add1e3b79d9a5477a65dde11043c0> <location> "51.30443311306082,13.111495971679688" .
 <europeana19141918:place/0b1add1e3b79d9a5477a65dde11043c0> <http://www.w3.org/2004/02/skos/core#prefLabel> "Oschatz (Sachsen)" .
 <europeana19141918:timespan/01c3b134ea504c570ab59bc7af03387d> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/01c3b134ea504c570ab59bc7af03387d> <http://www.europeana.eu/schemas/edm/begin> "1910-06-26" .
@@ -596,6 +602,7 @@ _:b41 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/b53f10883b8f30a4601620d5f3581f99> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/b53f10883b8f30a4601620d5f3581f99> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "50.00332585031708" .
 <europeana19141918:place/b53f10883b8f30a4601620d5f3581f99> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "8.2672119140625" .
+<europeana19141918:place/b53f10883b8f30a4601620d5f3581f99> <location> "50.00332585031708,8.2672119140625" .
 <europeana19141918:place/b53f10883b8f30a4601620d5f3581f99> <http://www.w3.org/2004/02/skos/core#prefLabel> "Mainz" .
 <europeana19141918:timespan/4dc42f5f591676f6a83f7ba0011341b2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/4dc42f5f591676f6a83f7ba0011341b2> <http://www.europeana.eu/schemas/edm/begin> "1916" .
@@ -642,6 +649,7 @@ _:b46 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/deff7bae2a4902ed6d3bde110f05c393> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/deff7bae2a4902ed6d3bde110f05c393> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "53.14038653042395" .
 <europeana19141918:place/deff7bae2a4902ed6d3bde110f05c393> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "8.215885162353516" .
+<europeana19141918:place/deff7bae2a4902ed6d3bde110f05c393> <location> "53.14038653042395,8.215885162353516" .
 <europeana19141918:place/deff7bae2a4902ed6d3bde110f05c393> <http://www.w3.org/2004/02/skos/core#prefLabel> "Oldenburg" .
 <europeana19141918:timespan/d1c53c5479d3cae4e930606eee06f933> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/d1c53c5479d3cae4e930606eee06f933> <http://www.europeana.eu/schemas/edm/begin> "1914" .
@@ -694,6 +702,7 @@ _:b51 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/0dd139df48f3ab0a56a37ad116e978ed> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/0dd139df48f3ab0a56a37ad116e978ed> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/0dd139df48f3ab0a56a37ad116e978ed> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/0dd139df48f3ab0a56a37ad116e978ed> <location> "0.0,0.0" .
 <europeana19141918:place/0dd139df48f3ab0a56a37ad116e978ed> <http://www.w3.org/2004/02/skos/core#prefLabel> "Mantelkirchen (Bayern)" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/182/111.182.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/182/111.182.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-23 22:32:15 UTC" .
@@ -739,6 +748,7 @@ _:b56 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/d9b7c5943ccf1a1bfcced2285f989507> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/d9b7c5943ccf1a1bfcced2285f989507> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "47.9004627009329" .
 <europeana19141918:place/d9b7c5943ccf1a1bfcced2285f989507> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "10.361394882202148" .
+<europeana19141918:place/d9b7c5943ccf1a1bfcced2285f989507> <location> "47.9004627009329,10.361394882202148" .
 <europeana19141918:place/d9b7c5943ccf1a1bfcced2285f989507> <http://www.w3.org/2004/02/skos/core#prefLabel> "Ollarzried (Bayern)" .
 <europeana19141918:timespan/94cc4a90c026f4d8bf0e48bfab14a6da> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/94cc4a90c026f4d8bf0e48bfab14a6da> <http://www.europeana.eu/schemas/edm/begin> "1918" .
@@ -788,6 +798,7 @@ _:b61 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/19062c7fd19edb596bd011751ad23c3a> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/19062c7fd19edb596bd011751ad23c3a> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "52.53710835019913" .
 <europeana19141918:place/19062c7fd19edb596bd011751ad23c3a> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "13.4088134765625" .
+<europeana19141918:place/19062c7fd19edb596bd011751ad23c3a> <location> "52.53710835019913,13.4088134765625" .
 <europeana19141918:place/19062c7fd19edb596bd011751ad23c3a> <http://www.w3.org/2004/02/skos/core#prefLabel> "Berlin" .
 <europeana19141918:timespan/80cb3c975e99a210badec25e72186bce> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/80cb3c975e99a210badec25e72186bce> <http://www.europeana.eu/schemas/edm/begin> "1914" .
@@ -836,6 +847,7 @@ _:b66 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/d2c9a6557c9c1fd4825ad3a5a4625461> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/d2c9a6557c9c1fd4825ad3a5a4625461> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/d2c9a6557c9c1fd4825ad3a5a4625461> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/d2c9a6557c9c1fd4825ad3a5a4625461> <location> "0.0,0.0" .
 <europeana19141918:place/d2c9a6557c9c1fd4825ad3a5a4625461> <http://www.w3.org/2004/02/skos/core#prefLabel> "Deutschland (unbekannter Ort)" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/187/114.187.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/187/114.187.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-23 23:18:25 UTC" .
@@ -879,6 +891,7 @@ _:b71 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/bb7c02c24776f48e6ae27183fb3eeef0> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/bb7c02c24776f48e6ae27183fb3eeef0> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/bb7c02c24776f48e6ae27183fb3eeef0> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/bb7c02c24776f48e6ae27183fb3eeef0> <location> "0.0,0.0" .
 <europeana19141918:place/bb7c02c24776f48e6ae27183fb3eeef0> <http://www.w3.org/2004/02/skos/core#prefLabel> "Russland" .
 <europeana19141918:timespan/8c15ff74fc98ecfa5a1c980d9b633908> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/8c15ff74fc98ecfa5a1c980d9b633908> <http://www.europeana.eu/schemas/edm/begin> "1915-08-23" .
@@ -929,6 +942,7 @@ _:b76 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/520d135524918854f9da2e8fba8ec9a5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/520d135524918854f9da2e8fba8ec9a5> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "48.982019588328214" .
 <europeana19141918:place/520d135524918854f9da2e8fba8ec9a5> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "9.580421447753906" .
+<europeana19141918:place/520d135524918854f9da2e8fba8ec9a5> <location> "48.982019588328214,9.580421447753906" .
 <europeana19141918:place/520d135524918854f9da2e8fba8ec9a5> <http://www.w3.org/2004/02/skos/core#prefLabel> "Murrhardt (W\u00FCrttemberg)" .
 <europeana19141918:timespan/9ee821882e4a0c69519d5b55586119bf> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/9ee821882e4a0c69519d5b55586119bf> <http://www.europeana.eu/schemas/edm/begin> "1915" .
@@ -980,6 +994,7 @@ _:b81 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/b4e2c1169b8f4b32b9ec2944095352e5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/b4e2c1169b8f4b32b9ec2944095352e5> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/b4e2c1169b8f4b32b9ec2944095352e5> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/b4e2c1169b8f4b32b9ec2944095352e5> <location> "0.0,0.0" .
 <europeana19141918:place/b4e2c1169b8f4b32b9ec2944095352e5> <http://www.w3.org/2004/02/skos/core#prefLabel> "Sch\u00FCtzengraben" .
 <europeana19141918:timespan/135df84aa394e02335babd87851d0c67> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/135df84aa394e02335babd87851d0c67> <http://www.europeana.eu/schemas/edm/begin> "1917-08-17" .
@@ -1027,6 +1042,7 @@ _:b86 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchives
 <europeana19141918:place/994bbdcf14f6ca0ef2017f6f79086d1d> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/994bbdcf14f6ca0ef2017f6f79086d1d> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/994bbdcf14f6ca0ef2017f6f79086d1d> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/994bbdcf14f6ca0ef2017f6f79086d1d> <location> "0.0,0.0" .
 <europeana19141918:place/994bbdcf14f6ca0ef2017f6f79086d1d> <http://www.w3.org/2004/02/skos/core#prefLabel> "Deutschland (unbekannten Ort)" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/194/118.194.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/194/118.194.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-24 00:44:01 UTC" .
@@ -1161,6 +1177,7 @@ _:b101 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/6bb03b056722e3fa78e9114645c8b4f3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/6bb03b056722e3fa78e9114645c8b4f3> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/6bb03b056722e3fa78e9114645c8b4f3> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/6bb03b056722e3fa78e9114645c8b4f3> <location> "0.0,0.0" .
 <europeana19141918:place/6bb03b056722e3fa78e9114645c8b4f3> <http://www.w3.org/2004/02/skos/core#prefLabel> "Frankreich" .
 <europeana19141918:timespan/47fac99108f52d3b51669bcc6f007bfa> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/47fac99108f52d3b51669bcc6f007bfa> <http://www.europeana.eu/schemas/edm/begin> "1914" .
@@ -1249,6 +1266,7 @@ _:b111 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/dad4f043aa880c8cee1ae370d2e41bb4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/dad4f043aa880c8cee1ae370d2e41bb4> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "48.6029891" .
 <europeana19141918:place/dad4f043aa880c8cee1ae370d2e41bb4> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "11.6273101" .
+<europeana19141918:place/dad4f043aa880c8cee1ae370d2e41bb4> <location> "48.6029891,11.6273101" .
 <europeana19141918:place/dad4f043aa880c8cee1ae370d2e41bb4> <http://www.w3.org/2004/02/skos/core#prefLabel> "Wolnzach" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/209/156.209.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/209/156.209.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-25 16:40:10 UTC" .
@@ -1294,6 +1312,7 @@ _:b116 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/d9cbb8532ef67dfebadff44c012517de> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/d9cbb8532ef67dfebadff44c012517de> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "52.93539665862318" .
 <europeana19141918:place/d9cbb8532ef67dfebadff44c012517de> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "16.7431640625" .
+<europeana19141918:place/d9cbb8532ef67dfebadff44c012517de> <location> "52.93539665862318,16.7431640625" .
 <europeana19141918:place/d9cbb8532ef67dfebadff44c012517de> <http://www.w3.org/2004/02/skos/core#prefLabel> "West-Preussen, Bromberg / Bydgoszcz (Polen)" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/1457/160.1457.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/1457/160.1457.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-04-30 11:54:26 UTC" .
@@ -1353,6 +1372,7 @@ _:b121 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/a895dec1321c318123c122fcdb36c8b9> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/a895dec1321c318123c122fcdb36c8b9> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/a895dec1321c318123c122fcdb36c8b9> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/a895dec1321c318123c122fcdb36c8b9> <location> "0.0,0.0" .
 <europeana19141918:place/a895dec1321c318123c122fcdb36c8b9> <http://www.w3.org/2004/02/skos/core#prefLabel> "Westlicher und \u00F6stlicher Kriegsschauplatz" .
 <europeana19141918:timespan/7ae33ed550272e7ec095737fd7824ba9> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/7ae33ed550272e7ec095737fd7824ba9> <http://www.europeana.eu/schemas/edm/begin> "1914-11" .
@@ -1408,6 +1428,7 @@ _:b126 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/08d6250c4f9ed64f6bf138685f5ce529> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/08d6250c4f9ed64f6bf138685f5ce529> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/08d6250c4f9ed64f6bf138685f5ce529> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/08d6250c4f9ed64f6bf138685f5ce529> <location> "0.0,0.0" .
 <europeana19141918:place/08d6250c4f9ed64f6bf138685f5ce529> <http://www.w3.org/2004/02/skos/core#prefLabel> "Reichenberg, Sudetenland" .
 <europeana19141918:timespan/e63481c4b4a605271daf1f3e0237f846> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/e63481c4b4a605271daf1f3e0237f846> <http://www.europeana.eu/schemas/edm/begin> "1914-06" .
@@ -1459,6 +1480,7 @@ _:b131 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/4e99efc812399787c101d1687921fa7d> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/4e99efc812399787c101d1687921fa7d> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.19397587459075" .
 <europeana19141918:place/4e99efc812399787c101d1687921fa7d> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "6.44622802734375" .
+<europeana19141918:place/4e99efc812399787c101d1687921fa7d> <location> "51.19397587459075,6.44622802734375" .
 <europeana19141918:place/4e99efc812399787c101d1687921fa7d> <http://www.w3.org/2004/02/skos/core#prefLabel> "M. Gladbach" .
 <europeana19141918:timespan/38285f1ee7a63ba21e6bc595de036e52> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/38285f1ee7a63ba21e6bc595de036e52> <http://www.europeana.eu/schemas/edm/begin> "1916" .
@@ -1557,6 +1579,7 @@ _:b141 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/a9aea7fa4247a194efe8aae61bb0bce9> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/a9aea7fa4247a194efe8aae61bb0bce9> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "48.2081743" .
 <europeana19141918:place/a9aea7fa4247a194efe8aae61bb0bce9> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "16.3738189" .
+<europeana19141918:place/a9aea7fa4247a194efe8aae61bb0bce9> <location> "48.2081743,16.3738189" .
 <europeana19141918:place/a9aea7fa4247a194efe8aae61bb0bce9> <http://www.w3.org/2004/02/skos/core#prefLabel> "Wien" .
 <europeana19141918:timespan/a100dfb49b8ee7ef479776920e38c90c> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/a100dfb49b8ee7ef479776920e38c90c> <http://www.europeana.eu/schemas/edm/begin> "1917-06-19" .
@@ -1607,6 +1630,7 @@ _:b146 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/f031a995eb7b30e6c336eebf2c4f71e7> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/f031a995eb7b30e6c336eebf2c4f71e7> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.2470325" .
 <europeana19141918:place/f031a995eb7b30e6c336eebf2c4f71e7> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "9.1646313" .
+<europeana19141918:place/f031a995eb7b30e6c336eebf2c4f71e7> <location> "51.2470325,9.1646313" .
 <europeana19141918:place/f031a995eb7b30e6c336eebf2c4f71e7> <http://www.w3.org/2004/02/skos/core#prefLabel> "Naumburg (Hessen)" .
 <europeana19141918:timespan/56c42894f5c06dc4ad018d9b1d074a86> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/56c42894f5c06dc4ad018d9b1d074a86> <http://www.europeana.eu/schemas/edm/begin> "1915-11-04" .
@@ -1665,6 +1689,7 @@ _:b151 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/e66691decff75903593e57340efbd741> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/e66691decff75903593e57340efbd741> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/e66691decff75903593e57340efbd741> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/e66691decff75903593e57340efbd741> <location> "0.0,0.0" .
 <europeana19141918:place/e66691decff75903593e57340efbd741> <http://www.w3.org/2004/02/skos/core#prefLabel> "Frankreich, Belgien" .
 <europeana19141918:timespan/cf6687418858aa8133c09544860c756b> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/cf6687418858aa8133c09544860c756b> <http://www.europeana.eu/schemas/edm/begin> "1914" .
@@ -1737,6 +1762,7 @@ _:b156 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/88cb58e803ba35debb3755e5e1c45ba6> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/88cb58e803ba35debb3755e5e1c45ba6> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "50.690029" .
 <europeana19141918:place/88cb58e803ba35debb3755e5e1c45ba6> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "7.651917" .
+<europeana19141918:place/88cb58e803ba35debb3755e5e1c45ba6> <location> "50.690029,7.651917" .
 <europeana19141918:timespan/76956c1710d7b49bccee1ba8439e7c57> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/76956c1710d7b49bccee1ba8439e7c57> <http://www.europeana.eu/schemas/edm/begin> "1914" .
 <europeana19141918:timespan/76956c1710d7b49bccee1ba8439e7c57> <http://www.europeana.eu/schemas/edm/end> "1918" .
@@ -1795,6 +1821,7 @@ _:b161 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/e89060d92b8ed9a629c7aa4c6a1e9bfb> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/e89060d92b8ed9a629c7aa4c6a1e9bfb> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "49.45897547781564" .
 <europeana19141918:place/e89060d92b8ed9a629c7aa4c6a1e9bfb> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "3.5559654235839844" .
+<europeana19141918:place/e89060d92b8ed9a629c7aa4c6a1e9bfb> <location> "49.45897547781564,3.5559654235839844" .
 <europeana19141918:place/e89060d92b8ed9a629c7aa4c6a1e9bfb> <http://www.w3.org/2004/02/skos/core#prefLabel> "Filain" .
 <europeana19141918:timespan/d567f10e1babe1945c0f490fc6d25bcb> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/d567f10e1babe1945c0f490fc6d25bcb> <http://www.europeana.eu/schemas/edm/begin> "1917-08-17" .
@@ -1849,6 +1876,7 @@ _:b166 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/acb8288305f0bece2ea8421ab842b517> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/acb8288305f0bece2ea8421ab842b517> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.75647157430813" .
 <europeana19141918:place/acb8288305f0bece2ea8421ab842b517> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "11.451873779296875" .
+<europeana19141918:place/acb8288305f0bece2ea8421ab842b517> <location> "51.75647157430813,11.451873779296875" .
 <europeana19141918:place/acb8288305f0bece2ea8421ab842b517> <http://www.w3.org/2004/02/skos/core#prefLabel> "Aschersleben" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/1267/198.1267.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/1267/198.1267.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-04-21 14:22:21 UTC" .
@@ -1900,6 +1928,7 @@ _:b171 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/95fa5eeed8355a461daeeae1ef95e7e9> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/95fa5eeed8355a461daeeae1ef95e7e9> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "54.20261680346747" .
 <europeana19141918:place/95fa5eeed8355a461daeeae1ef95e7e9> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "19.114837646484375" .
+<europeana19141918:place/95fa5eeed8355a461daeeae1ef95e7e9> <location> "54.20261680346747,19.114837646484375" .
 <europeana19141918:place/95fa5eeed8355a461daeeae1ef95e7e9> <http://www.w3.org/2004/02/skos/core#prefLabel> "(Zeitung) verm. in Tiegenhof, Westpreussen" .
 <europeana19141918:timespan/9f7154bab3e354e80b788162e08f759f> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/9f7154bab3e354e80b788162e08f759f> <http://www.europeana.eu/schemas/edm/begin> "1916-08" .
@@ -1947,6 +1976,7 @@ _:b176 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/7ddc2196b52f775cb39ecff01cebea5b> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/7ddc2196b52f775cb39ecff01cebea5b> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "54.20101023973888" .
 <europeana19141918:place/7ddc2196b52f775cb39ecff01cebea5b> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "19.11346435546875" .
+<europeana19141918:place/7ddc2196b52f775cb39ecff01cebea5b> <location> "54.20101023973888,19.11346435546875" .
 <europeana19141918:place/7ddc2196b52f775cb39ecff01cebea5b> <http://www.w3.org/2004/02/skos/core#prefLabel> "vermutlich Tiegenhof, Westpreussen" .
 <europeana19141918:timespan/ff809fabe8579950ff111504a6cd4045> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/ff809fabe8579950ff111504a6cd4045> <http://www.europeana.eu/schemas/edm/begin> "1918-04" .
@@ -1995,6 +2025,7 @@ _:b181 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/953e6a70c5c96410dd5aec2b334b8d4e> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/953e6a70c5c96410dd5aec2b334b8d4e> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/953e6a70c5c96410dd5aec2b334b8d4e> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/953e6a70c5c96410dd5aec2b334b8d4e> <location> "0.0,0.0" .
 <europeana19141918:place/953e6a70c5c96410dd5aec2b334b8d4e> <http://www.w3.org/2004/02/skos/core#prefLabel> "nicht bekannt" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/283/201.283.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/283/201.283.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-29 23:53:57 UTC" .
@@ -2075,6 +2106,7 @@ _:b191 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/24073fc8da235c29382f5e5bc7da0d59> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/24073fc8da235c29382f5e5bc7da0d59> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "53.83186504485331" .
 <europeana19141918:place/24073fc8da235c29382f5e5bc7da0d59> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "10.702743530273438" .
+<europeana19141918:place/24073fc8da235c29382f5e5bc7da0d59> <location> "53.83186504485331,10.702743530273438" .
 <europeana19141918:place/24073fc8da235c29382f5e5bc7da0d59> <http://www.w3.org/2004/02/skos/core#prefLabel> "L\u00FCbeck" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/285/204.285.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/285/204.285.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-30 00:22:56 UTC" .
@@ -2117,6 +2149,7 @@ _:b196 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/f3f69760ec6a5f3ad1f49d17b928fdeb> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/f3f69760ec6a5f3ad1f49d17b928fdeb> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "52.455611890170886" .
 <europeana19141918:place/f3f69760ec6a5f3ad1f49d17b928fdeb> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "9.69217300415039" .
+<europeana19141918:place/f3f69760ec6a5f3ad1f49d17b928fdeb> <location> "52.455611890170886,9.69217300415039" .
 <europeana19141918:place/f3f69760ec6a5f3ad1f49d17b928fdeb> <http://www.w3.org/2004/02/skos/core#prefLabel> "wahrscheinlich Hannover" .
 <europeana19141918:timespan/ed670534d145b6a7936afc565d516ead> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/ed670534d145b6a7936afc565d516ead> <http://www.europeana.eu/schemas/edm/begin> "1917" .
@@ -2164,6 +2197,7 @@ _:b201 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/5c47dc88f98e50530a7d62de9ad19bea> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/5c47dc88f98e50530a7d62de9ad19bea> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "52.5234051" .
 <europeana19141918:place/5c47dc88f98e50530a7d62de9ad19bea> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "13.4113999" .
+<europeana19141918:place/5c47dc88f98e50530a7d62de9ad19bea> <location> "52.5234051,13.4113999" .
 <europeana19141918:place/5c47dc88f98e50530a7d62de9ad19bea> <http://www.w3.org/2004/02/skos/core#prefLabel> "Berlin" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/287/209.287.original.JPG> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/287/209.287.original.JPG> <http://purl.org/dc/elements/1.1/description> "2011-03-30 08:26:30 UTC" .
@@ -2249,6 +2283,7 @@ _:b211 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/aeeb568daab116acdd5031d75c41c570> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/aeeb568daab116acdd5031d75c41c570> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "55.8752802" .
 <europeana19141918:place/aeeb568daab116acdd5031d75c41c570> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "26.535760299999993" .
+<europeana19141918:place/aeeb568daab116acdd5031d75c41c570> <location> "55.8752802,26.535760299999993" .
 <europeana19141918:place/aeeb568daab116acdd5031d75c41c570> <http://www.w3.org/2004/02/skos/core#prefLabel> "Berlin und D\u00FCnaburg" .
 <europeana19141918:timespan/d21137ba42c476d6a8b0c8152ae63e94> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/d21137ba42c476d6a8b0c8152ae63e94> <http://www.europeana.eu/schemas/edm/begin> "1916-04-20" .
@@ -2302,6 +2337,7 @@ _:b216 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/e1dd1dbbd8ff6df8ee5f5b4442f2fc56> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/e1dd1dbbd8ff6df8ee5f5b4442f2fc56> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "45.5482652" .
 <europeana19141918:place/e1dd1dbbd8ff6df8ee5f5b4442f2fc56> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "13.7311713" .
+<europeana19141918:place/e1dd1dbbd8ff6df8ee5f5b4442f2fc56> <location> "45.5482652,13.7311713" .
 <europeana19141918:place/e1dd1dbbd8ff6df8ee5f5b4442f2fc56> <http://www.w3.org/2004/02/skos/core#prefLabel> "Capodistria (heute: Koper / Slowenien)" .
 <europeana19141918:timespan/1c09f3c8df8f78025d5c330be0449457> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/1c09f3c8df8f78025d5c330be0449457> <http://www.europeana.eu/schemas/edm/begin> "1918-11-04" .
@@ -2384,6 +2420,7 @@ _:b226 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/e07e2549b48f15b74c63a79f79ec95b2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/e07e2549b48f15b74c63a79f79ec95b2> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "45.5482652" .
 <europeana19141918:place/e07e2549b48f15b74c63a79f79ec95b2> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "13.7311713" .
+<europeana19141918:place/e07e2549b48f15b74c63a79f79ec95b2> <location> "45.5482652,13.7311713" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/292/215.292.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/292/215.292.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-30 08:50:14 UTC" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/292/215.292.original.jpg> <http://purl.org/dc/terms/created> "2011-03-30 08:50:14 UTC" .
@@ -2429,6 +2466,7 @@ _:b231 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/50d1f050a8a8190563e80cca5a2f1f26> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/50d1f050a8a8190563e80cca5a2f1f26> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "45.489116517830624" .
 <europeana19141918:place/50d1f050a8a8190563e80cca5a2f1f26> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "12.23876953125" .
+<europeana19141918:place/50d1f050a8a8190563e80cca5a2f1f26> <location> "45.489116517830624,12.23876953125" .
 <europeana19141918:place/50d1f050a8a8190563e80cca5a2f1f26> <http://www.w3.org/2004/02/skos/core#prefLabel> "photo taken in Venice, now" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/293/216.293.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/293/216.293.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-30 08:53:24 UTC" .
@@ -2470,6 +2508,7 @@ _:b236 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/3d1f975d5aa159ee8ceebff2bed01d58> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/3d1f975d5aa159ee8ceebff2bed01d58> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "45.5482652" .
 <europeana19141918:place/3d1f975d5aa159ee8ceebff2bed01d58> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "13.7311713" .
+<europeana19141918:place/3d1f975d5aa159ee8ceebff2bed01d58> <location> "45.5482652,13.7311713" .
 <europeana19141918:place/3d1f975d5aa159ee8ceebff2bed01d58> <http://www.w3.org/2004/02/skos/core#prefLabel> "Capodistria" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/294/217.294.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/294/217.294.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-30 08:58:32 UTC" .
@@ -2560,6 +2599,7 @@ _:b246 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/c5ff989028b589a4bf18d33a19976666> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/c5ff989028b589a4bf18d33a19976666> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "45.873528" .
 <europeana19141918:place/c5ff989028b589a4bf18d33a19976666> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "13.483957" .
+<europeana19141918:place/c5ff989028b589a4bf18d33a19976666> <location> "45.873528,13.483957" .
 <europeana19141918:place/c5ff989028b589a4bf18d33a19976666> <http://www.w3.org/2004/02/skos/core#prefLabel> "Trincea delle Frasche" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/298/219.298.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/298/219.298.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-30 09:29:09 UTC" .
@@ -2647,6 +2687,7 @@ _:b256 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/6b6b1cf94d09cf0779b71568317dc8fe> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/6b6b1cf94d09cf0779b71568317dc8fe> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/6b6b1cf94d09cf0779b71568317dc8fe> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/6b6b1cf94d09cf0779b71568317dc8fe> <location> "0.0,0.0" .
 <europeana19141918:place/6b6b1cf94d09cf0779b71568317dc8fe> <http://www.w3.org/2004/02/skos/core#prefLabel> "unbekannt (m\u00F6glicherweise Mars la Tour)" .
 <europeana19141918:timespan/27d1a79f4a3adb3975a8130e38098f1d> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/27d1a79f4a3adb3975a8130e38098f1d> <http://www.europeana.eu/schemas/edm/begin> "1914" .
@@ -2699,6 +2740,7 @@ _:b261 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/27cbfc49a7dfe41f6e66fb82ea497505> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/27cbfc49a7dfe41f6e66fb82ea497505> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "48.11685818754378" .
 <europeana19141918:place/27cbfc49a7dfe41f6e66fb82ea497505> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "11.57682180404663" .
+<europeana19141918:place/27cbfc49a7dfe41f6e66fb82ea497505> <location> "48.11685818754378,11.57682180404663" .
 <europeana19141918:place/27cbfc49a7dfe41f6e66fb82ea497505> <http://www.w3.org/2004/02/skos/core#prefLabel> "M\u00FCnchen - Giesing" .
 <europeana19141918:timespan/e9bb8675ceaf1ce7fd7873dd7b98fa09> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/e9bb8675ceaf1ce7fd7873dd7b98fa09> <http://www.europeana.eu/schemas/edm/begin> "1914" .
@@ -2744,6 +2786,7 @@ _:b266 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/4de34ccac13f8762f58d23766003761b> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/4de34ccac13f8762f58d23766003761b> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "45.814912" .
 <europeana19141918:place/4de34ccac13f8762f58d23766003761b> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "15.9785145" .
+<europeana19141918:place/4de34ccac13f8762f58d23766003761b> <location> "45.814912,15.9785145" .
 <europeana19141918:place/4de34ccac13f8762f58d23766003761b> <http://www.w3.org/2004/02/skos/core#prefLabel> "Zagreb (Kroatien) - damals zugeh\u00F6rig zu k.u.k. \u00D6sterreich" .
 <europeana19141918:timespan/6058a82beb829b002f0e475ba4d29468> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/6058a82beb829b002f0e475ba4d29468> <http://www.europeana.eu/schemas/edm/begin> "1918-03-22" .
@@ -2803,6 +2846,7 @@ _:b271 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/098293a1997d8fca8392fd9c23ff57e0> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/098293a1997d8fca8392fd9c23ff57e0> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "42.6418783" .
 <europeana19141918:place/098293a1997d8fca8392fd9c23ff57e0> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "18.1064811" .
+<europeana19141918:place/098293a1997d8fca8392fd9c23ff57e0> <location> "42.6418783,18.1064811" .
 <europeana19141918:place/098293a1997d8fca8392fd9c23ff57e0> <http://www.w3.org/2004/02/skos/core#prefLabel> "Ragusa, heute Dubrovnik" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/312/229.312.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/312/229.312.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-30 15:51:21 UTC" .
@@ -2850,6 +2894,7 @@ _:b276 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/e8446043fff64b840d22251c4857173f> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/e8446043fff64b840d22251c4857173f> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "45.8148347" .
 <europeana19141918:place/e8446043fff64b840d22251c4857173f> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "15.978307099999938" .
+<europeana19141918:place/e8446043fff64b840d22251c4857173f> <location> "45.8148347,15.978307099999938" .
 <europeana19141918:place/e8446043fff64b840d22251c4857173f> <http://www.w3.org/2004/02/skos/core#prefLabel> "Zagreb (Kroatien)" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/314/230.314.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/314/230.314.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-30 15:58:18 UTC" .
@@ -2895,6 +2940,7 @@ _:b281 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/66240292edea08f09ffa310a9000b76c> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/66240292edea08f09ffa310a9000b76c> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "47.04795" .
 <europeana19141918:place/66240292edea08f09ffa310a9000b76c> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "16.08013" .
+<europeana19141918:place/66240292edea08f09ffa310a9000b76c> <location> "47.04795,16.08013" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/316/231.316.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/316/231.316.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-03-30 16:32:58 UTC" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/316/231.316.original.jpg> <http://purl.org/dc/terms/created> "2011-03-30 16:32:58 UTC" .
@@ -2939,6 +2985,7 @@ _:b286 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/088a7dbaf67ba75a57adbb28c7fd8695> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/088a7dbaf67ba75a57adbb28c7fd8695> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "44.740768" .
 <europeana19141918:place/088a7dbaf67ba75a57adbb28c7fd8695> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "18.09296" .
+<europeana19141918:place/088a7dbaf67ba75a57adbb28c7fd8695> <location> "44.740768,18.09296" .
 <europeana19141918:place/088a7dbaf67ba75a57adbb28c7fd8695> <http://www.w3.org/2004/02/skos/core#prefLabel> "Duboj (Ukraine)" .
 <europeana19141918:timespan/dbe4714b237f5706b40a6f679c363d0f> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/dbe4714b237f5706b40a6f679c363d0f> <http://www.europeana.eu/schemas/edm/begin> "1917-12-06" .
@@ -3028,6 +3075,7 @@ _:b296 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/b32ac7e33a83b532f0551c12889800dc> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/b32ac7e33a83b532f0551c12889800dc> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/b32ac7e33a83b532f0551c12889800dc> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/b32ac7e33a83b532f0551c12889800dc> <location> "0.0,0.0" .
 <europeana19141918:place/b32ac7e33a83b532f0551c12889800dc> <http://www.w3.org/2004/02/skos/core#prefLabel> "Ukraine" .
 <europeana19141918:timespan/78501cd71b952311fe9e12cbcefc1e29> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/78501cd71b952311fe9e12cbcefc1e29> <http://www.europeana.eu/schemas/edm/begin> "1918-07-18" .
@@ -3075,6 +3123,7 @@ _:b301 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/40c56c41083c3d4c2333bdf8e1634498> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/40c56c41083c3d4c2333bdf8e1634498> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/40c56c41083c3d4c2333bdf8e1634498> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/40c56c41083c3d4c2333bdf8e1634498> <location> "0.0,0.0" .
 <europeana19141918:place/40c56c41083c3d4c2333bdf8e1634498> <http://www.w3.org/2004/02/skos/core#prefLabel> "Wjasnowoje (Ukraine)" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/323/237.323.original.JPG> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/323/237.323.original.JPG> <http://purl.org/dc/elements/1.1/description> "2011-03-30 20:12:07 UTC" .
@@ -3163,6 +3212,7 @@ _:b311 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/08f5bb60d0d92dd647e078069fd1cf09> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/08f5bb60d0d92dd647e078069fd1cf09> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "48.464717" .
 <europeana19141918:place/08f5bb60d0d92dd647e078069fd1cf09> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "35.046183" .
+<europeana19141918:place/08f5bb60d0d92dd647e078069fd1cf09> <location> "48.464717,35.046183" .
 <europeana19141918:place/08f5bb60d0d92dd647e078069fd1cf09> <http://www.w3.org/2004/02/skos/core#prefLabel> "Dnipropetrowsk (Jekaterinoslaw) und andere damals russische Orte" .
 <europeana19141918:timespan/71b9f9bd02f0f4e5b998b5a8ce60ed3f> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/71b9f9bd02f0f4e5b998b5a8ce60ed3f> <http://www.europeana.eu/schemas/edm/begin> "1918-12-20" .
@@ -3214,6 +3264,7 @@ _:b316 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/0f09e53e94b991f39c2c24f5fb973d50> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/0f09e53e94b991f39c2c24f5fb973d50> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "52.4983717" .
 <europeana19141918:place/0f09e53e94b991f39c2c24f5fb973d50> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "13.395979" .
+<europeana19141918:place/0f09e53e94b991f39c2c24f5fb973d50> <location> "52.4983717,13.395979" .
 <europeana19141918:place/0f09e53e94b991f39c2c24f5fb973d50> <http://www.w3.org/2004/02/skos/core#prefLabel> "Kreuzberg" .
 <europeana19141918:timespan/11889906832f43cdb48fba1dd635b0cd> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/11889906832f43cdb48fba1dd635b0cd> <http://www.europeana.eu/schemas/edm/begin> "1915-07-18" .
@@ -3262,6 +3313,7 @@ _:b321 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/266d3523949b786c72411f55ab98b3a9> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/266d3523949b786c72411f55ab98b3a9> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/266d3523949b786c72411f55ab98b3a9> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/266d3523949b786c72411f55ab98b3a9> <location> "0.0,0.0" .
 <europeana19141918:place/266d3523949b786c72411f55ab98b3a9> <http://www.w3.org/2004/02/skos/core#prefLabel> "Liven - Barsen ?" .
 <europeana19141918:timespan/bcdb2f1f5368cd08dac208c2de7e5238> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/bcdb2f1f5368cd08dac208c2de7e5238> <http://www.europeana.eu/schemas/edm/begin> "1915-08-07" .
@@ -3402,6 +3454,7 @@ _:b336 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/26368466ca0044fe6a88224b4a1438c4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/26368466ca0044fe6a88224b4a1438c4> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "49.37432592004196" .
 <europeana19141918:place/26368466ca0044fe6a88224b4a1438c4> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "5.394287109375" .
+<europeana19141918:place/26368466ca0044fe6a88224b4a1438c4> <location> "49.37432592004196,5.394287109375" .
 <europeana19141918:place/26368466ca0044fe6a88224b4a1438c4> <http://www.w3.org/2004/02/skos/core#prefLabel> "Peuvillers" .
 <europeana19141918:timespan/52352a892033bdb7168b58dd6790ba94> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/52352a892033bdb7168b58dd6790ba94> <http://www.europeana.eu/schemas/edm/begin> "1916-04-07" .
@@ -3451,6 +3504,7 @@ _:b341 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/5eebd830b35f0454d35cbd73063c1af8> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/5eebd830b35f0454d35cbd73063c1af8> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.983168" .
 <europeana19141918:place/5eebd830b35f0454d35cbd73063c1af8> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "9.2447" .
+<europeana19141918:place/5eebd830b35f0454d35cbd73063c1af8> <location> "51.983168,9.2447" .
 <europeana19141918:place/5eebd830b35f0454d35cbd73063c1af8> <http://www.w3.org/2004/02/skos/core#prefLabel> "Bad Pyrmont" .
 <europeana19141918:timespan/95d3697297050fb08abceffe50c34e3b> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/95d3697297050fb08abceffe50c34e3b> <http://www.europeana.eu/schemas/edm/begin> "1916-07-05" .
@@ -3546,6 +3600,7 @@ _:b351 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/05e00dc0843896d040ff83d3301c313d> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/05e00dc0843896d040ff83d3301c313d> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "53.548243" .
 <europeana19141918:place/05e00dc0843896d040ff83d3301c313d> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "8.58265700000004" .
+<europeana19141918:place/05e00dc0843896d040ff83d3301c313d> <location> "53.548243,8.58265700000004" .
 <europeana19141918:place/05e00dc0843896d040ff83d3301c313d> <http://www.w3.org/2004/02/skos/core#prefLabel> "Bremerhaven" .
 <europeana19141918:timespan/e99a6455ffdaded56921a4370099210d> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/e99a6455ffdaded56921a4370099210d> <http://www.europeana.eu/schemas/edm/begin> "1914-07" .
@@ -3591,6 +3646,7 @@ _:b356 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/dbbf1ea75e4707e2f4216d602b80f36d> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/dbbf1ea75e4707e2f4216d602b80f36d> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "47.032137" .
 <europeana19141918:place/dbbf1ea75e4707e2f4216d602b80f36d> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "16.0539208" .
+<europeana19141918:place/dbbf1ea75e4707e2f4216d602b80f36d> <location> "47.032137,16.0539208" .
 <europeana19141918:place/dbbf1ea75e4707e2f4216d602b80f36d> <http://www.w3.org/2004/02/skos/core#prefLabel> "\u00DCbersbach" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/357/259.357.original.JPG> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/357/259.357.original.JPG> <http://purl.org/dc/elements/1.1/description> "2011-04-02 15:21:14 UTC" .
@@ -3639,6 +3695,7 @@ _:b361 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/fd12cf3fe421858cbb3b5fd45099c1cc> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/fd12cf3fe421858cbb3b5fd45099c1cc> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "50.81011" .
 <europeana19141918:place/fd12cf3fe421858cbb3b5fd45099c1cc> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "2.89208" .
+<europeana19141918:place/fd12cf3fe421858cbb3b5fd45099c1cc> <location> "50.81011,2.89208" .
 <europeana19141918:place/fd12cf3fe421858cbb3b5fd45099c1cc> <http://www.w3.org/2004/02/skos/core#prefLabel> "St. Elooi" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/328/261.328.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/328/261.328.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-04-01 07:32:56 UTC" .
@@ -3726,6 +3783,7 @@ _:b371 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/9387f1e6022facc9658da8e2a812259a> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/9387f1e6022facc9658da8e2a812259a> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.3626037" .
 <europeana19141918:place/9387f1e6022facc9658da8e2a812259a> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "12.372626" .
+<europeana19141918:place/9387f1e6022facc9658da8e2a812259a> <location> "51.3626037,12.372626" .
 <europeana19141918:place/9387f1e6022facc9658da8e2a812259a> <http://www.w3.org/2004/02/skos/core#prefLabel> "Leipzig-Gohlis" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/330/263.330.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/330/263.330.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-04-01 07:47:13 UTC" .
@@ -3768,6 +3826,7 @@ _:b376 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/10027e663097a88b0f5b3866140563f4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/10027e663097a88b0f5b3866140563f4> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "60.6200875" .
 <europeana19141918:place/10027e663097a88b0f5b3866140563f4> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "6.53483" .
+<europeana19141918:place/10027e663097a88b0f5b3866140563f4> <location> "60.6200875,6.53483" .
 <europeana19141918:place/10027e663097a88b0f5b3866140563f4> <http://www.w3.org/2004/02/skos/core#prefLabel> "Tembrilen" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/331/264.331.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/331/264.331.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-04-01 07:56:06 UTC" .
@@ -3813,6 +3872,7 @@ _:b381 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/feb62cc840d9c109bd3b527b2e7839dc> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/feb62cc840d9c109bd3b527b2e7839dc> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "50.78567" .
 <europeana19141918:place/feb62cc840d9c109bd3b527b2e7839dc> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "2.88385" .
+<europeana19141918:place/feb62cc840d9c109bd3b527b2e7839dc> <location> "50.78567,2.88385" .
 <europeana19141918:place/feb62cc840d9c109bd3b527b2e7839dc> <http://www.w3.org/2004/02/skos/core#prefLabel> "Wijtschate" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/333/265.333.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/333/265.333.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-04-01 08:04:31 UTC" .
@@ -3857,6 +3917,7 @@ _:b386 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/46d4de1dba6da375c17ca7b12251adb2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/46d4de1dba6da375c17ca7b12251adb2> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "50.508068" .
 <europeana19141918:place/46d4de1dba6da375c17ca7b12251adb2> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "2.6357093" .
+<europeana19141918:place/46d4de1dba6da375c17ca7b12251adb2> <location> "50.508068,2.6357093" .
 <europeana19141918:place/46d4de1dba6da375c17ca7b12251adb2> <http://www.w3.org/2004/02/skos/core#prefLabel> "Fouqui\u00E9res" .
 <europeana19141918:timespan/06a1200a2da1e92e020ca67354df91b5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/06a1200a2da1e92e020ca67354df91b5> <http://www.europeana.eu/schemas/edm/begin> "1915-10-10" .
@@ -3948,6 +4009,7 @@ _:b396 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/7a7d18b50efe4f73f26a85b933f4ead0> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/7a7d18b50efe4f73f26a85b933f4ead0> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "50.78906" .
 <europeana19141918:place/7a7d18b50efe4f73f26a85b933f4ead0> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "2.90948" .
+<europeana19141918:place/7a7d18b50efe4f73f26a85b933f4ead0> <location> "50.78906,2.90948" .
 <europeana19141918:place/7a7d18b50efe4f73f26a85b933f4ead0> <http://www.w3.org/2004/02/skos/core#prefLabel> "Oosttaverne" .
 <europeana19141918:timespan/2cd4ac35f24442a7e543435f8720fb5c> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/2cd4ac35f24442a7e543435f8720fb5c> <http://www.europeana.eu/schemas/edm/begin> "1916-01-20" .
@@ -4173,6 +4235,7 @@ _:b421 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/ceb00d919630e9b8aca15e661fb445a8> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/ceb00d919630e9b8aca15e661fb445a8> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "50.37305821327337" .
 <europeana19141918:place/ceb00d919630e9b8aca15e661fb445a8> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "2.8255462646484375" .
+<europeana19141918:place/ceb00d919630e9b8aca15e661fb445a8> <location> "50.37305821327337,2.8255462646484375" .
 <europeana19141918:place/ceb00d919630e9b8aca15e661fb445a8> <http://www.w3.org/2004/02/skos/core#prefLabel> "Vimy, France" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/346/274.346.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/346/274.346.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-04-01 10:30:16 UTC" .
@@ -4218,6 +4281,7 @@ _:b426 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/af34e4fca27159a19246330ae05cfce5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/af34e4fca27159a19246330ae05cfce5> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "50.49999805746128" .
 <europeana19141918:place/af34e4fca27159a19246330ae05cfce5> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "2.836017608642578" .
+<europeana19141918:place/af34e4fca27159a19246330ae05cfce5> <location> "50.49999805746128,2.836017608642578" .
 <europeana19141918:place/af34e4fca27159a19246330ae05cfce5> <http://www.w3.org/2004/02/skos/core#prefLabel> "Wingles" .
 <europeana19141918:timespan/275155ab97c95ca74a2e3e4fe1fcead4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/275155ab97c95ca74a2e3e4fe1fcead4> <http://www.europeana.eu/schemas/edm/begin> "1915-10-04" .
@@ -4268,6 +4332,7 @@ _:b431 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/ac80a7f84ac6ecea0390ec198bb834da> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/ac80a7f84ac6ecea0390ec198bb834da> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "50.86858" .
 <europeana19141918:place/ac80a7f84ac6ecea0390ec198bb834da> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "2.95542" .
+<europeana19141918:place/ac80a7f84ac6ecea0390ec198bb834da> <location> "50.86858,2.95542" .
 <europeana19141918:place/ac80a7f84ac6ecea0390ec198bb834da> <http://www.w3.org/2004/02/skos/core#prefLabel> "Frezenberg" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/352/276.352.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/352/276.352.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-04-01 11:44:47 UTC" .
@@ -4314,6 +4379,7 @@ _:b436 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/f2fd202cfd18deb216066b6c3f39c5c5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/f2fd202cfd18deb216066b6c3f39c5c5> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "49.553517" .
 <europeana19141918:place/f2fd202cfd18deb216066b6c3f39c5c5> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "25.594767" .
+<europeana19141918:place/f2fd202cfd18deb216066b6c3f39c5c5> <location> "49.553517,25.594767" .
 <europeana19141918:place/f2fd202cfd18deb216066b6c3f39c5c5> <http://www.w3.org/2004/02/skos/core#prefLabel> "Front an der Strypa bei Tarnopol, Galizien (heute: Ternopil, Ukraine)" .
 <europeana19141918:timespan/441c932511901640c2c84e8df0ee3eea> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/441c932511901640c2c84e8df0ee3eea> <http://www.europeana.eu/schemas/edm/begin> "1915-05-05" .
@@ -4418,6 +4484,7 @@ _:b441 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/79e2612195a46432db845877773b9ada> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/79e2612195a46432db845877773b9ada> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/79e2612195a46432db845877773b9ada> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/79e2612195a46432db845877773b9ada> <location> "0.0,0.0" .
 <europeana19141918:place/79e2612195a46432db845877773b9ada> <http://www.w3.org/2004/02/skos/core#prefLabel> "Im Felde" .
 <europeana19141918:timespan/3b544d5490530cc662dfe1832d52c50e> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/3b544d5490530cc662dfe1832d52c50e> <http://www.europeana.eu/schemas/edm/begin> "1918-05-25" .
@@ -4465,6 +4532,7 @@ _:b446 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/a9cfd5b1e4f75c7d7feacb959d7ad34e> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/a9cfd5b1e4f75c7d7feacb959d7ad34e> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "45.583289756006316" .
 <europeana19141918:place/a9cfd5b1e4f75c7d7feacb959d7ad34e> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "13.798828125" .
+<europeana19141918:place/a9cfd5b1e4f75c7d7feacb959d7ad34e> <location> "45.583289756006316,13.798828125" .
 <europeana19141918:place/a9cfd5b1e4f75c7d7feacb959d7ad34e> <http://www.w3.org/2004/02/skos/core#prefLabel> "Trieste, Italy" .
 <europeana19141918:timespan/6620bcb5e572538434af35f49647b8a6> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/6620bcb5e572538434af35f49647b8a6> <http://www.europeana.eu/schemas/edm/begin> "1916" .
@@ -4509,6 +4577,7 @@ _:b451 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/cd42162d5a823fa3dc5aa05677e07ce5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/cd42162d5a823fa3dc5aa05677e07ce5> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "45.9798115" .
 <europeana19141918:place/cd42162d5a823fa3dc5aa05677e07ce5> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "12.3033131" .
+<europeana19141918:place/cd42162d5a823fa3dc5aa05677e07ce5> <location> "45.9798115,12.3033131" .
 <europeana19141918:place/cd42162d5a823fa3dc5aa05677e07ce5> <http://www.w3.org/2004/02/skos/core#prefLabel> "Vittorio Veneto" .
 <europeana19141918:timespan/c0b2fa669eb9f8d92d3b52ebdbc737c7> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/c0b2fa669eb9f8d92d3b52ebdbc737c7> <http://www.europeana.eu/schemas/edm/begin> "1918" .
@@ -4555,6 +4624,7 @@ _:b456 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/688170802ffd996fa4ec79ac95bd153f> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/688170802ffd996fa4ec79ac95bd153f> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "45.6536295" .
 <europeana19141918:place/688170802ffd996fa4ec79ac95bd153f> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "13.7784072" .
+<europeana19141918:place/688170802ffd996fa4ec79ac95bd153f> <location> "45.6536295,13.7784072" .
 <europeana19141918:place/688170802ffd996fa4ec79ac95bd153f> <http://www.w3.org/2004/02/skos/core#prefLabel> "Trieste, Italy" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/363/289.363.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/363/289.363.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-04-02 17:13:26 UTC" .
@@ -4599,6 +4669,7 @@ _:b461 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/369b0c9ba3e84d941108588b19261739> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/369b0c9ba3e84d941108588b19261739> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "45.9798115" .
 <europeana19141918:place/369b0c9ba3e84d941108588b19261739> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "12.3033131" .
+<europeana19141918:place/369b0c9ba3e84d941108588b19261739> <location> "45.9798115,12.3033131" .
 <europeana19141918:place/369b0c9ba3e84d941108588b19261739> <http://www.w3.org/2004/02/skos/core#prefLabel> "Vittorio Veneto, Italy" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/364/290.364.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/364/290.364.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-04-02 17:19:15 UTC" .
@@ -4641,6 +4712,7 @@ _:b466 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/7b03325dcd31401665360a7349ace47b> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/7b03325dcd31401665360a7349ace47b> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/7b03325dcd31401665360a7349ace47b> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/7b03325dcd31401665360a7349ace47b> <location> "0.0,0.0" .
 <europeana19141918:place/7b03325dcd31401665360a7349ace47b> <http://www.w3.org/2004/02/skos/core#prefLabel> "Italy" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/365/291.365.original.psd> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/365/291.365.original.psd> <http://purl.org/dc/elements/1.1/description> "2011-04-02 18:18:46 UTC" .
@@ -4684,6 +4756,7 @@ _:b471 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/cc155715443ab38dd1d7532cbb319511> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/cc155715443ab38dd1d7532cbb319511> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "52.2687128" .
 <europeana19141918:place/cc155715443ab38dd1d7532cbb319511> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.7223311" .
+<europeana19141918:place/cc155715443ab38dd1d7532cbb319511> <location> "52.2687128,0.7223311" .
 <europeana19141918:place/cc155715443ab38dd1d7532cbb319511> <http://www.w3.org/2004/02/skos/core#prefLabel> "UK - Fornham St Martin - Suffolk" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/367/292.367.original.doc> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/367/292.367.original.doc> <http://purl.org/dc/elements/1.1/description> "2011-04-03 11:03:25 UTC" .
@@ -4738,6 +4811,7 @@ _:b476 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/a04d24db9e03cc3eb412ae5ff878c5a2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/a04d24db9e03cc3eb412ae5ff878c5a2> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/a04d24db9e03cc3eb412ae5ff878c5a2> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/a04d24db9e03cc3eb412ae5ff878c5a2> <location> "0.0,0.0" .
 <europeana19141918:place/a04d24db9e03cc3eb412ae5ff878c5a2> <http://www.w3.org/2004/02/skos/core#prefLabel> "Zwischen Darmstadt und Frankreich" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/20852/294.20852.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/20852/294.20852.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-07-19 19:14:14 UTC" .
@@ -4882,6 +4956,7 @@ _:b491 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/7bd79fa916f13359e140edb18145dcbb> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/7bd79fa916f13359e140edb18145dcbb> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "50.067012802765824" .
 <europeana19141918:place/7bd79fa916f13359e140edb18145dcbb> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "8.2177734375" .
+<europeana19141918:place/7bd79fa916f13359e140edb18145dcbb> <location> "50.067012802765824,8.2177734375" .
 <europeana19141918:place/7bd79fa916f13359e140edb18145dcbb> <http://www.w3.org/2004/02/skos/core#prefLabel> "Wiesbaden" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/384/301.384.original.jpg> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/384/301.384.original.jpg> <http://purl.org/dc/elements/1.1/description> "2011-04-03 14:38:35 UTC" .
@@ -4929,6 +5004,7 @@ _:b496 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/535926166d41cfae88df617110ed4d30> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/535926166d41cfae88df617110ed4d30> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "0.0" .
 <europeana19141918:place/535926166d41cfae88df617110ed4d30> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "0.0" .
+<europeana19141918:place/535926166d41cfae88df617110ed4d30> <location> "0.0,0.0" .
 <europeana19141918:place/535926166d41cfae88df617110ed4d30> <http://www.w3.org/2004/02/skos/core#prefLabel> "Frankreich (Vogesen)" .
 <europeana19141918:timespan/6ced4c2ba85b1af5b0b1571db6d7da32> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/TimeSpan> .
 <europeana19141918:timespan/6ced4c2ba85b1af5b0b1571db6d7da32> <http://www.europeana.eu/schemas/edm/begin> "1914" .
@@ -4993,6 +5069,7 @@ _:b501 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.openarchive
 <europeana19141918:place/7d240fcea6d0714bf941cb635ff2b7b1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/Place> .
 <europeana19141918:place/7d240fcea6d0714bf941cb635ff2b7b1> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "48.10972362702283" .
 <europeana19141918:place/7d240fcea6d0714bf941cb635ff2b7b1> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "10.93963623046875" .
+<europeana19141918:place/7d240fcea6d0714bf941cb635ff2b7b1> <location> "48.10972362702283,10.93963623046875" .
 <europeana19141918:place/7d240fcea6d0714bf941cb635ff2b7b1> <http://www.w3.org/2004/02/skos/core#prefLabel> "Geretshausen" .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/386/305.386.original.pdf> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.europeana.eu/schemas/edm/WebResource> .
 <https://europeana1914-1918.s3.amazonaws.com/attachments/386/305.386.original.pdf> <http://purl.org/dc/elements/1.1/description> "2011-04-03 17:24:03 UTC" .

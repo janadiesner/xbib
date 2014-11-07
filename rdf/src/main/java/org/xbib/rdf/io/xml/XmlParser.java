@@ -31,10 +31,7 @@
  */
 package org.xbib.rdf.io.xml;
 
-import org.xbib.rdf.Identifiable;
 import org.xbib.rdf.Parser;
-import org.xbib.rdf.Property;
-import org.xbib.rdf.Node;
 import org.xbib.rdf.Triple;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -46,13 +43,8 @@ import java.io.Reader;
 
 /**
  * An XML reader for parsing XML into triples
- *
- * @param <S>
- * @param <P>
- * @param <O>
  */
-public class XmlParser<S extends Identifiable, P extends Property, O extends Node>
-        implements Parser {
+public class XmlParser implements Parser {
 
     private Triple.Builder builder;
 
@@ -62,7 +54,7 @@ public class XmlParser<S extends Identifiable, P extends Property, O extends Nod
 
     private boolean validate = false;
 
-    public XmlParser<S, P, O> setHandler(XmlHandler handler) {
+    public XmlParser setHandler(XmlHandler handler) {
         this.handler = handler;
         return this;
     }

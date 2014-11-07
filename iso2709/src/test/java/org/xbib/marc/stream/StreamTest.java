@@ -46,8 +46,8 @@ public class StreamTest {
     public void testZDB() throws IOException {
         Iso2709Reader reader = new Iso2709Reader();
         long count = reader.stream(getClass().getResource("zdblokutf8.mrc").openStream())
-                .fields()
-                .count();
+                    .fields()
+                    .count();
         assertEquals(10171L, count);
         reader.stream(getClass().getResource("zdblokutf8.mrc").openStream())
                 .fields()

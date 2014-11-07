@@ -32,6 +32,7 @@
 package org.xbib.marc.xml;
 
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -79,14 +80,32 @@ public class MarcXchangeReader extends MarcXchangeContentHandler {
         }
     }
 
+    public MarcXchangeReader setContentHandler(ContentHandler handler) {
+        this.contentHandler = handler;
+        return this;
+    }
+
     @Override
     public MarcXchangeReader setMarcXchangeListener(MarcXchangeListener listener) {
         super.setMarcXchangeListener(listener);
         return this;
     }
 
-    public MarcXchangeReader setContentHandler(ContentHandler handler) {
-        this.contentHandler = handler;
+    @Override
+    public MarcXchangeReader addNamespace(String uri) {
+        super.addNamespace(uri);
+        return this;
+    }
+
+    @Override
+    public MarcXchangeReader setTransformer(String key, StringTransformer transformer) {
+        super.setTransformer(key, transformer);
+        return this;
+    }
+
+    @Override
+    public MarcXchangeReader setTransform(boolean transform) {
+        super.setTransform(transform);
         return this;
     }
 

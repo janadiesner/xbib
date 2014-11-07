@@ -31,10 +31,10 @@
  */
 package org.xbib.rdf.io.xml;
 
-import org.xbib.rdf.Property;
+import org.xbib.iri.IRI;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.memory.MemoryResource;
 
 import javax.xml.namespace.QName;
@@ -50,8 +50,8 @@ public abstract class AbstractXmlResourceHandler
 
     private final Stack<Resource> stack = new Stack<Resource>();
 
-    public AbstractXmlResourceHandler(ResourceContext<Resource> resourceContext) {
-        super(resourceContext);
+    public AbstractXmlResourceHandler(Context<Resource> context) {
+        super(context);
     }
 
     @Override
@@ -76,7 +76,7 @@ public abstract class AbstractXmlResourceHandler
      */
     @Override
     public void openPredicate(QName parent, QName name, int level) {
-        Property p = toProperty(resource.newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
+        IRI p = toProperty(resource.newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
         stack.push(stack.peek().newResource(p));
     }
 
@@ -86,7 +86,7 @@ public abstract class AbstractXmlResourceHandler
 
     @Override
     public void closePredicate(QName parent, QName name, int level) {
-        Property p = toProperty(resource.newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
+        IRI p = toProperty(resource.newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
         Resource r = stack.pop();
         if (level < 0) {
             // it's a Resource
@@ -105,13 +105,13 @@ public abstract class AbstractXmlResourceHandler
                     } else if (o instanceof Resource) {
                         r.add(p, (Resource) o);
                     }
-                    stack.peek().compactPredicate(p.id());
+                    stack.peek().compactPredicate(p);
                 }
             }
         }
     }
 
-    public Property toProperty(Property property) {
+    public IRI toProperty(IRI property) {
         return property;
     }
 

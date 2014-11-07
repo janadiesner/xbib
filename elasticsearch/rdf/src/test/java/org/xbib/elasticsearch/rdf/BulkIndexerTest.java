@@ -14,8 +14,8 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.memory.MemoryContext;
 
 public class BulkIndexerTest extends Assert {
 
@@ -33,8 +33,8 @@ public class BulkIndexerTest extends Assert {
                     .newClient(settings.getAsMap());
             es.newIndex("test");
             es.deleteIndex("test");
-            ResourceContext context = createContext();
-            new ResourceSink(es).write(context);
+            Context context = createContext();
+            new Sink(es).write(context);
             es.flushIngest();
             es.waitForResponses(TimeValue.timeValueSeconds(30));
             // check if IRI path "document" worked
@@ -50,8 +50,8 @@ public class BulkIndexerTest extends Assert {
         }
     }
 
-    private ResourceContext createContext() {
-        ResourceContext context = new MemoryResourceContext()
+    private Context createContext() {
+        Context context = new MemoryContext()
                 .newNamespaceContext()
                 .setContentBuilder(new DefaultContentBuilder());
         context.getNamespaceContext().addNamespace(ES.NS_PREFIX, ES.NS_URI);

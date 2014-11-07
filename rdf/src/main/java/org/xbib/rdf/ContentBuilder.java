@@ -29,26 +29,11 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.rdf.memory;
+package org.xbib.rdf;
 
-import org.xbib.iri.IRI;
-import org.xbib.rdf.Identifiable;
-import org.xbib.rdf.Property;
+import java.io.IOException;
 
-public class MemoryProperty extends IRI implements Property {
+public interface ContentBuilder<C extends Context<R>, R extends Resource> {
 
-    public MemoryProperty(IRI iri) {
-        super(iri);
-    }
-
-    @Override
-    public IRI id() {
-        return this;
-    }
-
-    @Override
-    public Identifiable id(IRI identifier) {
-        return this;
-    }
-
+    String build(C context, R resource) throws IOException;
 }

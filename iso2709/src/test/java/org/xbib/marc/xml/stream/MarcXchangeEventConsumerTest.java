@@ -1,24 +1,20 @@
 package org.xbib.marc.xml.stream;
 
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.xbib.helper.StreamTester;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.XMLEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 
 import static org.testng.Assert.assertNull;
 
-public class MarcXchangeEventConsumerTest {
-
-    private final Logger logger = LoggerFactory.getLogger(MarcXchangeEventConsumerTest.class.getName());
-
-    private final XMLInputFactory factory = XMLInputFactory.newInstance();
+public class MarcXchangeEventConsumerTest extends StreamTester {
 
     @Test
     public void testMarcXchangeEventConsumer() throws Exception {
@@ -33,7 +29,7 @@ public class MarcXchangeEventConsumerTest {
                 .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd")
                 .setMarcXchangeListener(writer);
         try (InputStream in = getClass().getResourceAsStream("HT016424175.xml")) {
-            XMLEventReader xmlReader = factory.createXMLEventReader(in);
+            XMLEventReader xmlReader = XMLInputFactory.newInstance().createXMLEventReader(in);
             while (xmlReader.hasNext()) {
                 XMLEvent event = xmlReader.nextEvent();
                 consumer.add(event);
@@ -45,12 +41,9 @@ public class MarcXchangeEventConsumerTest {
         writer.endCollection();
         writer.endDocument();
         sw.close();
-        if (writer.getException() != null) {
-            logger.error("err?", writer.getException());
-        }
-
         assertNull(writer.getException());
         sw.close();
-
+        assertStream(getClass().getResource("HT016424175-event.xml").openStream(),
+                new FileInputStream(file));
     }
 }

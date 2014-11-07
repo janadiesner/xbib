@@ -35,7 +35,7 @@ import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.elements.marc.MARCElementPipeline;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 
 public class RecordIdentifier extends MARCElement {
     private final static RecordIdentifier instance = new RecordIdentifier();
@@ -45,8 +45,8 @@ public class RecordIdentifier extends MARCElement {
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<DataField, String, MARCElement, MARCContext> builder,
-                          DataField fields, String value) {
+    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
+                          FieldList fields, String value) {
         String predicate = getClass().getSimpleName();
         if (getSettings().containsKey("_predicate")) {
             predicate = (String) getSettings().get("_predicate");

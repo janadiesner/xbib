@@ -93,7 +93,7 @@ public abstract class AbstractSpecification implements Specification {
         try {
             if (lock.isLocked()) {
                 try {
-                    logger.info("waiting for initialized spec");
+                    logger.info("waiting for initialized specification");
                     lock.tryLock(30, TimeUnit.SECONDS);
                     if (maps.containsKey(format)) {
                         return maps.get(format);
@@ -115,7 +115,7 @@ public abstract class AbstractSpecification implements Specification {
             throws IOException, ClassNotFoundException, InstantiationException,
             IllegalAccessException, NoSuchMethodException, IllegalArgumentException,
             InvocationTargetException {
-        logger.info("initializing spec from {}", path + format + ".json");
+        logger.info("initializing specification from {}", path + format + ".json");
         InputStream resource = loadResource(cl, path + format + ".json");
         if (resource == null) {
             String msg = "format " + format + " not found: " + path + format + ".json";
@@ -197,22 +197,23 @@ public abstract class AbstractSpecification implements Specification {
             // connect each value to an element class
             if (values != null) {
                 for (String value : values) {
-                    addSpec(value, element, elementMap);
+                    addKey(value, element, elementMap);
                 }
             }
         }
         maps.put(format, elementMap);
     }
 
-    public Element getElement(String spec, Map map) {
-        int pos = spec != null ? spec.indexOf('$') : 0;
-        String h = pos > 0 ? spec.substring(0, pos) : null;
-        String t = pos > 0 ? spec.substring(pos+1) : spec;
+    public Element getElement(String key, Map map) {
+        int pos = key != null ? key.indexOf('$') : 0;
+        String h = pos > 0 ? key.substring(0, pos) : null;
+        String t = pos > 0 ? key.substring(pos+1) : key;
         return getElement(h, t, map);
     }
 
-    public Element getElementBySpec(String spec, Map map) {
-        return getElement(null, spec, map);
+    @Override
+    public Element getElementByKey(String key, Map map) {
+        return getElement(null, key, map);
     }
 
     private Element getElement(String head, String tail, Map map) {
@@ -289,7 +290,7 @@ public abstract class AbstractSpecification implements Specification {
     }
     private Map<String,List<String>> elements;
 
-    public abstract Map addSpec(String value, Element element, Map map);
+    public abstract Map addKey(String value, Element element, Map map);
 
     public void dump(String format, Writer writer) throws IOException {
         Map<String,Object> m = map().get(format);

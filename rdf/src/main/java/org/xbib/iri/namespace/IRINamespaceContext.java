@@ -62,7 +62,7 @@ public final class IRINamespaceContext extends XmlNamespaceContext implements Co
     public static IRINamespaceContext getInstance() {
         if (instance == null) {
             try {
-                instance = new IRINamespaceContext(ResourceBundle.getBundle("org.xbib.xml.namespace"));
+                instance = new IRINamespaceContext(ResourceBundle.getBundle("org.xbib.xml.namespaces"));
             } catch (MissingResourceException e) {
                 instance = new IRINamespaceContext();
             }
@@ -77,6 +77,7 @@ public final class IRINamespaceContext extends XmlNamespaceContext implements Co
     public void addNamespace(String prefix, String namespace) {
         super.addNamespace(prefix, namespace);
         namespaces = new ArrayList<String>(getNamespaces().values());
+        // sort from longest to shortest for matching
         Collections.sort(namespaces, (s1, s2) -> {
             Integer l1 = s1.length();
             Integer l2 = s2.length();
@@ -98,9 +99,11 @@ public final class IRINamespaceContext extends XmlNamespaceContext implements Co
     }
 
     public String compact(IRI uri, boolean dropfragment) {
+        if (uri == null) {
+            return null;
+        }
         // drop fragment (useful for resource counters in fragments)
-        final String s = dropfragment
-                ? new IRI(uri.getScheme(), uri.getSchemeSpecificPart(), null).toString() : uri.toString();
+        final String s = dropfragment ? new IRI(uri.getScheme(), uri.getSchemeSpecificPart(), null).toString() : uri.toString();
 
         // search from longest to shortest namespace prefix
         if (namespaces != null) {

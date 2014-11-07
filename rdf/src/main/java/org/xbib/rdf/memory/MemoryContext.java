@@ -33,22 +33,22 @@ package org.xbib.rdf.memory;
 
 import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.ContentBuilder;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ContentBuilder;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class MemoryResourceContext<R extends Resource> implements ResourceContext<R> {
+public class MemoryContext<R extends Resource> implements Context<R> {
 
-    private ContentBuilder<ResourceContext<R>, R> contentBuilder;
+    private ContentBuilder<Context<R>, R> contentBuilder;
 
-    private ResourceContextWriter writer;
+    private ContextWriter writer;
 
     private IRINamespaceContext namespaceContext;
 
@@ -56,12 +56,12 @@ public class MemoryResourceContext<R extends Resource> implements ResourceContex
 
     private Map<Object, R> resources;
 
-    public ResourceContext<R> newNamespaceContext() {
+    public Context<R> newNamespaceContext() {
         this.namespaceContext = IRINamespaceContext.newInstance();
         return this;
     }
 
-    public ResourceContext<R> setNamespaceContext(IRINamespaceContext namespaces) {
+    public Context<R> setNamespaceContext(IRINamespaceContext namespaces) {
         this.namespaceContext = namespaces;
         return this;
     }
@@ -74,7 +74,7 @@ public class MemoryResourceContext<R extends Resource> implements ResourceContex
     }
 
     @Override
-    public ResourceContext<R> switchTo(R resource) {
+    public Context<R> switchTo(R resource) {
         this.resource = resource;
         return this;
     }
@@ -132,31 +132,32 @@ public class MemoryResourceContext<R extends Resource> implements ResourceContex
     public String toString() {
         return resource.toString() + "\n";
     }
+
     @Override
-    public ResourceContext<R> setContentBuilder(ContentBuilder<ResourceContext<R>, R> contentBuilder) {
+    public Context<R> setContentBuilder(ContentBuilder<Context<R>, R> contentBuilder) {
         this.contentBuilder = contentBuilder;
         return this;
     }
 
     @Override
-    public ResourceContext<R> setWriter(ResourceContextWriter writer) {
+    public Context<R> setWriter(ContextWriter writer) {
         this.writer = writer;
         return this;
     }
 
     @Override
     public R newResource() {
-        switchTo((R)new MemoryResource());
+        switchTo((R) new MemoryResource());
         return getResource();
     }
 
     @Override
-    public ResourceContext<R> beforeBuild() {
+    public Context<R> beforeBuild() {
         return this;
     }
 
     @Override
-    public ResourceContext<R> afterBuild() {
+    public Context<R> afterBuild() {
         return this;
     }
 

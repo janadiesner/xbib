@@ -35,14 +35,13 @@ import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.context.ResourceContextWriter;
-import org.xbib.rdf.Property;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 
 import java.io.Closeable;
 import java.io.Flushable;
@@ -52,8 +51,8 @@ import java.io.Writer;
 /**
  * NTriple writer
  */
-public class NTripleWriter<C extends ResourceContext<Resource>>
-        implements ResourceContextWriter<C, Resource>, Triple.Builder, Closeable, Flushable {
+public class NTripleWriter<C extends Context<Resource>>
+        implements ContextWriter<C, Resource>, Triple.Builder, Closeable, Flushable {
 
     private final static Logger logger = LoggerFactory.getLogger(NTripleWriter.class.getName());
 
@@ -70,7 +69,7 @@ public class NTripleWriter<C extends ResourceContext<Resource>>
 
     public NTripleWriter(Writer writer) {
         this.writer = writer;
-        this.resourceContext = (C)new MemoryResourceContext();
+        this.resourceContext = (C) new MemoryContext();
         resourceContext.newResource();
     }
 
@@ -163,9 +162,9 @@ public class NTripleWriter<C extends ResourceContext<Resource>>
 
     public String writeStatement(Triple stmt) throws IOException {
         Resource subj = stmt.subject();
-        Property pred = stmt.predicate();
+        IRI pred = stmt.predicate();
         Node obj = stmt.object();
-        return new StringBuilder().append(writeSubject(subj)).append(" ").append(writePredicate(pred)).append(" ").append(writeObject(obj)).append(" .").append(LF).toString();
+        return writeSubject(subj) + " " + writePredicate(pred) + " " + writeObject(obj) + " ." + LF;
     }
 
     public String writeSubject(Resource subject) {
@@ -174,8 +173,8 @@ public class NTripleWriter<C extends ResourceContext<Resource>>
                 "<" + escape(subject.toString()) + ">";
     }
 
-    public String writePredicate(Property predicate) {
-        return "<" + escape(predicate.id().toString()) + ">";
+    public String writePredicate(IRI predicate) {
+        return "<" + escape(predicate.toString()) + ">";
     }
 
     public String writeObject(Node object) {
@@ -195,12 +194,7 @@ public class NTripleWriter<C extends ResourceContext<Resource>>
                 return s + "^^<" + escape(type.toString()) + ">";
             }
             return s;
-        } /*else if (object instanceof MemoryIdentifiable) {
-            MemoryIdentifiable node = (MemoryIdentifiable) object;
-            return node.isEmbedded() ?
-                    node.toString() :
-                    "<" + escape(node.toString()) + ">";
-        }*/
+        }
         return "<???>";
     }
 
@@ -243,9 +237,8 @@ public class NTripleWriter<C extends ResourceContext<Resource>>
 
 
     /**
-     *
      * Process a literal according to given sort language (e.g. mechanical word order, sort area).
-     *
+     * <p>
      * see http://www.w3.org/International/articles/language-tags/
      *
      * @param literal the literal

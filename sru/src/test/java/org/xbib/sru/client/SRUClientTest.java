@@ -44,7 +44,7 @@ import org.xbib.io.Request;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
@@ -69,15 +69,15 @@ public class SRUClientTest {
                         return Normalizer.normalize(value, Normalizer.Form.NFC);
                     }
                 })
-                .addListener(new KeyValueStreamAdapter<DataField, String>() {
+                .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                     @Override
-                    public KeyValueStreamAdapter<DataField, String> begin() {
+                    public KeyValueStreamAdapter<FieldList, String> begin() {
                         logger.debug("begin object");
                         return this;
                     }
 
                     @Override
-                    public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
+                    public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("begin");
                             for (Field f : key) {
@@ -94,7 +94,7 @@ public class SRUClientTest {
                     }
 
                     @Override
-                    public KeyValueStreamAdapter<DataField, String> end() {
+                    public KeyValueStreamAdapter<FieldList, String> end() {
                         logger.debug("end object");
                         return this;
                     }

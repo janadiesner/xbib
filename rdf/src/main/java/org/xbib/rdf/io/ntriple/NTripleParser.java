@@ -32,9 +32,8 @@
 package org.xbib.rdf.io.ntriple;
 
 import org.xbib.iri.IRI;
-import org.xbib.rdf.Parser;
-import org.xbib.rdf.Property;
 import org.xbib.rdf.Node;
+import org.xbib.rdf.Parser;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.memory.MemoryResource;
@@ -122,7 +121,7 @@ public class NTripleParser implements Parser {
         }
         Matcher matcher = NTRIPLE_PATTERN.matcher(s);
         Resource subject;
-        Property predicate;
+        IRI predicate;
         Node object;
         if (!matcher.matches()) {
             throw new PatternSyntaxException("The given pattern " + tripleExpression + " doesn't match the expression:", s, -1);
@@ -142,7 +141,7 @@ public class NTripleParser implements Parser {
         // object
         if (matcher.group(7) != null) {
             // anonymous node
-            object =  new MemoryResource().blank(matcher.group(6));  // resource.newBlankNode(matcher.group(6));
+            object = new MemoryResource().blank(matcher.group(6));  // resource.newBlankNode(matcher.group(6));
         } else if (matcher.group(8) != null) {
             // getResource node
             String obj = matcher.group(6);

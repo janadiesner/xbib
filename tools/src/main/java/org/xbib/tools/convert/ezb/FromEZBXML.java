@@ -39,8 +39,8 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
@@ -86,7 +86,7 @@ public class FromEZBXML extends Converter {
     @Override
     public void process(URI uri) throws Exception {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
-        ResourceContext<Resource> resourceContext = new MemoryResourceContext()
+        Context<Resource> context = new MemoryContext()
                 .setNamespaceContext(namespaceContext);
 
         Writer writer = new FileWriter(settings.get("output"));
@@ -94,7 +94,7 @@ public class FromEZBXML extends Converter {
         final TurtleWriter turtleWriter = new TurtleWriter(writer);
         turtleWriter.setNamespaceContext(namespaceContext);
 
-        AbstractXmlHandler handler = new EZBHandler(resourceContext)
+        AbstractXmlHandler handler = new EZBHandler(context)
                 .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/");
 
         try (InputStream in = InputService.getInputStream(uri)) {
@@ -111,8 +111,8 @@ public class FromEZBXML extends Converter {
 
         //ResourceSerializer resourceSerializer;
 
-        public EZBHandler(ResourceContext resourceContext) {
-            super(resourceContext);
+        public EZBHandler(Context context) {
+            super(context);
             //setBuilder(resourceSerializer);
             //this.resourceSerializer = resourceSerializer;
         }

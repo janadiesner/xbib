@@ -36,7 +36,7 @@ import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.elements.marc.MARCElementPipeline;
 import org.xbib.elements.support.EnumerationAndChronology;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.rdf.Resource;
 
@@ -78,8 +78,8 @@ public class TextualHoldings extends MARCElement {
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<DataField, String, MARCElement, MARCContext> builder,
-                          DataField fields, String value) {
+    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
+                          FieldList fields, String value) {
         for (Field field : fields) {
             builder.context().getResource().add("textualholdings", field.data());
             if ("a".equals(field.subfieldId())) {

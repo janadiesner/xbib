@@ -7,11 +7,20 @@ import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 
 public class ResourceTest extends Assert {
+
+    @Test
+    public void deleted() throws Exception {
+        Resource r = new MemoryResource();
+        assertEquals(r.isDeleted(), false);
+        r.setDeleted(true);
+        assertEquals(r.isDeleted(), true);
+        r.setDeleted(false);
+        assertEquals(r.isDeleted(), false);
+    }
 
     @Test
     public void testResourceId() throws Exception {
@@ -44,8 +53,7 @@ public class ResourceTest extends Assert {
         assertEquals(r.isEmpty(), false);
         assertEquals(r.triples().iterator().next().object().toString(), "Hello World");
     }
-    
-    
+
     @Test
     public void testIntegerLiteral() throws Exception {
         Resource r = new MemoryResource().id(IRI.create("urn:root"));
@@ -72,7 +80,7 @@ public class ResourceTest extends Assert {
         Resource r = new MemoryResource().id(IRI.create("urn:doc4"));
         r.add("urn:hasAttribute", "a")
                 .add("urn:hasAttribute", "b")
-                .add("urn:hasAttribute", "a")
+                .add("urn:hasAttribute", "a") // another a
                 .add("urn:hasAttribute", "c");
         assertEquals("[a, b, c]", r.objects("urn:hasAttribute").toString());
     }
@@ -143,18 +151,18 @@ public class ResourceTest extends Assert {
         Resource r = new MemoryResource();
         r.id(IRI.create("urn:doc"))
                 .add("urn:value1", "Hello World");
-        Property predicate = new MemoryProperty(IRI.create("urn:pred"));
+        IRI predicate = IRI.create("urn:pred");
         Resource r1 = r.newResource(predicate);
         r1.add(predicate, "a value");
         Iterator<Triple> it = r.triples().iterator();
         int cnt = 0;
         while (it.hasNext()) {
-            Triple stmt = it.next();
+            it.next();
             cnt++;
         }
         assertEquals(cnt, 3);        
   
-        r.compactPredicate(predicate.id());
+        r.compactPredicate(predicate);
         it = r.triples().iterator();
         assertEquals("urn:doc urn:value1 Hello World", it.next().toString());
         assertEquals("urn:doc urn:pred a value", it.next().toString());
@@ -187,7 +195,7 @@ public class ResourceTest extends Assert {
         Resource v = new MemoryResource();
         v.id(blank2).add("urn:value", "Hello V");
 
-        Property predicate = new MemoryProperty(IRI.create("dc:subject"));
+        IRI predicate = IRI.create("dc:subject");
         r.add(predicate, s);
         r.add(predicate, t);
         r.add(predicate, u);

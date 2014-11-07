@@ -33,7 +33,7 @@ package org.xbib.tools;
 
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.unit.TimeValue;
-import org.xbib.elasticsearch.rdf.ResourceSink;
+import org.xbib.elasticsearch.rdf.Sink;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
 import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
@@ -58,7 +58,7 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
 
     protected static Ingest output;
 
-    protected static ResourceSink sink;
+    protected static Sink sink;
 
     @Override
     public Feeder<T, R, P> reader(Reader reader) {
@@ -103,7 +103,7 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
                 .newIndex(index)
                 .startBulk(index);
         afterIndexCreation(output);
-        sink = new ResourceSink(output);
+        sink = new Sink(output);
         return this;
     }
 

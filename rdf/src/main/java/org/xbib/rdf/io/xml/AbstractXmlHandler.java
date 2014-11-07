@@ -34,16 +34,15 @@ package org.xbib.rdf.io.xml;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.namespace.QName;
 import java.util.EmptyStackException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
@@ -54,7 +53,7 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
 
     private final Logger logger = LoggerFactory.getLogger(AbstractXmlHandler.class.getName());
 
-    private final ResourceContext<Resource> resourceContext;
+    private final Context<Resource> context;
 
     private final StringBuilder content = new StringBuilder();
 
@@ -68,18 +67,18 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
 
     private int lastlevel;
 
-    public AbstractXmlHandler(ResourceContext<Resource> context) {
-        this.resourceContext = context;
+    public AbstractXmlHandler(Context<Resource> context) {
+        this.context = context;
     }
 
-    public ResourceContext resourceContext() {
-        return resourceContext;
+    public Context resourceContext() {
+        return context;
     }
 
     public AbstractXmlHandler setDefaultNamespace(String prefix, String namespaceURI) {
         this.defaultPrefix = prefix;
         this.defaultNamespace = namespaceURI;
-        resourceContext.getNamespaceContext().addNamespace(prefix, namespaceURI);
+        context.getNamespaceContext().addNamespace(prefix, namespaceURI);
         return this;
     }
 
@@ -146,7 +145,7 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
         }
         int level = parents.size();
         parents.pop();
-        identify(name, content(), resourceContext.getResource().id());
+        identify(name, content(), context.getResource().id());
         if (!isResourceDelimiter(name) && !parents.isEmpty()) {
             try {
                 closePredicate(parents.peek(), name, level - lastlevel);
@@ -166,7 +165,7 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
 
     @Override
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        resourceContext.getNamespaceContext().addNamespace(makePrefix(prefix), uri);
+        context.getNamespaceContext().addNamespace(makePrefix(prefix), uri);
     }
 
     @Override
@@ -180,7 +179,7 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
     }
 
     protected QName makeQName(String nsURI, String localname, String qname) {
-        String prefix = resourceContext.getNamespaceContext().getPrefix(nsURI);
+        String prefix = context.getNamespaceContext().getPrefix(nsURI);
         return new QName(!isEmpty(nsURI) ? nsURI : defaultNamespace,
                 !isEmpty(localname) ? localname : qname,
                 !isEmpty(prefix) ? prefix : defaultPrefix);
@@ -192,17 +191,17 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
     }
 
     protected void openResource() {
-        resourceContext.newResource();
+        context.newResource();
     }
 
     protected void closeResource() {
-        boolean empty = resourceContext.getResource().isEmpty();
+        boolean empty = context.getResource().isEmpty();
         if (empty) {
             return;
         }
         if (builder != null) {
-            builder.newIdentifier(resourceContext.getResource().id());
-            List<Triple> list = resourceContext.getResource().triples();
+            builder.newIdentifier(context.getResource().id());
+            List<Triple> list = context.getResource().triples();
             for (Triple triple : list) {
                 builder.triple(triple);
             }

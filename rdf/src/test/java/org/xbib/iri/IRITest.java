@@ -13,7 +13,6 @@ public class IRITest extends Assert {
     }
 
     @Test(expectedExceptions = org.xbib.iri.IRISyntaxException.class)
-    //@Test
     public void testIllegalBlankNodeIRI() {
         IRI iri = IRI.create("_:a1");
         assertEquals("_", iri.getScheme());
@@ -49,5 +48,13 @@ public class IRITest extends Assert {
         assertNull(curi.getScheme());
         assertEquals("creator", curi.getSchemeSpecificPart());
         assertEquals("creator", curi.toString());
+    }
+
+    @Test
+    public void testIdentity() {
+        String s = "urn:a";
+        IRI i1 = IRI.builder().curie(s).build();
+        IRI i2 = IRI.create(s);
+        assertEquals(i1, i2);
     }
 }

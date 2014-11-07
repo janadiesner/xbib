@@ -34,8 +34,8 @@ package org.xbib.elasticsearch.rdf;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 
 import java.io.Closeable;
 import java.io.Flushable;
@@ -45,7 +45,7 @@ import java.io.Writer;
 /**
  * Write RDF resources as Elasticsearch bulk format
  */
-public class BulkFormatWriter implements ResourceContextWriter, Flushable, Closeable {
+public class BulkFormatWriter implements ContextWriter, Flushable, Closeable {
 
     private final Logger logger = LoggerFactory.getLogger(BulkFormatWriter.class.getName());
 
@@ -56,8 +56,8 @@ public class BulkFormatWriter implements ResourceContextWriter, Flushable, Close
     }
 
     @Override
-    public void write(ResourceContext resourceContext) throws IOException {
-        Resource resource = resourceContext.getResource();
+    public void write(Context context) throws IOException {
+        Resource resource = context.getResource();
         if (resource.id() == null) {
             return;
         }
@@ -97,7 +97,7 @@ public class BulkFormatWriter implements ResourceContextWriter, Flushable, Close
             }
             StringBuilder sb = new StringBuilder();
             sb.append("{\"index\":{\"_index\":\"").append(index).append("\",\"_type\":\"").append(type).append("\",\"_id\":\"").append(id).append("\"}}\n")
-                    .append(resourceContext.build(resource))
+                    .append(context.build(resource))
                     .append("\n");
             writer.write(sb.toString());
         }

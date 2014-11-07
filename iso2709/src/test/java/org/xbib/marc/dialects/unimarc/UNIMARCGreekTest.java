@@ -32,8 +32,6 @@
 package org.xbib.marc.dialects.unimarc;
 
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.stream.MarcXchangeWriter;
@@ -48,9 +46,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
-public class UNIMARCGreekTest {
+import static org.testng.Assert.assertNull;
 
-    private final Logger logger = LoggerFactory.getLogger(UNIMARCGreekTest.class.getSimpleName());
+public class UNIMARCGreekTest {
 
     private final Charset ISO88591 = Charset.forName("ISO-8859-1"); // 8 bit
 
@@ -62,7 +60,7 @@ public class UNIMARCGreekTest {
         try (InputStreamReader r = new InputStreamReader(in, ISO88591)) {
 
             final Iso2709Reader reader = new Iso2709Reader()
-                    .setTransformer(new StringTransformer() {
+                    .setTransformer("_default", new StringTransformer() {
                         @Override
                         public String transform(String value) {
                             return XMLUtil.sanitizeXml10(new String(value.getBytes(ISO88591), UTF8)).toString();
@@ -78,9 +76,7 @@ public class UNIMARCGreekTest {
             reader.parse(new InputSource(r));
             writer.endCollection();
             writer.endDocument();
-            if (writer.getException() != null) {
-                logger.error("err?", writer.getException());
-            }
+            assertNull(writer.getException());
             w.close();
         }
     }

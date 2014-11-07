@@ -42,9 +42,9 @@ public interface Triple {
 
     Resource subject();
 
-    Triple predicate(Property predicate);
+    Triple predicate(IRI predicate);
 
-    Property predicate();
+    IRI predicate();
 
     Triple object(Node object);
 

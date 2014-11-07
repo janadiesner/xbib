@@ -37,7 +37,7 @@ import java.util.TreeMap;
 
 public class FieldDirectory extends TreeMap<Integer, Field> {
 
-    public FieldDirectory(RecordLabel label, String buffer) throws InvalidFieldDirectoryException {
+    public FieldDirectory(RecordLabel label, String buffer) throws MarcException {
         super();
         if (label != null) {
             int directoryLength = label.getBaseAddressOfData() - (RecordLabel.LENGTH + 1);
@@ -56,7 +56,7 @@ public class FieldDirectory extends TreeMap<Integer, Field> {
                         + label.getStartingCharacterPositionLength()
                         + label.getSegmentIdentifierLength();
                 if (directoryLength % entrysize != 0) {
-                    throw new InvalidFieldDirectoryException("invalid ISO 2709 directory length: "
+                    throw new MarcException("invalid ISO 2709 directory length: "
                             + directoryLength + ", definitions in record label: "
                             + " data field length = " + label.getDataFieldLength()
                             + " starting character position length = " + label.getStartingCharacterPositionLength()
@@ -72,7 +72,7 @@ public class FieldDirectory extends TreeMap<Integer, Field> {
                         Field field = new Field(key, position, length);
                         put(position, field);
                     } catch (NumberFormatException e) {
-                        throw new InvalidFieldDirectoryException("directory corrupt? key = " + key + " length = " + directoryLength);
+                        throw new MarcException("directory corrupt? key = " + key + " length = " + directoryLength);
                     }
                 }
             }

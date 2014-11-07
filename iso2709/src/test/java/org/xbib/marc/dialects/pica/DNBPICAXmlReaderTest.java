@@ -32,20 +32,18 @@
 package org.xbib.marc.dialects.pica;
 
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
 
+import java.io.FileWriter;
 import java.io.InputStream;
 
 public class DNBPICAXmlReaderTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(DNBPICAXmlReaderTest.class.getName());
-
     @Test
     public void testZDBBIBFromOAI() throws Exception {
         InputStream in = getClass().getResourceAsStream("zdb-oai-bib.xml");
+        StringBuilder sb = new StringBuilder();
         MarcXchangeListener listener = new MarcXchangeListener() {
             @Override
             public void beginCollection() {
@@ -57,53 +55,57 @@ public class DNBPICAXmlReaderTest {
 
             @Override
             public void leader(String label) {
-                logger.debug("leader=" + label);
+                sb.append("leader=").append(label).append("\n");
             }
 
             @Override
             public void beginRecord(String format, String type) {
-                logger.debug("beginRecord format=" + format + " type=" + type);
+                sb.append("beginRecord format=").append(format).append(" type=").append(type).append("\n");
             }
 
             @Override
             public void beginControlField(Field field) {
-                logger.debug("beginControlField field=" + field);
+                sb.append("beginControlField field=").append(field).append("\n");
             }
 
             @Override
             public void endControlField(Field field) {
-                logger.debug("endControlField field=" + field);
+                sb.append("endControlField field=").append(field).append("\n");
             }
 
             @Override
             public void beginDataField(Field field) {
-                logger.debug("beginDataField field=" + field);
+                sb.append("beginDataField field=").append(field).append("\n");
             }
 
             @Override
             public void endDataField(Field field) {
-                logger.debug("endDataField field=" + field);
+                sb.append("endDataField field=").append(field).append("\n");
             }
 
             @Override
             public void beginSubField(Field field) {
-                logger.debug("beginSubField field=" + field);
+                sb.append("beginSubField field=").append(field).append("\n");
             }
 
             @Override
             public void endSubField(Field field) {
-                logger.debug("endsubField field=" + field);
+                sb.append("endsubField field=").append(field).append("\n");
             }
 
             @Override
             public void endRecord() {
-                logger.debug("endRecord");
+                sb.append("endRecord\n");
             }
 
         };
         DNBPICAXmlReader reader = new DNBPICAXmlReader();
         reader.setListener(listener);
         reader.parse(in);
+
+        FileWriter fw = new FileWriter("zdb-oai-bib-keyvalue.txt");
+        fw.write(sb.toString());
+        fw.close();
     }
 
 }

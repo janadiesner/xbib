@@ -41,11 +41,11 @@ import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.oai.xml.XmlMetadataHandler;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.content.DefaultContentBuilder;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.util.DateUtil;
@@ -92,21 +92,21 @@ public class LOMClientTest {
 
     protected MetadataHandler xmlMetadataHandler() {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
-        ResourceContext<Resource> resourceContext = new MemoryResourceContext()
+        Context<Resource> context = new MemoryContext()
                 .setContentBuilder(new DefaultContentBuilder())
                 .setNamespaceContext(namespaceContext);
-        resourceContext.setNamespaceContext(IRINamespaceContext.getInstance());
-        RdfResourceHandler handler = new RdfResourceHandler(resourceContext);
+        context.setNamespaceContext(IRINamespaceContext.getInstance());
+        RdfResourceHandler handler = new RdfResourceHandler(context);
         return new LOMHandler()
                 .setHandler(handler)
-                .setResourceContext(handler.resourceContext());
+                .setContext(handler.resourceContext());
     }
 
     class LOMHandler extends XmlMetadataHandler {
 
         private XmlHandler handler;
 
-        private ResourceContext<Resource> resourceContext;
+        private Context<Resource> context;
 
         private boolean attributes;
 
@@ -120,8 +120,8 @@ public class LOMClientTest {
             return this;
         }
 
-        public LOMHandler setResourceContext(ResourceContext<Resource> resourceContext) {
-            this.resourceContext = resourceContext;
+        public LOMHandler setContext(Context<Resource> context) {
+            this.context = context;
             return this;
         }
 
@@ -133,18 +133,18 @@ public class LOMClientTest {
         public void endDocument() throws SAXException {
             handler.endDocument();
             String identifier = getHeader().getIdentifier();
-                if (resourceContext.getResource() != null) {
+                if (context.getResource() != null) {
                     IRI iri = IRI.builder().scheme("http")
                             .host("test")
                             .query("test")
                             .fragment(identifier).build();
-                    resourceContext.getResource().id(iri);
+                    context.getResource().id(iri);
                 }
                 //output.write(resourceContext);
-                if (resourceContext.getResources() == null) {
+                if (context.getResources() == null) {
                     // single document
                     //mock.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
-                } else for (Resource resource : resourceContext.getResources()) {
+                } else for (Resource resource : context.getResources()) {
                     // multiple documents. Rewrite IRI for ES index/type addressing
                     String index = "test";
                     String type = "test";
@@ -164,7 +164,7 @@ public class LOMClientTest {
             try {
                 StringWriter sw = new StringWriter();
                 NTripleWriter writer = new NTripleWriter(sw);
-                writer.write(resourceContext);
+                writer.write(context);
                 logger.info("{}", sw.toString());
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
@@ -174,10 +174,10 @@ public class LOMClientTest {
         @Override
         public void startPrefixMapping(String prefix, String nsURI) throws SAXException {
             handler.startPrefixMapping(prefix, nsURI);
-            resourceContext.getNamespaceContext().addNamespace(prefix, nsURI);
+            context.getNamespaceContext().addNamespace(prefix, nsURI);
             if ("".equals(prefix)) {
                 handler.setDefaultNamespace("oai_lom", nsURI);
-                resourceContext.getNamespaceContext().addNamespace("oai_lom", nsURI);
+                context.getNamespaceContext().addNamespace("oai_lom", nsURI);
             }
         }
 

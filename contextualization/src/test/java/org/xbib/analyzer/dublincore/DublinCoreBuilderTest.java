@@ -36,12 +36,11 @@ import java.io.StringReader;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.testng.Assert;
-import org.testng.annotations.Test;
 import org.xbib.keyvalue.KeyValueReader;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 
 public class DublinCoreBuilderTest extends Assert {
 
@@ -52,10 +51,10 @@ public class DublinCoreBuilderTest extends Assert {
     // TODO groovy/jruby are broken
     public void testDublinCoreBuilder() throws Exception {
         StringReader sr = new StringReader("100=John Doe\n200=Hello Word\n300=2012\n400=1");
-        ResourceContextWriter output = new ResourceContextWriter() {
+        ContextWriter output = new ContextWriter() {
 
             @Override
-            public void write(ResourceContext context) throws IOException {
+            public void write(Context context) throws IOException {
                 //logger.info("resource = {}", context.getResource());
                 counter.incrementAndGet();
             }

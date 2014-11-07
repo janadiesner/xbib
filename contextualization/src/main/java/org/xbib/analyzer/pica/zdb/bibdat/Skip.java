@@ -33,7 +33,7 @@ package org.xbib.analyzer.pica.zdb.bibdat;
 
 import org.xbib.elements.marc.dialects.pica.PicaElementBuilder;
 import org.xbib.elements.marc.dialects.pica.PicaElement;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 
 public class Skip extends PicaElement {
     
@@ -44,7 +44,7 @@ public class Skip extends PicaElement {
     }
 
     @Override
-    public Skip build(PicaElementBuilder b, DataField key, String value) {
+    public Skip build(PicaElementBuilder b, FieldList key, String value) {
         // skip
         return this;
     }

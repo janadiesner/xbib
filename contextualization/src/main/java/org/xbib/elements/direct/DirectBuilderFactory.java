@@ -32,9 +32,9 @@
 package org.xbib.elements.direct;
 
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.Context;
 
-public interface DirectBuilderFactory<K, V, C extends ResourceContext<Resource>> {
+public interface DirectBuilderFactory<K, V, C extends Context<Resource>> {
 
      DirectBuilder<K, V, C> newBuilder();
 }

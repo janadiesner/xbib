@@ -40,7 +40,7 @@ import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -51,7 +51,7 @@ public class JsonReaderTest extends StreamTester {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonReaderTest.class.getName());
 
-    final MemoryResourceContext resourceContext = new MemoryResourceContext();
+    final MemoryContext resourceContext = new MemoryContext();
 
     @Test
     public void testGenericJsonReader() throws Exception {

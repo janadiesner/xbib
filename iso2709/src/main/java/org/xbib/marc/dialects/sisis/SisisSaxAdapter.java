@@ -34,11 +34,9 @@ package org.xbib.marc.dialects.sisis;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.event.EventListener;
 import org.xbib.marc.event.FieldEvent;
-import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.MarcXchangeSaxAdapter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -113,11 +111,6 @@ public class SisisSaxAdapter extends MarcXchangeSaxAdapter {
         return this;
     }
 
-    public SisisSaxAdapter setSilentErrors(Boolean silenterrors) {
-        super.setSilentErrors(silenterrors);
-        return this;
-    }
-
     public SisisSaxAdapter setCleanTags(Boolean cleanTags) {
         super.setCleanTags(cleanTags);
         return this;
@@ -128,10 +121,11 @@ public class SisisSaxAdapter extends MarcXchangeSaxAdapter {
         return this;
     }
 
-    public SisisSaxAdapter setTransformer(StringTransformer transformer) {
-        super.setTransformer(transformer);
+    public SisisSaxAdapter setTransformData(Boolean transformData) {
+        super.setTransformData(transformData);
         return this;
     }
+
 
     public SisisSaxAdapter addFieldMap(String fieldMapName, Map<String, Object> map) {
         super.addFieldMap(fieldMapName, map);
@@ -146,7 +140,7 @@ public class SisisSaxAdapter extends MarcXchangeSaxAdapter {
         return new SisisFieldStreamReader(reader,  new MappedStreamListener());
     }
 
-    public void parseCollection(SisisFieldStreamReader stream) throws IOException, SAXException {
+    public void parseCollection(SisisFieldStreamReader stream) throws Exception {
         beginCollection();
         String s;
         stream.begin();

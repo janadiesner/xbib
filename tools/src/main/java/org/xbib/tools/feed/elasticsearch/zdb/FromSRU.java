@@ -34,7 +34,7 @@ package org.xbib.tools.feed.elasticsearch.zdb;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
-import org.xbib.elasticsearch.rdf.ResourceSink;
+import org.xbib.elasticsearch.rdf.Sink;
 import org.xbib.elements.UnmappedKeyListener;
 import org.xbib.elements.marc.MARCElementBuilder;
 import org.xbib.elements.marc.MARCElementBuilderFactory;
@@ -43,15 +43,15 @@ import org.xbib.io.Request;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.MarcXchangeContentHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.sru.client.SRUClient;
 import org.xbib.sru.client.SRUClientFactory;
 import org.xbib.sru.searchretrieve.SearchRetrieveListener;
@@ -137,7 +137,7 @@ public class FromSRU extends Feeder {
         output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         output.shards(shards).replica(replica).newIndex(index);
         afterIndexCreation(output);
-        sink = new ResourceSink(output);
+        sink = new Sink(output);
     }
 
     @Override
@@ -158,19 +158,19 @@ public class FromSRU extends Feeder {
         final String holIndex = settings.get("holIndex", "zdbholdings");
         final String holType = settings.get("holType", "holdings");
 
-        final OurContextResourceOutput bibout = new OurContextResourceOutput().setIndex(bibIndex).setType(bibType);
+        final OurContextOutput bibout = new OurContextOutput().setIndex(bibIndex).setType(bibType);
 
-        final OurContextResourceOutput holout = new OurContextResourceOutput().setIndex(holIndex).setType(holType);
+        final OurContextOutput holout = new OurContextOutput().setIndex(holIndex).setType(holType);
 
         final Set<String> unmappedbib = Collections.synchronizedSet(new TreeSet<String>());
         final MARCElementMapper bibmapper = new MARCElementMapper("marc/zdb/bib")
                 .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<DataField>() {
+                .setListener(new UnmappedKeyListener<FieldList>() {
                     @Override
-                    public void unknown(DataField key) {
-                        logger.warn("unmapped field {}", key.toSpec());
+                    public void unknown(FieldList key) {
+                        logger.warn("unmapped field {}", key);
                         if ((settings.getAsBoolean("detect", false))) {
-                            unmappedbib.add("\"" + key.toSpec() + "\"");
+                            unmappedbib.add("\"" + key + "\"");
                         }
                     }
                 })
@@ -185,12 +185,12 @@ public class FromSRU extends Feeder {
         final Set<String> unmappedhol = Collections.synchronizedSet(new TreeSet<String>());
         final MARCElementMapper holmapper = new MARCElementMapper("marc/zdb/hol")
                 .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<DataField>() {
+                .setListener(new UnmappedKeyListener<FieldList>() {
                     @Override
-                    public void unknown(DataField key) {
-                        logger.warn("unmapped field {}", key.toSpec());
+                    public void unknown(FieldList key) {
+                        logger.warn("unmapped field {}", key);
                         if ((settings.getAsBoolean("detect", false))) {
-                            unmappedbib.add("\"" + key.toSpec() + "\"");
+                            unmappedbib.add("\"" + key + "\"");
                         }
                     }
                 })
@@ -307,24 +307,24 @@ public class FromSRU extends Feeder {
         return this;
     }
 
-    private class OurContextResourceOutput implements ResourceContextWriter<ResourceContext<Resource>, Resource> {
+    private class OurContextOutput implements ContextWriter<Context<Resource>, Resource> {
 
         String index;
 
         String type;
 
-        public OurContextResourceOutput setIndex(String index) {
+        public OurContextOutput setIndex(String index) {
             this.index = index;
             return this;
         }
 
-        public OurContextResourceOutput setType(String type) {
+        public OurContextOutput setType(String type) {
             this.type = type;
             return this;
         }
 
         @Override
-        public void write(ResourceContext context) throws IOException {
+        public void write(Context context) throws IOException {
             IRI iri = context.getResource().id();
             context.getResource().id(IRI.builder()
                     .scheme("http")

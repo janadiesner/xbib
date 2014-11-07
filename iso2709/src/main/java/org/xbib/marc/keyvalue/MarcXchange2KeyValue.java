@@ -32,8 +32,10 @@
 package org.xbib.marc.keyvalue;
 
 import org.xbib.keyvalue.KeyValueStreamListener;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
+import org.xbib.marc.MarcException;
+import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.transformer.StringTransformer;
 
@@ -44,16 +46,16 @@ import java.util.List;
 /**
  * Convert a MarcXchange stream to a key/value stream
  */
-public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStreamListener<DataField, String> {
+public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStreamListener<FieldList, String>, MarcXchangeConstants {
 
-    private DataField fields;
+    private FieldList fields;
 
     private StringTransformer transformer;
 
-    private List<KeyValueStreamListener<DataField, String>> listeners =
-            new LinkedList<KeyValueStreamListener<DataField, String>>();
+    private List<KeyValueStreamListener<FieldList, String>> listeners =
+            new LinkedList<KeyValueStreamListener<FieldList, String>>();
 
-    public MarcXchange2KeyValue addListener(KeyValueStreamListener<DataField, String> listener) {
+    public MarcXchange2KeyValue addListener(KeyValueStreamListener<FieldList, String> listener) {
         this.listeners.add(listener);
         return this;
     }
@@ -64,16 +66,16 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
     }
 
     @Override
-    public KeyValueStreamListener<DataField, String> begin() throws IOException {
-        for (KeyValueStreamListener<DataField, String> listener : listeners) {
+    public KeyValueStreamListener<FieldList, String> begin() throws IOException {
+        for (KeyValueStreamListener<FieldList, String> listener : listeners) {
             listener.begin();
         }
         return this;
     }
 
     @Override
-    public KeyValueStreamListener<DataField, String> keyValue(DataField key, String value) throws IOException {
-        for (KeyValueStreamListener<DataField, String> listener : listeners) {
+    public KeyValueStreamListener<FieldList, String> keyValue(FieldList key, String value) throws IOException {
+        for (KeyValueStreamListener<FieldList, String> listener : listeners) {
             // we allow null value, but null keys are not passed to the listeners
             if (key != null) {
                 listener.keyValue(key, value);
@@ -83,18 +85,18 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
     }
 
     @Override
-    public KeyValueStreamListener<DataField, String> keys(List<DataField> keys) throws IOException {
+    public KeyValueStreamListener<FieldList, String> keys(List<FieldList> keys) throws IOException {
         return this;
     }
 
     @Override
-    public KeyValueStreamListener<DataField, String> values(List<String> values) throws IOException {
+    public KeyValueStreamListener<FieldList, String> values(List<String> values) throws IOException {
         return this;
     }
 
     @Override
-    public KeyValueStreamListener<DataField, String> end() throws IOException {
-        for (KeyValueStreamListener<DataField, String> listener : listeners) {
+    public KeyValueStreamListener<FieldList, String> end() throws IOException {
+        for (KeyValueStreamListener<FieldList, String> listener : listeners) {
             listener.end();
         }
         return this;
@@ -113,13 +115,17 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
         try {
             begin();
             if (format != null) {
-                keyValue(DataField.FORMAT_KEY, format);
+                FieldList field = new FieldList();
+                field.add(new Field().tag(FORMAT_TAG).data(format));
+                keyValue(field, format);
             }
             if (type != null) {
-                keyValue(DataField.TYPE_KEY, type);
+                FieldList field = new FieldList();
+                field.add(new Field().tag(TYPE_TAG).data(type));
+                keyValue(field, type);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new MarcException(e);
         }
     }
 
@@ -128,7 +134,7 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
         try {
             end();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new MarcException(e);
         }
     }
 
@@ -136,35 +142,37 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
     public void leader(String label) {
         try {
             if (label != null) {
-                keyValue(DataField.LEADER_KEY, label);
+                FieldList field = new FieldList();
+                field.add(new Field().tag(LEADER_TAG).data(label));
+                keyValue(field, label);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new MarcException(e);
         }
     }
 
     @Override
     public void beginControlField(Field field) {
-        fields = new DataField();
+        fields = new FieldList();
         fields.add(field);
     }
 
     @Override
     public void endControlField(Field field) {
         String data = field != null ? field.data() : null;
-        if (transformer != null && data != null) {
+        if (transformer != null) {
             data = transformer.transform(data);
         }
         try {
             keyValue(fields, data);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new MarcException(e);
         }
     }
 
     @Override
     public void beginDataField(Field field) {
-        fields = new DataField();
+        fields = new FieldList();
         fields.add(field);
     }
 
@@ -179,7 +187,7 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
         try {
             keyValue(fields, data);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new MarcException(e);
         }
     }
 
@@ -193,8 +201,7 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
         if (field == null) {
             return;
         }
-        // transform field data
-        if (transformer != null && field.data() != null) {
+        if (transformer != null) {
             field.data(transformer.transform(field.data()));
         }
         fields.add(field);

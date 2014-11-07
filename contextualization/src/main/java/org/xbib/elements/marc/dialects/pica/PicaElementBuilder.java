@@ -32,13 +32,13 @@
 package org.xbib.elements.marc.dialects.pica;
 
 import org.xbib.elements.AbstractElementBuilder;
-import org.xbib.elements.context.ResourceContextFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
+import org.xbib.rdf.ContextFactory;
 
 public class PicaElementBuilder
-        extends AbstractElementBuilder<DataField, String, PicaElement, PicaContext> {
+        extends AbstractElementBuilder<FieldList, String, PicaElement, PicaContext> {
 
-    private final ResourceContextFactory<PicaContext> contextFactory = new ResourceContextFactory<PicaContext>() {
+    private final ContextFactory<PicaContext> contextFactory = new ContextFactory<PicaContext>() {
         @Override
         public PicaContext newContext() {
             return new PicaContext();
@@ -46,7 +46,7 @@ public class PicaElementBuilder
     };
 
     @Override
-    public ResourceContextFactory<PicaContext> resourceContextFactory() {
+    public ContextFactory<PicaContext> resourceContextFactory() {
         return contextFactory;
     }
 

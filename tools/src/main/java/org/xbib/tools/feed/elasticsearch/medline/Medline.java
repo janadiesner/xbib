@@ -37,7 +37,7 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
 import org.xbib.rdf.io.xml.XmlParser;
@@ -55,7 +55,7 @@ public final class Medline extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(Medline.class.getSimpleName());
 
-    private static final MemoryResourceContext resourceContext = new MemoryResourceContext();
+    private static final MemoryContext resourceContext = new MemoryContext();
 
     @Override
     public String getName() {

@@ -35,14 +35,13 @@ import org.xbib.iri.IRI;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * A Resource is an iterable over statements of subjects, predicates, and
- * objects, based upon Literal. It has predicate multimaps for associated
- * resources and local properties.
+ * A Resource is an ID with a map of predicates associated with objects.
  */
-public interface Resource extends Identifiable, Node {
+public interface Resource extends Node {
 
     /**
      * Set the identifier of this resource
@@ -50,11 +49,12 @@ public interface Resource extends Identifiable, Node {
      * @param id the IRI for this resource
      * @return this resource
      */
-    @Override
     Resource id(IRI id);
 
+    IRI id();
+
     /**
-     * Is resource ID local/embedded?
+     * Is resource ID local/embedded ("blank node")?
      *
      * @return true if embedded, otherwise false
      */
@@ -67,7 +67,7 @@ public interface Resource extends Identifiable, Node {
      * @param object    an object in its string representation form
      * @return the new resource with the property added
      */
-    Resource add(Property predicate, Node object);
+    Resource add(IRI predicate, Node object);
 
     /**
      * Add a property to this resource with a string object value
@@ -76,7 +76,7 @@ public interface Resource extends Identifiable, Node {
      * @param object    an object in its string representation form
      * @return the new resource with the property added
      */
-    Resource add(Property predicate, String object);
+    Resource add(IRI predicate, String object);
 
     /**
      * Add a property to this resource
@@ -85,9 +85,9 @@ public interface Resource extends Identifiable, Node {
      * @param number    an integer
      * @return the new resource with the property added
      */
-    Resource add(Property predicate, Integer number);
+    Resource add(IRI predicate, Integer number);
 
-    Resource add(Property predicate, Boolean number);
+    Resource add(IRI predicate, Boolean number);
 
     /**
      * Add a property to this resource
@@ -96,25 +96,27 @@ public interface Resource extends Identifiable, Node {
      * @param literal   a literal
      * @return the new resource with the property added
      */
-    Resource add(Property predicate, Literal literal);
-
-    /**
-     * Add a property to this resource
-     *
-     * @param predicate        a predicate identifier
-     * @param resource external resource IRI
-     * @return the new resource with the property added
-     */
-    Resource add(Property predicate, IRI resource);
+    Resource add(IRI predicate, Literal literal);
 
     /**
      * Add a property to this resource
      *
      * @param predicate a predicate identifier
-     * @param objects  objects
+     * @param resource  external resource IRI
      * @return the new resource with the property added
      */
-    Resource add(Property predicate, List<Node> objects);
+    Resource add(IRI predicate, IRI resource);
+
+    /**
+     * Add a property to this resource
+     *
+     * @param predicate a predicate identifier
+     * @param list      a list of objects
+     * @return the new resource with the property added
+     */
+    Resource add(IRI predicate, List list);
+
+    Resource add(IRI predicate, Map map);
 
     /**
      * Add another resource to this resource
@@ -123,7 +125,7 @@ public interface Resource extends Identifiable, Node {
      * @param resource  resource
      * @return the new resource with the resource added
      */
-    Resource add(Property predicate, Resource resource);
+    Resource add(IRI predicate, Resource resource);
 
     /**
      * Add a property to this resource.
@@ -167,10 +169,12 @@ public interface Resource extends Identifiable, Node {
      * Add a property to this resource
      *
      * @param predicate predicate
-     * @param objects  objects
+     * @param list      a list of objects
      * @return the new resource with the property added
      */
-    Resource add(String predicate, List<Node> objects);
+    Resource add(String predicate, List list);
+
+    Resource add(String predicate, Map map);
 
     /**
      * Add another resource to this resource
@@ -180,6 +184,8 @@ public interface Resource extends Identifiable, Node {
      * @return the new resource with the resource added
      */
     Resource add(String predicate, Resource resource);
+
+    Resource add(Map map);
 
     /**
      * Setting the type of the resource.
@@ -192,6 +198,7 @@ public interface Resource extends Identifiable, Node {
 
     /**
      * Return list of resources for this predicate
+     *
      * @param predicate the predicate
      * @return list of resources
      */
@@ -212,16 +219,6 @@ public interface Resource extends Identifiable, Node {
      * resource under the given resource identifier already exists, the existing
      * resource is returned.
      *
-     * @param predicate the predicate ID for the reesource
-     * @return the new anonymous reesource
-     */
-    Resource newResource(Property predicate);
-
-    /**
-     * Create an anonymous resource and associate it with this resource. If the
-     * resource under the given resource identifier already exists, the existing
-     * resource is returned.
-     *
      * @param predicate the predicate ID for the resource
      * @return the new anonymous resource
      */
@@ -229,7 +226,7 @@ public interface Resource extends Identifiable, Node {
 
     Resource newSubject(Object subject);
 
-    Property newPredicate(Object predicate);
+    IRI newPredicate(Object predicate);
 
     Node newObject(Object object);
 
@@ -250,12 +247,6 @@ public interface Resource extends Identifiable, Node {
      */
     Collection<Node> objects(IRI predicate);
 
-    /**
-     * Return object set for a given predicate
-     *
-     * @param predicate predicate
-     * @return set of objects
-     */
     Collection<Node> objects(String predicate);
 
     List<Literal> literals(IRI predicate);
@@ -263,6 +254,8 @@ public interface Resource extends Identifiable, Node {
     List<Resource> embeddedResources(IRI predicate);
 
     List<Resource> linkedResources(IRI predicate);
+
+    List<Node> visibleObjects(IRI predicate);
 
     /**
      * Add a triple to this resource

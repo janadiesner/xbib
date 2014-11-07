@@ -34,7 +34,7 @@ package org.xbib.tools;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
-import org.xbib.elasticsearch.rdf.ResourceSink;
+import org.xbib.elasticsearch.rdf.Sink;
 import org.xbib.io.NullWriter;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
@@ -47,9 +47,9 @@ import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.util.DateUtil;
 import org.xbib.util.URIUtil;
@@ -94,7 +94,7 @@ public abstract class OAIFeeder extends Feeder {
         beforeIndexCreation(output);
         output.shards(shards).replica(replica).newIndex(index).startBulk(index);
         afterIndexCreation(output);
-        sink = new ResourceSink(output);
+        sink = new Sink(output);
 
         // a list of OAI URLs
 
@@ -146,7 +146,7 @@ public abstract class OAIFeeder extends Feeder {
     }
 
     protected RdfResourceHandler rdfResourceHandler() {
-        MemoryResourceContext resourceContext = new MemoryResourceContext();
+        MemoryContext resourceContext = new MemoryContext();
         return new RdfResourceHandler(resourceContext);
     }
 
@@ -155,7 +155,7 @@ public abstract class OAIFeeder extends Feeder {
         return new XmlMetadataHandler()
                 .setHandler(rdfResourceHandler)
                 .setResourceContext(rdfResourceHandler.resourceContext())
-                .setResourceContextWriter(new MyResourceContextWriter());
+                .setContextWriter(new MyContextWriter());
     }
 
     class XmlMetadataHandler extends MetadataHandler {
@@ -164,9 +164,9 @@ public abstract class OAIFeeder extends Feeder {
 
         XmlHandler handler;
 
-        ResourceContext resourceContext;
+        Context resourceContext;
 
-        ResourceContextWriter resourceContextWriter;
+        ContextWriter contextWriter;
 
         XmlMetadataHandler() {
             context = IRINamespaceContext.newInstance();
@@ -180,14 +180,14 @@ public abstract class OAIFeeder extends Feeder {
             return this;
         }
 
-        public XmlMetadataHandler setResourceContext(ResourceContext resourceContext) {
-            this.resourceContext = resourceContext;
-            resourceContext.setNamespaceContext(context);
+        public XmlMetadataHandler setResourceContext(Context context) {
+            this.resourceContext = context;
+            context.setNamespaceContext(this.context);
             return this;
         }
 
-        public XmlMetadataHandler setResourceContextWriter(ResourceContextWriter resourceContextWriter) {
-            this.resourceContextWriter = resourceContextWriter;
+        public XmlMetadataHandler setContextWriter(ContextWriter contextWriter) {
+            this.contextWriter = contextWriter;
             return this;
         }
 
@@ -206,7 +206,7 @@ public abstract class OAIFeeder extends Feeder {
                         .query(settings.get("type"))
                         .fragment(identifier).build();
                 resourceContext.getResource().id(iri);
-                resourceContextWriter.write(resourceContext);
+                contextWriter.write(resourceContext);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -238,11 +238,11 @@ public abstract class OAIFeeder extends Feeder {
         }
     }
 
-    class MyResourceContextWriter implements ResourceContextWriter {
+    class MyContextWriter implements ContextWriter {
 
         @Override
-        public void write(ResourceContext resourceContext) throws IOException {
-            sink.write(resourceContext);
+        public void write(Context context) throws IOException {
+            sink.write(context);
         }
     }
 

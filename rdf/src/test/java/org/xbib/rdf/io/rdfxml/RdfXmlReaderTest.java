@@ -57,9 +57,6 @@ public class RdfXmlReaderTest extends StreamTester {
         sw.close();
         assertStream(getClass().getResource("rdfxml.ttl").openStream(),
                 new ByteArrayInputStream(sw.toString().getBytes()));
-
-
     }
-
 
 }

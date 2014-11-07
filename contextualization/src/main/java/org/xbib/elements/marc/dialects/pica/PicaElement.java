@@ -37,13 +37,13 @@ import org.xbib.elements.ElementBuilder;
 import org.xbib.analyzer.dublincore.DublinCoreTerms;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 
 import java.util.Map;
 
 public abstract class PicaElement
-        implements Element<DataField, String, PicaElementBuilder>,
+        implements Element<FieldList, String, PicaElementBuilder>,
         DublinCoreTerms,
         LibraryAddressProperties {
 
@@ -58,7 +58,7 @@ public abstract class PicaElement
     }
 
     @Override
-    public boolean map(DataField key) {
+    public boolean map(FieldList key) {
         return false;
     }
 
@@ -73,7 +73,7 @@ public abstract class PicaElement
     }
 
     @Override
-    public PicaElement build(PicaElementBuilder builder, DataField key, String value) {
+    public PicaElement build(PicaElementBuilder builder, FieldList key, String value) {
         return this;
     }
 
@@ -89,8 +89,8 @@ public abstract class PicaElement
      * @param fields
      * @param value
      */
-    public void fields(ElementBuilder<DataField, String, PicaElement, PicaContext> builder,
-                       DataField fields, String value) {
+    public void fields(ElementBuilder<FieldList, String, PicaElement, PicaContext> builder,
+                       FieldList fields, String value) {
         // should be overridden
     }
 
@@ -101,7 +101,7 @@ public abstract class PicaElement
      * @param field
      * @param subfieldType
      */
-    public void field(ElementBuilder<DataField, String, PicaElement, PicaContext> builder,
+    public void field(ElementBuilder<FieldList, String, PicaElement, PicaContext> builder,
                       Field field, String subfieldType) {
         // should be overridden
     }

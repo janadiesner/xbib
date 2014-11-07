@@ -36,23 +36,23 @@ import java.io.IOException;
 
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 
 /**
  * Index RDF resources into Elasticsearch
  *
  */
-public class ResourceSink implements ResourceContextWriter, Closeable {
+public class Sink implements ContextWriter, Closeable {
 
     private final Ingest feeder;
 
-    public ResourceSink(final Ingest feeder) {
+    public Sink(final Ingest feeder) {
         this.feeder = feeder;
     }
 
     @Override
-    public void write(ResourceContext context) throws IOException {
+    public void write(Context context) throws IOException {
         Resource resource = context.getResource();
         if (resource == null) {
             throw new IllegalArgumentException("resource is null");

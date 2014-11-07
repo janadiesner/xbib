@@ -37,6 +37,7 @@ public enum FieldEvent implements Event {
 
     TAG_CLEANED,
     DATA_SCRUBBED,
+    DATA_TRANSFORMED,
     RECORD_NUMBER,
     RECORD_NUMBER_MULTIPLE,
     FIELD_DROPPED {

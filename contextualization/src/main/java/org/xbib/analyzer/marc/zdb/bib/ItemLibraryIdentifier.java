@@ -3,7 +3,7 @@ package org.xbib.analyzer.marc.zdb.bib;
 import org.xbib.elements.ValueMapFactory;
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.elements.marc.MARCElementBuilder;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class ItemLibraryIdentifier extends MARCElement {
     }
 
     @Override
-    public ItemLibraryIdentifier build(MARCElementBuilder b, DataField key, String value) {
+    public ItemLibraryIdentifier build(MARCElementBuilder b, FieldList key, String value) {
         boolean servicecreated = false;
         for (Field d : key) {
             String s = d.subfieldId();

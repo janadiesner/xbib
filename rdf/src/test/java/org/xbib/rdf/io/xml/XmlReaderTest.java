@@ -43,8 +43,8 @@ import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Triple;
 import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.memory.MemoryResource;
-import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.text.CharUtils.Profile;
 import org.xbib.text.UrlEncoding;
@@ -65,7 +65,7 @@ public class XmlReaderTest extends StreamTester {
         context.addNamespace("oaidc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
 
-        final MemoryResourceContext resourceContext = new MemoryResourceContext();
+        final MemoryContext resourceContext = new MemoryContext();
         resourceContext.setNamespaceContext(context);
 
         XmlHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {
@@ -114,7 +114,7 @@ public class XmlReaderTest extends StreamTester {
             throw new IOException("file " + filename + " not found");
         }
         IRINamespaceContext context = IRINamespaceContext.newInstance();
-        final MemoryResourceContext resourceContext = new MemoryResourceContext();
+        final MemoryContext resourceContext = new MemoryContext();
         resourceContext.setNamespaceContext(context);
         AbstractXmlHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {
 
@@ -136,7 +136,7 @@ public class XmlReaderTest extends StreamTester {
             }
 
         };
-        final LinkedList<Triple> triples = new LinkedList();
+        final LinkedList<Triple> triples = new LinkedList<Triple>();
         xmlHandler.setDefaultNamespace("xml", "http://xmltest")
                 .setBuilder(new Triple.Builder() {
                     @Override
@@ -187,7 +187,7 @@ public class XmlReaderTest extends StreamTester {
             throw new IOException("file " + filename + " not found");
         }
         IRINamespaceContext context = IRINamespaceContext.newInstance();
-        final MemoryResourceContext resourceContext = new MemoryResourceContext();
+        final MemoryContext resourceContext = new MemoryContext();
         resourceContext.setNamespaceContext(context);
         AbstractXmlResourceHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {
 

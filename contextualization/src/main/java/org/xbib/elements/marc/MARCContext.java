@@ -34,7 +34,7 @@ package org.xbib.elements.marc;
 import org.xbib.analyzer.dublincore.DublinCoreContext;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.util.DateUtil;
 
@@ -85,7 +85,7 @@ public class MARCContext extends DublinCoreContext {
      * @return this context
      */
     @Override
-    public ResourceContext<Resource> beforeBuild() {
+    public Context<Resource> beforeBuild() {
         if (getResource() == null) {
             return this;
         }

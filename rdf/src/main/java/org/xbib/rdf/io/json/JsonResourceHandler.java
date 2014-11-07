@@ -31,13 +31,13 @@
  */
 package org.xbib.rdf.io.json;
 
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
 
 public abstract class JsonResourceHandler extends AbstractXmlResourceHandler {
 
-    public JsonResourceHandler(ResourceContext resourceContext) {
-        super(resourceContext);
+    public JsonResourceHandler(Context context) {
+        super(context);
         super.setDefaultNamespace("", "http://json.org");
     }
 

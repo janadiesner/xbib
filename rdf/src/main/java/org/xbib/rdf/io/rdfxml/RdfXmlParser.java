@@ -33,18 +33,17 @@ package org.xbib.rdf.io.rdfxml;
 
 import org.xbib.iri.IRI;
 import org.xbib.iri.IRISyntaxException;
-import org.xbib.rdf.RdfConstants;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.memory.MemoryLiteral;
-import org.xbib.rdf.Property;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
+import org.xbib.rdf.Parser;
+import org.xbib.rdf.RdfConstants;
+import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.io.xml.XmlHandler;
+import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.rdf.memory.MemoryTriple;
-import org.xbib.rdf.Parser;
-import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.xml.XMLUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -402,7 +401,7 @@ public class RdfXmlParser implements RdfConstants, Parser {
         }
 
         @Override
-        public ResourceContext resourceContext() {
+        public Context resourceContext() {
             return null;
         }
 
@@ -449,8 +448,8 @@ public class RdfXmlParser implements RdfConstants, Parser {
                             String aVal = attrs.getValue(i);
                             if (!aUri.startsWith(RDF_STRING)
                                     && !aQn.startsWith("xml:")) {
-                                        yield(frame.node, IRI.create(aUri), aVal);
-                                    }
+                                yield(frame.node, IRI.create(aUri), aVal);
+                            }
                         }
                         // is this node the value of some enclosing predicate?
                         if (inPredicate(stack)) {
@@ -501,7 +500,7 @@ public class RdfXmlParser implements RdfConstants, Parser {
                             frame.isCollection = true;
                             frame.collection = new LinkedList();
                             Resource s = resource.newSubject(ancestorSubject(stack));
-                            Property p = resource.newPredicate(frame.node);
+                            IRI p = resource.newPredicate(frame.node);
                             Node o = resource.newObject(blankNode());
                             frame.collectionHead = new MemoryTriple(s, p, o);
                             pcdata = null;
@@ -523,17 +522,17 @@ public class RdfXmlParser implements RdfConstants, Parser {
                         String aVal = attrs.getValue(i);
                         if (((aUri.toString().equals(RDF_TYPE.toString()) || !aUri.toString().startsWith(RDF_STRING)))
                                 && !aQn.startsWith("xml:")) {
-                                    if (object == null) {
-                                        object = blankNode().id();
-                                        yield(ancestorSubject(stack), frame.node, object);
-                                    }
-                                    if (aUri.equals(RDF_TYPE)) {
-                                        yield(object, RDF_TYPE, aVal);
-                                    } else {
-                                        Literal value = withLanguageTag(new MemoryLiteral(aVal), stack);
-                                        yield(object, aUri, value);
-                                    }
-                                }
+                            if (object == null) {
+                                object = blankNode().id();
+                                yield(ancestorSubject(stack), frame.node, object);
+                            }
+                            if (aUri.equals(RDF_TYPE)) {
+                                yield(object, RDF_TYPE, aVal);
+                            } else {
+                                Literal value = withLanguageTag(new MemoryLiteral(aVal), stack);
+                                yield(object, aUri, value);
+                            }
+                        }
                     }
                     // if we had to generate a node to hold properties specified
                     // as attributes, then expect an empty element and therefore

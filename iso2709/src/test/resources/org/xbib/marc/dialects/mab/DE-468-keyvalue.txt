@@ -1,12 +1,12 @@
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MAB
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00800nM2.01200024   000h
 end
 begin
 tag=001 indicator=null subfield=null data= HT016983451
@@ -165,13 +165,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MAB
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=01075nM2.01200024   000h
 end
 begin
 tag=001 indicator=null subfield=null data= HT016980609
@@ -346,13 +346,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MAB
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00757nM2.01200024   000h
 end
 begin
 tag=001 indicator=null subfield=null data= HT016978781
@@ -503,13 +503,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MAB
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00949nM2.01200024   000h
 end
 begin
 tag=001 indicator=null subfield=null data= HT016984572
@@ -684,13 +684,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MAB
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00802nM2.01200024   000h
 end
 begin
 tag=001 indicator=null subfield=null data= HT016979194
@@ -841,13 +841,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MAB
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00907nM2.01200024   000h
 end
 begin
 tag=001 indicator=null subfield=null data= HT016980352
@@ -1005,13 +1005,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MAB
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00858nM2.01200024   000h
 end
 begin
 tag=001 indicator=null subfield=null data= HT016983768
@@ -1173,13 +1173,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MAB
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00841nM2.01200024   000h
 end
 begin
 tag=001 indicator=null subfield=null data= HT016979244
@@ -1326,13 +1326,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MAB
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00798nM2.01200024   000h
 end
 begin
 tag=001 indicator=null subfield=null data= HT016979076
@@ -1484,13 +1484,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MAB
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00948nM2.01200024   000h
 end
 begin
 tag=001 indicator=null subfield=null data= HT016982637
@@ -1646,13 +1646,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MAB
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00918nM2.01200024   000h
 end
 begin
 tag=001 indicator=null subfield=null data= HT016983725
@@ -1835,13 +1835,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MAB
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00742nM2.01200024   000h
 end
 begin
 tag=001 indicator=null subfield=null data= HT016977854

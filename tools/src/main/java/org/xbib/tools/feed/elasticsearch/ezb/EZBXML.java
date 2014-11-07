@@ -37,11 +37,11 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
 import org.xbib.rdf.io.xml.XmlParser;
@@ -85,11 +85,11 @@ public final class EZBXML extends Feeder {
     @Override
     public void process(URI uri) throws Exception {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
-        ResourceContext<Resource> resourceContext = new MemoryResourceContext();
-        resourceContext.setNamespaceContext(namespaceContext);
-        resourceContext.setContentBuilder(new DefaultContentBuilder<>());
+        Context<Resource> context = new MemoryContext();
+        context.setNamespaceContext(namespaceContext);
+        context.setContentBuilder(new DefaultContentBuilder<>());
 
-        AbstractXmlHandler handler = new EZBHandler(resourceContext)
+        AbstractXmlHandler handler = new EZBHandler(context)
                 .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/");
 
         InputStream in = InputService.getInputStream(uri);
@@ -101,8 +101,8 @@ public final class EZBXML extends Feeder {
 
     class EZBHandler extends AbstractXmlResourceHandler {
 
-        public EZBHandler(ResourceContext resourceContext) {
-            super(resourceContext);
+        public EZBHandler(Context context) {
+            super(context);
         }
 
         @Override

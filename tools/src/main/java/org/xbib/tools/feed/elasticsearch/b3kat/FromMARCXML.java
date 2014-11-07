@@ -43,15 +43,15 @@ import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.MarcXchangeReader;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.tools.Feeder;
 
 import java.io.IOException;
@@ -101,19 +101,19 @@ public final class FromMARCXML extends Feeder {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         final MARCElementMapper mapper = new MARCElementMapper(settings.get("elements"))
                 .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<DataField>() {
+                .setListener(new UnmappedKeyListener<FieldList>() {
                     @Override
-                    public void unknown(DataField key) {
-                        logger.warn("unmapped field {}", key.toSpec());
+                    public void unknown(FieldList key) {
+                        logger.warn("unmapped field {}", key);
                         if ((settings.getAsBoolean("detect", false))) {
-                            unmapped.add("\"" + key.toSpec() + "\"");
+                            unmapped.add("\"" + key + "\"");
                         }
                     }
                 })
                 .start(new MARCElementBuilderFactory() {
                     public MARCElementBuilder newBuilder() {
                         MARCElementBuilder builder = new MARCElementBuilder();
-                        builder.addWriter(new MarcContextResourceOutput());
+                        builder.addWriter(new MarcContextOutput());
                         return builder;
                     }
                 });
@@ -123,7 +123,7 @@ public final class FromMARCXML extends Feeder {
                 .start(new MARCDirectBuilderFactory() {
                     public MARCDirectBuilder newBuilder() {
                         MARCDirectBuilder builder = new MARCDirectBuilder();
-                        builder.addWriter(new MarcContextResourceOutput());
+                        builder.addWriter(new MarcContextOutput());
                         return builder;
 
                     }
@@ -150,10 +150,10 @@ public final class FromMARCXML extends Feeder {
         }
     }
 
-    private class MarcContextResourceOutput implements ResourceContextWriter<ResourceContext<Resource>, Resource> {
+    private class MarcContextOutput implements ContextWriter<Context<Resource>, Resource> {
 
         @Override
-        public void write(ResourceContext context) throws IOException {
+        public void write(Context context) throws IOException {
             IRI iri = context.getResource().id();
             if (iri != null) {
                 context.getResource().id(IRI.builder().scheme("http").host(settings.get("index")).query(settings.get("type"))

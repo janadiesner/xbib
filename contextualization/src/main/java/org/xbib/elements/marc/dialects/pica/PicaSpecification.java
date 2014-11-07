@@ -43,15 +43,16 @@ public class PicaSpecification extends AbstractSpecification {
 
     private final static Logger logger = LoggerFactory.getLogger(PicaSpecification.class.getName());
 
-    public Map addSpec(String value, Element element, Map map) {
+    @Override
+    public Map addKey(String value, Element element, Map map) {
         int pos = value.indexOf('$');
         String h = pos > 0 ? value.substring(0,pos) : null;
         String t = pos > 0 ? value.substring(pos+1) : value;
-        addSpec(h, t, element, map);
+        addKey(h, t, element, map);
         return map;
     }
 
-    private Map addSpec(String head, String tail, Element element, Map map) {
+    private Map addKey(String head, String tail, Element element, Map map) {
         if (head == null) {
             if (map.containsKey(tail)) {
                 logger.warn("already exist in map: {} {}", tail, map);
@@ -65,11 +66,11 @@ public class PicaSpecification extends AbstractSpecification {
         String t = pos > 0 ? tail.substring(pos+1) : tail;
         Object o = map.get(head);
         if (o != null) {
-            addSpec(h, t, element, (Map) o);
+            addKey(h, t, element, (Map) o);
             return map;
         } else {
             Map m = new HashMap();
-            Map n = addSpec(h, t, element, m);
+            Map n = addKey(h, t, element, m);
             map.put(head, n);
             return map;
         }

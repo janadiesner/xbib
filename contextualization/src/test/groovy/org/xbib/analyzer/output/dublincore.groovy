@@ -1,12 +1,12 @@
 package org.xbib.analyzer.output
 
-import org.xbib.rdf.context.ResourceContext
-import org.xbib.rdf.context.ResourceContextWriter
+import org.xbib.rdf.Context
+import org.xbib.rdf.ContextWriter
 
-public class DublinCoreWriter implements ResourceContextWriter {
+public class DublinCoreWriter implements ContextWriter {
 
     @Override
-    void write(ResourceContext resourceContext) throws IOException {
+    void write(Context resourceContext) throws IOException {
         println 'scripted groovy output'
     }
 

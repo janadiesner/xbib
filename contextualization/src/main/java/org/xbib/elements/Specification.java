@@ -40,7 +40,7 @@ public interface Specification {
 
     Element getElement(String spec, Map map);
 
-    Element getElementBySpec(String spec, Map map);
+    Element getElementByKey(String key, Map map);
 
     Map<String,Map> map();
 

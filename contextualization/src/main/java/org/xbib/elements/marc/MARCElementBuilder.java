@@ -32,8 +32,8 @@
 package org.xbib.elements.marc;
 
 import org.xbib.elements.AbstractElementBuilder;
-import org.xbib.elements.context.ResourceContextFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
+import org.xbib.rdf.ContextFactory;
 
 /**
  * A MARC element builder builds semantic elements from MARC field collections.
@@ -41,9 +41,9 @@ import org.xbib.marc.DataField;
  *
  */
 public class MARCElementBuilder
-       extends AbstractElementBuilder<DataField, String, MARCElement, MARCContext> {
+       extends AbstractElementBuilder<FieldList, String, MARCElement, MARCContext> {
 
-    private final ResourceContextFactory<MARCContext> contextFactory = new ResourceContextFactory<MARCContext>() {
+    private final ContextFactory<MARCContext> contextFactory = new ContextFactory<MARCContext>() {
 
         @Override
         public MARCContext newContext() {
@@ -52,7 +52,7 @@ public class MARCElementBuilder
     };
     
     @Override
-    public ResourceContextFactory<MARCContext> resourceContextFactory() {
+    public ContextFactory<MARCContext> resourceContextFactory() {
         return contextFactory;
     }
 

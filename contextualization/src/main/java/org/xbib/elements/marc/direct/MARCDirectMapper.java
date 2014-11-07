@@ -35,12 +35,12 @@ import org.xbib.elements.direct.AbstractDirectMapper;
 import org.xbib.elements.direct.DirectBuilderFactory;
 import org.xbib.elements.direct.KeyValueDirectPipeline;
 import org.xbib.elements.marc.MARCContext;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 
 /**
  * A direct MARC mapper. It provides plain MARC pipelines.
  */
-public class MARCDirectMapper extends AbstractDirectMapper<DataField, String, MARCContext> {
+public class MARCDirectMapper extends AbstractDirectMapper<FieldList, String, MARCContext> {
 
     @Override
     public MARCDirectMapper pipelines(int n) {
@@ -49,7 +49,7 @@ public class MARCDirectMapper extends AbstractDirectMapper<DataField, String, MA
     }
 
     @Override
-    public MARCDirectMapper start(DirectBuilderFactory<DataField, String, MARCContext> factory) {
+    public MARCDirectMapper start(DirectBuilderFactory<FieldList, String, MARCContext> factory) {
         super.start(factory);
         return this;
     }

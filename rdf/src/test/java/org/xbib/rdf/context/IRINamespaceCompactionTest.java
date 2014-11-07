@@ -11,10 +11,10 @@ public class IRINamespaceCompactionTest extends Assert {
     @Test
     public void testCompaction() throws Exception {
         IRINamespaceContext context = IRINamespaceContext.getInstance();
-        assertEquals("http://purl.org/dc/elements/1.1/", context.getNamespaceURI("dc"));
-        assertEquals("dc", context.getPrefix("http://purl.org/dc/elements/1.1/"));
+        assertEquals(context.getNamespaceURI("dc"), "http://purl.org/dc/elements/1.1/");
+        assertEquals(context.getPrefix("http://purl.org/dc/elements/1.1/"), "dc");
         IRI dc = IRI.create("http://purl.org/dc/elements/1.1/creator");
-        assertEquals(context.compact(dc).toString(), "dc:creator");
+        assertEquals(context.compact(dc), "dc:creator");
     }
 
 }

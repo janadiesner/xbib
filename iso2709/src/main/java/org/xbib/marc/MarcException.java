@@ -31,15 +31,21 @@
  */
 package org.xbib.marc;
 
-import java.io.IOException;
+public class MarcException extends RuntimeException {
 
-/**
- * Exception for broken field directories
- */
-public class InvalidFieldDirectoryException extends IOException {
+    public MarcException(Throwable throwable) {
+        super(throwable);
+    }
 
-    public InvalidFieldDirectoryException(String message) {
+    public MarcException(String message) {
         super(message);
     }
 
+    public MarcException(String message,Throwable throwable) {
+        super(message, throwable);
+    }
+
+    public MarcException(Field field, Throwable throwable) {
+        super(field != null ? field.toKey() : "", throwable);
+    }
 }

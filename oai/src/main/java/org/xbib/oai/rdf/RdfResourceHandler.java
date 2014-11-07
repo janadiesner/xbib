@@ -33,8 +33,8 @@ package org.xbib.oai.rdf;
 
 import org.xbib.iri.IRI;
 import org.xbib.oai.OAIConstants;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
 
 import javax.xml.namespace.QName;
@@ -44,7 +44,7 @@ import javax.xml.namespace.QName;
  */
 public class RdfResourceHandler extends AbstractXmlResourceHandler implements OAIConstants {
 
-    public RdfResourceHandler(ResourceContext<Resource> context) {
+    public RdfResourceHandler(Context<Resource> context) {
         super(context);
     }
 

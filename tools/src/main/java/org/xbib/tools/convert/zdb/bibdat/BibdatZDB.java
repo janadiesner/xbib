@@ -41,7 +41,7 @@ import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
@@ -49,7 +49,7 @@ import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.tools.Converter;
 
@@ -92,12 +92,12 @@ public final class BibdatZDB extends Converter {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         PicaElementMapper mapper = new PicaElementMapper("pica/zdb/bibdat")
                 .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<DataField>() {
+                .setListener(new UnmappedKeyListener<FieldList>() {
                     @Override
-                    public void unknown(DataField key) {
-                        logger.warn("unmapped field {}", key.toSpec());
+                    public void unknown(FieldList key) {
+                        logger.warn("unmapped field {}", key);
                         if ((settings.getAsBoolean("detect", false))) {
-                            unmapped.add("\"" + key.toSpec() + "\"");
+                            unmapped.add("\"" + key + "\"");
                         }
                     }
                 })
@@ -117,9 +117,9 @@ public final class BibdatZDB extends Converter {
                     }
                 })
                 .addListener(mapper)
-                .addListener(new KeyValueStreamAdapter<DataField, String>() {
+                .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                     @Override
-                    public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
+                    public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
                         if (logger.isTraceEnabled()) {
                             logger.trace("begin");
                             for (Field f : key) {
@@ -141,15 +141,15 @@ public final class BibdatZDB extends Converter {
         }
     }
 
-    private final static OurContextResourceOutput out = new OurContextResourceOutput();
+    private final static OurContextOutput out = new OurContextOutput();
 
-    private final static class OurContextResourceOutput implements ResourceContextWriter<PicaContext, Resource> {
+    private final static class OurContextOutput implements ContextWriter<PicaContext, Resource> {
 
         File f;
         FileWriter fw;
         NTripleWriter writer;
 
-        public OurContextResourceOutput init(String filename) throws IOException {
+        public OurContextOutput init(String filename) throws IOException {
             this.f = new File(filename);
             this.fw = new FileWriter(f);
             this.writer = new NTripleWriter(fw);

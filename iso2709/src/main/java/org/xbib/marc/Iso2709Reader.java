@@ -72,11 +72,6 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
     public static String FATAL_ERRORS = "fatal_errors";
 
     /**
-     * Should errors be silenced
-     */
-    public static String SILENT_ERRORS = "silent_errors";
-
-    /**
      * Should the ISO 25577 tags be clean (validateable)?
      * All erraneous tags will be assigned to "999".
      * This mode is active by default.
@@ -87,6 +82,11 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
      * Shall all data be XML 1.0 safe?
      */
     public static String SCRUB_DATA = "scrub_data";
+
+    /**
+     * Shall data transformations be allowed?
+     */
+    public static String TRANSFORM_DATA = "transform_data";
 
     /**
      * Buffer size for input stream
@@ -135,7 +135,6 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
             put(FORMAT, MARC21);
             put(TYPE, BIBLIOGRAPHIC);
             put(FATAL_ERRORS, Boolean.FALSE);
-            put(SILENT_ERRORS, Boolean.FALSE);
             put(BUFFER_SIZE, 65536);
         }
     };
@@ -228,8 +227,8 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
         return this;
     }
 
-    public Iso2709Reader setTransformer(StringTransformer transformer) {
-        this.adapter.setTransformer(transformer);
+    public Iso2709Reader setTransformer(String fieldKey, StringTransformer transformer) {
+        this.adapter.setTransformer(fieldKey, transformer);
         return this;
     }
 
@@ -291,19 +290,24 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
         return this;
     }
 
+    public Iso2709Reader setTransformData(Boolean transformData) {
+        properties.put(TRANSFORM_DATA, transformData);
+        return this;
+    }
+
     private MarcXchangeSaxAdapter setup(MarcXchangeSaxAdapter adapter) {
         Boolean fatalErrors = properties.get(FATAL_ERRORS) != null ?
                 (properties.get(FATAL_ERRORS) instanceof Boolean ? (Boolean)properties.get(FATAL_ERRORS) :
                 Boolean.parseBoolean((String)properties.get(FATAL_ERRORS))) : null;
-        Boolean silentErrors = properties.get(SILENT_ERRORS) != null ?
-                (properties.get(SILENT_ERRORS) instanceof Boolean ? (Boolean)properties.get(SILENT_ERRORS) :
-                Boolean.parseBoolean((String)properties.get(SILENT_ERRORS))) : null;
         Boolean cleanTags = properties.get(CLEAN_TAGS) != null ?
                 (properties.get(CLEAN_TAGS) instanceof Boolean ? (Boolean)properties.get(CLEAN_TAGS) :
                         Boolean.parseBoolean((String)properties.get(CLEAN_TAGS))) : Boolean.TRUE;
         Boolean scrubData = properties.get(SCRUB_DATA) != null ?
                 (properties.get(SCRUB_DATA) instanceof Boolean ? (Boolean)properties.get(SCRUB_DATA) :
                         Boolean.parseBoolean((String)properties.get(SCRUB_DATA))) : Boolean.TRUE;
+        Boolean transformData = properties.get(TRANSFORM_DATA) != null ?
+                (properties.get(TRANSFORM_DATA) instanceof Boolean ? (Boolean)properties.get(TRANSFORM_DATA) :
+                        Boolean.parseBoolean((String)properties.get(TRANSFORM_DATA))) : Boolean.TRUE;
         Integer subfieldCodeLength = properties.get(SUBFIELD_CODE_LENGTH) != null ?
                 (properties.get(SUBFIELD_CODE_LENGTH) instanceof  Integer ? (Integer) properties.get(SUBFIELD_CODE_LENGTH) :
                 Integer.parseInt((String)properties.get(SUBFIELD_CODE_LENGTH))) : null;
@@ -313,11 +317,11 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
                 .setFormat(getFormat())
                 .setType(getType())
                 .setFatalErrors(fatalErrors)
-                .setSilentErrors(silentErrors)
                 .setSubfieldDelimiter((String)properties.get(SUBFIELD_DELIMITER))
                 .setSubfieldIdLength(subfieldCodeLength)
                 .setCleanTags(cleanTags)
-                .setScrubData(scrubData);
+                .setScrubData(scrubData)
+                .setTransformData(transformData);
     }
 
     public BufferedFieldStreamReader stream(InputStream in) throws IOException {

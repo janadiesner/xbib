@@ -35,8 +35,8 @@ package org.xbib.elements.direct;
 import org.xbib.keyvalue.KeyValue;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -49,7 +49,7 @@ import java.util.concurrent.Callable;
  * @param <V>
  * @param <C>
  */
-public class KeyValueDirectPipeline<K,V,C extends ResourceContext<Resource>> implements Callable<Boolean> {
+public class KeyValueDirectPipeline<K,V,C extends Context<Resource>> implements Callable<Boolean> {
 
     private BlockingQueue<List<KeyValue<K,V>>> queue;
 

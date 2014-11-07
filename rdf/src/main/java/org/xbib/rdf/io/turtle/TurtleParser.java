@@ -34,16 +34,15 @@ package org.xbib.rdf.io.turtle;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Parser;
-import org.xbib.rdf.Property;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
+import org.xbib.rdf.Parser;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
+import org.xbib.rdf.XSDResourceIdentifiers;
 import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.rdf.memory.MemoryTriple;
-import org.xbib.rdf.types.XSDIdentifiers;
 import org.xbib.xml.namespace.XmlNamespaceContext;
 
 import java.io.EOFException;
@@ -83,7 +82,7 @@ public class TurtleParser implements Parser {
     /**
      * The parsed predicate
      */
-    private Property predicate;
+    private IRI predicate;
     /**
      * The parsed object
      */
@@ -209,6 +208,7 @@ public class TurtleParser implements Parser {
             if ("".equals(prefix)) {
                 this.baseIRI = nsURI;
             }
+            context.addNamespace(prefix, nsURI.toString());
         } else if ("@base".equalsIgnoreCase(directive)) {
             this.baseIRI = parseURI();
         } else {
@@ -274,7 +274,7 @@ public class TurtleParser implements Parser {
         }
     }
 
-    private Property parsePredicate() throws IOException {
+    private IRI parsePredicate() throws IOException {
         char ch = read();
         if (ch == 'a') {
             char ch2 = read();
@@ -307,14 +307,14 @@ public class TurtleParser implements Parser {
             object = parseValue();
         }
         Triple stmt = new MemoryTriple(subject, predicate, object);
-        if (subject instanceof Resource) {
+        if (subject.isEmbedded()) {
             // Push triples with blank node subjects on stack.
             // The idea for having ordered getResource properties is:
             // All getResource property triples should be serialized
             // after the getResource parent triple.
             triples.add(0, stmt);
         } else {
-            // Send record events. A record is grouped by a sequence of same non-blank subjects
+            // Send builder events. A record is grouped by a sequence of same non-blank subjects
             if (lastsubject == null) {
                 if (builder != null) {
                     builder.newIdentifier(subject.id());
@@ -390,7 +390,7 @@ public class TurtleParser implements Parser {
             }
         } while (!ended);
         String decoded = decode(sb.toString(), "UTF-8");
-        IRI u = IRI.create(decoded);
+        IRI u = IRI.builder().curie(decoded).build();
         u = baseIRI.resolve(u);
         return u;
     }
@@ -420,7 +420,7 @@ public class TurtleParser implements Parser {
             if (ch != ':') {
                 String value = sb.toString();
                 if (value.equals("true") || value.equals("false")) {
-                    return resource.newLiteral(value).type(XSDIdentifiers.BOOLEAN);
+                    return resource.newLiteral(value).type(XSDResourceIdentifiers.BOOLEAN);
                 }
             }
             validate(ch, ':');
@@ -460,7 +460,7 @@ public class TurtleParser implements Parser {
             ch = read();
             if (ch != ']') {
                 Resource oldsubject = subject;
-                Property oldpredicate = predicate;
+                IRI oldpredicate = predicate;
                 subject = bnode;
                 skipWhitespace();
                 parsePredicateObjectList();
@@ -492,7 +492,7 @@ public class TurtleParser implements Parser {
         } else {
             MemoryResource first = new MemoryResource();
             Resource oldsubject = subject;
-            Property oldpredicate = predicate;
+            IRI oldpredicate = predicate;
             subject = first;
             predicate = resource.newPredicate("rdf:first");
             parseObject();

@@ -89,4 +89,11 @@ public interface MarcXchangeConstants {
     String HOLDINGS = "Holdings";
 
     Pattern TAG_PATTERN = Pattern.compile("(00[1-9A-Za-z]|0[1-9A-Za-z][0-9A-Za-z]|[1-9A-Za-z][0-9A-Za-z]{2})");
+
+    String FORMAT_TAG = "__FORMAT";
+
+    String TYPE_TAG = "__TYPE";
+
+    String LEADER_TAG = "__LEADER";
+
 }

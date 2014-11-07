@@ -31,7 +31,7 @@
  */
 package org.xbib.tools.feed.elasticsearch.freebase;
 
-import org.xbib.elasticsearch.rdf.ResourceSink;
+import org.xbib.elasticsearch.rdf.Sink;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
@@ -40,8 +40,8 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.turtle.TurtleParser;
 import org.xbib.tools.Feeder;
 
@@ -84,13 +84,13 @@ public class Freebase extends Feeder {
 
     private class ElasticBuilder implements Triple.Builder {
 
-        private final ResourceSink sink;
+        private final Sink sink;
 
-        private final ResourceContext context = new MemoryResourceContext();
+        private final Context context = new MemoryContext();
 
         private Resource resource;
 
-        ElasticBuilder(ResourceSink sink) throws IOException {
+        ElasticBuilder(Sink sink) throws IOException {
             this.sink = sink;
             resource = context.newResource();
         }

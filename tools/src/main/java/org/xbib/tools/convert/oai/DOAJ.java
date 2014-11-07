@@ -35,12 +35,10 @@ import org.xbib.iri.IRI;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Property;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.memory.MemoryLiteral;
-import org.xbib.rdf.memory.MemoryProperty;
-import org.xbib.rdf.memory.MemoryResourceContext;
-import org.xbib.rdf.types.XSDIdentifiers;
+import org.xbib.rdf.XSDResourceIdentifiers;
 import org.xbib.tools.OAIHarvester;
 
 import javax.xml.namespace.QName;
@@ -68,21 +66,21 @@ public class DOAJ extends OAIHarvester {
         return resourceHandler;
     }
 
-    private final static RdfResourceHandler resourceHandler = new DOAJResourceHandler(new MemoryResourceContext());
+    private final static RdfResourceHandler resourceHandler = new DOAJResourceHandler(new MemoryContext());
 
     private static class DOAJResourceHandler extends RdfResourceHandler {
 
-        public DOAJResourceHandler(ResourceContext context) {
+        public DOAJResourceHandler(Context context) {
             super(context);
         }
 
         @Override
-        public Property toProperty(Property property) {
-            if ("issn".equals(property.id().getSchemeSpecificPart())) {
-                return new MemoryProperty(IRI.builder().curie("dc", "identifier").build());
+        public IRI toProperty(IRI property) {
+            if ("issn".equals(property.getSchemeSpecificPart())) {
+                return IRI.builder().curie("dc", "identifier").build();
             }
-            if ("eissn".equals(property.id().getSchemeSpecificPart())) {
-                return new MemoryProperty(IRI.builder().curie("dc", "identifier").build());
+            if ("eissn".equals(property.getSchemeSpecificPart())) {
+                return IRI.builder().curie("dc", "identifier").build();
             }
             return property;
         }
@@ -92,7 +90,7 @@ public class DOAJ extends OAIHarvester {
             switch (name.getLocalPart()) {
                 case "identifier": {
                     if (content.startsWith("http://")) {
-                        return new MemoryLiteral(content).type(XSDIdentifiers.ANYURI);
+                        return new MemoryLiteral(content).type(XSDResourceIdentifiers.ANYURI);
                     }
                     if (content.startsWith("issn: ")) {
                         return new MemoryLiteral(content.substring(6)).type(ISSN);

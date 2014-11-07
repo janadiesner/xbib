@@ -35,14 +35,14 @@ import org.xbib.elements.AbstractElementMapper;
 import org.xbib.elements.ElementBuilderFactory;
 import org.xbib.elements.KeyValueElementPipeline;
 import org.xbib.elements.UnmappedKeyListener;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 
 import java.util.Map;
 
 /**
  * A MARC element mapper
  */
-public class MARCElementMapper extends AbstractElementMapper<DataField, String, MARCElement, MARCContext> {
+public class MARCElementMapper extends AbstractElementMapper<FieldList, String, MARCElement, MARCContext> {
 
     /**
      * Instantiate a MARC element mapper.
@@ -69,13 +69,13 @@ public class MARCElementMapper extends AbstractElementMapper<DataField, String, 
     }
 
     @Override
-    public MARCElementMapper start(ElementBuilderFactory<DataField, String, MARCElement, MARCContext> factory) {
+    public MARCElementMapper start(ElementBuilderFactory<FieldList, String, MARCElement, MARCContext> factory) {
         super.start(factory);
         return this;
     }
 
     @Override
-    protected KeyValueElementPipeline<DataField, String, MARCElement, MARCContext> createPipeline(int i) {
+    protected KeyValueElementPipeline<FieldList, String, MARCElement, MARCContext> createPipeline(int i) {
         MARCElementPipeline pipeline = new MARCElementPipeline(i);
         pipeline.setElementBuilder(factory.newBuilder())
                 .setSpecification(specification)
@@ -85,7 +85,7 @@ public class MARCElementMapper extends AbstractElementMapper<DataField, String, 
     }
 
     @Override
-    public MARCElementMapper setListener(UnmappedKeyListener<DataField> listener) {
+    public MARCElementMapper setListener(UnmappedKeyListener<FieldList> listener) {
         super.setListener(listener);
         return this;
     }

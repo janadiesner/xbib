@@ -39,8 +39,8 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.rdfxml.RdfXmlParser;
 import org.xbib.tools.Feeder;
 
@@ -118,7 +118,7 @@ public class VIAF extends Feeder {
         }
     }
 
-    private final ResourceContext context = new MemoryResourceContext();
+    private final Context context = new MemoryContext();
 
     private class ElasticBuilder implements Triple.Builder {
 

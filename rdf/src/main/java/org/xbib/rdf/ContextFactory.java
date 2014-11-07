@@ -31,25 +31,7 @@
  */
 package org.xbib.rdf;
 
-import org.xbib.iri.IRI;
+public interface ContextFactory<C extends Context> {
 
-/**
- * Identifiable
- */
-public interface Identifiable {
-
-    /**
-     * Get the identifier
-     *
-     * @return the identifier
-     */
-    IRI id();
-
-    /**
-     * Set the identifier
-     *
-     * @param identifier an identifier
-     */
-    Identifiable id(IRI identifier);
-
+    C newContext();
 }

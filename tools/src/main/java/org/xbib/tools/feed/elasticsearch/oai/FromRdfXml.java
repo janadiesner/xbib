@@ -45,7 +45,7 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Triple;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.rdfxml.RdfXmlParser;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.tools.Feeder;
@@ -113,7 +113,7 @@ public class FromRdfXml extends Feeder {
         client.close();
     }
 
-    private final MemoryResourceContext resourceContext = new MemoryResourceContext();
+    private final MemoryContext resourceContext = new MemoryContext();
 
     private class OAIMetadataHandler extends MetadataHandler {
 

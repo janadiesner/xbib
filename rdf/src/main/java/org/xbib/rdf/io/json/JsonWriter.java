@@ -35,14 +35,11 @@ import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Identifiable;
-import org.xbib.rdf.Property;
-import org.xbib.rdf.Node;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.RdfConstants;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.rdf.memory.MemoryResource;
 
 import java.io.Closeable;
@@ -50,8 +47,8 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.util.Map;
 
-public class JsonWriter<S extends Identifiable, P extends Property, O extends Node, C extends ResourceContext<Resource>>
-        implements ResourceContextWriter<C, Resource>, Triple.Builder, Closeable, Flushable {
+public class JsonWriter<C extends Context<Resource>>
+        implements ContextWriter<C, Resource>, Triple.Builder, Closeable, Flushable {
 
     private final static Logger logger = LoggerFactory.getLogger(JsonWriter.class.getName());
 
@@ -80,13 +77,8 @@ public class JsonWriter<S extends Identifiable, P extends Property, O extends No
         write(resourceContext);
     }
 
-    public JsonWriter<S, P, O, C> setNamespaceContext(IRINamespaceContext context) {
+    public JsonWriter<C> setNamespaceContext(IRINamespaceContext context) {
         this.namespaceContext = context;
-        return this;
-    }
-
-    public JsonWriter<S, P, O, C> setSortLanguageTag(String languageTag) {
-        this.sortLangTag = languageTag;
         return this;
     }
 

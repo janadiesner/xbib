@@ -33,18 +33,18 @@ package org.xbib.elements.marc.direct;
 
 import org.xbib.elements.direct.KeyValueDirectPipeline;
 import org.xbib.elements.marc.MARCContext;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.rdf.Resource;
 
-public class MARCDirectPipeline extends KeyValueDirectPipeline<DataField, String, MARCContext> {
+public class MARCDirectPipeline extends KeyValueDirectPipeline<FieldList, String, MARCContext> {
 
     public MARCDirectPipeline(int i) {
         super(i);
     }
 
     @Override
-    protected void build(DataField fields, String value) {
+    protected void build(FieldList fields, String value) {
         if (fields == null) {
             return;
         }
@@ -57,7 +57,7 @@ public class MARCDirectPipeline extends KeyValueDirectPipeline<DataField, String
             if (field.isControlField()) {
                 tagResource.add("_", field.data());
             } else {
-                if (field.hasIndicator()) {
+                if (field.indicator() != null) {
                     // with indicator
                     String predicate = field.indicator().replaceAll("\\s", "_");
                     tagResource.newResource(predicate)

@@ -36,7 +36,10 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.event.EventListener;
+import org.xbib.marc.event.FieldEvent;
 import org.xbib.marc.label.RecordLabel;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
@@ -61,13 +64,17 @@ import java.util.Stack;
 public class MarcXchangeContentHandler
         implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler, MarcXchangeConstants, MarcXchangeListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(MarcXchangeContentHandler.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(MarcXchangeContentHandler.class.getName());
 
     private Stack<Field> stack = new Stack<Field>();
 
     private Map<String,MarcXchangeListener> listeners = new HashMap<String,MarcXchangeListener>();
 
     private MarcXchangeListener listener;
+
+    private Map<String, StringTransformer> transformers = new HashMap<String, StringTransformer>();
+
+    private EventListener<FieldEvent> fieldEventListener;
 
     private StringBuilder content = new StringBuilder();
 
@@ -82,6 +89,8 @@ public class MarcXchangeContentHandler
     protected boolean inControl;
 
     private boolean ignoreNamespace = false;
+
+    private boolean transform = false;
 
     private Set<String> validNamespaces = new HashSet<String>() {{
         add(MARCXCHANGE_V1_NS_URI);
@@ -114,9 +123,40 @@ public class MarcXchangeContentHandler
         return this;
     }
 
+    public MarcXchangeContentHandler setTransform(boolean transform) {
+        this.transform = transform;
+        return this;
+    }
+
     public MarcXchangeContentHandler addNamespace(String uri) {
         this.validNamespaces.add(uri);
         return this;
+    }
+
+    public MarcXchangeContentHandler setFieldEventListener(EventListener<FieldEvent> fieldEventListener) {
+        this.fieldEventListener = fieldEventListener;
+        return this;
+    }
+
+    public MarcXchangeContentHandler setTransformer(String fieldKey, StringTransformer transformer) {
+        this.transformers.put(fieldKey, transformer);
+        return this;
+    }
+
+    private void transform(Field field) {
+        StringTransformer transformer = transformers.get(field.toKey());
+        if (transformer == null) {
+            transformer = transformers.get("_default");
+        }
+        if (transformer != null) {
+            String old = field.data();
+            field.data(transformer.transform(field.data()));
+            if (!old.equals(field.data())) {
+                if (fieldEventListener != null) {
+                    fieldEventListener.receive(FieldEvent.DATA_TRANSFORMED.setField(field));
+                }
+            }
+        }
     }
 
     @Override
@@ -179,6 +219,9 @@ public class MarcXchangeContentHandler
     @Override
     public void endControlField(Field designator) {
         if (listener != null) {
+            if (transform) {
+                transform(designator);
+            }
             listener.endControlField(designator);
         }
     }
@@ -186,6 +229,9 @@ public class MarcXchangeContentHandler
     @Override
     public void endDataField(Field designator) {
         if (listener != null) {
+            if (transform) {
+                transform(designator);
+            }
             listener.endDataField(designator);
         }
     }
@@ -193,6 +239,9 @@ public class MarcXchangeContentHandler
     @Override
     public void endSubField(Field designator) {
         if (listener != null) {
+            if (transform) {
+                transform(designator);
+            }
             listener.endSubField(designator);
         }
     }
@@ -224,10 +273,10 @@ public class MarcXchangeContentHandler
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-        content.setLength(0);
         if (!isNamespace(uri)) {
             return;
         }
+        content.setLength(0);
         switch (localName) {
             case COLLECTION: {
                 beginCollection();
@@ -256,24 +305,14 @@ public class MarcXchangeContentHandler
                 inLeader = true;
                 break;
             }
-            case CONTROLFIELD: {
-                String tag = "";
-                for (int i = 0; i < atts.getLength(); i++) {
-                    if (TAG.equals(atts.getLocalName(i))) {
-                        tag = atts.getValue(i);
-                    }
-                }
-                Field field = new Field().tag(tag);
-                stack.push(field);
-                beginControlField(field);
-                inControl = true;
-                break;
-            }
+            case CONTROLFIELD: // fall-through
             case DATAFIELD: {
-                String tag = "";
-                char[] indicators = new char[atts.getLength()];
+                String tag = null;
+                StringBuilder sb = new StringBuilder();
+                sb.setLength(atts.getLength());
+                int min = atts.getLength();
+                int max = 0;
                 for (int i = 0; i < atts.getLength(); i++) {
-                    indicators[i] = '\0';
                     String name = atts.getLocalName(i);
                     if (TAG.equals(name)) {
                         tag = atts.getValue(i);
@@ -281,20 +320,32 @@ public class MarcXchangeContentHandler
                     if (name.startsWith(IND)) {
                         int pos = Integer.parseInt(name.substring(3));
                         if (pos >= 0 && pos < atts.getLength()) {
-                            indicators[pos-1] = atts.getValue(i).charAt(0);
+                            char ind = atts.getValue(i).charAt(0);
+                            if (ind == '-') {
+                                ind = ' '; // replace illegal '-' symbols
+                            }
+                            sb.setCharAt(pos-1, ind);
+                            if (pos < min) {
+                                min = pos;
+                            }
+                            if (pos > max) {
+                                max = pos;
+                            }
                         }
                     }
                 }
-                StringBuilder sb = new StringBuilder();
-                for (char indicator : indicators) {
-                    if (indicator != '\0') {
-                        sb.append(indicator);
-                    }
+                Field field = new Field().tag(tag);
+                if (max > 0) {
+                    field.indicator(sb.substring(min-1, max));
                 }
-                Field field = new Field().tag(tag).indicator(sb.toString()).data(null);
                 stack.push(field);
-                beginDataField(field);
-                inData = true;
+                if (field.isControlField()) {
+                    beginControlField(field);
+                    inControl = true;
+                } else {
+                    beginDataField(field);
+                    inData = true;
+                }
                 break;
             }
             case SUBFIELD: {
@@ -308,8 +359,8 @@ public class MarcXchangeContentHandler
                     stack.push(subfield);
                     beginSubField(subfield);
                     inData = true;
-                    break;
                 }
+                break;
             }
         }
     }
@@ -317,7 +368,6 @@ public class MarcXchangeContentHandler
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if (!isNamespace(uri)) {
-            content.setLength(0);
             return;
         }
         switch (localName) {
@@ -337,13 +387,27 @@ public class MarcXchangeContentHandler
                 break;
             }
             case CONTROLFIELD: {
-                endControlField(stack.pop().data(content.toString()));
-                inControl = false;
+                Field field = stack.pop();
+                if (field.isControlField()) {
+                    Field f = new Field(field).indicator(null).data(content.toString());
+                    endControlField(f);
+                    inControl = false;
+                } else {
+                    endDataField(new Field(field).subfieldId("a").data(content.toString()));
+                    inData = false;
+                }
                 break;
             }
             case DATAFIELD: {
-                endDataField(stack.pop().subfieldId(null).data(""));
-                inData = false;
+                Field field = stack.pop();
+                if (field.isControlField()) {
+                    //endControlField(new Field(field).data(content.toString()));
+                    endControlField(field);
+                    inControl = false;
+                } else {
+                    endDataField(field.subfieldId(null).data(null));
+                    inData = false;
+                }
                 break;
             }
             case SUBFIELD: {
@@ -352,7 +416,11 @@ public class MarcXchangeContentHandler
                     stack.peek().data(content.toString());
                     break;
                 } else {
-                    endSubField(stack.pop().data(content.toString()));
+                    Field f = stack.pop().data(content.toString());
+                    if (transform) {
+                        transform(f);
+                    }
+                    endSubField(f);
                     inData = false;
                     break;
                 }
@@ -395,17 +463,17 @@ public class MarcXchangeContentHandler
 
     @Override
     public void warning(SAXParseException exception) throws SAXException {
-        logger.warn(exception.getMessage(), exception);
+        //logger.warn(exception.getMessage(), exception);
     }
 
     @Override
     public void error(SAXParseException exception) throws SAXException {
-        logger.error(exception.getMessage(), exception);
+        //logger.error(exception.getMessage(), exception);
     }
 
     @Override
     public void fatalError(SAXParseException exception) throws SAXException {
-        logger.error(exception.getMessage(), exception);
+        //logger.error(exception.getMessage(), exception);
     }
 
     public String getFormat() {

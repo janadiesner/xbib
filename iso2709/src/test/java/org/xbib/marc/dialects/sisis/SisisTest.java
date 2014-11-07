@@ -36,7 +36,6 @@ public class SisisTest extends StreamTester {
         out.close();
         assertStream(getClass().getResource("DE-A96-unloaddipl-sisis.xml").openStream(),
                 new FileInputStream(file));
-
     }
 
 }

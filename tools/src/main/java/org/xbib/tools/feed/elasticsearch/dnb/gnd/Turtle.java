@@ -41,8 +41,8 @@ import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.turtle.TurtleParser;
 import org.xbib.tools.Feeder;
 
@@ -93,7 +93,7 @@ public class Turtle extends Feeder {
         namespaceContext.addNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         namespaceContext.addNamespace("skos", "http://www.w3.org/2004/02/skos/core#");
 
-        ResourceContext context = new MemoryResourceContext();
+        Context context = new MemoryContext();
         context.setContentBuilder(new DefaultContentBuilder<>());
         context.setNamespaceContext(namespaceContext);
 
@@ -105,12 +105,12 @@ public class Turtle extends Feeder {
 
     class MyTripleBuilder implements Triple.Builder {
 
-        private ResourceContext resourceContext;
+        private Context context;
 
         private String gndID;
 
-        MyTripleBuilder(ResourceContext resourceContext) {
-            this.resourceContext = resourceContext;
+        MyTripleBuilder(Context context) {
+            this.context = context;
         }
 
         @Override
@@ -131,7 +131,7 @@ public class Turtle extends Feeder {
         @Override
         public Triple.Builder newIdentifier(IRI uri) {
             try {
-                if (resourceContext.getResource() != null) {
+                if (context.getResource() != null) {
                     // set ES feed IRI
                     IRI doc = IRI.builder()
                             .scheme("http") // whatever
@@ -139,14 +139,14 @@ public class Turtle extends Feeder {
                             .query(settings.get("type", "gnd"))
                             .fragment(gndID)
                             .build();
-                    resourceContext.getResource().id(doc);
-                    sink.write(resourceContext);
+                    context.getResource().id(doc);
+                    sink.write(context);
                 }
-                sink.write(resourceContext);
+                sink.write(context);
             } catch (IOException e) {
                 logger.error("write failed: {}", e.getMessage(), e);
             }
-            Resource resource = resourceContext.newResource();
+            Resource resource = context.newResource();
             resource.id(uri);
             return this;
         }
@@ -156,15 +156,15 @@ public class Turtle extends Feeder {
             if (triple.predicate().toString().endsWith("gndIdentifier")) {
                 gndID = triple.object().toString();
             }
-            resourceContext.getResource().add(triple);
+            context.getResource().add(triple);
             return this;
         }
 
         @Override
         public Triple.Builder end() {
-            if (resourceContext.getResource() != null) {
+            if (context.getResource() != null) {
                 try {
-                    sink.write(resourceContext);
+                    sink.write(context);
                 } catch (IOException e) {
                     logger.error(e.getMessage(), e);
                 }

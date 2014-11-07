@@ -34,8 +34,8 @@ package org.xbib.elements.direct;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 
 import java.io.IOException;
 import java.util.List;
@@ -49,14 +49,14 @@ import static com.google.common.collect.Lists.newLinkedList;
  * @param <V> the value type
  * @param <C> the resource context type
  */
-public abstract class AbstractDirectBuilder<K, V, C extends ResourceContext<Resource>>
+public abstract class AbstractDirectBuilder<K, V, C extends Context<Resource>>
         implements DirectBuilder<K, V, C> {
 
     private final static Logger logger = LoggerFactory.getLogger(AbstractDirectBuilder.class.getName());
 
     private final ThreadLocal<C> contexts = new ThreadLocal<C>();
 
-    private final List<ResourceContextWriter> writers = newLinkedList();
+    private final List<ContextWriter> writers = newLinkedList();
 
     @Override
     public void begin() {
@@ -69,7 +69,7 @@ public abstract class AbstractDirectBuilder<K, V, C extends ResourceContext<Reso
     public void end() {
         C context = context();
         // no before ouput
-        for (ResourceContextWriter output : writers) {
+        for (ContextWriter output : writers) {
             try {
                output.write(context);
             } catch (IOException e) {
@@ -85,7 +85,7 @@ public abstract class AbstractDirectBuilder<K, V, C extends ResourceContext<Reso
     }
 
     @Override
-    public AbstractDirectBuilder<K, V, C> addWriter(ResourceContextWriter writer) {
+    public AbstractDirectBuilder<K, V, C> addWriter(ContextWriter writer) {
         writers.add(writer);
         return this;
     }

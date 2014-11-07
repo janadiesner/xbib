@@ -31,9 +31,8 @@
  */
 package org.xbib.marc.xml.stream;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
+import org.xbib.marc.MarcException;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.xml.MarcXchangeContentHandler;
@@ -65,8 +64,6 @@ import java.util.regex.Pattern;
  */
 public class MarcXchangeWriter extends MarcXchangeContentHandler
         implements MarcXchangeConstants, MarcXchangeListener {
-
-    private static final Logger logger = LoggerFactory.getLogger(MarcXchangeWriter.class.getName());
 
     private final static XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
@@ -105,8 +102,6 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
     private boolean fatalErrors;
 
     private boolean schemaWritten;
-
-    private boolean scrubData;
 
     public MarcXchangeWriter(OutputStream out) throws IOException {
         this(out, false);
@@ -150,11 +145,6 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         return this;
     }
 
-    public MarcXchangeWriter setScrubData(boolean scrub) {
-        this.scrubData = scrubData;
-        return this;
-    }
-
     public MarcXchangeWriter setMarcXchangeListener(MarcXchangeListener listener) {
         super.setMarcXchangeListener(listener);
         return this;
@@ -174,7 +164,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         }
     }
@@ -193,7 +183,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         } finally {
             if (lock.isLocked()) {
@@ -219,7 +209,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         }
     }
@@ -238,7 +228,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         }
     }
@@ -263,7 +253,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         }
     }
@@ -279,7 +269,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         } finally {
             if (lock.isLocked()) {
@@ -304,7 +294,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         }
     }
@@ -328,7 +318,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         }
     }
@@ -367,7 +357,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         }
     }
@@ -403,7 +393,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         }
     }
@@ -433,7 +423,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         }
     }
@@ -456,7 +446,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         }
     }
@@ -481,7 +471,7 @@ public class MarcXchangeWriter extends MarcXchangeContentHandler
         } catch (XMLStreamException e) {
             exception = e;
             if (fatalErrors) {
-                throw new RuntimeException(e);
+                throw new MarcException(e);
             }
         }
     }

@@ -1,19 +1,14 @@
 package org.xbib.marc.xml;
 
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.xbib.helper.StreamTester;
 import org.xbib.marc.Field;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 
-import static org.testng.Assert.assertEquals;
-
-public class MarcXchangeSRUTest {
-
-    private final Logger logger = LoggerFactory.getLogger(MarcXchangeSRUTest.class.getName());
+public class MarcXchangeSRUTest extends StreamTester {
 
     @Test
     public void testMarcXchangeListener() throws Exception {
@@ -29,7 +24,6 @@ public class MarcXchangeSRUTest {
 
             @Override
             public void beginRecord(String format, String type) {
-                logger.debug("beginRecord format="+format + " type="+type);
                 sb.append("beginRecord").append("\n");
                 sb.append(format).append("\n");
                 sb.append(type).append("\n");
@@ -37,50 +31,42 @@ public class MarcXchangeSRUTest {
 
             @Override
             public void leader(String label) {
-                logger.debug("leader="+label);
                 sb.append("leader").append("\n");
                 sb.append(label).append("\n");
             }
 
             @Override
             public void beginControlField(Field field) {
-                logger.debug("beginControlField field="+field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void endControlField(Field field) {
-                logger.debug("endControlField field="+field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void beginDataField(Field field) {
-                logger.debug("beginDataField field="+field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void endDataField(Field field) {
-                logger.debug("endDataField field="+field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void beginSubField(Field field) {
-                logger.debug("beginSubField field="+field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void endSubField(Field field) {
-                logger.debug("endsubField field="+field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void endRecord() {
-                logger.debug("endRecord");
                 sb.append("endRecord").append("\n");
             }
 
@@ -92,11 +78,11 @@ public class MarcXchangeSRUTest {
         reader.parse(in);
         in.close();
 
-        /*InputStreamReader r = new InputStreamReader(getClass().getResource("zdb-sru-marcxmlplus.txt").openStream());
-        StringWriter w = new StringWriter();
-        StreamUtil.copy(r, w);
-        assertEquals(sb.toString(), w.toString());
-        r.close();*/
+        FileWriter fw = new FileWriter("zdb-sru-marcxmlplus.txt");
+        fw.write(sb.toString());
+        fw.close();
 
+        assertStream(getClass().getResource("zdb-sru-marcxmlplus.txt").openStream(),
+                new ByteArrayInputStream(sb.toString().getBytes("UTF-8")));
     }
 }

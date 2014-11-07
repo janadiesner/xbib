@@ -37,11 +37,11 @@ import org.xbib.elements.UnmappedKeyListener;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 
 import javax.xml.transform.Transformer;
@@ -90,10 +90,10 @@ public class MARCElementsTest extends Assert {
         File file = File.createTempFile("DE-369.", ".xml");
         Writer w = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
         final AtomicInteger counter = new AtomicInteger();
-        final ResourceContextWriter output = new ResourceContextWriter() {
+        final ContextWriter output = new ContextWriter() {
 
             @Override
-            public void write(ResourceContext context) throws IOException {
+            public void write(Context context) throws IOException {
                 IRI iri = IRI.builder().scheme("http")
                         .host("dummy")
                         .query("dummy")
@@ -107,10 +107,10 @@ public class MARCElementsTest extends Assert {
         };
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         MARCElementMapper mapper = new MARCElementMapper("marc/bib")
-                .setListener(new UnmappedKeyListener<DataField>() {
+                .setListener(new UnmappedKeyListener<FieldList>() {
                     @Override
-                    public void unknown(DataField key) {
-                        unmapped.add(key.toSpec());
+                    public void unknown(FieldList key) {
+                        unmapped.add(key.toString());
                     }
                 })
                 .start(new MARCElementBuilderFactory() {
@@ -127,9 +127,12 @@ public class MARCElementsTest extends Assert {
         reader.parse(br);
 
         mapper.close();
-        // check if increment works
         logger.info("unmapped elements = {}", unmapped);
+        // we just check the counter (incomplete )
         assertEquals(8676, counter.get());
     }
+
+
+
 
 }

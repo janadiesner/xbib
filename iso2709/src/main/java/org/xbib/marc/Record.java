@@ -14,9 +14,9 @@ public class Record {
 
     private List<Field> controlfields;
 
-    private List<DataField> datafields;
+    private List<FieldList> datafields;
 
-    private DataField current;
+    private FieldList current;
 
     private FastByteArrayOutputStream directoryStream;
 
@@ -24,7 +24,7 @@ public class Record {
 
     public Record() {
         controlfields = new ArrayList<Field>();
-        datafields = new ArrayList<DataField>();
+        datafields = new ArrayList<FieldList>();
         directoryStream = new FastByteArrayOutputStream(2048);
         fieldStream = new FastByteArrayOutputStream(8192);
     }
@@ -51,7 +51,7 @@ public class Record {
         return controlfields;
     }
 
-    public List<DataField> getDatafields() {
+    public List<FieldList> getDatafields() {
         return datafields;
     }
 
@@ -64,10 +64,10 @@ public class Record {
     }
 
     public void newFieldCollection() {
-        this.current = new DataField();
+        this.current = new FieldList();
     }
 
-    public DataField getCurrent() {
+    public FieldList getCurrent() {
         return current;
     }
 

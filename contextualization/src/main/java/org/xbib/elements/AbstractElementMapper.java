@@ -35,9 +35,7 @@ import org.xbib.classloader.uri.URIClassLoader;
 import org.xbib.keyvalue.KeyValue;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.event.FieldEvent;
-import org.xbib.marc.event.EventListener;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.Context;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -62,7 +60,7 @@ import static com.google.common.collect.Sets.newHashSet;
  * @param <E>
  * @param <C>
  */
-public abstract class AbstractElementMapper<K, V, E extends Element, C extends ResourceContext>
+public abstract class AbstractElementMapper<K, V, E extends Element, C extends Context>
         implements ElementMapper<K,V,E,C> {
 
     private final Logger logger = LoggerFactory.getLogger(AbstractElementMapper.class.getName());
@@ -85,15 +83,13 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
 
     private UnmappedKeyListener<K> listener;
 
-    private EventListener<FieldEvent> fieldEventListener;
-
     public AbstractElementMapper(String path, String format, Specification specification) {
         this(new URIClassLoader(), path, format, specification);
     }
 
     public AbstractElementMapper(ClassLoader cl, String path, String format, Specification specification) {
         this.specification = specification;
-        this.queue = new SynchronousQueue(true);
+        this.queue = new SynchronousQueue<List<KeyValue<K,V>>>(true);
         this.pipelines = newHashSet();
         try {
             this.map = specification.getElementMap(cl, path, format);
@@ -113,11 +109,6 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
 
     public ElementMapper<K,V,E,C> setListener(UnmappedKeyListener<K> listener) {
         this.listener = listener;
-        return this;
-    }
-
-    public ElementMapper<K,V,E,C> setFieldEventListener(EventListener<FieldEvent> fieldEventListener) {
-        this.fieldEventListener = fieldEventListener;
         return this;
     }
 
@@ -141,8 +132,8 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
         this.factory = factory;
         for (int i = 0; i < numPipelines; i++) {
             KeyValueElementPipeline<K,V,E,C> pipeline = createPipeline(i)
-                    .setListener(listener)
-                    .setFieldEventListener(fieldEventListener);
+                    .setListener(listener);
+                    //.setFieldEventListener(fieldEventListener);
             pipelines.add(pipeline);
             service.submit(pipeline);
         }
@@ -174,7 +165,7 @@ public abstract class AbstractElementMapper<K, V, E extends Element, C extends R
 
     @Override
     public ElementMapper<K,V,E,C>  keyValue(K key, V value) {
-        keyvalues.add(new KeyValue(key, value));
+        keyvalues.add(new KeyValue<K,V>(key, value));
         return this;
     }
 

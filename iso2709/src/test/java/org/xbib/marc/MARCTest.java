@@ -32,28 +32,33 @@
 package org.xbib.marc;
 
 import org.testng.annotations.Test;
+import org.xbib.helper.StreamTester;
 import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xml.sax.SAXException;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
 
-public class MARCTest {
+public class MarcTest extends StreamTester {
 
     @Test
     public void testProperMarc() throws IOException, SAXException {
         for (String s : new String[]{
-                    "brkrtest.mrc", "makrtest.mrc", "chabon-loc.mrc", "chabon.mrc", "diacritic4.mrc",
-                    "summerland.mrc"
+                "brkrtest.mrc",
+                "makrtest.mrc",
+                "chabon-loc.mrc",
+                "chabon.mrc",
+                "diacritic4.mrc",
+                "summerland.mrc"
                 }) {
-            InputStream in = getClass().getResourceAsStream(s);
-            File file = File.createTempFile(s +".", ".xml");
+            InputStream in = getClass().getResource(s).openStream();
+            File file = File.createTempFile(s + ".", ".xml");
             FileOutputStream out = new FileOutputStream(file);
             try (InputStreamReader r = new InputStreamReader(in, "ANSEL")) {
                 Iso2709Reader reader = new Iso2709Reader();
@@ -65,8 +70,12 @@ public class MARCTest {
                 reader.parse(r);
                 writer.endCollection();
                 writer.endDocument();
+                assertNull(writer.getException());
             }
+            in.close();
             out.close();
+            assertStream(getClass().getResource(s + ".xml").openStream(),
+                    new FileInputStream(file));
         }
     }
 
@@ -75,7 +84,7 @@ public class MARCTest {
         for (String s : new String[]{
                      "error.mrc"
                 }) {
-            InputStream in = getClass().getResourceAsStream(s);
+            InputStream in = getClass().getResource(s).openStream();
             File file = File.createTempFile(s +".", ".xml");
             FileOutputStream out = new FileOutputStream(file);
             try (InputStreamReader r = new InputStreamReader(in, "ANSEL")) {
@@ -90,7 +99,10 @@ public class MARCTest {
                 writer.endDocument();
                 assertNull(writer.getException());
             }
+            in.close();
             out.close();
+            assertStream(getClass().getResource(s + ".xml").openStream(),
+                    new FileInputStream(file));
         }
     }
 
@@ -103,7 +115,7 @@ public class MARCTest {
     @Test
     public void testAMS() throws IOException, SAXException {
         String s = "amstransactions.mrc";
-        InputStream in = getClass().getResourceAsStream(s);
+        InputStream in = getClass().getResource(s).openStream();
         File file = File.createTempFile(s +".", ".xml");
         FileOutputStream out = new FileOutputStream(file);
         try (InputStreamReader r = new InputStreamReader(in, "ANSEL")) {
@@ -118,14 +130,16 @@ public class MARCTest {
             writer.endDocument();
             assertNull(writer.getException());
         }
+        in.close();
         out.close();
-        assertTrue(file.length() > 250);
+        assertStream(getClass().getResource(s + ".xml").openStream(),
+                new FileInputStream(file));
     }
     
     @Test
-    public void testZDB() throws IOException, SAXException {
+    public void testZDBLok() throws IOException, SAXException {
         String s = "zdblokutf8.mrc";
-        InputStream in = getClass().getResourceAsStream(s);
+        InputStream in = getClass().getResource(s).openStream();
         File file = File.createTempFile(s +".", ".xml");
         FileOutputStream out = new FileOutputStream(file);
         try (InputStreamReader r = new InputStreamReader(in, "UTF-8")) {
@@ -140,6 +154,9 @@ public class MARCTest {
             writer.endDocument();
             assertNull(writer.getException());
         }
+        in.close();
         out.close();
+        assertStream(getClass().getResource(s + ".xml").openStream(),
+                new FileInputStream(file));
     }
 }

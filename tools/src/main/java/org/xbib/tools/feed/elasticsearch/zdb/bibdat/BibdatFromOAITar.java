@@ -41,7 +41,7 @@ import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.MarcXchangeListener;
@@ -49,8 +49,8 @@ import org.xbib.marc.dialects.pica.stream.DNBPicaXmlReader;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContextWriter;
 import org.xbib.tools.Feeder;
 import org.xbib.tools.util.AbstractTarReader;
 
@@ -97,16 +97,16 @@ public final class BibdatFromOAITar extends Feeder {
     public void process(URI uri) throws Exception {
         logger.info("start of processing {}", uri);
 
-        final OurContextResourceOutput out = new OurContextResourceOutput();
+        final OurContextOutput out = new OurContextOutput();
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         PicaElementMapper mapper = new PicaElementMapper("pica/zdb/bibdat")
                 .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<DataField>() {
+                .setListener(new UnmappedKeyListener<FieldList>() {
                     @Override
-                    public void unknown(DataField key) {
-                        logger.warn("unmapped field {}", key.toSpec());
+                    public void unknown(FieldList key) {
+                        logger.warn("unmapped field {}", key);
                         if ((settings.getAsBoolean("detect", false))) {
-                            unmapped.add("\"" + key.toSpec() + "\"");
+                            unmapped.add("\"" + key + "\"");
                         }
                     }
                 })
@@ -125,9 +125,9 @@ public final class BibdatFromOAITar extends Feeder {
                     }
                 })
                 .addListener(mapper)
-                .addListener(new KeyValueStreamAdapter<DataField, String>() {
+                .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                     @Override
-                    public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
+                    public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
                         if (logger.isTraceEnabled()) {
                             logger.trace("begin");
                             for (Field f : key) {
@@ -196,7 +196,7 @@ public final class BibdatFromOAITar extends Feeder {
 
     }
 
-    private class OurContextResourceOutput implements ResourceContextWriter<PicaContext, Resource> {
+    private class OurContextOutput implements ContextWriter<PicaContext, Resource> {
 
         @Override
         public void write(PicaContext context) throws IOException {

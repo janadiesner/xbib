@@ -722,7 +722,11 @@
     "Collection" : {
          "values" : [
             "035$G$a",
-            "035$H$a"
+            "035$G$aa",
+            "035$G$aaa",
+            "035$G$aaaa",
+            "035$G$aaaaa",
+            "035$H$aaaaa"
          ],
          "subfields" : {
              "a" : "collectionName"

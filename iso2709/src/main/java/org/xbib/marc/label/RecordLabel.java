@@ -43,7 +43,7 @@ public class RecordLabel {
      */
     public final static int LENGTH = 24;
 
-    private char[] cfix = new char[LENGTH];
+    private final char[] cfix = new char[LENGTH];
 
     private int recordLength;
 

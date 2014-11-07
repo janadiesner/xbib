@@ -31,7 +31,7 @@
  */
 package org.xbib.rdf.memory;
 
-import org.xbib.rdf.Property;
+import org.xbib.iri.IRI;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
@@ -43,7 +43,7 @@ public class MemoryTriple implements Triple, Comparable<Triple> {
 
     private Resource subject;
 
-    private Property predicate;
+    private IRI predicate;
 
     private Node object;
 
@@ -54,7 +54,7 @@ public class MemoryTriple implements Triple, Comparable<Triple> {
      * @param predicate predicate
      * @param object    object
      */
-    public MemoryTriple(Resource subject, Property predicate, Node object) {
+    public MemoryTriple(Resource subject, IRI predicate, Node object) {
         this.subject = subject;
         this.predicate = predicate;
         this.object = object;
@@ -71,13 +71,13 @@ public class MemoryTriple implements Triple, Comparable<Triple> {
     }
 
     @Override
-    public Triple predicate(Property predicate) {
+    public Triple predicate(IRI predicate) {
         this.predicate = predicate;
         return null;
     }
 
     @Override
-    public Property predicate() {
+    public IRI predicate() {
         return predicate;
     }
 

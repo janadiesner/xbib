@@ -34,7 +34,7 @@ package org.xbib.marc.dialects.mab;
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
@@ -42,7 +42,6 @@ import org.xbib.marc.event.FieldEventLogger;
 import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -140,15 +139,15 @@ public class DE468MABTest extends StreamTester {
         File file = File.createTempFile("DE-468-keyvalue.", ".txt");
         StringWriter sw = new StringWriter();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .addListener(new KeyValueStreamAdapter<DataField, String>() {
+                .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                     @Override
-                    public KeyValueStreamAdapter<DataField, String> begin() {
+                    public KeyValueStreamAdapter<FieldList, String> begin() {
                         sw.write("begin object\n");
                         return this;
                     }
 
                     @Override
-                    public KeyValueStreamAdapter<DataField, String> keyValue(DataField fields, String value) {
+                    public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList fields, String value) {
                         sw.write("begin\n");
                         for (Field f : fields) {
                             sw.write(String.format("tag=%s indicator=%s subfield=%s data=%s\n",
@@ -159,7 +158,7 @@ public class DE468MABTest extends StreamTester {
                     }
 
                     @Override
-                    public KeyValueStreamAdapter<DataField, String> end() {
+                    public KeyValueStreamAdapter<FieldList, String> end() {
                         sw.write("end object\n");
                         return this;
                     }

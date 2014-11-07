@@ -32,6 +32,7 @@
 package org.xbib.tools.convert.zdb;
 
 import org.xbib.csv.CSVGenerator;
+import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.rdf.RdfMetadataHandler;
@@ -40,8 +41,7 @@ import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.oai.xml.XmlMetadataHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Property;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.tools.OAIHarvester;
 import org.xml.sax.SAXException;
@@ -118,7 +118,7 @@ public class FromOAI2CSV extends OAIHarvester {
         // TODO
         StringWriter sw = new StringWriter();
         metadataHandler.setHandler(resourceHandler)
-                .setResourceContextWriter(new NTripleWriter(sw));
+                .setContextWriter(new NTripleWriter(sw));
         return metadataHandler;
     }
 
@@ -131,11 +131,11 @@ public class FromOAI2CSV extends OAIHarvester {
     private static class OAIResourceHandler extends RdfResourceHandler {
 
         public OAIResourceHandler() {
-            super(new MemoryResourceContext());
+            super(new MemoryContext());
         }
 
         @Override
-        public Property toProperty(Property property) {
+        public IRI toProperty(IRI property) {
             return property;
         }
 

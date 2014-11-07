@@ -37,7 +37,7 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.event.EventListener;
 import org.xbib.marc.event.FieldEvent;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.Context;
 
 import java.util.List;
 import java.util.Map;
@@ -52,7 +52,7 @@ import java.util.concurrent.BlockingQueue;
  * @param <E>
  * @param <C>
  */
-public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceContext>
+public class KeyValueElementPipeline<K,V,E extends Element,C extends Context>
         implements Callable<Boolean> {
 
     protected Specification specification;
@@ -65,15 +65,10 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
 
     private final Logger logger;
 
-    private long counter;
-
     private UnmappedKeyListener<K> listener;
-
-    private EventListener<FieldEvent> fieldEventListener;
 
     public KeyValueElementPipeline(int i) {
         this.logger = LoggerFactory.getLogger("pipeline" + i);
-        this.counter = 0L;
     }
 
     public KeyValueElementPipeline<K,V,E,C> setSpecification(Specification specification) {
@@ -108,10 +103,6 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
         return this;
     }
 
-    public ElementBuilder<K,V,E,C> getElementBuilder() {
-        return builder;
-    }
-
     @Override
     public Boolean call() {
         try {
@@ -123,7 +114,7 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
                     logger.debug("key/value pipeline {} ending", getClass().getName());
                     break;
                 }
-                // if only a single element in list then skip this element
+                // if only a single element in list with empty key then skip this element
                 if (keyvalueList.size() == 1) {
                     if (keyvalueList.get(0).key() == null) {
                         logger.debug("single marker element skipped");
@@ -141,7 +132,6 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
                     } else {
                         build(key, value);
                     }
-                    counter++;
                 }
                 if (!end) {
                     builder.end();
@@ -154,10 +144,6 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
             logger.error("error in key/value pipeline, exiting", t);
         }
         return true;
-    }
-
-    public long getCounter() {
-        return counter;
     }
 
     protected ElementBuilder<K,V,E,C> builder() {
@@ -174,15 +160,6 @@ public class KeyValueElementPipeline<K,V,E extends Element,C extends ResourceCon
 
     public UnmappedKeyListener<K> getListener() {
         return listener;
-    }
-
-    public KeyValueElementPipeline<K,V,E,C> setFieldEventListener(EventListener<FieldEvent> fieldEventListener) {
-        this.fieldEventListener = fieldEventListener;
-        return this;
-    }
-
-    public EventListener getFieldEventListener() {
-        return fieldEventListener;
     }
 
 }

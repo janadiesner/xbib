@@ -32,12 +32,11 @@
 package org.xbib.rdf;
 
 import org.xbib.iri.IRI;
-import org.xbib.rdf.types.XSDIdentifiers;
 
 /**
  * A literal is a value with a type and/or a language
  */
-public interface Literal extends Node, XSDIdentifiers {
+public interface Literal extends Node, XSDResourceIdentifiers {
 
     /**
      * Set value for the literal

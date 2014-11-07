@@ -33,7 +33,6 @@ package org.xbib.elements.support;
 
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
 import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.util.DateUtil;
 import org.xbib.logging.Logger;

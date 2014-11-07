@@ -42,7 +42,7 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.Context;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -98,7 +98,7 @@ public class DOAJClientTest {
 
     class DOAJResourceHandler extends RdfResourceHandler {
 
-        public DOAJResourceHandler(ResourceContext context) {
+        public DOAJResourceHandler(Context context) {
             super(context);
         }
 

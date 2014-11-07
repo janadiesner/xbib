@@ -162,7 +162,7 @@ public class Iso2709Writer implements MarcXchangeListener, Flushable, Closeable 
             directory.write(makeEntry(controlfield.tag(), pos, fields.size() - pos).getBytes(LATIN));
             pos = fields.size();
         }
-        for (DataField datafield : record.getDatafields()) {
+        for (FieldList datafield : record.getDatafields()) {
             Field f = datafield.getFirst();
             fields.write(f.indicator().getBytes(LATIN));
             for (Field subfield : datafield) {

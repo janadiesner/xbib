@@ -35,9 +35,9 @@ import org.xbib.elements.AbstractElementMapper;
 import org.xbib.elements.ElementBuilderFactory;
 import org.xbib.elements.KeyValueElementPipeline;
 import org.xbib.elements.UnmappedKeyListener;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 
-public class PicaElementMapper extends AbstractElementMapper<DataField, String, PicaElement, PicaContext> {
+public class PicaElementMapper extends AbstractElementMapper<FieldList, String, PicaElement, PicaContext> {
 
     public PicaElementMapper(String format) {
         super("/org/xbib/analyzer/", format, new PicaSpecification());
@@ -55,13 +55,13 @@ public class PicaElementMapper extends AbstractElementMapper<DataField, String, 
     }
 
     @Override
-    public PicaElementMapper start(ElementBuilderFactory<DataField, String, PicaElement, PicaContext> factory) {
+    public PicaElementMapper start(ElementBuilderFactory<FieldList, String, PicaElement, PicaContext> factory) {
         super.start(factory);
         return this;
     }
 
     @Override
-    protected KeyValueElementPipeline<DataField, String, PicaElement, PicaContext> createPipeline(int i) {
+    protected KeyValueElementPipeline<FieldList, String, PicaElement, PicaContext> createPipeline(int i) {
         PicaElementPipeline picaPipeline =  new PicaElementPipeline(i);
         picaPipeline.setSpecification(specification)
                 .setQueue(queue)
@@ -71,7 +71,7 @@ public class PicaElementMapper extends AbstractElementMapper<DataField, String, 
     }
 
     @Override
-    public PicaElementMapper setListener(UnmappedKeyListener<DataField> listener) {
+    public PicaElementMapper setListener(UnmappedKeyListener<FieldList> listener) {
         super.setListener(listener);
         return this;
     }

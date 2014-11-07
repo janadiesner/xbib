@@ -29,11 +29,11 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.rdf.types;
+package org.xbib.rdf;
 
 import org.xbib.iri.IRI;
 
-public interface XSDIdentifiers {
+public interface XSDResourceIdentifiers {
 
     IRI STRING = IRI.create("xsd:string");
 

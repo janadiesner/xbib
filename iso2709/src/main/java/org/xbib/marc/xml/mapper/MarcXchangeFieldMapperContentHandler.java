@@ -36,8 +36,10 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.event.FieldEvent;
 import org.xbib.marc.event.RecordEvent;
 import org.xbib.marc.event.EventListener;
+import org.xbib.marc.transformer.StringTransformer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
@@ -71,6 +73,12 @@ public class MarcXchangeFieldMapperContentHandler
 
     private MarcXchangeListener listener;
 
+    private Map<String, StringTransformer> transformers = new HashMap<String, StringTransformer>();
+
+    private EventListener<FieldEvent> fieldEventListener;
+
+    private EventListener<RecordEvent> recordEventListener;
+
     private StringBuilder content = new StringBuilder();
 
     private String format = MARC21;
@@ -85,7 +93,7 @@ public class MarcXchangeFieldMapperContentHandler
 
     private boolean ignoreNamespace = false;
 
-    private EventListener<RecordEvent> recordEventListener;
+    private boolean transform = false;
 
     private Set<String> validNamespaces = new HashSet<String>() {{
         add(MARCXCHANGE_V1_NS_URI);
@@ -118,14 +126,45 @@ public class MarcXchangeFieldMapperContentHandler
         return this;
     }
 
+    public MarcXchangeFieldMapperContentHandler setTransform(boolean transform) {
+        this.transform = transform;
+        return this;
+    }
+
     public MarcXchangeFieldMapperContentHandler addNamespace(String uri) {
         this.validNamespaces.add(uri);
         return this;
     }
 
-    public MarcXchangeFieldMapperContentHandler setRecordEventLlistener(EventListener<RecordEvent> recordEventListener) {
+    public MarcXchangeFieldMapperContentHandler setFieldEventListener(EventListener<FieldEvent> fieldEventListener) {
+        this.fieldEventListener = fieldEventListener;
+        return this;
+    }
+
+    public MarcXchangeFieldMapperContentHandler setRecordEventListener(EventListener<RecordEvent> recordEventListener) {
         this.recordEventListener = recordEventListener;
         return this;
+    }
+
+    public MarcXchangeFieldMapperContentHandler setTransformer(String fieldKey, StringTransformer transformer) {
+        this.transformers.put(fieldKey, transformer);
+        return this;
+    }
+
+    private void transform(Field field) {
+        StringTransformer transformer = transformers.get(field.toKey());
+        if (transformer == null) {
+            transformer = transformers.get("_default");
+        }
+        if (transformer != null) {
+            String old = field.data();
+            field.data(transformer.transform(field.data()));
+            if (!old.equals(field.data())) {
+                if (fieldEventListener != null) {
+                    fieldEventListener.receive(FieldEvent.DATA_TRANSFORMED.setField(field));
+                }
+            }
+        }
     }
 
     @Override
@@ -233,55 +272,8 @@ public class MarcXchangeFieldMapperContentHandler
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-        content.setLength(0);
         if (!isNamespace(uri)) {
             return;
-        }
-        String format = null;
-        String type = null;
-        String tag = null;
-        char ind1 = '\u0000';
-        char ind2 = '\u0000';
-        char code = '\u0000';
-        for (int i = 0; i < atts.getLength(); i++) {
-            switch (atts.getLocalName(i)) {
-                case TAG: {
-                    tag = atts.getValue(i);
-                    break;
-                }
-                case IND + "1" : {
-                    ind1 = atts.getValue(i).charAt(0);
-                    if (ind1 == '-') {
-                        ind1 = ' '; // replace illegal '-' symbols
-                    }
-                    break;
-                }
-                case IND + "2" : {
-                    ind2 = atts.getValue(i).charAt(0);
-                    if (ind2 == '-') {
-                        ind2 = ' '; // replace illegal '-' symbols
-                    }
-                    break;
-                }
-                case CODE : {
-                    code = atts.getValue(i).charAt(0);
-                    break;
-                }
-                case FORMAT: {
-                    format = atts.getValue(i);
-                    break;
-                }
-                case TYPE: {
-                    type = atts.getValue(i);
-                    break;
-                }
-            }
-        }
-        if (format == null) {
-            format = this.format;
-        }
-        if (type == null) {
-            type = this.type;
         }
         content.setLength(0);
         switch (localName) {
@@ -290,6 +282,21 @@ public class MarcXchangeFieldMapperContentHandler
                 break;
             }
             case RECORD: {
+                String format = null;
+                String type = null;
+                for (int i = 0; i < atts.getLength(); i++) {
+                    if (FORMAT.equals(atts.getLocalName(i))) {
+                        format = atts.getValue(i);
+                    } else if (TYPE.equals(atts.getLocalName(i))) {
+                        type = atts.getValue(i);
+                    }
+                }
+                if (format == null) {
+                    format = this.format;
+                }
+                if (type == null) {
+                    type = this.type;
+                }
                 setFormat(format);
                 setType(type);
                 if (recordEventListener != null) {
@@ -301,28 +308,57 @@ public class MarcXchangeFieldMapperContentHandler
                 inLeader = true;
                 break;
             }
-            case CONTROLFIELD: {
-                stack.push(new Field(tag));
-                inControl = true;
-                break;
-            }
+            case CONTROLFIELD: // fall-through
             case DATAFIELD: {
-                Field field = ind2 != '\u0000'
-                        ? new Field(tag, Character.toString(ind1) + Character.toString(ind2))
-                        : new Field(tag, Character.toString(ind1));
+                String tag = null;
+                StringBuilder sb = new StringBuilder();
+                sb.setLength(atts.getLength());
+                int min = atts.getLength();
+                int max = 0;
+                for (int i = 0; i < atts.getLength(); i++) {
+                    String name = atts.getLocalName(i);
+                    if (TAG.equals(name)) {
+                        tag = atts.getValue(i);
+                    }
+                    if (name.startsWith(IND)) {
+                        int pos = Integer.parseInt(name.substring(3));
+                        if (pos >= 0 && pos < atts.getLength()) {
+                            char ind = atts.getValue(i).charAt(0);
+                            if (ind == '-') {
+                                ind = ' '; // replace illegal '-' symbols
+                            }
+                            sb.setCharAt(pos-1, ind);
+                            if (pos < min) {
+                                min = pos;
+                            }
+                            if (pos > max) {
+                                max = pos;
+                            }
+                        }
+                    }
+                }
+                Field field = new Field().tag(tag);
+                if (max > 0) {
+                    field.indicator(sb.substring(min-1, max));
+                }
                 stack.push(field);
-                inData = true;
+                if (field.isControlField()) {
+                    inControl = true;
+                } else {
+                    inData = true;
+                }
                 break;
             }
             case SUBFIELD: {
-                if (inControl) {
-                    break;
-                } else {
-                    Field f = stack.peek();
-                    Field subfield = new Field(f.tag(), f.indicator(), Character.toString(code));
+                if (!inControl) {
+                    Field subfield = new Field(stack.peek());
+                    for (int i = 0; i < atts.getLength(); i++) {
+                        if (CODE.equals(atts.getLocalName(i))) {
+                            subfield.subfieldId(atts.getValue(i));
+                        }
+                    }
                     stack.push(subfield);
                     inData = true;
-                    break;
                 }
             }
         }
@@ -340,7 +376,7 @@ public class MarcXchangeFieldMapperContentHandler
                 break;
             }
             case RECORD: {
-                flushRecord();
+                flushRecord(getFormat(), getType());
                 break;
             }
             case LEADER: {
@@ -349,43 +385,44 @@ public class MarcXchangeFieldMapperContentHandler
                 break;
             }
             case CONTROLFIELD: {
-                Field f = stack.pop();
-                if (f.isControlField()) {
-                    addControlField(f.subfieldId(null).data(content.toString()));
+                Field field = stack.pop();
+                if (field.isControlField()) {
+                    Field f = new Field(field).indicator(null).data(content.toString());
+                    addControlField(f);
+                    inControl = false;
                 } else {
-                    // conversion from datafield
-                    Field data = new Field(f).indicator("  ").subfieldId("a").data(content.toString());
-                    addDataField(data);
-                    addDataField(Field.EMPTY);
-                    flushField();
+                    Field data = new Field(field).subfieldId("a").data(content.toString());
+                    addField(data);
+                    addField(Field.EMPTY_FIELD);
+                    inData = false;
                 }
-                inControl = false;
                 break;
             }
             case DATAFIELD: {
-                Field f = stack.pop();
-                if (!f.isControlField()) {
-                    addDataField(f.subfieldId(null).data(""));
+                Field field = stack.pop();
+                if (field.isControlField()) {
+                    addControlField(field);
+                    inControl = false;
+                } else {
+                    addField(field.subfieldId(null).data(null));
                     flushField();
+                    inData = false;
                 }
-                inData = false;
                 break;
             }
             case SUBFIELD: {
                 if (inControl) {
                     // repair, move subfield content to controlfield content
                     stack.peek().data(content.toString());
-                    break;
                 } else {
                     Field f = stack.pop().data(content.toString());
-                    if (f.isControlField()) {
-                        addControlField(f);
-                    } else {
-                        addDataField(f);
+                    if (transform) {
+                        transform(f);
                     }
+                    addField(f);
                     inData = false;
-                    break;
                 }
+                break;
             }
         }
         content.setLength(0);

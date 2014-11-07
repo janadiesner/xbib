@@ -40,8 +40,8 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.memory.MemoryLiteral;
-import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.tools.Feeder;
 
 import java.io.BufferedReader;
@@ -59,7 +59,7 @@ public class SpringerCitations extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(SpringerCitations.class.getSimpleName());
 
-    private final static MemoryResourceContext resourceContext = new MemoryResourceContext();
+    private final static MemoryContext resourceContext = new MemoryContext();
 
     @Override
     public String getName() {

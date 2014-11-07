@@ -31,6 +31,7 @@
  */
 package org.xbib.iri;
 
+import org.xbib.rdf.Node;
 import org.xbib.scheme.HttpScheme;
 import org.xbib.scheme.Scheme;
 import org.xbib.scheme.SchemeRegistry;
@@ -49,7 +50,7 @@ import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class IRI implements Cloneable, Comparable<IRI> {
+public class IRI implements Cloneable, Comparable<IRI>, Node {
 
     private final static SchemeRegistry registry = SchemeRegistry.getInstance();
 
@@ -86,6 +87,11 @@ public class IRI implements Cloneable, Comparable<IRI> {
     private String a_userinfo;
 
     private String a_authority;
+
+    @Override
+    public boolean isVisible() {
+        return true;
+    }
 
     public static class Builder {
 
@@ -781,6 +787,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
 
     private static final Pattern IRIPATTERN =
             Pattern.compile("^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\\?([^#]*))?(?:#(.*))?");
+
     private static final Pattern AUTHORITYPATTERN =
             Pattern.compile("^(?:(.*)?@)?((?:\\[.*\\])|(?:[^:]*))?(?::(\\d+))?");
 
@@ -792,50 +799,45 @@ public class IRI implements Cloneable, Comparable<IRI> {
     @Override
     public int compareTo(IRI that) {
         int c;
-
-        if ((c = compareIgnoringCase(this.scheme, that.scheme)) != 0) {
+        if ((c = compareIgnoringCase(scheme, that.scheme)) != 0) {
             return c;
         }
-
-        if (this.isOpaque()) {
+        if (isOpaque()) {
             if (that.isOpaque()) {
                 // Both opaque
-                if ((c = compare(this.schemeSpecificPart,
-                        that.schemeSpecificPart)) != 0) {
+                if ((c = compare(schemeSpecificPart, that.schemeSpecificPart)) != 0) {
                     return c;
                 }
-                return compare(this.fragment, that.fragment);
+                return compare(fragment, that.fragment);
             }
             return +1;
         } else if (that.isOpaque()) {
             return -1;
         }
-
         // Hierarchical
-        if ((this.host != null) && (that.host != null)) {
+        if ((host != null) && (that.host != null)) {
             // Both server-based
-            if ((c = compare(this.userinfo, that.userinfo)) != 0) {
+            if ((c = compare(userinfo, that.userinfo)) != 0) {
                 return c;
             }
-            if ((c = compareIgnoringCase(this.host, that.host)) != 0) {
+            if ((c = compareIgnoringCase(host, that.host)) != 0) {
                 return c;
             }
-            if ((c = this.port - that.port) != 0) {
+            if ((c = port - that.port) != 0) {
                 return c;
             }
         } else {
-            if ((c = compare(this.authority, that.authority)) != 0) {
+            if ((c = compare(authority, that.authority)) != 0) {
                 return c;
             }
         }
-
-        if ((c = compare(this.path, that.path)) != 0) {
+        if ((c = compare(path, that.path)) != 0) {
             return c;
         }
-        if ((c = compare(this.query, that.query)) != 0) {
+        if ((c = compare(query, that.query)) != 0) {
             return c;
         }
-        return compare(this.fragment, that.fragment);
+        return compare(fragment, that.fragment);
     }
 
     private int compare(String s, String t) {
@@ -876,7 +878,7 @@ public class IRI implements Cloneable, Comparable<IRI> {
         }
     }
 
-    private static int toLower(char c) {
+    private int toLower(char c) {
         if ((c >= 'A') && (c <= 'Z')) {
             return c + ('a' - 'A');
         }

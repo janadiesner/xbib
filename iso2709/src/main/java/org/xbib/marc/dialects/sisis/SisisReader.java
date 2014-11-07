@@ -69,11 +69,6 @@ public class SisisReader implements XMLReader, MarcXchangeConstants {
     public static String FATAL_ERRORS = "fatal_errors";
 
     /**
-     * Should errors be silenced
-     */
-    public static String SILENT_ERRORS = "silent_errors";
-
-    /**
      * Should the ISO 25577 tags be clean (validateable)?
      * All erraneous tags will be assigned to "999".
      * This mode is active by default.
@@ -84,6 +79,11 @@ public class SisisReader implements XMLReader, MarcXchangeConstants {
      * Shall all data be XML 1.0 safe?
      */
     public static String SCRUB_DATA = "scrub_data";
+
+    /**
+     * Shall data transformations be allowed?
+     */
+    public static String TRANSFORM_DATA = "transform_data";
 
     /**
      * Buffer size for input stream
@@ -122,7 +122,6 @@ public class SisisReader implements XMLReader, MarcXchangeConstants {
             put(FORMAT, MARC21);
             put(TYPE, BIBLIOGRAPHIC);
             put(FATAL_ERRORS, Boolean.FALSE);
-            put(SILENT_ERRORS, Boolean.FALSE);
             put(BUFFER_SIZE, 65536);
         }
     };
@@ -210,8 +209,8 @@ public class SisisReader implements XMLReader, MarcXchangeConstants {
         return this;
     }
 
-    public SisisReader setTransformer(StringTransformer transformer) {
-        this.adapter.setTransformer(transformer);
+    public SisisReader setTransformer(String fieldKey, StringTransformer transformer) {
+        this.adapter.setTransformer(fieldKey, transformer);
         return this;
     }
 
@@ -252,24 +251,24 @@ public class SisisReader implements XMLReader, MarcXchangeConstants {
         Boolean fatalErrors = properties.get(FATAL_ERRORS) != null ?
                 (properties.get(FATAL_ERRORS) instanceof Boolean ? (Boolean)properties.get(FATAL_ERRORS) :
                         Boolean.parseBoolean((String)properties.get(FATAL_ERRORS))) : null;
-        Boolean silentErrors = properties.get(SILENT_ERRORS) != null ?
-                (properties.get(SILENT_ERRORS) instanceof Boolean ? (Boolean)properties.get(SILENT_ERRORS) :
-                        Boolean.parseBoolean((String)properties.get(SILENT_ERRORS))) : null;
         Boolean cleanTags = properties.get(CLEAN_TAGS) != null ?
                 (properties.get(CLEAN_TAGS) instanceof Boolean ? (Boolean)properties.get(CLEAN_TAGS) :
                         Boolean.parseBoolean((String)properties.get(CLEAN_TAGS))) : Boolean.TRUE;
         Boolean scrubData = properties.get(SCRUB_DATA) != null ?
                 (properties.get(SCRUB_DATA) instanceof Boolean ? (Boolean)properties.get(SCRUB_DATA) :
                         Boolean.parseBoolean((String)properties.get(SCRUB_DATA))) : Boolean.TRUE;
-        return adapter.setBuffersize((Integer)properties.get(BUFFER_SIZE))
+        Boolean transformData = properties.get(TRANSFORM_DATA) != null ?
+                (properties.get(TRANSFORM_DATA) instanceof Boolean ? (Boolean)properties.get(TRANSFORM_DATA) :
+                        Boolean.parseBoolean((String)properties.get(TRANSFORM_DATA))) : Boolean.TRUE;
+        return adapter.setBuffersize((Integer) properties.get(BUFFER_SIZE))
                 .setContentHandler(contentHandler)
                 .setSchema((String) properties.get(SCHEMA))
                 .setFormat(getFormat())
                 .setType(getType())
                 .setFatalErrors(fatalErrors)
-                .setSilentErrors(silentErrors)
                 .setCleanTags(cleanTags)
-                .setScrubData(scrubData);
+                .setScrubData(scrubData)
+                .setTransformData(transformData);
     }
 
     public SisisFieldStreamReader stream(InputStream in) throws IOException {
@@ -293,17 +292,17 @@ public class SisisReader implements XMLReader, MarcXchangeConstants {
     }
 
     public void parse(Reader reader) throws IOException {
-        try {
-            parse(new InputSource(reader));
-        } catch (SAXException e) {
-            throw new IOException(e);
-        }
+        parse(new InputSource(reader));
     }
 
     @Override
-    public void parse(InputSource input) throws IOException, SAXException {
-        setup(adapter).setInputSource(input)
-                .parseCollection(isFieldMapped() ? adapter.sisisMappedFieldStream() : adapter.sisisFieldStream());
+    public void parse(InputSource input) throws IOException {
+        try {
+            setup(adapter).setInputSource(input)
+                    .parseCollection(isFieldMapped() ? adapter.sisisMappedFieldStream() : adapter.sisisFieldStream());
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 
     /**

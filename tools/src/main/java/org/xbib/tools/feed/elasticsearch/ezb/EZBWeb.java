@@ -39,10 +39,10 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.tools.Feeder;
 
@@ -85,13 +85,13 @@ public class EZBWeb extends Feeder {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
         namespaceContext.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         namespaceContext.addNamespace("xbib", "http://xbib.org/elements/1.0/");
-        ResourceContext<Resource> resourceContext = new MemoryResourceContext()
+        Context<Resource> context = new MemoryContext()
                 //.setContentBuilder(contentBuilder(namespaceContext))
                 .setNamespaceContext(namespaceContext);
 
         InputStream in = InputService.getInputStream(uri);
         NullWriter nw = new NullWriter();
-        resourceContext.setNamespaceContext(namespaceContext);
+        context.setNamespaceContext(namespaceContext);
         final TurtleWriter turtle = new TurtleWriter(nw);
         turtle.setNamespaceContext(namespaceContext);
         Iterator<String> it = readZDBIDs(new InputStreamReader(in, "UTF-8"));
@@ -152,7 +152,7 @@ public class EZBWeb extends Feeder {
                             .query(settings.get("type"))
                             .fragment(key)
                             .build();
-                    Resource resource = resourceContext.newResource();
+                    Resource resource = context.newResource();
                     resource.id(id)
                             .add("dc:identifier", key)
                             .add("xbib:identifier", zdbid)
@@ -169,9 +169,9 @@ public class EZBWeb extends Feeder {
                                             + (code3.isEmpty() ? "x" : code3))
                             .add("xbib:comment", comment);
                     // turtle
-                    turtle.write(resourceContext);
+                    turtle.write(context);
                     // Elasticsearch
-                    sink.write(resourceContext);
+                    sink.write(context);
                     counter++;
                     if (counter % 1000 == 0) {
                         logger.info("{}", counter);

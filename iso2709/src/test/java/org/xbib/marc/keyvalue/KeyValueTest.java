@@ -34,16 +34,15 @@ package org.xbib.marc.keyvalue;
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.MarcXchangeConstants;
+import org.xbib.marc.xml.MarcXchangeReader;
 import org.xbib.marc.xml.stream.mapper.MarcXchangeFieldMapperReader;
 import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -57,22 +56,20 @@ public class KeyValueTest extends StreamTester {
     public void testZDBMarc2KeyValue() throws IOException, SAXException {
         String s = "zdblokutf8.mrc";
         InputStream in = getClass().getResourceAsStream(s);
-
         final StringWriter sw = new StringWriter();
-
         try (InputStreamReader r = new InputStreamReader(in, "UTF-8")) {
             Iso2709Reader reader = new Iso2709Reader();
             reader.setFormat(MarcXchangeConstants.MARC21);
             reader.setMarcXchangeListener(new MarcXchange2KeyValue()
-                            .addListener(new KeyValueStreamAdapter<DataField, String>() {
+                            .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                                 @Override
-                                public KeyValueStreamAdapter<DataField, String> begin() {
+                                public KeyValueStreamAdapter<FieldList, String> begin() {
                                     sw.append("begin object\n");
                                     return this;
                                 }
 
                                 @Override
-                                public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
+                                public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
                                     sw.append("begin\n");
                                     for (Field f : key) {
                                         sw.append(String.format("tag=%s indicator=%s subfield=%s data=%s\n",
@@ -83,7 +80,7 @@ public class KeyValueTest extends StreamTester {
                                 }
 
                                 @Override
-                                public KeyValueStreamAdapter<DataField, String> end() {
+                                public KeyValueStreamAdapter<FieldList, String> end() {
                                     sw.append("end object\n");
                                     return this;
                                 }
@@ -92,12 +89,8 @@ public class KeyValueTest extends StreamTester {
             );
             reader.parse(r);
         }
-        File kvfile = File.createTempFile(s + "-keyvalue.", ".txt");
-        FileWriter fw = new FileWriter(kvfile);
-        fw.write(sw.toString());
-        fw.close();
         assertStream(getClass().getResource(s + "-keyvalue.txt").openStream(),
-                new FileInputStream(kvfile));
+                new ByteArrayInputStream(sw.toString().getBytes("UTF-8")));
     }
 
     @Test
@@ -108,15 +101,15 @@ public class KeyValueTest extends StreamTester {
 
         final StringWriter sw = new StringWriter();
         reader.setMarcXchangeListener(new MarcXchange2KeyValue()
-                        .addListener(new KeyValueStreamAdapter<DataField, String>() {
+                        .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                             @Override
-                            public KeyValueStreamAdapter<DataField, String> begin() {
+                            public KeyValueStreamAdapter<FieldList, String> begin() {
                                 sw.append("begin object\n");
                                 return this;
                             }
 
                             @Override
-                            public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
+                            public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
                                 sw.append("begin\n");
                                 for (Field f : key) {
                                     sw.append(String.format("tag=%s indicator=%s subfield=%s data=%s\n",
@@ -127,7 +120,7 @@ public class KeyValueTest extends StreamTester {
                             }
 
                             @Override
-                            public KeyValueStreamAdapter<DataField, String> end() {
+                            public KeyValueStreamAdapter<FieldList, String> end() {
                                 sw.append("end object\n");
                                 return this;
                             }
@@ -135,13 +128,8 @@ public class KeyValueTest extends StreamTester {
                         })
         );
         reader.parse(in);
-
-        File kvfile = File.createTempFile("DE-605-keyvalue.", ".txt");
-        FileWriter fw = new FileWriter(kvfile);
-        fw.write(sw.toString());
-        fw.close();
         assertStream(getClass().getResource("DE-605-aleph500-publish-keyvalue.txt").openStream(),
-                new FileInputStream(kvfile));
+                new ByteArrayInputStream(sw.toString().getBytes("UTF-8")));
     }
 
     @Test
@@ -205,15 +193,15 @@ public class KeyValueTest extends StreamTester {
 
         final StringWriter sw = new StringWriter();
         reader.setMarcXchangeListener(new MarcXchange2KeyValue()
-                        .addListener(new KeyValueStreamAdapter<DataField, String>() {
+                        .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                             @Override
-                            public KeyValueStreamAdapter<DataField, String> begin() {
+                            public KeyValueStreamAdapter<FieldList, String> begin() {
                                 sw.append("begin object\n");
                                 return this;
                             }
 
                             @Override
-                            public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
+                            public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
                                 sw.append("begin\n");
                                 for (Field f : key) {
                                     sw.append(String.format("tag=%s indicator=%s subfield=%s data=%s\n",
@@ -224,7 +212,7 @@ public class KeyValueTest extends StreamTester {
                             }
 
                             @Override
-                            public KeyValueStreamAdapter<DataField, String> end() {
+                            public KeyValueStreamAdapter<FieldList, String> end() {
                                 sw.append("end object\n");
                                 return this;
                             }
@@ -232,15 +220,50 @@ public class KeyValueTest extends StreamTester {
                         })
         );
         reader.parse(in);
-
-        File kvfile = File.createTempFile("DE-605-mapped-keyvalue.", ".txt");
-        FileWriter fw = new FileWriter(kvfile);
-        fw.write(sw.toString());
-        fw.close();
         assertStream(getClass().getResource("DE-605-aleph500-publish-mapped-keyvalue.txt").openStream(),
-                new FileInputStream(kvfile));
+                new ByteArrayInputStream(sw.toString().getBytes("UTF-8")));
     }
 
+    @Test
+    public void testDE605Transform() throws IOException, SAXException {
+        InputStream in = getClass().getResource("DE-605-aleph500-publish.xml").openStream();
+        //MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader()
+        MarcXchangeReader reader = new MarcXchangeReader()
+                .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd")
+                .setTransformer("088$  $a", value -> value.equals("294") ? "DE-294" : value)
+                .setTransform(true);
 
+        final StringWriter sw = new StringWriter();
+        reader.setMarcXchangeListener(new MarcXchange2KeyValue()
+                        .addListener(new KeyValueStreamAdapter<FieldList, String>() {
+                            @Override
+                            public KeyValueStreamAdapter<FieldList, String> begin() {
+                                sw.append("begin object\n");
+                                return this;
+                            }
+
+                            @Override
+                            public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
+                                sw.append("begin\n");
+                                for (Field f : key) {
+                                    sw.append(String.format("tag=%s indicator=%s subfield=%s data=%s\n",
+                                            f.tag(), f.indicator(), f.subfieldId(), f.data()));
+                                }
+                                sw.append("end\n");
+                                return this;
+                            }
+
+                            @Override
+                            public KeyValueStreamAdapter<FieldList, String> end() {
+                                sw.append("end object\n");
+                                return this;
+                            }
+
+                        })
+        );
+        reader.parse(in);
+        assertStream(getClass().getResource("DE-605-aleph500-publish-transform.txt").openStream(),
+                new ByteArrayInputStream(sw.toString().getBytes("UTF-8")));
+    }
 }
 

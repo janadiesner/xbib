@@ -47,8 +47,8 @@ import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfConstants;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.memory.MemoryLiteral;
-import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.text.InvalidCharacterException;
 import org.xbib.tools.Feeder;
 import org.xbib.tools.convert.articles.SerialsDB;
@@ -141,7 +141,7 @@ public class JsonCoins extends Feeder {
         if (in == null) {
             throw new IOException("unable to open " + uri);
         }
-        final MemoryResourceContext resourceContext = new MemoryResourceContext();
+        final MemoryContext resourceContext = new MemoryContext();
         resourceContext.setNamespaceContext(context);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, UTF8))) {
             JsonParser parser = jsonFactory.createParser(reader);
@@ -331,9 +331,9 @@ public class JsonCoins extends Feeder {
                                     j.add("prism:issn", issn.toString());
                                 }
                             }
-                            Node publisher = serial.literal("dc:publisher");
-                            if (publisher != null) {
-                                j.add("dc:publisher", publisher.toString());
+                            Collection<Node> publisher = serial.objects("dc:publisher");
+                            if (publisher != null && !publisher.isEmpty()) {
+                                j.add("dc:publisher", publisher.iterator().next().toString());
                             }
                         } else {
                             missingserial = true;

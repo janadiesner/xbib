@@ -29,11 +29,56 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.elements.context;
+package org.xbib.marc;
 
-import org.xbib.rdf.context.ResourceContext;
+import java.util.ArrayList;
 
-public interface ResourceContextFactory<C extends ResourceContext> {
+/**
+ * An ISO 2709 field list, consisting of a list of subfields.
+ *
+ */
+public class FieldList extends ArrayList<Field> {
 
-    C newContext();
+    private final static String EMPTY = "";
+
+    private final static char DOLLAR = '$';
+
+    public String toKey() {
+        int l = size();
+        if (l == 0) {
+            return EMPTY;
+        }
+        int pos = 0;
+        char[] ch = new char[l];
+        for (Field field : this) {
+            String s = field.subfieldId();
+            if (s != null && s.length() > 0) {
+                char tmp = s.charAt(0);
+                int j = pos++;
+                while (j > 0 && ch[j - 1] > tmp) {
+                    ch[j] = ch[j - 1];
+                    j--;
+                }
+                ch[j] = tmp;
+            }
+        }
+        Field f = get(0);
+        return (f.tag() != null ? f.tag() : EMPTY)
+                    + (f.indicator() != null ? DOLLAR + f.indicator() : EMPTY)
+                    + DOLLAR
+                    + new String(ch, 0, pos);
+    }
+
+    public Field getFirst() {
+        return get(0);
+    }
+
+    public Field getLast() {
+        return isEmpty() ? null : get(size()-1);
+    }
+
+    public String toString() {
+        return toKey();
+    }
+
 }

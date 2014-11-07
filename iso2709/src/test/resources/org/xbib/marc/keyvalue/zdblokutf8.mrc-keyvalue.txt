@@ -1,12 +1,12 @@
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00388ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980291
@@ -66,13 +66,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00367ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980240
@@ -127,13 +127,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00367ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980259
@@ -188,13 +188,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00367ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980275
@@ -249,13 +249,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00367ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980283
@@ -310,13 +310,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00396ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980321
@@ -376,13 +376,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00407ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=05498033X
@@ -442,13 +442,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00396ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=094696373
@@ -508,13 +508,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00395ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980348
@@ -574,13 +574,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00395ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000124
@@ -640,13 +640,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00385ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=107954613
@@ -706,13 +706,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00389ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000132
@@ -772,13 +772,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00426ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=088791300
@@ -844,13 +844,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00432ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000159
@@ -914,13 +914,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00367ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000167
@@ -975,13 +975,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00402ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000175
@@ -1040,13 +1040,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00364ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000183
@@ -1101,13 +1101,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00356ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=100779565
@@ -1163,13 +1163,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00359ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=100308511
@@ -1225,13 +1225,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00394ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=150777833
@@ -1291,13 +1291,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00387ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980135
@@ -1357,13 +1357,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00400ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=113693915
@@ -1423,13 +1423,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00455ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=078692210
@@ -1500,13 +1500,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00403ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=078692229
@@ -1565,13 +1565,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00439ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=098305018
@@ -1636,13 +1636,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00428ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=127945296
@@ -1706,13 +1706,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00435ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=078692253
@@ -1778,13 +1778,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00435ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=091762006
@@ -1849,13 +1849,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00403ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=213647109
@@ -1918,13 +1918,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00374ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=140053085
@@ -1981,13 +1981,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00391ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=109522141
@@ -2048,13 +2048,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00422ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=091762014
@@ -2115,13 +2115,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00418ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=091762022
@@ -2182,13 +2182,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00421ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=081067259
@@ -2249,13 +2249,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00393ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000329
@@ -2315,13 +2315,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00333ny  a22001573n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=075723549
@@ -2372,13 +2372,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00359ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=210110392
@@ -2434,13 +2434,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00384ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000337
@@ -2500,13 +2500,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00382ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000345
@@ -2566,13 +2566,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00360ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000353
@@ -2627,13 +2627,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00393ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000361
@@ -2693,13 +2693,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00372ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=00000037X
@@ -2754,13 +2754,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00456ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=173791476
@@ -2826,13 +2826,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00401ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=173791492
@@ -2893,13 +2893,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00377ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=176539433
@@ -2956,13 +2956,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00391ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980119
@@ -3022,13 +3022,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00414ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980127
@@ -3092,13 +3092,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00405ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=116350709
@@ -3158,13 +3158,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00421ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=00000040X
@@ -3223,13 +3223,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00391ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980178
@@ -3289,13 +3289,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00364ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000434
@@ -3350,13 +3350,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00375ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000442
@@ -3411,13 +3411,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00388ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980186
@@ -3477,13 +3477,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00439ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980216
@@ -3548,13 +3548,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00450ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980194
@@ -3619,13 +3619,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00442ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980232
@@ -3690,13 +3690,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00416ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=11262684X
@@ -3761,13 +3761,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00407ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000515
@@ -3831,13 +3831,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00407ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=091292786
@@ -3898,13 +3898,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00389ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=00000054X
@@ -3964,13 +3964,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00393ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=204427827
@@ -4031,13 +4031,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00423ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000558
@@ -4102,13 +4102,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00389ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000566
@@ -4168,13 +4168,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00365ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000582
@@ -4229,13 +4229,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00337ny  a22001573n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=142182710
@@ -4286,13 +4286,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00365ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000590
@@ -4347,13 +4347,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00365ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000604
@@ -4408,13 +4408,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00365ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000620
@@ -4469,13 +4469,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00428ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=09606837X
@@ -4540,13 +4540,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00427ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=096068388
@@ -4609,13 +4609,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00357ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=147137608
@@ -4671,13 +4671,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00439ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=07840181X
@@ -4742,13 +4742,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00455ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=092995861
@@ -4818,13 +4818,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00456ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=09299587X
@@ -4894,13 +4894,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00402ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=098655388
@@ -4961,13 +4961,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00345ny  a22001573n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=221799680
@@ -5019,13 +5019,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00405ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=075924889
@@ -5086,13 +5086,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00385ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=00000068X
@@ -5152,13 +5152,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00391ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000698
@@ -5218,13 +5218,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00408ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=066718724
@@ -5285,13 +5285,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00408ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=00000071X
@@ -5352,13 +5352,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00409ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000728
@@ -5419,13 +5419,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00409ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000736
@@ -5486,13 +5486,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00443ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=081067186
@@ -5557,13 +5557,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00399ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000744
@@ -5625,13 +5625,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00379ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=21508537X
@@ -5691,13 +5691,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00366ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000760
@@ -5752,13 +5752,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00366ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000779
@@ -5813,13 +5813,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00369ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000795
@@ -5875,13 +5875,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00495ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=10910207X
@@ -5945,13 +5945,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00390ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000817
@@ -6011,13 +6011,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00402ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=205343961
@@ -6077,13 +6077,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00383ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=179893556
@@ -6139,13 +6139,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00454ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=155521748
@@ -6216,13 +6216,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00358ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000833
@@ -6277,13 +6277,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00377ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=074163337
@@ -6342,13 +6342,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00431ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000841
@@ -6413,13 +6413,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00399ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=080731155
@@ -6479,13 +6479,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00374ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=075814846
@@ -6541,13 +6541,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00383ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000752
@@ -6607,13 +6607,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00403ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=053371631
@@ -6673,13 +6673,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00440ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=21217911X
@@ -6747,13 +6747,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00406ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=10665344X
@@ -6813,13 +6813,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00410ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=107042835
@@ -6878,13 +6878,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00445ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=162174675
@@ -6952,13 +6952,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00433ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=12499234X
@@ -7022,13 +7022,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00426ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=130689637
@@ -7092,13 +7092,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00358ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=162660677
@@ -7154,13 +7154,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00377ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=150213794
@@ -7217,13 +7217,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00398ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000205
@@ -7283,13 +7283,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00393ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000299
@@ -7349,13 +7349,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00356ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=242007309
@@ -7411,13 +7411,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00468ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=089345657
@@ -7482,13 +7482,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00409ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=612882284
@@ -7546,13 +7546,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00514ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=082748799
@@ -7624,13 +7624,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00514ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=082748802
@@ -7707,13 +7707,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00510ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=082748810
@@ -7790,13 +7790,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00501ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=171332229
@@ -7873,13 +7873,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00485ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=160752078
@@ -7951,13 +7951,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00431ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980399
@@ -8023,13 +8023,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00436ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000892
@@ -8095,13 +8095,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00430ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=087807629
@@ -8167,13 +8167,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00537ny  a22002293n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=069236658
@@ -8255,13 +8255,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00588ny  a22002293n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=169633691
@@ -8344,13 +8344,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00590ny  a22002413n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=108575063
@@ -8439,13 +8439,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00449ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=067786189
@@ -8511,13 +8511,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00438ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000957
@@ -8583,13 +8583,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00357ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=079697836
@@ -8643,13 +8643,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00454ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000965
@@ -8720,13 +8720,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00433ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000973
@@ -8792,13 +8792,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00474ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=07856669X
@@ -8870,13 +8870,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00492ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=078566703
@@ -8948,13 +8948,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00453ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=067786227
@@ -9021,13 +9021,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00429ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001023
@@ -9093,13 +9093,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00467ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001031
@@ -9164,13 +9164,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00439ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980380
@@ -9237,13 +9237,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00497ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=069910731
@@ -9319,13 +9319,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00570ny  a22002293n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=06991074X
@@ -9407,13 +9407,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00504ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=156423286
@@ -9490,13 +9490,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00439ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=115422838
@@ -9562,13 +9562,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00392ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=115422846
@@ -9626,13 +9626,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00473ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=070194718
@@ -9704,13 +9704,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00432ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980372
@@ -9776,13 +9776,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00474ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=070693277
@@ -9854,13 +9854,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00493ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=071110607
@@ -9937,13 +9937,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00500ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=081753977
@@ -10020,13 +10020,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00479ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001112
@@ -10098,13 +10098,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00390ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=108098761
@@ -10165,13 +10165,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00516ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001120
@@ -10247,13 +10247,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00441ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000000930
@@ -10319,13 +10319,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00429ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001139
@@ -10391,13 +10391,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00460ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=067786197
@@ -10464,13 +10464,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00413ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=094277931
@@ -10531,13 +10531,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00448ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=067786219
@@ -10604,13 +10604,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00452ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=067786200
@@ -10677,13 +10677,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00403ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=078039274
@@ -10745,13 +10745,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00408ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=117136700
@@ -10813,13 +10813,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00405ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=138685975
@@ -10881,13 +10881,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00396ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001201
@@ -10948,13 +10948,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00517ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001171
@@ -11032,13 +11032,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00450ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=106920987
@@ -11104,13 +11104,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00437ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=181226952
@@ -11176,13 +11176,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00425ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=603436196
@@ -11243,13 +11243,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00374ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=612907880
@@ -11303,13 +11303,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00478ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=082748829
@@ -11381,13 +11381,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00512ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=082748837
@@ -11464,13 +11464,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00502ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=082748845
@@ -11547,13 +11547,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00471ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=171332237
@@ -11625,13 +11625,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00487ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=160752086
@@ -11703,13 +11703,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00472ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=087807637
@@ -11781,13 +11781,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00441ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=068324170
@@ -11853,13 +11853,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00438ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001309
@@ -11925,13 +11925,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00474ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=078566711
@@ -12003,13 +12003,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00449ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=07856672X
@@ -12074,13 +12074,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00455ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=091762030
@@ -12147,13 +12147,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00407ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=111608104
@@ -12215,13 +12215,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00510ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=069930341
@@ -12297,13 +12297,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00432ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=128116927
@@ -12369,13 +12369,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00473ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=070194726
@@ -12447,13 +12447,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00482ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=070693285
@@ -12525,13 +12525,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00434ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001392
@@ -12597,13 +12597,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00562ny  a22002293n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001406
@@ -12686,13 +12686,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00474ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001414
@@ -12763,13 +12763,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00475ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001422
@@ -12839,13 +12839,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00436ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001287
@@ -12911,13 +12911,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00462ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=068324197
@@ -12984,13 +12984,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00554ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001457
@@ -13066,13 +13066,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00442ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=077936205
@@ -13138,13 +13138,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00408ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=117136735
@@ -13206,13 +13206,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00458ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=100728952
@@ -13280,13 +13280,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00457ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=127799672
@@ -13352,13 +13352,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00450ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=106920979
@@ -13424,13 +13424,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00412ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=106886347
@@ -13490,13 +13490,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00569ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=087807645
@@ -13574,13 +13574,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00542ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=087807653
@@ -13658,13 +13658,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00557ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=061460613
@@ -13739,13 +13739,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00454ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001503
@@ -13811,13 +13811,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00437ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001511
@@ -13883,13 +13883,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00506ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=115941703
@@ -13960,13 +13960,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00503ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=070693293
@@ -14037,13 +14037,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00515ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001538
@@ -14115,13 +14115,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00531ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=106809318
@@ -14194,13 +14194,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00439ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=211980749
@@ -14261,13 +14261,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00399ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=087767589
@@ -14325,13 +14325,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00372ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=089758668
@@ -14385,13 +14385,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00425ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=082748853
@@ -14456,13 +14456,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00464ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=082748861
@@ -14533,13 +14533,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00462ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=08274887X
@@ -14610,13 +14610,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00465ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=171332245
@@ -14687,13 +14687,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00463ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=171332253
@@ -14764,13 +14764,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00434ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980496
@@ -14836,13 +14836,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00436ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=05498050X
@@ -14908,13 +14908,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00393ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980526
@@ -14974,13 +14974,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00427ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001635
@@ -15046,13 +15046,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00440ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001643
@@ -15119,13 +15119,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00466ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001651
@@ -15198,13 +15198,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00469ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=087807661
@@ -15275,13 +15275,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00484ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=069435480
@@ -15357,13 +15357,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00462ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=108582965
@@ -15433,13 +15433,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00519ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001708
@@ -15517,13 +15517,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00430ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001716
@@ -15589,13 +15589,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00469ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001724
@@ -15667,13 +15667,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00360ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=100152651
@@ -15729,13 +15729,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00430ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980429
@@ -15801,13 +15801,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00455dy  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=054980437
@@ -15877,13 +15877,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00465ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=078965918
@@ -15954,13 +15954,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00510ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=078965926
@@ -16036,13 +16036,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00485ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=078965934
@@ -16114,13 +16114,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00556ny  a22002293n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=098663895
@@ -16203,13 +16203,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00462ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=062014919
@@ -16276,13 +16276,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00573ny  a22002293n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=089720008
@@ -16365,13 +16365,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00416ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=091762049
@@ -16432,13 +16432,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00419ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=091762057
@@ -16499,13 +16499,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00442ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=062015028
@@ -16571,13 +16571,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00426ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001848
@@ -16643,13 +16643,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00425ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001856
@@ -16715,13 +16715,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00423ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001864
@@ -16787,13 +16787,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00427ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000001872
@@ -16859,13 +16859,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00480ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=05498047X
@@ -16937,13 +16937,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00532ny  a22002293n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=069640572
@@ -17025,13 +17025,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00453ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=156423294
@@ -17102,13 +17102,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00499ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=156423308
@@ -17185,13 +17185,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00456ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=062014986
@@ -17258,13 +17258,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00502ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=06201501X
@@ -17337,13 +17337,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00533ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=062014994
@@ -17422,13 +17422,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00497ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=062015001
@@ -17501,13 +17501,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00429ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=115422862
@@ -17573,13 +17573,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00458ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=00000197X
@@ -17649,13 +17649,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00509ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=099032597
@@ -17732,13 +17732,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00424ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=05337164X
@@ -17804,13 +17804,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00507ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=070693307
@@ -17887,13 +17887,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00448ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002011
@@ -17964,13 +17964,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00465ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=080648142
@@ -18042,13 +18042,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00468ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002046
@@ -18121,13 +18121,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00452ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002054
@@ -18199,13 +18199,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00459ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=073920819
@@ -18277,13 +18277,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00490ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=081753985
@@ -18358,13 +18358,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00548ny  a22002293n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002089
@@ -18446,13 +18446,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00453ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=091292794
@@ -18519,13 +18519,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00415ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=091292808
@@ -18586,13 +18586,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00451ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=091292816
@@ -18659,13 +18659,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00427ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002143
@@ -18731,13 +18731,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00427ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002151
@@ -18802,13 +18802,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00391ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=00000216X
@@ -18868,13 +18868,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00406ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002178
@@ -18935,13 +18935,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00399ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002186
@@ -19001,13 +19001,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00428ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002194
@@ -19072,13 +19072,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00510ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=099330369
@@ -19155,13 +19155,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00473ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002232
@@ -19232,13 +19232,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00473ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002240
@@ -19310,13 +19310,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00419ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=140549412
@@ -19379,13 +19379,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00506ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002267
@@ -19463,13 +19463,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00425ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002275
@@ -19535,13 +19535,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00481ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=062015036
@@ -19613,13 +19613,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00455ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002291
@@ -19684,13 +19684,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00319ny  a22001453n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002305
@@ -19735,13 +19735,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00470ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002313
@@ -19813,13 +19813,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00396ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=000002321
@@ -19879,13 +19879,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00473ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=073124486
@@ -19956,13 +19956,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00497ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=168652226
@@ -20039,13 +20039,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00614ny  a22002413n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=21206147X
@@ -20133,13 +20133,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00583ny  a22002413n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=212094556
@@ -20228,13 +20228,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00519ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=134201566
@@ -20311,13 +20311,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00457ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=076510662
@@ -20387,13 +20387,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00498ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=075392372
@@ -20470,13 +20470,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00471ny  a22002053n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=075447274
@@ -20546,13 +20546,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00331ny  a22001573n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=074234897
@@ -20603,13 +20603,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00375ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=121871495
@@ -20666,13 +20666,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00414ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=181861380
@@ -20732,13 +20732,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00423ny  a22001813n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=107138662
@@ -20799,13 +20799,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00497ny  a22002173n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=212146254
@@ -20880,13 +20880,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00494ny  a22001933n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=603417809
@@ -20951,13 +20951,13 @@ end
 end object
 begin object
 begin
-tag=FORMAT indicator=null subfield=null data=null
+tag=__FORMAT indicator=null subfield=null data=MARC21
 end
 begin
-tag=TYPE indicator=null subfield=null data=null
+tag=__TYPE indicator=null subfield=null data=Bibliographic
 end
 begin
-tag=LEADER indicator=null subfield=null data=null
+tag=__LEADER indicator=null subfield=null data=00375ny  a22001693n 4500
 end
 begin
 tag=001 indicator=null subfield=null data=612626458

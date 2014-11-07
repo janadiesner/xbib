@@ -35,7 +35,6 @@ import org.testng.annotations.Test;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
 import org.xbib.rdf.memory.MemoryLiteral;
-import org.xbib.rdf.memory.MemoryProperty;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
@@ -43,9 +42,8 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
-import org.xbib.rdf.Property;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.Context;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -62,8 +60,6 @@ public class DOAJArticleClientTest {
     private final static String DOAJ_NS_PREFIX = "doaj";
 
     private final static String DOAJ_NS_URI = "http://www.doaj.org/schemas/";
-
-    //private StringWriter sw = new StringWriter();
 
     @Test
     public void testListRecordsDOAJArticles() throws Exception {
@@ -110,7 +106,7 @@ public class DOAJArticleClientTest {
 
     class DOAJResourceHandler extends RdfResourceHandler {
 
-        public DOAJResourceHandler(ResourceContext context) {
+        public DOAJResourceHandler(Context context) {
             super(context);
         }
 
@@ -130,12 +126,12 @@ public class DOAJArticleClientTest {
         }
 
         @Override
-        public Property toProperty(Property property) {
-            if ("issn".equals(property.id().getSchemeSpecificPart())) {
-                return new MemoryProperty(IRI.builder().curie("dc", "identifier").build());
+        public IRI toProperty(IRI property) {
+            if ("issn".equals(property.getSchemeSpecificPart())) {
+                return IRI.builder().curie("dc", "identifier").build();
             }
-            if ("eissn".equals(property.id().getSchemeSpecificPart())) {
-                return new MemoryProperty(IRI.builder().curie("dc", "identifier").build());
+            if ("eissn".equals(property.getSchemeSpecificPart())) {
+                return IRI.builder().curie("dc", "identifier").build();
             }
             return property;
         }
@@ -151,26 +147,4 @@ public class DOAJArticleClientTest {
             return content;
         }
     }
-
-    /*class MyOutput extends RdfOutput {
-
-        TurtleWriter writer;
-
-        MyOutput(IRINamespaceContext context) throws IOException{
-            this.writer = new TurtleWriter()
-                    .output(sw)
-                    .setContext(context)
-                    .writeNamespaces();
-        }
-
-        @Override
-        public RdfOutput output(ResourceContext resourceContext) throws IOException {
-            writer.write(resourceContext.getResource());
-            logger.info("out = {}", sw);
-            sw = new StringWriter();
-            writer.output(sw);
-            return this;
-        }
-    }*/
-
 }

@@ -29,16 +29,14 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.rdf.context;
-
-import org.xbib.rdf.Resource;
+package org.xbib.rdf;
 
 import java.io.IOException;
 
 /**
- * A resource writer
+ * A context writer
  */
-public interface ResourceContextWriter<C extends ResourceContext<R>, R extends Resource> {
+public interface ContextWriter<C extends Context<R>, R extends Resource> {
 
-    void write(C resourceContext) throws IOException;
+    void write(C context) throws IOException;
 }

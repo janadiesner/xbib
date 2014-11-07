@@ -35,13 +35,13 @@ import org.xbib.elements.KeyValueElementPipeline;
 import org.xbib.elements.marc.SubfieldValueMapper;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.rdf.Resource;
 
 import java.util.Map;
 
-public class PicaElementPipeline extends KeyValueElementPipeline<DataField, String, PicaElement, PicaContext> {
+public class PicaElementPipeline extends KeyValueElementPipeline<FieldList, String, PicaElement, PicaContext> {
 
     private final Logger logger = LoggerFactory.getLogger(PicaElementPipeline.class.getName());
 
@@ -50,18 +50,17 @@ public class PicaElementPipeline extends KeyValueElementPipeline<DataField, Stri
     }
 
     @Override
-    protected void build(DataField fields, String value) {
+    protected void build(FieldList fields, String value) {
         if (fields == null) {
-            logger.debug("fields is null!");
             return;
         }
-        logger.debug("pica fields = {} value = {}", fields, value);
-        String key = fields.toSpec();
+        //logger.debug("pica fields = {} value = {}", fields, value);
+        String key = fields.toKey();
         PicaElement element = (PicaElement) specification.getElement(key, getMap());
         if (element != null) {
             // mapping?
             if (element.map(fields)) {
-                key = fields.toSpec();
+                key = fields.toKey();
                 element = (PicaElement) specification.getElement(key, getMap());
             }
             // element-based processing

@@ -32,21 +32,18 @@
 package org.xbib.analyzer.dublincore;
 
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.context.ContentBuilder;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.ContentBuilder;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.memory.MemoryResource;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 
 public class DublinCoreContext
-        extends MemoryResourceContext<Resource>
-        implements ResourceContext<Resource>, DublinCoreElements {
+        extends MemoryContext<Resource>
+        implements Context<Resource>, DublinCoreElements {
 
-    private ContentBuilder<ResourceContext<Resource>, Resource> contentBuilder = new DefaultContentBuilder();
 
     @Override
-    public ResourceContext<Resource> setContentBuilder(ContentBuilder<ResourceContext<Resource>, Resource> contentBuilder) {
-        this.contentBuilder = contentBuilder;
+    public Context<Resource> setContentBuilder(ContentBuilder<Context<Resource>, Resource> contentBuilder) {
         return this;
     }
 
@@ -56,12 +53,12 @@ public class DublinCoreContext
     }
 
     @Override
-    public ResourceContext<Resource> beforeBuild() {
+    public Context<Resource> beforeBuild() {
         return this;
     }
 
     @Override
-    public ResourceContext<Resource> afterBuild() {
+    public Context<Resource> afterBuild() {
         return this;
     }
 }

@@ -41,8 +41,8 @@ import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Triple;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.rdfxml.RdfXmlParser;
 import org.xbib.tools.Feeder;
 
@@ -100,7 +100,7 @@ public class RdfXml extends Feeder {
         namespaceContext.addNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         namespaceContext.addNamespace("skos", "http://www.w3.org/2004/02/skos/core#");
         namespaceContext.addNamespace("geosparql", "http://www.opengis.net/ont/geosparql#");
-        ResourceContext context = new MemoryResourceContext();
+        Context context = new MemoryContext();
         context.setContentBuilder(new DefaultContentBuilder<>());
         context.setNamespaceContext(namespaceContext);
         InputStream in = InputService.getInputStream(uri);
@@ -111,12 +111,12 @@ public class RdfXml extends Feeder {
 
     class MyTripleBuilder implements Triple.Builder {
 
-        private ResourceContext resourceContext;
+        private Context context;
 
         private String gndID;
 
-        MyTripleBuilder(ResourceContext resourceContext) {
-            this.resourceContext = resourceContext;
+        MyTripleBuilder(Context context) {
+            this.context = context;
         }
 
         @Override
@@ -138,7 +138,7 @@ public class RdfXml extends Feeder {
         public Triple.Builder newIdentifier(IRI iri) {
             // push currrent context before moving to next resource
             try {
-                if (resourceContext.getResource() != null) {
+                if (context.getResource() != null) {
                     // set ES feed IRI
                     IRI doc = IRI.builder()
                             .scheme("http") // whatever
@@ -146,14 +146,14 @@ public class RdfXml extends Feeder {
                             .query(settings.get("type", "gnd"))
                             .fragment(gndID)
                             .build();
-                    resourceContext.getResource().id(doc);
-                    sink.write(resourceContext);
+                    context.getResource().id(doc);
+                    sink.write(context);
                 }
             } catch (IOException e) {
                 logger.error("output failed: {}", e.getMessage(), e);
             }
-            resourceContext.switchTo(resourceContext.newResource());
-            resourceContext.getResource().id(iri);
+            context.switchTo(context.newResource());
+            context.getResource().id(iri);
             return this;
         }
 
@@ -162,15 +162,15 @@ public class RdfXml extends Feeder {
             if (triple.predicate().toString().endsWith("gndIdentifier")) {
                 gndID = triple.object().toString();
             }
-            resourceContext.getResource().add(triple);
+            context.getResource().add(triple);
             return this;
         }
 
         @Override
         public Triple.Builder end() {
-            if (resourceContext.getResource() != null) {
+            if (context.getResource() != null) {
                 try {
-                    sink.write(resourceContext);
+                    sink.write(context);
                 } catch (IOException e) {
                     logger.error(e.getMessage(), e);
                 }

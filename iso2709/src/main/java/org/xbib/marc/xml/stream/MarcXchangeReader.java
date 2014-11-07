@@ -34,9 +34,11 @@ package org.xbib.marc.xml.stream;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.event.FieldEvent;
 import org.xbib.marc.event.RecordEvent;
 import org.xbib.marc.event.EventListener;
 import org.xbib.marc.label.RecordLabel;
+import org.xbib.marc.transformer.StringTransformer;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -72,6 +74,12 @@ public class MarcXchangeReader
 
     private MarcXchangeListener listener;
 
+    private Map<String, StringTransformer> transformers = new HashMap<String, StringTransformer>();
+
+    private EventListener<FieldEvent> fieldEventListener;
+
+    private EventListener<RecordEvent> recordEventListener;
+
     private StringBuilder content = new StringBuilder();
 
     private String format = MARC21;
@@ -86,7 +94,7 @@ public class MarcXchangeReader
 
     private boolean ignoreNamespace = false;
 
-    private EventListener<RecordEvent> recordEventListener;
+    private boolean transform = false;
 
     private Integer bufferSize;
 
@@ -121,6 +129,11 @@ public class MarcXchangeReader
         return this;
     }
 
+    public MarcXchangeReader setTransform(boolean transform) {
+        this.transform = transform;
+        return this;
+    }
+
     public MarcXchangeReader setBufferSize(Integer bufferSize) {
         this.bufferSize = bufferSize;
         return this;
@@ -131,8 +144,18 @@ public class MarcXchangeReader
         return this;
     }
 
-    public MarcXchangeReader setRecordEventLlistener(EventListener<RecordEvent> recordEventListener) {
+    public MarcXchangeReader setFieldEventListener(EventListener<FieldEvent> fieldEventListener) {
+        this.fieldEventListener = fieldEventListener;
+        return this;
+    }
+
+    public MarcXchangeReader setRecordEventListener(EventListener<RecordEvent> recordEventListener) {
         this.recordEventListener = recordEventListener;
+        return this;
+    }
+
+    public MarcXchangeReader setTransformer(String fieldKey, StringTransformer transformer) {
+        this.transformers.put(fieldKey, transformer);
         return this;
     }
 
@@ -153,6 +176,22 @@ public class MarcXchangeReader
             xmlEventReader.close();
         } catch (XMLStreamException e) {
             throw new IOException(e);
+        }
+    }
+
+    private void transform(Field field) {
+        StringTransformer transformer = transformers.get(field.toKey());
+        if (transformer == null) {
+            transformer = transformers.get("_default");
+        }
+        if (transformer != null) {
+            String old = field.data();
+            field.data(transformer.transform(field.data()));
+            if (!old.equals(field.data())) {
+                if (fieldEventListener != null) {
+                    fieldEventListener.receive(FieldEvent.DATA_TRANSFORMED.setField(field));
+                }
+            }
         }
     }
 
@@ -202,6 +241,9 @@ public class MarcXchangeReader
     @Override
     public void endControlField(Field field) {
         if (listener != null) {
+            if (transform) {
+                transform(field);
+            }
             listener.endControlField(field);
         }
     }
@@ -216,6 +258,9 @@ public class MarcXchangeReader
     @Override
     public void endDataField(Field field) {
         if (listener != null) {
+            if (transform) {
+                transform(field);
+            }
             listener.endDataField(field);
         }
     }
@@ -230,6 +275,9 @@ public class MarcXchangeReader
     @Override
     public void endSubField(Field field) {
         if (listener != null) {
+            if (transform) {
+                transform(field);
+            }
             listener.endSubField(field);
         }
     }
@@ -247,45 +295,38 @@ public class MarcXchangeReader
             String format = null;
             String type = null;
             String tag = null;
-            char ind1 = '\u0000';
-            char ind2 = '\u0000';
-            char code = '\u0000';
+            String code = null;
+            StringBuilder sb = new StringBuilder();
+            sb.setLength(10);
+            int min = 10;
+            int max = 0;
             while (it.hasNext()) {
                 Attribute attr = (Attribute) it.next();
                 QName attributeName = attr.getName();
-                String attributeLocalName = attributeName.getLocalPart();
-                String attributeValue = attr.getValue();
-                switch (attributeLocalName) {
-                    case TAG: {
-                        tag = attributeValue;
-                        break;
-                    }
-                    case IND + "1": {
-                        ind1 = attributeValue.charAt(0);
-                        if (ind1 == '-') {
-                            ind1 = ' '; // replace illegal '-' symbols
+                String name = attributeName.getLocalPart();
+                if (TAG.equals(name)) {
+                    tag = attr.getValue();
+                } else if (CODE.equals(name)) {
+                    code = attr.getValue();
+                } else if (name.startsWith(IND)) {
+                    int pos = Integer.parseInt(name.substring(3));
+                    if (pos >= 0 && pos < 10) {
+                        char ind = attr.getValue().charAt(0);
+                        if (ind == '-') {
+                            ind = ' '; // replace illegal '-' symbols
                         }
-                        break;
-                    }
-                    case IND + "2": {
-                        ind2 = attributeValue.charAt(0);
-                        if (ind2 == '-') {
-                            ind2 = ' '; // replace illegal '-' symbols
+                        sb.setCharAt(pos-1, ind);
+                        if (pos < min) {
+                            min = pos;
                         }
-                        break;
+                        if (pos > max) {
+                            max = pos;
+                        }
                     }
-                    case CODE: {
-                        code = attributeValue.charAt(0);
-                        break;
-                    }
-                    case FORMAT: {
-                        format = attributeValue;
-                        break;
-                    }
-                    case TYPE: {
-                        type = attributeValue;
-                        break;
-                    }
+                } else if (FORMAT.equals(name)) {
+                    format = attr.getValue();
+                } else if (TYPE.equals(name)) {
+                    type = attr.getValue();
                 }
             }
             if (format == null) {
@@ -301,6 +342,8 @@ public class MarcXchangeReader
                     break;
                 }
                 case RECORD: {
+                    setFormat(format);
+                    setType(type);
                     beginRecord(format, type);
                     if (recordEventListener != null) {
                         recordEventListener.receive(RecordEvent.START);
@@ -315,29 +358,34 @@ public class MarcXchangeReader
                     Field field = new Field().tag(tag);
                     stack.push(field);
                     beginControlField(field);
-                    inControl = true;
+                    if (field.isControlField()) {
+                        inControl = true;
+                    } else {
+                        inData = true;
+                    }
                     break;
                 }
                 case DATAFIELD: {
-                    Field field = ind2 != '\u0000'
-                            ? new Field(tag, Character.toString(ind1) + Character.toString(ind2))
-                            : new Field(tag, Character.toString(ind1));
+                    Field field = new Field().tag(tag).indicator(sb.substring(min-1, max));
                     stack.push(field);
-                    beginDataField(field);
-                    inData = true;
+                    if (field.isControlField()) {
+                        beginControlField(field);
+                        inControl = true;
+                    } else {
+                        beginDataField(field);
+                        inData = true;
+                    }
                     break;
                 }
                 case SUBFIELD: {
-                    if (inControl) {
-                        break;
-                    } else {
+                    if (!inControl) {
                         Field f = stack.peek();
-                        Field subfield = new Field(f.tag(), f.indicator(), Character.toString(code));
+                        Field subfield = new Field(f.tag(), f.indicator(), code);
                         stack.push(subfield);
                         beginSubField(subfield);
                         inData = true;
-                        break;
                     }
+                    break;
                 }
             }
         } else if (event.isEndElement()) {
@@ -363,13 +411,30 @@ public class MarcXchangeReader
                     break;
                 }
                 case CONTROLFIELD: {
-                    endControlField(stack.pop().data(content.toString()));
-                    inControl = false;
+                    Field f = stack.pop();
+                    if (f.isControlField()) {
+                        endControlField(new Field(f).subfieldId(null).data(content.toString()));
+                        inControl = false;
+                    } else {
+                        // conversion from control- to datafield
+                        Field data = new Field().tag(f.tag()).subfieldId("a").data(content.toString());
+                        if (transform) {
+                            transform(data);
+                        }
+                        endDataField(data);
+                        inData = false;
+                    }
                     break;
                 }
                 case DATAFIELD: {
-                    endDataField(stack.pop().subfieldId(null).data(""));
-                    inData = false;
+                    Field f = stack.pop();
+                    if (f.isControlField()) {
+                        endControlField(new Field(f).subfieldId(null));
+                        inControl = false;
+                    } else {
+                        endDataField(f.subfieldId(null).data(null));
+                        inData = false;
+                    }
                     break;
                 }
                 case SUBFIELD: {
@@ -378,7 +443,11 @@ public class MarcXchangeReader
                         stack.peek().data(content.toString());
                         break;
                     } else {
-                        endSubField(stack.pop().data(content.toString()));
+                        Field f = stack.pop().data(content.toString());
+                        if (transform) {
+                            transform(f);
+                        }
+                        endSubField(f);
                         inData = false;
                         break;
                     }

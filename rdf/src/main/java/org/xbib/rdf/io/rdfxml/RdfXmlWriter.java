@@ -35,15 +35,14 @@ import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
 import org.xbib.rdf.RdfConstants;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.xml.XMLUtil;
 
 import java.io.Closeable;
@@ -55,8 +54,8 @@ import java.util.Map;
 /**
  * RDF/XML writer
  */
-public class RdfXmlWriter<C extends ResourceContext<Resource>>
-        implements ResourceContextWriter<C, Resource>, Triple.Builder, Closeable, Flushable, RdfConstants {
+public class RdfXmlWriter<C extends Context<Resource>>
+        implements ContextWriter<C, Resource>, Triple.Builder, Closeable, Flushable, RdfConstants {
 
     private final static Logger logger = LoggerFactory.getLogger(RdfXmlWriter.class.getName());
 
@@ -74,7 +73,7 @@ public class RdfXmlWriter<C extends ResourceContext<Resource>>
 
     public RdfXmlWriter(Writer writer) {
         this.writer = writer;
-        this.resourceContext = (C)new MemoryResourceContext();
+        this.resourceContext = (C) new MemoryContext();
         resourceContext.newResource();
     }
 
@@ -245,7 +244,7 @@ public class RdfXmlWriter<C extends ResourceContext<Resource>>
                 throw new IOException("document writing has not yet been started");
             }
             Resource subj = triple.subject();
-            Property pred = triple.predicate();
+            IRI pred = triple.predicate();
             Node obj = triple.object();
             String predString = pred.toString();
             int predSplitIdx = findURISplitIndex(predString);
@@ -281,7 +280,7 @@ public class RdfXmlWriter<C extends ResourceContext<Resource>>
                 }
                 writer.write("/>");
             } else if (obj instanceof Literal) {
-                Literal l = (Literal)obj;
+                Literal l = (Literal) obj;
                 if (l.language() != null) {
                     writeAttribute("xml:lang", l.language());
                 }

@@ -47,8 +47,8 @@ import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfConstants;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.memory.MemoryLiteral;
-import org.xbib.rdf.memory.MemoryResourceContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.text.InvalidCharacterException;
 import org.xbib.tools.Converter;
@@ -83,7 +83,7 @@ public class JsonCoins extends Converter {
 
     protected final static JsonFactory jsonFactory = new JsonFactory();
 
-    protected final static MemoryResourceContext resourceContext = new MemoryResourceContext();
+    protected final static MemoryContext resourceContext = new MemoryContext();
 
     private static TurtleWriter serializer;
 
@@ -379,9 +379,9 @@ public class JsonCoins extends Converter {
                                     j.add("prism:issn", issn.toString());
                                 }
                             }
-                            Node publisher = serial.literal("dc:publisher");
-                            if (publisher != null) {
-                                j.add("dc:publisher", publisher.toString());
+                            Collection<Node> publisher = serial.objects("dc:publisher");
+                            if (publisher != null && !publisher.isEmpty()) {
+                                j.add("dc:publisher", publisher.iterator().next().toString());
                             }
                         } else {
                             missingserial = true;

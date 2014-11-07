@@ -31,15 +31,15 @@
  */
 package org.xbib.elements.marc.direct;
 
-import org.xbib.elements.context.ResourceContextFactory;
+import org.xbib.marc.FieldList;
+import org.xbib.rdf.ContextFactory;
 import org.xbib.elements.direct.AbstractDirectBuilder;
 import org.xbib.elements.marc.MARCContext;
-import org.xbib.marc.DataField;
 
 public class MARCDirectBuilder
-       extends AbstractDirectBuilder<DataField, String, MARCContext> {
+       extends AbstractDirectBuilder<FieldList, String, MARCContext> {
 
-    private final static ResourceContextFactory<MARCContext> contextFactory = new ResourceContextFactory<MARCContext>() {
+    private final static ContextFactory<MARCContext> contextFactory = new ContextFactory<MARCContext>() {
 
         @Override
         public MARCContext newContext() {
@@ -48,7 +48,7 @@ public class MARCDirectBuilder
     };
     
     @Override
-    public ResourceContextFactory<MARCContext> contextFactory() {
+    public ContextFactory<MARCContext> contextFactory() {
         return contextFactory;
     }
     

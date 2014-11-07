@@ -41,7 +41,7 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.tools.Converter;
 
@@ -68,7 +68,7 @@ public class SerialsDB extends Converter {
         context.addNamespace("prism", "http://prismstandard.org/namespaces/basic/2.1/");
     }
 
-    private final static MemoryResourceContext resourceContext = new MemoryResourceContext();
+    private final static MemoryContext resourceContext = new MemoryContext();
 
     private final static Map<String, Resource> serials = new ConcurrentHashMap<>();
 

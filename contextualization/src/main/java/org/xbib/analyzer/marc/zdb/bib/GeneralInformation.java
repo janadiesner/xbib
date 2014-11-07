@@ -35,7 +35,7 @@ import org.xbib.elements.ElementBuilder;
 import org.xbib.elements.marc.MARCContext;
 import org.xbib.elements.marc.MARCElement;
 import org.xbib.elements.marc.MARCElementPipeline;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 
 import java.util.Map;
@@ -64,8 +64,8 @@ public class GeneralInformation extends MARCElement {
      * Example "991118d19612006xx z||p|r ||| 0||||0ger c"
      */
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<DataField, String, MARCElement, MARCContext> builder,
-                          DataField fields, String value) {
+    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
+                          FieldList fields, String value) {
 
         String date1 = value.length() > 11 ? value.substring(7,11) : "0000";
         builder.context().getResource().add("date1", check(date1));

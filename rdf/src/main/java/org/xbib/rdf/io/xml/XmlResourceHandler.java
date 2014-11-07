@@ -31,7 +31,6 @@
  */
 package org.xbib.rdf.io.xml;
 
-import org.xbib.rdf.Property;
 
 import javax.xml.namespace.QName;
 
@@ -46,8 +45,6 @@ public interface XmlResourceHandler extends XmlHandler {
     void addToPredicate(QName parent, String content);
 
     void closePredicate(QName parent, QName name, int level);
-
-    Property toProperty(Property property);
 
     Object toObject(QName name, String content);
 

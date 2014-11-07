@@ -31,9 +31,9 @@
  */
 package org.xbib.elements;
 
-import org.xbib.elements.context.ResourceContextFactory;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.ContextFactory;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 
 /**
  * Element Builder
@@ -43,13 +43,13 @@ import org.xbib.rdf.context.ResourceContextWriter;
  * @param <E>
  * @param <C>
  */
-public interface ElementBuilder<K, V, E extends Element, C extends ResourceContext> {
+public interface ElementBuilder<K, V, E extends Element, C extends Context> {
 
-    ResourceContextFactory<C> resourceContextFactory();
+    ContextFactory<C> resourceContextFactory();
 
     C context();
 
-    ElementBuilder<K,V,E,C> addWriter(ResourceContextWriter output);
+    ElementBuilder<K,V,E,C> addWriter(ContextWriter output);
 
     void begin();
     

@@ -34,9 +34,7 @@ package org.xbib.elements;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.elements.marc.MARCSpecification;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 
 import java.util.Map;
@@ -44,48 +42,44 @@ import java.util.TreeMap;
 
 public class KeyValueElementMapperTest extends Assert {
 
-    private final Logger logger = LoggerFactory.getLogger(KeyValueElementMapperTest.class.getName());
-
     @Test
-    public void testMARCSpecs() {
-        String value = "100$0$1$abc";
+    public void testMARCSubfields() {
+        String value = "100$01$abc";
         Element element = new NullElement();
         Map map = new TreeMap(); // for sorted output in assertEquals matching
         AbstractSpecification specification = new MARCSpecification();
-        Map m = specification.addSpec(value, element, map);
-        value = "100$0$2$abc";
+        Map m = specification.addKey(value, element, map);
+        value = "100$02$abc";
         element = new NullElement();
-        m = specification.addSpec(value, element, m);
-        value = "100$0$2$def";
+        m = specification.addKey(value, element, m);
+        value = "100$02$def";
         element = new NullElement();
-        m = specification.addSpec(value, element, m);
-        value = "200$0$2$abc";
+        m = specification.addKey(value, element, m);
+        value = "200$02$abc";
         element = new NullElement();
-        m = specification.addSpec(value, element, m);
-        // JDK 8 gives correct key order
-        assertEquals("{100={0={1={abc=<null>}, 2={abc=<null>, def=<null>}}}, 200={0={2={abc=<null>}}}}", m.toString());
-        Element e = specification.getElement("100$0$1$abc", m);
+        m = specification.addKey(value, element, m);
+        assertEquals("{100={01={abc=<null>}, 02={abc=<null>, def=<null>}}, 200={02={abc=<null>}}}", m.toString());
+        Element e = specification.getElement("100$01$abc", m);
         assertEquals("<null>", e.toString());
-        e = specification.getElement("100$0$1$def", m);
+        e = specification.getElement("100$01$def", m);
         assertNull(e);
     }
 
     @Test
-    public void testMARCFieldCollection() {
-        String value = "100$0$1$ab";
+    public void testMARCField() {
+        String value = "100$01$ab";
         Element element = new NullElement();
         Map map = new TreeMap(); // for sorted output in assertEquals matching
         MARCSpecification specification = new MARCSpecification();
-        Map m = specification.addSpec(value, element, map);
+        Map m = specification.addKey(value, element, map);
         Field f = new Field().tag("100").indicator("01");
         Field f1 = new Field(f).subfieldId("a").data("Hello");
         Field f2 = new Field(f).subfieldId("b").data("World");
-        DataField c = new DataField();
+        FieldList c = new FieldList();
         c.add(f);
         c.add(f1);
         c.add(f2);
-        logger.info("spec={}", c.toSpec());
-        Element e = specification.getElement(c.toSpec(), m);
+        Element e = specification.getElement(c.toKey(), m);
         assertNotNull(e);
     }
 

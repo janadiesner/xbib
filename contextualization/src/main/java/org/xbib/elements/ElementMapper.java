@@ -32,12 +32,12 @@
 package org.xbib.elements;
 
 import org.xbib.keyvalue.KeyValueStreamListener;
-import org.xbib.rdf.context.ResourceContext;
+import org.xbib.rdf.Context;
 
 import java.io.Closeable;
 import java.util.Collection;
 
-public interface ElementMapper<K, V, E extends Element, C extends ResourceContext>
+public interface ElementMapper<K, V, E extends Element, C extends Context>
     extends KeyValueStreamListener<K, V>, Closeable {
 
     ElementMapper<K,V,E,C> pipelines(int numPipelines);

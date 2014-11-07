@@ -36,4 +36,6 @@ package org.xbib.rdf;
  */
 public interface Node {
 
+    boolean isVisible();
+
 }

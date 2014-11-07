@@ -155,4 +155,8 @@ public class MemoryLiteral implements Literal, Comparable<Literal> {
         return a == b || (a != null && a.equals(b));
     }
 
+    @Override
+    public boolean isVisible() {
+        return true;
+    }
 }

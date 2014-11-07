@@ -34,7 +34,7 @@ package org.xbib.elements.marc;
 import org.xbib.elements.KeyValueElementPipeline;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.rdf.Resource;
 
@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
  * It performs the heavy lifting by looking up the structured information in the element map
  * and processes the MARC fields.
  */
-public class MARCElementPipeline extends KeyValueElementPipeline<DataField, String, MARCElement, MARCContext> {
+public class MARCElementPipeline extends KeyValueElementPipeline<FieldList, String, MARCElement, MARCContext> {
 
     private final Logger logger = LoggerFactory.getLogger(MARCElementPipeline.class.getName());
 
@@ -58,18 +58,18 @@ public class MARCElementPipeline extends KeyValueElementPipeline<DataField, Stri
     }
 
     @Override
-    protected void build(DataField fields, String value) {
+    protected void build(FieldList fields, String value) {
         if (fields == null) {
             return;
         }
-        String key = fields.toSpec();
+        String key = fields.toKey();
         MARCElement element = null;
         // element retrieval
         try {
             element = (MARCElement) specification.getElement(key, getMap());
             // if nothing was found, try tag only
             if (element == null) {
-                element = (MARCElement) specification.getElementBySpec(key, getMap());
+                element = (MARCElement) specification.getElementByKey(key, getMap());
             }
         } catch (ClassCastException e) {
             logger.error("not a MARCElement instance for key" + key);
@@ -77,12 +77,12 @@ public class MARCElementPipeline extends KeyValueElementPipeline<DataField, Stri
         if (element != null) {
             // map fields, and repeat element retrieval if a mapping was performed
             if (element.map(fields)) {
-                key = fields.toSpec();
+                key = fields.toKey();
                 try {
                     element = (MARCElement) specification.getElement(key, getMap());
                     // if nothing was found, try tag only
                     if (element == null) {
-                        element = (MARCElement) specification.getElementBySpec(key, getMap());
+                        element = (MARCElement) specification.getElementByKey(key, getMap());
                     }
                 } catch (ClassCastException e) {
                     logger.error("not a MARCElement instance for key" + key);
@@ -107,7 +107,7 @@ public class MARCElementPipeline extends KeyValueElementPipeline<DataField, Stri
     }
 
     public void addToResource(Resource resource,
-                              DataField fields,
+                              FieldList fields,
                               MARCElement element,
                               String value) {
         // setup

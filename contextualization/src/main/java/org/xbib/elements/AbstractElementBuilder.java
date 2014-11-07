@@ -36,9 +36,9 @@ import java.util.List;
 
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.ContextWriter;
 
 import static com.google.common.collect.Lists.newLinkedList;
 
@@ -50,14 +50,14 @@ import static com.google.common.collect.Lists.newLinkedList;
  * @param <E> the element type
  * @param <C> the resource context type
  */
-public abstract class AbstractElementBuilder<K, V, E extends Element, C extends ResourceContext<Resource>>
+public abstract class AbstractElementBuilder<K, V, E extends Element, C extends Context<Resource>>
         implements ElementBuilder<K, V, E, C> {
 
     private final static Logger logger = LoggerFactory.getLogger(AbstractElementBuilder.class.getName());
 
     private final ThreadLocal<C> contexts = new ThreadLocal<C>();
 
-    private final List<ResourceContextWriter> writers = newLinkedList();
+    private final List<ContextWriter> writers = newLinkedList();
 
     @Override
     public void begin() {
@@ -70,7 +70,7 @@ public abstract class AbstractElementBuilder<K, V, E extends Element, C extends 
     public void end() {
         C context = context();
         context.beforeBuild();
-        for (ResourceContextWriter writer : writers) {
+        for (ContextWriter writer : writers) {
             try {
                writer.write(context);
             } catch (IOException e) {
@@ -86,7 +86,7 @@ public abstract class AbstractElementBuilder<K, V, E extends Element, C extends 
     }
 
     @Override
-    public AbstractElementBuilder<K, V, E, C> addWriter(ResourceContextWriter writer) {
+    public AbstractElementBuilder<K, V, E, C> addWriter(ContextWriter writer) {
         writers.add(writer);
         return this;
     }

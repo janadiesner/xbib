@@ -40,7 +40,7 @@ import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.tools.Converter;
 
@@ -84,7 +84,7 @@ public class FromEZBWeb extends Converter {
         IRINamespaceContext context = IRINamespaceContext.newInstance();
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         context.addNamespace("prism", "http://prismstandard.org/namespaces/basic/2.1/");
-        MemoryResourceContext resourceContext = new MemoryResourceContext();
+        MemoryContext resourceContext = new MemoryContext();
         resourceContext.setNamespaceContext(context);
 
         Reader reader = new InputStreamReader(InputService.getInputStream(uri), "UTF-8");

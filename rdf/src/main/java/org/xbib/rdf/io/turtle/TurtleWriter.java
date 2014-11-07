@@ -35,15 +35,14 @@ import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.RdfConstants;
-import org.xbib.rdf.context.ResourceContextWriter;
-import org.xbib.rdf.Property;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
+import org.xbib.rdf.RdfConstants;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 
 import java.io.Closeable;
 import java.io.Flushable;
@@ -58,8 +57,8 @@ import java.util.Stack;
  * See <a href="http://www.w3.org/TeamSubmission/turtle/">Turtle - Terse RDF
  * Triple Language</a>
  */
-public class TurtleWriter<C extends ResourceContext<Resource>>
-        implements ResourceContextWriter<C, Resource>, Triple.Builder, Closeable, Flushable {
+public class TurtleWriter<C extends Context<Resource>>
+        implements ContextWriter<C, Resource>, Triple.Builder, Closeable, Flushable {
 
     private final static Logger logger = LoggerFactory.getLogger(TurtleWriter.class.getName());
 
@@ -77,7 +76,7 @@ public class TurtleWriter<C extends ResourceContext<Resource>>
 
     private Resource lastSubject;
 
-    private Property lastPredicate;
+    private IRI lastPredicate;
 
     private Node lastObject;
 
@@ -95,7 +94,7 @@ public class TurtleWriter<C extends ResourceContext<Resource>>
 
     public TurtleWriter(Writer writer) {
         this.writer = writer;
-        this.resourceContext = (C)new MemoryResourceContext();
+        this.resourceContext = (C) new MemoryContext();
         resourceContext.newResource();
         this.nsWritten = false;
         this.sameResource = false;
@@ -122,12 +121,12 @@ public class TurtleWriter<C extends ResourceContext<Resource>>
         write(resourceContext);
     }
 
-    public TurtleWriter<C>  setNamespaceContext(IRINamespaceContext context) {
+    public TurtleWriter<C> setNamespaceContext(IRINamespaceContext context) {
         this.namespaceContext = context;
         return this;
     }
 
-    public TurtleWriter<C>  setSortLanguageTag(String languageTag) {
+    public TurtleWriter<C> setSortLanguageTag(String languageTag) {
         this.sortLangTag = languageTag;
         return this;
     }
@@ -147,7 +146,7 @@ public class TurtleWriter<C extends ResourceContext<Resource>>
     }
 
     @Override
-    public TurtleWriter<C>  end() {
+    public TurtleWriter<C> end() {
         return this;
     }
 
@@ -169,7 +168,7 @@ public class TurtleWriter<C extends ResourceContext<Resource>>
     }
 
     @Override
-    public TurtleWriter<C>  endPrefixMapping(String prefix) {
+    public TurtleWriter<C> endPrefixMapping(String prefix) {
         return this;
     }
 
@@ -225,7 +224,7 @@ public class TurtleWriter<C extends ResourceContext<Resource>>
     public void writeTriple(Triple stmt) throws IOException {
         this.triple = stmt;
         Resource subject = stmt.subject();
-        Property predicate = stmt.predicate();
+        IRI predicate = stmt.predicate();
         Node object = stmt.object();
         if (subject == null || predicate == null) {
             return;
@@ -297,8 +296,8 @@ public class TurtleWriter<C extends ResourceContext<Resource>>
         lastSubject = subject;
     }
 
-    private void writePredicate(Property predicate) throws IOException {
-        if (predicate.id() == null) {
+    private void writePredicate(IRI predicate) throws IOException {
+        if (predicate == null) {
             sb.append("<> ");
             return;
         }
@@ -306,7 +305,7 @@ public class TurtleWriter<C extends ResourceContext<Resource>>
         if ("rdf:type".equals(p) || TYPE.equals(p)) {
             sb.append("a ");
         } else {
-            writeURI(predicate.id());
+            writeURI(predicate);
             sb.append(" ");
         }
         lastPredicate = predicate;
@@ -354,6 +353,10 @@ public class TurtleWriter<C extends ResourceContext<Resource>>
     }
 
     private void writeURI(IRI uri) throws IOException {
+        if (uri == null) {
+            sb.append("<>");
+            return;
+        }
         String abbrev = namespaceContext.compact(uri);
         if (!abbrev.equals(uri.toString())) {
             sb.append(abbrev);
@@ -436,9 +439,8 @@ public class TurtleWriter<C extends ResourceContext<Resource>>
     }
 
     /**
-     *
      * Process a literal according to given sort language (e.g. mechanical word order, sort area).
-     *
+     * <p>
      * see http://www.w3.org/International/articles/language-tags/
      *
      * @param literal the literal

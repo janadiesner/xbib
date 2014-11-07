@@ -41,14 +41,14 @@ import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 
 import java.io.BufferedReader;
@@ -71,7 +71,7 @@ public class ZDBBibTest extends Assert {
 
     @Test
     public void testZDBElements() throws Exception {
-        final OurContextResourceOutput out = new OurContextResourceOutput();
+        final OurContextOutput out = new OurContextOutput();
         final Charset UTF8 = Charset.forName("UTF-8");
         final Charset ISO88591 = Charset.forName("ISO-8859-1");
         InputStream in = getClass().getResourceAsStream("zdbtitutf8.mrc");
@@ -80,10 +80,10 @@ public class ZDBBibTest extends Assert {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         MARCElementMapper mapper = new MARCElementMapper("marc/zdb/bib")
                 .pipelines(Runtime.getRuntime().availableProcessors() * 2)
-                .setListener(new UnmappedKeyListener<DataField>() {
+                .setListener(new UnmappedKeyListener<FieldList>() {
                     @Override
-                    public void unknown(DataField key) {
-                        unmapped.add(key.toSpec());
+                    public void unknown(FieldList key) {
+                        unmapped.add(key.toString());
                     }
                 })
                 .start(new MARCElementBuilderFactory() {
@@ -103,9 +103,9 @@ public class ZDBBibTest extends Assert {
                     }
                 })
                 .addListener(mapper)
-                .addListener(new KeyValueStreamAdapter<DataField, String>() {
+                .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                     @Override
-                    public KeyValueStreamAdapter<DataField, String> keyValue(DataField key, String value) {
+                    public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("begin");
                             for (Field f : key) {
@@ -129,10 +129,10 @@ public class ZDBBibTest extends Assert {
         assertEquals(counter.get(), 8);
     }
 
-    class OurContextResourceOutput implements ResourceContextWriter {
+    class OurContextOutput implements ContextWriter {
 
         @Override
-        public void write(ResourceContext context) throws IOException {
+        public void write(Context context) throws IOException {
             Resource r = context.getResource();
             r.id(IRI.builder()
                     .scheme("http")

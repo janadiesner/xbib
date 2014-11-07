@@ -35,12 +35,11 @@ import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Node;
-import org.xbib.rdf.Property;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.memory.MemoryProperty;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.memory.MemoryContext;
+import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.rdf.memory.MemoryTriple;
 import org.xbib.rdf.io.ntriple.NTripleWriter;
 
@@ -60,7 +59,7 @@ public class EuropeanaEDMReaderTest extends StreamTester {
             throw new IOException("file " + filename + " not found");
         }
 
-        MemoryResourceContext resourceContext = new MemoryResourceContext();
+        MemoryContext resourceContext = new MemoryContext();
 
         RdfXmlParser reader = new RdfXmlParser();
         reader.parse(new InputStreamReader(in, "UTF-8"), new GeoJSONFilter(resourceContext));
@@ -77,18 +76,18 @@ public class EuropeanaEDMReaderTest extends StreamTester {
 
     private final static IRI GEO_LON = IRI.create("http://www.w3.org/2003/01/geo/wgs84_pos#long");
 
-    private final static Property location = new MemoryProperty(IRI.create("location"));
+    private final static IRI location = IRI.create("location");
 
     class GeoJSONFilter implements Triple.Builder {
 
-        ResourceContext<Resource> resourceContext;
+        Context<Resource> context;
 
         Node lat = null;
 
         Node lon = null;
 
-        GeoJSONFilter(ResourceContext<Resource> resourceContext) {
-            this.resourceContext = resourceContext;
+        GeoJSONFilter(Context<Resource> context) {
+            this.context = context;
         }
 
         @Override
@@ -113,18 +112,17 @@ public class EuropeanaEDMReaderTest extends StreamTester {
 
         @Override
         public Triple.Builder triple(Triple triple) {
-            resourceContext.triple(triple);
-            if (triple.predicate().id().equals(GEO_LAT)) {
+            context.triple(triple);
+            if (triple.predicate().equals(GEO_LAT)) {
                 lat = triple.object();
             }
-            if (triple.predicate().id().equals(GEO_LON)) {
+            if (triple.predicate().equals(GEO_LON)) {
                 lon = triple.object();
             }
             if (lat != null && lon != null) {
-                // create GeoJSON
-                resourceContext.triple(new MemoryTriple(triple.subject(), location, lon));
+                // create location string for Elasticsearch
+                context.triple(new MemoryTriple(triple.subject(), location, new MemoryLiteral(lat + "," + lon)));
                 lon = null;
-                resourceContext.triple(new MemoryTriple(triple.subject(), location, lat));
                 lat = null;
             }
             return this;

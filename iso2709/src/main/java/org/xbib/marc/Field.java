@@ -39,7 +39,11 @@ import org.xbib.marc.label.RecordLabel;
  */
 public class Field implements Comparable<Field> {
 
-    public final static Field EMPTY = new Field();
+    private final static String EMPTY_STRING = "";
+
+    private final static char DOLLAR = '$';
+
+    public final static Field EMPTY_FIELD = new Field();
 
     public final static String ERROR_TAG = "999";
 
@@ -58,6 +62,8 @@ public class Field implements Comparable<Field> {
     private String data;
 
     private String sortable;
+
+    private boolean isControl;
 
     public Field() {
         this(null, null, null);
@@ -86,6 +92,7 @@ public class Field implements Comparable<Field> {
 
     public Field(String tag, String indicator, String subfieldId) {
         this.tag = tag;
+        this.isControl = tag != null && tag.charAt(0) == '0' && tag.charAt(1) == '0';
         this.indicator = indicator;
         this.subfieldId = subfieldId;
         this.data = null;
@@ -96,6 +103,7 @@ public class Field implements Comparable<Field> {
 
     public Field(String tag, int position, int length) {
         this.tag = tag;
+        this.isControl = tag != null && tag.charAt(0) == '0' && tag.charAt(1) == '0';
         this.indicator = null;
         this.subfieldId = null;
         this.data = null;
@@ -105,6 +113,7 @@ public class Field implements Comparable<Field> {
 
     public Field(Field field) {
         this.tag = field.tag();
+        this.isControl = tag != null && tag.charAt(0) == '0' && tag.charAt(1) == '0';
         this.indicator = field.indicator();
         this.subfieldId = field.subfieldId();
         this.position = field.position();
@@ -120,6 +129,7 @@ public class Field implements Comparable<Field> {
      */
     public Field(RecordLabel label, String rawContent) {
         this.tag = rawContent.length() > 2 ? rawContent.substring(0, 3) : ERROR_TAG;
+        this.isControl = tag.charAt(0) == '0' && tag.charAt(1) == '0';
         if (isControlField()) {
             this.indicator = null;
             this.subfieldId = null;
@@ -150,6 +160,7 @@ public class Field implements Comparable<Field> {
      */
     public Field(RecordLabel label, Field designator, String content, boolean asSubfield) {
         this.tag = designator.tag();
+        this.isControl = tag != null && tag.charAt(0) == '0' && tag.charAt(1) == '0';
         this.position = designator.position();
         this.length = designator.length();
         int indlen = label.getIndicatorLength();
@@ -178,8 +189,9 @@ public class Field implements Comparable<Field> {
         }
     }
 
-    public Field setEmpty() {
+    public Field clear() {
         this.tag = null;
+        this.isControl = false;
         this.indicator = null;
         this.subfieldId = null;
         this.data = null;
@@ -187,27 +199,11 @@ public class Field implements Comparable<Field> {
     }
 
     /**
-     * Returns true if this field has a defined tag and data.
-     * @return true if tag is not null and data is not null and data is not empty
-     */
-    public boolean isEmpty() {
-        return tag == null || (data != null && data.isEmpty());
-    }
-
-    /**
      * Returns true if this field is a control field.
      * @return true if tag is between 000 and 009 (inclusive)
      */
     public final boolean isControlField() {
-        return tag != null && tag.charAt(0) == '0' && tag.charAt(1) == '0';
-    }
-
-    /**
-     * Returns true if this field has an indicator
-     * @return true if indicators exist, false if not
-     */
-    public boolean hasIndicator() {
-        return indicator != null;
+        return isControl;
     }
 
     /**
@@ -226,6 +222,7 @@ public class Field implements Comparable<Field> {
      */
     public Field tag(String tag) {
         this.tag = tag;
+        this.isControl = tag != null && tag.charAt(0) == '0' && tag.charAt(1) == '0';
         return this;
     }
 
@@ -330,6 +327,12 @@ public class Field implements Comparable<Field> {
 
     public String getDesignator() {
         return tag + (indicator != null ? indicator : "") + (subfieldId != null ? subfieldId : "");
+    }
+
+    public String toKey() {
+        return (tag != null ? tag : EMPTY_STRING)
+                + (indicator != null ? DOLLAR + indicator : EMPTY_STRING)
+                + (subfieldId != null ?  DOLLAR + subfieldId : EMPTY_STRING);
     }
 
     @Override

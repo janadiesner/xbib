@@ -29,13 +29,38 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.rdf.context;
+package org.xbib.rdf.io.turtle;
 
-import org.xbib.rdf.Resource;
+import org.testng.annotations.Test;
+import org.xbib.helper.StreamTester;
+import org.xbib.iri.IRI;
+import org.xbib.logging.Logger;
+import org.xbib.logging.LoggerFactory;
 
-import java.io.IOException;
+import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 
-public interface ContentBuilder<C extends ResourceContext<R>, R extends Resource> {
+public class TurtleConformanceTest extends StreamTester {
 
-    String build(C context, R resource) throws IOException;
+    private final Logger logger = LoggerFactory.getLogger(TurtleConformanceTest.class.getName());
+
+    @Test
+    public void conformance() throws Exception {
+        for (int n = 0; n < 30; n++) {
+            String testNum = String.format("%02d", n);
+            InputStream in = getClass().getResource("/turtle/test-" + testNum + ".ttl").openStream();
+            TurtleParser turtleParser = new TurtleParser().setBaseIRI(IRI.create("http://example/base/"));
+            //StringWriter sw = new StringWriter();
+            FileWriter sw = new FileWriter("test-" + testNum + ".result");
+            TurtleWriter turtleWriter = new TurtleWriter(sw);
+            turtleParser.parse(new InputStreamReader(in, "UTF-8"), turtleWriter);
+            turtleWriter.close();
+            sw.close();
+            //logger.info("test {} -> {}", n, sw.toString());
+        }
+
+    }
+
 }

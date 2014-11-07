@@ -4,7 +4,7 @@ import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.text.CharUtils;
 import org.xbib.text.UrlEncoding;
@@ -30,7 +30,7 @@ public class OAITest extends StreamTester {
         context.addNamespace("oaidc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
 
-        final MemoryResourceContext resourceContext = new MemoryResourceContext();
+        final MemoryContext resourceContext = new MemoryContext();
         resourceContext.setNamespaceContext(context);
 
         XmlHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {

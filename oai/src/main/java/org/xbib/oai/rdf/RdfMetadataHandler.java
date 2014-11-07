@@ -36,9 +36,9 @@ import org.xbib.oai.OAIConstants;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
-import org.xbib.rdf.memory.MemoryResourceContext;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.xml.XmlResourceHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -52,9 +52,9 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
 
     private RdfResourceHandler handler;
 
-    private ResourceContext<Resource> resourceContext;
+    private Context<Resource> resourceContext;
 
-    private ResourceContextWriter resourceContextWriter;
+    private ContextWriter contextWriter;
 
     private IRINamespaceContext context;
 
@@ -71,7 +71,7 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
 
     public RdfMetadataHandler(IRINamespaceContext context) {
         this.context = context;
-        this.resourceContext = new MemoryResourceContext();
+        this.resourceContext = new MemoryContext();
         resourceContext.setNamespaceContext(context);
         resourceContext.newResource();
         // set up our default handler
@@ -83,19 +83,19 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
         return context;
     }
 
-    public RdfMetadataHandler setResourceContext(ResourceContext<Resource> resourceContext) {
-        this.resourceContext = resourceContext;
+    public RdfMetadataHandler setResourceContext(Context<Resource> context) {
+        this.resourceContext = context;
         return this;
     }
 
-    public ResourceContext<Resource> getResourceContext() {
+    public Context<Resource> getResourceContext() {
         return resourceContext;
     }
 
     public RdfMetadataHandler setHandler(RdfResourceHandler handler) {
         handler.setDefaultNamespace(NS_PREFIX, NS_URI);
         this.handler = handler;
-        if (resourceContextWriter != null) {
+        if (contextWriter != null) {
             //handler.setBuilder(resourceContextWriter);
         }
         return this;
@@ -105,9 +105,9 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
         return handler;
     }
 
-    public RdfMetadataHandler setResourceContextWriter(ResourceContextWriter resourceContextWriter) {
-        if (resourceContextWriter != null) {
-            this.resourceContextWriter = resourceContextWriter;
+    public RdfMetadataHandler setContextWriter(ContextWriter contextWriter) {
+        if (contextWriter != null) {
+            this.contextWriter = contextWriter;
             //handler.setBuilder(resourceContextWriter);
         }
         return this;
@@ -135,8 +135,8 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
             resourceContext.getResource().id(IRI.create(id));
             handler.endDocument();
             try {
-                if (resourceContextWriter != null) {
-                    resourceContextWriter.write(resourceContext);
+                if (contextWriter != null) {
+                    contextWriter.write(resourceContext);
                 }
             } catch (IOException e) {
                 throw new SAXException(e);

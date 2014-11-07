@@ -37,12 +37,12 @@ import org.xbib.elements.UnmappedKeyListener;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.DataField;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.transformer.StringTransformer;
-import org.xbib.rdf.context.ResourceContext;
-import org.xbib.rdf.context.ResourceContextWriter;
+import org.xbib.rdf.Context;
+import org.xbib.rdf.ContextWriter;
 import org.xbib.rdf.io.turtle.TurtleWriter;
 
 import java.io.File;
@@ -77,12 +77,6 @@ public class UNIMARCElementsTest extends Assert {
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
         Iso2709Reader reader = new Iso2709Reader()
                 .setMarcXchangeListener(kv);
-        //reader.setProperty(Iso2709Reader.FORMAT, "MARC");
-        //reader.setProperty(Iso2709Reader.TYPE, "Bibliographic");
-        //TransformerFactory tFactory = TransformerFactory.newInstance();
-        //Transformer transformer = tFactory.newTransformer();
-        //assertNotNull(transformer);
-
         mapper.close();
     }
 
@@ -94,10 +88,10 @@ public class UNIMARCElementsTest extends Assert {
             InputStream in = getClass().getResourceAsStream(s);
             InputStreamReader r = new InputStreamReader(in, ISO88591);
             final AtomicInteger counter = new AtomicInteger();
-            final ResourceContextWriter output = new ResourceContextWriter() {
+            final ContextWriter output = new ContextWriter() {
 
                 @Override
-                public void write(ResourceContext context) throws IOException {
+                public void write(Context context) throws IOException {
                     IRI iri = IRI.builder().scheme("http")
                             .host("dummyindex")
                             .query("dummytype")
@@ -111,10 +105,10 @@ public class UNIMARCElementsTest extends Assert {
             };
             final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
             MARCElementMapper mapper = new MARCElementMapper("marc/bib")
-                    .setListener(new UnmappedKeyListener<DataField>() {
+                    .setListener(new UnmappedKeyListener<FieldList>() {
                         @Override
-                        public void unknown(DataField key) {
-                            unmapped.add(key.toSpec());
+                        public void unknown(FieldList key) {
+                            unmapped.add(key.toString());
                         }
                     })
                     .start(new MARCElementBuilderFactory() {
@@ -127,7 +121,7 @@ public class UNIMARCElementsTest extends Assert {
             MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(mapper);
 
             final Iso2709Reader reader = new Iso2709Reader()
-                    .setTransformer(new StringTransformer() {
+                    .setTransformer("_default", new StringTransformer() {
                         @Override
                         public String transform(String value) {
                             return value == null ? null : new String(value.getBytes(ISO88591), UTF8);
@@ -138,17 +132,6 @@ public class UNIMARCElementsTest extends Assert {
             reader.setType("Bibliographic");
             reader.parse(r);
 
-/*            TransformerFactory tFactory = TransformerFactory.newInstance();
-            Transformer transformer = tFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-
-            new File("target/" + s).getParentFile().mkdirs();
-            FileOutputStream out = new FileOutputStream("target/" + s + ".xml");
-            Writer w = new OutputStreamWriter(out, UTF8);
-            StreamResult target = new StreamResult(w);
-            transformer.transform(new SAXSource(reader, r), target);
-            */
             mapper.close();
 
             // check if increment works

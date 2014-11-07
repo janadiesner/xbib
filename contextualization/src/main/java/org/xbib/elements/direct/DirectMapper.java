@@ -32,13 +32,13 @@
 package org.xbib.elements.direct;
 
 import org.xbib.keyvalue.KeyValueStreamListener;
+import org.xbib.rdf.Context;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.context.ResourceContext;
 
 import java.io.Closeable;
 import java.util.Collection;
 
-public interface DirectMapper<K, V, C extends ResourceContext<Resource>>
+public interface DirectMapper<K, V, C extends Context<Resource>>
     extends KeyValueStreamListener<K, V>, Closeable {
 
     DirectMapper<K,V,C> pipelines(int numPipelines);

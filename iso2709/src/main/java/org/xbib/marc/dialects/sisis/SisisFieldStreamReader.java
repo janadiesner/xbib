@@ -65,7 +65,7 @@ public class SisisFieldStreamReader extends LineFeedStreamReader {
         listener.data(label.getRecordLabel());
     }
 
-    public void process(String line) throws IOException {
+    public void process(String line) throws Exception {
         if (line == null || line.isEmpty()) {
             return;
         }

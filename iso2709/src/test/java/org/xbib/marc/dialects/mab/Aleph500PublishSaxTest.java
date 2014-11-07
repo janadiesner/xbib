@@ -51,7 +51,7 @@ public class Aleph500PublishSaxTest extends StreamTester {
     @Test
     public void testDE605() throws IOException, SAXException {
         InputStream in = getClass().getResource("DE-605-aleph500-publish.xml").openStream();
-        File file = File.createTempFile("DE-605.", ".xml");
+        File file = File.createTempFile("DE-605-sax-result.", ".xml");
         FileOutputStream out = new FileOutputStream(file);
         MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader()
             .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
@@ -120,7 +120,7 @@ public class Aleph500PublishSaxTest extends StreamTester {
         writer.endCollection();
         writer.endDocument();
         out.close();
-        assertStream(getClass().getResource("DE-605-result.xml").openStream(),
+        assertStream(getClass().getResource("DE-605-sax-result.xml").openStream(),
                 new FileInputStream(file));
     }
 

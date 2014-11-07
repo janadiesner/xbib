@@ -36,9 +36,9 @@ import java.io.StringWriter;
 import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.memory.MemoryLiteral;
-import org.xbib.rdf.memory.MemoryResourceContext;
-import org.xbib.rdf.types.XSDIdentifiers;
+import org.xbib.rdf.XSDResourceIdentifiers;
 
 import static org.testng.Assert.assertEquals;
 
@@ -53,12 +53,12 @@ public class NTripleTest<R extends Resource> {
 
     @Test
     public void testNTripleWriteInt() throws Exception {
-        MemoryResourceContext<R> context = new MemoryResourceContext();
+        MemoryContext<R> context = new MemoryContext();
         R resource = context.newResource();
         resource.id(IRI.create("urn:doc1"));
         resource.add("http://purl.org/dc/elements/1.1/date",
                 new MemoryLiteral("2010")
-                        .type(XSDIdentifiers.INTEGER));
+                        .type(XSDResourceIdentifiers.INTEGER));
                         //.type(IRI.create("http://www.w3.org/2001/XMLSchema#integer")));
         StringWriter w = new StringWriter();
         NTripleWriter t = new NTripleWriter(w);
@@ -66,8 +66,8 @@ public class NTripleTest<R extends Resource> {
         assertEquals(w.toString(), "<urn:doc1> <http://purl.org/dc/elements/1.1/date> \"2010\"^^<xsd:integer> .\n");
     }
 
-    private MemoryResourceContext<R> createResourceContext() {
-        MemoryResourceContext<R> context = new MemoryResourceContext();
+    private MemoryContext<R> createResourceContext() {
+        MemoryContext<R> context = new MemoryContext();
         R resource = context.newResource();
         String id = "urn:doc1";
         resource.id(IRI.create(id));

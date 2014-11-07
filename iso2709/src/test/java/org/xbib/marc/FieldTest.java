@@ -63,29 +63,114 @@ public class FieldTest {
     }
 
     @Test
-    public void testFieldIndicators() {
-        Field f = new Field().tag("100").indicator("01");
-        Field f1 = new Field(f).subfieldId("1");
-        Field f2 = new Field(f).subfieldId("2");
-        DataField c = new DataField();
+    public void testLonerField() {
+        Field f = new Field();
+        FieldList c = new FieldList();
         c.add(f);
-        c.add(f1);
-        c.add(f2);
-        assertEquals(c.toSpec(), "100$0$1$12");
+        assertEquals(c.toKey(), "$");
     }
 
     @Test
-    public void testFieldCollection() {
-        Field f = new Field().tag("016").indicator("").subfieldId(null).data(null);
+    public void testSingleTagField() {
+        Field f = new Field().tag("100");
+        FieldList c = new FieldList();
+        c.add(f);
+        assertEquals(c.toKey(), "100$");
+    }
+
+    @Test
+    public void testSingleFieldWithIndicators() {
+        Field f = new Field().tag("100").indicator("01");
+        FieldList c = new FieldList();
+        c.add(f);
+        assertEquals(c.toKey(), "100$01$");
+    }
+
+    @Test
+    public void testSingleFieldWithSubfields() {
+        Field f = new Field().tag("100").indicator("01");
+        Field f1 = new Field(f).subfieldId("1");
+        Field f2 = new Field(f).subfieldId("2");
+        FieldList c = new FieldList();
+        c.add(f);
+        c.add(f1);
+        c.add(f2);
+        assertEquals(c.toKey(), "100$01$12");
+    }
+
+    @Test
+    public void testNumericSubfields() {
+        Field f = new Field().tag("016");
         Field f1 = new Field(f).subfieldId("1");
         Field f2 = new Field(f).subfieldId("2");
         Field f3 = new Field(f).subfieldId("3");
-        DataField c = new DataField();
+        FieldList c = new FieldList();
         c.add(f);
         c.add(f1);
         c.add(f2);
         c.add(f3);
-        assertEquals(c.toSpec(), "016$123");
+        assertEquals(c.toKey(), "016$123");
+    }
+
+    @Test
+    public void testAlphabeticSubfields() {
+        Field f = new Field().tag("016");
+        Field f1 = new Field(f).subfieldId("a");
+        Field f2 = new Field(f).subfieldId("b");
+        Field f3 = new Field(f).subfieldId("c");
+        FieldList c = new FieldList();
+        c.add(f);
+        c.add(f1);
+        c.add(f2);
+        c.add(f3);
+        assertEquals(c.toKey(), "016$abc");
+    }
+
+    @Test
+    public void testRepeatingSubfields() {
+        Field f = new Field().tag("016");
+        Field f1 = new Field(f).subfieldId("a");
+        Field f2 = new Field(f).subfieldId("a");
+        Field f3 = new Field(f).subfieldId("a");
+        FieldList c = new FieldList();
+        c.add(f);
+        c.add(f1);
+        c.add(f2);
+        c.add(f3);
+        assertEquals(c.toKey(), "016$aaa");
+    }
+
+    @Test
+    public void testEmptyIndicatorWithSubfields() {
+        Field f = new Field().tag("016").indicator("").subfieldId(null).data(null);
+        Field f1 = new Field(f).subfieldId("1");
+        Field f2 = new Field(f).subfieldId("2");
+        Field f3 = new Field(f).subfieldId("3");
+        FieldList c = new FieldList();
+        c.add(f);
+        c.add(f1);
+        c.add(f2);
+        c.add(f3);
+        assertEquals(c.toKey(), "016$$123");
+    }
+
+    // 901  =, 901  a=98502599, 901  d=0, 901  e=14, 901  =f, 901  =h]
+    @Test
+    public void testBeginEndFields() {
+        Field f = new Field().tag("901").indicator("  ");
+        Field f1 = new Field(f).subfieldId("a");
+        Field f2 = new Field(f).subfieldId("d");
+        Field f3 = new Field(f).subfieldId("e");
+        Field f4 = new Field(f);
+        Field f5 = new Field(f);
+        FieldList c = new FieldList();
+        c.add(f);
+        c.add(f1);
+        c.add(f2);
+        c.add(f3);
+        c.add(f4);
+        c.add(f5);
+        assertEquals(c.toKey(), "901$  $ade");
     }
 
     @Test

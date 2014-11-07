@@ -32,22 +32,17 @@
 package org.xbib.marc.xml;
 
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.xbib.helper.StreamTester;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 
-import static org.testng.Assert.assertEquals;
+public class MarcXchangeOAITest extends StreamTester {
 
-public class MarcXchangeOAITest {
-
-    private final Logger logger = LoggerFactory.getLogger(MarcXchangeOAITest.class.getName());
-    
-
+    @Test
     public void testMarcXMLFromOAI() throws Exception {
         final StringBuilder sb = new StringBuilder();
         MarcXchangeListener listener = new MarcXchangeListener() {
@@ -62,14 +57,12 @@ public class MarcXchangeOAITest {
 
             @Override
             public void leader(String label) {
-                logger.debug("leader="+label);
                 sb.append("leader").append("\n");
                 sb.append(label).append("\n");
             }
 
             @Override
             public void beginRecord(String format, String type) {
-                logger.debug("beginRecord format="+format + " type="+type);
                 sb.append("beginRecord").append("\n");
                 sb.append(format).append("\n");
                 sb.append(type).append("\n");
@@ -77,58 +70,47 @@ public class MarcXchangeOAITest {
 
             @Override
             public void beginControlField(Field field) {
-                logger.debug("beginControlField field="+field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void endControlField(Field field) {
-                logger.debug("endControlField field="+field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void beginDataField(Field field) {
-                logger.debug("beginDataField field="+field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void endDataField(Field field) {
-                logger.debug("endDataField field="+field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void beginSubField(Field field) {
-                logger.debug("beginSubField field="+field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void endSubField(Field field) {
-                logger.debug("endsubField field="+field);
                 sb.append(field).append("\n");
             }
 
             @Override
             public void endRecord() {
-                logger.debug("endRecord");
                 sb.append("endRecord").append("\n");
             }
 
         };
 
-        InputStream in = getClass().getResourceAsStream("zdb-oai-marc.xml");
+        InputStream in = getClass().getResource("zdb-oai-marc.xml").openStream();
         MarcXchangeReader reader = new MarcXchangeReader();
         reader.addListener("Bibliographic", listener);
         reader.parse(in);
         in.close();
-
-        /*InputStreamReader r = new InputStreamReader(getClass().getResourceAsStream("zdb-oai-marc.txt"));
-        StringWriter w = new StringWriter();
-        StreamUtil.copy(r, w);
-        assertEquals(sb.toString(), w.toString());*/
-
+        assertStream( getClass().getResource("zdb-oai-marc.txt").openStream(),
+                new ByteArrayInputStream(sb.toString().getBytes("UTF-8")));
     }
 }
