@@ -1,21 +1,21 @@
 package org.xbib.analyzer
 
-import org.xbib.elements.Element
-import org.xbib.elements.ElementBuilder
+import org.xbib.entities.Entity
+import org.xbib.entities.EntityBuilder
 
-public class GroovyElement implements Element {
-    Element setSettings(Map map) { return this }
+public class GroovyEntity implements Entity {
+    Entity setSettings(Map map) { return this }
 
     Map<String,Object> getSettings() { return null }
 
-    Element begin() { return this }
+    Entity begin() { return this }
 
-    Element build(ElementBuilder builder, Object key, Object value) {
-        println 'A default build message from GroovyElement!'
+    Entity build(EntityBuilder builder, Object key, Object value) {
+        println 'A default complete message from GroovyElement!'
         return this
     }
 
-    Element end() { return this }
+    Entity end() { return this }
 }
 
-groovyElement = new GroovyElement()
+groovyElement = new GroovyEntity()

@@ -33,20 +33,28 @@ package org.xbib.tools.feed.elasticsearch.medline;
 
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.memory.MemoryContext;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.RdfContentParams;
+import org.xbib.rdf.content.RdfXContentParams;
+import org.xbib.rdf.content.RouteRdfXContentParams;
+import org.xbib.rdf.io.xml.XmlContentParser;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
-import org.xbib.rdf.io.xml.XmlParser;
+import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.tools.Feeder;
 
 import javax.xml.namespace.QName;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 /**
  * Elasticsearch indexer tool for Medline XML files
@@ -55,8 +63,6 @@ public final class Medline extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(Medline.class.getSimpleName());
 
-    private static final MemoryContext resourceContext = new MemoryContext();
-
     @Override
     public String getName() {
         return "medline-xml-elasticsearch";
@@ -64,48 +70,39 @@ public final class Medline extends Feeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new Medline();
-            }
-        };
+        return Medline::new;
     }
 
     @Override
     public void process(URI uri) throws Exception {
-        AbstractXmlHandler handler = new Handler()
+        IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
+        RdfContentParams params = new RdfXContentParams(namespaceContext, false);
+        AbstractXmlHandler handler = new Handler(params)
                 .setDefaultNamespace("ml", "http://www.nlm.nih.gov/medline");
         InputStream in = InputService.getInputStream(uri);
-        new XmlParser().setNamespaces(false)
+        new XmlContentParser().setNamespaces(false)
                 .setHandler(handler)
-                .parse(new InputStreamReader(in, "UTF-8"), null);
+                .parse(new InputStreamReader(in, "UTF-8"));
         in.close();
     }
 
     private class Handler extends AbstractXmlResourceHandler {
 
-        private String id = null;
+        String id;
 
-        public Handler() {
-            super(resourceContext);
+        public Handler(RdfContentParams params) {
+            super(params);
         }
 
         @Override
-        public void closeResource() {
+        public void closeResource() throws IOException {
             super.closeResource();
-            try {
-                resourceContext.getResource().id(IRI.builder()
-                        .scheme("http")
-                        .host(settings.get("index"))
-                        .query(settings.get("type"))
-                        .fragment(id)
-                        .build());
-                sink.write(resourceContext);
-                id = null;
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
+            RouteRdfXContentParams params = new RouteRdfXContentParams(getNamespaceContext(),
+                    settings.get("index", "ezbxml"),
+                    settings.get("type", "ezbxml"));
+            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), id, content));
+            RdfContentBuilder builder = routeRdfXContentBuilder(params);
+            builder.resource(getResource());
         }
 
         @Override
@@ -128,6 +125,16 @@ public final class Medline extends Feeder {
                     || "MedlineCitation".equals(name.getLocalPart())
                     || "@Label".equals(name.getLocalPart())
                     || "@NlmCategory".equals(name.getLocalPart());
+        }
+
+        @Override
+        public XmlHandler setNamespaceContext(IRINamespaceContext namespaceContext) {
+            return this;
+        }
+
+        @Override
+        public IRINamespaceContext getNamespaceContext() {
+            return IRINamespaceContext.getInstance();
         }
     }
 

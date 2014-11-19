@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class IdentifierSICI extends MARCElement {
+public class IdentifierSICI extends MARCEntity {
     private final static IdentifierSICI instance = new IdentifierSICI();
     
     public static IdentifierSICI getInstance() {

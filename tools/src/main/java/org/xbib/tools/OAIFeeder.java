@@ -34,9 +34,7 @@ package org.xbib.tools;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
-import org.xbib.elasticsearch.rdf.Sink;
 import org.xbib.io.NullWriter;
-import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIDateResolution;
@@ -47,9 +45,10 @@ import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.ContextWriter;
-import org.xbib.rdf.memory.MemoryContext;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.RdfContentParams;
+import org.xbib.rdf.content.RouteRdfXContentParams;
+import org.xbib.rdf.io.ntriple.NTripleContentParams;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.util.DateUtil;
 import org.xbib.util.URIUtil;
@@ -62,6 +61,7 @@ import java.util.Date;
 import java.util.Map;
 
 import static com.google.common.collect.Queues.newConcurrentLinkedQueue;
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 /**
  * Harvest from OAI and feed to Elasticsearch
@@ -80,8 +80,8 @@ public abstract class OAIFeeder extends Feeder {
         Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
                 Runtime.getRuntime().availableProcessors());
         String maxtimewait = settings.get("maxtimewait", "60s");
-        output = createIngest();
-        output.maxActionsPerBulkRequest(maxbulkactions)
+        ingest = createIngest();
+        ingest.maxActionsPerBulkRequest(maxbulkactions)
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
                 .maxRequestWait(TimeValue.parseTimeValue(maxtimewait, TimeValue.timeValueSeconds(60)))
                 .newClient(ImmutableSettings.settingsBuilder()
@@ -90,13 +90,9 @@ public abstract class OAIFeeder extends Feeder {
                         .put("port", settings.getAsInt("elasticsearch.port", 9300))
                         .put("sniff", settings.getAsBoolean("elasticsearch.sniff", false))
                         .build());
-        output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
-        beforeIndexCreation(output);
-        output.shards(shards).replica(replica).newIndex(index).startBulk(index);
-        afterIndexCreation(output);
-        sink = new Sink(output);
-
-        // a list of OAI URLs
+        ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
+        beforeIndexCreation(ingest);
+        ingest.shards(shards).replica(replica).newIndex(index).startBulk(index);
 
         String[] inputs = settings.getAsArray("input");
         if (inputs == null) {
@@ -146,48 +142,30 @@ public abstract class OAIFeeder extends Feeder {
     }
 
     protected RdfResourceHandler rdfResourceHandler() {
-        MemoryContext resourceContext = new MemoryContext();
-        return new RdfResourceHandler(resourceContext);
+        RdfContentParams params = NTripleContentParams.DEFAULT_PARAMS;
+        return new RdfResourceHandler(params);
     }
 
     protected MetadataHandler newMetadataHandler() {
         RdfResourceHandler rdfResourceHandler = rdfResourceHandler();
-        return new XmlMetadataHandler()
-                .setHandler(rdfResourceHandler)
-                .setResourceContext(rdfResourceHandler.resourceContext())
-                .setContextWriter(new MyContextWriter());
+        return new XmlMetadataHandler().setHandler(rdfResourceHandler);
     }
 
     class XmlMetadataHandler extends MetadataHandler {
 
-        final IRINamespaceContext context;
+        final IRINamespaceContext namespaceContext;
 
         XmlHandler handler;
 
-        Context resourceContext;
-
-        ContextWriter contextWriter;
-
         XmlMetadataHandler() {
-            context = IRINamespaceContext.newInstance();
-            context.addNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
-            context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
+            namespaceContext = IRINamespaceContext.newInstance();
+            namespaceContext.addNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
+            namespaceContext.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         }
 
         public XmlMetadataHandler setHandler(XmlHandler handler) {
             this.handler = handler;
             handler.setDefaultNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
-            return this;
-        }
-
-        public XmlMetadataHandler setResourceContext(Context context) {
-            this.resourceContext = context;
-            context.setNamespaceContext(this.context);
-            return this;
-        }
-
-        public XmlMetadataHandler setContextWriter(ContextWriter contextWriter) {
-            this.contextWriter = contextWriter;
             return this;
         }
 
@@ -199,16 +177,16 @@ public abstract class OAIFeeder extends Feeder {
         @Override
         public void endDocument() throws SAXException {
             handler.endDocument();
-            String identifier = getHeader().getIdentifier();
             try {
-                IRI iri = IRI.builder().scheme("http")
-                        .host(settings.get("index"))
-                        .query(settings.get("type"))
-                        .fragment(identifier).build();
-                resourceContext.getResource().id(iri);
-                contextWriter.write(resourceContext);
+                RouteRdfXContentParams params = new RouteRdfXContentParams(namespaceContext,
+                        settings.get("index", "oai"),
+                        settings.get("type", "oai"));
+                params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), getHeader().getIdentifier(), content));
+                RdfContentBuilder builder = routeRdfXContentBuilder(params);
+                builder.resource(rdfResourceHandler().getResource());
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
+                throw new SAXException(e);
             }
         }
 
@@ -235,14 +213,6 @@ public abstract class OAIFeeder extends Feeder {
         @Override
         public void characters(char[] chars, int i, int i1) throws SAXException {
             handler.characters(chars, i, i1);
-        }
-    }
-
-    class MyContextWriter implements ContextWriter {
-
-        @Override
-        public void write(Context context) throws IOException {
-            sink.write(context);
         }
     }
 

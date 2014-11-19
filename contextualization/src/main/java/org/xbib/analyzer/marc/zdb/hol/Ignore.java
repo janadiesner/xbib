@@ -31,13 +31,11 @@
  */
 package org.xbib.analyzer.marc.zdb.hol;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.marc.FieldList;
 
-public class Ignore extends MARCElement {
+public class Ignore extends MARCEntity {
 
     private final static Ignore instance = new Ignore();
 
@@ -46,7 +44,7 @@ public class Ignore extends MARCElement {
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
                           FieldList fields, String value) {
         return true;
     }

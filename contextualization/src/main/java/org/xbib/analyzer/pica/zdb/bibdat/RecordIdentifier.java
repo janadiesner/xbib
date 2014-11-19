@@ -31,13 +31,12 @@
  */
 package org.xbib.analyzer.pica.zdb.bibdat;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.dialects.pica.PicaContext;
-import org.xbib.elements.marc.dialects.pica.PicaElement;
+import org.xbib.entities.marc.dialects.pica.PicaEntity;
+import org.xbib.entities.marc.dialects.pica.PicaEntityQueue;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 
-public class RecordIdentifier extends PicaElement {
+public class RecordIdentifier extends PicaEntity {
 
     private final static RecordIdentifier instance = new RecordIdentifier();
 
@@ -46,10 +45,10 @@ public class RecordIdentifier extends PicaElement {
     }
 
     @Override
-    public void fields(ElementBuilder<FieldList, String, PicaElement, PicaContext> builder,
+    public void fields(PicaEntityQueue.PicaKeyValueWorker worker,
                        FieldList fields, String value) {
         for (Field field : fields) {
-            builder.context().setID(field.data());
+            worker.state().setID(field.data());
         }
     }
 }

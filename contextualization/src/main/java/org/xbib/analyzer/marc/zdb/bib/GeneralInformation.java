@@ -31,20 +31,19 @@
  */
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class GeneralInformation extends MARCElement {
+public class GeneralInformation extends MARCEntity {
 
     private final static GeneralInformation instance = new GeneralInformation();
     
-    public static MARCElement getInstance() {
+    public static GeneralInformation getInstance() {
         return instance;
     }
 
@@ -53,7 +52,7 @@ public class GeneralInformation extends MARCElement {
     private Map<String,Object> continuingresource;
 
     @Override
-    public MARCElement setSettings(Map params) {
+    public MARCEntity setSettings(Map params) {
         super.setSettings(params);
         this.codes= (Map<String,Object>)params.get("codes");
         this.continuingresource= (Map<String,Object>)params.get("continuingresource");
@@ -64,14 +63,14 @@ public class GeneralInformation extends MARCElement {
      * Example "991118d19612006xx z||p|r ||| 0||||0ger c"
      */
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
-                          FieldList fields, String value) {
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
+                          FieldList fields, String value) throws IOException {
 
         String date1 = value.length() > 11 ? value.substring(7,11) : "0000";
-        builder.context().getResource().add("date1", check(date1));
+        worker.state().getResource().add("date1", check(date1));
 
         String date2 = value.length() > 15 ? value.substring(11,15) : "0000";
-        builder.context().getResource().add("date2", check(date2));
+        worker.state().getResource().add("date2", check(date2));
 
         for (Field field: fields) {
             String data = field.data();
@@ -92,7 +91,7 @@ public class GeneralInformation extends MARCElement {
                         if (code == null) {
                             logger.warn("unmapped code {} in field {} predicate {}", ch, field, predicate);
                         }
-                        builder.context().getResource().add(predicate, code);
+                        worker.state().getResource().add(predicate, code);
                     }
                 }
                 if (continuingresource != null) {
@@ -103,7 +102,7 @@ public class GeneralInformation extends MARCElement {
                         if (code == null) {
                             logger.warn("unmapped code {} in field {} predicate {}", ch, field, predicate);
                         }
-                        builder.context().getResource().add(predicate, code);
+                        worker.state().getResource().add(predicate, code);
                     }
 
                 }

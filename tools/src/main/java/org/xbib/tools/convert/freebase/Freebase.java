@@ -37,18 +37,19 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.io.turtle.TurtleParser;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.io.turtle.TurtleContentParser;
 import org.xbib.tools.Converter;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
+
+import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
 
 /**
  * Freebase converter
@@ -63,12 +64,7 @@ public class Freebase extends Converter {
     }
 
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new Freebase();
-            }
-        };
+        return Freebase::new;
     }
 
     @Override
@@ -83,10 +79,12 @@ public class Freebase extends Converter {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
         };
-        NTripleWriter writer = new NTripleWriter(new OutputStreamWriter(out, "UTF-8"));
-        new TurtleParser().setBaseIRI(IRI.create(settings.get("base")))
-                .parse(new InputStreamReader(in, "UTF-8"), writer);
+        RdfContentBuilder builder = ntripleBuilder(out);
+        TurtleContentParser parser = new TurtleContentParser().setBaseIRI(IRI.create(settings.get("base")));
+        parser.builder(builder);
+        parser.parse(new InputStreamReader(in, "UTF-8"));
         in.close();
+        out.close();
     }
 
 }

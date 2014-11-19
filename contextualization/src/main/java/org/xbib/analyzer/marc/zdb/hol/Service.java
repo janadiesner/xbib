@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.zdb.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class Service extends MARCElement {
+public class Service extends MARCEntity {
 
     private final static Service instance = new Service();
 

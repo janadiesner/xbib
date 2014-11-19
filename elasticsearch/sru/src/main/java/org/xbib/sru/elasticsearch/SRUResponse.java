@@ -120,7 +120,7 @@ public class SRUResponse extends SearchRetrieveResponse {
             // this does not work, but would be sooo nice
             //getTransformer().addParameter("facets", new StreamSource(new StringReader(xmlFacets)));
 
-            // build DOM, pass it to XSL as parameter
+            // complete DOM, pass it to XSL as parameter
             if (xmlFacets != null && xmlFacets.length() > 0) {
                 try {
                     DocumentBuilder builder = factory.newDocumentBuilder();

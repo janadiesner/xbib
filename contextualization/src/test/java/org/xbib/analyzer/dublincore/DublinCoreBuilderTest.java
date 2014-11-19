@@ -31,16 +31,11 @@
  */
 package org.xbib.analyzer.dublincore;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.testng.Assert;
-import org.xbib.keyvalue.KeyValueReader;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.ContextWriter;
 
 public class DublinCoreBuilderTest extends Assert {
 
@@ -49,9 +44,9 @@ public class DublinCoreBuilderTest extends Assert {
     private final AtomicInteger counter = new AtomicInteger();
 
     // TODO groovy/jruby are broken
-    public void testDublinCoreBuilder() throws Exception {
+    /*public void testDublinCoreBuilder() throws Exception {
         StringReader sr = new StringReader("100=John Doe\n200=Hello Word\n300=2012\n400=1");
-        ContextWriter output = new ContextWriter() {
+        ResourceWriter output = new ResourceWriter() {
 
             @Override
             public void write(Context context) throws IOException {
@@ -61,12 +56,12 @@ public class DublinCoreBuilderTest extends Assert {
 
         };
 
-        DublinCoreBuilder builder = new DublinCoreBuilder();
+        DublinCoreEntityBuilder builder = new DublinCoreEntityBuilder();
         builder.addWriter(output);
 
         // load scripts
 
-        DublinCoreElementMapper mapper = new DublinCoreElementMapper("dublincore").start(builder);
+        DublinCoreKeyValueQueue mapper = new DublinCoreKeyValueQueue("dublincore").start(builder);
         KeyValueReader reader = new KeyValueReader(sr).addListener(mapper);
         String s;
         while ((s = reader.readLine()) != null) {
@@ -75,5 +70,5 @@ public class DublinCoreBuilderTest extends Assert {
         reader.close();
         mapper.close();
         assertEquals(counter.get() > 0, true);
-    }
+    }*/
 }

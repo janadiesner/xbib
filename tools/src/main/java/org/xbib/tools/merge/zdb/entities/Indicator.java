@@ -48,7 +48,7 @@ public class Indicator extends License {
 
     public Indicator(Map<String, Object> m) {
         super(m);
-        // do not call build(), it's done with super(m)
+        // do not call complete(), it's done with super(m)
     }
 
     @Override

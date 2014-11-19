@@ -31,18 +31,17 @@
  */
 package org.xbib.analyzer.unimarc.bib;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.marc.FieldList;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class RecordLabel extends MARCElement {
+public class RecordLabel extends MARCEntity {
     private final static RecordLabel instance = new RecordLabel();
     
-    public static MARCElement getInstance() {
+    public static RecordLabel getInstance() {
         return instance;
     }
 
@@ -51,7 +50,7 @@ public class RecordLabel extends MARCElement {
     private String predicate;
 
     @Override
-    public MARCElement setSettings(Map params) {
+    public MARCEntity setSettings(Map params) {
         super.setSettings(params);
         this.codes= (Map<String,Object>)params.get("codes");
         this.predicate = params.containsKey("_predicate") ?
@@ -60,8 +59,8 @@ public class RecordLabel extends MARCElement {
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
-                          FieldList fields, String value) {
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
+                          FieldList fields, String value) throws IOException {
         if (codes == null) {
             return false;
         }
@@ -70,12 +69,12 @@ public class RecordLabel extends MARCElement {
             Map<String,String> v = (Map<String,String>)codes.get(k);
             String code = value.length() > pos ? value.substring(pos,pos+1) : "";
             if (v.containsKey(code)) {
-                builder.context().getResource().add(predicate, v.get(code));
+                worker.state().getResource().add(predicate, v.get(code));
             }
         }
         char ch5 = value.charAt(5);
         if (ch5 == 'd') {
-            builder.context().getResource().add("deleted", "true");
+            worker.state().getResource().add("deleted", "true");
         }
 
         char ch6 = value.charAt(6);
@@ -84,38 +83,38 @@ public class RecordLabel extends MARCElement {
         boolean isBook = (ch6 == 'a' || ch6 == 't') &&
                 (ch7 == 'a' || ch7 == 'c' || ch7 == 'd' || ch7 == 'm');
         if (isBook) {
-            builder.context().getResource().add("type", "book");
+            worker.state().getResource().add("type", "book");
         }
 
         boolean isComputerFile = ch6 == 'm';
         if (isComputerFile) {
-            builder.context().getResource().add("type", "computerfile");
+            worker.state().getResource().add("type", "computerfile");
         }
 
         boolean isMap = (ch6 == 'e' || ch6 == 'f');
         if (isMap) {
-            builder.context().getResource().add("type", "map");
+            worker.state().getResource().add("type", "map");
         }
 
         boolean isMusic = (ch6 == 'c' || ch6 == 'd' || ch6 == 'i' || ch6 == 'j');
         if (isMusic) {
-            builder.context().getResource().add("type", "music");
+            worker.state().getResource().add("type", "music");
         }
 
         boolean isContinuingResource = ch6 == 'a' &&
                 (ch7 == 'b' || ch7 == 'i' || ch7 == 's');
         if (isContinuingResource) {
-            builder.context().getResource().add("type", "continuingresource");
+            worker.state().getResource().add("type", "continuingresource");
         }
 
         boolean isVisualMaterial = (ch6 == 'g' || ch6 == 'k' || ch6 == 'o' || ch6 == 'r');
         if (isVisualMaterial) {
-            builder.context().getResource().add("type", "visualmaterial");
+            worker.state().getResource().add("type", "visualmaterial");
         }
 
         boolean isMixedMaterial = ch6 == 'p';
         if (isMixedMaterial) {
-            builder.context().getResource().add("type", "mixedmaterial");
+            worker.state().getResource().add("type", "mixedmaterial");
         }
         return false;
     }

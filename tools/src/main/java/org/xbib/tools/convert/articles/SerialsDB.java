@@ -39,20 +39,24 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
+import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryContext;
-import org.xbib.rdf.io.turtle.TurtleWriter;
+import org.xbib.rdf.io.turtle.TurtleContentParams;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.tools.Converter;
 
 import java.io.EOFException;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
 
 /**
  * Import serials list
@@ -61,14 +65,12 @@ public class SerialsDB extends Converter {
 
     private final static Logger logger = LoggerFactory.getLogger(SerialsDB.class.getSimpleName());
 
-    private final static IRINamespaceContext context = IRINamespaceContext.newInstance();
+    private final static IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
 
     static {
-        context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
-        context.addNamespace("prism", "http://prismstandard.org/namespaces/basic/2.1/");
+        namespaceContext.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
+        namespaceContext.addNamespace("prism", "http://prismstandard.org/namespaces/basic/2.1/");
     }
-
-    private final static MemoryContext resourceContext = new MemoryContext();
 
     private final static Map<String, Resource> serials = new ConcurrentHashMap<>();
 
@@ -79,12 +81,7 @@ public class SerialsDB extends Converter {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new SerialsDB();
-            }
-        };
+        return SerialsDB::new;
     }
 
     @Override
@@ -99,11 +96,7 @@ public class SerialsDB extends Converter {
         }
 
         String fileName = settings.get("output") + ".ttl";
-        FileWriter w = new FileWriter(fileName);
-
-        resourceContext.setNamespaceContext(context);
-        final TurtleWriter writer = new TurtleWriter(w);
-        writer.setNamespaceContext(context);
+        FileOutputStream out = new FileOutputStream(fileName);
         CSVParser parser = new CSVParser(new InputStreamReader(in, "UTF-8"));
         try {
             int i = 0;
@@ -124,7 +117,7 @@ public class SerialsDB extends Converter {
                     // head line
                     continue;
                 }
-                Resource resource = resourceContext.newResource();
+                Resource resource = new MemoryResource();
                 String issn1 = buildISSN(issnArr, 0, true);
                 String issn2 = buildISSN(issnArr, 1, true);
                 if (issn1 != null && issn1.equals(issn2)) {
@@ -147,7 +140,9 @@ public class SerialsDB extends Converter {
                         .add("prism:issn", issn2)
                         .add("prism:doi", doi.isEmpty() ? null : doi);
                 if (!serials.containsKey(journalTitle)) {
-                    writer.write(resourceContext);
+                    TurtleContentParams params = new TurtleContentParams(namespaceContext, false);
+                    RdfContentBuilder builder = turtleBuilder(out, params);
+                    builder.resource(resource);
                     serials.put(journalTitle, resource);
                 } else {
                     logger.info("ignoring double serial title: {}", journalTitle);

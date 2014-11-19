@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.unimarc.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class VersionIdentifier extends MARCElement {
+public class VersionIdentifier extends MARCEntity {
 
     private final static VersionIdentifier instance = new VersionIdentifier();
 

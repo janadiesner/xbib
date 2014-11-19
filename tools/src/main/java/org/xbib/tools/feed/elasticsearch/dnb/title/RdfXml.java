@@ -33,24 +33,22 @@ package org.xbib.tools.feed.elasticsearch.dnb.title;
 
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.io.InputService;
-import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.memory.MemoryContext;
-import org.xbib.rdf.io.rdfxml.RdfXmlParser;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.content.RouteRdfXContentParams;
+import org.xbib.rdf.io.rdfxml.RdfXmlContentParser;
 import org.xbib.tools.Feeder;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.util.concurrent.atomic.AtomicLong;
+
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 /**
  * Ingest DNB Title RDF/XML to Elasticsearch
@@ -66,12 +64,7 @@ public class RdfXml extends Feeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new RdfXml();
-            }
-        };
+        return RdfXml::new;
     }
 
     @Override
@@ -101,81 +94,18 @@ public class RdfXml extends Feeder {
         namespaceContext.addNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         namespaceContext.addNamespace("skos", "http://www.w3.org/2004/02/skos/core#");
 
-        Context context = new MemoryContext();
-        context.setContentBuilder(new DefaultContentBuilder<>());
-        context.setNamespaceContext(namespaceContext);
+        RouteRdfXContentParams params = new RouteRdfXContentParams(namespaceContext,
+                settings.get("index", "dnb"),
+                settings.get("type", "title"));
+        params.setIdPredicate("gnd:gndIdentifier");
+        params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
+        RdfContentBuilder builder = routeRdfXContentBuilder(params);
+        RdfXmlContentParser reader = new RdfXmlContentParser();
+        reader.builder(builder);
         InputStream in = InputService.getInputStream(uri);
-        RdfXmlParser reader = new RdfXmlParser();
-        reader.parse(new InputStreamReader(in, "UTF-8"), new MyTripleBuilder(context));
+        reader.parse(new InputStreamReader(in, "UTF-8"));
         in.close();
     }
 
-    class MyTripleBuilder implements Triple.Builder {
-
-        private Context context;
-
-        private AtomicLong counter = new AtomicLong();
-
-        MyTripleBuilder(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        public Triple.Builder begin() {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder startPrefixMapping(String prefix, String uri) {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder endPrefixMapping(String prefix) {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder newIdentifier(IRI iri) {
-            // push currrent context before moving to next resource
-            try {
-                if (context.getResource() != null) {
-                    // set ES feed IRI
-                    IRI doc = IRI.builder()
-                            .scheme("http") // whatever
-                            .host(settings.get("index", "dnb"))
-                            .query(settings.get("type", "title"))
-                            .fragment(Long.toString(counter.incrementAndGet()))
-                            .build();
-                    context.getResource().id(doc);
-                    sink.write(context);
-                }
-            } catch (IOException e) {
-                logger.error("output failed: {}", e.getMessage(), e);
-            }
-            context.switchTo(context.newResource());
-            context.getResource().id(iri);
-            return this;
-        }
-
-        @Override
-        public Triple.Builder triple(Triple triple) {
-            context.getResource().add(triple);
-            return this;
-        }
-
-        @Override
-        public Triple.Builder end() {
-            if (context.getResource() != null) {
-                try {
-                    sink.write(context);
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-            return this;
-        }
-
-    }
 }
 

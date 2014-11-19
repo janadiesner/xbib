@@ -34,13 +34,16 @@ package org.xbib.rdf.io.turtle;
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.RdfContentBuilder;
 
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
+
+import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
 
 public class TurtleConformanceTest extends StreamTester {
 
@@ -51,14 +54,18 @@ public class TurtleConformanceTest extends StreamTester {
         for (int n = 0; n < 30; n++) {
             String testNum = String.format("%02d", n);
             InputStream in = getClass().getResource("/turtle/test-" + testNum + ".ttl").openStream();
-            TurtleParser turtleParser = new TurtleParser().setBaseIRI(IRI.create("http://example/base/"));
+            TurtleContentParser turtleParser = new TurtleContentParser().setBaseIRI(IRI.create("http://example/base/"));
             //StringWriter sw = new StringWriter();
             FileWriter sw = new FileWriter("test-" + testNum + ".result");
-            TurtleWriter turtleWriter = new TurtleWriter(sw);
-            turtleParser.parse(new InputStreamReader(in, "UTF-8"), turtleWriter);
-            turtleWriter.close();
+
+            //TurtleContentGenerator turtleWriter = new TurtleContentGenerator(sw);
+            TurtleContentParams params = new TurtleContentParams(IRINamespaceContext.newInstance(), false);
+            RdfContentBuilder builder = turtleBuilder(params);
+            turtleParser.builder(builder);
+            turtleParser.parse(new InputStreamReader(in, "UTF-8"));
+            sw.write(builder.string());
             sw.close();
-            //logger.info("test {} -> {}", n, sw.toString());
+            //logger.info("test {} -> {}", n, builder.string());
         }
 
     }

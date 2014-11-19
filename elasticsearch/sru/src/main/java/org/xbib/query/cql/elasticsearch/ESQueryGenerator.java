@@ -155,7 +155,7 @@ public class ESQueryGenerator implements Visitor {
             if (node.getSortSpec() != null) {
                 node.getSortSpec().accept(this);
             }
-            // build query
+            // complete query
             queryGen.start();
             node.getQuery().accept(this);
             // check for a filter after query node was being accepted
@@ -195,7 +195,7 @@ public class ESQueryGenerator implements Visitor {
                     filter,
                     facets);
         } catch (IOException e) {
-            throw new SyntaxException("unable to build a valid query from " + node + " , reason: " + e.getMessage(), e);
+            throw new SyntaxException("unable to complete a valid query from " + node + " , reason: " + e.getMessage(), e);
         }
     }
 

@@ -31,13 +31,13 @@
  */
 package org.xbib.analyzer.marc.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class TitleAlternative extends MARCElement {
+public class TitleAlternative extends MARCEntity {
     
-    private final static MARCElement element = new TitleAlternative();
+    private final static MARCEntity element = new TitleAlternative();
 
-    public static MARCElement getInstance() {
+    public static MARCEntity getInstance() {
         return element;
     }
 }

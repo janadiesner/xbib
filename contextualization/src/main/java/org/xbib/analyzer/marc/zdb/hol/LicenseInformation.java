@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.zdb.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class LicenseInformation extends MARCElement {
+public class LicenseInformation extends MARCEntity {
 
     private final static LicenseInformation instance = new LicenseInformation();
 

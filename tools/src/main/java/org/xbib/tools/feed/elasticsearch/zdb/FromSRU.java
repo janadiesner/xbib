@@ -34,24 +34,17 @@ package org.xbib.tools.feed.elasticsearch.zdb;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
-import org.xbib.elasticsearch.rdf.Sink;
-import org.xbib.elements.UnmappedKeyListener;
-import org.xbib.elements.marc.MARCElementBuilder;
-import org.xbib.elements.marc.MARCElementBuilderFactory;
-import org.xbib.elements.marc.MARCElementMapper;
+import org.xbib.entities.marc.MARCEntityBuilderState;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.io.Request;
-import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.FieldList;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
-import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.MarcXchangeContentHandler;
-import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.ContextWriter;
-import org.xbib.rdf.Resource;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.content.RouteRdfXContentParams;
 import org.xbib.sru.client.SRUClient;
 import org.xbib.sru.client.SRUClientFactory;
 import org.xbib.sru.searchretrieve.SearchRetrieveListener;
@@ -73,6 +66,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 public class FromSRU extends Feeder {
 
@@ -118,15 +113,14 @@ public class FromSRU extends Feeder {
 
     protected void prepareOutput() throws IOException {
         String index = settings.get("index");
-        String type = settings.get("type");
         Integer shards = settings.getAsInt("shards", 1);
         Integer replica = settings.getAsInt("replica", 0);
         Integer maxbulkactions = settings.getAsInt("maxbulkactions", 100);
         Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
                 Runtime.getRuntime().availableProcessors());
-        output = createIngest();
-        beforeIndexCreation(output);
-        output.maxActionsPerBulkRequest(maxbulkactions)
+        ingest = createIngest();
+        beforeIndexCreation(ingest);
+        ingest.maxActionsPerBulkRequest(maxbulkactions)
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
                 .newClient(ImmutableSettings.settingsBuilder()
                         .put("cluster.name", settings.get("elasticsearch.cluster"))
@@ -134,91 +128,44 @@ public class FromSRU extends Feeder {
                         .put("port", settings.getAsInt("elasticsearch.port", 9300))
                         .put("sniff", settings.getAsBoolean("elasticsearch.sniff", false))
                         .build());
-        output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
-        output.shards(shards).replica(replica).newIndex(index);
-        afterIndexCreation(output);
-        sink = new Sink(output);
+        ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
+        ingest.shards(shards).replica(replica).newIndex(index);
     }
 
     @Override
     protected PipelineProvider pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new FromSRU(true);
-            }
-        };
+        return () -> new FromSRU(true);
     }
 
     @Override
     protected void process(URI uri) throws Exception {
 
-        final String bibIndex = settings.get("bibIndex", "zdb");
-        final String bibType = settings.get("bibType", "title");
-        final String holIndex = settings.get("holIndex", "zdbholdings");
-        final String holType = settings.get("holType", "holdings");
-
-        final OurContextOutput bibout = new OurContextOutput().setIndex(bibIndex).setType(bibType);
-
-        final OurContextOutput holout = new OurContextOutput().setIndex(holIndex).setType(holType);
-
         final Set<String> unmappedbib = Collections.synchronizedSet(new TreeSet<String>());
-        final MARCElementMapper bibmapper = new MARCElementMapper("marc/zdb/bib")
-                .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<FieldList>() {
-                    @Override
-                    public void unknown(FieldList key) {
-                        logger.warn("unmapped field {}", key);
-                        if ((settings.getAsBoolean("detect", false))) {
-                            unmappedbib.add("\"" + key + "\"");
-                        }
-                    }
-                })
-                .start(new MARCElementBuilderFactory() {
-                    public MARCElementBuilder newBuilder() {
-                        MARCElementBuilder builder = new MARCElementBuilder();
-                        builder.addWriter(bibout);
-                        return builder;
-                    }
-                });
+        final MyBibQueue bibqueue = new MyBibQueue("marc/zdb/bib", settings.getAsInt("pipelines", 1));
+        bibqueue.setUnmappedKeyListener(key -> {
+            if ((settings.getAsBoolean("detect", false))) {
+                logger.warn("unmapped field {}", key);
+                unmappedbib.add("\"" + key + "\"");
+            }
+        });
 
         final Set<String> unmappedhol = Collections.synchronizedSet(new TreeSet<String>());
-        final MARCElementMapper holmapper = new MARCElementMapper("marc/zdb/hol")
-                .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<FieldList>() {
-                    @Override
-                    public void unknown(FieldList key) {
-                        logger.warn("unmapped field {}", key);
-                        if ((settings.getAsBoolean("detect", false))) {
-                            unmappedbib.add("\"" + key + "\"");
-                        }
-                    }
-                })
-                .start(new MARCElementBuilderFactory() {
-                    public MARCElementBuilder newBuilder() {
-                        MARCElementBuilder builder = new MARCElementBuilder();
-                        builder.addWriter(holout);
-                        return builder;
-                    }
-                });
+        final MyHolQueue holqueue = new MyHolQueue("marc/zdb/hol", settings.getAsInt("pipelines", 1));
+        holqueue.setUnmappedKeyListener(key -> {
+            if ((settings.getAsBoolean("detect", false))) {
+                logger.warn("unmapped field {}", key);
+                unmappedhol.add("\"" + key + "\"");
+            }
+        });
+
 
         final MarcXchange2KeyValue bib = new MarcXchange2KeyValue()
-                .setStringTransformer(new StringTransformer() {
-                    @Override
-                    public String transform(String value) {
-                        return Normalizer.normalize(value, Normalizer.Form.NFC);
-                    }
-                })
-                .addListener(bibmapper);
+                .setStringTransformer(value -> Normalizer.normalize(value, Normalizer.Form.NFC))
+                .addListener(bibqueue);
 
         final MarcXchange2KeyValue hol = new MarcXchange2KeyValue()
-                .setStringTransformer(new StringTransformer() {
-                    @Override
-                    public String transform(String value) {
-                        return Normalizer.normalize(value, Normalizer.Form.NFC);
-                    }
-                })
-                .addListener(holmapper);
+                .setStringTransformer(value -> Normalizer.normalize(value, Normalizer.Form.NFC))
+                .addListener(holqueue);
 
         final MarcXchangeContentHandler handler = new MarcXchangeContentHandler()
                 .addListener("Bibliographic", bib)
@@ -307,32 +254,39 @@ public class FromSRU extends Feeder {
         return this;
     }
 
-    private class OurContextOutput implements ContextWriter<Context<Resource>, Resource> {
+    class MyBibQueue extends MARCEntityQueue {
 
-        String index;
-
-        String type;
-
-        public OurContextOutput setIndex(String index) {
-            this.index = index;
-            return this;
-        }
-
-        public OurContextOutput setType(String type) {
-            this.type = type;
-            return this;
+        public MyBibQueue(String path, int workers) {
+            super(path, workers);
         }
 
         @Override
-        public void write(Context context) throws IOException {
-            IRI iri = context.getResource().id();
-            context.getResource().id(IRI.builder()
-                    .scheme("http")
-                    .host(index)
-                    .query(type)
-                    .fragment(iri.getFragment())
-                    .build());
-            sink.write(context);
+        public void afterCompletion(MARCEntityBuilderState state) throws IOException {
+            RouteRdfXContentParams params = new RouteRdfXContentParams(IRINamespaceContext.getInstance(),
+                    settings.get("bibIndex", "zdb"),
+                    settings.get("bibType", "title"));
+            params.setIdPredicate("identifierZDB");
+            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
+            RdfContentBuilder builder = routeRdfXContentBuilder(params);
+            builder.resource(state.getResource());
+        }
+    }
+
+    class MyHolQueue extends MARCEntityQueue {
+
+        public MyHolQueue(String path, int workers) {
+            super(path, workers);
+        }
+
+        @Override
+        public void afterCompletion(MARCEntityBuilderState state) throws IOException {
+            RouteRdfXContentParams params = new RouteRdfXContentParams(IRINamespaceContext.getInstance(),
+                    settings.get("holIndex", "zdbholdings"),
+                    settings.get("holType", "holdings"));
+            params.setIdPredicate("identifierZDB");
+            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
+            RdfContentBuilder builder = routeRdfXContentBuilder(params);
+            builder.resource(state.getResource());
         }
     }
 }

@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class NormalizedHoldings extends MARCElement {
+public class NormalizedHoldings extends MARCEntity {
 
     private final static NormalizedHoldings instance = new NormalizedHoldings();
 

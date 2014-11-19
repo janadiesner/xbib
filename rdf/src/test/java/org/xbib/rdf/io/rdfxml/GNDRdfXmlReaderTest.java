@@ -33,23 +33,18 @@ package org.xbib.rdf.io.rdfxml;
 
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
-import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.rdf.memory.MemoryResource;
+import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.io.turtle.TurtleContentParams;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
+
+import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
+import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
 
 public class GNDRdfXmlReaderTest extends StreamTester {
-
-    private final Logger logger = LoggerFactory.getLogger(GNDRdfXmlReaderTest.class.getName());
 
     @Test
     public void testGNDfromRdfXmltoTurtle() throws Exception {
@@ -58,90 +53,27 @@ public class GNDRdfXmlReaderTest extends StreamTester {
         if (in == null) {
             throw new IOException("file " + filename + " not found");
         }
-        StringWriter sw = new StringWriter();
-        TurtleWriter writer  = new TurtleWriter(sw);
-        RdfXmlParser reader = new RdfXmlParser();
-        reader.parse(new InputStreamReader(in, "UTF-8"), writer);
-        writer.close();
-        sw.close();
+        TurtleContentParams params = new TurtleContentParams(IRINamespaceContext.getInstance(), false);
+        RdfContentBuilder builder = turtleBuilder(params);
+        RdfXmlContentParser reader = new RdfXmlContentParser();
+        reader.builder(builder);
+        reader.parse(new InputStreamReader(in, "UTF-8"));
         assertStream(getClass().getResource("gnd.ttl").openStream(),
-                new ByteArrayInputStream(sw.toString().getBytes()));
+                builder.streamInput());
     }
 
     @Test
-    public void testGNDContentBuilder() throws Exception {
+    public void testGNDtoNtriple() throws Exception {
         String filename = "/org/xbib/rdf/io/rdfxml/GND.rdf";
         InputStream in = getClass().getResourceAsStream(filename);
         if (in == null) {
             throw new IOException("file " + filename + " not found");
         }
-        TripleContentBuilder tripleContentBuilder = new TripleContentBuilder();
-        RdfXmlParser reader = new RdfXmlParser();
-        reader.parse(new InputStreamReader(in, "UTF-8"), tripleContentBuilder);
-    }
+        RdfContentBuilder builder = ntripleBuilder();
+        RdfXmlContentParser reader = new RdfXmlContentParser();
+        reader.builder(builder);
+        reader.parse(new InputStreamReader(in, "UTF-8"));
 
-    class TripleContentBuilder implements Triple.Builder {
-
-        Resource resource;
-
-        @Override
-        public Triple.Builder begin() {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder startPrefixMapping(String prefix, String uri) {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder endPrefixMapping(String prefix) {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder newIdentifier(IRI identifier) {
-            try {
-                if (resource != null) {
-                    output(resource);
-                }
-            } catch (IOException e) {
-                //
-            }
-            resource = new MemoryResource();
-            resource.id(identifier);
-            return this;
-        }
-
-        @Override
-        public Triple.Builder triple(Triple triple) {
-            /*logger.info("{} {} {} -> {} {} {}",
-                    triple.subject().getClass(),
-                    triple.predicate().getClass(),
-                    triple.object().getClass(),
-                    triple.subject(),
-                    triple.predicate(),
-                    triple.object()
-                    );*/
-            resource.add(triple);
-            return this;
-        }
-
-        @Override
-        public Triple.Builder end() {
-            try {
-                if (resource != null) {
-                    output(resource);
-                }
-            } catch (IOException e) {
-                //
-            }
-            return this;
-        }
-
-        private void output(Resource resource) throws IOException {
-            logger.info("output = {}", resource);
-        }
     }
 
 }

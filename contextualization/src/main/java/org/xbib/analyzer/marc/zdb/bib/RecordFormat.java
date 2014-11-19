@@ -31,12 +31,12 @@
  */
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class RecordFormat extends MARCElement {
+public class RecordFormat extends MARCEntity {
     private final static RecordFormat instance = new RecordFormat();
     
-    public static MARCElement getInstance() {
+    public static RecordFormat getInstance() {
         return instance;
     }
 }

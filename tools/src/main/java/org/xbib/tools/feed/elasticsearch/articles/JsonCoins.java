@@ -45,10 +45,12 @@ import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfConstants;
+import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryContext;
+import org.xbib.rdf.content.RouteRdfXContentParams;
 import org.xbib.rdf.memory.MemoryLiteral;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.text.InvalidCharacterException;
 import org.xbib.tools.Feeder;
 import org.xbib.tools.convert.articles.SerialsDB;
@@ -64,9 +66,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
+
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 /**
  * Index article DB into Elasticsearch
@@ -75,21 +79,21 @@ public class JsonCoins extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(JsonCoins.class.getSimpleName());
 
-    private final static IRINamespaceContext context = IRINamespaceContext.newInstance();
+    private final static IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
 
     static {
-        context.addNamespace(RdfConstants.NS_PREFIX, RdfConstants.NS_URI);
-        context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
-        context.addNamespace("dcterms", "http://purl.org/dc/terms/");
-        context.addNamespace("foaf", "http://xmlns.com/foaf/0.1/");
-        context.addNamespace("frbr", "http://purl.org/vocab/frbr/core#");
-        context.addNamespace("fabio", "http://purl.org/spar/fabio/");
-        context.addNamespace("prism", "http://prismstandard.org/namespaces/basic/2.1/");
+        namespaceContext.add(new HashMap<String, String>() {{
+            put(RdfConstants.NS_PREFIX, RdfConstants.NS_URI);
+            put("dc", "http://purl.org/dc/elements/1.1/");
+            put("dcterms", "http://purl.org/dc/terms/");
+            put("foaf", "http://xmlns.com/foaf/0.1/");
+            put("frbr", "http://purl.org/vocab/frbr/core#");
+            put("fabio", "http://purl.org/spar/fabio/");
+            put("prism", "http://prismstandard.org/namespaces/basic/2.1/");
+        }});
     }
 
     private final static JsonFactory jsonFactory = new JsonFactory();
-
-    private final static AtomicLong resourceCounter = new AtomicLong(0L);
 
     private final static Charset UTF8 = Charset.forName("UTF-8");
 
@@ -102,12 +106,7 @@ public class JsonCoins extends Feeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new JsonCoins();
-            }
-        };
+        return JsonCoins::new;
     }
 
     @Override
@@ -141,8 +140,11 @@ public class JsonCoins extends Feeder {
         if (in == null) {
             throw new IOException("unable to open " + uri);
         }
-        final MemoryContext resourceContext = new MemoryContext();
-        resourceContext.setNamespaceContext(context);
+
+        RouteRdfXContentParams params = new RouteRdfXContentParams(namespaceContext);
+        params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
+        RdfContentBuilder builder = routeRdfXContentBuilder(params);
+
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, UTF8))) {
             JsonParser parser = jsonFactory.createParser(reader);
             JsonToken token = parser.nextToken();
@@ -153,7 +155,7 @@ public class JsonCoins extends Feeder {
             while (token != null) {
                 switch (token) {
                     case START_OBJECT: {
-                        resource = resourceContext.newResource();
+                        resource = new MemoryResource();
                         break;
                     }
                     case END_OBJECT: {
@@ -169,15 +171,13 @@ public class JsonCoins extends Feeder {
                                 indexType = type + "errors";
                                 break;
                         }
-                        resourceContext.getResource().id(IRI.builder()
-                                .scheme("http")
-                                .host(index)
-                                .query(indexType)
-                                .fragment(resourceContext.getResource().id().getFragment())
-                                .build());
-                        sink.write(resourceContext);
-                        resourceCounter.incrementAndGet();
-                        resource = null;
+                        if (resource != null) {
+                            params.setIndex(index);
+                            params.setType(indexType);
+                            params.setId(resource.id().getFragment());
+                            builder.resource(resource);
+                            resource = null;
+                        }
                         break;
                     }
                     case START_ARRAY: {
@@ -297,8 +297,7 @@ public class JsonCoins extends Feeder {
                             // encode as URI, but info URI RFC wants slash as unencoded character
                             // anyway we use xbib.info/doi/
                             doiURI = doiURI.replaceAll("%2F", "/");
-                            IRI iri = IRI.builder()
-                                    .scheme("http")
+                            IRI iri = IRI.builder().scheme("http")
                                     .host("xbib.info")
                                     .path("/doi/")
                                     .fragment(doiURI)
@@ -307,7 +306,7 @@ public class JsonCoins extends Feeder {
                                     .a(FABIO_ARTICLE)
                                     .add("prism:doi", s);
                         } catch (Exception e) {
-                            logger.warn("can't build IRI from DOI " + v, e);
+                            logger.warn("can't complete IRI from DOI " + v, e);
                         }
                         break;
                     }

@@ -41,8 +41,9 @@ import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.oai.xml.XmlMetadataHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.memory.MemoryContext;
-import org.xbib.rdf.io.ntriple.NTripleWriter;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.RdfContentParams;
+import org.xbib.rdf.io.ntriple.NTripleContentParams;
 import org.xbib.tools.OAIHarvester;
 import org.xml.sax.SAXException;
 
@@ -54,6 +55,7 @@ import java.io.StringWriter;
 import java.net.URI;
 
 import static com.google.common.collect.Queues.newConcurrentLinkedQueue;
+import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
 
 /**
  * Fetch OAI result from ZDB OAI service.
@@ -115,23 +117,26 @@ public class FromOAI2CSV extends OAIHarvester {
     protected MetadataHandler ntripleMetadataHandler() {
         final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();
-        // TODO
-        StringWriter sw = new StringWriter();
-        metadataHandler.setHandler(resourceHandler)
-                .setContextWriter(new NTripleWriter(sw));
-        return metadataHandler;
+        try {
+            RdfContentBuilder builder = ntripleBuilder();
+            metadataHandler.setHandler(resourceHandler)
+                    .setBuilder(builder);
+            return metadataHandler;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected RdfResourceHandler rdfResourceHandler() {
         return resourceHandler;
     }
 
-    private final static RdfResourceHandler resourceHandler = new OAIResourceHandler();
+    private final static RdfResourceHandler resourceHandler = new OAIResourceHandler(NTripleContentParams.DEFAULT_PARAMS);
 
     private static class OAIResourceHandler extends RdfResourceHandler {
 
-        public OAIResourceHandler() {
-            super(new MemoryContext());
+        public OAIResourceHandler(RdfContentParams params) {
+            super(params);
         }
 
         @Override

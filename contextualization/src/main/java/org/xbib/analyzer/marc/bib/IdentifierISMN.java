@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class IdentifierISMN extends MARCElement {
+public class IdentifierISMN extends MARCEntity {
     private final static IdentifierISMN instance = new IdentifierISMN();
     
     public static IdentifierISMN getInstance() {

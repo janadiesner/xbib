@@ -31,21 +31,15 @@
  */
 package org.xbib.tools.feed.elasticsearch.freebase;
 
-import org.xbib.elasticsearch.rdf.Sink;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.memory.MemoryContext;
-import org.xbib.rdf.io.turtle.TurtleParser;
+import org.xbib.rdf.io.turtle.TurtleContentParser;
 import org.xbib.tools.Feeder;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -75,23 +69,23 @@ public class Freebase extends Feeder {
     @Override
     public void process(URI uri) throws Exception {
         InputStream in = InputService.getInputStream(uri);
-        ElasticBuilder builder = new ElasticBuilder(sink);
+        //ElasticBuilder builder = new ElasticBuilder(elasticsearchRdfXContentGenerator);
         IRI base = IRI.create(settings.get("base"));
-        new TurtleParser().setBaseIRI(base)
-                .parse(new InputStreamReader(in, "UTF-8"), builder);
+        new TurtleContentParser().setBaseIRI(base)
+                .parse(new InputStreamReader(in, "UTF-8"));
         in.close();
     }
-
+/*
     private class ElasticBuilder implements Triple.Builder {
 
-        private final Sink sink;
+        private final ElasticsearchRdfXContentGenerator elasticsearchRdfXContentGenerator;
 
         private final Context context = new MemoryContext();
 
         private Resource resource;
 
-        ElasticBuilder(Sink sink) throws IOException {
-            this.sink = sink;
+        ElasticBuilder(ElasticsearchRdfXContentGenerator elasticsearchRdfXContentGenerator) throws IOException {
+            this.elasticsearchRdfXContentGenerator = elasticsearchRdfXContentGenerator;
             resource = context.newResource();
         }
 
@@ -134,11 +128,12 @@ public class Freebase extends Feeder {
 
         private void flush() {
             try {
-                sink.write(context);
+                elasticsearchRdfXContentGenerator.write(context);
             } catch (IOException e) {
                 logger.error("flush failed: {}", e.getMessage(), e);
             }
         }
 
     }
+*/
 }

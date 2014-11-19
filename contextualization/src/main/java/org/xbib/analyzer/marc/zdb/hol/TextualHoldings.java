@@ -31,33 +31,32 @@
  */
 package org.xbib.analyzer.marc.zdb.hol;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
-import org.xbib.elements.support.EnumerationAndChronology;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
+import org.xbib.entities.support.EnumerationAndChronology;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.rdf.Resource;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class TextualHoldings extends MARCElement {
+public class TextualHoldings extends MARCEntity {
 
     private final static TextualHoldings instance = new TextualHoldings();
-
-    private Pattern[] movingwallPatterns;
 
     public static TextualHoldings getInstance() {
         return instance;
     }
 
+    private Pattern[] movingwallPatterns;
+
     @Override
     public TextualHoldings setSettings(Map params) {
-        this.params = params;
+        super.setSettings(params);
         List<String> movingwalls = (List<String>) params.get("movingwall");
         if (movingwalls != null) {
             Pattern[] p = new Pattern[movingwalls.size()];
@@ -78,17 +77,17 @@ public class TextualHoldings extends MARCElement {
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
-                          FieldList fields, String value) {
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
+                          FieldList fields, String value) throws IOException {
         for (Field field : fields) {
-            builder.context().getResource().add("textualholdings", field.data());
+            worker.state().getResource().add("textualholdings", field.data());
             if ("a".equals(field.subfieldId())) {
-                Resource r = builder.context().getResource().newResource("holdings");
+                Resource r = worker.state().getResource().newResource("holdings");
                 Resource parsedHoldings = EnumerationAndChronology.parse(field.data(), r, getMovingwallPatterns());
                 if (!parsedHoldings.isEmpty()) {
                     Set<Integer> dates = EnumerationAndChronology.dates(r.id(), parsedHoldings);
                     for (Integer date : dates) {
-                        builder.context().getResource().add("dates", date);
+                        worker.state().getResource().add("dates", date);
                     }
                 } else {
                     if (logger.isTraceEnabled()) {

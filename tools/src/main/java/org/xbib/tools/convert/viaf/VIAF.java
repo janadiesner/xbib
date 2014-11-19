@@ -36,13 +36,12 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.io.rdfxml.RdfXmlParser;
-import org.xbib.rdf.io.turtle.TurtleWriter;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.io.rdfxml.RdfXmlContentParser;
 import org.xbib.tools.Converter;
 
 import java.io.BufferedReader;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -53,6 +52,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
+
+import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
+import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
 
 /**
  * VIAF indexer to Elasticsearch
@@ -126,16 +128,18 @@ public class VIAF extends Converter {
 
         @Override
         public Boolean call() throws Exception {
-            FileWriter fileWriter = new FileWriter(settings.get("output"));
+            FileOutputStream out = new FileOutputStream(settings.get("output"));
             try {
                 while (true) {
                     String line = pump.take();
                     if ("|".equals(line)) {
                         break;
                     }
-                    RdfXmlParser rdfxml = new RdfXmlParser();
-                    rdfxml.parse(new StringReader(line), settings.getAsBoolean("ntriples", false) ?
-                         new NTripleWriter(fileWriter) : new TurtleWriter(fileWriter));
+                    RdfXmlContentParser parser = new RdfXmlContentParser();
+                    RdfContentBuilder builder = settings.getAsBoolean("ntriples", false) ?
+                            ntripleBuilder(out) : turtleBuilder(out);
+                    parser.builder(builder);
+                    parser.parse(new StringReader(line));
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);

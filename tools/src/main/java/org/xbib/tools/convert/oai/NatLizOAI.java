@@ -38,12 +38,7 @@ import org.xbib.tools.OAIHarvester;
 public class NatLizOAI extends OAIHarvester {
 
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new NatLizOAI();
-            }
-        };
+        return NatLizOAI::new;
     }
     @Override
     public String getName() {

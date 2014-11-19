@@ -1,8 +1,8 @@
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.elements.ValueMapFactory;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementBuilder;
+import org.xbib.entities.ValueMapFactory;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityBuilder;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 
@@ -12,24 +12,25 @@ import java.util.Map;
 /**
  * TODO replace by library service onotology
  */
-public class ItemLibraryIdentifier extends MARCElement {
+public class ItemLibraryIdentifier extends MARCEntity {
 
-    private final static MARCElement element = new ItemLibraryIdentifier();
-    private final String defaultProvider = "DE-605";
+    private final static ItemLibraryIdentifier element = new ItemLibraryIdentifier();
+
     private final static Map<String, String> sigel2isil =
             ValueMapFactory.getAssocStringMap("sigel2isil");
+
     private final static Map<String, Map<String, List<String>>> product2isil =
             ValueMapFactory.getMap("product2isil");
 
     private ItemLibraryIdentifier() {
     }
 
-    public static MARCElement getInstance() {
+    public static ItemLibraryIdentifier getInstance() {
         return element;
     }
 
     @Override
-    public ItemLibraryIdentifier build(MARCElementBuilder b, FieldList key, String value) {
+    public ItemLibraryIdentifier build(MARCEntityBuilder b, FieldList key, String value) {
         boolean servicecreated = false;
         for (Field d : key) {
             String s = d.subfieldId();
@@ -48,7 +49,7 @@ public class ItemLibraryIdentifier extends MARCElement {
         return this;
     }
 
-    private String resolveIdentifier(MARCElementBuilder b, String value) {
+    private String resolveIdentifier(MARCEntityBuilder b, String value) {
         if (product2isil.containsKey(value)) {
             for (String isil : product2isil.get(value).get("authorized")) {
                 createISIL(b, isil, value);
@@ -62,9 +63,9 @@ public class ItemLibraryIdentifier extends MARCElement {
         return isil;
     }
 
-    private void createISIL(MARCElementBuilder b, String isil, String provider) {
+    private void createISIL(MARCEntityBuilder b, String isil, String provider) {
     }
 
-    private void createItemService(MARCElementBuilder b, String itemStatus) {
+    private void createItemService(MARCEntityBuilder b, String itemStatus) {
     }
 }

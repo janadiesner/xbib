@@ -33,12 +33,13 @@ package org.xbib.rdf.io.xml;
 
 
 import javax.xml.namespace.QName;
+import java.io.IOException;
 
 public interface XmlResourceHandler extends XmlHandler {
 
-    void openResource();
+    void openResource() throws IOException;
 
-    void closeResource();
+    void closeResource() throws IOException;
 
     void openPredicate(QName parent, QName name, int level);
 

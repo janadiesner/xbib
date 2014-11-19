@@ -1,17 +1,17 @@
 {
     "RecordFormat" : {
         "values" : [
-        "FORMAT"
+        "__FORMAT$"
         ]  
     },
     "RecordType" : {
         "values" : [
-        "TYPE"
+        "__TYPE$"
         ]  
     },
     "RecordLeader" : {
         "values" : [
-        "LEADER"
+        "__LEADER$"
         ],
         "codes" : {
             "5" : {

@@ -34,44 +34,37 @@ package org.xbib.rdf.io.json;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryContext;
-import org.xbib.rdf.io.turtle.TurtleWriter;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.io.xml.XmlHandler;
 
 import javax.xml.namespace.QName;
 
+import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
+
 public class JsonReaderTest extends StreamTester {
-
-    private static final Logger logger = LoggerFactory.getLogger(JsonReaderTest.class.getName());
-
-    final MemoryContext resourceContext = new MemoryContext();
 
     @Test
     public void testGenericJsonReader() throws Exception {
-
         String filename = "dc.json";
         InputStream in = getClass().getResourceAsStream(filename);
         if (in == null) {
             throw new IOException("file " + filename + " not found");
         }
 
-        IRINamespaceContext context = IRINamespaceContext.newInstance();
-        context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
-        context.addNamespace("dcterms", "http://purl.org/dc/terms/");
-        context.addNamespace("bib", "info:srw/cql-context-set/1/bib-v1/");
-        context.addNamespace("xbib", "http://xbib.org/");
-        context.addNamespace("lia", "http://xbib.org/lia/");
+        IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
+        namespaceContext.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
+        namespaceContext.addNamespace("dcterms", "http://purl.org/dc/terms/");
+        namespaceContext.addNamespace("bib", "info:srw/cql-context-set/1/bib-v1/");
+        namespaceContext.addNamespace("xbib", "http://xbib.org/");
+        namespaceContext.addNamespace("lia", "http://xbib.org/lia/");
 
-        resourceContext.setNamespaceContext(context);
-
-        JsonResourceHandler jsonHandler = new JsonResourceHandler(resourceContext) {
+        JsonContentParams params = new JsonContentParams(namespaceContext, true);
+        JsonResourceHandler jsonHandler = new JsonResourceHandler(params) {
 
             @Override
             public boolean isResourceDelimiter(QName name) {
@@ -86,19 +79,26 @@ public class JsonReaderTest extends StreamTester {
             @Override
             public void identify(QName name, String value, IRI identifier) {
                 if (identifier == null) {
-                    resourceContext.getResource().id(IRI.create("id:doc1"));
+                    getResource().id(IRI.create("id:doc1"));
                 }
             }
 
+            @Override
+            public XmlHandler setNamespaceContext(IRINamespaceContext namespaceContext) {
+                return this;
+            }
+
+            @Override
+            public IRINamespaceContext getNamespaceContext() {
+                return namespaceContext;
+            }
         };
-        StringWriter sw = new StringWriter();
-        TurtleWriter t = new TurtleWriter(sw);
-        jsonHandler.setBuilder(t);
-        new JsonParser()
+        RdfContentBuilder builder = turtleBuilder();
+        jsonHandler.setBuilder(builder);
+        new JsonContentParser()
                 .setHandler(jsonHandler)
                 .root(new QName("http://purl.org/dc/elements/1.1/", "root", "dc"))
-                .parse(new InputStreamReader(in, "UTF-8"), t);
-        logger.info("resource={}", sw.toString());
+                .parse(new InputStreamReader(in, "UTF-8"));
     }
 
 }

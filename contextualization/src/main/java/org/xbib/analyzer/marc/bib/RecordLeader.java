@@ -31,18 +31,17 @@
  */
 package org.xbib.analyzer.marc.bib;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.marc.FieldList;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class RecordLeader extends MARCElement {
+public class RecordLeader extends MARCEntity {
     private final static RecordLeader instance = new RecordLeader();
     
-    public static MARCElement getInstance() {
+    public static MARCEntity getInstance() {
         return instance;
     }
 
@@ -51,7 +50,7 @@ public class RecordLeader extends MARCElement {
     private String predicate;
 
     @Override
-    public MARCElement setSettings(Map params) {
+    public MARCEntity setSettings(Map params) {
         super.setSettings(params);
         this.codes= (Map<String,Object>)params.get("codes");
         this.predicate = params.containsKey("_predicate") ?
@@ -60,9 +59,9 @@ public class RecordLeader extends MARCElement {
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
-                          FieldList fields, String value) {
-        builder.context().setLabel(value);
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
+                          FieldList fields, String value) throws IOException {
+        worker.state().setLabel(value);
         if (codes == null) {
             return false;
         }
@@ -71,13 +70,13 @@ public class RecordLeader extends MARCElement {
             Map<String,String> v = (Map<String,String>)codes.get(k);
             String code = value.length() > pos ? value.substring(pos,pos+1) : "";
             if (v.containsKey(code)) {
-                builder.context().getResource().add(predicate, v.get(code));
+                worker.state().getResource().add(predicate, v.get(code));
             }
         }
 
         char ch5 = value.charAt(5);
         if (ch5 == 'd') {
-            builder.context().getResource().add("deleted", "true");
+            worker.state().getResource().add("deleted", "true");
         }
 
         char ch6 = value.charAt(6);
@@ -86,45 +85,45 @@ public class RecordLeader extends MARCElement {
         boolean isBook = (ch6 == 'a' || ch6 == 't') &&
                 (ch7 == 'a' || ch7 == 'c' || ch7 == 'd' || ch7 == 'm');
         if (isBook) {
-            builder.context().setResourceType("book");
-            builder.context().getResource().add("type", "book");
+            //worker.state().setResourceType("book");
+            worker.state().getResource().add("type", "book");
         }
 
         boolean isComputerFile = ch6 == 'm';
         if (isComputerFile) {
-            builder.context().setResourceType("computerfile");
-            builder.context().getResource().add("type", "computerfile");
+            //worker.context().setResourceType("computerfile");
+            worker.state().getResource().add("type", "computerfile");
         }
 
         boolean isMap = (ch6 == 'e' || ch6 == 'f');
         if (isMap) {
-            builder.context().setResourceType("map");
-            builder.context().getResource().add("type", "map");
+            //worker.context().setResourceType("map");
+            worker.state().getResource().add("type", "map");
         }
 
         boolean isMusic = (ch6 == 'c' || ch6 == 'd' || ch6 == 'i' || ch6 == 'j');
         if (isMusic) {
-            builder.context().setResourceType("music");
-            builder.context().getResource().add("type", "music");
+            //worker.context().setResourceType("music");
+            worker.state().getResource().add("type", "music");
         }
 
         boolean isContinuingResource = ch6 == 'a' &&
                 (ch7 == 'b' || ch7 == 'i' || ch7 == 's');
         if (isContinuingResource) {
-            builder.context().setResourceType("continuingresource");
-            builder.context().getResource().add("type", "continuingresource");
+            //worker.context().setResourceType("continuingresource");
+            worker.state().getResource().add("type", "continuingresource");
         }
 
         boolean isVisualMaterial = (ch6 == 'g' || ch6 == 'k' || ch6 == 'o' || ch6 == 'r');
         if (isVisualMaterial) {
-            builder.context().setResourceType("visualmaterial");
-            builder.context().getResource().add("type", "visualmaterial");
+            //builder.context().setResourceType("visualmaterial");
+            worker.state().getResource().add("type", "visualmaterial");
         }
 
         boolean isMixedMaterial = ch6 == 'p';
         if (isMixedMaterial) {
-            builder.context().setResourceType("mixedmaterial");
-            builder.context().getResource().add("type", "mixedmaterial");
+            //worker.context().setResourceType("mixedmaterial");
+            worker.state().getResource().add("type", "mixedmaterial");
         }
         return false;
     }

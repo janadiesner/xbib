@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.testng.annotations.Test;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
-import org.xbib.rdf.io.xml.XmlParser;
+import org.xbib.rdf.io.xml.XmlContentParser;
 import org.xbib.util.DateUtil;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -70,7 +70,7 @@ public class DNBClientTest {
                 .setUntil(DateUtil.parseDateISO("2013-01-10T00:00:00Z"), OAIDateResolution.SECOND)
                 .setSet("bib")
                 .setMetadataPrefix("PicaPlus-xml");
-        final XmlParser reader = new XmlParser();
+        final XmlContentParser reader = new XmlContentParser();
         final AtomicLong count = new AtomicLong(0L);
         MetadataHandler metadataHandler = new MetadataHandler() {
             @Override

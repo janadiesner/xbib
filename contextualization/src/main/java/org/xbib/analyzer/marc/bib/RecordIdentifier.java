@@ -31,13 +31,13 @@
  */
 package org.xbib.analyzer.marc.bib;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.marc.FieldList;
 
-public class RecordIdentifier extends MARCElement {
+import java.io.IOException;
+
+public class RecordIdentifier extends MARCEntity {
 
     private final static RecordIdentifier instance = new RecordIdentifier();
 
@@ -46,10 +46,10 @@ public class RecordIdentifier extends MARCElement {
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
-                          FieldList fields, String value) {
-        super.fields(pipeline, builder, fields, value);
-        builder.context().setRecordNumber(value);
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
+                          FieldList fields, String value) throws IOException {
+        super.fields(worker, fields, value);
+        worker.state().setRecordNumber(value);
         return true;
     }
 }

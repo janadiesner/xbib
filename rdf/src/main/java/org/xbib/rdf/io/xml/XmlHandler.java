@@ -31,22 +31,25 @@
  */
 package org.xbib.rdf.io.xml;
 
-import org.xbib.rdf.Context;
-import org.xbib.rdf.Triple;
+import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.RdfContentBuilder;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 
 /**
- * XML handler with triple listener
+ * XML handler
  */
 public interface XmlHandler
         extends EntityResolver, DTDHandler, ContentHandler, ErrorHandler {
 
+    XmlHandler setNamespaceContext(IRINamespaceContext namespaceContext);
+
+    IRINamespaceContext getNamespaceContext();
+
     XmlHandler setDefaultNamespace(String prefix, String uri);
 
-    XmlHandler setBuilder(Triple.Builder builder);
+    XmlHandler setBuilder(RdfContentBuilder builder);
 
-    Context resourceContext();
 }

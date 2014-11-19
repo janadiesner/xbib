@@ -31,28 +31,28 @@
  */
 package org.xbib.analyzer.marc.zdb.hol;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.marc.FieldList;
 
-public class RecordIdentifier extends MARCElement {
+import java.io.IOException;
+
+public class RecordIdentifier extends MARCEntity {
     private final static RecordIdentifier instance = new RecordIdentifier();
 
-    public static MARCElement getInstance() {
+    public static RecordIdentifier getInstance() {
         return instance;
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
-                          FieldList fields, String value) {
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
+                          FieldList fields, String value) throws IOException {
         String predicate = getClass().getSimpleName();
         if (getSettings().containsKey("_predicate")) {
             predicate = (String) getSettings().get("_predicate");
         }
-        builder.context().setRecordNumber(value);
-        builder.context().getResource().add(predicate, value);
+        worker.state().setRecordNumber(value);
+        worker.state().getResource().add(predicate, value);
         return false;
     }
 }

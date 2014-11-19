@@ -31,21 +31,22 @@
  */
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.EntityBuilder;
+import org.xbib.entities.marc.MARCEntityBuilderState;
+import org.xbib.entities.marc.MARCEntity;
 import org.xbib.marc.FieldList;
 import org.xbib.rdf.Resource;
 
-public class PrecedingEntry extends MARCElement {
+public class PrecedingEntry extends MARCEntity {
     private final static PrecedingEntry instance = new PrecedingEntry();
     
-    public static MARCElement getInstance() {
+    public static PrecedingEntry getInstance() {
         return instance;
     }
 
     @Override
-    public String data(ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,String predicate, Resource resource, String property, String value) {
+    public String data(EntityBuilder<MARCEntityBuilderState, MARCEntity, FieldList, String> builder,
+                       String predicate, Resource resource, String property, String value) {
         if ("identifier".equals(property)) {
             if (value.startsWith("(DE-600)")) {
                 resource.add("identifierZDB", value.substring(8).replaceAll("\\-","").toLowerCase());

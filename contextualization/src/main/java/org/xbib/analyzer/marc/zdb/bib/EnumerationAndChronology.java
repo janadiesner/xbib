@@ -31,12 +31,12 @@
  */
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class EnumerationAndChronology extends MARCElement {
+public class EnumerationAndChronology extends MARCEntity {
     private final static EnumerationAndChronology instance = new EnumerationAndChronology();
     
-    public static MARCElement getInstance() {
+    public static EnumerationAndChronology getInstance() {
         return instance;
     }
 }

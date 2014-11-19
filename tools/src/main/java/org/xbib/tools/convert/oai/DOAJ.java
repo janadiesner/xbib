@@ -32,11 +32,13 @@
 package org.xbib.tools.convert.oai;
 
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.memory.MemoryContext;
+import org.xbib.rdf.RdfContentParams;
+import org.xbib.rdf.io.ntriple.NTripleContentParams;
+import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.rdf.XSDResourceIdentifiers;
 import org.xbib.tools.OAIHarvester;
@@ -54,24 +56,19 @@ public class DOAJ extends OAIHarvester {
     }
 
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new DOAJ();
-            }
-        };
+        return DOAJ::new;
     }
 
     protected RdfResourceHandler rdfResourceHandler() {
         return resourceHandler;
     }
 
-    private final static RdfResourceHandler resourceHandler = new DOAJResourceHandler(new MemoryContext());
+    private final static RdfResourceHandler resourceHandler = new DOAJResourceHandler(NTripleContentParams.DEFAULT_PARAMS);
 
     private static class DOAJResourceHandler extends RdfResourceHandler {
 
-        public DOAJResourceHandler(Context context) {
-            super(context);
+        public DOAJResourceHandler(RdfContentParams params) {
+            super(params);
         }
 
         @Override
@@ -122,5 +119,14 @@ public class DOAJ extends OAIHarvester {
 
         private final static IRI LCCN = IRI.create("urn:LCC");
 
+        @Override
+        public XmlHandler setNamespaceContext(IRINamespaceContext namespaceContext) {
+            return null;
+        }
+
+        @Override
+        public IRINamespaceContext getNamespaceContext() {
+            return null;
+        }
     }
 }

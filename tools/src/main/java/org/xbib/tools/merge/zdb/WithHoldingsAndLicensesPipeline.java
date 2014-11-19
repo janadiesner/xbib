@@ -236,7 +236,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             logger.error("service queue not empty?");
         }
         if (!buildQueue.isEmpty()) {
-            logger.error("build queue not empty?");
+            logger.error("complete queue not empty?");
         }
         logger.info("closing");
     }

@@ -187,6 +187,10 @@ public interface Resource extends Node {
 
     Resource add(Map map);
 
+    Resource rename(String oldPredicate, String newPredicate);
+
+    Resource rename(IRI oldPredicate, IRI newPredicate);
+
     /**
      * Setting the type of the resource.
      * This is equivalent to add("rdf:type", externalResource)
@@ -203,6 +207,12 @@ public interface Resource extends Node {
      * @return list of resources
      */
     List<Resource> resources(IRI predicate);
+
+    /**
+     * Create an anonymous resource and do not associate it with this resource.
+     * @return a new anonymous resource
+     */
+    Resource newResource();
 
     /**
      * Create an anonymous resource and associate it with this resource. If the

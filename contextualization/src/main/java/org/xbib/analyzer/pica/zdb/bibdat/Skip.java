@@ -31,20 +31,20 @@
  */
 package org.xbib.analyzer.pica.zdb.bibdat;
 
-import org.xbib.elements.marc.dialects.pica.PicaElementBuilder;
-import org.xbib.elements.marc.dialects.pica.PicaElement;
+import org.xbib.entities.marc.dialects.pica.PicaEntity;
+import org.xbib.entities.marc.dialects.pica.PicaEntityBuilder;
 import org.xbib.marc.FieldList;
 
-public class Skip extends PicaElement {
+public class Skip extends PicaEntity {
     
-    private final static PicaElement element = new Skip();
+    private final static PicaEntity element = new Skip();
 
-    public static PicaElement getInstance() {
+    public static PicaEntity getInstance() {
         return element;
     }
 
     @Override
-    public Skip build(PicaElementBuilder b, FieldList key, String value) {
+    public Skip build(PicaEntityBuilder b, FieldList key, String value) {
         // skip
         return this;
     }

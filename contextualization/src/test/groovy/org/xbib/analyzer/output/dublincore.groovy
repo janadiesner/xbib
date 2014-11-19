@@ -1,9 +1,9 @@
 package org.xbib.analyzer.output
 
 import org.xbib.rdf.Context
-import org.xbib.rdf.ContextWriter
+import org.xbib.rdf.ResourceWriter
 
-public class DublinCoreWriter implements ContextWriter {
+public class DublinCoreWriter implements ResourceWriter {
 
     @Override
     void write(Context resourceContext) throws IOException {

@@ -31,13 +31,11 @@
  */
 package org.xbib.analyzer.marc.bib;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.marc.FieldList;
 
-public class Event extends MARCElement {
+public class Event extends MARCEntity {
 
     private final static Event instance = new Event();
 
@@ -46,7 +44,7 @@ public class Event extends MARCElement {
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
                           FieldList fields, String value) {
         return true;
     }

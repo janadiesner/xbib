@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.pica.zdb.bibdat;
 
-import org.xbib.elements.marc.dialects.pica.PicaElement;
+import org.xbib.entities.marc.dialects.pica.PicaEntity;
 
-public class Name extends PicaElement {
+public class Name extends PicaEntity {
     private final static Name instance = new Name();
     
     public static Name getInstance() {

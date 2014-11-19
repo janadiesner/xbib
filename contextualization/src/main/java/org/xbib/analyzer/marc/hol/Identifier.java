@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class Identifier extends MARCElement {
+public class Identifier extends MARCEntity {
 
     private final static Identifier instance = new Identifier();
 

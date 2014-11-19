@@ -44,7 +44,6 @@ import org.xbib.util.Strings;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.net.URI;
 import java.util.Scanner;
 import java.util.zip.ZipEntry;
@@ -66,12 +65,7 @@ public class GeonamesFromZIP extends Feeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new GeonamesFromZIP();
-            }
-        };
+        return GeonamesFromZIP::new;
     }
 
     @Override
@@ -139,15 +133,11 @@ public class GeonamesFromZIP extends Feeder {
                         .field("dem", dem)
                         .field("timezone", timezone)
                         .endObject();
-                output.index(settings.get("index"), settings.get("type"), geonameid, builder.string());
+                ingest.index(settings.get("index"), settings.get("type"), geonameid, builder.string());
             }
         }
         zin.close();
         logger.info("end of processing {}", uri);
-    }
-
-    @Override
-    protected void writeMetrics(Writer writer) throws Exception {
     }
 
 }

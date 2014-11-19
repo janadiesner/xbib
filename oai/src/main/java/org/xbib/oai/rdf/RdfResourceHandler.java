@@ -32,10 +32,11 @@
 package org.xbib.oai.rdf;
 
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.oai.OAIConstants;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.Resource;
+import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
+import org.xbib.rdf.io.xml.XmlHandler;
 
 import javax.xml.namespace.QName;
 
@@ -44,8 +45,8 @@ import javax.xml.namespace.QName;
  */
 public class RdfResourceHandler extends AbstractXmlResourceHandler implements OAIConstants {
 
-    public RdfResourceHandler(Context<Resource> context) {
-        super(context);
+    public RdfResourceHandler(RdfContentParams params) {
+        super(params);
     }
 
     @Override
@@ -75,5 +76,15 @@ public class RdfResourceHandler extends AbstractXmlResourceHandler implements OA
 
     public Object toObject(QName parent, String content) {
         return content;
+    }
+
+    @Override
+    public XmlHandler setNamespaceContext(IRINamespaceContext namespaceContext) {
+        return this;
+    }
+
+    @Override
+    public IRINamespaceContext getNamespaceContext() {
+        return getParams().getNamespaceContext();
     }
 }

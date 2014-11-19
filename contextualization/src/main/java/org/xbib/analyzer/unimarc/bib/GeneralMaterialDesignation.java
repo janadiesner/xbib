@@ -31,12 +31,12 @@
  */
 package org.xbib.analyzer.unimarc.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class GeneralMaterialDesignation extends MARCElement {
+public class GeneralMaterialDesignation extends MARCEntity {
     private final static GeneralMaterialDesignation instance = new GeneralMaterialDesignation();
     
-    public static MARCElement getInstance() {
+    public static MARCEntity getInstance() {
         return instance;
     }
     

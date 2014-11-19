@@ -1,22 +1,19 @@
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementBuilder;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityBuilder;
 import org.xbib.marc.FieldList;
 
-public class Skip extends MARCElement {
+public class Skip extends MARCEntity {
     
-    private final static MARCElement element = new Skip();
-    
-    private Skip() {
-    }
+    private final static Skip element = new Skip();
         
-    public static MARCElement getInstance() {
+    public static Skip getInstance() {
         return element;
     }
 
     @Override
-    public Skip build(MARCElementBuilder b, FieldList key, String value) {
+    public Skip build(MARCEntityBuilder b, FieldList key, String value) {
         return this;
     }
 

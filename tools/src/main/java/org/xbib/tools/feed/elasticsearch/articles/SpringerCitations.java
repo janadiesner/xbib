@@ -34,14 +34,17 @@ package org.xbib.tools.feed.elasticsearch.articles;
 import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Literal;
+import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.memory.MemoryContext;
+import org.xbib.rdf.content.RouteRdfXContentParams;
 import org.xbib.rdf.memory.MemoryLiteral;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.tools.Feeder;
 
 import java.io.BufferedReader;
@@ -52,14 +55,14 @@ import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
+
 /**
  * Push Springer citations to Elasticsearch
  */
 public class SpringerCitations extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(SpringerCitations.class.getSimpleName());
-
-    private final static MemoryContext resourceContext = new MemoryContext();
 
     @Override
     public String getName() {
@@ -68,12 +71,7 @@ public class SpringerCitations extends Feeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new SpringerCitations();
-            }
-        };
+        return SpringerCitations::new;
     }
 
     @Override
@@ -174,7 +172,7 @@ public class SpringerCitations extends Feeder {
                     .createIdentifier();
             IRI dereferencable = IRI.builder().scheme("http").host("xbib.info")
                     .path("/doi/").fragment(doi).build();
-            Resource r = resourceContext.newResource()
+            Resource r = new MemoryResource()
                     .id(dereferencable)
                     .a(FABIO_ARTICLE)
                     .add("xbib:key", key)
@@ -198,13 +196,14 @@ public class SpringerCitations extends Feeder {
                     .add("prism:publicationName", journal)
                     .add("prism:issn", issn)
                     .add("dc:publisher", publisher);
-            resourceContext.getResource().id(IRI.builder()
-                    .scheme("http")
-                    .host(settings.get("index"))
-                    .query(settings.get("type"))
-                    .fragment(resourceContext.getResource().id().getFragment())
-                    .build());
-            sink.write(resourceContext);
+
+            IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
+            RouteRdfXContentParams params = new RouteRdfXContentParams(namespaceContext,
+                    settings.get("index"),
+                    settings.get("type"));
+            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), r.id().toString(), content));
+            RdfContentBuilder builder = routeRdfXContentBuilder(params);
+            builder.resource(r);
         }
     }
 

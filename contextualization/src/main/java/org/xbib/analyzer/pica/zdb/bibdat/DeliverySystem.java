@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.pica.zdb.bibdat;
 
-import org.xbib.elements.marc.dialects.pica.PicaElement;
+import org.xbib.entities.marc.dialects.pica.PicaEntity;
 
-public class DeliverySystem extends PicaElement {
+public class DeliverySystem extends PicaEntity {
 
     private final static DeliverySystem instance = new DeliverySystem();
 

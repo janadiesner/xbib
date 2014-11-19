@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class Location extends MARCElement {
+public class Location extends MARCEntity {
 
     private final static Location instance = new Location();
 

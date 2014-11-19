@@ -42,12 +42,7 @@ public class FromOAI extends OAIFeeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new FromOAI();
-            }
-        };
+        return FromOAI::new;
     }
 
     @Override

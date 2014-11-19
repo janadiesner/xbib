@@ -60,12 +60,7 @@ public class UNIMARCGreekTest {
         try (InputStreamReader r = new InputStreamReader(in, ISO88591)) {
 
             final Iso2709Reader reader = new Iso2709Reader()
-                    .setTransformer("_default", new StringTransformer() {
-                        @Override
-                        public String transform(String value) {
-                            return XMLUtil.sanitizeXml10(new String(value.getBytes(ISO88591), UTF8)).toString();
-                        }
-                    });
+                    .setTransformer("_default", value -> XMLUtil.sanitizeXml10(new String(value.getBytes(ISO88591), UTF8)).toString());
             File file = File.createTempFile("serres.", ".xml");
             FileWriter w = new FileWriter(file);
             MarcXchangeWriter writer = new MarcXchangeWriter(w);

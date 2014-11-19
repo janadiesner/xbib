@@ -41,12 +41,7 @@ import org.xbib.tools.OAIHarvester;
 public class OAI extends OAIHarvester {
 
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new OAI();
-            }
-        };
+        return OAI::new;
     }
     @Override
     public String getName() {

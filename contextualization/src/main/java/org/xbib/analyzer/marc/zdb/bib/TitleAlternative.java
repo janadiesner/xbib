@@ -1,15 +1,12 @@
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class TitleAlternative extends MARCElement {
+public class TitleAlternative extends MARCEntity {
     
-    private final static MARCElement element = new TitleAlternative();
-    
-    private TitleAlternative() {
-    }    
-    
-    public static MARCElement getInstance() {
+    private final static TitleAlternative element = new TitleAlternative();
+
+    public static TitleAlternative getInstance() {
         return element;
     }
 }

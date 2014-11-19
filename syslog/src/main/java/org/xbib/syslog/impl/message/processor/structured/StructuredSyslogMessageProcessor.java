@@ -2,8 +2,11 @@ package org.xbib.syslog.impl.message.processor.structured;
 
 import org.xbib.syslog.impl.message.processor.AbstractSyslogMessageProcessor;
 import org.xbib.syslog.impl.message.structured.StructuredSyslogMessage;
-import org.xbib.time.Instant;
-import org.xbib.time.format.DateTimeFormatter;
+
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+//import org.xbib.time.Instant;
+//import org.xbib.time.format.DateTimeFormatter;
 
 /**
  * SyslogStructuredMessageProcessor extends SyslogMessageProcessor's ability to

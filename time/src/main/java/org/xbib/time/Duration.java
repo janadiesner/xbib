@@ -281,7 +281,7 @@ public final class Duration
      * This calculates the duration between two temporal objects of the same type.
      * The difference in seconds is calculated using {@link Temporal#periodUntil(Temporal, TemporalUnit)}.
      * The difference in nanoseconds is calculated using by querying the
-     * {@link ChronoUnit#NANO_OF_SECOND NANO_OF_SECOND} field.
+     * {@link ChronoUnit#NANOS NANOS} field.
      * <p>
      * The result of this method can be a negative period if the end is before the start.
      * To guarantee to obtain a positive duration call abs() on the result.

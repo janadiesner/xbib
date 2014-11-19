@@ -31,12 +31,12 @@
  */
 package org.xbib.analyzer.unimarc.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class TextualLanguageMaterial extends MARCElement {
+public class TextualLanguageMaterial extends MARCEntity {
     private final static TextualLanguageMaterial instance = new TextualLanguageMaterial();
     
-    public static MARCElement getInstance() {
+    public static MARCEntity getInstance() {
         return instance;
     }
     

@@ -193,7 +193,7 @@ public final class QueryModel {
     /**
      * Get filter expression.
      * Only one filter expression is allowed per query.
-     * First, build conjunctive and disjunctive filter terms.
+     * First, complete conjunctive and disjunctive filter terms.
      * If both are null, there is no filter at all.
      * Otherwise, combine conjunctive and disjunctive filter terms with a
      * disjunction, and apply filter function, and return this expression.

@@ -45,11 +45,12 @@ import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfConstants;
+import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryContext;
+import org.xbib.rdf.io.turtle.TurtleContentParams;
 import org.xbib.rdf.memory.MemoryLiteral;
-import org.xbib.rdf.io.turtle.TurtleWriter;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.text.InvalidCharacterException;
 import org.xbib.tools.Converter;
 import org.xbib.util.Entities;
@@ -62,15 +63,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Queue;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
+
+import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
 
 /**
  * Convert article DB
@@ -83,13 +86,11 @@ public class JsonCoins extends Converter {
 
     protected final static JsonFactory jsonFactory = new JsonFactory();
 
-    protected final static MemoryContext resourceContext = new MemoryContext();
+    private static RdfContentBuilder articleBuilder;
 
-    private static TurtleWriter serializer;
+    private static RdfContentBuilder errorArticleBuilder;
 
-    private static TurtleWriter errorSerializer;
-
-    private static TurtleWriter missingSerializer;
+    private static RdfContentBuilder missingArticleBuilder;
 
     private static GZIPOutputStream gzout;
 
@@ -101,7 +102,7 @@ public class JsonCoins extends Converter {
 
     private final static SerialsDB serialsdb = new SerialsDB();
 
-    private final static IRINamespaceContext context = IRINamespaceContext.newInstance();
+    private final static IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
 
     @Override
     public String getName() {
@@ -109,13 +110,15 @@ public class JsonCoins extends Converter {
     }
 
     static {
-        context.addNamespace(RdfConstants.NS_PREFIX, RdfConstants.NS_URI);
-        context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
-        context.addNamespace("dcterms", "http://purl.org/dc/terms/");
-        context.addNamespace("foaf", "http://xmlns.com/foaf/0.1/");
-        context.addNamespace("frbr", "http://purl.org/vocab/frbr/core#");
-        context.addNamespace("fabio", "http://purl.org/spar/fabio/");
-        context.addNamespace("prism", "http://prismstandard.org/namespaces/basic/2.1/");
+        namespaceContext.add(new HashMap<String, String>() {{
+            put(RdfConstants.NS_PREFIX, RdfConstants.NS_URI);
+            put("dc", "http://purl.org/dc/elements/1.1/");
+            put("dcterms", "http://purl.org/dc/terms/");
+            put("foaf", "http://xmlns.com/foaf/0.1/");
+            put("frbr", "http://purl.org/vocab/frbr/core#");
+            put("fabio", "http://purl.org/spar/fabio/");
+            put("prism", "http://prismstandard.org/namespaces/basic/2.1/");
+        }});
     }
 
     @Override
@@ -146,9 +149,8 @@ public class JsonCoins extends Converter {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
         };
-        serializer = new TurtleWriter(new OutputStreamWriter(gzout, "UTF-8"));
-        serializer.setNamespaceContext(context);
-        serializer.writeNamespaces();
+        TurtleContentParams params = new TurtleContentParams(namespaceContext, true);
+        articleBuilder = turtleBuilder(gzout, params);
 
         FileOutputStream errorfout = new FileOutputStream(outputFilename + "-errors.ttl.gz");
         errorgzout = new GZIPOutputStream(errorfout) {
@@ -156,9 +158,7 @@ public class JsonCoins extends Converter {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
         };
-        errorSerializer = new TurtleWriter(new OutputStreamWriter(errorgzout, "UTF-8"));
-        errorSerializer.setNamespaceContext(context);
-        errorSerializer.writeNamespaces();
+        errorArticleBuilder = turtleBuilder(errorgzout, params);
 
         FileOutputStream noserialfout = new FileOutputStream(outputFilename + "-without-serial.ttl.gz");
         noserialgzout = new GZIPOutputStream(noserialfout) {
@@ -166,9 +166,7 @@ public class JsonCoins extends Converter {
                 def.setLevel(Deflater.BEST_COMPRESSION);
             }
         };
-        missingSerializer = new TurtleWriter(new OutputStreamWriter(noserialgzout, "UTF-8"));
-        missingSerializer.setNamespaceContext(context);
-        missingSerializer.writeNamespaces();
+        missingArticleBuilder = turtleBuilder(noserialgzout, params);
 
         // extra text file for missing serials
         missingserials = new FileWriter("missingserials.txt");
@@ -212,24 +210,24 @@ public class JsonCoins extends Converter {
             while (token != null) {
                 switch (token) {
                     case START_OBJECT: {
-                        resource = resourceContext.newResource();
+                        resource = new MemoryResource();
                         break;
                     }
                     case END_OBJECT: {
                         switch (result) {
                             case OK:
-                                synchronized (serializer) {
-                                    serializer.write(resourceContext);
+                                synchronized (articleBuilder) {
+                                    articleBuilder.resource(resource);
                                 }
                                 break;
                             case MISSINGSERIAL:
-                                synchronized (missingSerializer) {
-                                    missingSerializer.write(resourceContext);
+                                synchronized (missingArticleBuilder) {
+                                    missingArticleBuilder.resource(resource);
                                 }
                                 break;
                             case ERROR:
-                                synchronized (errorSerializer) {
-                                    errorSerializer.write(resourceContext);
+                                synchronized (errorArticleBuilder) {
+                                    errorArticleBuilder.resource(resource);
                                 }
                                 break;
 
@@ -356,7 +354,7 @@ public class JsonCoins extends Converter {
                                     .a(FABIO_ARTICLE)
                                     .add("prism:doi", s);
                         } catch (Exception e) {
-                            logger.warn("can't build IRI from DOI " + v, e);
+                            logger.warn("can't complete IRI from DOI " + v, e);
                         }
                         break;
                     }

@@ -126,7 +126,7 @@ public class ESFilterGenerator implements Visitor {
             }
             filterGen.end();
         } catch (IOException e) {
-            throw new SyntaxException("unable to build a valid query from " + node + ", reason: " + e.getMessage(), e);
+            throw new SyntaxException("unable to complete a valid query from " + node + ", reason: " + e.getMessage(), e);
         }
     }
 

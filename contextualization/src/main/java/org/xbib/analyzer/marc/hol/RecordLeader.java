@@ -31,18 +31,17 @@
  */
 package org.xbib.analyzer.marc.hol;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.marc.FieldList;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class RecordLeader extends MARCElement {
+public class RecordLeader extends MARCEntity {
     private final static RecordLeader instance = new RecordLeader();
 
-    public static MARCElement getInstance() {
+    public static RecordLeader getInstance() {
         return instance;
     }
 
@@ -51,7 +50,7 @@ public class RecordLeader extends MARCElement {
     private String predicate;
 
     @Override
-    public MARCElement setSettings(Map params) {
+    public MARCEntity setSettings(Map params) {
         super.setSettings(params);
         this.codes= (Map<String,Object>)params.get("codes");
         this.predicate = params.containsKey("_predicate") ?
@@ -60,9 +59,9 @@ public class RecordLeader extends MARCElement {
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
-                          FieldList fields, String value) {
-        builder.context().setLabel(value);
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
+                          FieldList fields, String value) throws IOException {
+        worker.state().setLabel(value);
         if (codes == null) {
             return false;
         }
@@ -71,7 +70,7 @@ public class RecordLeader extends MARCElement {
             Map<String,String> v = (Map<String,String>)codes.get(k);
             String code = value.length() > pos ? value.substring(pos,pos+1) : "";
             if (v.containsKey(code)) {
-                builder.context().getResource().add(predicate, v.get(code));
+                worker.state().getResource().add(predicate, v.get(code));
             }
         }
         return false;

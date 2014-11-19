@@ -32,12 +32,13 @@
 package org.xbib.rdf.io.xml;
 
 import org.xbib.iri.IRI;
-import org.xbib.rdf.Context;
 import org.xbib.rdf.Literal;
+import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.memory.MemoryResource;
 
 import javax.xml.namespace.QName;
+import java.io.IOException;
 import java.util.Stack;
 
 /**
@@ -50,18 +51,18 @@ public abstract class AbstractXmlResourceHandler
 
     private final Stack<Resource> stack = new Stack<Resource>();
 
-    public AbstractXmlResourceHandler(Context<Resource> context) {
-        super(context);
+    public AbstractXmlResourceHandler(RdfContentParams params) {
+        super(params);
     }
 
     @Override
-    public void openResource() {
+    public void openResource() throws IOException {
         super.openResource();
-        stack.push(resourceContext().getResource());
+        stack.push(getResource());
     }
 
     @Override
-    public void closeResource() {
+    public void closeResource() throws IOException {
         super.closeResource();
         stack.clear();
     }

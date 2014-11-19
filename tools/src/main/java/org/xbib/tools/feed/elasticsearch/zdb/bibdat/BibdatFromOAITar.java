@@ -31,13 +31,10 @@
  */
 package org.xbib.tools.feed.elasticsearch.zdb.bibdat;
 
-import org.xbib.elements.UnmappedKeyListener;
-import org.xbib.elements.marc.dialects.pica.PicaContext;
-import org.xbib.elements.marc.dialects.pica.PicaElementBuilder;
-import org.xbib.elements.marc.dialects.pica.PicaElementBuilderFactory;
-import org.xbib.elements.marc.dialects.pica.PicaElementMapper;
+import org.xbib.entities.marc.dialects.pica.PicaEntityBuilderState;
+import org.xbib.entities.marc.dialects.pica.PicaEntityQueue;
 import org.xbib.io.Packet;
-import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -46,11 +43,10 @@ import org.xbib.marc.Field;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.dialects.pica.stream.DNBPicaXmlReader;
-import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.ContextWriter;
-import org.xbib.rdf.Resource;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.content.RouteRdfXContentParams;
 import org.xbib.tools.Feeder;
 import org.xbib.tools.util.AbstractTarReader;
 
@@ -66,6 +62,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
+
 public final class BibdatFromOAITar extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(BibdatFromOAITar.class.getSimpleName());
@@ -79,12 +77,7 @@ public final class BibdatFromOAITar extends Feeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new BibdatFromOAITar();
-            }
-        };
+        return BibdatFromOAITar::new;
     }
 
     @Override
@@ -95,36 +88,17 @@ public final class BibdatFromOAITar extends Feeder {
 
     @Override
     public void process(URI uri) throws Exception {
-        logger.info("start of processing {}", uri);
-
-        final OurContextOutput out = new OurContextOutput();
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
-        PicaElementMapper mapper = new PicaElementMapper("pica/zdb/bibdat")
-                .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<FieldList>() {
-                    @Override
-                    public void unknown(FieldList key) {
-                        logger.warn("unmapped field {}", key);
-                        if ((settings.getAsBoolean("detect", false))) {
-                            unmapped.add("\"" + key + "\"");
-                        }
-                    }
-                })
-                .start(new PicaElementBuilderFactory() {
-                    public PicaElementBuilder newBuilder() {
-                        PicaElementBuilder builder = new PicaElementBuilder();
-                        builder.addWriter(out);
-                        return builder;
-                    }
-                });
+        MyQueue queue = new MyQueue("pica/zdb/bibdat", settings.getAsInt("pipelines", 1));
+        queue.setUnmappedKeyListener(key -> {
+            if ((settings.getAsBoolean("detect", false))) {
+                logger.warn("unmapped field {}", key);
+                unmapped.add("\"" + key + "\"");
+            }
+        });
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .setStringTransformer(new StringTransformer() {
-                    @Override
-                    public String transform(String value) {
-                        return Normalizer.normalize(value, Normalizer.Form.NFC);
-                    }
-                })
-                .addListener(mapper)
+                .setStringTransformer(value -> Normalizer.normalize(value, Normalizer.Form.NFC))
+                .addListener(queue)
                 .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                     @Override
                     public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
@@ -147,7 +121,7 @@ public final class BibdatFromOAITar extends Feeder {
             reader.next();
         }
         reader.close();
-        mapper.close();
+        queue.close();
         if (settings.getAsBoolean("detect", false)) {
             logger.info("unknown keys = {}", unmapped);
         }
@@ -193,22 +167,21 @@ public final class BibdatFromOAITar extends Feeder {
                 throw new IOException(e);
             }
         }
-
     }
 
-    private class OurContextOutput implements ContextWriter<PicaContext, Resource> {
+    class MyQueue extends PicaEntityQueue {
+
+        public MyQueue(String path, int workers) {
+            super(path, workers);
+        }
 
         @Override
-        public void write(PicaContext context) throws IOException {
-            IRI id = IRI.builder()
-                    .scheme("http")
-                    .host(settings.get("index"))
-                    .path("/pica/zdb/bibdat") //ignored
-                    .query(settings.get("type"))
-                    .fragment(context.getID()).build();
-            context.getResource().id(id);
-            sink.write(context);
+        public void afterCompletion(PicaEntityBuilderState state) throws IOException {
+            RouteRdfXContentParams params = new RouteRdfXContentParams(IRINamespaceContext.getInstance(),
+                    settings.get("index"), settings.get("type"));
+            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), state.getID(), content));
+            RdfContentBuilder builder = routeRdfXContentBuilder(params);
+            builder.resource(state.getResource());
         }
     }
-
 }

@@ -31,13 +31,10 @@
  */
 package org.xbib.tools.convert.zdb.bibdat;
 
-import org.xbib.elements.UnmappedKeyListener;
-import org.xbib.elements.marc.dialects.pica.PicaContext;
-import org.xbib.elements.marc.dialects.pica.PicaElementBuilder;
-import org.xbib.elements.marc.dialects.pica.PicaElementBuilderFactory;
-import org.xbib.elements.marc.dialects.pica.PicaElementMapper;
+import org.xbib.entities.marc.dialects.pica.PicaEntityBuilderState;
+import org.xbib.entities.marc.dialects.pica.PicaEntityQueue;
 import org.xbib.io.InputService;
-import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -45,16 +42,12 @@ import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
-import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.ContextWriter;
-import org.xbib.rdf.io.ntriple.NTripleWriter;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.content.RouteRdfXContentParams;
 import org.xbib.tools.Converter;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -62,6 +55,8 @@ import java.text.Normalizer;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 public final class BibdatZDB extends Converter {
 
@@ -73,50 +68,24 @@ public final class BibdatZDB extends Converter {
     }
 
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new BibdatZDB();
-            }
-        };
-    }
-
-    protected BibdatZDB prepare() throws IOException {
-        super.prepare();
-        out.init(settings.get("output", "bibdat.nt"));
-        return this;
+        return BibdatZDB::new;
     }
 
     @Override
     public void process(URI uri) throws Exception {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
-        PicaElementMapper mapper = new PicaElementMapper("pica/zdb/bibdat")
-                .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<FieldList>() {
-                    @Override
-                    public void unknown(FieldList key) {
-                        logger.warn("unmapped field {}", key);
-                        if ((settings.getAsBoolean("detect", false))) {
-                            unmapped.add("\"" + key + "\"");
-                        }
-                    }
-                })
-                .start(new PicaElementBuilderFactory() {
-                    public PicaElementBuilder newBuilder() {
-                        PicaElementBuilder builder = new PicaElementBuilder();
-                        builder.addWriter(out);
-                        return builder;
-                    }
-                });
-        logger.info("mapper is up, {} elemnents", mapper.map().size());
+        MyQueue queue = new MyQueue("/org/xbib/analyze/pica/zdb/bibdat.json", settings.getAsInt("pipelines", 1));
+        queue.setUnmappedKeyListener(key -> {
+            if ((settings.getAsBoolean("detect", false))) {
+                logger.warn("unmapped field {}", key);
+                unmapped.add("\"" + key + "\"");
+            }
+        });
+        logger.info("queue is up, {} elements", queue.map().size());
+        queue.execute();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .setStringTransformer(new StringTransformer() {
-                    @Override
-                    public String transform(String value) {
-                        return Normalizer.normalize(value, Normalizer.Form.NFC);
-                    }
-                })
-                .addListener(mapper)
+                .setStringTransformer(value -> Normalizer.normalize(value, Normalizer.Form.NFC))
+                .addListener(queue)
                 .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                     @Override
                     public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
@@ -130,35 +99,53 @@ public final class BibdatZDB extends Converter {
                         }
                         return this;
                     }
-
                 });
         InputStream in = InputService.getInputStream(uri);
         new DNBPICAXmlReader().setListener(kv).parse(in);
         in.close();
-        mapper.close();
+        queue.close();
         if (settings.getAsBoolean("detect", false)) {
             logger.info("detected unknown elements = {}", unmapped);
         }
     }
 
-    private final static OurContextOutput out = new OurContextOutput();
+    class MyQueue extends PicaEntityQueue {
 
-    private final static class OurContextOutput implements ContextWriter<PicaContext, Resource> {
+        public MyQueue(String path, int workers) {
+            super(path, workers);
+        }
+
+        @Override
+        public void afterCompletion(PicaEntityBuilderState state) throws IOException {
+            RouteRdfXContentParams params = new RouteRdfXContentParams(IRINamespaceContext.getInstance(),
+                    settings.get("index"), settings.get("type"));
+            //params.setIdPredicate("identifierZDB");
+            //params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
+            RdfContentBuilder builder = routeRdfXContentBuilder(params);
+            builder.resource(state.getResource());
+            //out.init(settings.get("output", "bibdat.nt"));
+
+        }
+    }
+
+    /*private final static OurResourceOutput out = new OurResourceOutput();
+
+    private final static class OurResourceOutput implements ResourceWriter<PicaEntityBuilderState, Resource> {
 
         File f;
         FileWriter fw;
-        NTripleWriter writer;
+        NTripleContentGenerator writer;
 
-        public OurContextOutput init(String filename) throws IOException {
+        public OurResourceOutput init(String filename) throws IOException {
             this.f = new File(filename);
             this.fw = new FileWriter(f);
-            this.writer = new NTripleWriter(fw);
-                    //.setNullPredicate(IRI.builder().scheme("http").host("xbib.org").path("/adr").build());
+            this.writer = new NTripleContentGenerator(fw);
+                    //.setNullPredicate(IRI.builder().scheme("http").host("xbib.org").path("/adr").complete());
             return this;
         }
 
         @Override
-        public void write(PicaContext context) throws IOException {
+        public void write(PicaEntityBuilderState context) throws IOException {
             IRI id = IRI.builder().scheme("http").host("xbib.org").path("/pica/zdb/bibdat")
                     .fragment(context.getID()).build();
             context.getResource().id(id);
@@ -170,6 +157,6 @@ public final class BibdatZDB extends Converter {
                 fw.close();
             }
         }
-    }
+    }*/
 
 }

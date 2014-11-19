@@ -50,19 +50,4 @@ public interface Triple {
 
     Node object();
 
-    interface Builder {
-
-        Builder begin();
-
-        Builder startPrefixMapping(String prefix, String uri);
-
-        Builder endPrefixMapping(String prefix);
-
-        Builder newIdentifier(IRI identifier);
-
-        Builder triple(Triple triple);
-
-        Builder end();
-    }
-
 }

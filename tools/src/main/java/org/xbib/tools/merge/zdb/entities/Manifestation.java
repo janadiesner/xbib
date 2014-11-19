@@ -1043,7 +1043,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
     }
 
     /**
-     * Iterate through holdings and build a new list that contains
+     * Iterate through holdings and complete a new list that contains
      * unique holdings.
      *
      * @param holdings the holdings

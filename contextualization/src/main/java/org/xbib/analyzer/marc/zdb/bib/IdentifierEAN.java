@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class IdentifierEAN extends MARCElement {
+public class IdentifierEAN extends MARCEntity {
     private final static IdentifierEAN instance = new IdentifierEAN();
     
     public static IdentifierEAN getInstance() {

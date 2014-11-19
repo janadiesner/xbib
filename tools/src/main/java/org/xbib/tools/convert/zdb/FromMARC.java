@@ -31,12 +31,8 @@
  */
 package org.xbib.tools.convert.zdb;
 
-import org.xbib.elements.UnmappedKeyListener;
-import org.xbib.elements.marc.MARCElementBuilder;
-import org.xbib.elements.marc.MARCElementBuilderFactory;
-import org.xbib.elements.marc.MARCElementMapper;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.io.InputService;
-import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -44,18 +40,11 @@ import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
-import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.ContextWriter;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.tools.Converter;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
@@ -64,15 +53,15 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * COnverting Zeitschriftendatenbank (ZDB) MARC ISO2709 files
+ * Cnnverting Zeitschriftendatenbank (ZDB) MARC ISO2709 files
  */
 public final class FromMARC extends Converter {
 
     private final static Logger logger = LoggerFactory.getLogger(FromMARC.class.getName());
 
-    private final Charset UTF8 = Charset.forName("UTF-8");
+    private final static Charset UTF8 = Charset.forName("UTF-8");
 
-    private final Charset ISO88591 = Charset.forName("ISO-8859-1");
+    private final static Charset ISO88591 = Charset.forName("ISO-8859-1");
 
     @Override
     public String getName() {
@@ -81,46 +70,24 @@ public final class FromMARC extends Converter {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new FromMARC();
-            }
-        };
+        return FromMARC::new;
     }
 
     @Override
     public void process(URI uri) throws Exception {
-
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
-        final MARCElementMapper mapper = new MARCElementMapper(settings.get("elements"))
-                .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<FieldList>() {
-                    @Override
-                    public void unknown(FieldList key) {
-                        logger.warn("unmapped field {}", key);
-                        if ((settings.getAsBoolean("detect", false))) {
-                            unmapped.add("\"" + key + "\"");
-                        }
-                    }
-                })
-                .start(new MARCElementBuilderFactory() {
-                    public MARCElementBuilder newBuilder() {
-                        MARCElementBuilder builder = new MARCElementBuilder();
-                        builder.addWriter(new MarcContextOutput());
-                        return builder;
-                    }
-                });
+        final MARCEntityQueue queue = new MARCEntityQueue(settings.get("elements"), settings.getAsInt("pipelines", 1));
+        queue.setUnmappedKeyListener(key -> {
+            if ((settings.getAsBoolean("detect", false))) {
+                logger.warn("unmapped field {}", key);
+                unmapped.add("\"" + key + "\"");
+            }
+        });
+        queue.execute();
 
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .setStringTransformer(new StringTransformer() {
-                    @Override
-                    public String transform(String value) {
-                        return Normalizer.normalize(new String(value.getBytes(ISO88591), UTF8),
-                                Normalizer.Form.NFKC);
-                    }
-                })
-                .addListener(mapper)
+                .setStringTransformer(value -> Normalizer.normalize(new String(value.getBytes(ISO88591), UTF8), Normalizer.Form.NFKC))
+                .addListener(queue)
                 .addListener(new LoggingAdapter());
 
         final Iso2709Reader reader = new Iso2709Reader()
@@ -135,13 +102,13 @@ public final class FromMARC extends Converter {
         InputStreamReader r = new InputStreamReader(InputService.getInputStream(uri), ISO88591);
         reader.parse(r);
         r.close();
-        mapper.close();
+        queue.close();
         if (settings.getAsBoolean("detect", false)) {
             logger.info("unknown keys={}", unmapped);
         }
     }
 
-    private class MarcContextOutput implements ContextWriter<Context<Resource>, Resource> {
+    /*private class MarcResourceOutput implements ResourceWriter<Context<Resource>, Resource> {
 
         @Override
         public void write(Context context) throws IOException {
@@ -150,13 +117,13 @@ public final class FromMARC extends Converter {
                     .fragment(iri.getFragment()).build());
 
             StringWriter sw = new StringWriter();
-            NTripleWriter writer = new NTripleWriter(sw);
+            NTripleContentGenerator writer = new NTripleContentGenerator(sw);
             writer.write(context);
             logger.debug("{}", sw.toString());
         }
-    }
+    }*/
 
-    private class LoggingAdapter extends KeyValueStreamAdapter<FieldList, String> {
+    class LoggingAdapter extends KeyValueStreamAdapter<FieldList, String> {
         @Override
         public KeyValueStreamAdapter<FieldList, String> begin() {
             logger.debug("begin");

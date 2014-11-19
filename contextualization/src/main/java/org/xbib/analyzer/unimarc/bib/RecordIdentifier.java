@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.unimarc.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class RecordIdentifier extends MARCElement {
+public class RecordIdentifier extends MARCEntity {
 
     private final static RecordIdentifier instance = new RecordIdentifier();
 

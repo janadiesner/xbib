@@ -31,12 +31,12 @@
  */
 package org.xbib.analyzer.unimarc.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class FormOfItem extends MARCElement {
+public class FormOfItem extends MARCEntity {
     private final static FormOfItem instance = new FormOfItem();
     
-    public static MARCElement getInstance() {
+    public static MARCEntity getInstance() {
         return instance;
     }
     

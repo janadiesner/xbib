@@ -69,6 +69,26 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
 
     private boolean deleted;
 
+    public static void reset() {
+        nodeID.set(0L);
+    }
+
+    public static long next() {
+        return nodeID.incrementAndGet();
+    }
+
+    public MemoryResource blank() {
+        id(IRI.builder().curie(GENID, "b" + next()).build());
+        this.embedded = true;
+        return this;
+    }
+
+    public MemoryResource blank(String id) {
+        id(IRI.builder().curie(GENID, id).build());
+        this.embedded = true;
+        return this;
+    }
+
     @Override
     public MemoryResource id(IRI id) {
         this.id = id;
@@ -98,32 +118,14 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
         return id != null && obj != null && obj instanceof Resource && id.equals(((Resource) obj).id());
     }
 
-    public MemoryResource blank() {
-        id(IRI.builder().curie(GENID, "b" + next()).build());
-        this.embedded = true;
-        return this;
-    }
-
-    public MemoryResource blank(String id) {
-        id(IRI.builder().curie(GENID, id).build());
-        this.embedded = true;
-        return this;
-    }
-
+    @Override
     public boolean isEmbedded() {
         return embedded;
     }
 
+    @Override
     public boolean isVisible() {
         return !embedded;
-    }
-
-    public static void reset() {
-        nodeID.set(0L);
-    }
-
-    public static long next() {
-        return nodeID.incrementAndGet();
     }
 
     @Override
@@ -299,6 +301,25 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
         return this;
     }
 
+    @Override
+    public Resource rename(IRI oldPredicate, IRI newPredicate) {
+        Collection<Node> node = attributes.remove(oldPredicate);
+        if (node != null) {
+            node.forEach(n -> attributes.put(newPredicate, n));
+        }
+        Resource resource = children.remove(oldPredicate);
+        if (resource != null) {
+            children.put(newPredicate, resource);
+        }
+        return this;
+    }
+
+    @Override
+    public Resource rename(String oldPredicate, String newPredicate) {
+        rename(newPredicate(oldPredicate), newPredicate(newPredicate));
+        return this;
+    }
+
     public Resource remove(IRI predicate) {
         if (predicate == null) {
             return this;
@@ -423,6 +444,11 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
     }
 
     @Override
+    public Resource newResource() {
+        return new MemoryResource().blank();
+    }
+
+    @Override
     public Resource newResource(IRI predicate) {
         Resource r = new MemoryResource().blank();
         children.put(r.id(), r);
@@ -434,7 +460,6 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
     public Resource newResource(String predicate) {
         return newResource(newPredicate(predicate));
     }
-
 
     @Override
     public List<Triple> triples() {

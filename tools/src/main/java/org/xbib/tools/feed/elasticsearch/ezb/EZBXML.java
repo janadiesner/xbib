@@ -37,14 +37,15 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.Resource;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.RdfContentParams;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.content.DefaultContentBuilder;
-import org.xbib.rdf.memory.MemoryContext;
+import org.xbib.rdf.content.RdfXContentParams;
+import org.xbib.rdf.content.RouteRdfXContentParams;
+import org.xbib.rdf.io.xml.XmlContentParser;
 import org.xbib.rdf.io.xml.AbstractXmlHandler;
 import org.xbib.rdf.io.xml.AbstractXmlResourceHandler;
-import org.xbib.rdf.io.xml.XmlParser;
+import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.tools.Feeder;
 import org.xbib.util.URIUtil;
 import org.xml.sax.SAXException;
@@ -55,6 +56,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.Charset;
+
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 /**
  * Elasticsearch indexer for "Elektronische Zeitschriftenbibliothek" (EZB)
@@ -74,35 +77,29 @@ public final class EZBXML extends Feeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new EZBXML();
-            }
-        };
+        return EZBXML::new;
     }
 
     @Override
     public void process(URI uri) throws Exception {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
-        Context<Resource> context = new MemoryContext();
-        context.setNamespaceContext(namespaceContext);
-        context.setContentBuilder(new DefaultContentBuilder<>());
-
-        AbstractXmlHandler handler = new EZBHandler(context)
+        RdfContentParams params = new RdfXContentParams(namespaceContext, false);
+        AbstractXmlHandler handler = new EZBHandler(params)
                 .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/");
-
         InputStream in = InputService.getInputStream(uri);
-        new XmlParser().setNamespaces(false)
-                    .setHandler(handler)
-                    .parse(new InputStreamReader(in, "UTF-8"), null);
+        new XmlContentParser()
+                .setNamespaces(false)
+                .setHandler(handler)
+                .parse(new InputStreamReader(in, "UTF-8"));
         in.close();
     }
 
     class EZBHandler extends AbstractXmlResourceHandler {
 
-        public EZBHandler(Context context) {
-            super(context);
+        String id;
+
+        public EZBHandler(RdfContentParams params) {
+            super(params);
         }
 
         @Override
@@ -114,12 +111,7 @@ public final class EZBXML extends Feeder {
         @Override
         public void identify(QName name, String value, IRI identifier) {
             if ("license_entry_id".equals(name.getLocalPart()) && identifier == null) {
-                IRI id = IRI.builder().scheme("iri")
-                        .host(settings.get("index"))
-                        .query(settings.get("type"))
-                        .fragment(value)
-                        .build();
-                resourceContext().getResource().id(id);
+                this.id = value;
             }
         }
 
@@ -129,18 +121,14 @@ public final class EZBXML extends Feeder {
         }
 
         @Override
-        public void closeResource() {
-            // attach closeResource to output write
-            try {
-                if (resourceContext().getResource() != null && resourceContext().getResource().id() != null) {
-                    sink.write(resourceContext());
-                } else {
-                    logger.warn("no resource to output");
-                }
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
+        public void closeResource() throws IOException {
             super.closeResource();
+            RouteRdfXContentParams params = new RouteRdfXContentParams(getNamespaceContext(),
+                    settings.get("index", "ezbxml"),
+                    settings.get("type", "ezbxml"));
+            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), id, content));
+            RdfContentBuilder builder = routeRdfXContentBuilder(params);
+            builder.resource(getResource());
         }
 
         @Override
@@ -221,6 +209,16 @@ public final class EZBXML extends Feeder {
                 }
             }
             return super.toObject(name, content);
+        }
+
+        @Override
+        public XmlHandler setNamespaceContext(IRINamespaceContext namespaceContext) {
+            return this;
+        }
+
+        @Override
+        public IRINamespaceContext getNamespaceContext() {
+            return IRINamespaceContext.getInstance();
         }
     }
 

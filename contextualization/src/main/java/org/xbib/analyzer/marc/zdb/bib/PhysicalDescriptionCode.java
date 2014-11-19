@@ -31,25 +31,24 @@
  */
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class PhysicalDescriptionCode extends MARCElement {
+public class PhysicalDescriptionCode extends MARCEntity {
     private final static PhysicalDescriptionCode instance = new PhysicalDescriptionCode();
 
-    public static MARCElement getInstance() {
+    public static PhysicalDescriptionCode getInstance() {
         return instance;
     }
     
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
-                          FieldList fields, String value) {
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
+                          FieldList fields, String value) throws IOException {
         Map<String,Object> codes = (Map<String,Object>)getSettings().get("codes");
         if (codes != null) {
             // position 0 is the selector
@@ -71,7 +70,7 @@ public class PhysicalDescriptionCode extends MARCElement {
                 Map<String,Object> q = (Map<String,Object>)m.get(Integer.toString(i));
                 if (q != null) {
                     String code = (String)q.get(ch);
-                    builder.context().getResource().add(predicate, code);
+                    worker.state().getResource().add(predicate, code);
                 }
             }
         }

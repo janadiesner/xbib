@@ -41,12 +41,9 @@ import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.oai.xml.XmlMetadataHandler;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.content.DefaultContentBuilder;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.RdfContentParams;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryContext;
-import org.xbib.rdf.io.ntriple.NTripleWriter;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.util.DateUtil;
 import org.xbib.xml.XMLNS;
@@ -57,6 +54,8 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.IOException;
 import java.io.StringWriter;
+
+import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
 
 public class LOMClientTest {
 
@@ -91,22 +90,25 @@ public class LOMClientTest {
     }
 
     protected MetadataHandler xmlMetadataHandler() {
-        IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
+        /*IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
         Context<Resource> context = new MemoryContext()
-                .setContentBuilder(new DefaultContentBuilder())
+                .setContentBuilder(new RdfXContentGenerator())
                 .setNamespaceContext(namespaceContext);
-        context.setNamespaceContext(IRINamespaceContext.getInstance());
-        RdfResourceHandler handler = new RdfResourceHandler(context);
-        return new LOMHandler()
-                .setHandler(handler)
-                .setContext(handler.resourceContext());
+        context.setNamespaceContext(IRINamespaceContext.getInstance());*/
+        RdfContentParams params = IRINamespaceContext::getInstance;
+        RdfResourceHandler handler = new RdfResourceHandler(params);
+        return new LOMHandler(params).setHandler(handler);
     }
 
     class LOMHandler extends XmlMetadataHandler {
 
+        private RdfContentParams params;
+
+        private RdfContentBuilder builder;
+
         private XmlHandler handler;
 
-        private Context<Resource> context;
+        //private Resource resource = new MemoryResource();
 
         private boolean attributes;
 
@@ -114,14 +116,19 @@ public class LOMClientTest {
 
         private String qname;
 
-        public LOMHandler setHandler(XmlHandler handler) {
-            this.handler = handler;
-            this.handler.setDefaultNamespace("oai_dc","http://www.openarchives.org/OAI/2.0/oai_dc/");
-            return this;
+        public LOMHandler(RdfContentParams params) {
+            this.params = params;
         }
 
-        public LOMHandler setContext(Context<Resource> context) {
-            this.context = context;
+        public LOMHandler setHandler(XmlHandler handler) {
+            this.handler = handler;
+            try {
+                this.builder = ntripleBuilder();
+            } catch (IOException e) {
+                // empty
+            }
+            handler.setBuilder(builder);
+            this.handler.setDefaultNamespace("oai_dc","http://www.openarchives.org/OAI/2.0/oai_dc/");
             return this;
         }
 
@@ -133,39 +140,47 @@ public class LOMClientTest {
         public void endDocument() throws SAXException {
             handler.endDocument();
             String identifier = getHeader().getIdentifier();
-                if (context.getResource() != null) {
-                    IRI iri = IRI.builder().scheme("http")
-                            .host("test")
-                            .query("test")
-                            .fragment(identifier).build();
-                    context.getResource().id(iri);
+            /*if (resource != null) {
+                IRI iri = IRI.builder().scheme("http")
+                        .host("test")
+                        .query("test")
+                        .fragment(identifier).build();
+                resource.id(iri);
+            }*/
+            //output.write(resourceContext);
+            /*if (context.getResources() == null) {
+                // single document
+                //mock.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
+            } else for (Resource resource : context.getResources()) {
+                // multiple documents. Rewrite IRI for ES index/type addressing
+                String index = "test";
+                String type = "test";
+                if (index.equals(resource.id().getHost())) {
+                    IRI iri = IRI.builder().scheme("http").host(index).query(type)
+                            .fragment(resource.id().getFragment()).build();
+                    resource.add("iri", resource.id().getFragment());
+                    resource.id(iri);
+                } else {
+                    IRI iri = IRI.builder().scheme("http").host(index).query(type)
+                            .fragment(resource.id().toString()).build();
+                    resource.add("iri", resource.id().toString());
+                    resource.id(iri);
                 }
-                //output.write(resourceContext);
-                if (context.getResources() == null) {
-                    // single document
-                    //mock.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
-                } else for (Resource resource : context.getResources()) {
-                    // multiple documents. Rewrite IRI for ES index/type addressing
-                    String index = "test";
-                    String type = "test";
-                    if (index.equals(resource.id().getHost())) {
-                        IRI iri = IRI.builder().scheme("http").host(index).query(type)
-                                .fragment(resource.id().getFragment()).build();
-                        resource.add("iri", resource.id().getFragment());
-                        resource.id(iri);
-                    } else {
-                        IRI iri = IRI.builder().scheme("http").host(index).query(type)
-                                .fragment(resource.id().toString()).build();
-                        resource.add("iri", resource.id().toString());
-                        resource.id(iri);
-                    }
-                    //mock.output(resourceContext, resource, resourceContext.getContentBuilder());
-                }
+                //mock.output(resourceContext, resource, resourceContext.getContentBuilder());
+            }*/
             try {
-                StringWriter sw = new StringWriter();
-                NTripleWriter writer = new NTripleWriter(sw);
-                writer.write(context);
-                logger.info("{}", sw.toString());
+                /*StringWriter sw = new StringWriter();
+                NTripleContentGenerator writer = new NTripleContentGenerator(sw);
+                writer.write(context);*/
+                logger.info("{}", builder.string());
+                // re-open builder
+                try {
+                    this.builder = ntripleBuilder();
+                } catch (IOException e) {
+                    // empty
+                }
+                handler.setBuilder(builder);
+
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -174,10 +189,10 @@ public class LOMClientTest {
         @Override
         public void startPrefixMapping(String prefix, String nsURI) throws SAXException {
             handler.startPrefixMapping(prefix, nsURI);
-            context.getNamespaceContext().addNamespace(prefix, nsURI);
+            params.getNamespaceContext().addNamespace(prefix, nsURI);
             if ("".equals(prefix)) {
                 handler.setDefaultNamespace("oai_lom", nsURI);
-                context.getNamespaceContext().addNamespace("oai_lom", nsURI);
+                params.getNamespaceContext().addNamespace("oai_lom", nsURI);
             }
         }
 

@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -83,6 +84,20 @@ public final class IRINamespaceContext extends XmlNamespaceContext implements Co
             Integer l2 = s2.length();
             return -l1.compareTo(l2);
         });
+    }
+
+    public IRINamespaceContext add(Map<String,String> map) {
+        for (Map.Entry<String,String> e : map.entrySet()) {
+            super.addNamespace(e.getKey(), e.getValue());
+        }
+        namespaces = new ArrayList<String>(getNamespaces().values());
+        // sort from longest to shortest for matching
+        Collections.sort(namespaces, (s1, s2) -> {
+            Integer l1 = s1.length();
+            Integer l2 = s2.length();
+            return -l1.compareTo(l2);
+        });
+        return this;
     }
 
     /**

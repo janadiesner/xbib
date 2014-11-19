@@ -71,6 +71,18 @@
         </dependency>
 
         <dependency>
+            <groupId>org.xbib</groupId>
+            <artifactId>stream</artifactId>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xbib</groupId>
+            <artifactId>http</artifactId>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
             <version>4.1</version>

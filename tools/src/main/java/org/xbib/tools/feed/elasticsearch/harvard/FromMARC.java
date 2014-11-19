@@ -32,26 +32,19 @@
 package org.xbib.tools.feed.elasticsearch.harvard;
 
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elements.UnmappedKeyListener;
-import org.xbib.elements.marc.MARCElementBuilder;
-import org.xbib.elements.marc.MARCElementBuilderFactory;
-import org.xbib.elements.marc.MARCElementMapper;
-import org.xbib.elements.marc.direct.MARCDirectBuilder;
-import org.xbib.elements.marc.direct.MARCDirectBuilderFactory;
-import org.xbib.elements.marc.direct.MARCDirectMapper;
+import org.xbib.entities.marc.MARCEntityBuilderState;
+import org.xbib.entities.marc.MARCEntityQueue;
+import org.xbib.entities.marc.direct.MARCDirectQueue;
 import org.xbib.io.InputService;
-import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
-import org.xbib.marc.FieldList;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
-import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.ContextWriter;
-import org.xbib.rdf.Resource;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.content.RouteRdfXContentParams;
 import org.xbib.tools.Feeder;
 import org.xml.sax.InputSource;
 
@@ -64,6 +57,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
+
 /**
  * Indexing Harvard MARC ISO2709 files
  */
@@ -71,9 +66,9 @@ public final class FromMARC extends Feeder {
 
     private final static Logger logger = LoggerFactory.getLogger(FromMARC.class.getName());
 
-    private final Charset UTF8 = Charset.forName("UTF-8");
+    private final static Charset UTF8 = Charset.forName("UTF-8");
 
-    private final Charset ISO88591 = Charset.forName("ISO-8859-1");
+    private final static Charset ISO88591 = Charset.forName("ISO-8859-1");
 
     @Override
     public String getName() {
@@ -82,12 +77,7 @@ public final class FromMARC extends Feeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new FromMARC();
-            }
-        };
+        return FromMARC::new;
     }
 
     @Override
@@ -100,44 +90,19 @@ public final class FromMARC extends Feeder {
     public void process(URI uri) throws Exception {
 
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
-        final MARCElementMapper mapper = new MARCElementMapper(settings.get("elements"))
-                .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<FieldList>() {
-                    @Override
-                    public void unknown(FieldList key) {
-                        logger.warn("unmapped field {}", key);
-                        if ((settings.getAsBoolean("detect", false))) {
-                            unmapped.add("\"" + key + "\"");
-                        }
-                    }
-                })
-                .start(new MARCElementBuilderFactory() {
-                    public MARCElementBuilder newBuilder() {
-                        MARCElementBuilder builder = new MARCElementBuilder();
-                        builder.addWriter(new MarcContextOutput());
-                        return builder;
-                    }
-                });
-
-        final MARCDirectMapper directMapper = new MARCDirectMapper()
-                .pipelines(settings.getAsInt("pipelines", 1))
-                .start(new MARCDirectBuilderFactory() {
-                    public MARCDirectBuilder newBuilder() {
-                        MARCDirectBuilder builder = new MARCDirectBuilder();
-                        builder.addWriter(new MarcContextOutput());
-                        return builder;
-                    }
-                });
-
+        final MARCEntityQueue queue = settings.getAsBoolean("direct", false) ?
+                new MyDirectQueue(settings.get("elements"), settings.getAsInt("pipelines", 1)) :
+                new MyEntityQueue(settings.get("elements"), settings.getAsInt("pipelines", 1)) ;
+        queue.setUnmappedKeyListener(key -> {
+            if ((settings.getAsBoolean("detect", false))) {
+                logger.warn("unmapped field {}", key);
+                unmapped.add("\"" + key + "\"");
+            }
+        });
+        queue.execute();
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .setStringTransformer(new StringTransformer() {
-                    @Override
-                    public String transform(String value) {
-                        return Normalizer.normalize(new String(value.getBytes(ISO88591), UTF8),
-                                Normalizer.Form.NFKC);
-                    }
-                })
-                .addListener(settings.getAsBoolean("direct", false) ? directMapper : mapper);
+                .setStringTransformer(value -> Normalizer.normalize(new String(value.getBytes(ISO88591), UTF8), Normalizer.Form.NFKC))
+                .addListener(queue);
         final Iso2709Reader reader = new Iso2709Reader()
                 .setMarcXchangeListener(kv);
         // setting the properties is just informational and not used for any purpose.
@@ -148,23 +113,42 @@ public final class FromMARC extends Feeder {
         InputSource source = new InputSource(r);
         reader.parse(source);
         r.close();
-        mapper.close();
+        queue.close();
         if (settings.getAsBoolean("detect", false)) {
             logger.info("unknown keys={}", unmapped);
         }
     }
 
-    private class MarcContextOutput implements ContextWriter<Context<Resource>, Resource> {
+    class MyEntityQueue extends MARCEntityQueue {
+
+        public MyEntityQueue(String path, int workers) {
+            super(path, workers);
+        }
 
         @Override
-        public void write(Context context) throws IOException {
-            IRI iri = context.getResource().id();
-            if (iri != null) {
-                context.getResource().id(IRI.builder().scheme("http").host(settings.get("index")).query(settings.get("type"))
-                        .fragment(iri.getFragment()).build());
-                sink.write(context);
-            }
+        public void afterCompletion(MARCEntityBuilderState state) throws IOException {
+            RouteRdfXContentParams params = new RouteRdfXContentParams(IRINamespaceContext.getInstance(),
+                    settings.get("index"), settings.get("type"));
+            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
+            RdfContentBuilder builder = routeRdfXContentBuilder(params);
+            builder.resource(state.getResource());
         }
     }
 
+    class MyDirectQueue extends MARCDirectQueue {
+
+        public MyDirectQueue(String path, int workers) {
+            super(path, workers);
+        }
+
+        @Override
+        public void afterCompletion(MARCEntityBuilderState state) throws IOException {
+            RouteRdfXContentParams params = new RouteRdfXContentParams(IRINamespaceContext.getInstance(),
+                    settings.get("index"), settings.get("type"));
+            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
+            RdfContentBuilder builder = routeRdfXContentBuilder(params);
+            builder.resource(state.getResource());
+        }
+    }
 }
+

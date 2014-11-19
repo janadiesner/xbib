@@ -80,7 +80,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>dd.MM.yyyy HH:mm</maven.build.timestamp.format>
         <java.compiler.source>1.8</java.compiler.source>
-        <elasticsearch.support.plugin.version>1.3.2.0</elasticsearch.support.plugin.version>
+        <elasticsearch.support.plugin.version>1.4.0.1</elasticsearch.support.plugin.version>
     </properties>
 
     <build>
@@ -350,11 +350,6 @@
             </dependency>
             <dependency>
                 <groupId>org.xbib</groupId>
-                <artifactId>time</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.xbib</groupId>
                 <artifactId>content</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -559,20 +554,10 @@
                 <version>4.0.17.Final</version>
             </dependency>
             <dependency>
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time</artifactId>
-                <version>2.5</version>
-            </dependency>
-            <dependency>
                 <groupId>commons-dbcp</groupId>
                 <artifactId>commons-dbcp</artifactId>
                 <version>1.4</version>
             </dependency>
-            <dependency>
-                <groupId>com.yammer.metrics</groupId>
-                <artifactId>metrics-core</artifactId>
-                <version>3.0.0-BETA1</version>
-            </dependency>            
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
@@ -589,18 +574,8 @@
                 <version>3.0.9.Final</version>
             </dependency>
             <dependency>
-                <groupId>com.sleepycat</groupId>
-                <artifactId>je</artifactId>
-                <version>5.0.73</version>
-            </dependency>
-            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.7</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j2</artifactId>
                 <version>1.7.7</version>
             </dependency>
             <dependency>
@@ -647,11 +622,6 @@
                 <groupId>org.jruby</groupId>
                 <artifactId>jruby-complete</artifactId>
                 <version>1.7.16</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jvnet</groupId>
-                <artifactId>mimepull</artifactId>
-                <version>1.6</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ant</groupId>
@@ -702,7 +672,6 @@
         <module>charset</module>
         <module>compress</module>
         <module>util</module>
-        <module>time</module>
         <module>content</module>
         <module>xml</module>
         <module>json</module>
@@ -730,9 +699,9 @@
         <module>io/ftp</module>
         <module>io/rsync</module>
         <module>io/jdbc</module>
+        <module>io/posix</module>
 
         <module>elasticsearch/search</module>
-        <module>elasticsearch/rdf</module>
         <module>elasticsearch/sru</module>
         <module>elasticsearch/oai</module>
         <module>elasticsearch/opensearch</module>

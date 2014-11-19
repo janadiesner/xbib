@@ -31,8 +31,6 @@
  */
 package org.xbib.tools.feed.elasticsearch.oai;
 
-
-import org.xbib.iri.IRI;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIDateResolution;
@@ -43,10 +41,10 @@ import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Triple;
+import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryContext;
-import org.xbib.rdf.io.rdfxml.RdfXmlParser;
+import org.xbib.rdf.content.RouteRdfXContentParams;
+import org.xbib.rdf.io.rdfxml.RdfXmlContentParser;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.tools.Feeder;
 import org.xbib.util.DateUtil;
@@ -57,6 +55,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.Date;
+
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 /**
  * A generic OAI indexer for Elasticsearch
@@ -72,12 +72,7 @@ public class FromRdfXml extends Feeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new FromRdfXml();
-            }
-        };
+        return FromRdfXml::new;
     }
 
     @Override
@@ -93,9 +88,16 @@ public class FromRdfXml extends Feeder {
                 .setSet(set)
                 .setFrom(from, OAIDateResolution.DAY)
                 .setUntil(until, OAIDateResolution.DAY);
-        //ResourceBuilder builder = new ResourceBuilder();
-        RdfXmlParser reader = new RdfXmlParser(); // .setTripleListener(builder);
-        MetadataHandler metadataHandler = new OAIMetadataHandler(reader.getHandler());
+
+        IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
+        namespaceContext.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
+        RouteRdfXContentParams params = new RouteRdfXContentParams(namespaceContext,
+                settings.get("index", "oai"),
+                settings.get("type", "oai"));
+        RdfContentBuilder builder = routeRdfXContentBuilder(params);
+        RdfXmlContentParser parser = new RdfXmlContentParser();
+        parser.builder(builder);
+        MetadataHandler metadataHandler = new MyHandler(params, builder, parser.getHandler());
         request.addHandler(metadataHandler);
         ListRecordsListener listener = new ListRecordsListener(request);
         do {
@@ -113,19 +115,18 @@ public class FromRdfXml extends Feeder {
         client.close();
     }
 
-    private final MemoryContext resourceContext = new MemoryContext();
-
-    private class OAIMetadataHandler extends MetadataHandler {
+    private class MyHandler extends MetadataHandler {
 
         final XmlHandler handler;
 
-        final IRINamespaceContext context;
+        final RouteRdfXContentParams params;
 
-        OAIMetadataHandler(XmlHandler handler) {
+        final RdfContentBuilder builder;
+
+        MyHandler(RouteRdfXContentParams params, RdfContentBuilder builder, XmlHandler handler) {
             this.handler = handler;
-            context = IRINamespaceContext.newInstance();
-            context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
-            resourceContext.setNamespaceContext(context);
+            this.params = params;
+            this.builder = builder;
         }
 
         @Override
@@ -135,18 +136,9 @@ public class FromRdfXml extends Feeder {
 
         @Override
         public void endDocument() throws SAXException {
+            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), getHeader().getIdentifier(), content));
             handler.endDocument();
-            String identifier = getHeader().getIdentifier();
-            try {
-                IRI iri = IRI.builder().scheme("http")
-                        .host(settings.get("index"))
-                        .query(settings.get("type"))
-                        .fragment(identifier).build();
-                resourceContext.getResource().id(iri);
-                sink.write(resourceContext);
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
+            // builder.resource( ... );
         }
 
         @Override
@@ -175,37 +167,4 @@ public class FromRdfXml extends Feeder {
         }
     }
 
-    private class ResourceBuilder implements Triple.Builder {
-
-        @Override
-        public Triple.Builder begin() {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder startPrefixMapping(String prefix, String uri) {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder endPrefixMapping(String prefix) {
-            return this;
-        }
-
-        @Override
-        public ResourceBuilder newIdentifier(IRI identifier) {
-            return this;
-        }
-
-        @Override
-        public ResourceBuilder triple(Triple triple) {
-            resourceContext.getResource().add(triple);
-            return this;
-        }
-
-        @Override
-        public Triple.Builder end() {
-            return this;
-        }
-    }
 }

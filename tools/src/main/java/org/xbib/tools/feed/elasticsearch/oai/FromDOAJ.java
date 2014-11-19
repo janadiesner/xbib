@@ -35,8 +35,7 @@ import org.xbib.iri.IRI;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.memory.MemoryContext;
+import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.rdf.XSDResourceIdentifiers;
 import org.xbib.tools.OAIFeeder;
@@ -54,23 +53,19 @@ public class FromDOAJ extends OAIFeeder {
     }
 
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new FromDOAJ();
-            }
-        };
+        return FromDOAJ::new;
     }
 
     @Override
     protected RdfResourceHandler rdfResourceHandler() {
-        return new DOAJResourceHandler(new MemoryContext());
+        RdfContentParams params = RdfContentParams.EMPTY;
+        return new DOAJResourceHandler(params);
     }
 
     class DOAJResourceHandler extends RdfResourceHandler {
 
-        public DOAJResourceHandler(Context context) {
-            super(context);
+        public DOAJResourceHandler(RdfContentParams params) {
+            super(params);
         }
 
         @Override

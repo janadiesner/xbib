@@ -31,26 +31,23 @@
  */
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.logging.Logger;
-import org.xbib.logging.Loggers;
+import org.xbib.entities.EntityBuilder;
+import org.xbib.entities.marc.MARCEntityBuilderState;
+import org.xbib.entities.marc.MARCEntity;
 import org.xbib.marc.FieldList;
 import org.xbib.rdf.Resource;
 
-public class Title extends MARCElement {
-
-    private final static Logger logger = Loggers.getLogger(Title.class);
+public class Title extends MARCEntity {
 
     private final static Title instance = new Title();
     
-    public static MARCElement getInstance() {
+    public static Title getInstance() {
         return instance;
     }
 
     @Override
-    public String data(ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,String predicate, Resource resource, String property, String value) {
+    public String data(EntityBuilder<MARCEntityBuilderState, MARCEntity, FieldList, String> builder,
+                       String predicate, Resource resource, String property, String value) {
         // let's make "sorting" marker characters visible again
         // 0098 = START OF STRING, 009c = END OF STRING
         // --> 00ac = negation sign

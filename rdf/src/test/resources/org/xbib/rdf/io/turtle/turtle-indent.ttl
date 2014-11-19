@@ -1,7 +1,7 @@
-<urn:res> <dc:title> "Hello", "World";
-	<xbib:person> "Jörg Prante";
-	<dc:subject> "An", "example", "for", "a", "sequence";
-	<http://purl.org/dc/terms/place> "Köln";
+<urn:res> dc:title "Hello", "World";
+	xbib:person "Jörg Prante";
+	dc:subject "An", "example", "for", "a", "sequence";
+	dcterms:place "Köln";
 	<urn:res1> [
 		<property1> "value1";
 		<property2> "value2";

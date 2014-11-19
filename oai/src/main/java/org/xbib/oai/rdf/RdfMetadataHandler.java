@@ -34,12 +34,13 @@ package org.xbib.oai.rdf;
 import org.xbib.iri.IRI;
 import org.xbib.oai.OAIConstants;
 import org.xbib.oai.xml.MetadataHandler;
+import org.xbib.rdf.RdfContent;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.ContextWriter;
-import org.xbib.rdf.memory.MemoryContext;
 import org.xbib.rdf.io.xml.XmlResourceHandler;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -52,15 +53,13 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
 
     private RdfResourceHandler handler;
 
-    private Context<Resource> resourceContext;
+    private Resource resource;
 
-    private ContextWriter contextWriter;
+    private RdfContentBuilder builder;
 
-    private IRINamespaceContext context;
+    private RdfContentParams params;
 
-    public RdfMetadataHandler() {
-        this(getDefaultContext());
-    }
+    private IRINamespaceContext namespaceContext;
 
     public static IRINamespaceContext getDefaultContext() {
         IRINamespaceContext context = IRINamespaceContext.newInstance();
@@ -69,21 +68,29 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
         return context;
     }
 
-    public RdfMetadataHandler(IRINamespaceContext context) {
-        this.context = context;
-        this.resourceContext = new MemoryContext();
-        resourceContext.setNamespaceContext(context);
-        resourceContext.newResource();
+    public RdfMetadataHandler() {
+        this(RdfMetadataHandler::getDefaultContext);
+    }
+
+    public RdfMetadataHandler(RdfContentParams params) {
+        this.params = params;
+        this.resource = new MemoryResource();
+        //resourceContext.setNamespaceContext(context);
+        //resourceContext.newResource();
         // set up our default handler
-        this.handler = new RdfResourceHandler(resourceContext);
+        this.handler = new RdfResourceHandler(params);
         handler.setDefaultNamespace(NS_PREFIX, NS_URI);
     }
 
     public IRINamespaceContext getContext() {
-        return context;
+        return params.getNamespaceContext();
     }
 
-    public RdfMetadataHandler setResourceContext(Context<Resource> context) {
+    public Resource getResource() {
+        return resource;
+    }
+
+    /*public RdfMetadataHandler setResourceContext(Context<Resource> context) {
         this.resourceContext = context;
         return this;
     }
@@ -91,13 +98,14 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
     public Context<Resource> getResourceContext() {
         return resourceContext;
     }
+    */
 
     public RdfMetadataHandler setHandler(RdfResourceHandler handler) {
         handler.setDefaultNamespace(NS_PREFIX, NS_URI);
         this.handler = handler;
-        if (contextWriter != null) {
+        /*if (resourceWriter != null) {
             //handler.setBuilder(resourceContextWriter);
-        }
+        }*/
         return this;
     }
 
@@ -105,11 +113,16 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
         return handler;
     }
 
-    public RdfMetadataHandler setContextWriter(ContextWriter contextWriter) {
-        if (contextWriter != null) {
-            this.contextWriter = contextWriter;
+    /*public RdfMetadataHandler setResourceWriter(ResourceWriter resourceWriter) {
+        if (resourceWriter != null) {
+            this.resourceWriter = resourceWriter;
             //handler.setBuilder(resourceContextWriter);
         }
+        return this;
+    }*/
+
+    public RdfMetadataHandler setBuilder(RdfContentBuilder builder) {
+        this.builder = builder;
         return this;
     }
 
@@ -132,11 +145,11 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
         String id = getHeader().getIdentifier().trim();
         if (handler != null) {
             handler.identify(null, id, null);
-            resourceContext.getResource().id(IRI.create(id));
+            resource.id(IRI.create(id));
             handler.endDocument();
             try {
-                if (contextWriter != null) {
-                    contextWriter.write(resourceContext);
+                if (builder != null) {
+                    builder.resource(resource);
                 }
             } catch (IOException e) {
                 throw new SAXException(e);

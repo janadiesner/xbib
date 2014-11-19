@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class TextualHoldingsPrefix extends MARCElement {
+public class TextualHoldingsPrefix extends MARCEntity {
 
     private final static TextualHoldingsPrefix instance = new TextualHoldingsPrefix();
 

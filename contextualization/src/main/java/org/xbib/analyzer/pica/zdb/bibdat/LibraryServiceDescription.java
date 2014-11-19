@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.pica.zdb.bibdat;
 
-import org.xbib.elements.marc.dialects.pica.PicaElement;
+import org.xbib.entities.marc.dialects.pica.PicaEntity;
 
-public class LibraryServiceDescription extends PicaElement {
+public class LibraryServiceDescription extends PicaEntity {
     private final static LibraryServiceDescription instance = new LibraryServiceDescription();
     
     public static LibraryServiceDescription getInstance() {

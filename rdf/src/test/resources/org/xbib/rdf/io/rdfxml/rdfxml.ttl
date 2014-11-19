@@ -302,16 +302,16 @@
 	rdaGr2:biographicalInformation "Geheimrat; Italienreise 1786-1788 und 1790"@de;
 	rdaGr2:placeOfDeath "Weimar"@de;
 	foaf:page <http://de.wikipedia.org/wiki/Johann_Wolfgang_von_Goethe>;
-	relationship:spouseOf gnd:118628011;
-	relationship:siblingOf gnd:11871791X;
-	relationship:childOf gnd:118695940, gnd:118540246;
+	rel:spouseOf gnd:118628011;
+	rel:siblingOf gnd:11871791X;
+	rel:childOf gnd:118695940, gnd:118540246;
 	rdaGr2:gender <http://RDVocab.info/termList/gender/1002>;
 	rdaGr2:dateOfBirth "1749";
 	rdaGr2:identifierForThePerson "(DE-588)118540238", "(DE-588c)4021455-2", "(DLC)n 79003362";
 	rdaGr2:dateOfDeath "1832";
 	owl:sameAs <http://dbpedia.org/resource/Johann_Wolfgang_von_Goethe>, <http://viaf.org/viaf/24602065>;
 	rdaGr2:placeOfBirth "Frankfurt <Main>"@de;
-	relationship:parentOf gnd:11854022X;
+	rel:parentOf gnd:11854022X;
 	rdaGr2:languageOfThePerson <http://marccodes.heroku.com/languages/ger>;
 	gnd:functionOfThePerson "Textverfasser", "s";
 	gnd:countryCodeForThePerson "XA-DE".

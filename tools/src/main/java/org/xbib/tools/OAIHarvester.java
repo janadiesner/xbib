@@ -48,9 +48,7 @@ import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.oai.xml.XmlMetadataHandler;
-import org.xbib.rdf.memory.MemoryContext;
-import org.xbib.rdf.io.ntriple.NTripleWriter;
-import org.xbib.rdf.io.turtle.TurtleWriter;
+import org.xbib.rdf.RdfContentParams;
 import org.xbib.util.DateUtil;
 import org.xbib.util.URIUtil;
 import org.xml.sax.SAXException;
@@ -63,6 +61,8 @@ import java.util.Date;
 import java.util.Map;
 
 import static com.google.common.collect.Queues.newConcurrentLinkedQueue;
+import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
+import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
 
 /**
  * Harvest from OAI
@@ -86,7 +86,7 @@ public abstract class OAIHarvester extends Converter {
         String output = settings.get("output");
         try {
             TarConnectionFactory factory = new TarConnectionFactory();
-            Connection<TarSession> connection = factory.getConnection(URI.create("targz:" + output));
+            Connection<TarSession> connection = factory.getConnection(URI.create(output));
             session = connection.createSession();
             session.open(Session.Mode.WRITE);
         } catch (IOException e) {
@@ -141,24 +141,25 @@ public abstract class OAIHarvester extends Converter {
         return new XmlPacketHandler().setWriter(new StringWriter());
     }
 
-    protected MetadataHandler turtleMetadataHandler() {
+    protected MetadataHandler turtleMetadataHandler() throws IOException {
         final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();
         metadataHandler.setHandler(resourceHandler)
-                .setContextWriter(new TurtleWriter(writer));
+                .setBuilder(turtleBuilder());
         return metadataHandler;
     }
 
-    protected MetadataHandler ntripleMetadataHandler() {
+    protected MetadataHandler ntripleMetadataHandler() throws IOException {
         final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();
         metadataHandler.setHandler(resourceHandler)
-                .setContextWriter(new NTripleWriter(writer));
+                .setBuilder(ntripleBuilder());
         return metadataHandler;
     }
 
     protected RdfResourceHandler rdfResourceHandler() {
-        return new RdfResourceHandler(new MemoryContext());
+        RdfContentParams params = RdfContentParams.EMPTY;
+        return new RdfResourceHandler(params);
     }
 
     protected class XmlPacketHandler extends XmlMetadataHandler {
@@ -183,10 +184,10 @@ public abstract class OAIHarvester extends Converter {
 
    /* protected class TurtleWriterOutput extends TurtleWriter {
 
-        TurtleWriterOutput(Writer writer, IRINamespaceContext context) {
+        TurtleWriterOutput(Writer writer, IRINamespaceContext namespaceContext) {
             super(writer);
             try {
-                setContext(context);
+                setContext(namespaceContext);
                 writeNamespaces();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);

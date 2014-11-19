@@ -31,11 +31,10 @@
  */
 package org.xbib.analyzer.marc.hol;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.marc.FieldList;
+
+import java.io.IOException;
 
 public class ParentRecordIdentifier extends org.xbib.analyzer.marc.bib.Identifier {
 
@@ -46,13 +45,13 @@ public class ParentRecordIdentifier extends org.xbib.analyzer.marc.bib.Identifie
     }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
-                          FieldList fields, String value) {
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
+                          FieldList fields, String value) throws IOException {
         String predicate = getClass().getSimpleName();
         if (getSettings().containsKey("_predicate")) {
             predicate = (String) getSettings().get("_predicate");
         }
-        builder.context().getResource().add(predicate, value);
+        worker.state().getResource().add(predicate, value);
         return false;
     }
 }

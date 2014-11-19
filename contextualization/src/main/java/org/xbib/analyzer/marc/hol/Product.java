@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class Product extends MARCElement {
+public class Product extends MARCEntity {
 
     private final static Product instance = new Product();
 

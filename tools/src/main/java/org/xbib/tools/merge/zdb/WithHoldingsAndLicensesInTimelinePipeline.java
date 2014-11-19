@@ -247,7 +247,7 @@ public class WithHoldingsAndLicensesInTimelinePipeline implements Pipeline<Boole
             logger.error("service queue not empty?");
         }
         if (!buildQueue.isEmpty()) {
-            logger.error("build queue not empty?");
+            logger.error("complete queue not empty?");
         }
         logger.info("closing");
     }

@@ -31,14 +31,16 @@
  */
 package org.xbib.rdf.io.rdfxml;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
-import org.xbib.rdf.io.turtle.TurtleWriter;
+import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.io.turtle.TurtleContentParams;
+
+import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
 
 public class RdfXmlReaderTest extends StreamTester {
 
@@ -49,14 +51,13 @@ public class RdfXmlReaderTest extends StreamTester {
         if (in == null) {
             throw new IOException("file " + filename + " not found");
         }
-        RdfXmlParser reader = new RdfXmlParser();
-        StringWriter sw = new StringWriter();
-        TurtleWriter writer = new TurtleWriter(sw);
-        reader.parse(new InputStreamReader(in, "UTF-8"), writer);
-        writer.close();
-        sw.close();
+        TurtleContentParams params = new TurtleContentParams(IRINamespaceContext.getInstance(), false);
+        RdfContentBuilder builder = turtleBuilder(params);
+        RdfXmlContentParser reader = new RdfXmlContentParser();
+        reader.builder(builder);
+        reader.parse(new InputStreamReader(in, "UTF-8"));
         assertStream(getClass().getResource("rdfxml.ttl").openStream(),
-                new ByteArrayInputStream(sw.toString().getBytes()));
+                builder.streamInput());
     }
 
 }

@@ -31,25 +31,25 @@
  */
 package org.xbib.analyzer.marc.hol;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class PhysicalDescriptionCode extends MARCElement {
+public class PhysicalDescriptionCode extends MARCEntity {
+
     private final static PhysicalDescriptionCode instance = new PhysicalDescriptionCode();
 
-    public static MARCElement getInstance() {
+    public static MARCEntity getInstance() {
         return instance;
     }
     
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
-                       FieldList fields, String value) {
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
+                          FieldList fields, String value) throws IOException {
         Map<String,Object> codes = (Map<String,Object>)getSettings().get("codes");
         if (codes == null) {
             logger.warn("no 'codes' for " + value);
@@ -58,20 +58,20 @@ public class PhysicalDescriptionCode extends MARCElement {
         // position 0 is the selector
         codes = (Map<String,Object>)codes.get("0");
         if (value != null) {
-            check(builder, codes, value);
+            check(worker, codes, value);
         }
         for (Field field: fields) {
             String data = field.data();
             if (data == null) {
                 continue;
             }
-            check(builder, codes, data);
+            check(worker, codes, data);
         }
         return false;
     }
 
-    private void check(ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
-                       Map<String,Object> codes, String data) {
+    private void check(MARCEntityQueue.MARCWorker worker,
+                       Map<String,Object> codes, String data) throws IOException {
         Map<String,Object> m = (Map<String,Object>)codes.get(data.substring(0,1));
         if (m == null) {
            return;
@@ -83,7 +83,7 @@ public class PhysicalDescriptionCode extends MARCElement {
             Map<String,Object> q = (Map<String,Object>)m.get(Integer.toString(i));
             if (q != null) {
                 String code = (String)q.get(ch);
-                builder.context().getResource().add(predicate, code);
+                worker.state().getResource().add(predicate, code);
             }
         }
     }

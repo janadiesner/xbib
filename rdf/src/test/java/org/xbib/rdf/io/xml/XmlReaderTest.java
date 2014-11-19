@@ -31,25 +31,28 @@
  */
 package org.xbib.rdf.io.xml;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.namespace.QName;
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.RdfContentGenerator;
+import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryContext;
+import org.xbib.rdf.io.turtle.TurtleContentParams;
 import org.xbib.rdf.memory.MemoryResource;
-import org.xbib.rdf.io.turtle.TurtleWriter;
 import org.xbib.text.CharUtils.Profile;
 import org.xbib.text.UrlEncoding;
 
 import static org.testng.Assert.assertEquals;
+import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
 
 public class XmlReaderTest extends StreamTester {
 
@@ -61,14 +64,12 @@ public class XmlReaderTest extends StreamTester {
             throw new IOException("file " + filename + " not found");
         }
 
-        IRINamespaceContext context = IRINamespaceContext.newInstance();
-        context.addNamespace("oaidc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
-        context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
+        IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
+        namespaceContext.addNamespace("oaidc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
+        namespaceContext.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
 
-        final MemoryContext resourceContext = new MemoryContext();
-        resourceContext.setNamespaceContext(context);
-
-        XmlHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {
+        XmlContentParams params = new XmlContentParams(namespaceContext, true);
+        XmlHandler xmlHandler = new AbstractXmlResourceHandler(params) {
 
             @Override
             public boolean isResourceDelimiter(QName name) {
@@ -80,7 +81,7 @@ public class XmlReaderTest extends StreamTester {
                 if ("identifier".equals(name.getLocalPart()) && identifier == null) {
                     // make sure we can build an opaque IRI, whatever is out there
                     String s = UrlEncoding.encode(value, Profile.SCHEMESPECIFICPART.filter());
-                    resourceContext.getResource().id(IRI.create("id:" + s));
+                    getResource().id(IRI.create("id:" + s));
                 }
             }
             
@@ -90,20 +91,24 @@ public class XmlReaderTest extends StreamTester {
                 return "dc".equals(name.getLocalPart());
             }
 
-        };
-        StringWriter sw = new StringWriter();
-        TurtleWriter writer = new TurtleWriter(sw);
-        writer.setNamespaceContext(context);
-        writer.writeNamespaces();
-        xmlHandler.setBuilder(writer);
-        new XmlParser()
-                .setHandler(xmlHandler)
-                .parse(new InputStreamReader(in, "UTF-8"), writer);
-        writer.close();
-        sw.close();
+            @Override
+            public XmlHandler setNamespaceContext(IRINamespaceContext namespaceContext) {
+                return this;
+            }
 
+            @Override
+            public IRINamespaceContext getNamespaceContext() {
+                return namespaceContext;
+            }
+        };
+        TurtleContentParams turtleParams = new TurtleContentParams(namespaceContext, true);
+        RdfContentBuilder builder = turtleBuilder(turtleParams);
+        xmlHandler.setBuilder(builder);
+        new XmlContentParser()
+                .setHandler(xmlHandler)
+                .parse(new InputStreamReader(in, "UTF-8"));
         assertStream(getClass().getResource("dc.ttl").openStream(),
-                new ByteArrayInputStream(sw.toString().getBytes()));
+                builder.streamInput());
     }
 
     @Test
@@ -113,10 +118,9 @@ public class XmlReaderTest extends StreamTester {
         if (in == null) {
             throw new IOException("file " + filename + " not found");
         }
-        IRINamespaceContext context = IRINamespaceContext.newInstance();
-        final MemoryContext resourceContext = new MemoryContext();
-        resourceContext.setNamespaceContext(context);
-        AbstractXmlHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {
+        IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
+        XmlContentParams params = new XmlContentParams(namespaceContext, true);
+        AbstractXmlHandler xmlHandler = new AbstractXmlResourceHandler(params) {
 
             @Override
             public boolean isResourceDelimiter(QName name) {
@@ -126,7 +130,7 @@ public class XmlReaderTest extends StreamTester {
             @Override
             public void identify(QName name, String value, IRI identifier) {
                 if (identifier == null) {
-                    resourceContext.getResource().id(IRI.create("id:1"));
+                    getResource().id(IRI.create("id:1"));
                 }
             }
 
@@ -135,46 +139,25 @@ public class XmlReaderTest extends StreamTester {
                 return false;
             }
 
+            @Override
+            public XmlHandler setNamespaceContext(IRINamespaceContext namespaceContext) {
+                return this;
+            }
+
+            @Override
+            public IRINamespaceContext getNamespaceContext() {
+                return namespaceContext;
+            }
         };
-        final LinkedList<Triple> triples = new LinkedList<Triple>();
+
+        MyBuilder builder = new MyBuilder();
         xmlHandler.setDefaultNamespace("xml", "http://xmltest")
-                .setBuilder(new Triple.Builder() {
-                    @Override
-                    public Triple.Builder begin() {
-                        return this;
-                    }
-
-                    @Override
-                    public Triple.Builder startPrefixMapping(String prefix, String uri) {
-                        return this;
-                    }
-
-                    @Override
-                    public Triple.Builder endPrefixMapping(String prefix) {
-                        return this;
-                    }
-
-                    @Override
-                    public Triple.Builder newIdentifier(IRI identifier) {
-                        return this;
-                    }
-
-                    @Override
-                    public Triple.Builder triple(Triple triple) {
-                        triples.add(triple);
-                        return this;
-                    }
-
-                    @Override
-                    public Triple.Builder end() {
-                        return this;
-                    }
-                });
+                .setBuilder(builder);
         MemoryResource.reset();
-        new XmlParser()
+        new XmlContentParser()
                 .setHandler(xmlHandler)
-                .parse(new InputStreamReader(in, "UTF-8"), null);
-        assertEquals(triples.toString(),
+                .parse(new InputStreamReader(in, "UTF-8"));
+        assertEquals(builder.getTriples().toString(),
                 "[id:1 xml:dates _:b1, _:b1 xml:date 2001, _:b1 xml:date 2002, _:b1 xml:date 2003]"
         );
     }
@@ -186,11 +169,9 @@ public class XmlReaderTest extends StreamTester {
         if (in == null) {
             throw new IOException("file " + filename + " not found");
         }
-        IRINamespaceContext context = IRINamespaceContext.newInstance();
-        final MemoryContext resourceContext = new MemoryContext();
-        resourceContext.setNamespaceContext(context);
-        AbstractXmlResourceHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {
-
+        IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
+        XmlContentParams params = new XmlContentParams(namespaceContext, true);
+        AbstractXmlHandler xmlHandler = new AbstractXmlResourceHandler(params) {
             @Override
             public boolean isResourceDelimiter(QName name) {
                 return false;
@@ -199,7 +180,7 @@ public class XmlReaderTest extends StreamTester {
             @Override
             public void identify(QName name, String value, IRI identifier) {
                 if (identifier ==null) {
-                    resourceContext.getResource().id(IRI.create("id:1"));
+                    getResource().id(IRI.create("id:1"));
                 }
             }
 
@@ -208,48 +189,52 @@ public class XmlReaderTest extends StreamTester {
                 return false;
             }
 
+            @Override
+            public XmlHandler setNamespaceContext(IRINamespaceContext namespaceContext) {
+                return this;
+            }
+
+            @Override
+            public IRINamespaceContext getNamespaceContext() {
+                return namespaceContext;
+            }
         };
-        LinkedList<Triple> triples = new LinkedList<>();
+
+        MyBuilder builder = new MyBuilder();
+
         xmlHandler.setDefaultNamespace("xml", "http://localhost")
-                .setBuilder(new Triple.Builder() {
-                    @Override
-                    public Triple.Builder begin() {
-                        return this;
-                    }
-
-                    @Override
-                    public Triple.Builder startPrefixMapping(String prefix, String uri) {
-                        return this;
-                    }
-
-                    @Override
-                    public Triple.Builder endPrefixMapping(String prefix) {
-                        return this;
-                    }
-
-                    @Override
-                    public Triple.Builder newIdentifier(IRI identifier) {
-                        return this;
-                    }
-
-                    @Override
-                    public Triple.Builder triple(Triple triple) {
-                        triples.add(triple);
-                        return this;
-                    }
-
-                    @Override
-                    public Triple.Builder end() {
-                        return this;
-                    }
-                });
+                .setBuilder(builder);
         MemoryResource.reset();
-        new XmlParser()
+        new XmlContentParser()
                 .setHandler(xmlHandler)
-                .parse(new InputStreamReader(in, "UTF-8"), null);
-        assertEquals( triples.toString(),
+                .parse(new InputStreamReader(in, "UTF-8"));
+        assertEquals(builder.getTriples().toString(),
                 "[id:1 xml:dates _:b1, _:b1 xml:date _:b2, _:b2 xml:@href 1, _:b1 xml:date _:b4, _:b4 xml:@href 2, _:b1 xml:date _:b6, _:b6 xml:@href 3, _:b1 xml:date _:b8, _:b8 xml:hello World]");
 
+    }
+
+    class MyBuilder extends RdfContentBuilder {
+
+        final List<Triple> triples = new LinkedList<Triple>();
+
+        public MyBuilder() throws IOException {
+        }
+
+        @Override
+        public RdfContentGenerator triple(Triple triple) {
+            triples.add(triple);
+            return this;
+        }
+
+        @Override
+        public RdfContentGenerator resource(Resource resource) throws IOException {
+            triples.addAll(resource.triples().stream().collect(Collectors.toList()));
+            return this;
+        }
+
+        public List<Triple> getTriples() {
+            return triples;
+        }
     }
 
 }

@@ -1,16 +1,16 @@
 package org.xbib.analyzer.marc.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
 
-public class ItemLibraryIdentifier extends MARCElement {
+public class ItemLibraryIdentifier extends MARCEntity {
 
-    private final static MARCElement element = new ItemLibraryIdentifier();
+    private final static MARCEntity element = new ItemLibraryIdentifier();
 
     private ItemLibraryIdentifier() {
     }
 
-    public static MARCElement getInstance() {
+    public static MARCEntity getInstance() {
         return element;
     }
 

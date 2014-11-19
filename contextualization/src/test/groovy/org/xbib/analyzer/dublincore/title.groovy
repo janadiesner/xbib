@@ -1,13 +1,14 @@
 package org.xbib.analyzer.dublincore
 
-import org.xbib.elements.ElementBuilder;
+import org.xbib.entities.EntityBuilder
+import org.xbib.entities.dublincore.DublinCoreEntity;
 
-public class TitleElement extends DublinCoreElement {
+public class TitleEntity extends DublinCoreEntity {
     @Override
-    TitleElement build(ElementBuilder builder, Object key, Object value) {
+    TitleEntity build(EntityBuilder builder, Object key, Object value) {
         println 'got title ' + value
         builder.context().getResource().add("dc:title", value.toString())
         return this
     }
 }
-titleElement = new TitleElement()
+titleElement = new TitleEntity()

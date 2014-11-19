@@ -31,12 +31,12 @@
  */
 package org.xbib.analyzer.marc.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class ClassificationNumber extends MARCElement {
+public class ClassificationNumber extends MARCEntity {
     private final static ClassificationNumber instance = new ClassificationNumber();
     
-    public static MARCElement getInstance() {
+    public static MARCEntity getInstance() {
         return instance;
     }
 }

@@ -34,6 +34,7 @@ package org.xbib.oai.client;
 import org.testng.annotations.Test;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
+import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
@@ -43,7 +44,6 @@ import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.Context;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -64,11 +64,12 @@ public class DOAJArticleClientTest {
     @Test
     public void testListRecordsDOAJArticles() throws Exception {
 
-        IRINamespaceContext context = RdfMetadataHandler.getDefaultContext();
-        context.addNamespace(DOAJ_NS_PREFIX,  DOAJ_NS_URI);
+        IRINamespaceContext namespaceContext = RdfMetadataHandler.getDefaultContext();
+        namespaceContext.addNamespace(DOAJ_NS_PREFIX, DOAJ_NS_URI);
 
-        final RdfMetadataHandler metadataHandler = new RdfMetadataHandler(context);
-        final RdfResourceHandler resourceHandler = new DOAJResourceHandler(metadataHandler.getResourceContext());
+        RdfContentParams params = () -> namespaceContext;
+        final RdfMetadataHandler metadataHandler = new RdfMetadataHandler(params);
+        final RdfResourceHandler resourceHandler = new DOAJResourceHandler(params);
         resourceHandler.setDefaultNamespace(DOAJ_NS_PREFIX,  DOAJ_NS_URI);
         //final RdfOutput out = new MyOutput(metadataHandler.getContext());
 
@@ -102,12 +103,13 @@ public class DOAJArticleClientTest {
     }
 
     private final IRI ISSN = IRI.create("urn:ISSN");
+
     private final IRI EISSN = IRI.create("urn:EISSN");
 
     class DOAJResourceHandler extends RdfResourceHandler {
 
-        public DOAJResourceHandler(Context context) {
-            super(context);
+        public DOAJResourceHandler(RdfContentParams params) {
+            super(params);
         }
 
         @Override

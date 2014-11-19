@@ -1,13 +1,14 @@
 package org.xbib.analyzer.dublincore
 
-import org.xbib.elements.ElementBuilder
+import org.xbib.entities.EntityBuilder
+import org.xbib.entities.dublincore.DublinCoreEntity
 
-public class DateElement extends DublinCoreElement {
+public class DateEntity extends DublinCoreEntity {
 
     @Override
-    DateElement build(ElementBuilder builder, Object key, Object value) {
+    DateEntity build(EntityBuilder builder, Object key, Object value) {
         println 'got date ' + value
         return this
     }
 }
-dateElement = new DateElement()
+dateElement = new DateEntity()

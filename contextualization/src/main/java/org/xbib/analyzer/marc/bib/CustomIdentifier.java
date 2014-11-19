@@ -31,12 +31,12 @@
  */
 package org.xbib.analyzer.marc.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class CustomIdentifier extends MARCElement {
+public class CustomIdentifier extends MARCEntity {
     private final static CustomIdentifier instance = new CustomIdentifier();
 
-    public static MARCElement getInstance() {
+    public static MARCEntity getInstance() {
         return instance;
     }
 

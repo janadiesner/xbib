@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.zdb.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class LocalClassification extends MARCElement {
+public class LocalClassification extends MARCEntity {
 
     private final static LocalClassification instance = new LocalClassification();
 

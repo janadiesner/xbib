@@ -31,13 +31,10 @@
  */
 package org.xbib.tools.feed.elasticsearch.zdb.bibdat;
 
-import org.xbib.elements.UnmappedKeyListener;
-import org.xbib.elements.marc.dialects.pica.PicaContext;
-import org.xbib.elements.marc.dialects.pica.PicaElementBuilder;
-import org.xbib.elements.marc.dialects.pica.PicaElementBuilderFactory;
-import org.xbib.elements.marc.dialects.pica.PicaElementMapper;
+import org.xbib.entities.marc.dialects.pica.PicaEntityBuilderState;
+import org.xbib.entities.marc.dialects.pica.PicaEntityQueue;
 import org.xbib.io.InputService;
-import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
@@ -45,11 +42,10 @@ import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
-import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.ContextWriter;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.content.RouteRdfXContentParams;
 import org.xbib.tools.Feeder;
 
 import java.io.IOException;
@@ -59,6 +55,8 @@ import java.text.Normalizer;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 /**
  * Index bib addresses into Elasticsearch
@@ -74,49 +72,23 @@ public final class BibdatFromPPXML extends Feeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new BibdatFromPPXML();
-            }
-        };
-    }
-
-    @Override
-    protected BibdatFromPPXML prepare() throws IOException {
-        super.prepare();
-        return this;
+        return BibdatFromPPXML::new;
     }
 
     @Override
     public void process(URI uri) throws Exception {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
-        PicaElementMapper mapper = new PicaElementMapper("pica/zdb/bib")
-                .pipelines(settings.getAsInt("pipelines", 1))
-                .setListener(new UnmappedKeyListener<FieldList>() {
-                    @Override
-                    public void unknown(FieldList key) {
+        MyQueue queue = new MyQueue("pica/zdb/bib", settings.getAsInt("pipelines", 1));
+        queue.setUnmappedKeyListener(key -> {
+                    if ((settings.getAsBoolean("detect", false))) {
                         logger.warn("unmapped field {}", key);
-                        if ((settings.getAsBoolean("detect", false))) {
-                            unmapped.add("\"" + key + "\"");
-                        }
-                    }
-                })
-                .start(new PicaElementBuilderFactory() {
-                    public PicaElementBuilder newBuilder() {
-                        PicaElementBuilder builder = new PicaElementBuilder();
-                        builder.addWriter(new PicaContextOutput());
-                        return builder;
+                        unmapped.add("\"" + key + "\"");
                     }
                 });
+        queue.execute();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                .setStringTransformer(new StringTransformer() {
-                    @Override
-                    public String transform(String value) {
-                        return Normalizer.normalize(value, Normalizer.Form.NFKC);
-                    }
-                })
-                .addListener(mapper)
+                .setStringTransformer(value -> Normalizer.normalize(value, Normalizer.Form.NFKC))
+                .addListener(queue)
                 .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                     @Override
                     public KeyValueStreamAdapter<FieldList, String> begin() {
@@ -151,21 +123,26 @@ public final class BibdatFromPPXML extends Feeder {
         InputStream in = InputService.getInputStream(uri);
         new DNBPICAXmlReader().setListener(kv).parse(in);
         in.close();
-        mapper.close();
+        queue.close();
         if (settings.getAsBoolean("detect", false)) {
             logger.info("detected unmapped elements = {}", unmapped);
         }
     }
 
-    private class PicaContextOutput implements ContextWriter<PicaContext, Resource> {
+    class MyQueue extends PicaEntityQueue {
 
-        @Override
-        public void write(PicaContext context) throws IOException {
-            context.getResource().id(IRI.builder().host(settings.get("index")).query(settings.get("type"))
-                    .fragment(context.getID()).build());
-            sink.write(context);
+        public MyQueue(String path, int workers) {
+            super(path, workers);
         }
 
+        @Override
+        public void afterCompletion(PicaEntityBuilderState state) throws IOException {
+            RouteRdfXContentParams params = new RouteRdfXContentParams(IRINamespaceContext.getInstance(),
+                    settings.get("index"), settings.get("type"));
+            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), state.getID(), content));
+            RdfContentBuilder builder = routeRdfXContentBuilder(params);
+            builder.resource(state.getResource());
+        }
     }
 
 }

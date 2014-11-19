@@ -31,13 +31,13 @@
  */
 package org.xbib.analyzer.marc.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class PhysicalDescription extends MARCElement {
+public class PhysicalDescription extends MARCEntity {
 
     private final static PhysicalDescription instance = new PhysicalDescription();
     
-    public static MARCElement getInstance() {
+    public static MARCEntity getInstance() {
         return instance;
     }
 

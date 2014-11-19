@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class FormattedEnumerationAndChronology extends MARCElement {
+public class FormattedEnumerationAndChronology extends MARCEntity {
 
     private final static FormattedEnumerationAndChronology instance = new FormattedEnumerationAndChronology();
 

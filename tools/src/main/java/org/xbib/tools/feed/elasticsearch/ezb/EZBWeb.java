@@ -39,11 +39,11 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Context;
+import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryContext;
-import org.xbib.rdf.io.turtle.TurtleWriter;
+import org.xbib.rdf.content.RouteRdfXContentParams;
+import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.tools.Feeder;
 
 import java.io.BufferedReader;
@@ -57,6 +57,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 /**
  * Ingest inter library loan codes from EZB web service into Elasticsearch
@@ -85,15 +87,9 @@ public class EZBWeb extends Feeder {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
         namespaceContext.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         namespaceContext.addNamespace("xbib", "http://xbib.org/elements/1.0/");
-        Context<Resource> context = new MemoryContext()
-                //.setContentBuilder(contentBuilder(namespaceContext))
-                .setNamespaceContext(namespaceContext);
 
         InputStream in = InputService.getInputStream(uri);
         NullWriter nw = new NullWriter();
-        context.setNamespaceContext(namespaceContext);
-        final TurtleWriter turtle = new TurtleWriter(nw);
-        turtle.setNamespaceContext(namespaceContext);
         Iterator<String> it = readZDBIDs(new InputStreamReader(in, "UTF-8"));
         long counter = 0;
         while (it.hasNext()) {
@@ -152,7 +148,7 @@ public class EZBWeb extends Feeder {
                             .query(settings.get("type"))
                             .fragment(key)
                             .build();
-                    Resource resource = context.newResource();
+                    Resource resource = new MemoryResource();
                     resource.id(id)
                             .add("dc:identifier", key)
                             .add("xbib:identifier", zdbid)
@@ -168,10 +164,14 @@ public class EZBWeb extends Feeder {
                                             + (code2.isEmpty() ? "x" : code2)
                                             + (code3.isEmpty() ? "x" : code3))
                             .add("xbib:comment", comment);
-                    // turtle
-                    turtle.write(context);
-                    // Elasticsearch
-                    sink.write(context);
+
+                    RouteRdfXContentParams params = new RouteRdfXContentParams(namespaceContext,
+                            settings.get("index", "ezbweb"),
+                            settings.get("type", "ezbweb"));
+                    params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), id.toString(), content));
+                    RdfContentBuilder builder = routeRdfXContentBuilder(params);
+                    builder.resource(resource);
+
                     counter++;
                     if (counter % 1000 == 0) {
                         logger.info("{}", counter);
@@ -181,9 +181,6 @@ public class EZBWeb extends Feeder {
                 }
             }
             br.close();
-        }
-        if (turtle != null) {
-            turtle.close();
         }
         if (writer != null) {
             writer.close();

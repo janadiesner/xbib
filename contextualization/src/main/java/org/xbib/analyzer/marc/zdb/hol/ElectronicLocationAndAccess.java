@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.zdb.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class ElectronicLocationAndAccess extends MARCElement {
+public class ElectronicLocationAndAccess extends MARCEntity {
 
     private final static ElectronicLocationAndAccess instance = new ElectronicLocationAndAccess();
 

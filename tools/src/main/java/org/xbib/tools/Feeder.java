@@ -32,8 +32,8 @@
 package org.xbib.tools;
 
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
+import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
-import org.xbib.elasticsearch.rdf.Sink;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
 import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
@@ -56,9 +56,9 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
 
     private final static Logger logger = LoggerFactory.getLogger(Feeder.class.getSimpleName());
 
-    protected static Ingest output;
+    protected static Ingest ingest;
 
-    protected static Sink sink;
+    //protected static ElasticsearchRdfXContentGenerator elasticsearchRdfXContentGenerator;
 
     @Override
     public Feeder<T, R, P> reader(Reader reader) {
@@ -83,54 +83,36 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
     @Override
     protected Feeder<T, R, P> prepare() throws IOException {
         super.prepare();
-        String index = settings.get("index");
-        String type = settings.get("type");
-        Integer shards = settings.getAsInt("shards", 1);
-        Integer replica = settings.getAsInt("replica", 0);
-        Integer maxbulkactions = settings.getAsInt("maxbulkactions", 100);
+        Integer maxbulkactions = settings.getAsInt("maxbulkactions", 1000);
         Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
                 Runtime.getRuntime().availableProcessors());
         String maxtimewait = settings.get("maxtimewait", "60s");
-        output = createIngest();
-        output.maxActionsPerBulkRequest(maxbulkactions)
+        ingest = createIngest();
+        ingest.maxActionsPerBulkRequest(maxbulkactions)
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
-                .maxRequestWait(TimeValue.parseTimeValue(maxtimewait, TimeValue.timeValueSeconds(60)))
-                .newClient(settings.getAsMap());
-        output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
-        beforeIndexCreation(output);
-        output.shards(shards)
-                .replica(replica)
-                .newIndex(index)
-                .startBulk(index);
-        afterIndexCreation(output);
-        sink = new Sink(output);
+                .maxRequestWait(TimeValue.parseTimeValue(maxtimewait, TimeValue.timeValueSeconds(60)));
+        createIndex(ingest);
+        //elasticsearchRdfXContentGenerator = new ElasticsearchRdfXContentGenerator(output);
         return this;
     }
 
     @Override
     protected Feeder<T, R, P> cleanup() {
         super.cleanup();
-        if (output != null) {
+        if (ingest != null) {
             try {
                 logger.info("flush");
-                output.flushIngest();
-                logger.info("waiting for responses");
-                output.waitForResponses(TimeValue.timeValueSeconds(60));
+                ingest.flushIngest();
+                logger.info("waiting for all responses");
+                ingest.waitForResponses(TimeValue.timeValueSeconds(120));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.error(e.getMessage(), e);
             }
-            logger.info("stopping bulk mode");
-            try {
-                output.stopBulk(settings.get("index"));
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            } finally {
-                logger.info("shutdown");
-                output.shutdown();
-            }
+            logger.info("shutdown");
+            ingest.shutdown();
         }
-        logger.info("done");
+        logger.info("done with run");
         return this;
     }
 
@@ -181,12 +163,28 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
         }
     }
 
+    protected Feeder createIndex(Ingest output) throws IOException {
+        output.newClient(ImmutableSettings.settingsBuilder()
+                .put("cluster.name", settings.get("elasticsearch.cluster"))
+                .put("host", settings.get("elasticsearch.host"))
+                .put("port", settings.getAsInt("elasticsearch.port", 9300))
+                .put("sniff", settings.getAsBoolean("elasticsearch.sniff", false))
+                .build());
+        output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
+        try {
+            beforeIndexCreation(output);
+            output.newIndex(settings.get("index"));
+        } catch (Exception e) {
+            if (!settings.getAsBoolean("ignoreindexcreationerror", false)) {
+                throw e;
+            } else {
+                logger.warn("index creation error, but configured to ignore");
+            }
+        }
+        return this;
+    }
+
     protected Feeder beforeIndexCreation(Ingest output) throws IOException {
         return this;
     }
-
-    protected Feeder afterIndexCreation(Ingest output) throws IOException {
-        return this;
-    }
-
 }

@@ -6,6 +6,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -18,10 +22,10 @@ import org.xbib.io.BytesArray;
 import org.xbib.io.BytesReference;
 import org.xbib.io.stream.BytesStream;
 import org.xbib.io.FastByteArrayOutputStream;
-import org.xbib.time.Instant;
-import org.xbib.time.ZoneId;
-import org.xbib.time.ZonedDateTime;
-import org.xbib.time.format.DateTimeFormatter;
+//import org.xbib.time.Instant;
+//import org.xbib.time.ZoneId;
+//import org.xbib.time.ZonedDateTime;
+//import org.xbib.time.format.DateTimeFormatter;
 
 public final class XContentBuilder implements BytesStream, ToXContent {
 
@@ -1005,12 +1009,12 @@ public final class XContentBuilder implements BytesStream, ToXContent {
             Date date = (Date)value;
             Instant instant = Instant.ofEpochMilli(date.getTime());
             ZonedDateTime zdt = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
-            generator.writeString(zdt.toString(DateTimeFormatter.ISO_INSTANT));
+            generator.writeString(zdt.format(DateTimeFormatter.ISO_INSTANT));
         } else if (value instanceof Calendar) {
             Calendar calendar = (Calendar)value;
             Instant instant = Instant.ofEpochMilli(calendar.getTime().getTime());
             ZonedDateTime zdt = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
-            generator.writeString(zdt.toString(DateTimeFormatter.ISO_INSTANT));
+            generator.writeString(zdt.format(DateTimeFormatter.ISO_INSTANT));
         } else if (value instanceof BytesReference) {
             BytesReference bytes = (BytesReference) value;
             if (!bytes.hasArray()) {

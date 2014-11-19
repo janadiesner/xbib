@@ -33,7 +33,7 @@ package org.xbib.tools.merge.zdb.entities;
 
 import org.elasticsearch.common.collect.ImmutableSet;
 import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.elements.support.EnumerationAndChronology;
+import org.xbib.entities.support.EnumerationAndChronology;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 

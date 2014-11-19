@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.bib;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class IdentifierUPC extends MARCElement {
+public class IdentifierUPC extends MARCEntity {
     private final static IdentifierUPC instance = new IdentifierUPC();
     
     public static IdentifierUPC getInstance() {

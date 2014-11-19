@@ -32,31 +32,31 @@
 package org.xbib.rdf.io.turtle;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
-import org.xbib.rdf.Context;
+import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.Resource;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryContext;
+import org.xbib.rdf.memory.MemoryResource;
 
 import static org.testng.Assert.assertEquals;
+import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
 
-public class TurtleTest<R extends Resource> extends StreamTester {
+public class TurtleTest extends StreamTester {
 
     @Test
     public void testTurtleGND() throws Exception {
         IRINamespaceContext context = IRINamespaceContext.newInstance();
         context.addNamespace("gnd", "http://d-nb.info/gnd/");
         InputStream in = getClass().getResourceAsStream("GND.ttl");
-        TurtleParser reader = new TurtleParser().setBaseIRI(IRI.create("http://d-nb.info/gnd/"))
+        TurtleContentParser reader = new TurtleContentParser()
+                .setBaseIRI(IRI.create("http://d-nb.info/gnd/"))
                 .context(context);
-        reader.parse(new InputStreamReader(in, "UTF-8"), null);
+        reader.parse(new InputStreamReader(in, "UTF-8"));
     }
 
     @Test
@@ -74,28 +74,21 @@ public class TurtleTest<R extends Resource> extends StreamTester {
         }
         reader.close();
         String s1 = sb.toString().trim();
-        Context<R> resourceContext = createResourceContext();
+        Resource resource = createResource();
 
         IRINamespaceContext context = IRINamespaceContext.newInstance();
         context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         context.addNamespace("dcterms", "http://purl.org/dc/terms/");
 
-        StringWriter sw = new StringWriter();
-        TurtleWriter writer = new TurtleWriter(sw);
-        writer.setNamespaceContext(context);
-        writer.writeNamespaces();
-        writer.write(resourceContext);
-        writer.close();
-        sw.close();
-
-        String s2 = sw.toString().trim();
+        TurtleContentParams params = new TurtleContentParams(context, true);
+        RdfContentBuilder builder = turtleBuilder(params);
+        builder.resource(resource);
+        String s2 = builder.string().trim();
         assertEquals(s2, s1);
-
     }
 
-    private Context<R> createResourceContext() {
-        MemoryContext<R> context = new MemoryContext();
-        R resource = context.newResource();
+    private Resource createResource() {
+        Resource resource = new MemoryResource();
         resource.id(IRI.create("urn:doc1"));
         resource.add("dc:creator", "Smith");
         resource.add("dc:creator", "Jones");
@@ -108,24 +101,20 @@ public class TurtleTest<R extends Resource> extends StreamTester {
         resource.newResource("dcterms:isPartOf")
                 .add("dc:title", "another")
                 .add("dc:title", "title");
-        return context;
+        return resource;
     }
 
     @Test
-    public void testTurtleWrite() throws Exception {
-        Context<R> context = createResourceContext2();
-        StringWriter sw = new StringWriter();
-        TurtleWriter writer = new TurtleWriter(sw);
-        writer.writeNamespaces();
-        writer.write(context);
-        sw.close();
-        assertStream(getClass().getResource("turtle-test.ttl").openStream(),
-                new ByteArrayInputStream(sw.toString().getBytes()));
+    public void testTurtleBuilder() throws Exception {
+        Resource resource = createResource2();
+        TurtleContentParams params = new TurtleContentParams(IRINamespaceContext.getInstance(), false);
+        RdfContentBuilder builder = turtleBuilder(params);
+        builder.resource(resource);
+        assertStream(getClass().getResource("turtle-test.ttl").openStream(), builder.streamInput());
     }
 
-    private Context<R> createResourceContext2() {
-        MemoryContext<R> context = new MemoryContext();
-        R r = context.newResource();
+    private Resource createResource2() {
+        Resource r = new MemoryResource();
         r.id(IRI.create("urn:res"))
                 .add("dc:title", "Hello")
                 .add("dc:title", "World")
@@ -145,24 +134,21 @@ public class TurtleTest<R extends Resource> extends StreamTester {
         r.newResource("urn:res3")
                 .add("property5", "value5")
                 .add("property6", "value6");
-        return context;
+        return r;
     }
 
     @Test
     public void testTurtleResourceIndent() throws Exception {
-        Context<R> context = createNestedResources();
-        StringWriter sw = new StringWriter();
-        TurtleWriter writer = new TurtleWriter(sw);
-        writer.writeNamespaces();
-        writer.write(context);
-        sw.close();
+        Resource resource = createNestedResources();
+        TurtleContentParams params = new TurtleContentParams(IRINamespaceContext.getInstance(), false);
+        RdfContentBuilder builder = turtleBuilder(params);
+        builder.resource(resource);
         assertStream(getClass().getResource("turtle-indent.ttl").openStream(),
-                new ByteArrayInputStream(sw.toString().getBytes()));
+                builder.streamInput());
     }
 
-    private Context<R> createNestedResources() {
-        MemoryContext<R> context = new MemoryContext();
-        R r = context.newResource();
+    private Resource createNestedResources() {
+        Resource r = new MemoryResource();
         r.id(IRI.create("urn:res"))
                 .add("dc:title", "Hello")
                 .add("dc:title", "World")
@@ -182,7 +168,7 @@ public class TurtleTest<R extends Resource> extends StreamTester {
         r.newResource("urn:res3")
                 .add("property5", "value5")
                 .add("property6", "value6");
-        return context;
+        return r;
     }
 
 

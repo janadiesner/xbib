@@ -32,25 +32,23 @@
 package org.xbib.tools.feed.elasticsearch.viaf;
 
 import org.xbib.io.InputService;
-import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
-import org.xbib.rdf.Resource;
-import org.xbib.rdf.Triple;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.memory.MemoryContext;
-import org.xbib.rdf.io.rdfxml.RdfXmlParser;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.content.RouteRdfXContentParams;
+import org.xbib.rdf.io.rdfxml.RdfXmlContentParser;
 import org.xbib.tools.Feeder;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URI;
-import java.util.concurrent.Callable;
+
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 /**
  * VIAF indexer to Elasticsearch
@@ -65,115 +63,31 @@ public class VIAF extends Feeder {
     }
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return new PipelineProvider<Pipeline>() {
-            @Override
-            public Pipeline get() {
-                return new VIAF();
-            }
-        };
+        return VIAF::new;
     }
 
     @Override
     public void process(URI uri) throws Exception {
+        IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
         InputStream in = InputService.getInputStream(uri);
         BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-        for (int i = 0; i < settings.getAsInt("pumps", 1); i++) {
-            //pumpService.submit(new VIAFPipeline());
-        }
         String line;
         long linecounter = 0;
         while ((line = reader.readLine()) != null) {
-            //pump.put(line);
+            RouteRdfXContentParams params = new RouteRdfXContentParams(namespaceContext,
+                    settings.get("index", "viaf"),
+                    settings.get("type", "viaf"));
+            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
+            RdfContentBuilder builder = routeRdfXContentBuilder(params);
+            RdfXmlContentParser parser = new RdfXmlContentParser();
+            parser.builder(builder);
+            parser.parse(new StringReader(line));
             linecounter++;
             if (linecounter % 10000 == 0) {
                 logger.info("{}", linecounter);
             }
         }
         in.close();
-        for (int i = 0; i < settings.getAsInt("pumps", 1); i++) {
-            //pump.put("|");
-        }
-    }
-
-    private class VIAFPipeline implements Callable<Boolean> {
-
-        @Override
-        public Boolean call() throws Exception {
-            try {
-                while (true) {
-                    String line = null; //pump.take();
-                    if ("|".equals(line)) {
-                        break;
-                    }
-                    final ElasticBuilder builder = new ElasticBuilder();
-                    RdfXmlParser rdfxml = new RdfXmlParser();
-                    rdfxml.parse(new StringReader(line), builder);
-                    builder.close();
-                }
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-                return false;
-            }
-            return true;
-        }
-    }
-
-    private final Context context = new MemoryContext();
-
-    private class ElasticBuilder implements Triple.Builder {
-
-        private Resource resource;
-
-        ElasticBuilder() throws IOException {
-            resource = context.newResource();
-        }
-
-        @Override
-        public Triple.Builder begin() {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder startPrefixMapping(String prefix, String uri) {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder endPrefixMapping(String prefix) {
-            return this;
-        }
-
-        @Override
-        public ElasticBuilder newIdentifier(IRI iri) {
-            flush();
-            resource.id(iri);
-            return this;
-        }
-
-        @Override
-        public ElasticBuilder triple(Triple triple) {
-            resource.add(triple);
-            return this;
-        }
-
-        @Override
-        public Triple.Builder end() {
-            return this;
-        }
-
-        public void close() throws IOException {
-            flush();
-        }
-
-        private void flush() {
-            try {
-                sink.write(context);
-            } catch (IOException e) {
-                logger.error("flush failed: {}", e.getMessage(), e);
-            }
-            resource = context.newResource();
-        }
-
     }
 
 }

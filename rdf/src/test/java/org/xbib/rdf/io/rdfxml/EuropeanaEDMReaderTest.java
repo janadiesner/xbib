@@ -35,19 +35,24 @@ import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Node;
+import org.xbib.rdf.RdfContent;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.RdfContentGenerator;
+import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
-import org.xbib.rdf.Context;
-import org.xbib.rdf.memory.MemoryContext;
+import org.xbib.rdf.io.ntriple.NTripleContent;
+import org.xbib.rdf.io.ntriple.NTripleContentParams;
+import org.xbib.rdf.memory.MemoryRdfGraph;
 import org.xbib.rdf.memory.MemoryLiteral;
+import org.xbib.rdf.memory.MemoryRdfGraphParams;
 import org.xbib.rdf.memory.MemoryTriple;
-import org.xbib.rdf.io.ntriple.NTripleWriter;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
+
+import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
 
 public class EuropeanaEDMReaderTest extends StreamTester {
 
@@ -59,17 +64,19 @@ public class EuropeanaEDMReaderTest extends StreamTester {
             throw new IOException("file " + filename + " not found");
         }
 
-        MemoryContext resourceContext = new MemoryContext();
+        MemoryRdfGraph<MemoryRdfGraphParams> graph = new MemoryRdfGraph<MemoryRdfGraphParams>();
 
-        RdfXmlParser reader = new RdfXmlParser();
-        reader.parse(new InputStreamReader(in, "UTF-8"), new GeoJSONFilter(resourceContext));
+        RdfXmlContentParser reader = new RdfXmlContentParser();
+        GeoJSONFilter filter = new GeoJSONFilter(NTripleContent.nTripleContent, NTripleContentParams.DEFAULT_PARAMS, graph);
+        reader.builder(filter);
+        reader.parse(new InputStreamReader(in, "UTF-8"));
 
-        StringWriter sw = new StringWriter();
-        NTripleWriter writer = new NTripleWriter(sw);
-        writer.write(resourceContext);
-        sw.close();
+        RdfContentBuilder builder = ntripleBuilder();
+        for (Resource resource : graph.getResources()) {
+            builder.resource(resource);
+        }
         assertStream(getClass().getResource("edm.nt").openStream(),
-                new ByteArrayInputStream(sw.toString().getBytes()));
+                builder.streamInput());
     }
 
     private final static IRI GEO_LAT = IRI.create("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
@@ -78,41 +85,22 @@ public class EuropeanaEDMReaderTest extends StreamTester {
 
     private final static IRI location = IRI.create("location");
 
-    class GeoJSONFilter implements Triple.Builder {
+    class GeoJSONFilter extends RdfContentBuilder {
 
-        Context<Resource> context;
+        MemoryRdfGraph graph;
 
         Node lat = null;
 
         Node lon = null;
 
-        GeoJSONFilter(Context<Resource> context) {
-            this.context = context;
+        GeoJSONFilter(RdfContent content, RdfContentParams params, MemoryRdfGraph graph) throws IOException {
+            super(content, params);
+            this.graph = graph;
         }
 
         @Override
-        public Triple.Builder begin() {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder startPrefixMapping(String prefix, String uri) {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder endPrefixMapping(String prefix) {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder newIdentifier(IRI identifier) {
-            return this;
-        }
-
-        @Override
-        public Triple.Builder triple(Triple triple) {
-            context.triple(triple);
+        public GeoJSONFilter triple(Triple triple) {
+            graph.triple(triple);
             if (triple.predicate().equals(GEO_LAT)) {
                 lat = triple.object();
             }
@@ -121,17 +109,13 @@ public class EuropeanaEDMReaderTest extends StreamTester {
             }
             if (lat != null && lon != null) {
                 // create location string for Elasticsearch
-                context.triple(new MemoryTriple(triple.subject(), location, new MemoryLiteral(lat + "," + lon)));
+                graph.triple(new MemoryTriple(triple.subject(), location, new MemoryLiteral(lat + "," + lon)));
                 lon = null;
                 lat = null;
             }
             return this;
         }
 
-        @Override
-        public Triple.Builder end() {
-            return this;
-        }
     }
 
 }

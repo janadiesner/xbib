@@ -32,8 +32,10 @@
 package org.xbib.oai.client;
 
 import org.testng.annotations.Test;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
+import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
@@ -42,7 +44,6 @@ import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
-import org.xbib.rdf.Context;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -59,8 +60,10 @@ public class DOAJClientTest {
     @Test
     public void testListRecordsDOAJ() throws Exception {
 
-        final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
-        final RdfResourceHandler resourceHandler = new DOAJResourceHandler(metadataHandler.getResourceContext());
+        RdfContentParams params = IRINamespaceContext::getInstance;
+
+        final RdfMetadataHandler metadataHandler = new RdfMetadataHandler(params);
+        final RdfResourceHandler resourceHandler = new DOAJResourceHandler(params);
         //final RdfOutput out = new MyOutput(metadataHandler.getContext());
 
         metadataHandler.setHandler(resourceHandler);
@@ -98,8 +101,8 @@ public class DOAJClientTest {
 
     class DOAJResourceHandler extends RdfResourceHandler {
 
-        public DOAJResourceHandler(Context context) {
-            super(context);
+        public DOAJResourceHandler(RdfContentParams params) {
+            super(params);
         }
 
         @Override

@@ -4,17 +4,17 @@ import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.rdf.memory.MemoryContext;
-import org.xbib.rdf.io.turtle.TurtleWriter;
+import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.io.turtle.TurtleContentParams;
 import org.xbib.text.CharUtils;
 import org.xbib.text.UrlEncoding;
 
 import javax.xml.namespace.QName;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
+
+import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
 
 public class OAITest extends StreamTester {
 
@@ -27,13 +27,8 @@ public class OAITest extends StreamTester {
         }
 
         IRINamespaceContext context = IRINamespaceContext.newInstance();
-        context.addNamespace("oaidc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
-        context.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
-
-        final MemoryContext resourceContext = new MemoryContext();
-        resourceContext.setNamespaceContext(context);
-
-        XmlHandler xmlHandler = new AbstractXmlResourceHandler(resourceContext) {
+        XmlContentParams params = new XmlContentParams(context, true);
+        XmlHandler xmlHandler = new AbstractXmlResourceHandler(params) {
 
             @Override
             public boolean isResourceDelimiter(QName name) {
@@ -45,7 +40,7 @@ public class OAITest extends StreamTester {
                 if ("identifier".equals(name.getLocalPart()) && identifier == null) {
                     // make sure we can build an opaque IRI, whatever is out there
                     String s = UrlEncoding.encode(value, CharUtils.Profile.SCHEMESPECIFICPART.filter());
-                    resourceContext.getResource().id(IRI.create("id:" + s));
+                    getResource().id(IRI.create("id:" + s));
                 }
             }
 
@@ -54,20 +49,25 @@ public class OAITest extends StreamTester {
                 return name.getLocalPart().startsWith("@");
             }
 
+            @Override
+            public XmlHandler setNamespaceContext(IRINamespaceContext namespaceContext) {
+                return this;
+            }
+
+            @Override
+            public IRINamespaceContext getNamespaceContext() {
+                return context;
+            }
         };
-        StringWriter sw = new StringWriter();
-        //FileWriter sw = new FileWriter("oai.ttl");
-        TurtleWriter writer = new TurtleWriter(sw);
-        writer.setNamespaceContext(context);
-        writer.writeNamespaces();
-        xmlHandler.setBuilder(writer)
-            .setDefaultNamespace("oai", "http://www.openarchives.org/OAI/2.0/oai_dc/");
-        new XmlParser()
-                .setHandler(xmlHandler)
-                .parse(new InputStreamReader(in, "UTF-8"), writer);
-        writer.close();
-        sw.close();
-        assertStream(getClass().getResource("oai.ttl").openStream(),
-                new ByteArrayInputStream(sw.toString().getBytes()));
+        TurtleContentParams turtleParams = new TurtleContentParams(context, true);
+        RdfContentBuilder builder = turtleBuilder(turtleParams);
+        xmlHandler.setBuilder(builder)
+                .setNamespaceContext(context)
+                .setDefaultNamespace("oai", "http://www.openarchives.org/OAI/2.0/oai_dc/");
+        XmlContentParser parser = new XmlContentParser();
+        parser.builder(builder);
+        parser.setHandler(xmlHandler)
+                .parse(new InputStreamReader(in, "UTF-8"));
+        assertStream(getClass().getResource("oai.ttl").openStream(), builder.streamInput());
     }
 }

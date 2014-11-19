@@ -31,22 +31,22 @@
  */
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.elements.ElementBuilder;
-import org.xbib.elements.marc.MARCContext;
-import org.xbib.elements.marc.MARCElement;
-import org.xbib.elements.marc.MARCElementPipeline;
+import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 
-public class AlternateGraphicRepresentation extends MARCElement {
+import java.io.IOException;
+
+public class AlternateGraphicRepresentation extends MARCEntity {
 
     private final static AlternateGraphicRepresentation instance = new AlternateGraphicRepresentation();
 
-    public static MARCElement getInstance() { return instance; }
+    public static AlternateGraphicRepresentation getInstance() { return instance; }
 
     @Override
-    public boolean fields(MARCElementPipeline pipeline, ElementBuilder<FieldList, String, MARCElement, MARCContext> builder,
-                          FieldList fields, String value) {
+    public boolean fields(MARCEntityQueue.MARCWorker worker,
+                          FieldList fields, String value) throws IOException {
         // http://www.loc.gov/marc/bibliographic/ecbdcntf.html
         // find linkage: $6 [linking tag]-[occurrence number]/[script identification code]/[field orientation code]
         for (Field field : fields) {
@@ -55,6 +55,6 @@ public class AlternateGraphicRepresentation extends MARCElement {
                 field.tag(tag);
             }
         }
-        return super.fields(pipeline, builder, fields, value);
+        return super.fields(worker, fields, value);
     }
 }

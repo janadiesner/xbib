@@ -31,13 +31,13 @@
  */
 package org.xbib.analyzer.marc.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class ReproductionNote extends MARCElement {
+public class ReproductionNote extends MARCEntity {
 
     private final static ReproductionNote instance = new ReproductionNote();
 
-    public static MARCElement getInstance() {
+    public static MARCEntity getInstance() {
         return instance;
     }
 }

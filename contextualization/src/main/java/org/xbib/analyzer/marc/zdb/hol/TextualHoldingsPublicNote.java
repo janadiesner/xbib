@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.zdb.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class TextualHoldingsPublicNote extends MARCElement {
+public class TextualHoldingsPublicNote extends MARCEntity {
 
     private final static TextualHoldingsPublicNote instance = new TextualHoldingsPublicNote();
 

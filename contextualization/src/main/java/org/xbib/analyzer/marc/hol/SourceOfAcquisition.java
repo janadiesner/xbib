@@ -31,9 +31,9 @@
  */
 package org.xbib.analyzer.marc.hol;
 
-import org.xbib.elements.marc.MARCElement;
+import org.xbib.entities.marc.MARCEntity;
 
-public class SourceOfAcquisition extends MARCElement {
+public class SourceOfAcquisition extends MARCEntity {
 
     private final static SourceOfAcquisition instance = new SourceOfAcquisition();
 

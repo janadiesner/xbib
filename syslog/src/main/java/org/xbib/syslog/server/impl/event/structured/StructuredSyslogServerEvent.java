@@ -3,12 +3,16 @@ package org.xbib.syslog.server.impl.event.structured;
 import org.xbib.syslog.SyslogConstants;
 import org.xbib.syslog.impl.message.structured.StructuredSyslogMessage;
 import org.xbib.syslog.server.impl.event.SyslogServerEvent;
-import org.xbib.time.Instant;
-import org.xbib.time.LocalDateTime;
-import org.xbib.time.ZoneId;
-import org.xbib.time.format.DateTimeFormatter;
+//import org.xbib.time.Instant;
+//import org.xbib.time.LocalDateTime;
+//import org.xbib.time.ZoneId;
+//import org.xbib.time.format.DateTimeFormatter;
 
 import java.net.InetAddress;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
