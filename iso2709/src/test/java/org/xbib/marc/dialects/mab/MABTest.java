@@ -32,12 +32,15 @@
 package org.xbib.marc.dialects.mab;
 
 import org.testng.annotations.Test;
+import org.xbib.helper.StreamTester;
 import org.xbib.marc.Iso2709Reader;
+import org.xbib.marc.xml.MarcXchangeReader;
 import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +49,8 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 
-public class MABTest {
+public class MABTest extends StreamTester {
+
 
     @Test
     public void testZDBMAB() throws IOException, SAXException {
@@ -56,6 +60,8 @@ public class MABTest {
         try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
             read(new InputStreamReader(in, "x-MAB"), w);
         }
+        assertStream(getClass().getResource("1217zdbtit.dat-out.xml").openStream(),
+                new FileInputStream(file));
     }
 
     @Test
@@ -66,6 +72,28 @@ public class MABTest {
         try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
             read(new InputStreamReader(in, "x-MAB"), w);
         }
+        assertStream(getClass().getResource("test.groupstream-out.xml").openStream(),
+                new FileInputStream(file));
+    }
+
+    @Test
+    public void testReplacement() throws IOException, SAXException {
+        InputStream in = getClass().getResource("DE-605-aleph500-publish.xml").openStream();
+        File file = File.createTempFile("DE-605-aleph500-publish-out.", ".xml");
+        FileOutputStream out = new FileOutputStream(file);
+        MarcXchangeReader reader = new MarcXchangeReader()
+                .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
+        reader.setTransformer("088$  $a", value -> "Das ist ein Test").setTransform(true);
+        MarcXchangeWriter writer = new MarcXchangeWriter(out);
+        reader.setMarcXchangeListener(writer);
+        writer.startDocument();
+        writer.beginCollection();
+        reader.parse(in);
+        writer.endCollection();
+        writer.endDocument();
+        out.close();
+        assertStream(getClass().getResource("DE-605-aleph500-publish-out.xml").openStream(),
+                new FileInputStream(file));
     }
 
     private void read(Reader source, Writer target) throws IOException, SAXException {

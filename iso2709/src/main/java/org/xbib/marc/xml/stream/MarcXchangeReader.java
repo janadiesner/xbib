@@ -65,8 +65,7 @@ import java.util.Stack;
 /**
  * The MarcXchange event consumer listens to StaX events and converts them to MarcXchange events
  */
-public class MarcXchangeReader
-        implements XMLEventConsumer, MarcXchangeConstants, MarcXchangeListener {
+public class MarcXchangeReader implements XMLEventConsumer, MarcXchangeConstants, MarcXchangeListener {
 
     private Stack<Field> stack = new Stack<Field>();
 
@@ -85,6 +84,8 @@ public class MarcXchangeReader
     private String format = MARC21;
 
     private String type = BIBLIOGRAPHIC;
+
+    private String recordIdentifier;
 
     protected boolean inData;
 
@@ -189,7 +190,7 @@ public class MarcXchangeReader
             field.data(transformer.transform(field.data()));
             if (!old.equals(field.data())) {
                 if (fieldEventListener != null) {
-                    fieldEventListener.receive(FieldEvent.DATA_TRANSFORMED.setField(field));
+                    fieldEventListener.receive(FieldEvent.DATA_TRANSFORMED.setRecordIdentifier(recordIdentifier).setField(field));
                 }
             }
         }
@@ -245,6 +246,12 @@ public class MarcXchangeReader
                 transform(field);
             }
             listener.endControlField(field);
+        }
+        if (RECORD_NUMBER_FIELD.equals(field.tag())) {
+            this.recordIdentifier = field.data();
+            if (fieldEventListener != null) {
+                fieldEventListener.receive(FieldEvent.RECORD_NUMBER.setRecordIdentifier(recordIdentifier));
+            }
         }
     }
 

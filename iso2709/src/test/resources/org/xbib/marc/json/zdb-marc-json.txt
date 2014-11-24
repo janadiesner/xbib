@@ -1,0 +1,1504 @@
+beginRecord
+format=MARC
+type=Bibliographic
+leader=01522nas a2200385 c 4500
+begin controlfield=001=010000011
+end controlfield=001=010000011
+begin controlfield=003=DE-101
+end controlfield=003=DE-101
+begin controlfield=005=20090911214751.0
+end controlfield=005=20090911214751.0
+begin controlfield=007=tu
+end controlfield=007=tu
+begin controlfield=008=991118d19691969gw u||p|r ||| 0||||0ger c
+end controlfield=008=991118d19691969gw u||p|r ||| 0||||0ger c
+begin datafield=0167 
+begin subfield=0167 2=DE-101
+end subfield=0167 2=DE-101
+begin subfield=0167 a=010000011
+end subfield=0167 a=010000011
+end datafield=0167 
+begin datafield=0167 
+begin subfield=0167 2=DE-600
+end subfield=0167 2=DE-600
+begin subfield=0167 a=5-x
+end subfield=0167 a=5-x
+end datafield=0167 
+begin datafield=035  
+begin subfield=035  a=(DE-599)ZDB5-x
+end subfield=035  a=(DE-599)ZDB5-x
+end datafield=035  
+begin datafield=035  
+begin subfield=035  a=(OCoLC)183277955
+end subfield=035  a=(OCoLC)183277955
+end datafield=035  
+begin datafield=040  
+begin subfield=040  a=9001
+end subfield=040  a=9001
+begin subfield=040  b=ger
+end subfield=040  b=ger
+begin subfield=040  c=DE-101
+end subfield=040  c=DE-101
+begin subfield=040  d=9999
+end subfield=040  d=9999
+end datafield=040  
+begin datafield=041  
+begin subfield=041  a=ger
+end subfield=041  a=ger
+end datafield=041  
+begin datafield=044  
+begin subfield=044  c=XA-DE
+end subfield=044  c=XA-DE
+end datafield=044  
+begin datafield=084  
+begin subfield=084  a=050
+end subfield=084  a=050
+begin subfield=084  a=940
+end subfield=084  a=940
+begin subfield=084  q=DE-600
+end subfield=084  q=DE-600
+begin subfield=084  2=sdnb
+end subfield=084  2=sdnb
+end datafield=084  
+begin datafield=24510
+begin subfield=24510a=A bis Z
+end subfield=24510a=A bis Z
+begin subfield=24510b=ein Taschen- u. Nachschlagebuch über d. anderen Teil Deutschlands
+end subfield=24510b=ein Taschen- u. Nachschlagebuch über d. anderen Teil Deutschlands
+begin subfield=24510c=hrsg. vom Bundesministerium für Gesamtdeutsche Fragen. Red. Günter Fischbach
+end subfield=24510c=hrsg. vom Bundesministerium für Gesamtdeutsche Fragen. Red. Günter Fischbach
+end datafield=24510
+begin datafield=2603 
+begin subfield=2603 a=Bonn
+end subfield=2603 a=Bonn
+begin subfield=2603 b=Dt. Bundes-Verl.
+end subfield=2603 b=Dt. Bundes-Verl.
+end datafield=2603 
+begin datafield=3620 
+begin subfield=3620 a=Aufl. 11.1969
+end subfield=3620 a=Aufl. 11.1969
+end datafield=3620 
+begin datafield=591  
+begin subfield=591  a=F/BAC
+end subfield=591  a=F/BAC
+end datafield=591  
+begin datafield=650 7
+begin subfield=650 70=(DE-588)4066724-8
+end subfield=650 70=(DE-588)4066724-8
+begin subfield=650 70=(DE-101)040667243
+end subfield=650 70=(DE-101)040667243
+begin subfield=650 7a=Wörterbuch
+end subfield=650 7a=Wörterbuch
+begin subfield=650 72=gnd
+end subfield=650 72=gnd
+end datafield=650 7
+begin datafield=651 7
+begin subfield=651 70=(DE-588)4011890-3
+end subfield=651 70=(DE-588)4011890-3
+begin subfield=651 70=(DE-101)040118908
+end subfield=651 70=(DE-101)040118908
+begin subfield=651 7a=Deutschland
+end subfield=651 7a=Deutschland
+begin subfield=651 7g=DDR
+end subfield=651 7g=DDR
+begin subfield=651 72=gnd
+end subfield=651 72=gnd
+end datafield=651 7
+begin datafield=651 7
+begin subfield=651 70=(DE-588)4011890-3
+end subfield=651 70=(DE-588)4011890-3
+begin subfield=651 70=(DE-101)040118908
+end subfield=651 70=(DE-101)040118908
+begin subfield=651 7a=Deutschland
+end subfield=651 7a=Deutschland
+begin subfield=651 7g=DDR
+end subfield=651 7g=DDR
+begin subfield=651 72=gnd
+end subfield=651 72=gnd
+end datafield=651 7
+begin datafield=655 7
+begin subfield=655 7a=Wörterbuch
+end subfield=655 7a=Wörterbuch
+begin subfield=655 72=gnd
+end subfield=655 72=gnd
+end datafield=655 7
+begin datafield=68900
+begin subfield=689000=(DE-588)4011890-3
+end subfield=689000=(DE-588)4011890-3
+begin subfield=689000=(DE-101)040118908
+end subfield=689000=(DE-101)040118908
+begin subfield=68900D=g
+end subfield=68900D=g
+begin subfield=68900a=Deutschland
+end subfield=68900a=Deutschland
+begin subfield=68900g=DDR
+end subfield=68900g=DDR
+end datafield=68900
+begin datafield=68901
+begin subfield=689010=(DE-588)4066724-8
+end subfield=689010=(DE-588)4066724-8
+begin subfield=689010=(DE-101)040667243
+end subfield=689010=(DE-101)040667243
+begin subfield=68901D=s
+end subfield=68901D=s
+begin subfield=68901a=Wörterbuch
+end subfield=68901a=Wörterbuch
+end datafield=68901
+begin datafield=6890 
+begin subfield=6890 5=DE-600
+end subfield=6890 5=DE-600
+begin subfield=6890 5=DE-600
+end subfield=6890 5=DE-600
+end datafield=6890 
+begin datafield=68910
+begin subfield=689100=(DE-588)4011890-3
+end subfield=689100=(DE-588)4011890-3
+begin subfield=689100=(DE-101)040118908
+end subfield=689100=(DE-101)040118908
+begin subfield=68910D=g
+end subfield=68910D=g
+begin subfield=68910a=Deutschland
+end subfield=68910a=Deutschland
+begin subfield=68910g=DDR
+end subfield=68910g=DDR
+end datafield=68910
+begin datafield=68911
+begin subfield=68911A=f
+end subfield=68911A=f
+begin subfield=68911a=Wörterbuch
+end subfield=68911a=Wörterbuch
+end datafield=68911
+begin datafield=6891 
+begin subfield=6891 5=DE-600
+end subfield=6891 5=DE-600
+begin subfield=6891 5=DE-600
+end subfield=6891 5=DE-600
+end datafield=6891 
+begin datafield=7101 
+begin subfield=7101 0=(DE-588)2028926-1
+end subfield=7101 0=(DE-588)2028926-1
+begin subfield=7101 0=(DE-101)004854950
+end subfield=7101 0=(DE-101)004854950
+begin subfield=7101 a=Deutschland
+end subfield=7101 a=Deutschland
+begin subfield=7101 g=Bundesrepublik
+end subfield=7101 g=Bundesrepublik
+begin subfield=7101 b=Bundesminister für Gesamtdeutsche Fragen
+end subfield=7101 b=Bundesminister für Gesamtdeutsche Fragen
+end datafield=7101 
+begin datafield=78000
+begin subfield=78000i=Vorg.:
+end subfield=78000i=Vorg.:
+begin subfield=78000t=SBZ von A bis Z
+end subfield=78000t=SBZ von A bis Z
+begin subfield=78000w=(DE-600)874-6
+end subfield=78000w=(DE-600)874-6
+begin subfield=78000w=(DE-101)010008896
+end subfield=78000w=(DE-101)010008896
+end datafield=78000
+begin datafield=78500
+begin subfield=78500i=Forts.:
+end subfield=78500i=Forts.:
+begin subfield=78500t=DDR-Handbuch
+end subfield=78500t=DDR-Handbuch
+begin subfield=78500w=(DE-600)130385-5
+end subfield=78500w=(DE-600)130385-5
+begin subfield=78500w=(DE-101)010746765
+end subfield=78500w=(DE-101)010746765
+end datafield=78500
+endRecord
+beginRecord
+format=MARC
+type=Bibliographic
+leader=01879nas a2200529 c 4500
+begin controlfield=00100w=01000002X
+end controlfield=00100w=01000002X
+begin controlfield=00300w=DE-101
+end controlfield=00300w=DE-101
+begin controlfield=00500w=20120816085322.0
+end controlfield=00500w=20120816085322.0
+begin controlfield=00700w=tu
+end controlfield=00700w=tu
+begin controlfield=00800w=991118d19632008xx z||p|r ||| 0||||0ger c
+end controlfield=00800w=991118d19632008xx z||p|r ||| 0||||0ger c
+begin datafield=015  
+begin subfield=015  a=08,B23,0382
+end subfield=015  a=08,B23,0382
+begin subfield=015  2=dnb
+end subfield=015  2=dnb
+end datafield=015  
+begin datafield=0167 
+begin subfield=0167 2=DE-101
+end subfield=0167 2=DE-101
+begin subfield=0167 a=01000002X
+end subfield=0167 a=01000002X
+end datafield=0167 
+begin datafield=0167 
+begin subfield=0167 2=DE-600
+end subfield=0167 2=DE-600
+begin subfield=0167 a=7-3
+end subfield=0167 a=7-3
+end datafield=0167 
+begin datafield=022  
+begin subfield=022  a=0070-7252
+end subfield=022  a=0070-7252
+end datafield=022  
+begin datafield=022  
+begin subfield=022  a=0375-2135
+end subfield=022  a=0375-2135
+end datafield=022  
+begin datafield=029aa
+begin subfield=029aaa=0375-2135 = Faunistische Abhandlungen
+end subfield=029aaa=0375-2135 = Faunistische Abhandlungen
+end datafield=029aa
+begin datafield=030  
+begin subfield=030  a=SMTFB
+end subfield=030  a=SMTFB
+end datafield=030  
+begin datafield=035  
+begin subfield=035  a=(DE-599)ZDB7-3
+end subfield=035  a=(DE-599)ZDB7-3
+end datafield=035  
+begin datafield=035  
+begin subfield=035  a=(OCoLC)224540449
+end subfield=035  a=(OCoLC)224540449
+end datafield=035  
+begin datafield=040  
+begin subfield=040  a=9001
+end subfield=040  a=9001
+begin subfield=040  b=ger
+end subfield=040  b=ger
+begin subfield=040  c=DE-101
+end subfield=040  c=DE-101
+begin subfield=040  d=1242
+end subfield=040  d=1242
+end datafield=040  
+begin datafield=041  
+begin subfield=041  a=ger
+end subfield=041  a=ger
+end datafield=041  
+begin datafield=044  
+begin subfield=044  c=XA-DDDE
+end subfield=044  c=XA-DDDE
+begin subfield=044  c=XA-DE
+end subfield=044  c=XA-DE
+end datafield=044  
+begin datafield=084  
+begin subfield=084  a=590
+end subfield=084  a=590
+begin subfield=084  a=Y
+end subfield=084  a=Y
+begin subfield=084  q=DE-101
+end subfield=084  q=DE-101
+begin subfield=084  2=sdnb
+end subfield=084  2=sdnb
+end datafield=084  
+begin datafield=084  
+begin subfield=084  a=12,2
+end subfield=084  a=12,2
+begin subfield=084  2=ssgn
+end subfield=084  2=ssgn
+end datafield=084  
+begin datafield=084  
+begin subfield=084  a=590
+end subfield=084  a=590
+begin subfield=084  q=DE-600
+end subfield=084  q=DE-600
+begin subfield=084  2=sdnb
+end subfield=084  2=sdnb
+end datafield=084  
+begin datafield=21010
+begin subfield=21010a=FAUN ABH (DRES)
+end subfield=21010a=FAUN ABH (DRES)
+end datafield=21010
+begin datafield=222 0
+begin subfield=222 0a=Faunistische Abhandlungen
+end subfield=222 0a=Faunistische Abhandlungen
+end datafield=222 0
+begin datafield=24510
+begin subfield=24510a=Faunistische Abhandlungen
+end subfield=24510a=Faunistische Abhandlungen
+begin subfield=24510c=Publ.: Museum für Tierkunde Dresden, Staatliche Naturhistorische Sammlungen Dresden
+end subfield=24510c=Publ.: Museum für Tierkunde Dresden, Staatliche Naturhistorische Sammlungen Dresden
+end datafield=24510
+begin datafield=2603 
+begin subfield=2603 a=Dresden
+end subfield=2603 a=Dresden
+begin subfield=2603 b=Museum für Tierkunde
+end subfield=2603 b=Museum für Tierkunde
+end datafield=2603 
+begin datafield=260  
+begin subfield=260  a=Leipzig
+end subfield=260  a=Leipzig
+begin subfield=260  b=Geest & Portig
+end subfield=260  b=Geest & Portig
+begin subfield=260  c=anfangs
+end subfield=260  c=anfangs
+end datafield=260  
+begin datafield=300  
+begin subfield=300  c=24 cm
+end subfield=300  c=24 cm
+end datafield=300  
+begin datafield=3620 
+begin subfield=3620 a=1.1963/66 - 26.2008; damit Ersch. eingest.
+end subfield=3620 a=1.1963/66 - 26.2008; damit Ersch. eingest.
+end datafield=3620 
+begin datafield=36300
+begin subfield=363008=1.1\x
+end subfield=363008=1.1\x
+begin subfield=36300i=1963/66
+end subfield=36300i=1963/66
+end datafield=36300
+begin datafield=36310
+begin subfield=363108=1.2\x
+end subfield=363108=1.2\x
+begin subfield=36310i=2008
+end subfield=36310i=2008
+end datafield=36310
+begin datafield=515  
+begin subfield=515  a=Ersch. unregelmäßig
+end subfield=515  a=Ersch. unregelmäßig
+end datafield=515  
+begin datafield=591  
+begin subfield=591  a=84!(22-02-08)
+end subfield=591  a=84!(22-02-08)
+end datafield=591  
+begin datafield=61017
+begin subfield=610170=(DE-588)4219481-7
+end subfield=610170=(DE-588)4219481-7
+begin subfield=610170=(DE-101)042194814
+end subfield=610170=(DE-101)042194814
+begin subfield=61017a=Museum für Tierkunde Dresden
+end subfield=61017a=Museum für Tierkunde Dresden
+begin subfield=610172=gnd
+end subfield=610172=gnd
+end datafield=61017
+begin datafield=650 7
+begin subfield=650 72=local
+end subfield=650 72=local
+begin subfield=650 7a=Zoologie
+end subfield=650 7a=Zoologie
+end datafield=650 7
+begin datafield=655 7
+begin subfield=655 7a=Zeitschrift
+end subfield=655 7a=Zeitschrift
+begin subfield=655 72=gnd
+end subfield=655 72=gnd
+end datafield=655 7
+begin datafield=68900
+begin subfield=689000=(DE-588)4219481-7
+end subfield=689000=(DE-588)4219481-7
+begin subfield=689000=(DE-101)042194814
+end subfield=689000=(DE-101)042194814
+begin subfield=68900D=b
+end subfield=68900D=b
+begin subfield=68900a=Museum für Tierkunde Dresden
+end subfield=68900a=Museum für Tierkunde Dresden
+end datafield=68900
+begin datafield=68901
+begin subfield=68901A=f
+end subfield=68901A=f
+begin subfield=68901a=Zeitschrift
+end subfield=68901a=Zeitschrift
+end datafield=68901
+begin datafield=6890 
+begin subfield=6890 5=DE-600
+end subfield=6890 5=DE-600
+begin subfield=6890 5=DE-600
+end subfield=6890 5=DE-600
+end datafield=6890 
+begin datafield=7102 
+begin subfield=7102 0=(DE-588)35521-5
+end subfield=7102 0=(DE-588)35521-5
+begin subfield=7102 0=(DE-101)000355216
+end subfield=7102 0=(DE-101)000355216
+begin subfield=7102 a=Staatliches Museum für Tierkunde Dresden
+end subfield=7102 a=Staatliches Museum für Tierkunde Dresden
+end datafield=7102 
+begin datafield=77508
+begin subfield=77508i=Online-Ausg.
+end subfield=77508i=Online-Ausg.
+begin subfield=77508t=Faunistische Abhandlungen
+end subfield=77508t=Faunistische Abhandlungen
+begin subfield=77508w=(DE-600)2233959-0
+end subfield=77508w=(DE-600)2233959-0
+begin subfield=77508w=(DE-101)979605725
+end subfield=77508w=(DE-101)979605725
+end datafield=77508
+begin datafield=78000
+begin subfield=78000i=Vorg.:
+end subfield=78000i=Vorg.:
+begin subfield=78000a=Staatliches Museum für Tierkunde Dresden
+end subfield=78000a=Staatliches Museum für Tierkunde Dresden
+begin subfield=78000t=Abhandlungen und Berichte aus dem Staatlichen Museum für Tierkunde in Dresden
+end subfield=78000t=Abhandlungen und Berichte aus dem Staatlichen Museum für Tierkunde in Dresden
+begin subfield=78000w=(DE-600)6068-9
+end subfield=78000w=(DE-600)6068-9
+begin subfield=78000w=(DE-101)010081739
+end subfield=78000w=(DE-101)010081739
+end datafield=78000
+begin datafield=889  
+begin subfield=889  w=(DE-101)550147969
+end subfield=889  w=(DE-101)550147969
+end datafield=889  
+begin datafield=925r 
+begin subfield=925r a=rb
+end subfield=925r a=rb
+end datafield=925r 
+endRecord
+beginRecord
+format=MARC
+type=Bibliographic
+leader=02523nas a2200673 c 4500
+begin controlfield=001r a=010000038
+end controlfield=001r a=010000038
+begin controlfield=003r a=DE-101
+end controlfield=003r a=DE-101
+begin controlfield=005r a=20110111105737.0
+end controlfield=005r a=20110111105737.0
+begin controlfield=007r a=tu
+end controlfield=007r a=tu
+begin controlfield=008r a=991118d19642006xx z||p|r ||| 0||||0ger c
+end controlfield=008r a=991118d19642006xx z||p|r ||| 0||||0ger c
+begin datafield=015  
+begin subfield=015  a=97,B12,0347
+end subfield=015  a=97,B12,0347
+begin subfield=015  2=dnb
+end subfield=015  2=dnb
+end datafield=015  
+begin datafield=0167 
+begin subfield=0167 2=DE-101
+end subfield=0167 2=DE-101
+begin subfield=0167 a=010000038
+end subfield=0167 a=010000038
+end datafield=0167 
+begin datafield=0167 
+begin subfield=0167 2=DE-600
+end subfield=0167 2=DE-600
+begin subfield=0167 a=9-7
+end subfield=0167 a=9-7
+end datafield=0167 
+begin datafield=022  
+begin subfield=022  a=0070-7260
+end subfield=022  a=0070-7260
+end datafield=022  
+begin datafield=029aa
+begin subfield=029aaa=0070-7260 = Malakologische Abhandlungen
+end subfield=029aaa=0070-7260 = Malakologische Abhandlungen
+end datafield=029aa
+begin datafield=030  
+begin subfield=030  a=SMTMB
+end subfield=030  a=SMTMB
+end datafield=030  
+begin datafield=035  
+begin subfield=035  a=(DE-599)ZDB9-7
+end subfield=035  a=(DE-599)ZDB9-7
+end datafield=035  
+begin datafield=035  
+begin subfield=035  a=(OCoLC)643914482
+end subfield=035  a=(OCoLC)643914482
+end datafield=035  
+begin datafield=040  
+begin subfield=040  a=9001
+end subfield=040  a=9001
+begin subfield=040  b=ger
+end subfield=040  b=ger
+begin subfield=040  c=DE-101
+end subfield=040  c=DE-101
+begin subfield=040  d=9001
+end subfield=040  d=9001
+end datafield=040  
+begin datafield=041  
+begin subfield=041  a=ger
+end subfield=041  a=ger
+end datafield=041  
+begin datafield=044  
+begin subfield=044  c=XA-DDDE
+end subfield=044  c=XA-DDDE
+begin subfield=044  c=XA-DE
+end subfield=044  c=XA-DE
+end datafield=044  
+begin datafield=084  
+begin subfield=084  a=590
+end subfield=084  a=590
+begin subfield=084  q=DE-101
+end subfield=084  q=DE-101
+begin subfield=084  2=sdnb
+end subfield=084  2=sdnb
+end datafield=084  
+begin datafield=084  
+begin subfield=084  a=12,2
+end subfield=084  a=12,2
+begin subfield=084  2=ssgn
+end subfield=084  2=ssgn
+end datafield=084  
+begin datafield=084  
+begin subfield=084  a=590
+end subfield=084  a=590
+begin subfield=084  q=DE-600
+end subfield=084  q=DE-600
+begin subfield=084  2=sdnb
+end subfield=084  2=sdnb
+end datafield=084  
+begin datafield=21010
+begin subfield=21010a=MALAKOL ABH (DRES)
+end subfield=21010a=MALAKOL ABH (DRES)
+end datafield=21010
+begin datafield=21010
+begin subfield=21010a=Malakol. Abh.
+end subfield=21010a=Malakol. Abh.
+end datafield=21010
+begin datafield=222 0
+begin subfield=222 0a=Malakologische Abhandlungen
+end subfield=222 0a=Malakologische Abhandlungen
+end datafield=222 0
+begin datafield=24510
+begin subfield=24510a=Malakologische Abhandlungen
+end subfield=24510a=Malakologische Abhandlungen
+begin subfield=24510c=Staatliches Museum für Tierkunde Dresden
+end subfield=24510c=Staatliches Museum für Tierkunde Dresden
+end datafield=24510
+begin datafield=24710
+begin subfield=24710a=Malakologische Abhandlungen aus dem Staatlichen Museum für Tierkunde Dresden
+end subfield=24710a=Malakologische Abhandlungen aus dem Staatlichen Museum für Tierkunde Dresden
+begin subfield=24710f=Nebent. ab 13.1988
+end subfield=24710f=Nebent. ab 13.1988
+end datafield=24710
+begin datafield=2603 
+begin subfield=2603 a=Dresden
+end subfield=2603 a=Dresden
+begin subfield=2603 b=Museum für Tierkunde
+end subfield=2603 b=Museum für Tierkunde
+end datafield=2603 
+begin datafield=260  
+begin subfield=260  a=Leipzig
+end subfield=260  a=Leipzig
+begin subfield=260  b=Geest & Porting
+end subfield=260  b=Geest & Porting
+begin subfield=260  c=anfangs
+end subfield=260  c=anfangs
+end datafield=260  
+begin datafield=300  
+begin subfield=300  c=24 cm
+end subfield=300  c=24 cm
+end datafield=300  
+begin datafield=3620 
+begin subfield=3620 a=1.1964/67 - 24.2006
+end subfield=3620 a=1.1964/67 - 24.2006
+end datafield=3620 
+begin datafield=36300
+begin subfield=363008=1.1\x
+end subfield=363008=1.1\x
+begin subfield=36300i=1964/67
+end subfield=36300i=1964/67
+end datafield=36300
+begin datafield=36310
+begin subfield=363108=1.2\x
+end subfield=363108=1.2\x
+begin subfield=36310i=2006
+end subfield=36310i=2006
+end datafield=36310
+begin datafield=365  
+begin subfield=365  b=brosch. : M 19.50 (Einzelbd.)
+end subfield=365  b=brosch. : M 19.50 (Einzelbd.)
+end datafield=365  
+begin datafield=515  
+begin subfield=515  a=Ersch. unregelmäßig
+end subfield=515  a=Ersch. unregelmäßig
+end datafield=515  
+begin datafield=550  
+begin subfield=550  a=Hrsg. anfangs: W. Götz
+end subfield=550  a=Hrsg. anfangs: W. Götz
+end datafield=550  
+begin datafield=591  
+begin subfield=591  a=14!IIA!(07-05-07)C!(06-08-07)
+end subfield=591  a=14!IIA!(07-05-07)C!(06-08-07)
+end datafield=591  
+begin datafield=61017
+begin subfield=610170=(DE-588)4219481-7
+end subfield=610170=(DE-588)4219481-7
+begin subfield=610170=(DE-101)042194814
+end subfield=610170=(DE-101)042194814
+begin subfield=61017a=Museum für Tierkunde Dresden
+end subfield=61017a=Museum für Tierkunde Dresden
+begin subfield=610172=gnd
+end subfield=610172=gnd
+end datafield=61017
+begin datafield=650 7
+begin subfield=650 70=(DE-588)4060087-7
+end subfield=650 70=(DE-588)4060087-7
+begin subfield=650 70=(DE-101)040600874
+end subfield=650 70=(DE-101)040600874
+begin subfield=650 7a=Tiere
+end subfield=650 7a=Tiere
+begin subfield=650 72=gnd
+end subfield=650 72=gnd
+end datafield=650 7
+begin datafield=650 7
+begin subfield=650 70=(DE-588)4352566-0
+end subfield=650 70=(DE-588)4352566-0
+begin subfield=650 70=(DE-101)942342860
+end subfield=650 70=(DE-101)942342860
+begin subfield=650 7a=Weichtierkunde
+end subfield=650 7a=Weichtierkunde
+begin subfield=650 72=gnd
+end subfield=650 72=gnd
+end datafield=650 7
+begin datafield=650 7
+begin subfield=650 72=local
+end subfield=650 72=local
+begin subfield=650 7a=Weichtiere
+end subfield=650 7a=Weichtiere
+end datafield=650 7
+begin datafield=651 7
+begin subfield=651 70=(DE-588)4051176-5
+end subfield=651 70=(DE-588)4051176-5
+begin subfield=651 70=(DE-101)040511766
+end subfield=651 70=(DE-101)040511766
+begin subfield=651 7a=Sachsen
+end subfield=651 7a=Sachsen
+begin subfield=651 72=gnd
+end subfield=651 72=gnd
+end datafield=651 7
+begin datafield=655 7
+begin subfield=655 7a=Zeitschrift
+end subfield=655 7a=Zeitschrift
+begin subfield=655 72=gnd
+end subfield=655 72=gnd
+end datafield=655 7
+begin datafield=655 7
+begin subfield=655 7a=Zeitschrift
+end subfield=655 7a=Zeitschrift
+begin subfield=655 72=gnd
+end subfield=655 72=gnd
+end datafield=655 7
+begin datafield=68900
+begin subfield=689000=(DE-588)4219481-7
+end subfield=689000=(DE-588)4219481-7
+begin subfield=689000=(DE-101)042194814
+end subfield=689000=(DE-101)042194814
+begin subfield=68900D=b
+end subfield=68900D=b
+begin subfield=68900a=Museum für Tierkunde Dresden
+end subfield=68900a=Museum für Tierkunde Dresden
+end datafield=68900
+begin datafield=68901
+begin subfield=68901A=f
+end subfield=68901A=f
+begin subfield=68901a=Zeitschrift
+end subfield=68901a=Zeitschrift
+end datafield=68901
+begin datafield=6890 
+begin subfield=6890 5=DE-600
+end subfield=6890 5=DE-600
+begin subfield=6890 5=DE-600
+end subfield=6890 5=DE-600
+end datafield=6890 
+begin datafield=68910
+begin subfield=689100=(DE-588)4051176-5
+end subfield=689100=(DE-588)4051176-5
+begin subfield=689100=(DE-101)040511766
+end subfield=689100=(DE-101)040511766
+begin subfield=68910D=g
+end subfield=68910D=g
+begin subfield=68910a=Sachsen
+end subfield=68910a=Sachsen
+end datafield=68910
+begin datafield=68911
+begin subfield=689110=(DE-588)4060087-7
+end subfield=689110=(DE-588)4060087-7
+begin subfield=689110=(DE-101)040600874
+end subfield=689110=(DE-101)040600874
+begin subfield=68911D=s
+end subfield=68911D=s
+begin subfield=68911a=Tiere
+end subfield=68911a=Tiere
+end datafield=68911
+begin datafield=68912
+begin subfield=689120=(DE-588)4352566-0
+end subfield=689120=(DE-588)4352566-0
+begin subfield=689120=(DE-101)942342860
+end subfield=689120=(DE-101)942342860
+begin subfield=68912D=s
+end subfield=68912D=s
+begin subfield=68912a=Weichtierkunde
+end subfield=68912a=Weichtierkunde
+end datafield=68912
+begin datafield=68913
+begin subfield=68913A=f
+end subfield=68913A=f
+begin subfield=68913a=Zeitschrift
+end subfield=68913a=Zeitschrift
+end datafield=68913
+begin datafield=6891 
+begin subfield=6891 5=DE-600
+end subfield=6891 5=DE-600
+begin subfield=6891 5=DE-600
+end subfield=6891 5=DE-600
+end datafield=6891 
+begin datafield=7102 
+begin subfield=7102 0=(DE-588)35521-5
+end subfield=7102 0=(DE-588)35521-5
+begin subfield=7102 0=(DE-101)000355216
+end subfield=7102 0=(DE-101)000355216
+begin subfield=7102 a=Staatliches Museum für Tierkunde Dresden
+end subfield=7102 a=Staatliches Museum für Tierkunde Dresden
+end datafield=7102 
+begin datafield=78000
+begin subfield=78000i=Vorg.:
+end subfield=78000i=Vorg.:
+begin subfield=78000a=Staatliches Museum für Tierkunde Dresden
+end subfield=78000a=Staatliches Museum für Tierkunde Dresden
+begin subfield=78000t=Abhandlungen und Berichte aus dem Staatlichen Museum für Tierkunde in Dresden
+end subfield=78000t=Abhandlungen und Berichte aus dem Staatlichen Museum für Tierkunde in Dresden
+begin subfield=78000w=(DE-600)6068-9
+end subfield=78000w=(DE-600)6068-9
+begin subfield=78000w=(DE-101)010081739
+end subfield=78000w=(DE-101)010081739
+end datafield=78000
+begin datafield=78500
+begin subfield=78500i=Forts.:
+end subfield=78500i=Forts.:
+begin subfield=78500t=Mollusca
+end subfield=78500t=Mollusca
+begin subfield=78500w=(DE-600)2280187-X
+end subfield=78500w=(DE-600)2280187-X
+begin subfield=78500w=(DE-101)983950105
+end subfield=78500w=(DE-101)983950105
+end datafield=78500
+begin datafield=889  
+begin subfield=889  w=(DE-101)550196447
+end subfield=889  w=(DE-101)550196447
+end datafield=889  
+begin datafield=925r 
+begin subfield=925r a=rb
+end subfield=925r a=rb
+end datafield=925r 
+endRecord
+beginRecord
+format=MARC
+type=Bibliographic
+leader=00967nas a2200265 c 4500
+begin controlfield=001r a=010000046
+end controlfield=001r a=010000046
+begin controlfield=003r a=DE-101
+end controlfield=003r a=DE-101
+begin controlfield=005r a=20070627061749.0
+end controlfield=005r a=20070627061749.0
+begin controlfield=007r a=tu
+end controlfield=007r a=tu
+begin controlfield=008r a=991118d19491964it u||p|r b|| 0||||0||| c
+end controlfield=008r a=991118d19491964it u||p|r b|| 0||||0||| c
+begin datafield=0167 
+begin subfield=0167 2=DE-101
+end subfield=0167 2=DE-101
+begin subfield=0167 a=010000046
+end subfield=0167 a=010000046
+end datafield=0167 
+begin datafield=0167 
+begin subfield=0167 2=DE-600
+end subfield=0167 2=DE-600
+begin subfield=0167 a=10-3
+end subfield=0167 a=10-3
+end datafield=0167 
+begin datafield=035  
+begin subfield=035  a=(DE-599)ZDB10-3
+end subfield=035  a=(DE-599)ZDB10-3
+end datafield=035  
+begin datafield=035  
+begin subfield=035  a=(OCoLC)183215696
+end subfield=035  a=(OCoLC)183215696
+end datafield=035  
+begin datafield=040  
+begin subfield=040  a=9001
+end subfield=040  a=9001
+begin subfield=040  b=ger
+end subfield=040  b=ger
+begin subfield=040  c=DE-101
+end subfield=040  c=DE-101
+begin subfield=040  d=0012
+end subfield=040  d=0012
+end datafield=040  
+begin datafield=044  
+begin subfield=044  c=XA-IT
+end subfield=044  c=XA-IT
+end datafield=044  
+begin datafield=084  
+begin subfield=084  a=540
+end subfield=084  a=540
+begin subfield=084  q=DE-600
+end subfield=084  q=DE-600
+begin subfield=084  2=sdnb
+end subfield=084  2=sdnb
+end datafield=084  
+begin datafield=24510
+begin subfield=24510a=Bibliografia polarografica
+end subfield=24510a=Bibliografia polarografica
+begin subfield=24510n=P. 1, Elenco dei lavori e indice degli autori
+end subfield=24510n=P. 1, Elenco dei lavori e indice degli autori
+begin subfield=24510c=Consiglio Nazionale delle Ricerche, Centro di Studio per la Polarografia
+end subfield=24510c=Consiglio Nazionale delle Ricerche, Centro di Studio per la Polarografia
+end datafield=24510
+begin datafield=24619
+begin subfield=24619a=Bibliografia polarografica / 1
+end subfield=24619a=Bibliografia polarografica / 1
+end datafield=24619
+begin datafield=2603 
+begin subfield=2603 a=Spoleto
+end subfield=2603 a=Spoleto
+begin subfield=2603 b=[s.n.]
+end subfield=2603 b=[s.n.]
+end datafield=2603 
+begin datafield=3620 
+begin subfield=3620 a=[1/3.]1922/49(1949); 4.1922/51(1951) - 15.1922/62(1964)
+end subfield=3620 a=[1/3.]1922/49(1949); 4.1922/51(1951) - 15.1922/62(1964)
+end datafield=3620 
+begin datafield=591  
+begin subfield=591  a=C
+end subfield=591  a=C
+end datafield=591  
+begin datafield=77208
+begin subfield=77208i=Beil. zu:
+end subfield=77208i=Beil. zu:
+begin subfield=77208t=La ricerca scientifica
+end subfield=77208t=La ricerca scientifica
+begin subfield=77208w=(DE-600)205482-6
+end subfield=77208w=(DE-600)205482-6
+begin subfield=77208w=(DE-101)011179724
+end subfield=77208w=(DE-101)011179724
+end datafield=77208
+begin datafield=78500
+begin subfield=78500i=Forts.:
+end subfield=78500i=Forts.:
+begin subfield=78500t=Bibliografia polarografica / 1 2
+end subfield=78500t=Bibliografia polarografica / 1 2
+begin subfield=78500w=(DE-600)3564-6
+end subfield=78500w=(DE-600)3564-6
+begin subfield=78500w=(DE-101)010053565
+end subfield=78500w=(DE-101)010053565
+end datafield=78500
+begin datafield=930  
+begin subfield=930  r=P. 1, Elenco dei lavori e indice degli autori
+end subfield=930  r=P. 1, Elenco dei lavori e indice degli autori
+end datafield=930  
+endRecord
+beginRecord
+format=MARC
+type=Bibliographic
+leader=01359nas a2200361 c 4500
+begin controlfield=001  r=010000054
+end controlfield=001  r=010000054
+begin controlfield=003  r=DE-101
+end controlfield=003  r=DE-101
+begin controlfield=005  r=20111123211515.0
+end controlfield=005  r=20111123211515.0
+begin controlfield=007  r=tu
+end controlfield=007  r=tu
+begin controlfield=008  r=991118d19431986gw z||p|r ||| 0||||0ger c
+end controlfield=008  r=991118d19431986gw z||p|r ||| 0||||0ger c
+begin datafield=0167 
+begin subfield=0167 2=DE-101
+end subfield=0167 2=DE-101
+begin subfield=0167 a=010000054
+end subfield=0167 a=010000054
+end datafield=0167 
+begin datafield=0167 
+begin subfield=0167 2=DE-600
+end subfield=0167 2=DE-600
+begin subfield=0167 a=12-7
+end subfield=0167 a=12-7
+end datafield=0167 
+begin datafield=022  
+begin subfield=022  a=0078-6799
+end subfield=022  a=0078-6799
+end datafield=022  
+begin datafield=022  
+begin subfield=022  a=0371-5264
+end subfield=022  a=0371-5264
+end datafield=022  
+begin datafield=030  
+begin subfield=030  a=TAOGA
+end subfield=030  a=TAOGA
+end datafield=030  
+begin datafield=035  
+begin subfield=035  a=(DE-599)ZDB12-7
+end subfield=035  a=(DE-599)ZDB12-7
+end datafield=035  
+begin datafield=035  
+begin subfield=035  a=(OCoLC)263588241
+end subfield=035  a=(OCoLC)263588241
+end datafield=035  
+begin datafield=040  
+begin subfield=040  a=9001
+end subfield=040  a=9001
+begin subfield=040  b=ger
+end subfield=040  b=ger
+begin subfield=040  c=DE-101
+end subfield=040  c=DE-101
+begin subfield=040  d=9999
+end subfield=040  d=9999
+end datafield=040  
+begin datafield=041  
+begin subfield=041  a=ger
+end subfield=041  a=ger
+end datafield=041  
+begin datafield=044  
+begin subfield=044  c=XA-DE
+end subfield=044  c=XA-DE
+end datafield=044  
+begin datafield=084  
+begin subfield=084  a=600
+end subfield=084  a=600
+begin subfield=084  q=DE-600
+end subfield=084  q=DE-600
+begin subfield=084  2=sdnb
+end subfield=084  2=sdnb
+end datafield=084  
+begin datafield=1102 
+begin subfield=1102 0=(DE-588)35536-7
+end subfield=1102 0=(DE-588)35536-7
+begin subfield=1102 0=(DE-101)000355364
+end subfield=1102 0=(DE-101)000355364
+begin subfield=1102 a=Osram-Gesellschaft
+end subfield=1102 a=Osram-Gesellschaft
+begin subfield=1102 g=München; Berlin, West
+end subfield=1102 g=München; Berlin, West
+begin subfield=1102 4=aut
+end subfield=1102 4=aut
+end datafield=1102 
+begin datafield=21010
+begin subfield=21010a=Tech.-Wiss. Abh. Osram-Ges.
+end subfield=21010a=Tech.-Wiss. Abh. Osram-Ges.
+end datafield=21010
+begin datafield=24510
+begin subfield=24510a=Technisch-wissenschaftliche Abhandlungen der Osram-Gesellschaft
+end subfield=24510a=Technisch-wissenschaftliche Abhandlungen der Osram-Gesellschaft
+begin subfield=24510c=hrsg. unter Mitw. ... von Wilfried Meyer
+end subfield=24510c=hrsg. unter Mitw. ... von Wilfried Meyer
+end datafield=24510
+begin datafield=2603 
+begin subfield=2603 a=Berlin
+end subfield=2603 a=Berlin
+begin subfield=2603 a=Göttingen
+end subfield=2603 a=Göttingen
+begin subfield=2603 a=Heidelberg
+end subfield=2603 a=Heidelberg
+begin subfield=2603 b=Springer
+end subfield=2603 b=Springer
+end datafield=2603 
+begin datafield=3620 
+begin subfield=3620 a=5.1943; 6.1953 - 11.1973; 12.1986; damit Ersch. eingest.
+end subfield=3620 a=5.1943; 6.1953 - 11.1973; 12.1986; damit Ersch. eingest.
+end datafield=3620 
+begin datafield=591  
+begin subfield=591  a=C
+end subfield=591  a=C
+end datafield=591  
+begin datafield=650 7
+begin subfield=650 70=(DE-588)4035633-4
+end subfield=650 70=(DE-588)4035633-4
+begin subfield=650 70=(DE-101)040356337
+end subfield=650 70=(DE-101)040356337
+begin subfield=650 7a=Lichttechnik
+end subfield=650 7a=Lichttechnik
+begin subfield=650 72=gnd
+end subfield=650 72=gnd
+end datafield=650 7
+begin datafield=650 7
+begin subfield=650 70=(DE-588)4067488-5
+end subfield=650 70=(DE-588)4067488-5
+begin subfield=650 70=(DE-101)040674886
+end subfield=650 70=(DE-101)040674886
+begin subfield=650 7a=Zeitschrift
+end subfield=650 7a=Zeitschrift
+begin subfield=650 72=gnd
+end subfield=650 72=gnd
+end datafield=650 7
+begin datafield=68900
+begin subfield=689000=(DE-588)4035633-4
+end subfield=689000=(DE-588)4035633-4
+begin subfield=689000=(DE-101)040356337
+end subfield=689000=(DE-101)040356337
+begin subfield=68900D=s
+end subfield=68900D=s
+begin subfield=68900a=Lichttechnik
+end subfield=68900a=Lichttechnik
+end datafield=68900
+begin datafield=68901
+begin subfield=689010=(DE-588)4067488-5
+end subfield=689010=(DE-588)4067488-5
+begin subfield=689010=(DE-101)040674886
+end subfield=689010=(DE-101)040674886
+begin subfield=68901D=s
+end subfield=68901D=s
+begin subfield=68901a=Zeitschrift
+end subfield=68901a=Zeitschrift
+end datafield=68901
+begin datafield=6890 
+begin subfield=6890 5=DE-600
+end subfield=6890 5=DE-600
+begin subfield=6890 5=DE-600
+end subfield=6890 5=DE-600
+end datafield=6890 
+begin datafield=78000
+begin subfield=78000i=Vorg.:
+end subfield=78000i=Vorg.:
+begin subfield=78000a=Osram-Konzern <Berlin>
+end subfield=78000a=Osram-Konzern <Berlin>
+begin subfield=78000t=Technisch-wissenschaftliche Abhandlungen aus dem Osram-Konzern
+end subfield=78000t=Technisch-wissenschaftliche Abhandlungen aus dem Osram-Konzern
+begin subfield=78000w=(DE-600)502428-6
+end subfield=78000w=(DE-600)502428-6
+begin subfield=78000w=(DE-101)012625787
+end subfield=78000w=(DE-101)012625787
+end datafield=78000
+endRecord
+beginRecord
+format=MARC
+type=Bibliographic
+leader=02086nas a2200553 c 4500
+begin controlfield=00100w=010000062
+end controlfield=00100w=010000062
+begin controlfield=00300w=DE-101
+end controlfield=00300w=DE-101
+begin controlfield=00500w=20100713165615.0
+end controlfield=00500w=20100713165615.0
+begin controlfield=00700w=tu
+end controlfield=00700w=tu
+begin controlfield=00800w=991118d19612006xx z||p|r ||| 0||||0ger c
+end controlfield=00800w=991118d19612006xx z||p|r ||| 0||||0ger c
+begin datafield=015  
+begin subfield=015  a=96,B09,0553
+end subfield=015  a=96,B09,0553
+begin subfield=015  2=dnb
+end subfield=015  2=dnb
+end datafield=015  
+begin datafield=0167 
+begin subfield=0167 2=DE-101
+end subfield=0167 2=DE-101
+begin subfield=0167 a=010000062
+end subfield=0167 a=010000062
+end datafield=0167 
+begin datafield=0167 
+begin subfield=0167 2=DE-600
+end subfield=0167 2=DE-600
+begin subfield=0167 a=13-9
+end subfield=0167 a=13-9
+end datafield=0167 
+begin datafield=022  
+begin subfield=022  a=0070-7287
+end subfield=022  a=0070-7287
+end datafield=022  
+begin datafield=022  
+begin subfield=022  a=0375-5231
+end subfield=022  a=0375-5231
+end datafield=022  
+begin datafield=029aa
+begin subfield=029aaa=0375-5231 = Zoologische Abhandlungen
+end subfield=029aaa=0375-5231 = Zoologische Abhandlungen
+end datafield=029aa
+begin datafield=030  
+begin subfield=030  a=ZASMA
+end subfield=030  a=ZASMA
+end datafield=030  
+begin datafield=035  
+begin subfield=035  a=(DE-599)ZDB13-9
+end subfield=035  a=(DE-599)ZDB13-9
+end datafield=035  
+begin datafield=035  
+begin subfield=035  a=(OCoLC)643926073
+end subfield=035  a=(OCoLC)643926073
+end datafield=035  
+begin datafield=040  
+begin subfield=040  a=9001
+end subfield=040  a=9001
+begin subfield=040  b=ger
+end subfield=040  b=ger
+begin subfield=040  c=DE-101
+end subfield=040  c=DE-101
+begin subfield=040  d=9999
+end subfield=040  d=9999
+end datafield=040  
+begin datafield=041  
+begin subfield=041  a=ger
+end subfield=041  a=ger
+begin subfield=041  a=eng
+end subfield=041  a=eng
+end datafield=041  
+begin datafield=044  
+begin subfield=044  c=XA-DDDE
+end subfield=044  c=XA-DDDE
+begin subfield=044  c=XA-DE
+end subfield=044  c=XA-DE
+end datafield=044  
+begin datafield=08204
+begin subfield=082048=1\x
+end subfield=082048=1\x
+begin subfield=08204a=590.5
+end subfield=08204a=590.5
+begin subfield=08204q=DE-101
+end subfield=08204q=DE-101
+begin subfield=082042=22/ger
+end subfield=082042=22/ger
+end datafield=08204
+begin datafield=084  
+begin subfield=084  a=590
+end subfield=084  a=590
+begin subfield=084  q=DE-101
+end subfield=084  q=DE-101
+begin subfield=084  2=sdnb
+end subfield=084  2=sdnb
+end datafield=084  
+begin datafield=084  
+begin subfield=084  a=12,2
+end subfield=084  a=12,2
+begin subfield=084  2=ssgn
+end subfield=084  2=ssgn
+end datafield=084  
+begin datafield=084  
+begin subfield=084  a=590
+end subfield=084  a=590
+begin subfield=084  q=DE-600
+end subfield=084  q=DE-600
+begin subfield=084  2=sdnb
+end subfield=084  2=sdnb
+end datafield=084  
+begin datafield=085  
+begin subfield=085  8=1\x
+end subfield=085  8=1\x
+begin subfield=085  b=590
+end subfield=085  b=590
+end datafield=085  
+begin datafield=085  
+begin subfield=085  8=1\x
+end subfield=085  8=1\x
+begin subfield=085  z=1
+end subfield=085  z=1
+begin subfield=085  s=05
+end subfield=085  s=05
+end datafield=085  
+begin datafield=21010
+begin subfield=21010a=ZOOL ABH (DRESD)
+end subfield=21010a=ZOOL ABH (DRESD)
+end datafield=21010
+begin datafield=222 0
+begin subfield=222 0a=Zoologische Abhandlungen
+end subfield=222 0a=Zoologische Abhandlungen
+end datafield=222 0
+begin datafield=24510
+begin subfield=24510a=Zoologische Abhandlungen
+end subfield=24510a=Zoologische Abhandlungen
+begin subfield=24510c=Staatliche Naturhistorische Sammlungen Dresden, Museum für Tierkunde
+end subfield=24510c=Staatliche Naturhistorische Sammlungen Dresden, Museum für Tierkunde
+end datafield=24510
+begin datafield=24710
+begin subfield=24710a=Zoologische Abhandlungen aus dem Staatlichen Museum für Tierkunde Dresden
+end subfield=24710a=Zoologische Abhandlungen aus dem Staatlichen Museum für Tierkunde Dresden
+begin subfield=24710f=Hauptsacht. auf d. Jg.-Titelbl. 42.1986/87 - 51.2000/01
+end subfield=24710f=Hauptsacht. auf d. Jg.-Titelbl. 42.1986/87 - 51.2000/01
+end datafield=24710
+begin datafield=24710
+begin subfield=24710a=Abhandlungen und Berichte aus dem Staatlichen Museum für Tierkunde in Dresden
+end subfield=24710a=Abhandlungen und Berichte aus dem Staatlichen Museum für Tierkunde in Dresden
+begin subfield=24710f=Nebent. 26.1961/64
+end subfield=24710f=Nebent. 26.1961/64
+end datafield=24710
+begin datafield=24710
+begin subfield=24710a=Zoologische Abhandlungen und Berichte
+end subfield=24710a=Zoologische Abhandlungen und Berichte
+begin subfield=24710f=Hauptsacht. teils
+end subfield=24710f=Hauptsacht. teils
+end datafield=24710
+begin datafield=2603 
+begin subfield=2603 a=Dresden
+end subfield=2603 a=Dresden
+begin subfield=2603 b=Museum für Tierkunde
+end subfield=2603 b=Museum für Tierkunde
+end datafield=2603 
+begin datafield=260  
+begin subfield=260  a=Leipzig
+end subfield=260  a=Leipzig
+begin subfield=260  b=Geest & Portig
+end subfield=260  b=Geest & Portig
+begin subfield=260  c=anfangs
+end subfield=260  c=anfangs
+end datafield=260  
+begin datafield=300  
+begin subfield=300  c=25 cm
+end subfield=300  c=25 cm
+end datafield=300  
+begin datafield=3620 
+begin subfield=3620 a=26.1961/64 - 56.2006
+end subfield=3620 a=26.1961/64 - 56.2006
+end datafield=3620 
+begin datafield=36300
+begin subfield=363008=1.1\x
+end subfield=363008=1.1\x
+begin subfield=36300i=1961/64
+end subfield=36300i=1961/64
+end datafield=36300
+begin datafield=36310
+begin subfield=363108=1.2\x
+end subfield=363108=1.2\x
+begin subfield=36310i=2006
+end subfield=36310i=2006
+end datafield=36310
+begin datafield=515  
+begin subfield=515  a=Ersch. unregelmäßig
+end subfield=515  a=Ersch. unregelmäßig
+end datafield=515  
+begin datafield=591  
+begin subfield=591  a=F/C
+end subfield=591  a=F/C
+end datafield=591  
+begin datafield=650 7
+begin subfield=650 72=local
+end subfield=650 72=local
+begin subfield=650 7a=Zoologie
+end subfield=650 7a=Zoologie
+begin subfield=650 7x=Periodika
+end subfield=650 7x=Periodika
+end datafield=650 7
+begin datafield=7102 
+begin subfield=7102 0=(DE-588)35521-5
+end subfield=7102 0=(DE-588)35521-5
+begin subfield=7102 0=(DE-101)000355216
+end subfield=7102 0=(DE-101)000355216
+begin subfield=7102 a=Staatliches Museum für Tierkunde Dresden
+end subfield=7102 a=Staatliches Museum für Tierkunde Dresden
+end datafield=7102 
+begin datafield=77508
+begin subfield=77508i=Online-Ausg.
+end subfield=77508i=Online-Ausg.
+begin subfield=77508t=Zoologische Abhandlungen
+end subfield=77508t=Zoologische Abhandlungen
+begin subfield=77508w=(DE-600)2392089-0
+end subfield=77508w=(DE-600)2392089-0
+begin subfield=77508w=(DE-101)986049786
+end subfield=77508w=(DE-101)986049786
+end datafield=77508
+begin datafield=78000
+begin subfield=78000i=Vorg.:
+end subfield=78000i=Vorg.:
+begin subfield=78000a=Staatliches Museum für Tierkunde Dresden
+end subfield=78000a=Staatliches Museum für Tierkunde Dresden
+begin subfield=78000t=Abhandlungen und Berichte aus dem Staatlichen Museum für Tierkunde in Dresden
+end subfield=78000t=Abhandlungen und Berichte aus dem Staatlichen Museum für Tierkunde in Dresden
+begin subfield=78000w=(DE-600)6068-9
+end subfield=78000w=(DE-600)6068-9
+begin subfield=78000w=(DE-101)010081739
+end subfield=78000w=(DE-101)010081739
+end datafield=78000
+begin datafield=78500
+begin subfield=78500i=Forts.:
+end subfield=78500i=Forts.:
+begin subfield=78500t=Vertebrate zoology
+end subfield=78500t=Vertebrate zoology
+begin subfield=78500w=(DE-600)2383989-2
+end subfield=78500w=(DE-600)2383989-2
+begin subfield=78500w=(DE-101)985426152
+end subfield=78500w=(DE-101)985426152
+end datafield=78500
+begin datafield=889  
+begin subfield=889  w=(DE-101)540322814
+end subfield=889  w=(DE-101)540322814
+end datafield=889  
+begin datafield=925r 
+begin subfield=925r a=rb
+end subfield=925r a=rb
+end datafield=925r 
+endRecord
+beginRecord
+format=MARC
+type=Bibliographic
+leader=01148nas a2200289 c 4500
+begin controlfield=001r a=010000070
+end controlfield=001r a=010000070
+begin controlfield=003r a=DE-101
+end controlfield=003r a=DE-101
+begin controlfield=005r a=20050603141946.0
+end controlfield=005r a=20050603141946.0
+begin controlfield=007r a=tu
+end controlfield=007r a=tu
+begin controlfield=008r a=991118d19651965xxuu||p|r b|| 0||||0eng c
+end controlfield=008r a=991118d19651965xxuu||p|r b|| 0||||0eng c
+begin datafield=0167 
+begin subfield=0167 2=DE-101
+end subfield=0167 2=DE-101
+begin subfield=0167 a=010000070
+end subfield=0167 a=010000070
+end datafield=0167 
+begin datafield=0167 
+begin subfield=0167 2=DE-600
+end subfield=0167 2=DE-600
+begin subfield=0167 a=15-2
+end subfield=0167 a=15-2
+end datafield=0167 
+begin datafield=035  
+begin subfield=035  a=(DE-599)ZDB15-2
+end subfield=035  a=(DE-599)ZDB15-2
+end datafield=035  
+begin datafield=035  
+begin subfield=035  a=(OCoLC)310926585
+end subfield=035  a=(OCoLC)310926585
+end datafield=035  
+begin datafield=040  
+begin subfield=040  a=9001
+end subfield=040  a=9001
+begin subfield=040  b=ger
+end subfield=040  b=ger
+begin subfield=040  c=DE-101
+end subfield=040  c=DE-101
+begin subfield=040  d=9999
+end subfield=040  d=9999
+end datafield=040  
+begin datafield=041  
+begin subfield=041  a=eng
+end subfield=041  a=eng
+end datafield=041  
+begin datafield=044  
+begin subfield=044  c=XD-US
+end subfield=044  c=XD-US
+end datafield=044  
+begin datafield=084  
+begin subfield=084  a=390
+end subfield=084  a=390
+begin subfield=084  a=300
+end subfield=084  a=300
+begin subfield=084  q=DE-600
+end subfield=084  q=DE-600
+begin subfield=084  2=sdnb
+end subfield=084  2=sdnb
+end datafield=084  
+begin datafield=24510
+begin subfield=24510a=The American behavioral scientist
+end subfield=24510a=The American behavioral scientist
+begin subfield=24510n=The ABS guide to recent publications in the social and behavioral sciences
+end subfield=24510n=The ABS guide to recent publications in the social and behavioral sciences
+end datafield=24510
+begin datafield=24619
+begin subfield=24619a=The American behavioral scientist / The ABS guide to recent publications in the social and behavioral sciences
+end subfield=24619a=The American behavioral scientist / The ABS guide to recent publications in the social and behavioral sciences
+end datafield=24619
+begin datafield=24613
+begin subfield=24613a=The ABS guide to recent publications in the social and behavioral sciences
+end subfield=24613a=The ABS guide to recent publications in the social and behavioral sciences
+end datafield=24613
+begin datafield=2603 
+begin subfield=2603 a=New York, NY
+end subfield=2603 a=New York, NY
+begin subfield=2603 b=American Behavioral Scientist
+end subfield=2603 b=American Behavioral Scientist
+end datafield=2603 
+begin datafield=2603 
+begin subfield=2603 a=Oxford [u.a.]
+end subfield=2603 a=Oxford [u.a.]
+begin subfield=2603 a=Frankfurt, M.
+end subfield=2603 a=Frankfurt, M.
+begin subfield=2603 b=Pergamon Press
+end subfield=2603 b=Pergamon Press
+end datafield=2603 
+begin datafield=3620 
+begin subfield=3620 a=1965
+end subfield=3620 a=1965
+end datafield=3620 
+begin datafield=591  
+begin subfield=591  a=F/PC
+end subfield=591  a=F/PC
+end datafield=591  
+begin datafield=78500
+begin subfield=78500i=Forts.:
+end subfield=78500i=Forts.:
+begin subfield=78500t=Recent publications in the social and behavioral sciences
+end subfield=78500t=Recent publications in the social and behavioral sciences
+begin subfield=78500w=(DE-600)1355410-4
+end subfield=78500w=(DE-600)1355410-4
+begin subfield=78500w=(DE-101)018543464
+end subfield=78500w=(DE-101)018543464
+end datafield=78500
+begin datafield=930  
+begin subfield=930  r=The ABS guide to recent publications in the social and behavioral sciences
+end subfield=930  r=The ABS guide to recent publications in the social and behavioral sciences
+end datafield=930  
+endRecord
+beginRecord
+format=MARC
+type=Bibliographic
+leader=01040nas a2200265 c 4500
+begin controlfield=001  r=010000089
+end controlfield=001  r=010000089
+begin controlfield=003  r=DE-101
+end controlfield=003  r=DE-101
+begin controlfield=005  r=20071204010107.0
+end controlfield=005  r=20071204010107.0
+begin controlfield=007  r=tu
+end controlfield=007  r=tu
+begin controlfield=008  r=991118d19501972xxku||p|r a|| 0||||0||| c
+end controlfield=008  r=991118d19501972xxku||p|r a|| 0||||0||| c
+begin datafield=0167 
+begin subfield=0167 2=DE-101
+end subfield=0167 2=DE-101
+begin subfield=0167 a=010000089
+end subfield=0167 a=010000089
+end datafield=0167 
+begin datafield=0167 
+begin subfield=0167 2=DE-600
+end subfield=0167 2=DE-600
+begin subfield=0167 a=16-4
+end subfield=0167 a=16-4
+end datafield=0167 
+begin datafield=022  
+begin subfield=022  a=0001-9895
+end subfield=022  a=0001-9895
+end datafield=022  
+begin datafield=035  
+begin subfield=035  a=(DE-599)ZDB16-4
+end subfield=035  a=(DE-599)ZDB16-4
+end datafield=035  
+begin datafield=035  
+begin subfield=035  a=(OCoLC)183277958
+end subfield=035  a=(OCoLC)183277958
+end datafield=035  
+begin datafield=040  
+begin subfield=040  a=9001
+end subfield=040  a=9001
+begin subfield=040  b=ger
+end subfield=040  b=ger
+begin subfield=040  c=DE-101
+end subfield=040  c=DE-101
+begin subfield=040  d=9999
+end subfield=040  d=9999
+end datafield=040  
+begin datafield=044  
+begin subfield=044  c=XA-GB
+end subfield=044  c=XA-GB
+end datafield=044  
+begin datafield=084  
+begin subfield=084  a=390
+end subfield=084  a=390
+begin subfield=084  q=DE-600
+end subfield=084  q=DE-600
+begin subfield=084  2=sdnb
+end subfield=084  2=sdnb
+end datafield=084  
+begin datafield=24510
+begin subfield=24510a=African abstracts
+end subfield=24510a=African abstracts
+begin subfield=24510b=a quarterly review of ethnographic, social, and linguistic studies appearing in current periodicals = Bulletin analytique africaniste : revue trimestr. d'études ethnologiques, sociales et linguistiques paraissant dans les périodiques du jour
+end subfield=24510b=a quarterly review of ethnographic, social, and linguistic studies appearing in current periodicals = Bulletin analytique africaniste : revue trimestr. d'études ethnologiques, sociales et linguistiques paraissant dans les périodiques du jour
+end datafield=24510
+begin datafield=2603 
+begin subfield=2603 a=London
+end subfield=2603 a=London
+begin subfield=2603 b=Internat. African Inst.
+end subfield=2603 b=Internat. African Inst.
+end datafield=2603 
+begin datafield=3620 
+begin subfield=3620 a=1.1950 - 23.1972; damit Ersch. eingest.
+end subfield=3620 a=1.1950 - 23.1972; damit Ersch. eingest.
+end datafield=3620 
+begin datafield=500  
+begin subfield=500  a=Repr.: Folk
+end subfield=500  a=Repr.: Folk
+end datafield=500  
+endRecord

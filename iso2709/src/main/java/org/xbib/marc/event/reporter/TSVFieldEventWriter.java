@@ -29,44 +29,71 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.rdf.content;
+package org.xbib.marc.event.reporter;
 
-import org.xbib.iri.IRI;
-import org.xbib.rdf.Node;
-import org.xbib.rdf.Resource;
+import org.xbib.marc.event.EventListener;
+import org.xbib.marc.event.FieldEvent;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
-public class RouteRdfXContentGenerator<R extends RouteRdfXContentParams> extends RdfXContentGenerator<R> {
+public class TSVFieldEventWriter implements EventListener<FieldEvent> {
 
-    RouteRdfXContentGenerator(OutputStream out) throws IOException {
-        super(out);
+    private final static int MAX_EVENTS = 100;
+
+    private final Writer writer;
+
+    private FieldEvent lastEvent;
+
+    List<String> events;
+
+    public TSVFieldEventWriter(OutputStream out) throws IOException {
+        this.writer = new OutputStreamWriter(out, "UTF-8");
+        reset();
+    }
+
+    public TSVFieldEventWriter(Writer writer) throws IOException {
+        this.writer = writer;
+        reset();
+    }
+
+    private void reset() {
+        events = new ArrayList<String>();
     }
 
     @Override
-    public RouteRdfXContentGenerator resource(Resource resource)  throws IOException {
-        super.resource(resource);
-        RouteRdfXContent.RouteHandler handler = getParams().getHandler();
-        if (handler != null) {
-            handler.complete(getParams().getGenerator().get(), getParams());
+    public void receive(FieldEvent event) {
+        if (lastEvent != null && event.getRecordIdentifier().equals(lastEvent.getRecordIdentifier())
+                && events.size() < MAX_EVENTS) {
+            events.add(event.toTSV());
+        } else {
+            try {
+                flush();
+                reset();
+            } catch (IOException e) {
+                // ignore
+            }
         }
-        return this;
+        lastEvent = event;
     }
 
-    public void filter(IRI predicate, Node object) {
-        String indexPredicate = getParams().getIndexPredicate();
-        if (indexPredicate != null && indexPredicate.equals(predicate.toString())) {
-            getParams().setIndex(object.toString());
+    public void flush() throws IOException {
+        if (events == null || events.isEmpty()) {
+            return;
         }
-        String typePredicate = getParams().getIdPredicate();
-        if (typePredicate != null && typePredicate.equals(predicate.toString())) {
-            getParams().setType(object.toString());
+        StringBuilder sb = new StringBuilder();
+        for (String s : events) {
+            sb.append(s).append('\n');
         }
-        String idPredicate = getParams().getIdPredicate();
-        if (idPredicate != null && idPredicate.equals(predicate.toString())) {
-            getParams().setId(object.toString());
-        }
+        writer.write(sb.toString());
     }
 
+    public void close() throws IOException {
+        flush();
+        writer.close();
+    }
 }

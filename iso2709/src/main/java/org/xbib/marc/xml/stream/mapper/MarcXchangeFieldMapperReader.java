@@ -88,6 +88,8 @@ public class MarcXchangeFieldMapperReader
 
     private String type = BIBLIOGRAPHIC;
 
+    private String recordIdentifier;
+
     protected boolean inData;
 
     protected boolean inLeader;
@@ -198,7 +200,7 @@ public class MarcXchangeFieldMapperReader
             field.data(transformer.transform(field.data()));
             if (!old.equals(field.data())) {
                 if (fieldEventListener != null) {
-                    fieldEventListener.receive(FieldEvent.DATA_TRANSFORMED.setField(field));
+                    fieldEventListener.receive(FieldEvent.DATA_TRANSFORMED.setRecordIdentifier(recordIdentifier).setField(field));
                 }
             }
         }
@@ -251,6 +253,12 @@ public class MarcXchangeFieldMapperReader
     public void endControlField(Field field) {
         if (listener != null) {
             listener.endControlField(field);
+        }
+        if (RECORD_NUMBER_FIELD.equals(field.tag())) {
+            this.recordIdentifier = field.data();
+            if (fieldEventListener != null) {
+                fieldEventListener.receive(FieldEvent.RECORD_NUMBER.setRecordIdentifier(recordIdentifier));
+            }
         }
     }
 

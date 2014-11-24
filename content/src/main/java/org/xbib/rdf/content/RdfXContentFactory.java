@@ -92,7 +92,7 @@ public class RdfXContentFactory {
 
     public static RdfContentBuilder rdfContentBuilder(RdfContentType type, RdfContentParams params) throws IOException {
         if (type == ExtendedRdfContentType.ROUTEXCONTENT) {
-            return RdfXContent.contentBuilder((RdfXContentParams) params);
+            return RouteRdfXContent.contentBuilder((RouteRdfXContentParams) params);
         } else if (type == ExtendedRdfContentType.XCONTENT) {
             return RdfXContent.contentBuilder((RdfXContentParams) params);
         } else if (type == ExtendedRdfContentType.NTRIPLE) {

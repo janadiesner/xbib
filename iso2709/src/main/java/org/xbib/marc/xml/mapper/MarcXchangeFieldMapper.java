@@ -33,6 +33,7 @@ package org.xbib.marc.xml.mapper;
 
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
+import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.label.RecordLabel;
 import org.xbib.marc.event.FieldEvent;
@@ -48,9 +49,7 @@ import java.util.regex.Pattern;
  * The MarcXchange field mapper parses MarcXchange fields one by one,
  * with the capability to map fields to other ones, or even remove them.
  */
-public abstract class MarcXchangeFieldMapper implements MarcXchangeListener {
-
-    private final static String RECORD_NUMBER_FIELD = "001";
+public abstract class MarcXchangeFieldMapper implements MarcXchangeConstants, MarcXchangeListener {
 
     private final static String EMPTY = "";
 

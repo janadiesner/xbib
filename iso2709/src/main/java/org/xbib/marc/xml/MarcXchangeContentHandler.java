@@ -31,8 +31,6 @@
  */
 package org.xbib.marc.xml;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
@@ -64,8 +62,6 @@ import java.util.Stack;
 public class MarcXchangeContentHandler
         implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler, MarcXchangeConstants, MarcXchangeListener {
 
-    private final static Logger logger = LoggerFactory.getLogger(MarcXchangeContentHandler.class.getName());
-
     private Stack<Field> stack = new Stack<Field>();
 
     private Map<String,MarcXchangeListener> listeners = new HashMap<String,MarcXchangeListener>();
@@ -81,6 +77,8 @@ public class MarcXchangeContentHandler
     private String format = MARC21;
 
     private String type = BIBLIOGRAPHIC;
+
+    private String recordIdentifier;
 
     protected boolean inData;
 
@@ -153,7 +151,7 @@ public class MarcXchangeContentHandler
             field.data(transformer.transform(field.data()));
             if (!old.equals(field.data())) {
                 if (fieldEventListener != null) {
-                    fieldEventListener.receive(FieldEvent.DATA_TRANSFORMED.setField(field));
+                    fieldEventListener.receive(FieldEvent.DATA_TRANSFORMED.setRecordIdentifier(recordIdentifier).setField(field));
                 }
             }
         }
@@ -223,6 +221,12 @@ public class MarcXchangeContentHandler
                 transform(designator);
             }
             listener.endControlField(designator);
+        }
+        if (RECORD_NUMBER_FIELD.equals(designator.tag())) {
+            this.recordIdentifier = designator.data();
+            if (fieldEventListener != null) {
+                fieldEventListener.receive(FieldEvent.RECORD_NUMBER.setRecordIdentifier(recordIdentifier));
+            }
         }
     }
 

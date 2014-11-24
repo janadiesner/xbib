@@ -96,4 +96,6 @@ public interface MarcXchangeConstants {
 
     String LEADER_TAG = "__LEADER";
 
+    String RECORD_NUMBER_FIELD = "001";
+
 }

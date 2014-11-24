@@ -60,9 +60,9 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 /**
  * Zeitschriftendatenbank (ZDB) MARC ISO2709 files
  */
-public final class MarcXML extends Feeder {
+public final class FromMarcXML extends Feeder {
 
-    private final static Logger logger = LoggerFactory.getLogger(MarcXML.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(FromMarcXML.class.getName());
 
     private final static Charset UTF8 = Charset.forName("UTF-8");
 
@@ -75,12 +75,12 @@ public final class MarcXML extends Feeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return MarcXML::new;
+        return FromMarcXML::new;
     }
 
     @Override
     protected Feeder beforeIndexCreation(Ingest ingest) throws IOException {
-        ingest.mapping("title", MarcXML.class.getResourceAsStream("mapping-title.json"));
+        ingest.mapping("title", FromMarcXML.class.getResourceAsStream("mapping-title.json"));
         return this;
     }
 

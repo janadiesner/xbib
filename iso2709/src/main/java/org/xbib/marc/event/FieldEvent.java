@@ -82,6 +82,8 @@ public enum FieldEvent implements Event {
     }
     ;
 
+    private String recordIdentifier;
+
     private Field field;
 
     FieldEvent() {
@@ -94,6 +96,15 @@ public enum FieldEvent implements Event {
 
     public Field getField() {
         return field;
+    }
+
+    public FieldEvent setRecordIdentifier(String recordIdentifier) {
+        this.recordIdentifier = recordIdentifier;
+        return this;
+    }
+
+    public String getRecordIdentifier() {
+        return recordIdentifier;
     }
 
     public FieldEvent setCause(String cause) {
@@ -138,6 +149,9 @@ public enum FieldEvent implements Event {
     public String toJSON() {
         StringBuilder sb = new StringBuilder();
         sb.append("{\"event\":\"").append(this.name()).append("\"");
+        if (getRecordIdentifier() != null) {
+            sb.append(",\"rec\":\"").append(getRecordIdentifier()).append("\"");
+        }
         if (getField() != null) {
             sb.append(",\"field\":\"").append(getField()).append("\"");
         }
@@ -155,12 +169,11 @@ public enum FieldEvent implements Event {
     }
 
     public String toTSV() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.name()).append('\t')
-        .append(getField() != null ? getField() : "").append('\t')
-        .append(getCause() != null ? getCause() : "").append('\t')
-        .append(getPrev() != null ? getPrev() : "").append('\t')
-        .append(getNext() != null ? getNext() : "");
-        return sb.toString();
+        return this.name() + '\t'
+                + (getRecordIdentifier() != null ? getRecordIdentifier() : "") + '\t'
+                + (getField() != null ? getField() : "") + '\t'
+                + (getCause() != null ? getCause() : "") + '\t'
+                + (getPrev() != null ? getPrev() : "") + '\t'
+                + (getNext() != null ? getNext() : "");
     }
 }

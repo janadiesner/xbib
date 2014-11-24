@@ -60,12 +60,6 @@
 
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>xml</artifactId>
-            <type>jar</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.xbib</groupId>
             <artifactId>json</artifactId>
             <type>jar</type>
         </dependency>

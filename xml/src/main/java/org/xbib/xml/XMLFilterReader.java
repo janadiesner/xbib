@@ -44,7 +44,7 @@ import java.io.IOException;
 
 /**
  * A XML reader which is also a filter.
- *
+ * <p>
  * Does evaluate namespaces and does not validate or import external entities or document type definitions.
  */
 public class XMLFilterReader extends XMLFilterImpl {
@@ -74,7 +74,7 @@ public class XMLFilterReader extends XMLFilterImpl {
     /**
      * Saxon uses setFeature, so we override it here, otherwise XmlFilterImpl will bark.
      *
-     * @param name the name
+     * @param name  the name
      * @param value the value
      * @throws org.xml.sax.SAXNotRecognizedException
      * @throws org.xml.sax.SAXNotSupportedException

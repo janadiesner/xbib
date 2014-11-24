@@ -29,44 +29,40 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.rdf.content;
+package org.xbib.rdf.xcontent;
 
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
-import org.xbib.rdf.Node;
+import org.xbib.iri.namespace.IRINamespaceContext;
+import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.content.RouteRdfXContentParams;
+import org.xbib.rdf.memory.MemoryLiteral;
+import org.xbib.rdf.memory.MemoryResource;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
-public class RouteRdfXContentGenerator<R extends RouteRdfXContentParams> extends RdfXContentGenerator<R> {
+public class RouteRdfXContentBuilderTest extends Assert {
 
-    RouteRdfXContentGenerator(OutputStream out) throws IOException {
-        super(out);
+    @Test
+    public void testRoute() throws Exception {
+        Resource resource = new MemoryResource();
+        MemoryLiteral l = new MemoryLiteral("2013")
+                .type(IRI.create("xsd:gYear"));
+        resource.id(IRI.create("urn:res"))
+                .add("urn:property", "Hello World")
+                .add("urn:date", l)
+                .add("urn:link", IRI.create("urn:pointer"));
+        RouteRdfXContentParams params = new RouteRdfXContentParams(IRINamespaceContext.getInstance(),
+                "index", "type");
+        params.setHandler((content, p) -> assertEquals(p.getIndex() + " " + p.getType() + " 1 " + content,
+                "index type 1 {\"urn:property\":\"Hello World\",\"urn:date\":2013,\"urn:link\":\"urn:pointer\"}"
+                ));
+        RdfContentBuilder builder = routeRdfXContentBuilder(params);
+        builder.resource(resource);
+
     }
 
-    @Override
-    public RouteRdfXContentGenerator resource(Resource resource)  throws IOException {
-        super.resource(resource);
-        RouteRdfXContent.RouteHandler handler = getParams().getHandler();
-        if (handler != null) {
-            handler.complete(getParams().getGenerator().get(), getParams());
-        }
-        return this;
-    }
-
-    public void filter(IRI predicate, Node object) {
-        String indexPredicate = getParams().getIndexPredicate();
-        if (indexPredicate != null && indexPredicate.equals(predicate.toString())) {
-            getParams().setIndex(object.toString());
-        }
-        String typePredicate = getParams().getIdPredicate();
-        if (typePredicate != null && typePredicate.equals(predicate.toString())) {
-            getParams().setType(object.toString());
-        }
-        String idPredicate = getParams().getIdPredicate();
-        if (idPredicate != null && idPredicate.equals(predicate.toString())) {
-            getParams().setId(object.toString());
-        }
-    }
 
 }

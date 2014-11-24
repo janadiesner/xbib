@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
 /**
  * A SAX handler that detects <code>xml-stylesheet</code> directive and delegates SAX
  * events to a declared transformer.
- * <p/>
+ * <p>
  * URI resolving replaced by servlet real path method.
  */
 public final class TransformingDocumentHandler implements ContentHandler {

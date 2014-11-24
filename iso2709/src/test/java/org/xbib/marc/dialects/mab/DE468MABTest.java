@@ -130,12 +130,6 @@ public class DE468MABTest extends StreamTester {
 
     @Test
     public void testKeyValueDE468MAB() throws Exception {
-        InputStream in = getClass().getResource("aleph500-subfields.mrc").openStream();
-        Iso2709Reader reader = new Iso2709Reader();
-        reader.setFormat("MAB");
-        reader.setSubfieldDelimiter("$$");
-        reader.setSubfieldCodeLength(2);
-
         File file = File.createTempFile("DE-468-keyvalue.", ".txt");
         StringWriter sw = new StringWriter();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
@@ -164,6 +158,11 @@ public class DE468MABTest extends StreamTester {
                     }
 
                 });
+        InputStream in = getClass().getResource("aleph500-subfields.mrc").openStream();
+        Iso2709Reader reader = new Iso2709Reader();
+        reader.setFormat("MAB");
+        reader.setSubfieldDelimiter("$$");
+        reader.setSubfieldCodeLength(2);
         reader.setMarcXchangeListener(kv);
         reader.parse(in);
         in.close();

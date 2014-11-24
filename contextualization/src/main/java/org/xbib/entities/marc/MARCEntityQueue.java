@@ -184,7 +184,7 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
             }
             Map<Field, String> fieldNames = new HashMap<Field, String>();
             // create another anoymous resource, will be linked late if predicate is determined
-            Resource newResource = state().getResource().newResource(tempPredicate);
+            Resource newResource = resource.newResource(tempPredicate);
             // default predicate is the name of the class
             String predicate = entity.getClass().getSimpleName();
             // the _predicate field allows to select a field to name the resource by a coded value

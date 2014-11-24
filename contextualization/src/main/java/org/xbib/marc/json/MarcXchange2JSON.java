@@ -29,24 +29,30 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.marc.keyvalue;
+package org.xbib.marc.json;
 
-import org.xbib.keyvalue.KeyValueStreamListener;
-import org.xbib.marc.FieldList;
+import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.marc.Field;
+import org.xbib.marc.FieldList;
 import org.xbib.marc.MarcException;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.transformer.StringTransformer;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.OutputStream;
+import java.util.Iterator;
+
+import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
- * Convert a MarcXchange stream to a key/value stream
+ * Convert a MarcXchange stream to Elasticsearch XContent lines
  */
-public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStreamListener<FieldList, String>, MarcXchangeConstants {
+public class MarcXchange2JSON implements MarcXchangeListener, MarcXchangeConstants {
+
+    private final OutputStream out;
+
+    private XContentBuilder builder;
 
     private FieldList fields;
 
@@ -54,58 +60,18 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
 
     private MarcXchangeListener marcXchangeListener;
 
-    private List<KeyValueStreamListener<FieldList, String>> listeners =
-            new LinkedList<KeyValueStreamListener<FieldList, String>>();
-
-    public MarcXchange2KeyValue addListener(KeyValueStreamListener<FieldList, String> listener) {
-        this.listeners.add(listener);
-        return this;
+    public MarcXchange2JSON(OutputStream out) throws IOException {
+        this.out = out;
+        this.builder = jsonBuilder(out);
     }
 
-    public MarcXchange2KeyValue setMarcXchangeListener(MarcXchangeListener marcXchangeListener) {
+    public MarcXchange2JSON setMarcXchangeListener(MarcXchangeListener marcXchangeListener) {
         this.marcXchangeListener = marcXchangeListener;
         return this;
     }
 
-    public MarcXchange2KeyValue setStringTransformer(StringTransformer transformer) {
+    public MarcXchange2JSON setStringTransformer(StringTransformer transformer) {
         this.transformer = transformer;
-        return this;
-    }
-
-    @Override
-    public KeyValueStreamListener<FieldList, String> begin() throws IOException {
-        for (KeyValueStreamListener<FieldList, String> listener : listeners) {
-            listener.begin();
-        }
-        return this;
-    }
-
-    @Override
-    public KeyValueStreamListener<FieldList, String> keyValue(FieldList key, String value) throws IOException {
-        for (KeyValueStreamListener<FieldList, String> listener : listeners) {
-            // we allow null value, but null keys are not passed to the listeners
-            if (key != null) {
-                listener.keyValue(key, value);
-            }
-        }
-        return this;
-    }
-
-    @Override
-    public KeyValueStreamListener<FieldList, String> keys(List<FieldList> keys) throws IOException {
-        return this;
-    }
-
-    @Override
-    public KeyValueStreamListener<FieldList, String> values(List<String> values) throws IOException {
-        return this;
-    }
-
-    @Override
-    public KeyValueStreamListener<FieldList, String> end() throws IOException {
-        for (KeyValueStreamListener<FieldList, String> listener : listeners) {
-            listener.end();
-        }
         return this;
     }
 
@@ -129,16 +95,12 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
             marcXchangeListener.beginRecord(format, type);
         }
         try {
-            begin();
+            builder.startObject();
             if (format != null) {
-                FieldList field = new FieldList();
-                field.add(new Field().tag(FORMAT_TAG).data(format));
-                keyValue(field, format);
+                builder.field(FORMAT_TAG, format);
             }
             if (type != null) {
-                FieldList field = new FieldList();
-                field.add(new Field().tag(TYPE_TAG).data(type));
-                keyValue(field, type);
+                builder.field(TYPE_TAG, type);
             }
         } catch (IOException e) {
             throw new MarcException(e);
@@ -151,7 +113,9 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
             marcXchangeListener.endRecord();
         }
         try {
-            end();
+            builder.endObject();
+            builder.flush();
+            out.write('\n');
         } catch (IOException e) {
             throw new MarcException(e);
         }
@@ -164,9 +128,7 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
         }
         try {
             if (label != null) {
-                FieldList field = new FieldList();
-                field.add(new Field().tag(LEADER_TAG).data(label));
-                keyValue(field, label);
+                builder.field(LEADER_TAG, label);
             }
         } catch (IOException e) {
             throw new MarcException(e);
@@ -192,7 +154,9 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
             data = transformer.transform(data);
         }
         try {
-            keyValue(fields, data);
+            for (Field f : fields) {
+                builder.field(f.tag(), data);
+            }
         } catch (IOException e) {
             throw new MarcException(e);
         }
@@ -212,14 +176,29 @@ public class MarcXchange2KeyValue implements MarcXchangeListener, KeyValueStream
         if (marcXchangeListener != null) {
             marcXchangeListener.endDataField(field);
         }
+
         String data = field != null ? field.data() : null;
-        // if we have data in a data field, move them to a subfield with subfield ID "a"
+        // if we have no subfields (data is in data field),
+        // so move data to a subfield with subfield code "a"
         if (field != null && data != null && !data.isEmpty()) {
             field.subfieldId("a");
             endSubField(field);
         }
         try {
-            keyValue(fields, data);
+            Iterator<Field> it = fields.iterator();
+            Field f = it.next();
+            builder.startObject(f.tag());
+            if (!f.indicator().isEmpty()) {
+                builder.startObject(f.indicator().replace(' ', '_'));
+            }
+            while (it.hasNext()) {
+                f = it.next();
+                builder.field(f.subfieldId(), f.data());
+            }
+            if (!f.indicator().isEmpty()) {
+                builder.endObject();
+            }
+            builder.endObject();
         } catch (IOException e) {
             throw new MarcException(e);
         }
