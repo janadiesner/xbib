@@ -169,7 +169,7 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
                 builder().build(state(), entity, fields, value);
             } else {
                 if (listener != null) {
-                    listener.unknown(fields);
+                    listener.unknown(state().getRecordNumber(), fields);
                 }
             }
             // complete no matter if an entity was found or not

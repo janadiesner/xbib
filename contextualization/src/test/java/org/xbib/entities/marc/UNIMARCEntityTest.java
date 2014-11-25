@@ -82,7 +82,7 @@ public class UNIMARCEntityTest extends Assert {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         logger.info("running UNIMARC test");
         MyQueue queue = new MyQueue("/org/xbib/analyzer/unimarc/bib.json", Runtime.getRuntime().availableProcessors());
-        queue.setUnmappedKeyListener(key -> unmapped.add(key.toString()));
+        queue.setUnmappedKeyListener((id, key) -> unmapped.add(key.toString()));
         queue.execute();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                 .addListener(queue);

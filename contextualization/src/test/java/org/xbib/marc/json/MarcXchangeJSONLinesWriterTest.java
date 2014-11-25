@@ -57,9 +57,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.xbib.rdf.content.RdfXContentFactory.rdfXContentBuilder;
 
-public class MarcXchange2JSONTest extends Assert {
+public class MarcXchangeJSONLinesWriterTest extends Assert {
 
-    private static final Logger logger = LoggerFactory.getLogger(MarcXchange2JSONTest.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(MarcXchangeJSONLinesWriterTest.class.getName());
 
     private final static Charset ISO88591 = Charset.forName("ISO-8859-1"); // 8 bit
 
@@ -72,16 +72,16 @@ public class MarcXchange2JSONTest extends Assert {
         BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591));
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         MyQueue queue = new MyQueue("/org/xbib/analyzer/marc/zdb/bib.json", Runtime.getRuntime().availableProcessors());
-        queue.setUnmappedKeyListener(key -> unmapped.add(key.toString()));
+        queue.setUnmappedKeyListener((id, key) -> unmapped.add(key.toString()));
         queue.execute();
         FileOutputStream out = new FileOutputStream("zdbtit.marc.jsonl");
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                 .setStringTransformer(value -> Normalizer.normalize(new String(value.getBytes(ISO88591), UTF8), Normalizer.Form.NFKC))
                 .addListener(queue);
-        MarcXchange2JSON marcXchange2JSON = new MarcXchange2JSON(out)
+        MarcXchangeJSONLinesWriter marcXchangeJSONLinesWriter = new MarcXchangeJSONLinesWriter(out)
                 .setMarcXchangeListener(kv);
         Iso2709Reader reader = new Iso2709Reader()
-                .setMarcXchangeListener(marcXchange2JSON);
+                .setMarcXchangeListener(marcXchangeJSONLinesWriter);
         reader.setProperty(Iso2709Reader.FORMAT, "MARC");
         reader.setProperty(Iso2709Reader.TYPE, "Bibliographic");
         reader.parse(br);

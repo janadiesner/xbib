@@ -48,7 +48,7 @@ import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 /**
  * Convert a MarcXchange stream to Elasticsearch XContent lines
  */
-public class MarcXchange2JSON implements MarcXchangeListener, MarcXchangeConstants {
+public class MarcXchangeJSONLinesWriter implements MarcXchangeListener, MarcXchangeConstants {
 
     private final OutputStream out;
 
@@ -60,19 +60,27 @@ public class MarcXchange2JSON implements MarcXchangeListener, MarcXchangeConstan
 
     private MarcXchangeListener marcXchangeListener;
 
-    public MarcXchange2JSON(OutputStream out) throws IOException {
+    public MarcXchangeJSONLinesWriter(OutputStream out) throws IOException {
         this.out = out;
         this.builder = jsonBuilder(out);
     }
 
-    public MarcXchange2JSON setMarcXchangeListener(MarcXchangeListener marcXchangeListener) {
+    public MarcXchangeJSONLinesWriter setMarcXchangeListener(MarcXchangeListener marcXchangeListener) {
         this.marcXchangeListener = marcXchangeListener;
         return this;
     }
 
-    public MarcXchange2JSON setStringTransformer(StringTransformer transformer) {
+    public MarcXchangeJSONLinesWriter setStringTransformer(StringTransformer transformer) {
         this.transformer = transformer;
         return this;
+    }
+
+    public void startDocument() throws IOException {
+        // empty
+    }
+
+    public void endDocument() throws IOException {
+        // empty
     }
 
     @Override

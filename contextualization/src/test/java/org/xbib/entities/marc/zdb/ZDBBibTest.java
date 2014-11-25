@@ -72,7 +72,7 @@ public class ZDBBibTest extends Assert {
         BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591));
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         MyQueue queue = new MyQueue("/org/xbib/analyzer/marc/zdb/bib.json", Runtime.getRuntime().availableProcessors());
-                queue.setUnmappedKeyListener(key -> unmapped.add(key.toString()));
+                queue.setUnmappedKeyListener((id, key) -> unmapped.add(key.toString()));
         queue.execute();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                 .setStringTransformer(value -> Normalizer.normalize(new String(value.getBytes(ISO88591), UTF8), Normalizer.Form.NFKC))
@@ -107,7 +107,7 @@ public class ZDBBibTest extends Assert {
         InputStream in = getClass().getResourceAsStream("zdb-oai-marc.xml");
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         MyQueue queue = new MyQueue("/org/xbib/analyzer/marc/zdb/bib.json", Runtime.getRuntime().availableProcessors());
-        queue.setUnmappedKeyListener(key -> unmapped.add(key.toString()));
+        queue.setUnmappedKeyListener((id, key) -> unmapped.add(key.toString()));
         queue.execute();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                 .addListener(queue);

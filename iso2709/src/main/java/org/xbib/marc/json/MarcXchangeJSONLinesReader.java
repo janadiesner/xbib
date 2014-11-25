@@ -189,6 +189,9 @@ public class MarcXchangeJSONLinesReader {
             listener.endDataField(dataField);
         }
         fields.clear();
+        tag = null;
+        indicator = null;
+        subfieldId = null;
     }
 
 }

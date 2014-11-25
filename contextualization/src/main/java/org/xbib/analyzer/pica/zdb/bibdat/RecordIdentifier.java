@@ -48,7 +48,7 @@ public class RecordIdentifier extends PicaEntity {
     public void fields(PicaEntityQueue.PicaKeyValueWorker worker,
                        FieldList fields, String value) {
         for (Field field : fields) {
-            worker.state().setID(field.data());
+            worker.state().setRecordNumber(field.data());
         }
     }
 }

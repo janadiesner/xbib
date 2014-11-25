@@ -45,7 +45,7 @@ public class PicaEntityBuilderState extends DefaultEntityBuilderState {
 
     private Resource root;
 
-    private String id;
+    private String recordNumber;
 
     public PicaEntityBuilderState(RdfGraph<RdfGraphParams> graph, List<RdfContentBuilderProvider> list) {
         super(graph, list);
@@ -63,12 +63,12 @@ public class PicaEntityBuilderState extends DefaultEntityBuilderState {
         return root;
     }
 
-    public void setID(String id) {
-        this.id = id;
+    public void setRecordNumber(String recordNumber) {
+        this.recordNumber = recordNumber;
     }
 
-    public String getID() {
-        return id;
+    public String getRecordNumber() {
+        return recordNumber;
     }
 
 }

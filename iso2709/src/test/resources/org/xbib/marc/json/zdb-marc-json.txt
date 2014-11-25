@@ -211,16 +211,16 @@ beginRecord
 format=MARC
 type=Bibliographic
 leader=01879nas a2200529 c 4500
-begin controlfield=00100w=01000002X
-end controlfield=00100w=01000002X
-begin controlfield=00300w=DE-101
-end controlfield=00300w=DE-101
-begin controlfield=00500w=20120816085322.0
-end controlfield=00500w=20120816085322.0
-begin controlfield=00700w=tu
-end controlfield=00700w=tu
-begin controlfield=00800w=991118d19632008xx z||p|r ||| 0||||0ger c
-end controlfield=00800w=991118d19632008xx z||p|r ||| 0||||0ger c
+begin controlfield=001=01000002X
+end controlfield=001=01000002X
+begin controlfield=003=DE-101
+end controlfield=003=DE-101
+begin controlfield=005=20120816085322.0
+end controlfield=005=20120816085322.0
+begin controlfield=007=tu
+end controlfield=007=tu
+begin controlfield=008=991118d19632008xx z||p|r ||| 0||||0ger c
+end controlfield=008=991118d19632008xx z||p|r ||| 0||||0ger c
 begin datafield=015  
 begin subfield=015  a=08,B23,0382
 end subfield=015  a=08,B23,0382
@@ -450,16 +450,16 @@ beginRecord
 format=MARC
 type=Bibliographic
 leader=02523nas a2200673 c 4500
-begin controlfield=001r a=010000038
-end controlfield=001r a=010000038
-begin controlfield=003r a=DE-101
-end controlfield=003r a=DE-101
-begin controlfield=005r a=20110111105737.0
-end controlfield=005r a=20110111105737.0
-begin controlfield=007r a=tu
-end controlfield=007r a=tu
-begin controlfield=008r a=991118d19642006xx z||p|r ||| 0||||0ger c
-end controlfield=008r a=991118d19642006xx z||p|r ||| 0||||0ger c
+begin controlfield=001=010000038
+end controlfield=001=010000038
+begin controlfield=003=DE-101
+end controlfield=003=DE-101
+begin controlfield=005=20110111105737.0
+end controlfield=005=20110111105737.0
+begin controlfield=007=tu
+end controlfield=007=tu
+begin controlfield=008=991118d19642006xx z||p|r ||| 0||||0ger c
+end controlfield=008=991118d19642006xx z||p|r ||| 0||||0ger c
 begin datafield=015  
 begin subfield=015  a=97,B12,0347
 end subfield=015  a=97,B12,0347
@@ -779,16 +779,16 @@ beginRecord
 format=MARC
 type=Bibliographic
 leader=00967nas a2200265 c 4500
-begin controlfield=001r a=010000046
-end controlfield=001r a=010000046
-begin controlfield=003r a=DE-101
-end controlfield=003r a=DE-101
-begin controlfield=005r a=20070627061749.0
-end controlfield=005r a=20070627061749.0
-begin controlfield=007r a=tu
-end controlfield=007r a=tu
-begin controlfield=008r a=991118d19491964it u||p|r b|| 0||||0||| c
-end controlfield=008r a=991118d19491964it u||p|r b|| 0||||0||| c
+begin controlfield=001=010000046
+end controlfield=001=010000046
+begin controlfield=003=DE-101
+end controlfield=003=DE-101
+begin controlfield=005=20070627061749.0
+end controlfield=005=20070627061749.0
+begin controlfield=007=tu
+end controlfield=007=tu
+begin controlfield=008=991118d19491964it u||p|r b|| 0||||0||| c
+end controlfield=008=991118d19491964it u||p|r b|| 0||||0||| c
 begin datafield=0167 
 begin subfield=0167 2=DE-101
 end subfield=0167 2=DE-101
@@ -886,16 +886,16 @@ beginRecord
 format=MARC
 type=Bibliographic
 leader=01359nas a2200361 c 4500
-begin controlfield=001  r=010000054
-end controlfield=001  r=010000054
-begin controlfield=003  r=DE-101
-end controlfield=003  r=DE-101
-begin controlfield=005  r=20111123211515.0
-end controlfield=005  r=20111123211515.0
-begin controlfield=007  r=tu
-end controlfield=007  r=tu
-begin controlfield=008  r=991118d19431986gw z||p|r ||| 0||||0ger c
-end controlfield=008  r=991118d19431986gw z||p|r ||| 0||||0ger c
+begin controlfield=001=010000054
+end controlfield=001=010000054
+begin controlfield=003=DE-101
+end controlfield=003=DE-101
+begin controlfield=005=20111123211515.0
+end controlfield=005=20111123211515.0
+begin controlfield=007=tu
+end controlfield=007=tu
+begin controlfield=008=991118d19431986gw z||p|r ||| 0||||0ger c
+end controlfield=008=991118d19431986gw z||p|r ||| 0||||0ger c
 begin datafield=0167 
 begin subfield=0167 2=DE-101
 end subfield=0167 2=DE-101
@@ -1057,16 +1057,16 @@ beginRecord
 format=MARC
 type=Bibliographic
 leader=02086nas a2200553 c 4500
-begin controlfield=00100w=010000062
-end controlfield=00100w=010000062
-begin controlfield=00300w=DE-101
-end controlfield=00300w=DE-101
-begin controlfield=00500w=20100713165615.0
-end controlfield=00500w=20100713165615.0
-begin controlfield=00700w=tu
-end controlfield=00700w=tu
-begin controlfield=00800w=991118d19612006xx z||p|r ||| 0||||0ger c
-end controlfield=00800w=991118d19612006xx z||p|r ||| 0||||0ger c
+begin controlfield=001=010000062
+end controlfield=001=010000062
+begin controlfield=003=DE-101
+end controlfield=003=DE-101
+begin controlfield=005=20100713165615.0
+end controlfield=005=20100713165615.0
+begin controlfield=007=tu
+end controlfield=007=tu
+begin controlfield=008=991118d19612006xx z||p|r ||| 0||||0ger c
+end controlfield=008=991118d19612006xx z||p|r ||| 0||||0ger c
 begin datafield=015  
 begin subfield=015  a=96,B09,0553
 end subfield=015  a=96,B09,0553
@@ -1312,16 +1312,16 @@ beginRecord
 format=MARC
 type=Bibliographic
 leader=01148nas a2200289 c 4500
-begin controlfield=001r a=010000070
-end controlfield=001r a=010000070
-begin controlfield=003r a=DE-101
-end controlfield=003r a=DE-101
-begin controlfield=005r a=20050603141946.0
-end controlfield=005r a=20050603141946.0
-begin controlfield=007r a=tu
-end controlfield=007r a=tu
-begin controlfield=008r a=991118d19651965xxuu||p|r b|| 0||||0eng c
-end controlfield=008r a=991118d19651965xxuu||p|r b|| 0||||0eng c
+begin controlfield=001=010000070
+end controlfield=001=010000070
+begin controlfield=003=DE-101
+end controlfield=003=DE-101
+begin controlfield=005=20050603141946.0
+end controlfield=005=20050603141946.0
+begin controlfield=007=tu
+end controlfield=007=tu
+begin controlfield=008=991118d19651965xxuu||p|r b|| 0||||0eng c
+end controlfield=008=991118d19651965xxuu||p|r b|| 0||||0eng c
 begin datafield=0167 
 begin subfield=0167 2=DE-101
 end subfield=0167 2=DE-101
@@ -1425,16 +1425,16 @@ beginRecord
 format=MARC
 type=Bibliographic
 leader=01040nas a2200265 c 4500
-begin controlfield=001  r=010000089
-end controlfield=001  r=010000089
-begin controlfield=003  r=DE-101
-end controlfield=003  r=DE-101
-begin controlfield=005  r=20071204010107.0
-end controlfield=005  r=20071204010107.0
-begin controlfield=007  r=tu
-end controlfield=007  r=tu
-begin controlfield=008  r=991118d19501972xxku||p|r a|| 0||||0||| c
-end controlfield=008  r=991118d19501972xxku||p|r a|| 0||||0||| c
+begin controlfield=001=010000089
+end controlfield=001=010000089
+begin controlfield=003=DE-101
+end controlfield=003=DE-101
+begin controlfield=005=20071204010107.0
+end controlfield=005=20071204010107.0
+begin controlfield=007=tu
+end controlfield=007=tu
+begin controlfield=008=991118d19501972xxku||p|r a|| 0||||0||| c
+end controlfield=008=991118d19501972xxku||p|r a|| 0||||0||| c
 begin datafield=0167 
 begin subfield=0167 2=DE-101
 end subfield=0167 2=DE-101

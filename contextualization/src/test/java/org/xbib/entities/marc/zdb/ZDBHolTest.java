@@ -69,9 +69,9 @@ public class ZDBHolTest extends Assert {
         BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591));
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         MyQueue queue = new MyQueue("/org/xbib/analyzer/marc/zdb/hol.json");
-        queue.setUnmappedKeyListener(key -> {
+        queue.setUnmappedKeyListener((id, key) -> {
             unmapped.add(key.toString());
-            logger.warn("unknown key: {}", key);
+            logger.warn("record {}: unknown key: {}", id, key);
         });
         queue.execute();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()

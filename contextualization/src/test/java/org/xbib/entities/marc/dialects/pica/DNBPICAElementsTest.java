@@ -65,9 +65,9 @@ public class DNBPICAElementsTest extends Assert {
     public void testZdbBib() throws Exception {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         final MyQueue queue = new MyQueue("/org/xbib/analyzer/pica/zdb/bibdat.json");
-        queue.setUnmappedKeyListener(key -> {
+        queue.setUnmappedKeyListener((id, key) -> {
             unmapped.add(key.toString());
-            logger.warn("unknown field {}", key);
+            logger.warn("record {}: unknown key {}", id, key);
         });
         queue.execute();
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()

@@ -75,7 +75,7 @@ public class MARCEntityTest extends Assert {
         RdfContentBuilderProvider provider = RdfContentFactory::turtleBuilder;
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         MyQueue queue = new MyQueue("/org/xbib/analyzer/marc/bib.json");
-        queue.setUnmappedKeyListener(key -> unmapped.add(key.toString()))
+        queue.setUnmappedKeyListener((id, key) -> unmapped.add(key.toString()))
                 .setContentBuilderProviders(provider);
         queue.execute();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(queue);

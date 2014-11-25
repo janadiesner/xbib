@@ -61,9 +61,17 @@ public class MARCEntityBuilderState extends DefaultEntityBuilderState {
         return this;
     }
 
+    public String getLabel() {
+        return label;
+    }
+
     public MARCEntityBuilderState setRecordNumber(String recordNumber) {
         this.recordNumber = recordNumber;
         return this;
+    }
+
+    public String getRecordNumber() {
+        return recordNumber;
     }
 
     public Resource getResource() throws IOException {

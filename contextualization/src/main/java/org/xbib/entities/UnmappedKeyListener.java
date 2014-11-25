@@ -33,5 +33,5 @@ package org.xbib.entities;
 
 public interface UnmappedKeyListener<K> {
 
-    void unknown(K key);
+    void unknown(String document, K key);
 }

@@ -136,7 +136,7 @@ public class PicaEntityQueue extends EntityQueue<PicaEntityBuilderState, PicaEnt
                 }
             } else {
                 if (listener != null) {
-                    listener.unknown(fields);
+                    listener.unknown(state().getRecordNumber(), fields);
                 }
             }
             builder().build(state(), entity, fields, value);
