@@ -34,11 +34,15 @@ package org.xbib.rdf.io.json;
 import org.xbib.json.xml.JsonSaxAdapter;
 import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.RdfContentParser;
+import org.xbib.rdf.RdfContentType;
+import org.xbib.rdf.StandardRdfContentType;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 
 /**
@@ -46,13 +50,25 @@ import java.io.Reader;
  */
 public class JsonContentParser implements RdfContentParser {
 
+    private final Reader reader;
+
     private XmlHandler handler;
 
     private RdfContentBuilder builder;
 
     private QName root;
 
-    public JsonContentParser() {
+    public JsonContentParser(InputStream in) throws IOException {
+        this(new InputStreamReader(in, "UTF-8"));
+    }
+
+    public JsonContentParser(Reader reader) {
+        this.reader = reader;
+    }
+
+    @Override
+    public RdfContentType contentType() {
+        return StandardRdfContentType.JSON;
     }
 
     public JsonContentParser setHandler(XmlHandler handler) {
@@ -75,7 +91,7 @@ public class JsonContentParser implements RdfContentParser {
     }
 
     @Override
-    public JsonContentParser parse(Reader reader) throws IOException {
+    public JsonContentParser parse() throws IOException {
         if (handler != null) {
             if (builder != null) {
                 handler.setBuilder(builder);

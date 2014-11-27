@@ -29,20 +29,64 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.entities;
+package org.xbib.entities.scripting;
 
-import java.io.IOException;
+import java.util.Map;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import org.xbib.entities.Entity;
 
-public class DefaultEntityBuilder<C extends EntityBuilderState, E extends Entity, K, V>
-    implements EntityBuilder<C, E, K, V> {
+public abstract class AbstractScriptEntity implements Entity {
 
-    @Override
-    public void build(C context, E element, K key, V value) {
-        // empty
+    private final ScriptEngine engine;
+
+    private final String invocable;
+
+    private final String script;
+
+    private Entity entity;
+
+    private Map settings;
+
+    public AbstractScriptEntity(String scriptEngineName, String script, String invocable) {
+        this.engine = new ScriptEngineManager().getEngineByName(scriptEngineName);
+        this.invocable = invocable;
+        this.script = script;        
     }
 
     @Override
-    public void complete(C context) throws IOException {
-        context.complete();
+    public AbstractScriptEntity setSettings(Map settings) {
+        try {
+            this.settings = settings;
+            engine.eval(script);
+            this.entity = (Entity)engine.get(invocable);
+            if (entity != null) {
+                entity.setSettings(settings);
+            }
+        } catch (ScriptException ex) {
+            throw new RuntimeException(ex);
+        }
+        return this;
     }
+
+    public Map getSettings() {
+        return settings;
+    }
+
+    public Entity getEntity(){
+        return entity;
+    }
+
+    /*@Override
+    public AbstractScriptingEntity build(EntityBuilder builder, Object key, Object value) {
+        Invocable inv = (Invocable) engine;
+        try {
+            inv.invokeMethod(entity, "complete", builder, key, value);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        return this;
+    }*/
+
 }

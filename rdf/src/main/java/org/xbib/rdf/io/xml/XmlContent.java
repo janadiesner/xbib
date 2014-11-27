@@ -33,8 +33,8 @@ public class XmlContent implements RdfContent {
     }
 
     @Override
-    public RdfContentGenerator createGenerator(OutputStream os) throws IOException {
-        return new XmlContentGenerator(os);
+    public RdfContentGenerator createGenerator(OutputStream out) throws IOException {
+        return new XmlContentGenerator(out);
     }
 
     @Override
@@ -44,11 +44,11 @@ public class XmlContent implements RdfContent {
 
     @Override
     public RdfContentParser createParser(InputStream in) throws IOException {
-        return null;
+        return new XmlContentParser(in);
     }
 
     @Override
     public RdfContentParser createParser(Reader reader) throws IOException {
-        return null;
+        return new XmlContentParser(reader);
     }
 }

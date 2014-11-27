@@ -31,17 +31,18 @@
  */
 package org.xbib.entities;
 
+import org.xbib.iri.IRI;
 import org.xbib.rdf.RdfContentBuilderProvider;
 import org.xbib.rdf.RdfGraph;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 public interface EntityBuilderState {
 
     RdfGraph graph();
 
-    List<RdfContentBuilderProvider> providers();
+    Map<IRI,RdfContentBuilderProvider> providerMap();
 
     void complete() throws IOException;
 

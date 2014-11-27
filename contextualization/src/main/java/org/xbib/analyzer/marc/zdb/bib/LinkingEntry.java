@@ -31,10 +31,8 @@
  */
 package org.xbib.analyzer.marc.zdb.bib;
 
-import org.xbib.entities.EntityBuilder;
-import org.xbib.entities.marc.MARCEntityBuilderState;
 import org.xbib.entities.marc.MARCEntity;
-import org.xbib.marc.FieldList;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.rdf.Resource;
 
 public class LinkingEntry extends MARCEntity {
@@ -45,7 +43,7 @@ public class LinkingEntry extends MARCEntity {
     }
 
     @Override
-    public String data(EntityBuilder<MARCEntityBuilderState, MARCEntity, FieldList, String> builder,
+    public String data(MARCEntityQueue.MARCWorker worker,
                        String predicate, Resource resource, String property, String value) {
         if ("identifier".equals(property)) {
             if (value.startsWith("(DE-600)")) {

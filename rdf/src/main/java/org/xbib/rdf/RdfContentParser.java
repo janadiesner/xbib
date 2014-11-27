@@ -32,10 +32,11 @@
 package org.xbib.rdf;
 
 import java.io.IOException;
-import java.io.Reader;
 
 public interface RdfContentParser {
 
-    RdfContentParser parse(Reader reader) throws IOException;
+    RdfContentType contentType();
+
+    RdfContentParser parse() throws IOException;
 
 }

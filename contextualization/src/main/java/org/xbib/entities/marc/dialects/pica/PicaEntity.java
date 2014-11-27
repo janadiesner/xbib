@@ -32,34 +32,25 @@
 package org.xbib.entities.marc.dialects.pica;
 
 import org.xbib.entities.Entity;
-import org.xbib.entities.EntityBuilder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.FieldList;
-import org.xbib.marc.Field;
 
 import java.util.Map;
 
-public class PicaEntity implements Entity<FieldList, String, PicaEntityBuilder> {
+public class PicaEntity implements Entity<FieldList, String> {
 
     protected static final Logger logger = LoggerFactory.getLogger(PicaEntity.class.getName());
 
-    protected Map<String,Object> params;
+    private  Map<String,Object> params;
     
-    @Override
     public PicaEntity setSettings(Map params) {
         this.params = params;
         return this;
     }
 
-    @Override
     public Map<String,Object> getSettings() {
         return params;
-    }
-
-    @Override
-    public PicaEntity build(PicaEntityBuilder builder, FieldList key, String value) {
-        return this;
     }
 
     /**
@@ -71,18 +62,6 @@ public class PicaEntity implements Entity<FieldList, String, PicaEntityBuilder> 
      */
     public void fields(PicaEntityQueue.PicaKeyValueWorker worker,
                        FieldList fields, String value) {
-        // should be overridden
-    }
-
-    /**
-     * Process mapped element, with subfield mappings. Empty by default.
-     *
-     * @param builder
-     * @param field
-     * @param subfieldType
-     */
-    public void field(EntityBuilder<PicaEntityBuilderState, PicaEntity, FieldList, String> builder,
-                      Field field, String subfieldType) {
         // should be overridden
     }
 

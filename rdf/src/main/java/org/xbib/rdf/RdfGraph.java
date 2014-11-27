@@ -48,12 +48,12 @@ public interface RdfGraph<Params extends RdfGraphParams> extends RdfContentGener
 
     RdfGraph endPrefixMapping(String prefix);
 
-    RdfGraph newIdentifier(IRI identifier);
+    RdfGraph receive(IRI identifier);
 
-    RdfGraph triple(Triple triple);
+    RdfGraph receive(Triple triple);
 
     RdfGraph end();
 
-    RdfGraph resource(Resource resource) throws IOException;
+    RdfGraph receive(Resource resource) throws IOException;
 
 }

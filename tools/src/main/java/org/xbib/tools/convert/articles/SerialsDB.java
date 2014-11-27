@@ -142,7 +142,7 @@ public class SerialsDB extends Converter {
                 if (!serials.containsKey(journalTitle)) {
                     TurtleContentParams params = new TurtleContentParams(namespaceContext, false);
                     RdfContentBuilder builder = turtleBuilder(out, params);
-                    builder.resource(resource);
+                    builder.receive(resource);
                     serials.put(journalTitle, resource);
                 } else {
                     logger.info("ignoring double serial title: {}", journalTitle);

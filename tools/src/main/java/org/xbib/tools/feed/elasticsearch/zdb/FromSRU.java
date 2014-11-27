@@ -142,7 +142,7 @@ public class FromSRU extends Feeder {
 
         final Set<String> unmappedbib = Collections.synchronizedSet(new TreeSet<String>());
         final MyBibQueue bibqueue = new MyBibQueue("marc/zdb/bib", settings.getAsInt("pipelines", 1));
-        bibqueue.setUnmappedKeyListener(key -> {
+        bibqueue.setUnmappedKeyListener((id,key) -> {
             if ((settings.getAsBoolean("detect", false))) {
                 logger.warn("unmapped field {}", key);
                 unmappedbib.add("\"" + key + "\"");
@@ -151,7 +151,7 @@ public class FromSRU extends Feeder {
 
         final Set<String> unmappedhol = Collections.synchronizedSet(new TreeSet<String>());
         final MyHolQueue holqueue = new MyHolQueue("marc/zdb/hol", settings.getAsInt("pipelines", 1));
-        holqueue.setUnmappedKeyListener(key -> {
+        holqueue.setUnmappedKeyListener((id,key) -> {
             if ((settings.getAsBoolean("detect", false))) {
                 logger.warn("unmapped field {}", key);
                 unmappedhol.add("\"" + key + "\"");
@@ -268,7 +268,7 @@ public class FromSRU extends Feeder {
             params.setIdPredicate("identifierZDB");
             params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
             RdfContentBuilder builder = routeRdfXContentBuilder(params);
-            builder.resource(state.getResource());
+            builder.receive(state.getResource());
         }
     }
 
@@ -286,7 +286,7 @@ public class FromSRU extends Feeder {
             params.setIdPredicate("identifierZDB");
             params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
             RdfContentBuilder builder = routeRdfXContentBuilder(params);
-            builder.resource(state.getResource());
+            builder.receive(state.getResource());
         }
     }
 }

@@ -215,8 +215,8 @@ public abstract class AbstractXmlHandler extends DefaultHandler implements XmlHa
             return;
         }
         if (builder != null) {
-            builder.newIdentifier(resource.id());
-            builder.resource(resource);
+            builder.receive(resource.id());
+            builder.receive(resource);
             /*for (Triple triple : resource.triples()) {
                 builder.triple(triple);
             }*/

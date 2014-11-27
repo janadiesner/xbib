@@ -59,7 +59,7 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
 
     private final static IRI tempPredicate = IRI.create("tmp");
 
-    private List<RdfContentBuilderProvider> providers;
+    private Map<IRI,RdfContentBuilderProvider> providers;
 
     private UnmappedKeyListener<FieldList> listener;
 
@@ -80,18 +80,13 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
         return this;
     }
 
-    public MARCEntityQueue setContentBuilderProviders(RdfContentBuilderProvider... providers) {
-        this.providers = Arrays.asList(providers);
-        return this;
-    }
-
-    public MARCEntityQueue setContentBuilderProviders(List<RdfContentBuilderProvider> providers) {
+    public MARCEntityQueue setContentBuilderProviders(Map<IRI,RdfContentBuilderProvider> providers) {
         this.providers = providers;
         return this;
     }
 
     @Override
-    public List<RdfContentBuilderProvider> contentBuilderProviders() {
+    public Map<IRI,RdfContentBuilderProvider> contentBuilderProviders() {
         return providers;
     }
 
@@ -127,11 +122,6 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
         }
 
         @Override
-        public MARCEntityBuilder newBuilder() {
-            return new MARCEntityBuilder();
-        }
-
-        @Override
         public void build(FieldList fields, String value) throws IOException {
             if (fields == null) {
                 return;
@@ -147,17 +137,6 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
                 logger.error("not a MARCEntity class instance for key " + key);
             }
             if (entity != null) {
-                /*if (entity.map(fields)) {
-                    key = fields.toKey();
-                    try {
-                        entity = (MARCEntity) specification().getEntity(key, map());
-                        if (entity == null) {
-                            entity = (MARCEntity) specification().getEntityByKey(key, map());
-                        }
-                    } catch (ClassCastException e) {
-                        logger.error("not a MARCElement instance for key" + key);
-                    }
-                }*/
                 // entity-based processing
                 boolean done = entity.fields(this, fields, value);
                 if (done) {
@@ -165,15 +144,13 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
                 }
                 // add entity to resource
                 addToResource(state().getResource(), fields, entity, value);
-                // complete other things for this entity, like facets etc.
-                builder().build(state(), entity, fields, value);
+                // add faceting etc. here
+                //builder().build(state(), entity, fields, value);
             } else {
                 if (listener != null) {
                     listener.unknown(state().getRecordNumber(), fields);
                 }
             }
-            // complete no matter if an entity was found or not
-            builder().build(state(), entity, fields, value);
         }
 
         public void addToResource(Resource resource, FieldList fields, MARCEntity entity, String value) throws IOException {
@@ -300,7 +277,7 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
                         }
                     }
                     // transform value v
-                    v = entity.data(builder(), predicate, newResource, me.getKey(), v);
+                    v = entity.data(this, predicate, newResource, me.getKey(), v);
                     // is this the predicate field or a value?
                     if (me.getKey().equals(predicate)) {
                         predicate = v;
@@ -324,10 +301,10 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
                         // unmapped subfield ID
                         property = subfieldId;
                     }
-                    newResource.add(property, entity.data(builder(), predicate, newResource, property, field.data()));
+                    newResource.add(property, entity.data(this, predicate, newResource, property, field.data()));
                 }
                 // call custom add-ons
-                entity.field(builder(), field, value);
+                //entity.field(builder(), field, value);
             }
             // add child resource, now that we know the predicate
             //resource.add(predicate, newResource);

@@ -39,16 +39,16 @@ public class NTripleContent implements RdfContent {
 
     @Override
     public RdfContentGenerator createGenerator(Writer writer) throws IOException {
-        return null;
+        return new NTripleContentGenerator(writer);
     }
 
     @Override
     public RdfContentParser createParser(InputStream in) throws IOException {
-        return null;
+        return new NTripleContentParser(in);
     }
 
     @Override
     public RdfContentParser createParser(Reader reader) throws IOException {
-        return null;
+        return new NTripleContentParser(reader);
     }
 }

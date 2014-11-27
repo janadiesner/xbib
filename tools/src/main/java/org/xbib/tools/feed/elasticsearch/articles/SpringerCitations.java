@@ -203,7 +203,7 @@ public class SpringerCitations extends Feeder {
                     settings.get("type"));
             params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), r.id().toString(), content));
             RdfContentBuilder builder = routeRdfXContentBuilder(params);
-            builder.resource(r);
+            builder.receive(r);
         }
     }
 

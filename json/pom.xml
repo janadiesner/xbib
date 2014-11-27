@@ -47,14 +47,8 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.xbib</groupId>
-            <artifactId>logging</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.8.5</version>
             <type>jar</type>
             <scope>test</scope>
         </dependency>

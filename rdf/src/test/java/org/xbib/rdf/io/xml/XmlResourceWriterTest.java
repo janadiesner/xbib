@@ -51,7 +51,7 @@ public class XmlResourceWriterTest extends Assert {
         Resource nestedResource = resource.newResource("urn:nestedresource");
         nestedResource.add("urn:nestedproperty", "nestedvalue");
         RdfContentBuilder builder = xmlBuilder();
-        builder.resource(root);
+        builder.receive(root);
         assertEquals(
                 builder.string(),
                 "<urn:root><urn:res><urn:property>value</urn:property><urn:nestedresource><urn:nestedproperty>nestedvalue</urn:nestedproperty></urn:nestedresource></urn:res></urn:root>");
@@ -65,7 +65,7 @@ public class XmlResourceWriterTest extends Assert {
         Resource child = parent.newResource("urn:res");
         child.add("urn:property", "value");
         RdfContentBuilder builder = xmlBuilder();
-        builder.resource(parent);
+        builder.receive(parent);
         assertEquals(
                 builder.string(),
                 "<urn:doc3><urn:res><urn:property>value</urn:property></urn:res></urn:doc3>");

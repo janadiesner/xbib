@@ -44,7 +44,6 @@ import org.xbib.rdf.io.turtle.TurtleContentParser;
 import org.xbib.tools.Feeder;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 
 import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
@@ -93,11 +92,11 @@ public class Turtle extends Feeder {
         params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
         RdfContentBuilder builder = routeRdfXContentBuilder(params);
         IRI id = IRI.builder().scheme("http").host("d-nb.info").path("/gnd/").build();
-        TurtleContentParser reader = new TurtleContentParser();
+        InputStream in = InputService.getInputStream(uri);
+        TurtleContentParser reader = new TurtleContentParser(in);
         reader.setBaseIRI(id).context(namespaceContext);
         reader.builder(builder);
-        InputStream in = InputService.getInputStream(uri);
-        reader.parse(new InputStreamReader(in, "UTF-8"));
+        reader.parse();
         in.close();
     }
 

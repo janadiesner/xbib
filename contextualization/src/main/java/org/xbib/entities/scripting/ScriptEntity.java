@@ -31,10 +31,12 @@
  */
 package org.xbib.entities.scripting;
 
-public class ScriptEntity extends AbstractScriptingEntity {
+import java.util.Map;
+
+public class ScriptEntity extends AbstractScriptEntity {
 
     public ScriptEntity(String scriptEngineName, String script, String invocable) {
         super(scriptEngineName, script, invocable);
     }
-    
+
 }

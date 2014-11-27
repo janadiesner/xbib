@@ -53,14 +53,14 @@ public class TurtleTest extends StreamTester {
         IRINamespaceContext context = IRINamespaceContext.newInstance();
         context.addNamespace("gnd", "http://d-nb.info/gnd/");
         InputStream in = getClass().getResourceAsStream("GND.ttl");
-        TurtleContentParser reader = new TurtleContentParser()
+        TurtleContentParser reader = new TurtleContentParser(in)
                 .setBaseIRI(IRI.create("http://d-nb.info/gnd/"))
                 .context(context);
-        reader.parse(new InputStreamReader(in, "UTF-8"));
+        reader.parse();
     }
 
     @Test
-    public void testTurtleReader() throws Exception {
+    public void testTurtle() throws Exception {
         StringBuilder sb = new StringBuilder();
         String filename = "turtle-demo.ttl";
         InputStream in = getClass().getResource(filename).openStream();
@@ -82,7 +82,7 @@ public class TurtleTest extends StreamTester {
 
         TurtleContentParams params = new TurtleContentParams(context, true);
         RdfContentBuilder builder = turtleBuilder(params);
-        builder.resource(resource);
+        builder.receive(resource);
         String s2 = builder.string().trim();
         assertEquals(s2, s1);
     }
@@ -109,7 +109,7 @@ public class TurtleTest extends StreamTester {
         Resource resource = createResource2();
         TurtleContentParams params = new TurtleContentParams(IRINamespaceContext.getInstance(), false);
         RdfContentBuilder builder = turtleBuilder(params);
-        builder.resource(resource);
+        builder.receive(resource);
         assertStream(getClass().getResource("turtle-test.ttl").openStream(), builder.streamInput());
     }
 
@@ -142,7 +142,7 @@ public class TurtleTest extends StreamTester {
         Resource resource = createNestedResources();
         TurtleContentParams params = new TurtleContentParams(IRINamespaceContext.getInstance(), false);
         RdfContentBuilder builder = turtleBuilder(params);
-        builder.resource(resource);
+        builder.receive(resource);
         assertStream(getClass().getResource("turtle-indent.ttl").openStream(),
                 builder.streamInput());
     }

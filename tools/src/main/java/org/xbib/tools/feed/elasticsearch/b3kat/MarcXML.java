@@ -92,7 +92,7 @@ public final class MarcXML extends Feeder {
         final MARCEntityQueue queue = settings.getAsBoolean("direct", false) ?
                 new MyDirectQueue(settings.get("elements"), settings.getAsInt("pipelines", 1)) :
                 new MyEntityQueue(settings.get("elements"), settings.getAsInt("pipelines", 1)) ;
-        queue.setUnmappedKeyListener(key -> {
+        queue.setUnmappedKeyListener((id,key) -> {
             if ((settings.getAsBoolean("detect", false))) {
                 logger.warn("unmapped field {}", key);
                 unmapped.add("\"" + key + "\"");
@@ -125,7 +125,7 @@ public final class MarcXML extends Feeder {
                     settings.get("index"), settings.get("type"));
             params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
             RdfContentBuilder builder = routeRdfXContentBuilder(params);
-            builder.resource(state.getResource());
+            builder.receive(state.getResource());
         }
     }
 
@@ -141,7 +141,7 @@ public final class MarcXML extends Feeder {
                     settings.get("index"), settings.get("type"));
             params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
             RdfContentBuilder builder = routeRdfXContentBuilder(params);
-            builder.resource(state.getResource());
+            builder.receive(state.getResource());
         }
     }
 }

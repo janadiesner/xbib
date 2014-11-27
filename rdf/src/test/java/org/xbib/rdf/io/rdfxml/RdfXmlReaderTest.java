@@ -53,9 +53,9 @@ public class RdfXmlReaderTest extends StreamTester {
         }
         TurtleContentParams params = new TurtleContentParams(IRINamespaceContext.getInstance(), false);
         RdfContentBuilder builder = turtleBuilder(params);
-        RdfXmlContentParser reader = new RdfXmlContentParser();
-        reader.builder(builder);
-        reader.parse(new InputStreamReader(in, "UTF-8"));
+        RdfXmlContentParser reader = new RdfXmlContentParser(in);
+        reader.setBuilder(builder);
+        reader.parse();
         assertStream(getClass().getResource("rdfxml.ttl").openStream(),
                 builder.streamInput());
     }

@@ -39,7 +39,6 @@ import org.xbib.rdf.io.turtle.TurtleContentParams;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
 import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
@@ -55,9 +54,9 @@ public class GNDRdfXmlReaderTest extends StreamTester {
         }
         TurtleContentParams params = new TurtleContentParams(IRINamespaceContext.getInstance(), false);
         RdfContentBuilder builder = turtleBuilder(params);
-        RdfXmlContentParser reader = new RdfXmlContentParser();
-        reader.builder(builder);
-        reader.parse(new InputStreamReader(in, "UTF-8"));
+        RdfXmlContentParser reader = new RdfXmlContentParser(in);
+        reader.setBuilder(builder);
+        reader.parse();
         assertStream(getClass().getResource("gnd.ttl").openStream(),
                 builder.streamInput());
     }
@@ -70,9 +69,9 @@ public class GNDRdfXmlReaderTest extends StreamTester {
             throw new IOException("file " + filename + " not found");
         }
         RdfContentBuilder builder = ntripleBuilder();
-        RdfXmlContentParser reader = new RdfXmlContentParser();
-        reader.builder(builder);
-        reader.parse(new InputStreamReader(in, "UTF-8"));
+        RdfXmlContentParser reader = new RdfXmlContentParser(in);
+        reader.setBuilder(builder);
+        reader.parse();
 
     }
 

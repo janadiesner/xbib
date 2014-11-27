@@ -184,7 +184,6 @@ public class MarcXchangeJSONLinesWriter implements MarcXchangeListener, MarcXcha
         if (marcXchangeListener != null) {
             marcXchangeListener.endDataField(field);
         }
-
         String data = field != null ? field.data() : null;
         // if we have no subfields (data is in data field),
         // so move data to a subfield with subfield code "a"

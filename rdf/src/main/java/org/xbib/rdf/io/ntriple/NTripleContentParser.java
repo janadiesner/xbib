@@ -35,12 +35,16 @@ import org.xbib.iri.IRI;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.RdfContentParser;
+import org.xbib.rdf.RdfContentType;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.StandardRdfContentType;
 import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.rdf.memory.MemoryTriple;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +57,8 @@ import java.util.regex.PatternSyntaxException;
  * specification</a>
  */
 public class NTripleContentParser implements RdfContentParser {
+
+    private final Reader reader;
 
     private final static Resource resource = new MemoryResource();
 
@@ -71,13 +77,26 @@ public class NTripleContentParser implements RdfContentParser {
 
     private RdfContentBuilder builder;
 
+    public NTripleContentParser(InputStream in) throws IOException {
+        this(new InputStreamReader(in, "UTF-8"));
+    }
+
+    public NTripleContentParser(Reader reader) {
+        this.reader = reader;
+    }
+
+    @Override
+    public RdfContentType contentType() {
+        return StandardRdfContentType.NTRIPLE;
+    }
+
     public NTripleContentParser builder(RdfContentBuilder builder) {
         this.builder = builder;
         return this;
     }
 
     @Override
-    public NTripleContentParser parse(Reader reader) throws IOException {
+    public NTripleContentParser parse() throws IOException {
         this.eof = false;
         try (BufferedReader br = new BufferedReader(reader)) {
             while (!eof) {
@@ -162,7 +181,7 @@ public class NTripleContentParser implements RdfContentParser {
         }
         if (builder != null) {
             // TODO begin/end
-            builder.triple(new MemoryTriple(subject, predicate, object));
+            builder.receive(new MemoryTriple(subject, predicate, object));
         }
     }
 }

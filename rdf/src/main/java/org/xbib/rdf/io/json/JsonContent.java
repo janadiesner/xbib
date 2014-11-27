@@ -39,16 +39,16 @@ public class JsonContent implements RdfContent {
 
     @Override
     public RdfContentGenerator createGenerator(Writer writer) throws IOException {
-        return null;
+        return new JsonContentGenerator(writer);
     }
 
     @Override
     public RdfContentParser createParser(InputStream in) throws IOException {
-        return null;
+        return new JsonContentParser(in);
     }
 
     @Override
     public RdfContentParser createParser(Reader reader) throws IOException {
-        return null;
+        return new JsonContentParser(reader);
     }
 }

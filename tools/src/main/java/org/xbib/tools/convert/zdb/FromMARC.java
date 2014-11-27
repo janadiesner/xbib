@@ -77,7 +77,7 @@ public final class FromMARC extends Converter {
     public void process(URI uri) throws Exception {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         final MARCEntityQueue queue = new MARCEntityQueue(settings.get("elements"), settings.getAsInt("pipelines", 1));
-        queue.setUnmappedKeyListener(key -> {
+        queue.setUnmappedKeyListener((id,key) -> {
             if ((settings.getAsBoolean("detect", false))) {
                 logger.warn("unmapped field {}", key);
                 unmapped.add("\"" + key + "\"");

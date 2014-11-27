@@ -45,7 +45,6 @@ import org.xbib.tools.Feeder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 
 import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
@@ -100,10 +99,10 @@ public class RdfXml extends Feeder {
         params.setIdPredicate("gnd:gndIdentifier");
         params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
         RdfContentBuilder builder = routeRdfXContentBuilder(params);
-        RdfXmlContentParser reader = new RdfXmlContentParser();
-        reader.builder(builder);
         InputStream in = InputService.getInputStream(uri);
-        reader.parse(new InputStreamReader(in, "UTF-8"));
+        RdfXmlContentParser reader = new RdfXmlContentParser(in);
+        reader.setBuilder(builder);
+        reader.parse();
         in.close();
     }
 

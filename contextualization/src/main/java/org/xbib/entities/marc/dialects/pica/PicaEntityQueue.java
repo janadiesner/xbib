@@ -78,15 +78,9 @@ public class PicaEntityQueue extends EntityQueue<PicaEntityBuilderState, PicaEnt
             if (fields == null) {
                 return;
             }
-            //logger.debug("pica fields = {} value = {}", fields, value);
             String key = fields.toKey();
             PicaEntity entity = (PicaEntity) specification().getEntity(key, map());
             if (entity != null) {
-                // mapping?
-                /*if (element.map(fields)) {
-                    key = fields.toKey();
-                    element = (PicaEntity) specification().getEntity(key, map());
-                }*/
                 // entity-based processing
                 entity.fields(this, fields, value);
                 // optional indicator configuration
@@ -128,7 +122,7 @@ public class PicaEntityQueue extends EntityQueue<PicaEntityBuilderState, PicaEnt
                             }
                             newResource.add(property, field.data());
                         }
-                        entity.field(builder(), field, value);
+                        //entity.field(this, field, value);
                     }
                     // add child resource
                     resource.add(predicate, newResource);
@@ -139,7 +133,7 @@ public class PicaEntityQueue extends EntityQueue<PicaEntityBuilderState, PicaEnt
                     listener.unknown(state().getRecordNumber(), fields);
                 }
             }
-            builder().build(state(), entity, fields, value);
+            //builder().build(state(), entity, fields, value);
         }
     }
 }

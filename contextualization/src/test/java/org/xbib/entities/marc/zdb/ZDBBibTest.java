@@ -157,7 +157,7 @@ public class ZDBBibTest extends Assert {
 
             RdfXContentParams params = new RdfXContentParams();
             RdfContentBuilder builder = rdfXContentBuilder(params);
-            builder.resource(state.getResource());
+            builder.receive(state.getResource());
             String result = params.getGenerator().get();
 
             logger.info(result);

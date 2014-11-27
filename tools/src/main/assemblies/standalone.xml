@@ -23,7 +23,7 @@
                 <include>org.xbib:keyvalue</include>
                 <include>org.xbib:stream</include>
                 <include>org.xbib:iso2709</include>
-                <include>org.xbib:grouping</include>
+                <include>org.xbib:matching</include>
                 <include>org.xbib:contextualization</include>
                 <include>org.xbib:pipeline</include>
                 <include>org.xbib:http</include>

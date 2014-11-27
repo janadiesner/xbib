@@ -76,13 +76,13 @@ public class MemoryRdfGraph<Params extends RdfGraphParams> implements RdfGraph<P
     }
 
     @Override
-    public MemoryRdfGraph newIdentifier(IRI identifier) {
+    public MemoryRdfGraph receive(IRI identifier) {
         // ignore
         return this;
     }
 
     @Override
-    public MemoryRdfGraph triple(Triple triple) {
+    public MemoryRdfGraph receive(Triple triple) {
         IRI subject = triple.subject().id();
         if (!resources.containsKey(subject)) {
             resources.put(subject, new MemoryResource().id(subject));
@@ -97,8 +97,7 @@ public class MemoryRdfGraph<Params extends RdfGraphParams> implements RdfGraph<P
     }
 
     @Override
-    public MemoryRdfGraph resource(Resource resource) throws IOException {
-        //resource.triples().forEach(this::triple);
+    public MemoryRdfGraph receive(Resource resource) throws IOException {
         resources.put(resource.id(), resource);
         return this;
     }

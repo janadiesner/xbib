@@ -13,75 +13,6 @@
     <description>Webservice for SRU Search/Retrieve via URL</description>
     <packaging>war</packaging>
 
-    <properties>
-        <jboss.arquillian.junit.container>1.1.0.Final</jboss.arquillian.junit.container>
-        <jboss.weld.servlet.version>2.0.3.Final</jboss.weld.servlet.version>
-        <jetty.version>8.1.11.v20130520</jetty.version>
-        <apache.httpclient.version>3.1</apache.httpclient.version>
-        <junit.version>4.7</junit.version>
-        <htmlunit.version>2.4</htmlunit.version>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-server</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-servlet</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-webapp</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.arquillian.junit</groupId>
-                <artifactId>arquillian-junit-container</artifactId>
-                <version>${jboss.arquillian.junit.container}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.arquillian.container</groupId>
-                <artifactId>arquillian-jetty-embedded-7</artifactId>
-                <version>${jboss.arquillian.junit.container}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.shrinkwrap.descriptors</groupId>
-                <artifactId>shrinkwrap-descriptors-impl</artifactId>
-                <version>1.1.0-beta-1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.weld.servlet</groupId>
-                <artifactId>weld-servlet-core</artifactId>
-                <version>${jboss.weld.servlet.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.weld</groupId>
-                <artifactId>weld-core-impl</artifactId>
-                <version>${jboss.weld.servlet.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.sourceforge.htmlunit</groupId>
-                <artifactId>htmlunit</artifactId>
-                <version>${htmlunit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-httpclient</groupId>
-                <artifactId>commons-httpclient</artifactId>
-                <version>${apache.httpclient.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
@@ -126,7 +57,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.15</version>
                 <executions>
                     <execution>
                         <id>generate-test-report</id>

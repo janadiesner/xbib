@@ -39,7 +39,9 @@ import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.RdfContentParser;
 import org.xbib.rdf.RdfConstants;
+import org.xbib.rdf.RdfContentType;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.StandardRdfContentType;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.rdf.memory.MemoryLiteral;
@@ -54,6 +56,8 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -73,6 +77,8 @@ import java.util.Stack;
  */
 public class RdfXmlContentParser implements RdfConstants, RdfContentParser {
 
+    private final Reader reader;
+
     private final static Resource resource = new MemoryResource();
 
     private XmlHandler xmlHandler = new Handler();
@@ -82,13 +88,26 @@ public class RdfXmlContentParser implements RdfConstants, RdfContentParser {
     // counter for blank node generation
     private int bn = 0;
 
-    public RdfXmlContentParser builder(RdfContentBuilder builder) {
+    public RdfXmlContentParser(InputStream in) throws IOException {
+        this(new InputStreamReader(in, "UTF-8"));
+    }
+
+    public RdfXmlContentParser(Reader reader) {
+        this.reader = reader;
+    }
+
+    @Override
+    public RdfContentType contentType() {
+        return StandardRdfContentType.RDFXML;
+    }
+
+    public RdfXmlContentParser setBuilder(RdfContentBuilder builder) {
         this.builder = builder;
         return this;
     }
 
     @Override
-    public RdfXmlContentParser parse(Reader reader) throws IOException {
+    public RdfXmlContentParser parse() throws IOException {
         try {
             parse(new InputSource(reader));
         } catch (SAXException ex) {
@@ -124,19 +143,19 @@ public class RdfXmlContentParser implements RdfConstants, RdfContentParser {
         return xmlHandler;
     }
 
-    private void yield(Object s, Object p, Object o) {
+    private void yield(Object s, Object p, Object o) throws IOException {
         yield(new MemoryTriple(resource.newSubject(s), resource.newPredicate(p), resource.newObject(o)));
     }
 
     // produce a triple for the listener
-    private void yield(Triple t) {
+    private void yield(Triple t) throws IOException {
         if (builder != null) {
-            builder.triple(t);
+            builder.receive(t);
         }
     }
 
     // produce a (possibly) reified triple
-    private void yield(Object s, IRI p, Object o, IRI reified) {
+    private void yield(Object s, IRI p, Object o, IRI reified) throws IOException {
         yield(s, p, o);
         if (reified != null) {
             yield(reified, RDF_TYPE, RDF_STATEMENT);
@@ -279,7 +298,7 @@ public class RdfXmlContentParser implements RdfConstants, RdfContentParser {
             frame.node = resolve(about, stack);
             if (builder != null) {
                 try {
-                    builder.newIdentifier(frame.node);
+                    builder.receive(frame.node);
                 } catch (IOException e) {
                     throw new SAXException(e);
                 }
@@ -435,175 +454,183 @@ public class RdfXmlContentParser implements RdfConstants, RdfContentParser {
 
         @Override
         public void startElement(String ns, String name, String qn, Attributes attrs) throws SAXException {
-            if (literalLevel > 0) { // this isn't RDF; we're in an XMLLiteral
-                literalLevel++;
-                // now produce an equivalent start tag
-                xmlLiteralStart(xmlLiteral, ns, qn, attrs);
-            } else { // we're in RDF
-                Frame frame = new Frame();
-                IRI uri = IRI.create(ns + name);
-                frame.lang = attrs.getValue("xml:lang");
-                frame.base = attrs.getValue("xml:base");
-                if (expectSubject(stack)) {
-                    if (!uri.equals(RDF_RDF)) {
-                        // get this getResource's ID
-                        getSubjectNode(frame, stack, attrs);
-                        // we have the subject
-                        if (!uri.equals(RDF_DESCRIPTION)) {
-                            // this is a typed node, so assert the type
-                            yield(frame.node, RDF_TYPE, uri);
+            try {
+                if (literalLevel > 0) { // this isn't RDF; we're in an XMLLiteral
+                    literalLevel++;
+                    // now produce an equivalent start tag
+                    xmlLiteralStart(xmlLiteral, ns, qn, attrs);
+                } else { // we're in RDF
+                    Frame frame = new Frame();
+                    IRI uri = IRI.create(ns + name);
+                    frame.lang = attrs.getValue("xml:lang");
+                    frame.base = attrs.getValue("xml:base");
+                    if (expectSubject(stack)) {
+                        if (!uri.equals(RDF_RDF)) {
+                            // get this getResource's ID
+                            getSubjectNode(frame, stack, attrs);
+                            // we have the subject
+                            if (!uri.equals(RDF_DESCRIPTION)) {
+                                // this is a typed node, so assert the type
+                                yield(frame.node, RDF_TYPE, uri);
+                            }
+                            // now process attribute-specified predicates
+                            for (int i = 0; i < attrs.getLength(); i++) {
+                                String aQn = attrs.getQName(i);
+                                String aUri = attrs.getURI(i) + attrs.getLocalName(i);
+                                String aVal = attrs.getValue(i);
+                                if (!aUri.startsWith(RDF_STRING)
+                                        && !aQn.startsWith("xml:")) {
+                                    yield(frame.node, IRI.create(aUri), aVal);
+                                }
+                            }
+                            // is this node the value of some enclosing predicate?
+                            if (inPredicate(stack)) {
+                                // is the value of the predicate a collection?
+                                if (isCollectionItem(stack)) {
+                                    Frame ppFrame = parentPredicateFrame(stack);
+                                    ppFrame.collection.add(frame.node);
+                                } else { // not a collection
+                                    // this subject is the value of its enclosing predicate
+                                    yield(ancestorSubject(stack), parentPredicate(stack), frame.node);
+                                }
+                            }
                         }
-                        // now process attribute-specified predicates
+                        // do not accumulate pcdata
+                        pcdata = null;
+                    } else { // expect predicate
+                        frame.node = uri;
+                        frame.isPredicate = true;
+                        // handle reification
+                        String reification = attrs.getValue(RDF_STRING, "ID");
+                        if (reification != null) {
+                            frame.reification = IRI.create(getBase(stack) + "#" + reification);
+                        }
+                        // handle container items
+                        if (uri.equals(RDF_LI)) {
+                            Frame asf = ancestorSubjectFrame(stack);
+                            frame.node = IRI.create(RDF + "_" + asf.li);
+                            asf.li++;
+                        }
+                        // parse attrs to see if the value of this pred is a uriref
+                        IRI object = getObjectNode(stack, attrs);
+                        if (object != null) {
+                            yield(ancestorSubject(stack), frame.node, object, frame.reification);
+                        } else {
+                            // this predicate encloses pcdata, prepare to accumulate
+                            pcdata = new StringBuilder();
+                        }
+                        // handle rdf:parseType="resource"
+                        String parseType = attrs.getValue(RDF_STRING, "parseType");
+                        if (parseType != null) {
+                            if (parseType.equals("Resource")) {
+                                object = object == null ? blankNode().id() : object;
+                                yield(ancestorSubject(stack), frame.node, object, frame.reification);
+                                // perform surgery on the current frame
+                                frame.node = object;
+                                frame.isSubject = true;
+                            } else if (parseType.equals("Collection")) {
+                                frame.isCollection = true;
+                                frame.collection = new LinkedList();
+                                Resource s = resource.newSubject(ancestorSubject(stack));
+                                IRI p = resource.newPredicate(frame.node);
+                                Node o = resource.newObject(blankNode());
+                                frame.collectionHead = new MemoryTriple(s, p, o);
+                                pcdata = null;
+                            } else if (parseType.equals("Literal")) {
+                                literalLevel = 1; // enter into a literal
+                                xmlLiteral = new StringBuilder();
+                                // which means we shouldn't accumulate pcdata!
+                                pcdata = null;
+                            } else {// handle datatype
+                                frame.datatype = attrs.getValue(RDF_STRING, "datatype");
+                            }
+                        }
+                        // now handle property attributes (if we do this, then this
+                        // must be an empty element)
+                        object = null;
                         for (int i = 0; i < attrs.getLength(); i++) {
                             String aQn = attrs.getQName(i);
-                            String aUri = attrs.getURI(i) + attrs.getLocalName(i);
+                            IRI aUri = IRI.create(attrs.getURI(i) + attrs.getLocalName(i));
                             String aVal = attrs.getValue(i);
-                            if (!aUri.startsWith(RDF_STRING)
+                            if (((aUri.toString().equals(RDF_TYPE.toString()) || !aUri.toString().startsWith(RDF_STRING)))
                                     && !aQn.startsWith("xml:")) {
-                                yield(frame.node, IRI.create(aUri), aVal);
+                                if (object == null) {
+                                    object = blankNode().id();
+                                    yield(ancestorSubject(stack), frame.node, object);
+                                }
+                                if (aUri.equals(RDF_TYPE)) {
+                                    yield(object, RDF_TYPE, aVal);
+                                } else {
+                                    Literal value = withLanguageTag(new MemoryLiteral(aVal), stack);
+                                    yield(object, aUri, value);
+                                }
                             }
                         }
-                        // is this node the value of some enclosing predicate?
-                        if (inPredicate(stack)) {
-                            // is the value of the predicate a collection?
-                            if (isCollectionItem(stack)) {
-                                Frame ppFrame = parentPredicateFrame(stack);
-                                ppFrame.collection.add(frame.node);
-                            } else { // not a collection
-                                // this subject is the value of its enclosing predicate
-                                yield(ancestorSubject(stack), parentPredicate(stack), frame.node);
-                            }
-                        }
-                    }
-                    // do not accumulate pcdata
-                    pcdata = null;
-                } else { // expect predicate
-                    frame.node = uri;
-                    frame.isPredicate = true;
-                    // handle reification
-                    String reification = attrs.getValue(RDF_STRING, "ID");
-                    if (reification != null) {
-                        frame.reification = IRI.create(getBase(stack) + "#" + reification);
-                    }
-                    // handle container items
-                    if (uri.equals(RDF_LI)) {
-                        Frame asf = ancestorSubjectFrame(stack);
-                        frame.node = IRI.create(RDF + "_" + asf.li);
-                        asf.li++;
-                    }
-                    // parse attrs to see if the value of this pred is a uriref
-                    IRI object = getObjectNode(stack, attrs);
-                    if (object != null) {
-                        yield(ancestorSubject(stack), frame.node, object, frame.reification);
-                    } else {
-                        // this predicate encloses pcdata, prepare to accumulate
-                        pcdata = new StringBuilder();
-                    }
-                    // handle rdf:parseType="resource"
-                    String parseType = attrs.getValue(RDF_STRING, "parseType");
-                    if (parseType != null) {
-                        if (parseType.equals("Resource")) {
-                            object = object == null ? blankNode().id() : object;
-                            yield(ancestorSubject(stack), frame.node, object, frame.reification);
-                            // perform surgery on the current frame
-                            frame.node = object;
-                            frame.isSubject = true;
-                        } else if (parseType.equals("Collection")) {
-                            frame.isCollection = true;
-                            frame.collection = new LinkedList();
-                            Resource s = resource.newSubject(ancestorSubject(stack));
-                            IRI p = resource.newPredicate(frame.node);
-                            Node o = resource.newObject(blankNode());
-                            frame.collectionHead = new MemoryTriple(s, p, o);
+                        // if we had to generate a node to hold properties specified
+                        // as attributes, then expect an empty element and therefore
+                        // don't record pcdata
+                        if (object != null) {
                             pcdata = null;
-                        } else if (parseType.equals("Literal")) {
-                            literalLevel = 1; // enter into a literal
-                            xmlLiteral = new StringBuilder();
-                            // which means we shouldn't accumulate pcdata!
-                            pcdata = null;
-                        } else {// handle datatype
-                            frame.datatype = attrs.getValue(RDF_STRING, "datatype");
                         }
                     }
-                    // now handle property attributes (if we do this, then this
-                    // must be an empty element)
-                    object = null;
-                    for (int i = 0; i < attrs.getLength(); i++) {
-                        String aQn = attrs.getQName(i);
-                        IRI aUri = IRI.create(attrs.getURI(i) + attrs.getLocalName(i));
-                        String aVal = attrs.getValue(i);
-                        if (((aUri.toString().equals(RDF_TYPE.toString()) || !aUri.toString().startsWith(RDF_STRING)))
-                                && !aQn.startsWith("xml:")) {
-                            if (object == null) {
-                                object = blankNode().id();
-                                yield(ancestorSubject(stack), frame.node, object);
-                            }
-                            if (aUri.equals(RDF_TYPE)) {
-                                yield(object, RDF_TYPE, aVal);
-                            } else {
-                                Literal value = withLanguageTag(new MemoryLiteral(aVal), stack);
-                                yield(object, aUri, value);
-                            }
-                        }
-                    }
-                    // if we had to generate a node to hold properties specified
-                    // as attributes, then expect an empty element and therefore
-                    // don't record pcdata
-                    if (object != null) {
-                        pcdata = null;
-                    }
+                    // finally, push the frame for use in subsequent callbacks
+                    stack.push(frame);
                 }
-                // finally, push the frame for use in subsequent callbacks
-                stack.push(frame);
+            } catch (IOException e) {
+                throw new SAXException(e);
             }
         }
 
         @Override
         public void endElement(String ns, String name, String qn) throws SAXException {
-            if (literalLevel > 0) { // this isn't RDF; we're in an XMLLiteral
-                literalLevel--;
-                if (literalLevel > 0) {
-                    xmlLiteralEnd(xmlLiteral, qn);
-                }
-            } else { // this is RDF
-                if (inPredicate(stack)) {
-                    Frame ppFrame = parentPredicateFrame(stack);
-                    // this is a predicate closing
-                    if (xmlLiteral != null) { // it was an XMLLiteral
-                        Literal value = new MemoryLiteral(xmlLiteral.toString()).type(RDF_XMLLITERAL);
-                        yield(ancestorSubject(stack), parentPredicate(stack), value);
-                        xmlLiteral = null;
-                    } else if (pcdata != null) { // we have an RDF literal
-                        IRI u = ppFrame.datatype == null ? null : IRI.create(ppFrame.datatype);
-                        Literal value = withLanguageTag(new MemoryLiteral(pcdata.toString()).type(u), stack);
-                        // deal with reification
-                        IRI reification = ppFrame.reification;
-                        yield(ancestorSubject(stack), ppFrame.node, value, reification);
-                        // no longer collect pcdata
-                        pcdata = null;
-                    } else if (ppFrame.isCollection) { // deal with collections
-                        if (ppFrame.collection.isEmpty()) {
-                            // in this case, the value of this property is rdf:nil
-                            yield(ppFrame.collectionHead.subject(),
-                                    ppFrame.collectionHead.predicate(),
-                                    resource.newObject(RDF_NIL));
-                        } else {
-                            yield(ppFrame.collectionHead);
-                            Object prevNode = null;
-                            Object node = ppFrame.collectionHead.object();
-                            for (IRI item : ppFrame.collection) {
-                                if (prevNode != null) {
-                                    yield(prevNode, RDF_REST, node);
+            try {
+                if (literalLevel > 0) { // this isn't RDF; we're in an XMLLiteral
+                    literalLevel--;
+                    if (literalLevel > 0) {
+                        xmlLiteralEnd(xmlLiteral, qn);
+                    }
+                } else { // this is RDF
+                    if (inPredicate(stack)) {
+                        Frame ppFrame = parentPredicateFrame(stack);
+                        // this is a predicate closing
+                        if (xmlLiteral != null) { // it was an XMLLiteral
+                            Literal value = new MemoryLiteral(xmlLiteral.toString()).type(RDF_XMLLITERAL);
+                            yield(ancestorSubject(stack), parentPredicate(stack), value);
+                            xmlLiteral = null;
+                        } else if (pcdata != null) { // we have an RDF literal
+                            IRI u = ppFrame.datatype == null ? null : IRI.create(ppFrame.datatype);
+                            Literal value = withLanguageTag(new MemoryLiteral(pcdata.toString()).type(u), stack);
+                            // deal with reification
+                            IRI reification = ppFrame.reification;
+                            yield(ancestorSubject(stack), ppFrame.node, value, reification);
+                            // no longer collect pcdata
+                            pcdata = null;
+                        } else if (ppFrame.isCollection) { // deal with collections
+                            if (ppFrame.collection.isEmpty()) {
+                                // in this case, the value of this property is rdf:nil
+                                yield(ppFrame.collectionHead.subject(),
+                                        ppFrame.collectionHead.predicate(),
+                                        resource.newObject(RDF_NIL));
+                            } else {
+                                yield(ppFrame.collectionHead);
+                                Object prevNode = null;
+                                Object node = ppFrame.collectionHead.object();
+                                for (IRI item : ppFrame.collection) {
+                                    if (prevNode != null) {
+                                        yield(prevNode, RDF_REST, node);
+                                    }
+                                    yield(node, RDF_FIRST, item);
+                                    prevNode = node;
+                                    node = blankNode().id();
                                 }
-                                yield(node, RDF_FIRST, item);
-                                prevNode = node;
-                                node = blankNode().id();
+                                yield(prevNode, RDF_REST, RDF_NIL);
                             }
-                            yield(prevNode, RDF_REST, RDF_NIL);
                         }
                     }
+                    stack.pop();
                 }
-                stack.pop();
+            } catch (IOException e) {
+                throw new SAXException(e);
             }
         }
 

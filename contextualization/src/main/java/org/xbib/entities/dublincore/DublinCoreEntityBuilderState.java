@@ -32,15 +32,17 @@
 package org.xbib.entities.dublincore;
 
 import org.xbib.entities.DefaultEntityBuilderState;
+import org.xbib.iri.IRI;
 import org.xbib.rdf.RdfContentBuilderProvider;
 import org.xbib.rdf.RdfGraph;
 import org.xbib.rdf.RdfGraphParams;
 
-import java.util.List;
+import java.util.Map;
 
 public class DublinCoreEntityBuilderState extends DefaultEntityBuilderState {
 
-    public DublinCoreEntityBuilderState(RdfGraph<RdfGraphParams> graph, List<RdfContentBuilderProvider> list) {
+    public DublinCoreEntityBuilderState(RdfGraph<RdfGraphParams> graph,
+                                        Map<IRI,RdfContentBuilderProvider> list) {
         super(graph, list);
     }
 

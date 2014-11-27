@@ -183,7 +183,7 @@ public abstract class OAIFeeder extends Feeder {
                         settings.get("type", "oai"));
                 params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), getHeader().getIdentifier(), content));
                 RdfContentBuilder builder = routeRdfXContentBuilder(params);
-                builder.resource(rdfResourceHandler().getResource());
+                builder.receive(rdfResourceHandler().getResource());
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 throw new SAXException(e);

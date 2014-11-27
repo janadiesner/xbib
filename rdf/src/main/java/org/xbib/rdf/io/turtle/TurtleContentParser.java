@@ -38,7 +38,9 @@ import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfContentGenerator;
 import org.xbib.rdf.RdfContentParser;
+import org.xbib.rdf.RdfContentType;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.StandardRdfContentType;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.XSDResourceIdentifiers;
 import org.xbib.rdf.memory.MemoryLiteral;
@@ -48,6 +50,8 @@ import org.xbib.xml.namespace.XmlNamespaceContext;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
@@ -73,7 +77,7 @@ public class TurtleContentParser implements RdfContentParser {
      */
     private IRI baseIRI;
     /**
-     * The push back reader for reading input streams of turtle statements.
+     * The reader for reading input streams of turtle statements.
      */
     private PushbackReader reader;
     /**
@@ -114,6 +118,19 @@ public class TurtleContentParser implements RdfContentParser {
 
     private boolean strict = false;
 
+    public TurtleContentParser(InputStream in) throws IOException {
+        this(new InputStreamReader(in, "UTF-8"));
+    }
+
+    public TurtleContentParser(Reader reader) {
+        this.reader = new PushbackReader(reader, 2);
+    }
+
+    @Override
+    public RdfContentType contentType() {
+        return StandardRdfContentType.TURTLE;
+    }
+
     public TurtleContentParser setBaseIRI(IRI baseIRI) {
         this.baseIRI = baseIRI;
         return this;
@@ -132,12 +149,9 @@ public class TurtleContentParser implements RdfContentParser {
     /**
      * Read statements and parse them. A valid base URI must be given in the
      * properties.
-     *
-     * @param reader the reader
-     * @throws IOException if stream can not be parsed
      */
     @Override
-    public TurtleContentParser parse(Reader reader) throws IOException {
+    public TurtleContentParser parse() throws IOException {
         this.reader = new PushbackReader(reader, 2);
         this.sb = new StringBuilder();
         this.eof = false;
@@ -322,22 +336,22 @@ public class TurtleContentParser implements RdfContentParser {
             // Send builder events. A record is grouped by a sequence of same non-blank subjects
             if (lastsubject == null) {
                 if (builder != null) {
-                    builder.newIdentifier(subject.id());
+                    builder.receive(subject.id());
                 }
                 lastsubject = subject;
             } else if (!subject.equals(lastsubject)) {
                 if (builder != null) {
-                    builder.newIdentifier(subject.id());
+                    builder.receive(subject.id());
                 }
                 lastsubject = subject;
             }
             if (builder != null) {
-                builder.triple(stmt);
+                builder.receive(stmt);
             }
             while (!triples.isEmpty()) {
                 Triple s = triples.pop();
                 if (builder != null) {
-                    builder.triple(s);
+                    builder.receive(s);
                 }
             }
         }
@@ -506,7 +520,7 @@ public class TurtleContentParser implements RdfContentParser {
             while (ch != ')') {
                 MemoryResource value = new MemoryResource();
                 if (builder != null) {
-                    builder.triple(new MemoryTriple(blanknode, resource.newPredicate("rdf:rest"), value));
+                    builder.receive(new MemoryTriple(blanknode, resource.newPredicate("rdf:rest"), value));
                 }
                 subject = value;
                 blanknode = value;
@@ -516,7 +530,7 @@ public class TurtleContentParser implements RdfContentParser {
             reader.read();
             if (builder != null) {
                 Node value = new MemoryResource().id(IRI.create("rdf:null"));
-                builder.triple(new MemoryTriple(blanknode, resource.newPredicate("rdf:rest"), value));
+                builder.receive(new MemoryTriple(blanknode, resource.newPredicate("rdf:rest"), value));
             }
             subject = oldsubject;
             predicate = oldpredicate;

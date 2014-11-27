@@ -53,7 +53,6 @@ import javax.xml.namespace.QName;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.Charset;
 
@@ -96,9 +95,9 @@ public class EZBXML extends Converter {
                 .setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/");
 
         try (InputStream in = InputService.getInputStream(uri)) {
-            new XmlContentParser().setNamespaces(false)
+            new XmlContentParser(in).setNamespaces(false)
                     .setHandler(handler)
-                    .parse(new InputStreamReader(in, "UTF-8"));
+                    .parse();
         } finally {
             builder.close();
             out.close();

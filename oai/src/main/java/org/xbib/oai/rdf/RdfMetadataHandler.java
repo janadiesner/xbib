@@ -34,7 +34,6 @@ package org.xbib.oai.rdf;
 import org.xbib.iri.IRI;
 import org.xbib.oai.OAIConstants;
 import org.xbib.oai.xml.MetadataHandler;
-import org.xbib.rdf.RdfContent;
 import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.Resource;
@@ -149,7 +148,7 @@ public class RdfMetadataHandler extends MetadataHandler implements OAIConstants 
             handler.endDocument();
             try {
                 if (builder != null) {
-                    builder.resource(resource);
+                    builder.receive(resource);
                 }
             } catch (IOException e) {
                 throw new SAXException(e);

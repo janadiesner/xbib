@@ -56,7 +56,7 @@ public class RdfXContentGeneratorTest
                 .add("urn:link", IRI.create("urn:pointer"));
         RdfXContentParams params = new RdfXContentParams();
         RdfContentBuilder builder = rdfXContentBuilder(params);
-        builder.resource(resource);
+        builder.receive(resource);
         String result = params.getGenerator().get();
         assertEquals(result,
                 "{\"urn:property\":\"Hello World\",\"urn:date\":2013,\"urn:link\":\"urn:pointer\"}");
@@ -75,7 +75,7 @@ public class RdfXContentGeneratorTest
                 .add("rdf:type", IRI.create("urn:type2"));
         RdfXContentParams params = new RdfXContentParams();
         RdfContentBuilder builder = rdfXContentBuilder(params);
-        builder.resource(resource);
+        builder.receive(resource);
         String result = params.getGenerator().get();
         assertEquals(result,
                 "{\"urn:property\":\"Hello World\",\"urn:date\":2013,\"rdf:type\":\"urn:type1\",\"urn:embedded\":{\"rdf:type\":\"urn:type2\"}}");
@@ -96,7 +96,7 @@ public class RdfXContentGeneratorTest
                 .add("rdf:type", IRI.create("urn:type3"));
         RdfXContentParams params = new RdfXContentParams();
         RdfContentBuilder builder = rdfXContentBuilder(params);
-        builder.resource(resource);
+        builder.receive(resource);
         String result = params.getGenerator().get();
         assertEquals(result,
                 "{\"urn:property\":\"Hello World\",\"urn:date\":2013,\"rdf:type\":\"urn:type1\",\"urn:embedded\":{\"rdf:type\":\"urn:type2\"},\"urn:embedded2\":{\"rdf:type\":\"urn:type3\"}}");

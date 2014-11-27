@@ -34,32 +34,12 @@ package org.xbib.entities;
 import java.util.Map;
 
 /**
- * Entity
+ * Marker interface for an Entity
  *
- * @param <K> the key class
- * @param <V> the value class
- * @param <B> th builder class
+ * @param <K> the key
+ * @param <V> the value
  */
-public interface Entity<K,V,B extends EntityBuilder>  {
-    
-    /**
-     * Set settings
-     * @param settings  the settings
-     */
-    Entity<K,V,B> setSettings(Map<String,Object> settings);
-    
-    /**
-     * Get settings.
-     * @return the settings
-     */
-    Map<String,Object> getSettings();
+public interface Entity<K,V> {
 
-    /**
-     * Build an element by adding a key/value information using a builder
-     * @param builder the builder
-     * @param key the key
-     * @param value the value
-     */
-    Entity<K,V,B> build(B builder, K key, V value);
-
+    Entity<K,V> setSettings(Map<String,Object> config);
 }

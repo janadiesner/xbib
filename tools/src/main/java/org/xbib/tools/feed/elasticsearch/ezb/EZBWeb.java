@@ -170,7 +170,7 @@ public class EZBWeb extends Feeder {
                             settings.get("type", "ezbweb"));
                     params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), id.toString(), content));
                     RdfContentBuilder builder = routeRdfXContentBuilder(params);
-                    builder.resource(resource);
+                    builder.receive(resource);
 
                     counter++;
                     if (counter % 1000 == 0) {

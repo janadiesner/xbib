@@ -51,7 +51,6 @@ import org.xbib.tools.Feeder;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 
 import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
@@ -80,9 +79,9 @@ public final class Medline extends Feeder {
         AbstractXmlHandler handler = new Handler(params)
                 .setDefaultNamespace("ml", "http://www.nlm.nih.gov/medline");
         InputStream in = InputService.getInputStream(uri);
-        new XmlContentParser().setNamespaces(false)
+        new XmlContentParser(in).setNamespaces(false)
                 .setHandler(handler)
-                .parse(new InputStreamReader(in, "UTF-8"));
+                .parse();
         in.close();
     }
 
@@ -102,7 +101,7 @@ public final class Medline extends Feeder {
                     settings.get("type", "ezbxml"));
             params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), id, content));
             RdfContentBuilder builder = routeRdfXContentBuilder(params);
-            builder.resource(getResource());
+            builder.receive(getResource());
         }
 
         @Override

@@ -43,7 +43,6 @@ import org.xbib.tools.Converter;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.zip.Deflater;
@@ -80,9 +79,10 @@ public class Freebase extends Converter {
             }
         };
         RdfContentBuilder builder = ntripleBuilder(out);
-        TurtleContentParser parser = new TurtleContentParser().setBaseIRI(IRI.create(settings.get("base")));
+        TurtleContentParser parser = new TurtleContentParser(in)
+                .setBaseIRI(IRI.create(settings.get("base")));
         parser.builder(builder);
-        parser.parse(new InputStreamReader(in, "UTF-8"));
+        parser.parse();
         in.close();
         out.close();
     }

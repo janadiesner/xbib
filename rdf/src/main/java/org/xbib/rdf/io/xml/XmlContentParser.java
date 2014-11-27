@@ -33,18 +33,24 @@ package org.xbib.rdf.io.xml;
 
 import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.RdfContentParser;
+import org.xbib.rdf.RdfContentType;
+import org.xbib.rdf.StandardRdfContentType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 
 /**
  * An XML reader for parsing XML into triples
  */
 public class XmlContentParser implements RdfContentParser {
+
+    private final Reader reader;
 
     private RdfContentBuilder builder;
 
@@ -53,6 +59,19 @@ public class XmlContentParser implements RdfContentParser {
     private boolean namespaces = true;
 
     private boolean validate = false;
+
+    public XmlContentParser(InputStream in) throws IOException {
+        this(new InputStreamReader(in, "UTF-8"));
+    }
+
+    public XmlContentParser(Reader reader) {
+        this.reader = reader;
+    }
+
+    @Override
+    public RdfContentType contentType() {
+        return StandardRdfContentType.XML;
+    }
 
     public XmlContentParser setHandler(XmlHandler handler) {
         this.handler = handler;
@@ -79,7 +98,7 @@ public class XmlContentParser implements RdfContentParser {
     }
 
     @Override
-    public XmlContentParser parse(Reader reader) throws IOException {
+    public XmlContentParser parse() throws IOException {
         try {
             XMLReader xmlReader = XMLReaderFactory.createXMLReader();
             parse(xmlReader, new InputSource(reader));

@@ -60,7 +60,7 @@ public class RouteRdfXContentBuilderTest extends Assert {
                 "index type 1 {\"urn:property\":\"Hello World\",\"urn:date\":2013,\"urn:link\":\"urn:pointer\"}"
                 ));
         RdfContentBuilder builder = routeRdfXContentBuilder(params);
-        builder.resource(resource);
+        builder.receive(resource);
 
     }
 

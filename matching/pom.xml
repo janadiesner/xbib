@@ -9,9 +9,9 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>grouping</artifactId>
-    <name>grouping</name>
-    <description>Grouping Algorithms</description>
+    <artifactId>matching</artifactId>
+    <name>matching</name>
+    <description>Matching and Grouping Algorithms</description>
     <packaging>jar</packaging>
 
     <dependencies>

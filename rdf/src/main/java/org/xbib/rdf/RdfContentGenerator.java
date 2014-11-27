@@ -47,12 +47,12 @@ public interface RdfContentGenerator<Params extends RdfContentParams> extends Fl
 
     RdfContentGenerator endPrefixMapping(String prefix);
 
-    RdfContentGenerator newIdentifier(IRI identifier) throws IOException;
+    RdfContentGenerator receive(IRI identifier) throws IOException;
 
-    RdfContentGenerator triple(Triple triple);
+    RdfContentGenerator receive(Triple triple) throws IOException;
+
+    RdfContentGenerator receive(Resource resource) throws IOException;
 
     RdfContentGenerator end();
-
-    RdfContentGenerator resource(Resource resource) throws IOException;
 
 }

@@ -23,11 +23,6 @@
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>stream</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
             <artifactId>rdf</artifactId>
             <type>jar</type>
         </dependency>
@@ -35,6 +30,7 @@
             <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
             <type>jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

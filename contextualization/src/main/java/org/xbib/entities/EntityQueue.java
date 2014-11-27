@@ -32,6 +32,7 @@
 package org.xbib.entities;
 
 import org.xbib.classloader.uri.URIClassLoader;
+import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValue;
 import org.xbib.keyvalue.KeyValueStreamListener;
 import org.xbib.logging.Logger;
@@ -41,6 +42,7 @@ import org.xbib.rdf.memory.MemoryRdfGraph;
 import org.xbib.util.JobQueue;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -147,8 +149,8 @@ public class EntityQueue<S extends EntityBuilderState, E extends Entity, K, V>
         return poison;
     }
 
-    public List<RdfContentBuilderProvider> contentBuilderProviders() {
-        return new LinkedList<RdfContentBuilderProvider>();
+    public Map<IRI,RdfContentBuilderProvider> contentBuilderProviders() {
+        return new HashMap<IRI,RdfContentBuilderProvider>();
     }
 
     public void beforeCompletion(S state) throws IOException {
@@ -166,12 +168,9 @@ public class EntityQueue<S extends EntityBuilderState, E extends Entity, K, V>
 
         private S state;
 
-        private EntityBuilder<S, E, K, V> builder;
-
         @Override
         public void execute(List<KeyValue<K, V>> job) throws IOException {
             this.state = newState();
-            this.builder = newBuilder();
             for (KeyValue<K,V> kv : job) {
                 K key = kv.key();
                 V value = kv.value();
@@ -182,16 +181,12 @@ public class EntityQueue<S extends EntityBuilderState, E extends Entity, K, V>
                 }
             }
             beforeCompletion(state);
-            builder.complete(state);
+            state.complete();
             afterCompletion(state);
         }
 
         public S state() {
             return state;
-        }
-
-        public EntityBuilder<S, E, K, V> builder() {
-            return builder;
         }
 
         public void build(K key, V value) throws IOException {
@@ -200,11 +195,6 @@ public class EntityQueue<S extends EntityBuilderState, E extends Entity, K, V>
         public S newState() {
             return (S) new DefaultEntityBuilderState(new MemoryRdfGraph<>(), contentBuilderProviders());
         }
-
-        public EntityBuilder<S, E, K, V> newBuilder() {
-            return new DefaultEntityBuilder();
-        }
-
     }
 
 }

@@ -49,7 +49,7 @@ public class NTripleTest {
     public void testNTripleBuilder() throws Exception {
         RdfContentBuilder builder = ntripleBuilder();
         Resource resource = createResource();
-        builder.resource(resource);
+        builder.receive(resource);
         assertTrue(builder.string().length() > 0);
     }
 
@@ -59,7 +59,7 @@ public class NTripleTest {
         resource.id(IRI.create("urn:doc1"));
         resource.add("http://purl.org/dc/elements/1.1/date",new MemoryLiteral("2010").type(XSDResourceIdentifiers.INTEGER));
         RdfContentBuilder builder = ntripleBuilder();
-        builder.resource(resource);
+        builder.receive(resource);
         assertEquals(builder.string(),
                 "<urn:doc1> <http://purl.org/dc/elements/1.1/date> \"2010\"^^<xsd:integer> .\n");
     }

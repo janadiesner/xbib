@@ -14,10 +14,6 @@
     <description>xbib - HTTP client</description>
     <packaging>jar</packaging>
 
-    <properties>
-        <jetty.version>9.0.5.v20130815</jetty.version>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -28,7 +24,6 @@
             </plugin>
         </plugins>
     </build>
-
 
     <dependencies>
         <dependency>
@@ -60,37 +55,31 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlets</artifactId>
-            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-security</artifactId>
-            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-proxy</artifactId>
-            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-server</artifactId>
-            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-servlet</artifactId>
-            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

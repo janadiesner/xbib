@@ -22,16 +22,6 @@
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>rdf</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
-            <artifactId>grouping</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
             <type>jar</type>
         </dependency>

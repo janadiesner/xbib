@@ -31,6 +31,7 @@
  */
 package org.xbib.rdf;
 
+import org.xbib.rdf.io.json.JsonContent;
 import org.xbib.rdf.io.ntriple.NTripleContent;
 import org.xbib.rdf.io.rdfxml.RdfXmlContent;
 import org.xbib.rdf.io.turtle.TurtleContent;
@@ -55,7 +56,7 @@ public enum StandardRdfContentType implements RdfContentType {
         }
     },
 
-    RDXFXML(1) {
+    RDFXML(1) {
         @Override
         public String contentType() {
             return "application/rdf+xml";
@@ -103,6 +104,23 @@ public enum StandardRdfContentType implements RdfContentType {
         @Override
         public RdfContent rdfContent() {
             return XmlContent.xmlContent;
+        }
+    },
+
+    JSON(4) {
+        @Override
+        public String contentType() {
+            return "text/json";
+        }
+
+        @Override
+        public String shortName() {
+            return "json";
+        }
+
+        @Override
+        public RdfContent rdfContent() {
+            return JsonContent.jsonContent;
         }
     };
 

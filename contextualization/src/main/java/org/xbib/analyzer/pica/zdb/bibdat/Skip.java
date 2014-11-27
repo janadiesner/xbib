@@ -32,8 +32,6 @@
 package org.xbib.analyzer.pica.zdb.bibdat;
 
 import org.xbib.entities.marc.dialects.pica.PicaEntity;
-import org.xbib.entities.marc.dialects.pica.PicaEntityBuilder;
-import org.xbib.marc.FieldList;
 
 public class Skip extends PicaEntity {
     
@@ -41,12 +39,6 @@ public class Skip extends PicaEntity {
 
     public static PicaEntity getInstance() {
         return element;
-    }
-
-    @Override
-    public Skip build(PicaEntityBuilder b, FieldList key, String value) {
-        // skip
-        return this;
     }
 
 }

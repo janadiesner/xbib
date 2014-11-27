@@ -35,23 +35,17 @@ import org.xbib.entities.Entity;
 
 import java.util.Map;
 
-public class DublinCoreEntity implements Entity<String, String, DublinCoreEntityBuilder> {
+public class DublinCoreEntity implements Entity<String, String> {
 
     private Map<String,Object> params;
 
-    @Override
     public DublinCoreEntity setSettings(Map<String,Object> params) {
         this.params = params;
         return this;
     }
 
-    @Override
     public Map<String,Object> getSettings() {
         return params;
     }
 
-    @Override
-    public Entity<String, String, DublinCoreEntityBuilder> build(DublinCoreEntityBuilder builder, String key, String value) {
-        return this;
-    }
 }

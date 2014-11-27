@@ -90,7 +90,7 @@ public final class BibdatFromOAITar extends Feeder {
     public void process(URI uri) throws Exception {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         MyQueue queue = new MyQueue("pica/zdb/bibdat", settings.getAsInt("pipelines", 1));
-        queue.setUnmappedKeyListener(key -> {
+        queue.setUnmappedKeyListener((id,key) -> {
             if ((settings.getAsBoolean("detect", false))) {
                 logger.warn("unmapped field {}", key);
                 unmapped.add("\"" + key + "\"");
@@ -179,9 +179,9 @@ public final class BibdatFromOAITar extends Feeder {
         public void afterCompletion(PicaEntityBuilderState state) throws IOException {
             RouteRdfXContentParams params = new RouteRdfXContentParams(IRINamespaceContext.getInstance(),
                     settings.get("index"), settings.get("type"));
-            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), state.getID(), content));
+            params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), state.getRecordNumber(), content));
             RdfContentBuilder builder = routeRdfXContentBuilder(params);
-            builder.resource(state.getResource());
+            builder.receive(state.getResource());
         }
     }
 }

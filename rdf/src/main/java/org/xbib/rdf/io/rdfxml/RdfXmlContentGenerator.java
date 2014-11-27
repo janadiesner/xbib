@@ -78,13 +78,13 @@ public class RdfXmlContentGenerator
     @Override
     public void close() throws IOException {
         // write last resource
-        resource(resource);
+        receive(resource);
     }
 
     @Override
-    public RdfXmlContentGenerator newIdentifier(IRI iri) throws IOException {
+    public RdfXmlContentGenerator receive(IRI iri) throws IOException {
         if (!iri.equals(resource.id())) {
-            resource(resource);
+            receive(resource);
             resource = new MemoryResource();
         }
         resource.id(iri);
@@ -103,7 +103,7 @@ public class RdfXmlContentGenerator
     }
 
     @Override
-    public RdfXmlContentGenerator triple(Triple triple) {
+    public RdfXmlContentGenerator receive(Triple triple) {
         resource.add(triple);
         return this;
     }
@@ -126,7 +126,7 @@ public class RdfXmlContentGenerator
     }
 
     @Override
-    public RdfXmlContentGenerator resource(Resource resource) throws IOException {
+    public RdfXmlContentGenerator receive(Resource resource) throws IOException {
         this.writingStarted = false;
         this.headerWritten = false;
         this.lastWrittenSubject = null;

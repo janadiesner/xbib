@@ -75,7 +75,7 @@ public final class BibdatZDB extends Converter {
     public void process(URI uri) throws Exception {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         MyQueue queue = new MyQueue("/org/xbib/analyze/pica/zdb/bibdat.json", settings.getAsInt("pipelines", 1));
-        queue.setUnmappedKeyListener(key -> {
+        queue.setUnmappedKeyListener((id,key) -> {
             if ((settings.getAsBoolean("detect", false))) {
                 logger.warn("unmapped field {}", key);
                 unmapped.add("\"" + key + "\"");
@@ -122,7 +122,7 @@ public final class BibdatZDB extends Converter {
             //params.setIdPredicate("identifierZDB");
             //params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
             RdfContentBuilder builder = routeRdfXContentBuilder(params);
-            builder.resource(state.getResource());
+            builder.receive(state.getResource());
             //out.init(settings.get("output", "bibdat.nt"));
 
         }

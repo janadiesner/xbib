@@ -40,16 +40,6 @@ public class NullEntity implements Entity {
         return this;
     }
 
-    @Override
-    public Map<String, Object> getSettings() {
-        return null;
-    }
-
-    @Override
-    public Entity build(EntityBuilder builder, Object key, Object value) {
-        return this;
-    }
-
     public String toString() {
         return "<null>";
     }

@@ -33,7 +33,6 @@ package org.xbib.rdf.io.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -104,9 +103,9 @@ public class XmlReaderTest extends StreamTester {
         TurtleContentParams turtleParams = new TurtleContentParams(namespaceContext, true);
         RdfContentBuilder builder = turtleBuilder(turtleParams);
         xmlHandler.setBuilder(builder);
-        new XmlContentParser()
+        new XmlContentParser(in)
                 .setHandler(xmlHandler)
-                .parse(new InputStreamReader(in, "UTF-8"));
+                .parse();
         assertStream(getClass().getResource("dc.ttl").openStream(),
                 builder.streamInput());
     }
@@ -154,9 +153,9 @@ public class XmlReaderTest extends StreamTester {
         xmlHandler.setDefaultNamespace("xml", "http://xmltest")
                 .setBuilder(builder);
         MemoryResource.reset();
-        new XmlContentParser()
+        new XmlContentParser(in)
                 .setHandler(xmlHandler)
-                .parse(new InputStreamReader(in, "UTF-8"));
+                .parse();
         assertEquals(builder.getTriples().toString(),
                 "[id:1 xml:dates _:b1, _:b1 xml:date 2001, _:b1 xml:date 2002, _:b1 xml:date 2003]"
         );
@@ -205,9 +204,9 @@ public class XmlReaderTest extends StreamTester {
         xmlHandler.setDefaultNamespace("xml", "http://localhost")
                 .setBuilder(builder);
         MemoryResource.reset();
-        new XmlContentParser()
+        new XmlContentParser(in)
                 .setHandler(xmlHandler)
-                .parse(new InputStreamReader(in, "UTF-8"));
+                .parse();
         assertEquals(builder.getTriples().toString(),
                 "[id:1 xml:dates _:b1, _:b1 xml:date _:b2, _:b2 xml:@href 1, _:b1 xml:date _:b4, _:b4 xml:@href 2, _:b1 xml:date _:b6, _:b6 xml:@href 3, _:b1 xml:date _:b8, _:b8 xml:hello World]");
 
@@ -221,13 +220,13 @@ public class XmlReaderTest extends StreamTester {
         }
 
         @Override
-        public RdfContentGenerator triple(Triple triple) {
+        public RdfContentGenerator receive(Triple triple) {
             triples.add(triple);
             return this;
         }
 
         @Override
-        public RdfContentGenerator resource(Resource resource) throws IOException {
+        public RdfContentGenerator receive(Resource resource) throws IOException {
             triples.addAll(resource.triples().stream().collect(Collectors.toList()));
             return this;
         }

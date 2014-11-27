@@ -64,10 +64,10 @@ public class OAITest extends StreamTester {
         xmlHandler.setBuilder(builder)
                 .setNamespaceContext(context)
                 .setDefaultNamespace("oai", "http://www.openarchives.org/OAI/2.0/oai_dc/");
-        XmlContentParser parser = new XmlContentParser();
+        XmlContentParser parser = new XmlContentParser(in);
         parser.builder(builder);
         parser.setHandler(xmlHandler)
-                .parse(new InputStreamReader(in, "UTF-8"));
+                .parse();
         assertStream(getClass().getResource("oai.ttl").openStream(), builder.streamInput());
     }
 }

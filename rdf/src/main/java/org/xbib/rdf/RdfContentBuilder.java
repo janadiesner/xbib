@@ -110,13 +110,13 @@ public class RdfContentBuilder implements RdfContentGenerator {
     }
 
     @Override
-    public RdfContentGenerator newIdentifier(IRI identifier) throws IOException {
-        return generator.newIdentifier(identifier);
+    public RdfContentGenerator receive(IRI identifier) throws IOException {
+        return generator.receive(identifier);
     }
 
     @Override
-    public RdfContentGenerator triple(Triple triple) {
-        return generator.triple(triple);
+    public RdfContentGenerator receive(Triple triple) throws IOException {
+        return generator.receive(triple);
     }
 
     @Override
@@ -125,8 +125,8 @@ public class RdfContentBuilder implements RdfContentGenerator {
     }
 
     @Override
-    public RdfContentGenerator resource(Resource resource) throws IOException {
-        generator.resource(resource);
+    public RdfContentGenerator receive(Resource resource) throws IOException {
+        generator.receive(resource);
         return this;
     }
 

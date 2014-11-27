@@ -42,8 +42,6 @@ import org.xbib.common.xcontent.XContentGenerator;
 import org.xbib.common.xcontent.XContentHelper;
 import org.xbib.common.xcontent.XContentParser;
 import org.xbib.common.xcontent.XContentType;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.xml.ToQName;
 import org.xbib.xml.namespace.XmlNamespaceContext;
 
@@ -61,8 +59,6 @@ import java.math.BigInteger;
  *
  */
 public class XmlXContentGenerator implements XContentGenerator {
-
-    private static final Logger logger = LoggerFactory.getLogger(XmlXContentGenerator.class.getName());
 
     protected final ToXmlGenerator generator;
 
@@ -82,7 +78,7 @@ public class XmlXContentGenerator implements XContentGenerator {
         try {
             generator.getStaxWriter().setDefaultNamespace(params.getQName().getNamespaceURI());
         } catch(XMLStreamException e) {
-            logger.error(e.getMessage(), e);
+            // ignore
         }
         return this;
     }
@@ -128,7 +124,7 @@ public class XmlXContentGenerator implements XContentGenerator {
                     generator.getStaxWriter().writeNamespace(prefix, getNamespaceContext().getNamespaceURI(prefix));
                 }
             } catch (XMLStreamException e) {
-                logger.error(e.getMessage(), e);
+                // ignore
             }
             rootUsed = true;
         }

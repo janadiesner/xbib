@@ -42,7 +42,7 @@ import org.xbib.util.DateUtil;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 public class MARCEntityBuilderState extends DefaultEntityBuilderState {
 
@@ -52,7 +52,8 @@ public class MARCEntityBuilderState extends DefaultEntityBuilderState {
 
     private String recordNumber;
 
-    public MARCEntityBuilderState(RdfGraph<RdfGraphParams> graph, List<RdfContentBuilderProvider> providers) {
+    public MARCEntityBuilderState(RdfGraph<RdfGraphParams> graph,
+                                  Map<IRI,RdfContentBuilderProvider> providers) {
         super(graph, providers);
     }
 
@@ -77,7 +78,7 @@ public class MARCEntityBuilderState extends DefaultEntityBuilderState {
     public Resource getResource() throws IOException {
         if (graph().getResources().isEmpty()) {
             root = new MemoryResource().blank();
-            graph().resource(root);
+            graph().receive(root);
         }
         return root;
     }

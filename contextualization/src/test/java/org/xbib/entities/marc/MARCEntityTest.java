@@ -38,8 +38,6 @@ import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
-import org.xbib.rdf.RdfContentBuilderProvider;
-import org.xbib.rdf.RdfContentFactory;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -72,11 +70,9 @@ public class MARCEntityTest extends Assert {
     @Test
     public void testStbBonn() throws Exception {
         InputStream in = getClass().getResourceAsStream("stb-bonn.mrc");
-        RdfContentBuilderProvider provider = RdfContentFactory::turtleBuilder;
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         MyQueue queue = new MyQueue("/org/xbib/analyzer/marc/bib.json");
-        queue.setUnmappedKeyListener((id, key) -> unmapped.add(key.toString()))
-                .setContentBuilderProviders(provider);
+        queue.setUnmappedKeyListener((id, key) -> unmapped.add(key.toString()));
         queue.execute();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(queue);
         Iso2709Reader reader = new Iso2709Reader().setMarcXchangeListener(kv);

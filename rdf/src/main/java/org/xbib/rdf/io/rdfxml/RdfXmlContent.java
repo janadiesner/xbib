@@ -29,7 +29,7 @@ public class RdfXmlContent implements RdfContent {
 
     @Override
     public StandardRdfContentType type() {
-        return StandardRdfContentType.RDXFXML;
+        return StandardRdfContentType.RDFXML;
     }
 
     @Override
@@ -44,11 +44,11 @@ public class RdfXmlContent implements RdfContent {
 
     @Override
     public RdfContentParser createParser(InputStream in) throws IOException {
-        return null;
+        return new RdfXmlContentParser(in);
     }
 
     @Override
     public RdfContentParser createParser(Reader reader) throws IOException {
-        return null;
+        return new RdfXmlContentParser(reader);
     }
 }

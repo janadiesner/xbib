@@ -37,7 +37,6 @@ import org.xbib.iri.IRI;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfContent;
 import org.xbib.rdf.RdfContentBuilder;
-import org.xbib.rdf.RdfContentGenerator;
 import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
@@ -50,7 +49,6 @@ import org.xbib.rdf.memory.MemoryTriple;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
 
@@ -66,14 +64,14 @@ public class EuropeanaEDMReaderTest extends StreamTester {
 
         MemoryRdfGraph<MemoryRdfGraphParams> graph = new MemoryRdfGraph<MemoryRdfGraphParams>();
 
-        RdfXmlContentParser reader = new RdfXmlContentParser();
+        RdfXmlContentParser reader = new RdfXmlContentParser(in);
         GeoJSONFilter filter = new GeoJSONFilter(NTripleContent.nTripleContent, NTripleContentParams.DEFAULT_PARAMS, graph);
-        reader.builder(filter);
-        reader.parse(new InputStreamReader(in, "UTF-8"));
+        reader.setBuilder(filter);
+        reader.parse();
 
         RdfContentBuilder builder = ntripleBuilder();
         for (Resource resource : graph.getResources()) {
-            builder.resource(resource);
+            builder.receive(resource);
         }
         assertStream(getClass().getResource("edm.nt").openStream(),
                 builder.streamInput());
@@ -99,8 +97,8 @@ public class EuropeanaEDMReaderTest extends StreamTester {
         }
 
         @Override
-        public GeoJSONFilter triple(Triple triple) {
-            graph.triple(triple);
+        public GeoJSONFilter receive(Triple triple) {
+            graph.receive(triple);
             if (triple.predicate().equals(GEO_LAT)) {
                 lat = triple.object();
             }
@@ -109,7 +107,7 @@ public class EuropeanaEDMReaderTest extends StreamTester {
             }
             if (lat != null && lon != null) {
                 // create location string for Elasticsearch
-                graph.triple(new MemoryTriple(triple.subject(), location, new MemoryLiteral(lat + "," + lon)));
+                graph.receive(new MemoryTriple(triple.subject(), location, new MemoryLiteral(lat + "," + lon)));
                 lon = null;
                 lat = null;
             }

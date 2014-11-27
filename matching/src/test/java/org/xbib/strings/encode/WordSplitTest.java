@@ -1,4 +1,4 @@
-package org.xbib.query;
+package org.xbib.strings.encode;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -8,8 +8,6 @@ import org.testng.annotations.Test;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.util.Filter;
-import org.xbib.strings.encode.QuotedStringTokenizer;
-import org.xbib.strings.encode.UnterminatedQuotedStringException;
 
 public class WordSplitTest {
     

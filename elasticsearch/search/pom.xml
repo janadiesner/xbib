@@ -53,12 +53,12 @@
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>content</artifactId>
+            <artifactId>query</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>query</artifactId>
+            <artifactId>matching</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>

@@ -41,7 +41,6 @@ import org.xbib.rdf.io.turtle.TurtleContentParser;
 import org.xbib.tools.Feeder;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 
 /**
@@ -71,8 +70,8 @@ public class Freebase extends Feeder {
         InputStream in = InputService.getInputStream(uri);
         //ElasticBuilder builder = new ElasticBuilder(elasticsearchRdfXContentGenerator);
         IRI base = IRI.create(settings.get("base"));
-        new TurtleContentParser().setBaseIRI(base)
-                .parse(new InputStreamReader(in, "UTF-8"));
+        new TurtleContentParser(in).setBaseIRI(base)
+                .parse();
         in.close();
     }
 /*

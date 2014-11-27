@@ -40,7 +40,6 @@ import org.xbib.tools.Converter;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.zip.Deflater;
@@ -80,9 +79,9 @@ public class RdfXml extends Converter {
             }
         };
         RdfContentBuilder builder = "turtle".equals(settings.get("format")) ? turtleBuilder(out) : ntripleBuilder(out);
-        RdfXmlContentParser reader = new RdfXmlContentParser();
-        reader.builder(builder);
-        reader.parse(new InputStreamReader(in, "UTF-8"));
+        RdfXmlContentParser reader = new RdfXmlContentParser(in);
+        reader.setBuilder(builder);
+        reader.parse();
         in.close();
         out.close();
     }

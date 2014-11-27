@@ -29,7 +29,7 @@
  * feasible for technical reasons, the Appropriate Legal Notices must display
  * the words "Powered by xbib".
  */
-package org.xbib.entities;
+package org.xbib.entities.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -43,13 +43,13 @@ import org.xbib.logging.LoggerFactory;
 
 import static com.google.common.collect.Maps.newHashMap;
 
-public class ValueMapFactory {
+public class ValueMaps {
 
-    private final static Logger logger = LoggerFactory.getLogger(ValueMapFactory.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(ValueMaps.class.getName());
 
     private final static Map<String, Object> maps = newHashMap();
 
-    private ValueMapFactory() {
+    private ValueMaps() {
     }
 
     public static Map getMap(String format) {
@@ -59,7 +59,7 @@ public class ValueMapFactory {
     public synchronized static Map getMap(String path, String format) {
         if (!maps.containsKey(format)) {
             try {
-                InputStream json = ValueMapFactory.class.getResourceAsStream(path + format + ".json");
+                InputStream json = ValueMaps.class.getResourceAsStream(path + format + ".json");
                 if (json == null) {
                     throw new IOException("format " + format + " not found: " + path + format + ".json");
                 }
@@ -79,7 +79,7 @@ public class ValueMapFactory {
     public synchronized static Map<String, String> getAssocStringMap(String path, String format) {
         if (!maps.containsKey(format)) {
             try {
-                InputStream json = ValueMapFactory.class.getResourceAsStream(path + format + ".json");
+                InputStream json = ValueMaps.class.getResourceAsStream(path + format + ".json");
                 if (json == null) {
                     throw new IOException("format " + format + " not found: " + path + format + ".json");
                 }

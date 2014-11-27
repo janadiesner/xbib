@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,11 +58,17 @@ import static com.fasterxml.jackson.core.JsonToken.START_OBJECT;
  */
 public class MarcXchangeJSONLinesReader {
 
+    private final static JsonFactory factory = new JsonFactory();
+
     private final MarcXchangeListener listener;
 
     private Integer bufferSize = 16 * 1024;
 
+    private Integer fieldSize = 64;
+
     private JsonParser jsonParser;
+
+    private List<Field> fields;
 
     private String format;
 
@@ -89,36 +96,43 @@ public class MarcXchangeJSONLinesReader {
     }
 
     public void parse(Reader reader) throws IOException {
-        JsonFactory factory = new JsonFactory();
-        BufferedReader bufferedReader = new BufferedReader(reader, bufferSize);
-        String line;
-        listener.beginCollection();
-        while ((line = bufferedReader.readLine()) != null) {
-            this.jsonParser = factory.createParser(line);
-            List<Field> fields = new ArrayList<Field>(8);
-            jsonParser.nextToken();
-            parseObject(fields, 0);
-            emitFields(fields);
-            listener.endRecord();
+        try (BufferedReader bufferedReader = new BufferedReader(reader, bufferSize)) {
+            listener.beginCollection();
+            bufferedReader.lines().forEach(this::parse);
+            listener.endCollection();
         }
-        listener.endCollection();
-        bufferedReader.close();
     }
 
-    private void parseObject(List<Field> fields, int level) throws IOException {
+    private void parse(String line) {
+        try {
+            parseLine(line);
+            listener.endRecord();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private void parseLine(String line) throws IOException {
+        jsonParser = factory.createParser(line);
+        this.fields =  new ArrayList<Field>(fieldSize);
+        jsonParser.nextToken();
+        parseObject(0);
+    }
+
+    public void parseObject(int level) throws IOException {
         while (jsonParser.nextToken() != null && jsonParser.getCurrentToken() != END_OBJECT) {
             if (FIELD_NAME.equals(jsonParser.getCurrentToken())) {
                 jsonParser.nextToken();
-                parseInner(jsonParser.getCurrentName(), fields, level);
+                parseInner(jsonParser.getCurrentName(), level);
             } else {
                 throw new JsonParseException("expected field name, but got " + jsonParser.getCurrentToken(),
                         jsonParser.getCurrentLocation());
             }
         }
-        emitFields(fields);
+        emitFields();
     }
 
-    private void parseInner(String name, List<Field> fields, int level) throws IOException {
+    private void parseInner(String name, int level) throws IOException {
         JsonToken currentToken = jsonParser.getCurrentToken();
         if (START_OBJECT.equals(currentToken)) {
             switch (level) {
@@ -131,7 +145,7 @@ public class MarcXchangeJSONLinesReader {
                     break;
                 }
             }
-            parseObject(fields, level + 1);
+            parseObject(level + 1);
         } else if (currentToken.isScalarValue()) {
             if (MarcXchangeConstants.FORMAT_TAG.equals(name)) {
                 format = jsonParser.getText();
@@ -156,15 +170,15 @@ public class MarcXchangeJSONLinesReader {
                 }
                 Field field = new Field().tag(tag).indicator(indicator).subfieldId(subfieldId).data(jsonParser.getText());
                 fields.add(field);
-                // need to emit control field here because it is complete
                 if (field.isControlField()) {
-                    emitFields(fields);
+                    // need to emit control field here because it is complete
+                    emitFields();
                 }
             }
         }
     }
 
-    private void emitFields(List<Field> fields) {
+    private void emitFields() {
         if (fields.isEmpty()) {
             return;
         }
@@ -188,10 +202,9 @@ public class MarcXchangeJSONLinesReader {
             }
             listener.endDataField(dataField);
         }
-        fields.clear();
+        fields = new ArrayList<>(fieldSize);
         tag = null;
         indicator = null;
         subfieldId = null;
     }
-
 }

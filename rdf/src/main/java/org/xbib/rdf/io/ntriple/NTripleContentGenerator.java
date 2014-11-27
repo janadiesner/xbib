@@ -32,8 +32,6 @@
 package org.xbib.rdf.io.ntriple;
 
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfContentGenerator;
@@ -52,13 +50,9 @@ import java.io.Writer;
 public class NTripleContentGenerator
         implements RdfContentGenerator<NTripleContentParams>, Flushable {
 
-    private final static Logger logger = LoggerFactory.getLogger(NTripleContentGenerator.class.getName());
-
     private final static char LF = '\n';
 
     private final Writer writer;
-
-    private String sortLangTag;
 
     private NTripleContentParams params = NTripleContentParams.DEFAULT_PARAMS;
 
@@ -75,18 +69,9 @@ public class NTripleContentGenerator
         writer.close();
     }
 
-    public NTripleContentGenerator setSortLanguageTag(String languageTag) {
-        this.sortLangTag = languageTag;
-        return this;
-    }
-
     @Override
-    public NTripleContentGenerator newIdentifier(IRI iri) throws IOException {
-        /*if (iri != null && !iri.equals(resource.id())) {
-            resource(resource);
-            resource = new MemoryResource();
-        }
-        resource.id(iri);*/
+    public NTripleContentGenerator receive(IRI iri) throws IOException {
+        // ignore
         return this;
     }
 
@@ -102,12 +87,8 @@ public class NTripleContentGenerator
     }
 
     @Override
-    public NTripleContentGenerator triple(Triple triple) {
-        try {
-            writeStatement(triple);
-        } catch (IOException e) {
-            //
-        }
+    public NTripleContentGenerator receive(Triple triple) throws IOException {
+        writer.write(writeStatement(triple));
         return this;
     }
 
@@ -130,9 +111,9 @@ public class NTripleContentGenerator
     }
 
     @Override
-    public NTripleContentGenerator resource(Resource resource) throws IOException {
+    public NTripleContentGenerator receive(Resource resource) throws IOException {
         for (Triple t : resource.triples()) {
-            writer.write(writeStatement(t)); // double cache ok here? we have a byte array in writer?
+            writer.write(writeStatement(t));
         }
         return this;
     }
@@ -165,7 +146,6 @@ public class NTripleContentGenerator
             return writeSubject(subject);
         } else if (object instanceof Literal) {
             Literal value = (Literal) object;
-            value = processSortLanguage(value);
             String s = "\"" + escape(value.object().toString()) + "\"";
             String lang = value.language();
             IRI type = value.type();
@@ -219,19 +199,16 @@ public class NTripleContentGenerator
 
 
     /**
-     * Process a literal according to given sort language (e.g. mechanical word order, sort area).
+     * Translate a literal according to given sort language (e.g. mechanical word order, sort area).
      * <p>
      * see http://www.w3.org/International/articles/language-tags/
      *
      * @param literal the literal
      * @return the process literal
      */
-    protected Literal processSortLanguage(Literal literal) {
+    private Literal translateLanguage(Literal literal, String langTag) {
         if (literal == null) {
             return null;
-        }
-        if (sortLangTag == null) {
-            return literal;
         }
         // we assume we have only one sort language. Search for '@' symbol.
         String value = literal.object().toString();
@@ -240,7 +217,8 @@ public class NTripleContentGenerator
         if (pos == 0) {
             literal.object(value.substring(1));
         } else if (pos > 0) {
-            literal.object('\u0098' + value.substring(0, pos + 1) + '\u009c' + value.substring(pos + 2)).language(sortLangTag);
+            literal.object('\u0098' + value.substring(0, pos + 1) + '\u009c' + value.substring(pos + 2))
+                    .language(langTag);
         }
         return literal;
     }

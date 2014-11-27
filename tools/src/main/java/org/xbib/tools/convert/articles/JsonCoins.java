@@ -217,17 +217,17 @@ public class JsonCoins extends Converter {
                         switch (result) {
                             case OK:
                                 synchronized (articleBuilder) {
-                                    articleBuilder.resource(resource);
+                                    articleBuilder.receive(resource);
                                 }
                                 break;
                             case MISSINGSERIAL:
                                 synchronized (missingArticleBuilder) {
-                                    missingArticleBuilder.resource(resource);
+                                    missingArticleBuilder.receive(resource);
                                 }
                                 break;
                             case ERROR:
                                 synchronized (errorArticleBuilder) {
-                                    errorArticleBuilder.resource(resource);
+                                    errorArticleBuilder.receive(resource);
                                 }
                                 break;
 

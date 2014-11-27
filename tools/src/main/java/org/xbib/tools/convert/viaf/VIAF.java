@@ -135,11 +135,11 @@ public class VIAF extends Converter {
                     if ("|".equals(line)) {
                         break;
                     }
-                    RdfXmlContentParser parser = new RdfXmlContentParser();
+                    RdfXmlContentParser parser = new RdfXmlContentParser(new StringReader(line));
                     RdfContentBuilder builder = settings.getAsBoolean("ntriples", false) ?
                             ntripleBuilder(out) : turtleBuilder(out);
-                    parser.builder(builder);
-                    parser.parse(new StringReader(line));
+                    parser.setBuilder(builder);
+                    parser.parse();
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);

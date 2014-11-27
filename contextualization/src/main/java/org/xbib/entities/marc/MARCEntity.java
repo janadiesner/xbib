@@ -32,11 +32,9 @@
 package org.xbib.entities.marc;
 
 import org.xbib.entities.Entity;
-import org.xbib.entities.EntityBuilder;
 import org.xbib.logging.Logger;
 import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.FieldList;
-import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.rdf.Resource;
 
@@ -46,35 +44,28 @@ import java.util.Map;
 /**
  * A MARC entity
  */
-public class MARCEntity implements Entity<FieldList, String, MARCEntityBuilder>, MarcXchangeConstants {
+public class MARCEntity implements Entity<FieldList, String>, MarcXchangeConstants {
 
     protected static final Logger logger = LoggerFactory.getLogger(MARCEntity.class.getName());
 
     private Map<String,Object> params;
 
-    @Override
     public MARCEntity setSettings(Map<String,Object> params) {
         this.params = params;
         return this;
     }
 
-    @Override
     public Map<String,Object> getSettings() {
         return params;
     }
 
-    @Override
-    public MARCEntity build(MARCEntityBuilder builder, FieldList key, String value) {
-        return this;
-    }
-
     /**
-     * Process entity.
+     * Process fields by a worker
      *
      * @param worker the worker
      * @param fields the fields
      * @param value the value
-     * @return true if processing of element has been completed and should not continue at this point,
+     * @return true if processing has been completed and should not continue at this point,
      * false if it should continue
      */
     public boolean fields(MARCEntityQueue.MARCWorker worker,
@@ -83,21 +74,9 @@ public class MARCEntity implements Entity<FieldList, String, MARCEntityBuilder>,
     }
 
     /**
-     * Process mapped element with subfield mappings. Empty by default.
-     *
-     * @param builder the builder
-     * @param field the field
-     * @param subfieldType the subfield type
-     */
-    public boolean field(EntityBuilder<MARCEntityBuilderState, MARCEntity, FieldList, String> builder,
-                         Field field, String subfieldType) {
-        return false;
-    }
-
-    /**
      * Transform field data
      */
-    public String data(EntityBuilder<MARCEntityBuilderState, MARCEntity, FieldList, String> builder,
+    public String data(MARCEntityQueue.MARCWorker worker,
                        String resourcePredicate, Resource resource, String property, String value) {
         return value;
     }

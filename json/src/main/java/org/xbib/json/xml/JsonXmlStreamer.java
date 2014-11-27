@@ -36,8 +36,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.xml.ToQName;
 import org.xbib.xml.namespace.XmlNamespaceContext;
 
@@ -62,8 +60,6 @@ import java.util.Stack;
  */
 public class JsonXmlStreamer {
 
-    private static final Logger logger = LoggerFactory.getLogger(JsonXmlStreamer.class.getName());
-
     private QName root = new QName("root");
 
     private XmlNamespaceContext context = XmlNamespaceContext.getDefaultInstance();
@@ -78,7 +74,7 @@ public class JsonXmlStreamer {
         outputFactory.setProperty("javax.xml.stream.isNamespaceAware", Boolean.TRUE);
     }
 
-    private Stack<QName> elements = new Stack();
+    private Stack<QName> elements = new Stack<QName>();
 
     public JsonXmlStreamer() {
     }
@@ -204,7 +200,7 @@ public class JsonXmlStreamer {
             }
         } catch (JsonParseException e) {
             // Illegal character ((CTRL-CHAR, code 0)): only regular white space (\r, \n, \t) is allowed between tokens
-            logger.debug(e.getMessage());
+            throw new IOException(e);
         } finally {
             if (consumer instanceof XMLEventWriter) {
                 ((XMLEventWriter)consumer).flush();

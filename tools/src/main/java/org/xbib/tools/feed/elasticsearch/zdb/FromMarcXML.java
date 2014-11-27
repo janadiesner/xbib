@@ -88,7 +88,7 @@ public final class FromMarcXML extends Feeder {
     public void process(URI uri) throws Exception {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
         final MyQueue queue = new MyQueue(settings.get("elements"), settings.getAsInt("pipelines", 1));
-                queue.setUnmappedKeyListener(key -> {
+                queue.setUnmappedKeyListener((id,key) -> {
                     if ((settings.getAsBoolean("detect", false))) {
                         logger.warn("unmapped field {}", key);
                         unmapped.add("\"" + key + "\"");
@@ -127,7 +127,7 @@ public final class FromMarcXML extends Feeder {
             params.setIdPredicate("identifierZDB");
             params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
             RdfContentBuilder builder = routeRdfXContentBuilder(params);
-            builder.resource(state.getResource());
+            builder.receive(state.getResource());
         }
     }
 

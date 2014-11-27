@@ -66,8 +66,6 @@ public class XmlContentGenerator
 
     private Resource resource;
 
-    private String sortLangTag;
-
     private XmlContentParams params = XmlContentParams.DEFAULT_PARAMS;
 
     public XmlContentGenerator(OutputStream out) throws IOException{
@@ -90,15 +88,15 @@ public class XmlContentGenerator
     }
 
     public XmlContentGenerator setSortLanguageTag(String languageTag) {
-        this.sortLangTag = languageTag;
+        //this.sortLangTag = languageTag;
         return this;
     }
 
 
     @Override
-    public XmlContentGenerator newIdentifier(IRI iri) throws IOException {
+    public XmlContentGenerator receive(IRI iri) throws IOException {
         if (!iri.equals(resource.id())) {
-            resource(resource);
+            receive(resource);
             resource = new MemoryResource();
         }
         resource.id(iri);
@@ -117,7 +115,7 @@ public class XmlContentGenerator
     }
 
     @Override
-    public XmlContentGenerator triple(Triple triple) {
+    public XmlContentGenerator receive(Triple triple) {
         resource.add(triple);
         return this;
     }
@@ -144,7 +142,7 @@ public class XmlContentGenerator
     }
 
     @Override
-    public XmlContentGenerator resource(Resource resource) throws IOException {
+    public XmlContentGenerator receive(Resource resource) throws IOException {
         if (resource == null) {
             return this;
         }

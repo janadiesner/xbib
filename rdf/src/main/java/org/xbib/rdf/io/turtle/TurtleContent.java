@@ -44,11 +44,11 @@ public class TurtleContent implements RdfContent {
 
     @Override
     public RdfContentParser createParser(InputStream in) throws IOException {
-        return null;
+        return new TurtleContentParser(in);
     }
 
     @Override
     public RdfContentParser createParser(Reader reader) throws IOException {
-        return null;
+        return new TurtleContentParser(reader);
     }
 }

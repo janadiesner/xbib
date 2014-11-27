@@ -18,13 +18,13 @@
         <dependency>
             <groupId>com.carrotsearch</groupId>
             <artifactId>hppc</artifactId>
-            <version>0.5.2</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>logging</artifactId>
             <type>jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

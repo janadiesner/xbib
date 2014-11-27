@@ -71,11 +71,11 @@ public class JsonContentGenerator
     @Override
     public void close() throws IOException {
         // write last resource
-        resource(resource);
+        receive(resource);
     }
 
     @Override
-    public JsonContentGenerator newIdentifier(IRI iri) {
+    public JsonContentGenerator receive(IRI iri) {
         if (!iri.equals(resource.id())) {
             try {
                 if (!nsWritten) {
@@ -113,7 +113,7 @@ public class JsonContentGenerator
     }
 
     @Override
-    public JsonContentGenerator triple(Triple triple) {
+    public JsonContentGenerator receive(Triple triple) {
         return this; // TODO
     }
 
@@ -145,7 +145,7 @@ public class JsonContentGenerator
     }
 
     @Override
-    public JsonContentGenerator resource(Resource resource) throws IOException {
+    public JsonContentGenerator receive(Resource resource) throws IOException {
         return this;
     }
 }

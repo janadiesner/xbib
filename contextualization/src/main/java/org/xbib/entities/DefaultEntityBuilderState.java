@@ -31,25 +31,25 @@
  */
 package org.xbib.entities;
 
-import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.iri.IRI;
 import org.xbib.rdf.RdfContentBuilderProvider;
 import org.xbib.rdf.RdfGraph;
 import org.xbib.rdf.RdfGraphParams;
 import org.xbib.rdf.Resource;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 public class DefaultEntityBuilderState implements EntityBuilderState {
 
     private final RdfGraph<RdfGraphParams> graph;
 
-    private final List<RdfContentBuilderProvider> providers;
+    private final Map<IRI,RdfContentBuilderProvider> builders;
 
     public DefaultEntityBuilderState(RdfGraph<RdfGraphParams> graph,
-                                     List<RdfContentBuilderProvider> providers) {
+                                     Map<IRI,RdfContentBuilderProvider> builders) {
         this.graph = graph;
-        this.providers = providers;
+        this.builders = builders;
     }
 
     @Override
@@ -58,18 +58,17 @@ public class DefaultEntityBuilderState implements EntityBuilderState {
     }
 
     @Override
-    public List<RdfContentBuilderProvider> providers() {
-        return providers;
+    public Map<IRI,RdfContentBuilderProvider> providerMap() {
+        return builders;
     }
 
     @Override
     public void complete() throws IOException {
         if (graph.getResources() != null) {
             for (Resource resource : graph.getResources()) {
-                if (providers != null) {
-                    for (RdfContentBuilderProvider provider : providers) {
-                        RdfContentBuilder builder = provider.newContentBuilder();
-                        builder.resource(resource);
+                if (builders != null) {
+                    for (RdfContentBuilderProvider provider : builders.values()) {
+                        provider.newContentBuilder().receive(resource);
                     }
                 }
             }

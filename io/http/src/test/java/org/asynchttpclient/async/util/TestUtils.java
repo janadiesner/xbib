@@ -191,7 +191,7 @@ public class TestUtils {
         security.setConstraintMappings(cm, knownRoles);
         security.setAuthenticator(authenticator);
         security.setLoginService(LOGIN_SERVICE);
-        security.setStrict(strict);
+        //security.setStrict(strict);
         security.setHandler(handler);
         server.setHandler(security);
     }

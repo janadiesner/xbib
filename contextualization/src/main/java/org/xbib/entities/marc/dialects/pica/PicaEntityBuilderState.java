@@ -32,6 +32,7 @@
 package org.xbib.entities.marc.dialects.pica;
 
 import org.xbib.entities.DefaultEntityBuilderState;
+import org.xbib.iri.IRI;
 import org.xbib.rdf.RdfContentBuilderProvider;
 import org.xbib.rdf.RdfGraph;
 import org.xbib.rdf.RdfGraphParams;
@@ -39,7 +40,7 @@ import org.xbib.rdf.Resource;
 import org.xbib.rdf.memory.MemoryResource;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 public class PicaEntityBuilderState extends DefaultEntityBuilderState {
 
@@ -47,8 +48,9 @@ public class PicaEntityBuilderState extends DefaultEntityBuilderState {
 
     private String recordNumber;
 
-    public PicaEntityBuilderState(RdfGraph<RdfGraphParams> graph, List<RdfContentBuilderProvider> list) {
-        super(graph, list);
+    public PicaEntityBuilderState(RdfGraph<RdfGraphParams> graph,
+                                  Map<IRI,RdfContentBuilderProvider> map) {
+        super(graph, map);
     }
 
     public void setResource(Resource resource) {
@@ -58,7 +60,7 @@ public class PicaEntityBuilderState extends DefaultEntityBuilderState {
     public Resource getResource() throws IOException {
         if (graph().getResources().isEmpty()) {
             root = new MemoryResource().blank();
-            graph().resource(root);
+            graph().receive(root);
         }
         return root;
     }

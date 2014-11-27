@@ -175,7 +175,7 @@ public class JsonCoins extends Feeder {
                             params.setIndex(index);
                             params.setType(indexType);
                             params.setId(resource.id().getFragment());
-                            builder.resource(resource);
+                            builder.receive(resource);
                             resource = null;
                         }
                         break;

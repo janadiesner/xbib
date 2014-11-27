@@ -63,14 +63,13 @@ public class DNBClientTest {
 
     @Test
     public void testListRecordsDNB() throws Exception {
-
         OAIClient client = OAIClientFactory.newClient("http://services.dnb.de/oai/repository");
         ListRecordsRequest request =  client.newListRecordsRequest()
                 .setFrom(DateUtil.parseDateISO("2013-01-01T00:00:00Z"), OAIDateResolution.SECOND)
                 .setUntil(DateUtil.parseDateISO("2013-01-10T00:00:00Z"), OAIDateResolution.SECOND)
                 .setSet("bib")
                 .setMetadataPrefix("PicaPlus-xml");
-        final XmlContentParser reader = new XmlContentParser();
+        //final XmlContentParser reader = new XmlContentParser();
         final AtomicLong count = new AtomicLong(0L);
         MetadataHandler metadataHandler = new MetadataHandler() {
             @Override

@@ -127,7 +127,7 @@ public class TurtleContentGenerator
     public void close() throws IOException {
         if (!closed) {
             if (!resource.isEmpty()) {
-                resource(resource);
+                receive(resource);
             }
             writer.close();
             closed = true;
@@ -140,9 +140,9 @@ public class TurtleContentGenerator
     }
 
     @Override
-    public TurtleContentGenerator newIdentifier(IRI iri) throws IOException {
+    public TurtleContentGenerator receive(IRI iri) throws IOException {
         if (iri != null && !iri.equals(resource.id())) {
-            resource(resource);
+            receive(resource);
             resource = new MemoryResource();
             resource.id(iri);
         }
@@ -155,7 +155,7 @@ public class TurtleContentGenerator
     }
 
     @Override
-    public RdfContentGenerator resource(Resource resource) throws IOException {
+    public RdfContentGenerator receive(Resource resource) throws IOException {
         for (Triple t : resource.triples()) {
             writeTriple(t);
         }
@@ -176,7 +176,7 @@ public class TurtleContentGenerator
     }
 
     @Override
-    public TurtleContentGenerator triple(Triple triple) {
+    public TurtleContentGenerator receive(Triple triple) {
         resource.add(triple);
         return this;
     }

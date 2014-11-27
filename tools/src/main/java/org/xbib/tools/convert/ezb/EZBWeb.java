@@ -142,7 +142,7 @@ public class EZBWeb extends Converter {
                                             + (code2.isEmpty() ? "x" : code2)
                                             + (code3.isEmpty() ? "x" : code3))
                             .add("xbib:comment", comment);
-                    builder.resource(resource);
+                    builder.receive(resource);
                     counter++;
                     if (counter % 1000 == 0) {
                         logger.info("{}", counter);

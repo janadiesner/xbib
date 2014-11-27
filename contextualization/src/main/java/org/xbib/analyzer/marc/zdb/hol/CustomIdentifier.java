@@ -31,10 +31,7 @@
  */
 package org.xbib.analyzer.marc.zdb.hol;
 
-import org.xbib.entities.EntityBuilder;
-import org.xbib.entities.marc.MARCEntityBuilderState;
-import org.xbib.entities.marc.MARCEntity;
-import org.xbib.marc.FieldList;
+import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.rdf.Resource;
 
 public class CustomIdentifier extends org.xbib.analyzer.marc.bib.CustomIdentifier {
@@ -55,15 +52,10 @@ public class CustomIdentifier extends org.xbib.analyzer.marc.bib.CustomIdentifie
      *
      * Idea: if type flag indicates ZDB, look up existing value, and add a property 'identifierZDB'.
      *
-     * @param predicate
-     * @param resource
-     * @param property
-     * @param value
-     * @return
      */
 
     @Override
-    public String data(EntityBuilder<MARCEntityBuilderState,MARCEntity, FieldList, String> builder,
+    public String data(MARCEntityQueue.MARCWorker worker,
                        String predicate, Resource resource, String property, String value) {
         if ("IdentifierZDB".equals(value) && "type".equals(property)) {
             String v = resource.objects("value").iterator().next().toString();

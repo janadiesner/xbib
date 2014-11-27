@@ -105,7 +105,7 @@ public class RdfContentFactory {
     public static RdfContentBuilder rdfContentBuilder(RdfContentType type, RdfContentParams params) throws IOException {
         if (type == StandardRdfContentType.NTRIPLE) {
             return NTripleContent.contentBuilder((NTripleContentParams) params);
-        } else if (type == StandardRdfContentType.RDXFXML) {
+        } else if (type == StandardRdfContentType.RDFXML) {
             return RdfXmlContent.contentBuilder((RdfXmlContentParams) params);
         } else if (type == StandardRdfContentType.TURTLE) {
             return TurtleContent.contentBuilder((TurtleContentParams) params);

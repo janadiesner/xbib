@@ -79,9 +79,9 @@ public class VIAF extends Feeder {
                     settings.get("type", "viaf"));
             params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), p.getId(), content));
             RdfContentBuilder builder = routeRdfXContentBuilder(params);
-            RdfXmlContentParser parser = new RdfXmlContentParser();
-            parser.builder(builder);
-            parser.parse(new StringReader(line));
+            RdfXmlContentParser parser = new RdfXmlContentParser(new StringReader(line));
+            parser.setBuilder(builder);
+            parser.parse();
             linecounter++;
             if (linecounter % 10000 == 0) {
                 logger.info("{}", linecounter);

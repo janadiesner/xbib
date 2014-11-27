@@ -90,13 +90,13 @@ public class RdfXContentGenerator<R extends RdfXContentParams> implements RdfCon
     }
 
     @Override
-    public RdfXContentGenerator newIdentifier(IRI identifier) throws IOException {
+    public RdfXContentGenerator receive(IRI identifier) throws IOException {
         resource.id(identifier);
         return this;
     }
 
     @Override
-    public RdfXContentGenerator triple(Triple triple) {
+    public RdfXContentGenerator receive(Triple triple) {
         resource.add(triple);
         return this;
     }
@@ -117,7 +117,7 @@ public class RdfXContentGenerator<R extends RdfXContentParams> implements RdfCon
     }
 
     @Override
-    public RdfXContentGenerator resource(Resource resource)  throws IOException {
+    public RdfXContentGenerator receive(Resource resource)  throws IOException {
         builder = jsonBuilder(out);
         builder.startObject();
         build(resource);

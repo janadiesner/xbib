@@ -207,7 +207,7 @@ public class Token implements Node {
         LinkedList l = new LinkedList();
         try {
             Filter.filter(new QuotedStringTokenizer(s, " \t\n\r\f", "\"", '\\', false), l, isWordPred);
-        } catch (UnterminatedQuotedStringException e) {
+        } catch (Exception e) {
             // swallow exception
         }
         return l;

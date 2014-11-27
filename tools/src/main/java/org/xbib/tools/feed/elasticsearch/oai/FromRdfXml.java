@@ -52,6 +52,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.Date;
@@ -95,8 +96,8 @@ public class FromRdfXml extends Feeder {
                 settings.get("index", "oai"),
                 settings.get("type", "oai"));
         RdfContentBuilder builder = routeRdfXContentBuilder(params);
-        RdfXmlContentParser parser = new RdfXmlContentParser();
-        parser.builder(builder);
+        RdfXmlContentParser parser = new RdfXmlContentParser((InputStream)null);
+        parser.setBuilder(builder);
         MetadataHandler metadataHandler = new MyHandler(params, builder, parser.getHandler());
         request.addHandler(metadataHandler);
         ListRecordsListener listener = new ListRecordsListener(request);

@@ -45,8 +45,8 @@ public class RouteRdfXContentGenerator<R extends RouteRdfXContentParams> extends
     }
 
     @Override
-    public RouteRdfXContentGenerator resource(Resource resource)  throws IOException {
-        super.resource(resource);
+    public RouteRdfXContentGenerator receive(Resource resource)  throws IOException {
+        super.receive(resource);
         RouteRdfXContent.RouteHandler handler = getParams().getHandler();
         if (handler != null) {
             handler.complete(getParams().getGenerator().get(), getParams());

@@ -33,7 +33,6 @@ package org.xbib.rdf.io.json;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
@@ -95,10 +94,10 @@ public class JsonReaderTest extends StreamTester {
         };
         RdfContentBuilder builder = turtleBuilder();
         jsonHandler.setBuilder(builder);
-        new JsonContentParser()
+        new JsonContentParser(in)
                 .setHandler(jsonHandler)
                 .root(new QName("http://purl.org/dc/elements/1.1/", "root", "dc"))
-                .parse(new InputStreamReader(in, "UTF-8"));
+                .parse();
     }
 
 }

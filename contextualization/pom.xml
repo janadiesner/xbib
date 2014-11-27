@@ -79,6 +79,7 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>   
             <type>jar</type>
+            <classifier>indy</classifier>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
