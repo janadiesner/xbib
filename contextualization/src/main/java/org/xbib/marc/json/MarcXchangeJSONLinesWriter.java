@@ -60,6 +60,10 @@ public class MarcXchangeJSONLinesWriter implements MarcXchangeListener, MarcXcha
 
     private MarcXchangeListener marcXchangeListener;
 
+    private String format;
+
+    private String type;
+
     public MarcXchangeJSONLinesWriter(OutputStream out) throws IOException {
         this.out = out;
         this.builder = jsonBuilder(out);
@@ -83,6 +87,16 @@ public class MarcXchangeJSONLinesWriter implements MarcXchangeListener, MarcXcha
         // empty
     }
 
+    public MarcXchangeJSONLinesWriter setFormat(String format) {
+        this.format = format;
+        return this;
+    }
+
+    public MarcXchangeJSONLinesWriter setType(String type) {
+        this.type = type;
+        return this;
+    }
+
     @Override
     public void beginCollection() {
         if (marcXchangeListener != null) {
@@ -99,8 +113,11 @@ public class MarcXchangeJSONLinesWriter implements MarcXchangeListener, MarcXcha
 
     @Override
     public void beginRecord(String format, String type) {
-        if (marcXchangeListener != null) {
-            marcXchangeListener.beginRecord(format, type);
+        if (this.format != null) {
+            format = this.format;
+        }
+        if (this.type != null) {
+            type = this.type;
         }
         try {
             builder.startObject();
@@ -113,13 +130,13 @@ public class MarcXchangeJSONLinesWriter implements MarcXchangeListener, MarcXcha
         } catch (IOException e) {
             throw new MarcException(e);
         }
+        if (marcXchangeListener != null) {
+            marcXchangeListener.beginRecord(format, type);
+        }
     }
 
     @Override
     public void endRecord() {
-        if (marcXchangeListener != null) {
-            marcXchangeListener.endRecord();
-        }
         try {
             builder.endObject();
             builder.flush();
@@ -127,13 +144,13 @@ public class MarcXchangeJSONLinesWriter implements MarcXchangeListener, MarcXcha
         } catch (IOException e) {
             throw new MarcException(e);
         }
+        if (marcXchangeListener != null) {
+            marcXchangeListener.endRecord();
+        }
     }
 
     @Override
     public void leader(String label) {
-        if (marcXchangeListener != null) {
-            marcXchangeListener.leader(label);
-        }
         try {
             if (label != null) {
                 builder.field(LEADER_TAG, label);
@@ -141,22 +158,22 @@ public class MarcXchangeJSONLinesWriter implements MarcXchangeListener, MarcXcha
         } catch (IOException e) {
             throw new MarcException(e);
         }
+        if (marcXchangeListener != null) {
+            marcXchangeListener.leader(label);
+        }
     }
 
     @Override
     public void beginControlField(Field field) {
+        fields = new FieldList();
+        fields.add(field);
         if (marcXchangeListener != null) {
             marcXchangeListener.beginControlField(field);
         }
-        fields = new FieldList();
-        fields.add(field);
     }
 
     @Override
     public void endControlField(Field field) {
-        if (marcXchangeListener != null) {
-            marcXchangeListener.endControlField(field);
-        }
         String data = field != null ? field.data() : null;
         if (transformer != null) {
             data = transformer.transform(data);
@@ -168,22 +185,22 @@ public class MarcXchangeJSONLinesWriter implements MarcXchangeListener, MarcXcha
         } catch (IOException e) {
             throw new MarcException(e);
         }
+        if (marcXchangeListener != null) {
+            marcXchangeListener.endControlField(field);
+        }
     }
 
     @Override
     public void beginDataField(Field field) {
+        fields = new FieldList();
+        fields.add(field);
         if (marcXchangeListener != null) {
             marcXchangeListener.beginDataField(field);
         }
-        fields = new FieldList();
-        fields.add(field);
     }
 
     @Override
     public void endDataField(Field field) {
-        if (marcXchangeListener != null) {
-            marcXchangeListener.endDataField(field);
-        }
         String data = field != null ? field.data() : null;
         // if we have no subfields (data is in data field),
         // so move data to a subfield with subfield code "a"
@@ -192,22 +209,28 @@ public class MarcXchangeJSONLinesWriter implements MarcXchangeListener, MarcXcha
             endSubField(field);
         }
         try {
-            Iterator<Field> it = fields.iterator();
-            Field f = it.next();
-            builder.startObject(f.tag());
-            if (!f.indicator().isEmpty()) {
-                builder.startObject(f.indicator().replace(' ', '_'));
-            }
-            while (it.hasNext()) {
-                f = it.next();
-                builder.field(f.subfieldId(), f.data());
-            }
-            if (!f.indicator().isEmpty()) {
+            if (fields != null && !fields.isEmpty()) {
+                Iterator<Field> it = fields.iterator();
+                Field f = it.next();
+                String ind = f.indicator();
+                builder.startObject(f.tag());
+                if (ind != null && !ind.isEmpty()) {
+                    builder.startObject(ind.replace(' ', '_'));
+                }
+                while (it.hasNext()) {
+                    f = it.next();
+                    builder.field(f.subfieldId(), f.data());
+                }
+                if (ind != null && !ind.isEmpty()) {
+                    builder.endObject();
+                }
                 builder.endObject();
             }
-            builder.endObject();
         } catch (IOException e) {
             throw new MarcException(e);
+        }
+        if (marcXchangeListener != null) {
+            marcXchangeListener.endDataField(field);
         }
     }
 
@@ -220,15 +243,14 @@ public class MarcXchangeJSONLinesWriter implements MarcXchangeListener, MarcXcha
 
     @Override
     public void endSubField(Field field) {
+        if (field != null) {
+            if (transformer != null) {
+                field.data(transformer.transform(field.data()));
+            }
+            fields.add(field);
+        }
         if (marcXchangeListener != null) {
             marcXchangeListener.endSubField(field);
         }
-        if (field == null) {
-            return;
-        }
-        if (transformer != null) {
-            field.data(transformer.transform(field.data()));
-        }
-        fields.add(field);
     }
 }
