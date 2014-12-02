@@ -36,16 +36,12 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 /**
  *  Factory for OAI clients
  *
  */
 public class OAIClientFactory {
-
-    private static final Logger logger = LoggerFactory.getLogger(OAIClientFactory.class.getName());
 
     private final static OAIClientFactory instance = new OAIClientFactory();
 
@@ -67,7 +63,7 @@ public class OAIClientFactory {
             try {
                 properties.load(in);
             } catch (IOException ex) {
-                logger.error(ex.getMessage(), ex);
+                // ignore
             }
             DefaultOAIClient client = new DefaultOAIClient();
             client.setURL(URI.create(properties.getProperty("uri")));

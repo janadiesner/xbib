@@ -1,6 +1,6 @@
 package org.xbib.syslog.impl.message.modifier.sequential;
 
-import org.xbib.syslog.SyslogIF;
+import org.xbib.syslog.Syslogger;
 import org.xbib.syslog.SyslogMessageModifierIF;
 
 /**
@@ -75,7 +75,7 @@ public class SequentialSyslogMessageModifier implements SyslogMessageModifierIF 
         return this.config;
     }
 
-    public String modify(SyslogIF syslog, int facility, int level, String message) {
+    public String modify(Syslogger syslog, int facility, int level, String message) {
         StringBuffer buffer = new StringBuffer(message);
 
         buffer.append(this.config.getPrefix());

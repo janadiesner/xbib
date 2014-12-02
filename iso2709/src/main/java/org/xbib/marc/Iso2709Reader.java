@@ -55,7 +55,9 @@ import java.util.Map;
 /**
  * ISO 2709 reader behaving like a SaX XMLReader
  */
-public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
+public class Iso2709Reader implements FieldReader, XMLReader, MarcXchangeConstants {
+
+    private final Reader reader;
 
     /**
      * The format property
@@ -139,7 +141,12 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
         }
     };
 
-    public Iso2709Reader() {
+    public Iso2709Reader(InputStream in, String encoding) throws IOException {
+        this(new InputStreamReader(in, encoding));
+    }
+
+    public Iso2709Reader(Reader reader) {
+        this.reader = reader;
         this.adapter = new MarcXchangeSaxAdapter();
     }
 
@@ -227,7 +234,12 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
         return this;
     }
 
-    public Iso2709Reader setTransformer(String fieldKey, StringTransformer transformer) {
+    public Iso2709Reader setStringTransformer(StringTransformer transformer) {
+        this.adapter.setTransformer("_default", transformer);
+        return this;
+    }
+
+    public Iso2709Reader setStringTransformer(String fieldKey, StringTransformer transformer) {
         this.adapter.setTransformer(fieldKey, transformer);
         return this;
     }
@@ -324,27 +336,15 @@ public class Iso2709Reader implements XMLReader, MarcXchangeConstants {
                 .setTransformData(transformData);
     }
 
-    public BufferedFieldStreamReader stream(InputStream in) throws IOException {
-        return setup(adapter).setInputStream(in).fieldStream();
-    }
-
-    public BufferedFieldStreamReader mappedStream(InputStream in) throws IOException {
-        return setup(adapter).setInputStream(in).mappedFieldStream();
-    }
-
-    public BufferedFieldStreamReader stream(Reader reader) throws IOException {
+    public BufferedFieldStreamReader stream() throws IOException {
         return setup(adapter).setReader(reader).fieldStream();
     }
 
-    public BufferedFieldStreamReader mappedStream(Reader reader) throws IOException {
+    public BufferedFieldStreamReader mappedStream() throws IOException {
         return setup(adapter).setReader(reader).mappedFieldStream();
     }
 
-    public void parse(InputStream in) throws IOException {
-        parse(new InputStreamReader(in, "UTF-8"));
-    }
-
-    public void parse(Reader reader) throws IOException {
+    public void parse() throws IOException {
         try {
             parse(new InputSource(reader));
         } catch (SAXException e) {

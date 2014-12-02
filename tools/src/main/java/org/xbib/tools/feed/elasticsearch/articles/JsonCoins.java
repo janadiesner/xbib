@@ -34,12 +34,12 @@ package org.xbib.tools.feed.elasticsearch.articles;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
 import org.xbib.io.InputService;
 import org.xbib.io.archive.file.Finder;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Literal;
@@ -77,7 +77,7 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
  */
 public class JsonCoins extends Feeder {
 
-    private final static Logger logger = LoggerFactory.getLogger(JsonCoins.class.getSimpleName());
+    private final static Logger logger = LogManager.getLogger(JsonCoins.class.getSimpleName());
 
     private final static IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
 

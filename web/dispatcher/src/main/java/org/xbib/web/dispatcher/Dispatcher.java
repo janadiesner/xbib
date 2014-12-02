@@ -2,6 +2,8 @@ package org.xbib.web.dispatcher;
 
 import com.google.common.collect.Lists;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -10,8 +12,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.search.SearchHit;
 
 import org.xbib.common.xcontent.XContentHelper;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.tools.merge.zdb.entities.Institution;
 import org.xbib.tools.merge.zdb.entities.Service;
 
@@ -37,7 +37,7 @@ import static org.elasticsearch.index.query.QueryBuilders.termQuery;
  */
 public class Dispatcher {
 
-    private final static Logger logger = LoggerFactory.getLogger(Dispatcher.class.getName());
+    private final static Logger logger = LogManager.getLogger(Dispatcher.class.getName());
 
     public Map<String,Object> execute(Client client, DispatcherRequest request) throws IOException {
         if (client == null) {

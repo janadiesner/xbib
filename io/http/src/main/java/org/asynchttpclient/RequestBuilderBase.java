@@ -2,10 +2,10 @@ package org.asynchttpclient;
 
 import static org.asynchttpclient.util.MiscUtil.isNonEmpty;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.util.AsyncHttpProviderUtils;
 import org.asynchttpclient.util.UTF8UrlEncoder;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -28,7 +28,7 @@ import java.util.Map.Entry;
  */
 public abstract class RequestBuilderBase<T extends RequestBuilderBase<T>> {
 
-    private final static Logger logger = LoggerFactory.getLogger(RequestBuilderBase.class.getName());
+    private final static Logger logger = LogManager.getLogger(RequestBuilderBase.class.getName());
 
     private static final URI DEFAULT_REQUEST_URL = URI.create("http://localhost");
 

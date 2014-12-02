@@ -31,6 +31,8 @@
  */
 package org.xbib.oai.client;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
 import org.xbib.util.DateUtil;
@@ -39,8 +41,6 @@ import org.xbib.io.Packet;
 import org.xbib.io.Session;
 import org.xbib.io.archive.tar.TarConnectionFactory;
 import org.xbib.io.archive.tar.TarSession;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.xml.XmlMetadataHandler;
 import org.xml.sax.SAXException;
@@ -55,7 +55,7 @@ import java.net.URI;
  */
 public class NatLizClientTest {
 
-    private final Logger logger = LoggerFactory.getLogger(NatLizClientTest.class.getName());
+    private final static Logger logger = LogManager.getLogger(NatLizClientTest.class.getName());
 
     private TarSession session;
 

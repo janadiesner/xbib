@@ -1,10 +1,10 @@
 package org.asynchttpclient.multipart;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.RandomAccessBody;
 
 import org.asynchttpclient.ByteArrayPart;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,7 +21,7 @@ import java.util.Set;
 
 public class MultipartBody implements RandomAccessBody {
 
-    private final static Logger logger = LoggerFactory.getLogger(MultipartBody.class.getName());
+    private final static Logger logger = LogManager.getLogger(MultipartBody.class.getName());
     private byte[] boundary;
     private long contentLength;
     private List<org.asynchttpclient.Part> parts;

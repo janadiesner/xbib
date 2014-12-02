@@ -33,8 +33,6 @@ package org.xbib.tools.convert.freebase;
 
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentBuilder;
@@ -54,8 +52,6 @@ import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
  * Freebase converter
  */
 public class Freebase extends Converter {
-
-    private final static Logger logger = LoggerFactory.getLogger(Freebase.class.getName());
 
     @Override
     public String getName() {

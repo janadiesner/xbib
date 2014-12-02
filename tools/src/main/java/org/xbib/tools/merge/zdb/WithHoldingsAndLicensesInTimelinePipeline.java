@@ -35,6 +35,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -44,8 +46,6 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.xbib.common.settings.Settings;
 import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineRequestListener;
@@ -125,7 +125,7 @@ public class WithHoldingsAndLicensesInTimelinePipeline implements Pipeline<Boole
         this.service = service;
         this.listeners = newHashMap();
         this.buildQueue = new ConcurrentLinkedQueue();
-        this.logger = LoggerFactory.getLogger(toString());
+        this.logger = LogManager.getLogger(toString());
         this.mapper = new ObjectMapper();
 
         Settings settings = service.settings();

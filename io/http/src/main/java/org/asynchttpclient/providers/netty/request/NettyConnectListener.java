@@ -11,6 +11,8 @@ import java.net.ConnectException;
 import java.net.URI;
 import java.nio.channels.ClosedChannelException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHandler;
 import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.ProxyServer;
@@ -19,8 +21,6 @@ import org.asynchttpclient.providers.netty.channel.Channels;
 import org.asynchttpclient.providers.netty.future.NettyResponseFuture;
 import org.asynchttpclient.providers.netty.future.NettyResponseFutures;
 import org.asynchttpclient.util.ProxyUtils;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 /**
  * Non Blocking connect.
@@ -29,7 +29,7 @@ import org.xbib.logging.LoggerFactory;
 // the future has it too
 final class NettyConnectListener<T> implements ChannelFutureListener {
 
-    private final static Logger logger = LoggerFactory.getLogger(NettyConnectListener.class.getName());
+    private final static Logger logger = LogManager.getLogger(NettyConnectListener.class.getName());
 
     private final AsyncHttpClientConfig config;
 

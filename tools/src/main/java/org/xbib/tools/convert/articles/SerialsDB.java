@@ -31,12 +31,12 @@
  */
 package org.xbib.tools.convert.articles;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.csv.CSVParser;
 import org.xbib.grouping.bibliographic.endeavor.PublishedJournal;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentBuilder;
@@ -63,7 +63,7 @@ import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
  */
 public class SerialsDB extends Converter {
 
-    private final static Logger logger = LoggerFactory.getLogger(SerialsDB.class.getSimpleName());
+    private final static Logger logger = LogManager.getLogger(SerialsDB.class.getSimpleName());
 
     private final static IRINamespaceContext namespaceContext = IRINamespaceContext.newInstance();
 

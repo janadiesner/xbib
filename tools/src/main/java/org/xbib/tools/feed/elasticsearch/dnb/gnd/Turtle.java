@@ -34,8 +34,6 @@ package org.xbib.tools.feed.elasticsearch.dnb.gnd;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentBuilder;
@@ -52,8 +50,6 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
  * GND ingest from Turtle format
  */
 public class Turtle extends Feeder {
-
-    private static final Logger logger = LoggerFactory.getLogger(Turtle.class.getSimpleName());
 
     @Override
     public String getName() {

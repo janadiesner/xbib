@@ -1,8 +1,8 @@
 package org.xbib.io.field;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,7 +11,7 @@ import static org.testng.Assert.assertEquals;
 
 public class GroupStreamTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(FieldStreamTest.class.getName());
+    private static final Logger logger = LogManager.getLogger(FieldStreamTest.class.getName());
 
     int dataCount = 0;
 

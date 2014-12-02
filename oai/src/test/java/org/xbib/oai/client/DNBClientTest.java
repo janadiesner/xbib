@@ -36,13 +36,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
-import org.xbib.rdf.io.xml.XmlContentParser;
 import org.xbib.util.DateUtil;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.identify.IdentifyRequest;
 import org.xbib.oai.client.identify.IdentifyResponseListener;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
@@ -52,7 +51,7 @@ import org.xml.sax.SAXException;
 
 public class DNBClientTest {
 
-    private final Logger logger = LoggerFactory.getLogger(DNBClientTest.class.getName());
+    private final static Logger logger = LogManager.getLogger(DNBClientTest.class.getName());
 
     @Test
     public void testIdentify() throws Exception {

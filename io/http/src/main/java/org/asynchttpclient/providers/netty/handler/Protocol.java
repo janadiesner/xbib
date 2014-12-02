@@ -21,12 +21,8 @@ import org.asynchttpclient.providers.netty.channel.Channels;
 import org.asynchttpclient.providers.netty.future.NettyResponseFuture;
 import org.asynchttpclient.providers.netty.request.NettyRequestSender;
 import org.asynchttpclient.util.AsyncHttpProviderUtils;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public abstract class Protocol {
-
-    private final static Logger logger = LoggerFactory.getLogger(Protocol.class.getName());
 
     protected final Channels channels;
     protected final AsyncHttpClientConfig config;
@@ -80,8 +76,6 @@ public abstract class Protocol {
                     if (request.getUrl().startsWith(WEBSOCKET)) {
                         newUrl = newUrl.replace(HTTP, WEBSOCKET);
                     }
-
-                    logger.debug("Redirecting to {}", newUrl);
 
                     for (String cookieStr : future.getHttpResponse().headers().getAll(HttpHeaders.Names.SET_COOKIE)) {
                         for (Cookie c : CookieDecoder.decode(cookieStr)) {

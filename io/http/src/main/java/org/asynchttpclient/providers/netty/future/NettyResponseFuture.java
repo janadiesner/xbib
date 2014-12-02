@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHandler;
 import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.ConnectionPoolKeyStrategy;
@@ -24,8 +26,6 @@ import org.asynchttpclient.Request;
 import org.asynchttpclient.listenable.AbstractListenableFuture;
 import org.asynchttpclient.providers.netty.DiscardEvent;
 import org.asynchttpclient.providers.netty.channel.Channels;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 /**
  * A {@link java.util.concurrent.Future} that can be used to track when an asynchronous HTTP request has been fully processed.
@@ -34,7 +34,7 @@ import org.xbib.logging.LoggerFactory;
  */
 public final class NettyResponseFuture<V> extends AbstractListenableFuture<V> {
 
-    private final static Logger logger = LoggerFactory.getLogger(NettyResponseFuture.class.getName());
+    private final static Logger logger = LogManager.getLogger(NettyResponseFuture.class.getName());
 
     public final static String MAX_RETRY = "org.asynchttpclient.providers.netty.maxRetry";
 

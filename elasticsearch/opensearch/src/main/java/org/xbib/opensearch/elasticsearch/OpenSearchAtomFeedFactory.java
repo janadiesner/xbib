@@ -35,6 +35,8 @@ import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.provider.managed.FeedConfiguration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.atom.AbderaFeedBuilder;
 import org.xbib.atom.AtomFeedFactory;
 import org.xbib.atom.AtomFeedProperties;
@@ -43,8 +45,6 @@ import org.xbib.common.settings.Settings;
 import org.xbib.elasticsearch.search.CQLRequest;
 import org.xbib.elasticsearch.search.CQLResponse;
 import org.xbib.elasticsearch.search.SearchSupport;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,7 +72,7 @@ public class OpenSearchAtomFeedFactory implements AtomFeedFactory {
     public final static String FEED_INDEX = "feed.index";
     public final static String FEED_TYPE = "feed.type";
     
-    private final static Logger logger = LoggerFactory.getLogger(OpenSearchAtomFeedFactory.class.getName());
+    private final static Logger logger = LogManager.getLogger(OpenSearchAtomFeedFactory.class.getName());
     protected AbderaFeedBuilder builder;
     private SearchSupport support = new SearchSupport();
 
@@ -170,8 +170,7 @@ public class OpenSearchAtomFeedFactory implements AtomFeedFactory {
         try {
             long t0 = System.currentTimeMillis();
             this.builder = new AbderaFeedBuilder(config, query);
-            String mediaType = "application/xml";
-            Logger logger = LoggerFactory.getLogger(mediaType, OpenSearchAtomFeedFactory.class.getName());
+            Logger logger = LogManager.getLogger(OpenSearchAtomFeedFactory.class);
             CQLRequest request = support.newSearchRequest();
             CQLResponse response =request.index(index)
                     .type(type)

@@ -31,11 +31,11 @@
  */
 package org.xbib.oai;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.Request;
 import org.xbib.io.http.netty.NettyHttpResponseListener;
 import org.xbib.io.http.HttpResponse;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.ClientOAIResponse;
 
 import java.io.IOException;
@@ -43,7 +43,7 @@ import java.io.IOException;
 public class DefaultOAIResponseListener<Response extends OAIResponse>
         extends NettyHttpResponseListener implements OAIResponseListener {
 
-    private final Logger logger = LoggerFactory.getLogger(DefaultOAIResponseListener.class.getName());
+    private final Logger logger = LogManager.getLogger(DefaultOAIResponseListener.class.getName());
 
     private OAIRequest request;
 

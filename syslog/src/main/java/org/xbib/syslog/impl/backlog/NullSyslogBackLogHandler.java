@@ -1,7 +1,7 @@
 package org.xbib.syslog.impl.backlog;
 
 import org.xbib.syslog.SyslogBackLogHandlerIF;
-import org.xbib.syslog.SyslogIF;
+import org.xbib.syslog.Syslogger;
 
 /**
  * NullSyslogBackLogHandler can be used if there's no need for a last-chance
@@ -12,12 +12,12 @@ public class NullSyslogBackLogHandler implements SyslogBackLogHandlerIF {
     public void initialize() {
     }
 
-    public void down(SyslogIF syslog, String reason) {
+    public void down(Syslogger syslog, String reason) {
     }
 
-    public void up(SyslogIF syslog) {
+    public void up(Syslogger syslog) {
     }
 
-    public void log(SyslogIF syslog, int level, String message, String reason) {
+    public void log(Syslogger syslog, int level, String message, String reason) {
     }
 }

@@ -2,7 +2,7 @@ package org.xbib.syslog.impl;
 
 import org.xbib.syslog.SyslogBackLogHandlerIF;
 import org.xbib.syslog.SyslogConfigIF;
-import org.xbib.syslog.SyslogIF;
+import org.xbib.syslog.Syslogger;
 import org.xbib.syslog.SyslogMessageIF;
 import org.xbib.syslog.SyslogMessageModifierIF;
 import org.xbib.syslog.SyslogMessageProcessorIF;
@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * AbstractSyslog provides a base abstract implementation of the SyslogIF.
  */
-public abstract class AbstractSyslog implements SyslogIF {
+public abstract class AbstractSyslog implements Syslogger {
 
     protected String syslogProtocol = null;
 

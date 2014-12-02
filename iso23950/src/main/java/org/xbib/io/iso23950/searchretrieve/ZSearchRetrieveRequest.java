@@ -35,6 +35,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.Session;
 import org.xbib.io.iso23950.ErrorRecord;
 import org.xbib.io.iso23950.InitOperation;
@@ -42,8 +45,6 @@ import org.xbib.io.iso23950.PresentOperation;
 import org.xbib.io.iso23950.Record;
 import org.xbib.io.iso23950.RecordHandler;
 import org.xbib.io.iso23950.ZSession;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
 
 /**
@@ -52,7 +53,7 @@ import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
  */
 public abstract class ZSearchRetrieveRequest extends SearchRetrieveRequest {
 
-    private final Logger logger = LoggerFactory.getLogger(ZSearchRetrieveRequest.class.getName());
+    private final static Logger logger = LogManager.getLogger(ZSearchRetrieveRequest.class.getName());
 
     private static final ResourceBundle recordSyntaxBundle =
             ResourceBundle.getBundle("org.xbib.io.iso23950.recordsyntax");

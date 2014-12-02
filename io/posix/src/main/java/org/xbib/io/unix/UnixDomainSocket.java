@@ -4,8 +4,8 @@ import com.sun.jna.LastErrorException;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import com.sun.jna.Structure;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +17,7 @@ import java.util.List;
 
 public class UnixDomainSocket extends Socket {
 
-    private final static Logger logger = LoggerFactory.getLogger(UnixDomainSocket.class.getName());
+    private final static Logger logger = LogManager.getLogger(UnixDomainSocket.class.getName());
 
     public static final int AF_UNIX = 1;
     public static final int SOCK_STREAM = Platform.isSolaris() ? 2 : 1;

@@ -2,13 +2,13 @@ package org.asynchttpclient.listener;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncCompletionHandlerBase;
 import org.asynchttpclient.FluentCaseInsensitiveStringsMap;
 import org.asynchttpclient.HttpResponseBodyPart;
 import org.asynchttpclient.HttpResponseHeaders;
 import org.asynchttpclient.Response;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 /**
  * A {@link org.asynchttpclient.AsyncHandler} that can be used to notify a set of {@link org.asynchttpclient.listener.TransferListener}
@@ -46,7 +46,7 @@ import org.xbib.logging.LoggerFactory;
  */
 public class TransferCompletionHandler extends AsyncCompletionHandlerBase {
 
-    private final static Logger logger = LoggerFactory.getLogger(TransferCompletionHandler.class.getName());
+    private final static Logger logger = LogManager.getLogger(TransferCompletionHandler.class.getName());
 
     private final ConcurrentLinkedQueue<TransferListener> listeners = new ConcurrentLinkedQueue<TransferListener>();
 

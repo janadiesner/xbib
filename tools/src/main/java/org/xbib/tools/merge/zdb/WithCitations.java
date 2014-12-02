@@ -31,6 +31,8 @@
  */
 package org.xbib.tools.merge.zdb;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -46,8 +48,6 @@ import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
 import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
 import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
 import org.xbib.elasticsearch.support.client.search.SearchClient;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.queue.QueuePipelineExecutor;
@@ -59,7 +59,6 @@ import org.xbib.util.ExceptionFormatter;
 
 import java.io.Reader;
 import java.io.Writer;
-import java.net.URI;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -75,7 +74,7 @@ public class WithCitations
         extends QueuePipelineExecutor<Boolean, Manifestation, WithCitationsPipeline, SearchHitPipelineElement>
         implements CommandLineInterpreter {
 
-    private final static Logger logger = LoggerFactory.getLogger(WithCitations.class.getName());
+    private final static Logger logger = LogManager.getLogger(WithCitations.class.getName());
 
     private Set<String> docs;
 

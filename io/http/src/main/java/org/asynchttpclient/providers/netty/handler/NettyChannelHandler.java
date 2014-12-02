@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.providers.netty.Callback;
 import org.asynchttpclient.providers.netty.DiscardEvent;
@@ -20,13 +22,11 @@ import org.asynchttpclient.providers.netty.channel.Channels;
 import org.asynchttpclient.providers.netty.future.NettyResponseFuture;
 import org.asynchttpclient.providers.netty.future.NettyResponseFutures;
 import org.asynchttpclient.providers.netty.request.NettyRequestSender;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 @Sharable
 public class NettyChannelHandler extends ChannelInboundHandlerAdapter {
 
-    static final Logger logger = LoggerFactory.getLogger(NettyChannelHandler.class.getName());
+    private static final Logger logger = LogManager.getLogger(NettyChannelHandler.class.getName());
 
     private final AsyncHttpClientConfig config;
     private final NettyRequestSender requestSender;

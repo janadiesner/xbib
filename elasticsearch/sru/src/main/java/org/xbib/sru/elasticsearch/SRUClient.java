@@ -31,13 +31,13 @@
  */
 package org.xbib.sru.elasticsearch;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.indices.IndexMissingException;
 import org.xbib.elasticsearch.search.CQLRequest;
 import org.xbib.elasticsearch.search.CQLResponse;
 import org.xbib.elasticsearch.search.SearchSupport;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.query.cql.SyntaxException;
 import org.xbib.search.NotFoundError;
 import org.xbib.sru.Diagnostics;
@@ -51,7 +51,7 @@ import java.net.URI;
  */
 public class SRUClient implements org.xbib.sru.client.SRUClient {
 
-    private final Logger logger = LoggerFactory.getLogger(SRUClient.class.getName());
+    private final static Logger logger = LogManager.getLogger(SRUClient.class.getName());
 
     private final SRUService service;
 

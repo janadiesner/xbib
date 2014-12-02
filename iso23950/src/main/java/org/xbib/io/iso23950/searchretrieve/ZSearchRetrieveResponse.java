@@ -48,6 +48,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
 
@@ -111,13 +112,13 @@ public class ZSearchRetrieveResponse extends SearchRetrieveResponse
         // push out results
         ByteArrayInputStream in = new ByteArrayInputStream(records);
         // stream encoding, must always be octet!
-        InputSource source = new InputSource(new InputStreamReader(in, "ISO-8859-1"));
-        SRUFilterReader reader = new SRUFilterReader(this, "UTF-8");
+        Reader reader = new InputStreamReader(in, "ISO-8859-1");
+        SRUFilterReader sruFilterReader = new SRUFilterReader(this, reader, "UTF-8");
         try {
-            reader.setProperty(Iso2709Reader.FORMAT, format);
-            reader.setProperty(Iso2709Reader.TYPE, type);
+            sruFilterReader.setProperty(Iso2709Reader.FORMAT, format);
+            sruFilterReader.setProperty(Iso2709Reader.TYPE, type);
             StreamResult streamResult = new StreamResult(writer);
-            getTransformer().setSource(new SAXSource(reader, source)).setResult(streamResult);
+            getTransformer().setSource(new SAXSource(sruFilterReader, new InputSource(reader))).setResult(streamResult);
             SRUVersion version = SRUVersion.fromString(request.getVersion());
             if (getStylesheets(version) != null) {
                 getTransformer().transform(Arrays.asList(getStylesheets(version)));

@@ -32,12 +32,7 @@
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>contextualization</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
-            <artifactId>logging</artifactId>
+            <artifactId>entity</artifactId>
             <type>jar</type>
         </dependency>
     </dependencies>

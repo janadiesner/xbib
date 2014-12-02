@@ -31,8 +31,9 @@
  */
 package org.xbib.xml.namespace;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.xml.namespace.NamespaceContext;
 import java.util.Enumeration;
@@ -49,7 +50,7 @@ import java.util.TreeMap;
  */
 public class XmlNamespaceContext implements NamespaceContext {
 
-    private static final Logger logger = LoggerFactory.getLogger(XmlNamespaceContext.class.getName());
+    private static final Logger logger = LogManager.getLogger(XmlNamespaceContext.class.getName());
 
     private static final String DEFAULT_RESOURCE = "org.xbib.xml.namespaces";
 

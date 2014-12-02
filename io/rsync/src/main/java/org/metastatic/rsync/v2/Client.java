@@ -25,11 +25,11 @@ along with Jarsync; if not, write to the
 
 package org.metastatic.rsync.v2;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.metastatic.rsync.Checksum32;
 import org.metastatic.rsync.Configuration;
 import org.metastatic.rsync.Util;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
@@ -53,8 +53,7 @@ import java.util.List;
 public class Client
         implements Constants {
 
-    private final static Logger logger = LoggerFactory.getLogger(Client.class.getName());
-
+    private final static Logger logger = LogManager.getLogger(Client.class.getName());
 
     public static final String PROGNAME = "jarsync";
 

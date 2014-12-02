@@ -40,6 +40,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.search.facet.Facets;
 import org.w3c.dom.Document;
 
@@ -50,22 +52,18 @@ import org.xbib.facet.FacetListener;
 import org.xbib.io.StreamUtil;
 import org.xbib.io.stream.StreamByteBuffer;
 import org.xbib.json.transform.JsonStylesheet;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.SRUVersion;
 import org.xbib.sru.facet.FacetedResult;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
 import org.xbib.sru.searchretrieve.SearchRetrieveResponse;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Elasticsearch SRU response
- *
  */
 public class SRUResponse extends SearchRetrieveResponse {
 
-    private final Logger logger = LoggerFactory.getLogger(SRUResponse.class.getName());
+    private final static Logger logger = LogManager.getLogger(SRUResponse.class.getName());
 
     private final static DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 

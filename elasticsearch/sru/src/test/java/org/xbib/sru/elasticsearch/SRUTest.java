@@ -35,9 +35,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.Diagnostics;
 import org.xbib.sru.SRUVersion;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
@@ -48,7 +48,7 @@ import org.xbib.xml.transform.StylesheetTransformer;
 
 public class SRUTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(SRUTest.class.getName());
+    private static final Logger logger = LogManager.getLogger(SRUTest.class.getName());
 
     @Test
     public void testElasticsearchSearchRetrieve() throws Exception {

@@ -1,10 +1,10 @@
 
 package org.xbib.web.dispatcher;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.Client;
 import org.xbib.common.settings.Settings;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -28,7 +28,7 @@ import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 @Path("/router/v1")
 public class RoutingService {
 
-    private final static Logger logger = LoggerFactory.getLogger(RoutingService.class.getName());
+    private final static Logger logger = LogManager.getLogger(RoutingService.class.getName());
 
     @GET
     @Produces({"application/json;charset=UTF-8"})

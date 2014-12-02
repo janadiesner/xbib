@@ -31,14 +31,14 @@
  */
 package org.xbib.tools;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.Connection;
 import org.xbib.io.NullWriter;
 import org.xbib.io.Session;
 import org.xbib.io.StringPacket;
 import org.xbib.io.archive.tar.TarConnectionFactory;
 import org.xbib.io.archive.tar.TarSession;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
@@ -69,7 +69,7 @@ import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
  */
 public abstract class OAIHarvester extends Converter {
 
-    private final static Logger logger = LoggerFactory.getLogger(OAIHarvester.class.getSimpleName());
+    private final static Logger logger = LogManager.getLogger(OAIHarvester.class.getSimpleName());
 
     private static Session<StringPacket> session;
 

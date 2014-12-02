@@ -31,10 +31,10 @@
  */
 package org.xbib.tools.convert.zdb;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.csv.CSVGenerator;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.oai.xml.MetadataHandler;
@@ -63,7 +63,7 @@ import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
  */
 public class FromOAI2CSV extends OAIHarvester {
 
-    private final static Logger logger = LoggerFactory.getLogger(FromOAI2CSV.class.getName());
+    private final static Logger logger = LogManager.getLogger(FromOAI2CSV.class.getName());
 
     @Override
     public String getName() {

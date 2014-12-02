@@ -31,6 +31,8 @@
  */
 package org.xbib.oai.client;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
@@ -38,8 +40,6 @@ import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
@@ -55,7 +55,7 @@ import java.io.StringWriter;
  */
 public class DOAJArticleClientTest {
 
-    private final Logger logger = LoggerFactory.getLogger(DOAJArticleClientTest.class.getName());
+    private final static Logger logger = LogManager.getLogger(DOAJArticleClientTest.class.getName());
 
     private final static String DOAJ_NS_PREFIX = "doaj";
 

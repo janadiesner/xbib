@@ -1,20 +1,18 @@
 
 package org.xbib.web.dispatcher;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 import org.xbib.io.InputService;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class HebisDispatcherTest {
 
-    private final Logger logger = LoggerFactory.getLogger(HebisDispatcherTest.class.getName());
+    private final static Logger logger = LogManager.getLogger(HebisDispatcherTest.class.getName());
 
     @Test
     public void testHebisDispatcher() throws IOException {

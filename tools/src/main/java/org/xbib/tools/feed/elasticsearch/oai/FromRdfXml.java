@@ -31,8 +31,8 @@
  */
 package org.xbib.tools.feed.elasticsearch.oai;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
@@ -64,7 +64,7 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
  */
 public class FromRdfXml extends Feeder {
 
-    private final Logger logger = LoggerFactory.getLogger(FromRdfXml.class.getSimpleName());
+    private final static Logger logger = LogManager.getLogger(FromRdfXml.class.getSimpleName());
 
     @Override
     public String getName() {

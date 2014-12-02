@@ -31,13 +31,13 @@
  */
 package org.xbib.tools.feed.elasticsearch.zdb;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.entities.marc.MARCEntityBuilderState;
 import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.io.InputService;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Iso2709Reader;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.pipeline.Pipeline;
@@ -62,7 +62,7 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
  */
 public final class FromMarcXML extends Feeder {
 
-    private final static Logger logger = LoggerFactory.getLogger(FromMarcXML.class.getName());
+    private final static Logger logger = LogManager.getLogger(FromMarcXML.class.getName());
 
     private final static Charset UTF8 = Charset.forName("UTF-8");
 
@@ -97,7 +97,8 @@ public final class FromMarcXML extends Feeder {
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                 .setStringTransformer(value -> Normalizer.normalize(new String(value.getBytes(ISO88591), UTF8), Normalizer.Form.NFKC))
                 .addListener(queue);
-        final Iso2709Reader reader = new Iso2709Reader()
+        InputStreamReader r = new InputStreamReader(InputService.getInputStream(uri), ISO88591);
+        final Iso2709Reader reader = new Iso2709Reader(r)
                 .setMarcXchangeListener(kv);
         reader.setProperty(Iso2709Reader.FORMAT, "MARC21");
         reader.setProperty(Iso2709Reader.TYPE, "Bibliographic");
@@ -105,8 +106,7 @@ public final class FromMarcXML extends Feeder {
             reader.setProperty(Iso2709Reader.TYPE, "Holdings");
         }
         reader.setProperty(Iso2709Reader.FATAL_ERRORS, false);
-        InputStreamReader r = new InputStreamReader(InputService.getInputStream(uri), ISO88591);
-        reader.parse(r);
+        reader.parse();
         r.close();
         queue.close();
         if (settings.getAsBoolean("detect", false)) {

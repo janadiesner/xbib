@@ -53,7 +53,7 @@ public class Aleph500PublishSaxTest extends StreamTester {
         InputStream in = getClass().getResource("DE-605-aleph500-publish.xml").openStream();
         File file = File.createTempFile("DE-605-sax-result.", ".xml");
         FileOutputStream out = new FileOutputStream(file);
-        MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader()
+        MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader(in)
             .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
 
         // transform MAB to MARC21
@@ -116,7 +116,7 @@ public class Aleph500PublishSaxTest extends StreamTester {
         reader.setMarcXchangeListener(writer);
         writer.startDocument();
         writer.beginCollection();
-        reader.parse(in);
+        reader.parse();
         writer.endCollection();
         writer.endDocument();
         out.close();

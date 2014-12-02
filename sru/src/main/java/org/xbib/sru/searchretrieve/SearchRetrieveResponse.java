@@ -41,11 +41,11 @@ import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
 import javax.xml.transform.TransformerException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.Request;
 import org.xbib.io.http.HttpResponse;
 import org.xbib.io.http.HttpResponseListener;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.DefaultSRUResponse;
 import org.xbib.sru.SRUResponse;
 import org.xbib.sru.SRUVersion;
@@ -60,7 +60,7 @@ import org.xml.sax.InputSource;
 public class SearchRetrieveResponse extends DefaultSRUResponse
         implements SRUResponse, SearchRetrieveListener, HttpResponseListener, XMLEventConsumer {
 
-    private final Logger logger = LoggerFactory.getLogger(SearchRetrieveResponse.class.getName());
+    private final static Logger logger = LogManager.getLogger(SearchRetrieveResponse.class.getName());
 
     private final SearchRetrieveRequest request;
 

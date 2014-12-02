@@ -35,13 +35,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ResourceBundle;
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public class Bib1Test {
 
-    private static final Logger logger = LoggerFactory.getLogger(Bib1Test.class.getName());
-    
     @Test
     public void testBibUse() {
         ResourceBundle bundle = ResourceBundle.getBundle("org.xbib.io.iso23950.bib-1");
@@ -51,7 +47,7 @@ public class Bib1Test {
         }
         Collections.sort(values);
         for (Object v : values) {
-            logger.info(v.toString());
+            //logger.info(v.toString());
         }
     }
 }

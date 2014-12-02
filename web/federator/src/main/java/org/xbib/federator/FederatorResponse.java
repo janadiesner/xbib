@@ -32,7 +32,6 @@
 package org.xbib.federator;
 
 import java.io.Writer;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
 import javax.xml.stream.XMLEventFactory;
@@ -42,13 +41,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.ProcessingInstruction;
 import javax.xml.stream.events.XMLEvent;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.SRUConstants;
 
 public class FederatorResponse {
-
-    private final static Logger logger = LoggerFactory.getLogger(FederatorResponse.class.getName());
 
     private final static XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 

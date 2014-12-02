@@ -1,14 +1,14 @@
 package org.xbib.sru.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.io.negotiate.MediaRangeSpec;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public class ContentTypeNegotiatorTest extends Assert {
     
-    private static final Logger logger = LoggerFactory.getLogger(ContentTypeNegotiatorTest.class.getName());
+    private static final Logger logger = LogManager.getLogger(ContentTypeNegotiatorTest.class.getName());
 
     @Test
     public void testNegotiator() throws Exception {

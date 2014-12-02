@@ -1,9 +1,9 @@
 package org.xbib.web.dispatcher;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.negotiate.ContentTypeNegotiator;
 import org.xbib.io.negotiate.MediaRangeSpec;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.web.dispatcher.baw.BAWService;
 import org.xbib.web.dispatcher.bay.BAYService;
 import org.xbib.web.dispatcher.ber.BERService;
@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 @ApplicationPath("app")
 public class DispatcherApplication extends Application {
 
-    private final static Logger logger = LoggerFactory.getLogger(DispatcherApplication.class.getName());
+    private final static Logger logger = LogManager.getLogger(DispatcherApplication.class.getName());
 
     public Set<Class<?>> getClasses() {
         return new HashSet<Class<?>>(Arrays.asList(

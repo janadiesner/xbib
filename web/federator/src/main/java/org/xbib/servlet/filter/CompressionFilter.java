@@ -40,8 +40,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.servlet.filter.common.AbstractFilter;
 import org.xbib.servlet.filter.common.Constants;
 import static org.xbib.servlet.filter.common.Constants.CONTENT_ENCODING_IDENTITY;
@@ -52,7 +52,6 @@ import org.xbib.servlet.filter.compression.CompressedHttpServletRequestWrapper;
 import org.xbib.servlet.filter.compression.CompressedHttpServletResponseWrapper;
 import org.xbib.servlet.filter.compression.EncodedStreamsFactory;
 
-
 /**
  * Servlet Filter implementation class CompressionFilter to handle compressed requests
  * and also respond with compressed contents supporting gzip, compress or
@@ -61,10 +60,7 @@ import org.xbib.servlet.filter.compression.EncodedStreamsFactory;
  */
 public class CompressionFilter extends AbstractFilter {
 
-    /**
-     * Logger
-     */
-    private static final Logger logger = LoggerFactory.getLogger(CompressionFilter.class.getName());
+    private static final Logger logger = LogManager.getLogger(CompressionFilter.class.getName());
 
     /**
      * The threshold number of bytes) to compress

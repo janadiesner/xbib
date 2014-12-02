@@ -38,8 +38,8 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.sru.client.SRUClient;
 import org.xbib.sru.service.SRUService;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
@@ -48,7 +48,7 @@ import org.xbib.sru.service.SRUServiceFactory;
 
 public class SRUAction extends AbstractAction {
 
-    private final Logger logger = LoggerFactory.getLogger(SRUAction.class.getName());
+    private final static Logger logger = LogManager.getLogger(SRUAction.class.getName());
 
     private final XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 

@@ -36,14 +36,14 @@ import java.io.StringReader;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.Request;
 import org.xbib.io.http.netty.NettyHttpResponseListener;
 import org.xbib.oai.OAIResponseListener;
 import org.xbib.oai.util.ResumptionToken;
 import org.xbib.util.DateUtil;
 import org.xbib.io.http.HttpResponse;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import org.xbib.xml.XMLUtil;
 import org.xbib.xml.transform.StylesheetTransformer;
@@ -52,7 +52,7 @@ import org.xml.sax.InputSource;
 public class ListRecordsListener extends NettyHttpResponseListener
         implements OAIResponseListener {
 
-    private final Logger logger = LoggerFactory.getLogger(ListRecordsListener.class.getName());
+    private final static Logger logger = LogManager.getLogger(ListRecordsListener.class.getName());
 
     private final ListRecordsRequest request;
 

@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHandler;
 import org.asynchttpclient.AsyncHandler.STATE;
 import org.asynchttpclient.AsyncHttpClientConfig;
@@ -43,12 +45,10 @@ import org.asynchttpclient.providers.netty.response.ResponseHeaders;
 import org.asynchttpclient.providers.netty.response.ResponseStatus;
 import org.asynchttpclient.spnego.SpnegoEngine;
 import org.asynchttpclient.util.AsyncHttpProviderUtils;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 final class HttpProtocol extends Protocol {
 
-    private final static Logger logger = LoggerFactory.getLogger(HttpProtocol.class.getName());
+    private final static Logger logger = LogManager.getLogger(HttpProtocol.class.getName());
 
     public HttpProtocol(Channels channels, AsyncHttpClientConfig config, NettyAsyncHttpProviderConfig nettyConfig, NettyRequestSender requestSender) {
         super(channels, config, nettyConfig, requestSender);

@@ -59,16 +59,11 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.ExtensibleElement;
 import org.apache.abdera.model.Feed;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 /**
  * The Abdera feed builder for atom feeds is an XML event consumer
- *
  */
 public class AbderaFeedBuilder implements XMLEventConsumer {
-
-    private final static Logger logger = LoggerFactory.getLogger(AbderaFeedBuilder.class.getName());
 
     private final static RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
 
@@ -238,8 +233,8 @@ public class AbderaFeedBuilder implements XMLEventConsumer {
         addProcessTime(processMillis);
         addOpenSearch(totalHits, from, size);
         String s = addStyleSheet();
-        logger.info("[query={}] [hits={}] [millis={}] [searchtime={}] [stylesheet={}]",
-                query, totalHits, millis, processMillis, s);
+        //logger.info("[query={}] [hits={}] [millis={}] [searchtime={}] [stylesheet={}]",
+        //        query, totalHits, millis, processMillis, s);
         return feed;
     }
 

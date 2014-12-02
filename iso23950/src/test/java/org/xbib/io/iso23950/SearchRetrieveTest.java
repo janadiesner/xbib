@@ -31,15 +31,14 @@
  */
 package org.xbib.io.iso23950;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
-import org.xbib.io.Session;
 import org.xbib.io.iso23950.client.ZClient;
 import org.xbib.io.iso23950.searchretrieve.ZSearchRetrieveRequest;
 import org.xbib.io.iso23950.searchretrieve.ZSearchRetrieveResponse;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.StringWriter;
 import java.net.URI;
@@ -47,7 +46,7 @@ import java.util.Arrays;
 
 public class SearchRetrieveTest {
 
-    private final Logger logger = LoggerFactory.getLogger(SearchRetrieveTest.class.getName());
+    private final static Logger logger = LogManager.getLogger(SearchRetrieveTest.class.getName());
 
     private final static ConnectionService<ZSession> service = ConnectionService.getInstance();
 

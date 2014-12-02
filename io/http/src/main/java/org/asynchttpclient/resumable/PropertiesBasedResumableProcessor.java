@@ -1,7 +1,7 @@
 package org.asynchttpclient.resumable;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PropertiesBasedResumableProcessor implements ResumableAsyncHandler.ResumableProcessor {
 
-    private final static Logger logger = LoggerFactory.getLogger(PropertiesBasedResumableProcessor.class.getName());
+    private final static Logger logger = LogManager.getLogger(PropertiesBasedResumableProcessor.class.getName());
 
     private final static File TMP = new File(System.getProperty("java.io.tmpdir"), "ahc");
 

@@ -1,9 +1,9 @@
 
 package org.xbib.web.dispatcher;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.elasticsearch.search.SearchSupport;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -12,7 +12,7 @@ import javax.servlet.annotation.WebListener;
 @WebListener
 public class ApplicationContextListener implements ServletContextListener {
 
-    private final Logger logger = LoggerFactory.getLogger(ApplicationContextListener.class.getName());
+    private final static Logger logger = LogManager.getLogger(ApplicationContextListener.class.getName());
 
     public static SearchSupport searchSupport;
 

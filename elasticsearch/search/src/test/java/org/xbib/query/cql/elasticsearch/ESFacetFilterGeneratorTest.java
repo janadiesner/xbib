@@ -31,21 +31,19 @@
  */
 package org.xbib.query.cql.elasticsearch;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.elasticsearch.search.CQLRequest;
 import org.xbib.elasticsearch.search.SearchSupport;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 /**
  *  Elasticsearch filter generation
-
  */
 public class ESFacetFilterGeneratorTest extends Assert {
 
-    private final static Logger logger = LoggerFactory.getLogger(ESFacetFilterGeneratorTest.class.getName());
-
+    private final static Logger logger = LogManager.getLogger(ESFacetFilterGeneratorTest.class.getName());
 
     @Test
     public void testFacetFilter() throws Exception {

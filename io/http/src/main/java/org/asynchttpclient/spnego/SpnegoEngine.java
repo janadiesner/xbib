@@ -1,13 +1,13 @@
 package org.asynchttpclient.spnego;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.util.Base64;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class SpnegoEngine {
 
-    private final Logger logger = LoggerFactory.getLogger(SpnegoEngine.class.getName());
+    private final static Logger logger = LogManager.getLogger(SpnegoEngine.class.getName());
 
     private static final String SPNEGO_OID = "1.3.6.1.5.5.2";
 

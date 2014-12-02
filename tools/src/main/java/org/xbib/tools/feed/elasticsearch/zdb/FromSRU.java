@@ -31,6 +31,8 @@
  */
 package org.xbib.tools.feed.elasticsearch.zdb;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
@@ -38,8 +40,6 @@ import org.xbib.entities.marc.MARCEntityBuilderState;
 import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.io.Request;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.xml.MarcXchangeContentHandler;
 import org.xbib.pipeline.PipelineProvider;
@@ -71,7 +71,7 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 public class FromSRU extends Feeder {
 
-    private final static Logger logger = LoggerFactory.getLogger(FromSRU.class.getName());
+    private final static Logger logger = LogManager.getLogger(FromSRU.class.getName());
 
     private SRUClient client;
 

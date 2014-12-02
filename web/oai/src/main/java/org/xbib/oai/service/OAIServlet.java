@@ -44,6 +44,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.server.OAIServer;
 import org.xbib.oai.server.OAIServiceFactory;
@@ -58,8 +60,6 @@ import org.xbib.oai.server.listrecords.ListRecordsServerResponse;
 import org.xbib.oai.server.listsets.ListSetsServerRequest;
 import org.xbib.oai.server.listsets.ListSetsServerResponse;
 import org.xbib.util.DateUtil;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIConstants;
 import org.xbib.oai.OAISession;
 import org.xbib.oai.util.ResumptionToken;
@@ -70,7 +70,7 @@ import org.xbib.oai.util.ResumptionToken;
  */
 public class OAIServlet extends HttpServlet implements OAIConstants {
 
-    private static final Logger logger = LoggerFactory.getLogger(OAIServlet.class.getName());
+    private static final Logger logger = LogManager.getLogger(OAIServlet.class.getName());
 
     private final OAIRequestDumper requestDumper = new OAIRequestDumper();
 

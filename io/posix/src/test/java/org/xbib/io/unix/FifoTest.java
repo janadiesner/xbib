@@ -1,27 +1,23 @@
 
 package org.xbib.io.unix;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 import org.xbib.io.posix.DummyPOSIXHandler;
 import org.xbib.io.posix.FileStat;
 import org.xbib.io.posix.POSIX;
 import org.xbib.io.posix.POSIXFactory;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 public class FifoTest {
 
-    private final static Logger logger = LoggerFactory.getLogger(FifoTest.class.getName());
+    private final static Logger logger = LogManager.getLogger(FifoTest.class.getName());
 
 
     String path = "test_test.fifo";

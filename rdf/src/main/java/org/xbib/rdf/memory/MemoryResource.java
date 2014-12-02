@@ -38,6 +38,8 @@ import org.xbib.rdf.RdfConstants;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.XSDResourceIdentifiers;
+import org.xbib.util.LinkedHashMultiMap;
+import org.xbib.util.MultiMap;
 
 import java.util.ArrayList;
 import java.util.Collection;

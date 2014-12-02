@@ -31,10 +31,10 @@
  */
 package org.xbib.tools;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.common.settings.Settings;
 import org.xbib.io.archive.file.Finder;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.AbstractPipeline;
 import org.xbib.pipeline.Pipeline;
@@ -63,7 +63,7 @@ import static org.xbib.common.settings.ImmutableSettings.settingsBuilder;
 public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline<T, R>>
         extends AbstractPipeline<URIPipelineElement, PipelineException> implements Provider {
 
-    private final static Logger logger = LoggerFactory.getLogger(Converter.class.getSimpleName());
+    private final static Logger logger = LogManager.getLogger(Converter.class.getSimpleName());
 
     private final static URIPipelineElement uriPipelineElement = new URIPipelineElement();
 
@@ -149,7 +149,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
             cleanup();
             if (executor != null) {
                 executor.shutdown();
-                writeMetrics(writer);
+                writeMetrics(executor.metric(), writer);
             }
         }
     }
@@ -170,7 +170,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
             cleanup();
             if (executor != null) {
                 executor.shutdown();
-                writeMetrics(writer);
+                writeMetrics(executor.metric(), writer);
             }
         }
         return this;
@@ -216,10 +216,10 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
         logger.error(error.getMessage(), error);
     }
 
-    protected void writeMetrics(Writer writer) throws Exception {
-        long docs = executor.metric().count();
+    protected void writeMetrics(MeterMetric metric, Writer writer) throws Exception {
+        long docs = metric.count();
         long bytes = 0L;
-        long elapsed = executor.metric().elapsed() / 1000000;
+        long elapsed = metric.elapsed() / 1000000;
         double dps = docs * 1000 / elapsed;
         double avg = bytes / (docs + 1); // avoid div by zero
         double mbps = (bytes * 1000 / elapsed) / (1024 * 1024);

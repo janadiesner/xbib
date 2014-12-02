@@ -33,10 +33,8 @@ package org.xbib.marc.dialects.unimarc;
 
 import org.testng.annotations.Test;
 import org.xbib.marc.Iso2709Reader;
-import org.xbib.marc.transformer.StringTransformer;
 import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xbib.xml.XMLUtil;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -50,17 +48,16 @@ import static org.testng.Assert.assertNull;
 
 public class UNIMARCGreekTest {
 
-    private final Charset ISO88591 = Charset.forName("ISO-8859-1"); // 8 bit
+    private final static Charset ISO88591 = Charset.forName("ISO-8859-1"); // 8 bit
 
-    private final Charset UTF8 = Charset.forName("UTF-8");
+    private final static Charset UTF8 = Charset.forName("UTF-8");
 
     @Test
     public void testUNIMARC() throws IOException, SAXException {
         InputStream in = getClass().getResourceAsStream("serres.mrc");
         try (InputStreamReader r = new InputStreamReader(in, ISO88591)) {
-
-            final Iso2709Reader reader = new Iso2709Reader()
-                    .setTransformer("_default", value -> XMLUtil.sanitizeXml10(new String(value.getBytes(ISO88591), UTF8)).toString());
+            final Iso2709Reader reader = new Iso2709Reader(r)
+                    .setStringTransformer(value -> XMLUtil.sanitizeXml10(new String(value.getBytes(ISO88591), UTF8)).toString());
             File file = File.createTempFile("serres.", ".xml");
             FileWriter w = new FileWriter(file);
             MarcXchangeWriter writer = new MarcXchangeWriter(w);
@@ -68,7 +65,7 @@ public class UNIMARCGreekTest {
             reader.setMarcXchangeListener(writer);
             writer.startDocument();
             writer.beginCollection();
-            reader.parse(new InputSource(r));
+            reader.parse();
             writer.endCollection();
             writer.endDocument();
             assertNull(writer.getException());

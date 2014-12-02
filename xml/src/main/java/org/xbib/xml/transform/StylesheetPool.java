@@ -31,8 +31,9 @@
  */
 package org.xbib.xml.transform;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.Loggers;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
@@ -48,7 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class StylesheetPool {
 
-    private final Logger logger = Loggers.getLogger(StylesheetPool.class);
+    private final static Logger logger = LogManager.getLogger(StylesheetPool.class.getName());
 
     /**
      * A map of precompiled stylesheets ({@link javax.xml.transform.Templates} objects).

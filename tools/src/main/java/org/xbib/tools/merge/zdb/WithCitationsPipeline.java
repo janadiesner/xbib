@@ -32,6 +32,8 @@
 package org.xbib.tools.merge.zdb;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -42,8 +44,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineRequestListener;
@@ -86,7 +86,7 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
     public WithCitationsPipeline(WithCitations service, int number) {
         this.number = number;
         this.service = service;
-        this.logger = LoggerFactory.getLogger(toString());
+        this.logger = LogManager.getLogger(toString());
         this.mapper = new ObjectMapper();
         this.listeners = newHashMap();
     }

@@ -41,9 +41,9 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.iso23950.ZSession;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import z3950.v3.DatabaseName;
 import z3950.v3.InternationalString;
 import z3950.v3.OtherInformation1;
@@ -59,7 +59,7 @@ import z3950.v3.SearchResponse;
  */
 public abstract class AbstractSearchOperation {
 
-    private final Logger logger = LoggerFactory.getLogger(AbstractSearchOperation.class.getName());
+    private final static Logger logger = LogManager.getLogger(AbstractSearchOperation.class.getName());
 
     private long timeout;
 

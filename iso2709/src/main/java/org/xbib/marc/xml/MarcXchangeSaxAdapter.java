@@ -766,6 +766,10 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                             if (transform) {
                                 transform(designator);
                             }
+                            // check if subfield is really there. If not, set to 'a'
+                            if (designator.subfieldId() == null) {
+                                designator.subfieldId("a");
+                            }
                             beginSubField(designator);
                             endSubField(designator);
                         }

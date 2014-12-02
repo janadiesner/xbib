@@ -46,12 +46,15 @@ import static org.xbib.servlet.filter.common.Constants.HTTP_CONTENT_LENGTH_HEADE
 import static org.xbib.servlet.filter.common.Constants.HTTP_CONTENT_TYPE_HEADER;
 import static org.xbib.servlet.filter.common.Constants.HTTP_ETAG_HEADER;
 import static org.xbib.servlet.filter.common.Constants.HTTP_VARY_HEADER;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.servlet.filter.common.IgnoreAcceptContext;
 import org.xbib.servlet.filter.common.WebUtilitiesResponseWrapper;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public class CompressedHttpServletResponseWrapper extends WebUtilitiesResponseWrapper {
+
+    private static final Logger logger = LogManager.getLogger(CompressedHttpServletResponseWrapper.class.getName());
 
     private final HttpServletResponse httpResponse;
 
@@ -84,12 +87,6 @@ public class CompressedHttpServletResponseWrapper extends WebUtilitiesResponseWr
         UNALLOWED_HEADERS.add(HTTP_CONTENT_ENCODING_HEADER.toLowerCase());
         UNALLOWED_HEADERS.add(HTTP_ETAG_HEADER.toLowerCase());
     }
-
-    /**
-     * Logger
-     */
-    private static final Logger logger = LoggerFactory.getLogger(CompressedHttpServletResponseWrapper.class.getName());
-
 
     public CompressedHttpServletResponseWrapper(HttpServletResponse httpResponse,
                                                 EncodedStreamsFactory encodedStreamsFactory,

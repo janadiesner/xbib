@@ -31,8 +31,8 @@
  */
 package org.xbib.oai.client.listrecords;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.oai.client.ClientOAIResponse;
 import org.xbib.util.DateUtil;
 import org.xbib.oai.exceptions.BadArgumentException;
@@ -49,7 +49,7 @@ import java.util.Date;
 
 public class ListRecordsResponse extends ClientOAIResponse {
 
-    private final Logger logger = LoggerFactory.getLogger(ListRecordsResponse.class.getName());
+    private final static Logger logger = LogManager.getLogger(ListRecordsResponse.class.getName());
 
     private ListRecordsRequest request;
 

@@ -39,11 +39,11 @@ import java.text.Normalizer;
 import java.util.Arrays;
 import javax.xml.stream.util.XMLEventConsumer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 import org.xbib.io.Request;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
@@ -57,7 +57,7 @@ import org.xbib.xml.stream.SaxEventConsumer;
 
 public class SRUClientTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(SRUClientTest.class.getName());
+    private static final Logger logger = LogManager.getLogger(SRUClientTest.class.getName());
 
     @Test
     public void testServiceSearchRetrieve() throws Exception {
@@ -78,18 +78,16 @@ public class SRUClientTest {
 
                     @Override
                     public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("begin");
-                            for (Field f : key) {
-                                logger.debug("tag={} ind={} subf={} data={}",
-                                        f.tag(), f.indicator(), f.subfieldId(), f.data());
-                            }
-                            if (value != null) {
-                                logger.debug("value={}", value);
-
-                            }
-                            logger.debug("end");
+                        logger.debug("begin");
+                        for (Field f : key) {
+                            logger.debug("tag={} ind={} subf={} data={}",
+                                    f.tag(), f.indicator(), f.subfieldId(), f.data());
                         }
+                        if (value != null) {
+                            logger.debug("value={}", value);
+
+                        }
+                        logger.debug("end");
                         return this;
                     }
 

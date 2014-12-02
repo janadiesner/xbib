@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.ProxyServer;
 import org.asynchttpclient.ProxyServer.Protocol;
 import org.asynchttpclient.ProxyServerSelector;
 import org.asynchttpclient.Request;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 /**
  * Utilities for Proxy handling.
@@ -24,7 +24,7 @@ import org.xbib.logging.LoggerFactory;
  */
 public class ProxyUtils {
 
-    private final static Logger logger = LoggerFactory.getLogger(ProxyUtils.class.getName());
+    private final static Logger logger = LogManager.getLogger(ProxyUtils.class.getName());
 
     private static final String PROPERTY_PREFIX = "org.asynchttpclient.AsyncHttpClientConfig.proxy.";
 

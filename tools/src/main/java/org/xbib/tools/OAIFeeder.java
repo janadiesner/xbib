@@ -31,12 +31,12 @@
  */
 package org.xbib.tools;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.xbib.io.NullWriter;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
@@ -68,7 +68,7 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
  */
 public abstract class OAIFeeder extends Feeder {
 
-    private final static Logger logger = LoggerFactory.getLogger(OAIFeeder.class.getSimpleName());
+    private final static Logger logger = LogManager.getLogger(OAIFeeder.class.getSimpleName());
 
     @Override
     protected OAIFeeder prepare() throws IOException {

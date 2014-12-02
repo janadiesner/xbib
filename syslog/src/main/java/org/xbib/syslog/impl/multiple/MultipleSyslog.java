@@ -3,7 +3,7 @@ package org.xbib.syslog.impl.multiple;
 import org.xbib.syslog.Syslog;
 import org.xbib.syslog.SyslogConfigIF;
 import org.xbib.syslog.SyslogConstants;
-import org.xbib.syslog.SyslogIF;
+import org.xbib.syslog.Syslogger;
 import org.xbib.syslog.SyslogMessageIF;
 import org.xbib.syslog.SyslogMessageProcessorIF;
 import org.xbib.syslog.SyslogRuntimeException;
@@ -12,7 +12,7 @@ import org.xbib.syslog.SyslogRuntimeException;
  * MultipleSyslog is an aggregator Syslog implementation for allowing a single
  * Syslog call to send to multiple Syslog implementations.
  */
-public class MultipleSyslog implements SyslogIF {
+public class MultipleSyslog implements Syslogger {
 
     protected String syslogProtocol = null;
     protected MultipleSyslogConfig multipleSyslogConfig = null;
@@ -100,7 +100,7 @@ public class MultipleSyslog implements SyslogIF {
         for (int i = 0; i < this.multipleSyslogConfig.getProtocols().size(); i++) {
             String protocol = (String) this.multipleSyslogConfig.getProtocols().get(i);
 
-            SyslogIF syslog = Syslog.getInstance(protocol);
+            Syslogger syslog = Syslog.getInstance(protocol);
 
             syslog.log(level, message);
         }
@@ -110,7 +110,7 @@ public class MultipleSyslog implements SyslogIF {
         for (int i = 0; i < this.multipleSyslogConfig.getProtocols().size(); i++) {
             String protocol = (String) this.multipleSyslogConfig.getProtocols().get(i);
 
-            SyslogIF syslog = Syslog.getInstance(protocol);
+            Syslogger syslog = Syslog.getInstance(protocol);
 
             syslog.log(level, message);
         }
@@ -120,7 +120,7 @@ public class MultipleSyslog implements SyslogIF {
         for (int i = 0; i < this.multipleSyslogConfig.getProtocols().size(); i++) {
             String protocol = (String) this.multipleSyslogConfig.getProtocols().get(i);
 
-            SyslogIF syslog = Syslog.getInstance(protocol);
+            Syslogger syslog = Syslog.getInstance(protocol);
 
             syslog.flush();
         }
@@ -130,7 +130,7 @@ public class MultipleSyslog implements SyslogIF {
         for (int i = 0; i < this.multipleSyslogConfig.getProtocols().size(); i++) {
             String protocol = (String) this.multipleSyslogConfig.getProtocols().get(i);
 
-            SyslogIF syslog = Syslog.getInstance(protocol);
+            Syslogger syslog = Syslog.getInstance(protocol);
 
             syslog.shutdown();
         }

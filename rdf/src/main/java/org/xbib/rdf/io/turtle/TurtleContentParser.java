@@ -32,8 +32,6 @@
 package org.xbib.rdf.io.turtle;
 
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfContentGenerator;
@@ -65,8 +63,6 @@ import java.util.Stack;
  * Triple Language</a>
  */
 public class TurtleContentParser implements RdfContentParser {
-
-    private final static Logger logger = LoggerFactory.getLogger(TurtleContentParser.class.getName());
 
     private final static Resource resource = new MemoryResource();
 
@@ -405,7 +401,7 @@ public class TurtleContentParser implements RdfContentParser {
             ch = read();
             ended = (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r');
             if (!ended) {
-                logger.warn("{} unescaped ''>'' in URI: {}", subject, sb);
+                //logger.warn("{} unescaped ''>'' in URI: {}", subject, sb);
             }
         } while (!ended);
         String decoded = decode(sb.toString(), "UTF-8");
@@ -772,7 +768,7 @@ public class TurtleContentParser implements RdfContentParser {
             if (strict) {
                 throw new IOException(message);
             } else {
-                logger.info(message);
+                //logger.info(message);
             }
         }
     }
@@ -814,7 +810,7 @@ public class TurtleContentParser implements RdfContentParser {
                 if (strict) {
                     throw new IllegalArgumentException("unescaped backslash in: " + s);
                 } else {
-                    logger.warn("unescaped backslash in: " + s);
+                    //logger.warn("unescaped backslash in: " + s);
                     break;
                 }
             }
@@ -865,7 +861,7 @@ public class TurtleContentParser implements RdfContentParser {
                 if (strict) {
                     throw new IllegalArgumentException("unescaped backslash in: " + s);
                 } else {
-                    logger.warn("unescaped backslash in: " + s);
+                    //logger.warn("unescaped backslash in: " + s);
                     sb.append('\\');
                     i = pos + 2;
                 }

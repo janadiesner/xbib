@@ -1,7 +1,7 @@
 package org.xbib.web.handlebars;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.template.handlebars.Handlebars;
 import org.xbib.template.handlebars.HandlebarsContext;
 import org.xbib.template.handlebars.Template;
@@ -23,7 +23,7 @@ import static com.google.common.collect.Lists.newLinkedList;
 
 public class HandlebarsService {
 
-    protected final static Logger logger = LoggerFactory.getLogger(HandlebarsService.class.getName());
+    protected final static Logger logger = LogManager.getLogger(HandlebarsService.class.getName());
 
     protected final static Handlebars handlebars = new Handlebars();
 

@@ -1,11 +1,11 @@
 package org.asynchttpclient;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.filter.FilterContext;
 import org.asynchttpclient.filter.FilterException;
 import org.asynchttpclient.filter.RequestFilter;
 import org.asynchttpclient.resumable.ResumableAsyncHandler;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.Closeable;
 
@@ -125,7 +125,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class AsyncHttpClient implements Closeable {
 
-    private final static Logger logger = LoggerFactory.getLogger(AsyncHttpClient.class.getName());
+    private final static Logger logger = LogManager.getLogger(AsyncHttpClient.class.getName());
 
     /**
      * Providers that will be searched for, on the classpath, in order when no

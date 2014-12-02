@@ -33,8 +33,6 @@
 package org.xbib.csv;
 
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -42,7 +40,6 @@ import java.util.Arrays;
 
 public class CSVGeneratorTest {
 
-    private final Logger logger = LoggerFactory.getLogger(CSVGeneratorTest.class.getName());
 
     @Test
     public void test() throws IOException {
@@ -55,6 +52,5 @@ public class CSVGeneratorTest {
             gen.write("hey look a line seperator \n");
         }
         gen.close();
-        logger.info(writer.toString());
     }
 }

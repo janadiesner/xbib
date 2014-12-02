@@ -73,9 +73,9 @@ public class MarcXchangeSRUTest extends StreamTester {
         };
 
         InputStream in = getClass().getResource("zdb-sru-marcxmlplus.xml").openStream();
-        MarcXchangeReader reader = new MarcXchangeReader();
+        MarcXchangeReader reader = new MarcXchangeReader(in);
         reader.setContentHandler(handler);
-        reader.parse(in);
+        reader.parse();
         in.close();
 
         FileWriter fw = new FileWriter("zdb-sru-marcxmlplus.txt");

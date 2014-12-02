@@ -33,8 +33,6 @@ package org.xbib.tools.feed.elasticsearch.dnb.gnd;
 
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.io.InputService;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentBuilder;
@@ -54,8 +52,6 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
  * Ingest DNB GND RDF/XML to Elasticsearch
  */
 public class RdfXml extends Feeder {
-
-    private final static Logger logger = LoggerFactory.getLogger(RdfXml.class.getSimpleName());
 
     @Override
     public String getName() {

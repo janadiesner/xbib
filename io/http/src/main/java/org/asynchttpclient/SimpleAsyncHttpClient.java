@@ -1,11 +1,11 @@
 package org.asynchttpclient;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.resumable.ResumableAsyncHandler;
 import org.asynchttpclient.resumable.ResumableIOExceptionFilter;
 import org.asynchttpclient.simple.HeaderMap;
 import org.asynchttpclient.simple.SimpleAHCTransferListener;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 
@@ -49,7 +49,7 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class SimpleAsyncHttpClient implements Closeable {
 
-    private final static Logger logger = LoggerFactory.getLogger(SimpleAsyncHttpClient.class.getName());
+    private final static Logger logger = LogManager.getLogger(SimpleAsyncHttpClient.class.getName());
 
     private final AsyncHttpClientConfig config;
 

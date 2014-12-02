@@ -1,6 +1,6 @@
 package org.xbib.syslog.impl.message.modifier.text;
 
-import org.xbib.syslog.SyslogIF;
+import org.xbib.syslog.Syslogger;
 import org.xbib.syslog.SyslogMessageModifierIF;
 import org.xbib.syslog.SyslogRuntimeException;
 
@@ -27,7 +27,7 @@ public class StringCaseSyslogMessageModifier implements SyslogMessageModifierIF 
         }
     }
 
-    public String modify(SyslogIF syslog, int facility, int level, String message) {
+    public String modify(Syslogger syslog, int facility, int level, String message) {
         String _message = message;
 
         if (message != null) {

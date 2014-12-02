@@ -31,8 +31,8 @@
  */
 package org.xbib.xml.transform;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -59,7 +59,7 @@ import java.util.List;
  */
 public class TransformerURIResolver implements URIResolver {
 
-    private final Logger logger = LoggerFactory.getLogger(TransformerURIResolver.class.getName());
+    private final Logger logger = LogManager.getLogger(TransformerURIResolver.class.getName());
 
     private List<InputStream> inputStreams = new LinkedList();
 

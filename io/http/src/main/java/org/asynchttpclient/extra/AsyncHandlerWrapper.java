@@ -2,16 +2,16 @@ package org.asynchttpclient.extra;
 
 import java.util.concurrent.Semaphore;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHandler;
 import org.asynchttpclient.HttpResponseBodyPart;
 import org.asynchttpclient.HttpResponseHeaders;
 import org.asynchttpclient.HttpResponseStatus;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public class AsyncHandlerWrapper<T> implements AsyncHandler<T> {
 
-	private final static Logger logger = LoggerFactory.getLogger(AsyncHandlerWrapper.class.getName());
+	private final static Logger logger = LogManager.getLogger(AsyncHandlerWrapper.class.getName());
 
     private final AsyncHandler<T> asyncHandler;
 

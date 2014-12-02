@@ -1,8 +1,6 @@
 package org.xbib.io.field;
 
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.InputStreamReader;
 import java.util.function.Consumer;
@@ -10,8 +8,6 @@ import java.util.function.Consumer;
 import static org.testng.Assert.assertEquals;
 
 public class StreamTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(StreamTest.class.getName());
 
     @Test
     public void testStream() throws Exception {

@@ -31,6 +31,8 @@
  */
 package org.xbib.tools;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
@@ -38,8 +40,7 @@ import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
 import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
 import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineRequest;
 import org.xbib.util.DateUtil;
@@ -54,11 +55,9 @@ import java.text.NumberFormat;
 public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T, R>>
         extends Converter<T, R, P> {
 
-    private final static Logger logger = LoggerFactory.getLogger(Feeder.class.getSimpleName());
+    private final static Logger logger = LogManager.getLogger(Feeder.class.getSimpleName());
 
     protected static Ingest ingest;
-
-    //protected static ElasticsearchRdfXContentGenerator elasticsearchRdfXContentGenerator;
 
     @Override
     public Feeder<T, R, P> reader(Reader reader) {
@@ -86,13 +85,11 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
         Integer maxbulkactions = settings.getAsInt("maxbulkactions", 1000);
         Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
                 Runtime.getRuntime().availableProcessors());
-        String maxtimewait = settings.get("maxtimewait", "60s");
         ingest = createIngest();
         ingest.maxActionsPerBulkRequest(maxbulkactions)
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
-                .maxRequestWait(TimeValue.parseTimeValue(maxtimewait, TimeValue.timeValueSeconds(60)));
+                .maxRequestWait(TimeValue.timeValueSeconds(60));
         createIndex(ingest);
-        //elasticsearchRdfXContentGenerator = new ElasticsearchRdfXContentGenerator(output);
         return this;
     }
 
@@ -117,11 +114,11 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
     }
 
     @Override
-    protected void writeMetrics(Writer writer) throws Exception {
+    protected void writeMetrics(MeterMetric metric, Writer writer) throws Exception {
         // TODO write output metrics, index output metrics
-        long docs = executor.metric().count();
+        long docs = metric.count();
         long bytes = 0L;
-        long elapsed = executor.metric().elapsed() / 1000000;
+        long elapsed = metric.elapsed() / 1000000;
         double dps = docs * 1000 / elapsed;
         double avg = bytes / (docs + 1); // avoid div by zero
         double mbps = (bytes * 1000 / elapsed) / (1024 * 1024);

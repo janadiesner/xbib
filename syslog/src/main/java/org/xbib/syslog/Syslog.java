@@ -59,10 +59,10 @@ public final class Syslog implements SyslogConstants {
      * @return Returns an instance of SyslogIF.
      * @throws SyslogRuntimeException
      */
-    public static SyslogIF getInstance(String protocol) throws SyslogRuntimeException {
+    public static Syslogger getInstance(String protocol) throws SyslogRuntimeException {
         String _protocol = protocol.toLowerCase();
         if (instances.containsKey(_protocol)) {
-            return (SyslogIF) instances.get(_protocol);
+            return (Syslogger) instances.get(_protocol);
         } else {
             StringBuilder message = new StringBuilder("Syslog protocol \"" + protocol + "\" not defined; call Syslogger.createSyslogInstance(protocol,config) first");
             if (instances.size() > 0) {
@@ -99,7 +99,7 @@ public final class Syslog implements SyslogConstants {
      * @return Returns an instance of SyslogIF.
      * @throws SyslogRuntimeException
      */
-    public static final SyslogIF createInstance(String protocol, SyslogConfigIF config) throws SyslogRuntimeException {
+    public static Syslogger createInstance(String protocol, SyslogConfigIF config) throws SyslogRuntimeException {
         if (protocol == null || "".equals(protocol.trim())) {
             throwRuntimeException("Instance protocol cannot be null or empty");
             return null;
@@ -109,7 +109,7 @@ public final class Syslog implements SyslogConstants {
             return null;
         }
         String syslogProtocol = protocol.toLowerCase();
-        SyslogIF syslog;
+        Syslogger syslog;
         synchronized (instances) {
             if (instances.containsKey(syslogProtocol)) {
                 throwRuntimeException("Syslog protocol \"" + protocol + "\" already defined");
@@ -117,7 +117,7 @@ public final class Syslog implements SyslogConstants {
             }
             try {
                 Class syslogClass = config.getSyslogClass();
-                syslog = (SyslogIF) syslogClass.newInstance();
+                syslog = (Syslogger) syslogClass.newInstance();
             } catch (ClassCastException cse) {
                 if (!config.isThrowExceptionOnInitialize()) {
                     throw new SyslogRuntimeException(cse);
@@ -148,7 +148,7 @@ public final class Syslog implements SyslogConstants {
      * initialize() sets up the default TCP and UDP Syslog protocols, as
      * well as UNIX_SYSLOG and UNIX_SOCKET (if running on a Unix-based system).
      */
-    public synchronized static final void initialize() {
+    public synchronized static void initialize() {
         createInstance(UDP, new UDPNetSyslogConfig());
         createInstance(TCP, new TCPNetSyslogConfig());
 
@@ -182,7 +182,7 @@ public final class Syslog implements SyslogConstants {
             }
             while (i.hasNext()) {
                 String protocol = (String) i.next();
-                SyslogIF syslog = (SyslogIF) instances.get(protocol);
+                Syslogger syslog = (Syslogger) instances.get(protocol);
                 syslog.shutdown();
             }
             instances.clear();
@@ -207,7 +207,7 @@ public final class Syslog implements SyslogConstants {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            SyslogIF syslog = (SyslogIF) instances.get(_protocol);
+            Syslogger syslog = (Syslogger) instances.get(_protocol);
             try {
                 syslog.shutdown();
             } finally {
@@ -225,7 +225,7 @@ public final class Syslog implements SyslogConstants {
      * @param syslog - the Syslog instance to destroy
      * @throws SyslogRuntimeException
      */
-    public synchronized static void destroyInstance(SyslogIF syslog) throws SyslogRuntimeException {
+    public synchronized static void destroyInstance(Syslogger syslog) throws SyslogRuntimeException {
         if (syslog == null) {
             return;
         }

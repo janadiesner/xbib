@@ -3,16 +3,12 @@ package org.xbib.morph.dict;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.dict.Dictionary;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
 public class DictionaryTest extends Assert {
-
-    private final static Logger logger = LoggerFactory.getLogger(DictionaryTest.class.getName());
 
     @Test
     public void testLemmatizer() throws Exception {

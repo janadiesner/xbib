@@ -1,5 +1,7 @@
 package org.asynchttpclient.providers.netty.ws;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.asynchttpclient.websocket.WebSocket;
 import org.asynchttpclient.websocket.WebSocketByteListener;
 import org.asynchttpclient.websocket.WebSocketCloseCodeReasonListener;
@@ -11,8 +13,6 @@ import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -21,7 +21,7 @@ import static io.netty.buffer.Unpooled.wrappedBuffer;
 
 public class NettyWebSocket implements WebSocket {
 
-    private final static Logger logger = LoggerFactory.getLogger(NettyWebSocket.class.getName());
+    private final static Logger logger = LogManager.getLogger(NettyWebSocket.class.getName());
 
     private final Channel channel;
     private final ConcurrentLinkedQueue<WebSocketListener> listeners = new ConcurrentLinkedQueue<WebSocketListener>();

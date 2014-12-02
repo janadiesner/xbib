@@ -3,14 +3,14 @@ package org.xbib.io.unix;
 import com.sun.jna.LastErrorException;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
 public class Fifo {
 
-    private final static Logger logger = LoggerFactory.getLogger(Fifo.class.getName());
+    private final static Logger logger = LogManager.getLogger(Fifo.class.getName());
 
     public static native int mkfifo(String path, int flags) throws LastErrorException;
 

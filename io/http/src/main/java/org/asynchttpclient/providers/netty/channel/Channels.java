@@ -34,6 +34,8 @@ import java.util.concurrent.Semaphore;
 
 import javax.net.ssl.SSLEngine;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHandler;
 import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.ConnectionPoolKeyStrategy;
@@ -45,12 +47,10 @@ import org.asynchttpclient.providers.netty.future.NettyResponseFuture;
 import org.asynchttpclient.providers.netty.handler.NettyChannelHandler;
 import org.asynchttpclient.providers.netty.util.CleanupChannelGroup;
 import org.asynchttpclient.util.SslUtils;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public class Channels {
 
-    private static final Logger logger = LoggerFactory.getLogger(Channels.class.getName());
+    private static final Logger logger = LogManager.getLogger(Channels.class.getName());
 
     public static final String HTTP_HANDLER = "httpHandler";
     public static final String SSL_HANDLER = "sslHandler";

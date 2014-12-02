@@ -31,11 +31,11 @@
  */
 package org.xbib.tools.convert.zdb;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.io.InputService;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.Iso2709Reader;
@@ -57,7 +57,7 @@ import java.util.TreeSet;
  */
 public final class FromMARC extends Converter {
 
-    private final static Logger logger = LoggerFactory.getLogger(FromMARC.class.getName());
+    private final static Logger logger = LogManager.getLogger(FromMARC.class.getName());
 
     private final static Charset UTF8 = Charset.forName("UTF-8");
 
@@ -90,7 +90,8 @@ public final class FromMARC extends Converter {
                 .addListener(queue)
                 .addListener(new LoggingAdapter());
 
-        final Iso2709Reader reader = new Iso2709Reader()
+        InputStreamReader r = new InputStreamReader(InputService.getInputStream(uri), ISO88591);
+        final Iso2709Reader reader = new Iso2709Reader(r)
                 .setMarcXchangeListener(kv);
         // setting the properties is just informational and not used for any purpose.
         reader.setProperty(Iso2709Reader.FORMAT, "MARC21");
@@ -99,8 +100,7 @@ public final class FromMARC extends Converter {
             reader.setProperty(Iso2709Reader.TYPE, "Holdings");
         }
         reader.setProperty(Iso2709Reader.FATAL_ERRORS, false);
-        InputStreamReader r = new InputStreamReader(InputService.getInputStream(uri), ISO88591);
-        reader.parse(r);
+        reader.parse();
         r.close();
         queue.close();
         if (settings.getAsBoolean("detect", false)) {

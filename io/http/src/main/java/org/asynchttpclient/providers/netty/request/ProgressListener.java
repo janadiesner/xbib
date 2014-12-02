@@ -6,18 +6,18 @@ import io.netty.channel.ChannelProgressiveFutureListener;
 import java.nio.channels.ClosedChannelException;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHandler;
 import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.ProgressAsyncHandler;
 import org.asynchttpclient.Realm;
 import org.asynchttpclient.providers.netty.future.NettyResponseFuture;
 import org.asynchttpclient.providers.netty.future.NettyResponseFutures;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public class ProgressListener implements ChannelProgressiveFutureListener {
     
-    private static final Logger logger = LoggerFactory.getLogger(ProgressListener.class.getName());
+    private static final Logger logger = LogManager.getLogger(ProgressListener.class.getName());
 
     private final AsyncHttpClientConfig config;
     private final boolean notifyHeaders;

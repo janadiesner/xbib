@@ -1,8 +1,8 @@
 package org.xbib.sru.iso23950;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.client.SRUClient;
 import org.xbib.sru.iso23950.service.ZSRUServiceFactory;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 
 public class PrivateSRUServiceTest {
 
-    private final Logger logger = LoggerFactory.getLogger(SRUServiceTest.class.getName());
+    private final static Logger logger = LogManager.getLogger(SRUServiceTest.class.getName());
 
     @Test
     public void testSRUService() throws IOException {

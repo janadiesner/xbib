@@ -1,12 +1,12 @@
 package org.xbib.jaxrs;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.iso23950.Diagnostics;
 import org.xbib.io.iso23950.client.ZClient;
 import org.xbib.io.iso23950.client.ZClientFactory;
 import org.xbib.io.iso23950.searchretrieve.ZSearchRetrieveRequest;
 import org.xbib.io.iso23950.searchretrieve.ZSearchRetrieveResponse;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.xml.transform.StylesheetTransformer;
 
 import javax.servlet.ServletConfig;
@@ -22,7 +22,7 @@ import java.io.OutputStreamWriter;
 
 public class SearchService {
 
-    private final static Logger logger = LoggerFactory.getLogger(SearchService.class.getName());
+    private final static Logger logger = LogManager.getLogger(SearchService.class.getName());
 
     @Context
     ServletConfig servletConfig;

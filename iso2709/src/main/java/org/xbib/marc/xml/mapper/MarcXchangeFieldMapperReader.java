@@ -31,6 +31,7 @@
  */
 package org.xbib.marc.xml.mapper;
 
+import org.xbib.marc.FieldReader;
 import org.xbib.marc.MarcXchangeListener;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -49,15 +50,21 @@ import java.util.Map;
  * This Sax-ContentHandler-based MarcXchangeReader reads MarcXML or MarcXchange, maps MarcXchange field to other fields,
  * and fires events to a MarcXchange listener
  */
-public class MarcXchangeFieldMapperReader extends MarcXchangeFieldMapperContentHandler {
+public class MarcXchangeFieldMapperReader extends MarcXchangeFieldMapperContentHandler implements FieldReader {
+
+    private final Reader reader;
 
     private ContentHandler contentHandler;
 
-    public void parse(InputStream in) throws IOException {
-        parse(new InputStreamReader(in, "UTF-8"));
+    public MarcXchangeFieldMapperReader(InputStream in) throws IOException {
+        this(new InputStreamReader(in, "UTF-8"));
     }
 
-    public void parse(Reader reader) throws IOException {
+    public MarcXchangeFieldMapperReader(Reader reader) throws IOException {
+        this.reader = reader;
+    }
+
+    public void parse() throws IOException {
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setNamespaceAware(true);

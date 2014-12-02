@@ -3,11 +3,11 @@ package org.asynchttpclient.extra;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.filter.FilterContext;
 import org.asynchttpclient.filter.FilterException;
 import org.asynchttpclient.filter.RequestFilter;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 /**
  * A {@link org.asynchttpclient.filter.RequestFilter} throttles requests and block when the number of permits is reached, waiting for
@@ -15,7 +15,7 @@ import org.xbib.logging.LoggerFactory;
  */
 public class ThrottleRequestFilter implements RequestFilter {
 
-    private final static Logger logger = LoggerFactory.getLogger(ThrottleRequestFilter.class.getName());
+    private final static Logger logger = LogManager.getLogger(ThrottleRequestFilter.class.getName());
 
     private final Semaphore available;
 

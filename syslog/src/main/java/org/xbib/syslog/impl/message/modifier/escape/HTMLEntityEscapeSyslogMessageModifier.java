@@ -1,6 +1,6 @@
 package org.xbib.syslog.impl.message.modifier.escape;
 
-import org.xbib.syslog.SyslogIF;
+import org.xbib.syslog.Syslogger;
 import org.xbib.syslog.SyslogMessageModifierIF;
 
 /**
@@ -16,7 +16,7 @@ public class HTMLEntityEscapeSyslogMessageModifier implements SyslogMessageModif
         return new HTMLEntityEscapeSyslogMessageModifier();
     }
 
-    public String modify(SyslogIF syslog, int facility, int level, String message) {
+    public String modify(Syslogger syslog, int facility, int level, String message) {
         if (message != null && !"".equals(message.trim())) {
             String escapedMessage = escapeHtml(message);
 

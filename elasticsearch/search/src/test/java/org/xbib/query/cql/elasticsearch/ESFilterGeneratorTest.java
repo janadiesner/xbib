@@ -31,10 +31,10 @@
  */
 package org.xbib.query.cql.elasticsearch;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.query.cql.CQLParser;
 
 import java.io.StringReader;
@@ -44,7 +44,7 @@ import java.io.StringReader;
  */
 public class ESFilterGeneratorTest extends Assert {
 
-    private final static Logger logger = LoggerFactory.getLogger(ESFilterGeneratorTest.class.getName());
+    private final static Logger logger = LogManager.getLogger(ESFilterGeneratorTest.class.getName());
        
     @Test
     public void testSimpleTermFilter() throws Exception {

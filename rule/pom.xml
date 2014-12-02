@@ -47,12 +47,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
-            <artifactId>logging</artifactId>
-            <scope>test</scope>
-            <type>jar</type>
-        </dependency>
     </dependencies>
 
 </project>

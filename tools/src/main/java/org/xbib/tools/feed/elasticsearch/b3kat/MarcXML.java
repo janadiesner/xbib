@@ -31,14 +31,14 @@
  */
 package org.xbib.tools.feed.elasticsearch.b3kat;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.entities.marc.MARCEntityBuilderState;
 import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.entities.marc.direct.MARCDirectQueue;
 import org.xbib.io.InputService;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.marc.xml.MarcXchangeReader;
 import org.xbib.pipeline.Pipeline;
@@ -63,7 +63,7 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
  */
 public final class MarcXML extends Feeder {
 
-    private final static Logger logger = LoggerFactory.getLogger(MarcXML.class.getName());
+    private final static Logger logger = LogManager.getLogger(MarcXML.class.getName());
 
     private final static Charset UTF8 = Charset.forName("UTF-8");
 
@@ -102,10 +102,10 @@ public final class MarcXML extends Feeder {
         final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
                 .setStringTransformer(value -> Normalizer.normalize(new String(value.getBytes(ISO88591), UTF8), Normalizer.Form.NFKC))
                 .addListener(queue);
-        MarcXchangeReader reader = new MarcXchangeReader()
-                .setMarcXchangeListener(kv);
         InputStreamReader r = new InputStreamReader(InputService.getInputStream(uri), ISO88591);
-        reader.parse(r);
+        MarcXchangeReader reader = new MarcXchangeReader(r)
+                .setMarcXchangeListener(kv);
+        reader.parse();
         r.close();
         queue.close();
         if (settings.getAsBoolean("detect", false)) {

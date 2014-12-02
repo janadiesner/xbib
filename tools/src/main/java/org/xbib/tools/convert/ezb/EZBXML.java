@@ -33,8 +33,6 @@ package org.xbib.tools.convert.ezb;
 
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentBuilder;
@@ -66,8 +64,6 @@ import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
  * http://www.zeitschriftendatenbank.de/fileadmin/user_upload/ZDB/pdf/services/Datenlieferdienst_ZDB_EZB_Lizenzdatenformat.pdf
  */
 public class EZBXML extends Converter {
-
-    private final static Logger logger = LoggerFactory.getLogger(EZBXML.class.getSimpleName());
 
     @Override
     public String getName() {

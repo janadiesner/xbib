@@ -33,8 +33,6 @@ package org.xbib.tools.feed.elasticsearch.freebase;
 
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.io.turtle.TurtleContentParser;
@@ -47,8 +45,6 @@ import java.net.URI;
  * Elasticsearch Freebase indexer
  */
 public class Freebase extends Feeder {
-
-    private static final Logger logger = LoggerFactory.getLogger(Freebase.class.getName());
 
     @Override
     public String getName() {

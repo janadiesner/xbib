@@ -115,7 +115,8 @@ public class MarcXchangeMappedOAITest extends StreamTester {
 
         });
 
-        MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader();
+        InputStream in = getClass().getResourceAsStream("zdb-oai-marc.xml");
+        MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader(in);
         reader.setMarcXchangeListener(writer);
 
         // just for fun: 084->085
@@ -127,8 +128,7 @@ public class MarcXchangeMappedOAITest extends StreamTester {
 
         writer.startDocument();
         writer.beginCollection();
-        InputStream in = getClass().getResourceAsStream("zdb-oai-marc.xml");
-        reader.parse(in);
+        reader.parse();
         in.close();
         writer.endCollection();
         writer.endDocument();

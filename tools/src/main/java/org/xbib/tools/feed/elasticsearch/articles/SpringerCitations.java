@@ -35,8 +35,6 @@ import org.xbib.grouping.bibliographic.endeavor.WorkAuthor;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.Literal;
@@ -61,8 +59,6 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
  * Push Springer citations to Elasticsearch
  */
 public class SpringerCitations extends Feeder {
-
-    private final static Logger logger = LoggerFactory.getLogger(SpringerCitations.class.getSimpleName());
 
     @Override
     public String getName() {
@@ -160,9 +156,6 @@ public class SpringerCitations extends Feeder {
                     case 'G': {
                         // language
                         break;
-                    }
-                    default: {
-                        logger.warn("unknown tag: " + line);
                     }
                 }
             }

@@ -34,11 +34,8 @@ package org.xbib.marc.dialects.sisis;
 import org.xbib.io.field.FieldListener;
 import org.xbib.io.field.FieldSeparator;
 import org.xbib.io.field.LineFeedStreamReader;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.label.RecordLabel;
 
-import java.io.IOException;
 import java.io.Reader;
 
 /**
@@ -46,8 +43,6 @@ import java.io.Reader;
  *
  */
 public class SisisFieldStreamReader extends LineFeedStreamReader {
-
-    private final static Logger logger = LoggerFactory.getLogger(SisisFieldStreamReader.class.getName());
 
     private FieldListener listener;
 

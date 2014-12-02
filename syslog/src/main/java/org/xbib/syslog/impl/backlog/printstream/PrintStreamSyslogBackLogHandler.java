@@ -1,6 +1,6 @@
 package org.xbib.syslog.impl.backlog.printstream;
 
-import org.xbib.syslog.SyslogIF;
+import org.xbib.syslog.Syslogger;
 import org.xbib.syslog.SyslogRuntimeException;
 import org.xbib.syslog.impl.backlog.AbstractSyslogBackLogHandler;
 
@@ -41,15 +41,15 @@ public class PrintStreamSyslogBackLogHandler extends AbstractSyslogBackLogHandle
         }
     }
 
-    public void down(SyslogIF syslog, String reason) {
+    public void down(Syslogger syslog, String reason) {
         this.printStream.println(syslog.getProtocol() + ": DOWN" + (reason != null && !"".equals(reason.trim()) ? " (" + reason + ")" : ""));
     }
 
-    public void up(SyslogIF syslog) {
+    public void up(Syslogger syslog) {
         this.printStream.println(syslog.getProtocol() + ": UP");
     }
 
-    public void log(SyslogIF syslog, int level, String message, String reason) {
+    public void log(Syslogger syslog, int level, String message, String reason) {
         String combinedMessage = combine(syslog, level, message, reason);
 
         if (this.appendLinefeed) {

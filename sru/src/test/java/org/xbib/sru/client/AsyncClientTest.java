@@ -39,10 +39,10 @@ import java.util.Arrays;
 import javax.xml.stream.util.XMLEventConsumer;
 
 import io.netty.channel.ConnectTimeoutException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 import org.xbib.io.Request;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.SRUResponse;
 import org.xbib.sru.searchretrieve.SearchRetrieveListener;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
@@ -51,7 +51,7 @@ import org.xbib.xml.transform.StylesheetTransformer;
 
 public class AsyncClientTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(AsyncClientTest.class.getName());
+    private static final Logger logger = LogManager.getLogger(AsyncClientTest.class.getName());
 
     @Test
     public void testMultiClient() throws Exception {

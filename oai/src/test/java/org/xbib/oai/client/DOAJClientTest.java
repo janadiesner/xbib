@@ -31,6 +31,8 @@
  */
 package org.xbib.oai.client;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.oai.OAIDateResolution;
@@ -39,8 +41,6 @@ import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
@@ -55,7 +55,7 @@ import java.io.StringWriter;
  */
 public class DOAJClientTest {
 
-    private final Logger logger = LoggerFactory.getLogger(DOAJClientTest.class.getName());
+    private final static Logger logger = LogManager.getLogger(DOAJClientTest.class.getName());
 
     @Test
     public void testListRecordsDOAJ() throws Exception {

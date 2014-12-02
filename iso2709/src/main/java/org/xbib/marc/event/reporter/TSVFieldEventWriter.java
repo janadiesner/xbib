@@ -67,7 +67,9 @@ public class TSVFieldEventWriter implements EventListener<FieldEvent> {
 
     @Override
     public void receive(FieldEvent event) {
-        if (lastEvent != null && event.getRecordIdentifier().equals(lastEvent.getRecordIdentifier())
+        if (event != null && event.getRecordIdentifier() != null
+                && lastEvent != null
+                && event.getRecordIdentifier().equals(lastEvent.getRecordIdentifier())
                 && events.size() < MAX_EVENTS) {
             events.add(event.toTSV());
         } else {

@@ -35,8 +35,6 @@ import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.rdf.RdfContentBuilder;
 
 import java.io.FileWriter;
@@ -46,7 +44,7 @@ import static org.xbib.rdf.RdfContentFactory.turtleBuilder;
 
 public class TurtleConformanceTest extends StreamTester {
 
-    private final Logger logger = LoggerFactory.getLogger(TurtleConformanceTest.class.getName());
+    //private final Logger logger = LoggerFactory.getLogger(TurtleConformanceTest.class.getName());
 
     @Test
     public void conformance() throws Exception {

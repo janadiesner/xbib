@@ -1,11 +1,10 @@
 
 package org.xbib.web.dispatcher;
 
-import com.google.common.collect.ImmutableMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 import org.xbib.io.InputService;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 public class DispatcherTest {
 
-    private final Logger logger = LoggerFactory.getLogger(DispatcherTest.class.getName());
+    private final Logger logger = LogManager.getLogger(DispatcherTest.class.getName());
 
     @Test
     public void testDispatcher() throws IOException {

@@ -1,8 +1,6 @@
 package org.xbib.tools.util;
 
 import org.xbib.io.Packet;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.xml.stream.MarcXchangeReader;
 import org.xbib.metric.MeterMetric;
@@ -19,7 +17,6 @@ import java.net.URI;
 
 public class MarcXmlTarReader extends AbstractTarReader {
 
-    private final Logger logger = LoggerFactory.getLogger(MarcXmlTarReader.class.getName());
 
     private final XMLInputFactory factory = XMLInputFactory.newInstance();
 
@@ -72,7 +69,7 @@ public class MarcXmlTarReader extends AbstractTarReader {
                 }
             }
         } catch (XMLStreamException e) {
-            logger.error(e.getMessage(), e);
+            // ignore
         }
     }
 }

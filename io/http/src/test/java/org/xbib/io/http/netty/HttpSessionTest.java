@@ -37,13 +37,10 @@ import org.testng.annotations.Test;
 import org.xbib.io.Session;
 import org.xbib.io.http.HttpRequest;
 import org.xbib.io.http.HttpResponse;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public class HttpSessionTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpSessionTest.class.getName());
-    
+
     @Test
     public void testGet() throws Exception {
         NettyHttpSession session = new NettyHttpSession();
@@ -55,7 +52,7 @@ public class HttpSessionTest {
         request.prepare().execute(new NettyHttpResponseListener() {
             @Override
             public void receivedResponse(HttpResponse result) {
-                logger.info("result = {}", result);
+                //logger.info("result = {}", result);
             }
         });
         session.close();
@@ -74,7 +71,7 @@ public class HttpSessionTest {
 
             @Override
             public void receivedResponse(HttpResponse result) {
-                logger.info("result = {}",result);
+                //logger.info("result = {}",result);
             }
         }).waitFor(15, TimeUnit.SECONDS);
         session.close();

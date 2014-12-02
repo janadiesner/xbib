@@ -31,8 +31,6 @@
  */
 package org.xbib.marc.xml.mapper;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
@@ -64,8 +62,6 @@ import java.util.Stack;
 public class MarcXchangeFieldMapperContentHandler
     extends MarcXchangeFieldMapper
     implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler, MarcXchangeConstants, MarcXchangeListener {
-
-    private static final Logger logger = LoggerFactory.getLogger(MarcXchangeFieldMapperContentHandler.class.getName());
 
     private Stack<Field> stack = new Stack<Field>();
 
@@ -471,17 +467,17 @@ public class MarcXchangeFieldMapperContentHandler
 
     @Override
     public void warning(SAXParseException exception) throws SAXException {
-        logger.warn(exception.getMessage(), exception);
+        throw new SAXException(exception);
     }
 
     @Override
     public void error(SAXParseException exception) throws SAXException {
-        logger.error(exception.getMessage(), exception);
+        throw new SAXException(exception);
     }
 
     @Override
     public void fatalError(SAXParseException exception) throws SAXException {
-        logger.error(exception.getMessage(), exception);
+        throw new SAXException(exception);
     }
 
     public String getFormat() {

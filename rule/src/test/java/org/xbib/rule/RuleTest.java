@@ -1,18 +1,15 @@
 package org.xbib.rule;
 
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class RuleTest {
 
-    private final Logger logger = LoggerFactory.getLogger(RuleTest.class.getName());
-
     @Test
     public void testRuleEngine() {
+        StringBuilder sb = new StringBuilder();
         // create a singleton container for operations
         Operations operations = Operations.INSTANCE;
         // register new operations with the previously created container
@@ -27,13 +24,13 @@ public class RuleTest {
         ActionDispatcher inPatient = new ActionDispatcher() {
             @Override
             public void fire() {
-                logger.info("patient in");
+                sb.append("patient in");
             }
         };
         ActionDispatcher outPatient = new ActionDispatcher() {
             @Override
             public void fire() {
-                logger.info("patient out");
+                sb.append("patient out");
             }
         };
         // create the rules and link them to the accoridng expression and action
@@ -56,6 +53,6 @@ public class RuleTest {
         bindings.put("ADMISSION_TYPE", "'O'");
         // and evaluate the defined rules with the specified bindings
         boolean triggered = rules.apply(null, bindings);
-        logger.info("Action triggered: " + triggered);
+        sb.append("Action triggered: " + triggered);
     }
 }

@@ -31,8 +31,8 @@
  */
 package org.xbib.sru.service;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +48,7 @@ import java.util.ServiceLoader;
  */
 public final class SRUServiceFactory {
 
-    private final static Logger logger = LoggerFactory.getLogger(SRUServiceFactory.class.getName());
+    private final static Logger logger = LogManager.getLogger(SRUServiceFactory.class.getName());
 
     private final static Map<URI, SRUService> services = new HashMap();
 

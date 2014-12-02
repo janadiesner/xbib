@@ -42,9 +42,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
-import org.xbib.io.Session;
 import org.xbib.io.iso23950.ZSession;
 import org.xbib.io.iso23950.client.ZClient;
 import org.xbib.io.iso23950.searchretrieve.ZSearchRetrieveRequest;
@@ -52,13 +53,11 @@ import org.xbib.io.iso23950.searchretrieve.ZSearchRetrieveResponse;
 import org.xbib.io.iso23950.util.ZContentTypeNegotiator;
 import org.xbib.io.negotiate.ContentTypeNegotiator;
 import org.xbib.io.negotiate.MediaRangeSpec;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.xml.transform.StylesheetTransformer;
 
 public class ZServlet extends HttpServlet {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZServlet.class.getName());
+    private static final Logger logger = LogManager.getLogger(ZServlet.class.getName());
 
     private final ConnectionService<ZSession> service = ConnectionService.getInstance();
 

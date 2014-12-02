@@ -6,12 +6,10 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public class AntlrIRITest {
 
-    private final static Logger logger = LoggerFactory.getLogger(AntlrIRITest.class.getName());
+    //private final static Logger logger = LoggerFactory.getLogger(AntlrIRITest.class.getName());
 
     @Test
     public void test() throws Exception {
@@ -26,27 +24,27 @@ public class AntlrIRITest {
 
         @Override
         public void enterScheme(IRIParser.SchemeContext ctx) {
-            logger.info("> scheme : " + ctx.getText());
+            //logger.info("> scheme : " + ctx.getText());
         }
 
         @Override
         public void enterIpath(IRIParser.IpathContext ctx) {
-            logger.info("> path : " + ctx.getText());
+            //logger.info("> path : " + ctx.getText());
         }
 
         @Override
         public void enterIquery(IRIParser.IqueryContext ctx) {
-            logger.info("> query : " + ctx.getText());
+            //logger.info("> query : " + ctx.getText());
         }
 
         @Override
         public void enterIfragment(IRIParser.IfragmentContext ctx) {
-            logger.info("> fragment : " + ctx.getText());
+            //logger.info("> fragment : " + ctx.getText());
         }
 
         @Override
         public void enterIhier_part(IRIParser.Ihier_partContext ctx) {
-            logger.info("> hier-part : " + ctx.getText());
+            //logger.info("> hier-part : " + ctx.getText());
         }
     }
 }

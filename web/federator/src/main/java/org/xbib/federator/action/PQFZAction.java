@@ -31,13 +31,10 @@
  */
 package org.xbib.federator.action;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.iso23950.client.ZClient;
 import org.xbib.io.iso23950.searchretrieve.PQFSearchRetrieveRequest;
-import org.xbib.io.iso23950.searchretrieve.ZSearchRetrieveRequest;
-import org.xbib.io.iso23950.service.ZService;
-import org.xbib.io.iso23950.service.ZServiceFactory;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.iso23950.service.ZSRUService;
 import org.xbib.sru.iso23950.service.ZSRUServiceFactory;
 
@@ -45,7 +42,7 @@ import java.io.StringWriter;
 
 public class PQFZAction extends AbstractAction {
 
-    private final Logger logger = LoggerFactory.getLogger(PQFZAction.class.getName());
+    private final static Logger logger = LogManager.getLogger(PQFZAction.class.getName());
 
     @Override
     public Action call() {

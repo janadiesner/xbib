@@ -1,6 +1,7 @@
 package org.asynchttpclient.webdav;
 
-import org.asynchttpclient.AsyncCompletionHandlerBase;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHandler;
 import org.asynchttpclient.Cookie;
 import org.asynchttpclient.FluentCaseInsensitiveStringsMap;
@@ -12,8 +13,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,7 +34,7 @@ import java.util.List;
  */
 public abstract class WebDavCompletionHandlerBase<T> implements AsyncHandler<T> {
 
-    private final Logger logger = LoggerFactory.getLogger(WebDavCompletionHandlerBase.class.getName());
+    private final static Logger logger = LogManager.getLogger(WebDavCompletionHandlerBase.class.getName());
 
     private final List<HttpResponseBodyPart> bodies =
             Collections.synchronizedList(new ArrayList<HttpResponseBodyPart>());

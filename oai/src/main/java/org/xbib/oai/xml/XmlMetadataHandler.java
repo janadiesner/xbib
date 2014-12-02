@@ -31,8 +31,6 @@
  */
 package org.xbib.oai.xml;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
@@ -56,8 +54,6 @@ import java.util.Map;
 import java.util.Stack;
 
 public class XmlMetadataHandler extends MetadataHandler implements OAIConstants {
-
-    private final Logger logger = LoggerFactory.getLogger(XmlMetadataHandler.class.getName());
 
     private final XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 
@@ -83,7 +79,7 @@ public class XmlMetadataHandler extends MetadataHandler implements OAIConstants 
             outputFactory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.TRUE);
             this.eventWriter = outputFactory.createXMLEventWriter(writer);
         } catch (XMLStreamException e) {
-            logger.error(e.getMessage(), e);
+            // ignore
         }
         return this;
     }

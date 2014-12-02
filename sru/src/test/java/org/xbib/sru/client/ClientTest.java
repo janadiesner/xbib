@@ -37,10 +37,10 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import javax.xml.stream.util.XMLEventConsumer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 import org.xbib.io.Request;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.searchretrieve.SearchRetrieveListener;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
 import org.xbib.sru.searchretrieve.SearchRetrieveResponseAdapter;
@@ -48,7 +48,7 @@ import org.xbib.xml.transform.StylesheetTransformer;
 
 public class ClientTest {
 
-    private final Logger logger = LoggerFactory.getLogger(ClientTest.class.getName());
+    private final static Logger logger = LogManager.getLogger(ClientTest.class.getName());
 
     @Test
     public void testClient() throws Exception {

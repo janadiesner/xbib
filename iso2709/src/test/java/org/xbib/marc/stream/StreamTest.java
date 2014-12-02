@@ -36,6 +36,7 @@ import org.xbib.io.field.Separable;
 import org.xbib.marc.Iso2709Reader;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.function.Consumer;
 
 import static org.testng.Assert.assertEquals;
@@ -44,12 +45,15 @@ public class StreamTest {
 
     @Test
     public void testZDB() throws IOException {
-        Iso2709Reader reader = new Iso2709Reader();
-        long count = reader.stream(getClass().getResource("zdblokutf8.mrc").openStream())
+        InputStream in = getClass().getResource("zdblokutf8.mrc").openStream();
+        Iso2709Reader reader = new Iso2709Reader(in, "UTF-8");
+        long count = reader.stream()
                     .fields()
                     .count();
         assertEquals(10171L, count);
-        reader.stream(getClass().getResource("zdblokutf8.mrc").openStream())
+        in = getClass().getResource("zdblokutf8.mrc").openStream();
+        reader = new Iso2709Reader(in, "UTF-8");
+        reader.stream()
                 .fields()
                 .forEach(new Consumer<Separable>() {
                     @Override

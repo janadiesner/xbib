@@ -188,7 +188,6 @@ public class Iso2709Writer implements MarcXchangeListener, Flushable, Closeable 
                 .setRecordLength(recordLength);
         // TODO more recordlabel defs
 
-
         record.setLabel(recordLabel);
     }
 

@@ -3,6 +3,7 @@ package org.xbib.marc.xml;
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.marc.Field;
+import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.xml.stream.MarcXchangeWriter;
 
 import java.io.ByteArrayInputStream;
@@ -18,7 +19,7 @@ public class MarcXchangeSingleTest extends StreamTester {
     @Test
     public void testMarcXchangeListener() throws Exception {
         final StringBuilder sb = new StringBuilder();
-        MarcXchangeContentHandler handler = new MarcXchangeContentHandler() {
+        MarcXchangeListener listener = new MarcXchangeContentHandler() {
             @Override
             public void beginCollection() {
             }
@@ -81,26 +82,26 @@ public class MarcXchangeSingleTest extends StreamTester {
         FileWriter sw = new FileWriter(file);
         MarcXchangeWriter writer = new MarcXchangeWriter(sw);
         writer.setFormat("AlephXML").setType("Bibliographic");
-        writer.setMarcXchangeListener(handler);
+        writer.setMarcXchangeListener(listener);
 
         writer.startDocument();
         writer.beginCollection();
 
         // write one MARC record twice
-        MarcXchangeReader reader = new MarcXchangeReader();
+        InputStream in = getClass().getResourceAsStream("HT016424175.xml");
+        MarcXchangeReader reader = new MarcXchangeReader(in);
         reader.setFormat("AlephXML").setType("Bibliographic");
         reader.addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
         reader.setMarcXchangeListener(writer);
-        InputStream in = getClass().getResourceAsStream("HT016424175.xml");
-        reader.parse(in);
+        reader.parse();
         in.close();
 
-        reader = new MarcXchangeReader();
+        in = getClass().getResourceAsStream("HT016424175.xml");
+        reader = new MarcXchangeReader(in);
         reader.setFormat("AlephXML").setType("Bibliographic");
         reader.addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
         reader.setMarcXchangeListener(writer);
-        in = getClass().getResourceAsStream("HT016424175.xml");
-        reader.parse(in);
+        reader.parse();
         in.close();
 
         writer.endCollection();
@@ -109,9 +110,9 @@ public class MarcXchangeSingleTest extends StreamTester {
 
         assertNull(writer.getException());
 
-        assertStream(getClass().getResource("HT016424175-keyvalue.txt").openStream(),
-                new ByteArrayInputStream(sb.toString().getBytes("UTF-8")));
         assertStream(getClass().getResource("HT016424175-out.xml").openStream(),
                 new FileInputStream(file));
+        assertStream(getClass().getResource("HT016424175-keyvalue.txt").openStream(),
+                new ByteArrayInputStream(sb.toString().getBytes("UTF-8")));
     }
 }

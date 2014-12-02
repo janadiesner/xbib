@@ -31,8 +31,8 @@
  */
 package org.xbib.oai.server.listrecords;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.oai.exceptions.BadArgumentException;
 import org.xbib.oai.exceptions.BadResumptionTokenException;
 import org.xbib.oai.exceptions.NoRecordsMatchException;
@@ -48,7 +48,7 @@ import java.util.Date;
 
 public class ListRecordsServerResponse extends ServerOAIResponse {
 
-    private final static Logger logger = LoggerFactory.getLogger(ListRecordsServerResponse.class.getName());
+    private final static Logger logger = LogManager.getLogger(ListRecordsServerResponse.class.getName());
 
     private String error;
 

@@ -34,8 +34,6 @@ package org.xbib.sru.service;
 import org.xbib.io.Session;
 import org.xbib.io.http.HttpSession;
 import org.xbib.io.http.netty.NettyHttpSession;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.client.SRUClient;
 
 import java.io.IOException;
@@ -47,8 +45,6 @@ import java.util.Properties;
  *
  */
 public class PropertiesSRUService implements SRUService {
-
-    private final Logger logger = LoggerFactory.getLogger(PropertiesSRUService.class.getName());
 
     private Properties properties;
 

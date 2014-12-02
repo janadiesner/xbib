@@ -31,8 +31,8 @@
  */
 package org.xbib.xml.transform;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
@@ -43,7 +43,7 @@ import javax.xml.transform.TransformerException;
  */
 public final class TransformerErrorListener implements ErrorListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(TransformerErrorListener.class.getName());
+    private static final Logger logger = LogManager.getLogger(TransformerErrorListener.class.getName());
     /**
      * We store the exception internally as a workaround to xalan, which reports
      * {@link javax.xml.transform.TransformerException} as {@link RuntimeException} (wrapped).

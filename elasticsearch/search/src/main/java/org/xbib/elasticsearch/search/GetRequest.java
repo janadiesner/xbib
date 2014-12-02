@@ -31,9 +31,9 @@
  */
 package org.xbib.elasticsearch.search;
 
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.xbib.elasticsearch.action.search.support.BasicGetRequest;
-import org.xbib.logging.Logger;
 
 import java.io.IOException;
 

@@ -31,8 +31,8 @@
  */
 package org.xbib.marc.dialects.aleph;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -45,7 +45,7 @@ import java.util.Iterator;
  */
 public class AlephSysNumberFileIterator implements Closeable, Iterator<Integer> {
 
-    private final static Logger logger = LoggerFactory.getLogger(AlephSysNumberFileIterator.class.getName());
+    private final static Logger logger = LogManager.getLogger(AlephSysNumberFileIterator.class.getName());
     private BufferedReader reader;
     private boolean error;
     private String filename;

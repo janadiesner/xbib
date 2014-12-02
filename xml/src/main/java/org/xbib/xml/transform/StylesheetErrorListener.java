@@ -31,8 +31,8 @@
  */
 package org.xbib.xml.transform;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
@@ -42,7 +42,7 @@ import javax.xml.transform.TransformerException;
  */
 public final class StylesheetErrorListener implements ErrorListener {
 
-    private final Logger logger = LoggerFactory.getLogger(StylesheetErrorListener.class.getName());
+    private final Logger logger = LogManager.getLogger(StylesheetErrorListener.class.getName());
 
     @Override
     public void warning(TransformerException e) throws TransformerException {

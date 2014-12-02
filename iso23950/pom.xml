@@ -75,7 +75,7 @@
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>contextualization</artifactId>
+            <artifactId>entity</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -86,11 +86,6 @@
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>sru</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
-            <artifactId>logging</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>

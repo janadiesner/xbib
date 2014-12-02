@@ -31,10 +31,10 @@
  */
 package org.xbib.tools.feed.elasticsearch.viaf;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.InputService;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentBuilder;
@@ -55,7 +55,7 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
  */
 public class VIAF extends Feeder {
 
-    private final static Logger logger = LoggerFactory.getLogger(VIAF.class.getSimpleName());
+    private final static Logger logger = LogManager.getLogger(VIAF.class.getSimpleName());
 
     @Override
     public String getName() {

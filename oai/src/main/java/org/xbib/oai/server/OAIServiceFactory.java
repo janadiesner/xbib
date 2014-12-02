@@ -31,9 +31,6 @@
  */
 package org.xbib.oai.server;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -43,8 +40,6 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 public class OAIServiceFactory {
-
-    private final static Logger logger = LoggerFactory.getLogger(OAIServiceFactory.class.getName());
 
     private final static Map<URI, OAIServer> services = new HashMap();
 
@@ -81,7 +76,7 @@ public class OAIServiceFactory {
             try {
                 properties.load(in);
             } catch (IOException ex) {
-                logger.error(ex.getMessage(), ex);
+                // ignore
             }
         } else {
             throw new IllegalArgumentException("service " + name + " not found");

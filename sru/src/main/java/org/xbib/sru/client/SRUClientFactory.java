@@ -31,8 +31,8 @@
  */
 package org.xbib.sru.client;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +45,7 @@ public final class SRUClientFactory {
 
     private final static SRUClientFactory instance = new SRUClientFactory();
 
-    private final static Logger logger = LoggerFactory.getLogger(SRUClientFactory.class.getName());
+    private final static Logger logger = LogManager.getLogger(SRUClientFactory.class.getName());
 
     private SRUClientFactory() {
     }

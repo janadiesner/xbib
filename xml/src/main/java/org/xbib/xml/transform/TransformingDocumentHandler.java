@@ -31,8 +31,8 @@
  */
 package org.xbib.xml.transform;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -64,7 +64,7 @@ import java.util.regex.Pattern;
  */
 public final class TransformingDocumentHandler implements ContentHandler {
 
-    private final static Logger logger = LoggerFactory.getLogger(TransformingDocumentHandler.class.getName());
+    private final static Logger logger = LogManager.getLogger(TransformingDocumentHandler.class.getName());
     /**
      * A map of XSLT output methods and their corresponding MIME content types.
      */

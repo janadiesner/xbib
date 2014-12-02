@@ -38,6 +38,8 @@ import java.net.URL;
 import java.util.Date;
 import java.util.ResourceBundle;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.indices.IndexMissingException;
 import org.xbib.elasticsearch.search.SearchSupport;
@@ -53,8 +55,6 @@ import org.xbib.oai.server.listrecords.ListRecordsServerResponse;
 import org.xbib.oai.server.listsets.ListSetsServerRequest;
 import org.xbib.oai.server.listsets.ListSetsServerResponse;
 import org.xbib.util.DateUtil;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.DefaultOAIClient;
 import org.xbib.oai.OAISession;
 import org.xbib.oai.server.identify.IdentifyServerRequest;
@@ -66,11 +66,10 @@ import org.xbib.xml.transform.StylesheetTransformer;
 
 /**
  * Elasticsearch OAI service. Not yet complete.
- *
  */
 public class OAIServer implements org.xbib.oai.server.OAIServer {
 
-    private final Logger logger = LoggerFactory.getLogger(org.xbib.oai.elasticsearch.OAIServer.class.getName());
+    private final static Logger logger = LogManager.getLogger(org.xbib.oai.elasticsearch.OAIServer.class.getName());
 
     private static final ResourceBundle bundle = ResourceBundle.getBundle("org.xbib.oai.elasticsearch");
 

@@ -32,7 +32,6 @@
 package org.xbib.atom;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Map;
 
@@ -45,16 +44,12 @@ import org.apache.abdera.protocol.server.provider.managed.FeedConfiguration;
 import org.apache.abdera.protocol.server.provider.managed.ManagedCollectionAdapter;
 
 import org.xbib.util.URIUtil;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 /**
  * An abstract Abdera managed collection service
  *
  */
 public abstract class AbstractAbderaAdapter extends ManagedCollectionAdapter {
-
-    private final static Logger logger = LoggerFactory.getLogger(AbstractAbderaAdapter.class.getName());
 
     protected abstract AtomFeedFactory getFeedFactory();
 
@@ -86,8 +81,6 @@ public abstract class AbstractAbderaAdapter extends ManagedCollectionAdapter {
             }
             from = Integer.parseInt(params.get("from"));
             size = Integer.parseInt(params.get("size"));
-        } catch (URISyntaxException ex) {
-            //
         } catch (Exception ex) {
             //
         }
@@ -102,7 +95,6 @@ public abstract class AbstractAbderaAdapter extends ManagedCollectionAdapter {
                     size // result set size
                     );
             if (feed == null) {
-                logger.error("unable to create feed");
                 ProviderHelper.servererror(request, "could not generate feed", null);
             }
             return ProviderHelper.returnBase(feed.getDocument(), 200, null);

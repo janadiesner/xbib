@@ -35,8 +35,6 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.xbib.io.http.netty.NettyHttpSession;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.client.getrecord.GetRecordRequest;
 import org.xbib.oai.client.identify.IdentifyRequest;
 import org.xbib.oai.client.listidentifiers.ListIdentifiersRequest;
@@ -49,8 +47,6 @@ import org.xbib.oai.util.ResumptionToken;
  * Default OAI client
  */
 public class DefaultOAIClient extends NettyHttpSession implements OAIClient {
-
-    private final Logger logger = LoggerFactory.getLogger(DefaultOAIClient.class.getName());
 
     private URI uri;
 
@@ -222,7 +218,7 @@ public class DefaultOAIClient extends NettyHttpSession implements OAIClient {
             try {
                 open(Mode.READ);
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                // ignore
             }
         }
     }

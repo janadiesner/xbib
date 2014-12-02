@@ -31,12 +31,12 @@
  */
 package org.xbib.marc.event;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class FieldEventLogger implements EventListener<FieldEvent> {
 
-    private final static Logger logger = LoggerFactory.getLogger(FieldEventLogger.class.getName());
+    private final static Logger logger = LogManager.getLogger(FieldEventLogger.class.getName());
 
     private String level = "info";
 

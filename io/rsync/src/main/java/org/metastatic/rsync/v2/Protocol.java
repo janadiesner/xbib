@@ -1,11 +1,11 @@
 
 package org.metastatic.rsync.v2;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.metastatic.rsync.Checksum32;
 import org.metastatic.rsync.Configuration;
 import org.metastatic.rsync.Util;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.File;
 import java.io.FileReader;
@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class Protocol implements Constants {
 
-    private final static Logger logger = LoggerFactory.getLogger(Protocol.class.getName());
+    private final static Logger logger = LogManager.getLogger(Protocol.class.getName());
 
     public static final String SPACES = "               ";
 

@@ -1,9 +1,9 @@
 package org.xbib.io.file;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 import org.xbib.file.MappedByteBufferInputStream;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -14,7 +14,7 @@ import java.nio.channels.FileChannel;
 
 public class FileReadTest {
 
-    private final Logger logger = LoggerFactory.getLogger(FileReadTest.class.getName());
+    private final Logger logger = LogManager.getLogger(FileReadTest.class.getName());
 
     private String name = "/Users/joerg/10_Recommended.zip";
 

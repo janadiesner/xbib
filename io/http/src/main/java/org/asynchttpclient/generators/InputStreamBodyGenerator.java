@@ -1,9 +1,9 @@
 package org.asynchttpclient.generators;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.Body;
 import org.asynchttpclient.BodyGenerator;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
  */
 public class InputStreamBodyGenerator implements BodyGenerator {
 
-    private final static Logger logger = LoggerFactory.getLogger(InputStreamBodyGenerator.class.getName());
+    private final static Logger logger = LogManager.getLogger(InputStreamBodyGenerator.class.getName());
     private final static byte[] END_PADDING = "\r\n".getBytes();
     private final static byte[] ZERO = "0".getBytes();
     private final InputStream inputStream;

@@ -5,7 +5,7 @@ package org.xbib.syslog;
  * message modifier implementations.
  */
 public interface SyslogMessageModifierIF extends SyslogConstants {
-    public String modify(SyslogIF syslog, int facility, int level, String message);
+    public String modify(Syslogger syslog, int facility, int level, String message);
 
     public boolean verify(String message);
 }

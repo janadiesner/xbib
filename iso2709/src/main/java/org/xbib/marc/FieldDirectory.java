@@ -63,15 +63,15 @@ public class FieldDirectory extends TreeMap<Integer, Field> {
                             + " segment identifier length = " + label.getSegmentIdentifierLength());
                 }
                 for (int i = RecordLabel.LENGTH; i < RecordLabel.LENGTH + directoryLength; i += entrysize) {
-                    String key = buffer.substring(i, i + keylength);
+                    String key = null;
                     try {
+                        key = buffer.substring(i, i + keylength);
                         int l = i + keylength + label.getDataFieldLength();
                         int length = Integer.parseInt(buffer.substring(i + keylength, l));
-                        int position = label.getBaseAddressOfData()
-                                + Integer.parseInt(buffer.substring(l, l + label.getStartingCharacterPositionLength()));
+                        int position = label.getBaseAddressOfData() + Integer.parseInt(buffer.substring(l, l + label.getStartingCharacterPositionLength()));
                         Field field = new Field(key, position, length);
                         put(position, field);
-                    } catch (NumberFormatException e) {
+                    } catch (StringIndexOutOfBoundsException | NumberFormatException e) {
                         throw new MarcException("directory corrupt? key = " + key + " length = " + directoryLength);
                     }
                 }

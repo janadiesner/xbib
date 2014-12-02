@@ -33,9 +33,10 @@ package org.xbib.io.iso23950.pqf;
 
 import java.io.IOException;
 import java.io.StringReader;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 /**
  * PQF parser test
@@ -43,7 +44,7 @@ import org.xbib.logging.LoggerFactory;
  */
 public class PQFParserTest extends ParserTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(PQFParserTest.class.getName());
+    private static final Logger logger = LogManager.getLogger(PQFParserTest.class.getName());
 
     @Test
     public void testSucceed() throws SyntaxException, IOException {

@@ -67,7 +67,7 @@ public class DE468MABTest extends StreamTester {
         InputStream in = getClass().getResource("aleph500-subfields.mrc").openStream();
         File file = File.createTempFile("DE-468.", ".xml");
         FileOutputStream out = new FileOutputStream(file);
-        Iso2709Reader reader = new Iso2709Reader();
+        Iso2709Reader reader = new Iso2709Reader(in, "UTF-8");
         reader.setFormat("MAB");
         // Set delimiter. Will be automatically quoted before used as split pattern.
         reader.setSubfieldDelimiter("$$");
@@ -78,7 +78,7 @@ public class DE468MABTest extends StreamTester {
         reader.setMarcXchangeListener(writer);
         writer.startDocument();
         writer.beginCollection();
-        reader.parse(in);
+        reader.parse();
         writer.endCollection();
         writer.endDocument();
         out.close();
@@ -91,7 +91,7 @@ public class DE468MABTest extends StreamTester {
         InputStream in = getClass().getResource("aleph500-subfields.mrc").openStream();
         File file = File.createTempFile("DE-468-mapped.", ".xml");
         FileOutputStream out = new FileOutputStream(file);
-        Iso2709Reader reader = new Iso2709Reader();
+        Iso2709Reader reader = new Iso2709Reader(in, "UTF-8");
         reader.setFormat("MAB");
 
         // custom subfield delimiter. Will be automatically quoted before used as split pattern.
@@ -120,7 +120,7 @@ public class DE468MABTest extends StreamTester {
         reader.setMarcXchangeListener(writer);
         writer.startDocument();
         writer.beginCollection();
-        reader.parse(in);
+        reader.parse();
         writer.endCollection();
         writer.endDocument();
         out.close();
@@ -159,12 +159,12 @@ public class DE468MABTest extends StreamTester {
 
                 });
         InputStream in = getClass().getResource("aleph500-subfields.mrc").openStream();
-        Iso2709Reader reader = new Iso2709Reader();
+        Iso2709Reader reader = new Iso2709Reader(in, "UTF-8");
         reader.setFormat("MAB");
         reader.setSubfieldDelimiter("$$");
         reader.setSubfieldCodeLength(2);
         reader.setMarcXchangeListener(kv);
-        reader.parse(in);
+        reader.parse();
         in.close();
         sw.close();
         FileWriter fw = new FileWriter(file);
@@ -179,7 +179,7 @@ public class DE468MABTest extends StreamTester {
         InputStream in = getClass().getResource("aleph500-subfields.mrc").openStream();
         File file = File.createTempFile("DE-468-killed-fields.", ".xml");
         FileOutputStream out = new FileOutputStream(file);
-        Iso2709Reader reader = new Iso2709Reader();
+        Iso2709Reader reader = new Iso2709Reader(in, "UTF-8");
         reader.setFormat("MAB");
         // Set delimiter. Will be automatically quoted before used as split pattern.
         reader.setSubfieldDelimiter("$$");
@@ -204,7 +204,7 @@ public class DE468MABTest extends StreamTester {
         reader.setMarcXchangeListener(writer);
         writer.startDocument();
         writer.beginCollection();
-        reader.parse(in);
+        reader.parse();
         writer.endCollection();
         writer.endDocument();
         out.close();

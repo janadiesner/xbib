@@ -31,8 +31,6 @@
  */
 package org.xbib.marc.dialects.pica;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
@@ -60,8 +58,6 @@ import java.io.Reader;
  */
 public class DNBPICAXmlReader
         implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler, DNBPICAConstants, MarcXchangeListener {
-
-    private static final Logger logger = LoggerFactory.getLogger(DNBPICAXmlReader.class.getName());
 
     private ContentHandler contentHandler;
 
@@ -344,17 +340,17 @@ public class DNBPICAXmlReader
 
     @Override
     public void warning(SAXParseException exception) throws SAXException {
-        logger.warn(exception.getMessage(), exception);
+        throw new SAXException(exception);
     }
 
     @Override
     public void error(SAXParseException exception) throws SAXException {
-        logger.error(exception.getMessage(), exception);
+        throw new SAXException(exception);
     }
 
     @Override
     public void fatalError(SAXParseException exception) throws SAXException {
-        logger.error(exception.getMessage(), exception);
+        throw new SAXException(exception);
     }
 
     private boolean isNamespace(String uri) {

@@ -43,6 +43,7 @@ import org.xml.sax.SAXException;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
@@ -64,7 +65,8 @@ public class SRUFilterReader extends Iso2709Reader implements MarcXchangeListene
 
     private int recordPosition;
 
-    public SRUFilterReader(SearchRetrieveResponse response, String encoding) {
+    public SRUFilterReader(SearchRetrieveResponse response, Reader reader, String encoding) {
+        super(reader);
         this.response = response;
         this.recordPosition = 1;
         this.encoding = encoding;

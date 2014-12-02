@@ -17,11 +17,6 @@
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>logging</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
             <artifactId>util</artifactId>
             <type>jar</type>
         </dependency>

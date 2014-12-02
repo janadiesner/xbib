@@ -3,11 +3,7 @@ package org.xbib.common.xcontent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.common.settings.Settings;
-import org.xbib.common.xcontent.XContentBuilder;
-import org.xbib.common.xcontent.XContentHelper;
 import org.xbib.common.xcontent.xml.XmlXParams;
-import org.xbib.logging.Logger;
-import org.xbib.logging.Loggers;
 import org.xbib.xml.namespace.XmlNamespaceContext;
 
 import javax.xml.namespace.QName;
@@ -22,13 +18,10 @@ import static org.xbib.common.xcontent.XContentFactory.xmlBuilder;
 
 public class XContentXmlBuilderTest extends Assert {
 
-    private final Logger logger = Loggers.getLogger(XContentXmlBuilderTest.class);
-
     @Test
     public void testXml() throws Exception {
         XContentBuilder builder = xmlBuilder();
         builder.startObject().field("Hello", "World").endObject();
-        logger.info("xml = {}", builder.string());
         assertEquals(builder.string(),
                 "<root xmlns=\"http://elasticsearch.org/ns/1.0/\" xmlns:es=\"http://elasticsearch.org/ns/1.0/\"><Hello>World</Hello></root>"
         );
@@ -39,7 +32,6 @@ public class XContentXmlBuilderTest extends Assert {
         XmlXParams params = new XmlXParams();
         XContentBuilder builder = xmlBuilder(params);
         builder.startObject().field("Hello", "World").endObject();
-        logger.info("xml (default params) = {}", builder.string());
         assertEquals(builder.string(),
                 "<root xmlns=\"http://elasticsearch.org/ns/1.0/\" xmlns:es=\"http://elasticsearch.org/ns/1.0/\"><Hello>World</Hello></root>"
         );
@@ -53,7 +45,6 @@ public class XContentXmlBuilderTest extends Assert {
         builder.startObject()
                 .field("dc:creator", "John Doe")
                 .endObject();
-        logger.info("xml (namespaces) = {}", builder.string());
         assertEquals(builder.string(),
                 "<root xmlns=\"http://elasticsearch.org/ns/1.0/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:es=\"http://elasticsearch.org/ns/1.0/\" xmlns:foaf=\"http://xmlns.com/foaf/0.1/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:xalan=\"http://xml.apache.org/xslt\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"><dc:creator>John Doe</dc:creator></root>"
         );
@@ -69,7 +60,6 @@ public class XContentXmlBuilderTest extends Assert {
         builder.startObject()
                 .field("abc:creator", "John Doe")
                 .endObject();
-        logger.info("xml (custom namespaces) = {}", builder.string());
         assertEquals(builder.string(),
                 "<result xmlns:abc=\"http://localhost\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:es=\"http://elasticsearch.org/ns/1.0/\" xmlns:foaf=\"http://xmlns.com/foaf/0.1/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:xalan=\"http://xml.apache.org/xslt\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"><abc:creator>John Doe</abc:creator></result>"
         );
@@ -90,7 +80,6 @@ public class XContentXmlBuilderTest extends Assert {
                 .field("role", "illustrator")
                 .endObject()
                 .endObject();
-        logger.info("xml (objects) = {}", builder.string());
         assertEquals(builder.string(),
             "<root xmlns=\"http://elasticsearch.org/ns/1.0/\" xmlns:es=\"http://elasticsearch.org/ns/1.0/\"><author><creator>John Doe</creator><role>writer</role></author><author><creator>Joe Smith</creator><role>illustrator</role></author></root>"
         );
@@ -108,7 +97,6 @@ public class XContentXmlBuilderTest extends Assert {
                 .field("@id", 1)
                 .endObject()
                 .endObject();
-        logger.info("xml (attribute) = {}", builder.string());
         assertEquals(builder.string(),
             "<root xmlns=\"http://elasticsearch.org/ns/1.0/\" xmlns:es=\"http://elasticsearch.org/ns/1.0/\"><author><name>John Doe</name><id>1</id></author></root>"
         );
@@ -123,7 +111,6 @@ public class XContentXmlBuilderTest extends Assert {
         builder.startObject()
                 .array("author", "John Doe", "Joe Smith")
                 .endObject();
-        logger.info("xml (array of values) = {}", builder.string());
         assertEquals(builder.string(),
             "<root xmlns=\"http://elasticsearch.org/ns/1.0/\" xmlns:es=\"http://elasticsearch.org/ns/1.0/\"><author>John Doe</author><author>Joe Smith</author></root>"
         );
@@ -146,7 +133,6 @@ public class XContentXmlBuilderTest extends Assert {
                 .endObject()
                 .endArray()
                 .endObject();
-        logger.info("xml (array of objects) = {}", builder.string());
         assertEquals(builder.string(),
                 "<root xmlns=\"http://elasticsearch.org/ns/1.0/\" xmlns:es=\"http://elasticsearch.org/ns/1.0/\"><author><creator>John Doe</creator><role>writer</role></author><author><creator>Joe Smith</creator><role>illustrator</role></author></root>"
         );
@@ -164,7 +150,6 @@ public class XContentXmlBuilderTest extends Assert {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         copy(in, out);
         byte[] buf = out.toByteArray();
-        logger.info("xml (parse from json) = {}", XContentHelper.convertToXml(params, buf, 0, buf.length, false));
     }
 
     @Test
@@ -172,7 +157,6 @@ public class XContentXmlBuilderTest extends Assert {
         StringReader sr = new StringReader("{\"name\":\"value\"}");
         Settings settings = settingsBuilder()
                 .loadFromReader(sr).build();
-        logger.info("{}", settings.getAsMap());
     }
 
 }

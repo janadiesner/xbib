@@ -61,13 +61,13 @@ public class MarcTest extends StreamTester {
             File file = File.createTempFile(s + ".", ".xml");
             FileOutputStream out = new FileOutputStream(file);
             try (InputStreamReader r = new InputStreamReader(in, "ANSEL")) {
-                Iso2709Reader reader = new Iso2709Reader();
+                Iso2709Reader reader = new Iso2709Reader(r);
                 reader.setFormat(MarcXchangeConstants.MARC21);
                 MarcXchangeWriter writer = new MarcXchangeWriter(out);
                 reader.setMarcXchangeListener(writer);
                 writer.startDocument();
                 writer.beginCollection();
-                reader.parse(r);
+                reader.parse();
                 writer.endCollection();
                 writer.endDocument();
                 assertNull(writer.getException());
@@ -88,13 +88,13 @@ public class MarcTest extends StreamTester {
             File file = File.createTempFile(s +".", ".xml");
             FileOutputStream out = new FileOutputStream(file);
             try (InputStreamReader r = new InputStreamReader(in, "ANSEL")) {
-                Iso2709Reader reader = new Iso2709Reader();
+                Iso2709Reader reader = new Iso2709Reader(r);
                 reader.setFormat(MarcXchangeConstants.MARC21);
                 MarcXchangeWriter writer = new MarcXchangeWriter(out);
                 reader.setMarcXchangeListener(writer);
                 writer.startDocument();
                 writer.beginCollection();
-                reader.parse(r);
+                reader.parse();
                 writer.endCollection();
                 writer.endDocument();
                 assertNull(writer.getException());
@@ -119,13 +119,13 @@ public class MarcTest extends StreamTester {
         File file = File.createTempFile(s +".", ".xml");
         FileOutputStream out = new FileOutputStream(file);
         try (InputStreamReader r = new InputStreamReader(in, "ANSEL")) {
-            Iso2709Reader reader = new Iso2709Reader();
+            Iso2709Reader reader = new Iso2709Reader(r);
             reader.setFormat(MarcXchangeConstants.MARC21);
             MarcXchangeWriter writer = new MarcXchangeWriter(out);
             reader.setMarcXchangeListener(writer);
             writer.startDocument();
             writer.beginCollection();
-            reader.parse(r);
+            reader.parse();
             writer.endCollection();
             writer.endDocument();
             assertNull(writer.getException());
@@ -143,13 +143,13 @@ public class MarcTest extends StreamTester {
         File file = File.createTempFile(s +".", ".xml");
         FileOutputStream out = new FileOutputStream(file);
         try (InputStreamReader r = new InputStreamReader(in, "UTF-8")) {
-            Iso2709Reader reader = new Iso2709Reader();
+            Iso2709Reader reader = new Iso2709Reader(r);
             reader.setFormat(MarcXchangeConstants.MARC21);
             MarcXchangeWriter writer = new MarcXchangeWriter(out);
             reader.setMarcXchangeListener(writer);
             writer.startDocument();
             writer.beginCollection();
-            reader.parse(r);
+            reader.parse();
             writer.endCollection();
             writer.endDocument();
             assertNull(writer.getException());

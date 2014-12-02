@@ -1,6 +1,6 @@
 package org.xbib.syslog.impl.message.modifier.text;
 
-import org.xbib.syslog.SyslogIF;
+import org.xbib.syslog.Syslogger;
 import org.xbib.syslog.SyslogMessageModifierIF;
 
 /**
@@ -35,7 +35,7 @@ public class SuffixSyslogMessageModifier implements SyslogMessageModifierIF {
         this.suffix = suffix;
     }
 
-    public String modify(SyslogIF syslog, int facility, int level, String message) {
+    public String modify(Syslogger syslog, int facility, int level, String message) {
         if (this.suffix == null || "".equals(this.suffix.trim())) {
             return message;
         }

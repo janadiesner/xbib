@@ -31,12 +31,12 @@
  */
 package org.xbib.tools.feed.elasticsearch.geonames;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.xbib.elasticsearch.support.client.Ingest;
 import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
 import org.xbib.io.InputService;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.tools.Feeder;
@@ -56,7 +56,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
  */
 public class GeonamesFromZIP extends Feeder {
 
-    private final static Logger logger = LoggerFactory.getLogger(GeonamesFromZIP.class.getSimpleName());
+    private final static Logger logger = LogManager.getLogger(GeonamesFromZIP.class.getSimpleName());
 
     @Override
     public String getName() {

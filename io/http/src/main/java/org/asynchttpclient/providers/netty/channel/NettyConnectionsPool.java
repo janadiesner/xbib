@@ -12,19 +12,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.ConnectionsPool;
 import org.asynchttpclient.providers.netty.DiscardEvent;
 import org.asynchttpclient.providers.netty.future.NettyResponseFuture;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 /**
  * A simple implementation of {@link org.asynchttpclient.ConnectionsPool} based on a {@link java.util.concurrent.ConcurrentHashMap}
  */
 public class NettyConnectionsPool implements ConnectionsPool<String, Channel> {
 
-    private final static Logger log = LoggerFactory.getLogger(NettyConnectionsPool.class.getName());
+    private final static Logger log = LogManager.getLogger(NettyConnectionsPool.class.getName());
 
     private final ConcurrentHashMap<String, ConcurrentLinkedQueue<IdleChannel>> connectionsPool = new ConcurrentHashMap<String, ConcurrentLinkedQueue<IdleChannel>>();
 

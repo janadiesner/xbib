@@ -13,6 +13,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHandler.STATE;
 import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.HttpResponseHeaders;
@@ -33,12 +35,10 @@ import org.asynchttpclient.providers.netty.response.ResponseStatus;
 import org.asynchttpclient.providers.netty.ws.NettyWebSocket;
 import org.asynchttpclient.providers.netty.ws.WebSocketUtil;
 import org.asynchttpclient.websocket.WebSocketUpgradeHandler;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 final class WebSocketProtocol extends Protocol {
 
-    private final static Logger logger = LoggerFactory.getLogger(WebSocketProtocol.class.getName());
+    private final static Logger logger = LogManager.getLogger(WebSocketProtocol.class.getName());
 
     private static final byte OPCODE_TEXT = 0x1;
     private static final byte OPCODE_BINARY = 0x2;

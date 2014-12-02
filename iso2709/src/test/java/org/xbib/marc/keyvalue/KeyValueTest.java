@@ -58,7 +58,7 @@ public class KeyValueTest extends StreamTester {
         InputStream in = getClass().getResourceAsStream(s);
         final StringWriter sw = new StringWriter();
         try (InputStreamReader r = new InputStreamReader(in, "UTF-8")) {
-            Iso2709Reader reader = new Iso2709Reader();
+            Iso2709Reader reader = new Iso2709Reader(r);
             reader.setFormat(MarcXchangeConstants.MARC21);
             reader.setMarcXchangeListener(new MarcXchange2KeyValue()
                             .addListener(new KeyValueStreamAdapter<FieldList, String>() {
@@ -87,7 +87,7 @@ public class KeyValueTest extends StreamTester {
 
                             })
             );
-            reader.parse(r);
+            reader.parse();
         }
         assertStream(getClass().getResource(s + "-keyvalue.txt").openStream(),
                 new ByteArrayInputStream(sw.toString().getBytes("UTF-8")));
@@ -227,8 +227,7 @@ public class KeyValueTest extends StreamTester {
     @Test
     public void testDE605Transform() throws IOException, SAXException {
         InputStream in = getClass().getResource("DE-605-aleph500-publish.xml").openStream();
-        //MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader()
-        MarcXchangeReader reader = new MarcXchangeReader()
+        MarcXchangeReader reader = new MarcXchangeReader(in)
                 .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd")
                 .setTransformer("088$  $a", value -> value.equals("294") ? "DE-294" : value)
                 .setTransform(true);
@@ -261,7 +260,7 @@ public class KeyValueTest extends StreamTester {
 
                         })
         );
-        reader.parse(in);
+        reader.parse();
         assertStream(getClass().getResource("DE-605-aleph500-publish-transform.txt").openStream(),
                 new ByteArrayInputStream(sw.toString().getBytes("UTF-8")));
     }

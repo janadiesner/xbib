@@ -1,6 +1,6 @@
 package org.xbib.syslog.impl.message.modifier.checksum;
 
-import org.xbib.syslog.SyslogIF;
+import org.xbib.syslog.Syslogger;
 import org.xbib.syslog.SyslogRuntimeException;
 import org.xbib.syslog.impl.message.modifier.AbstractSyslogMessageModifier;
 import org.xbib.syslog.util.SyslogUtility;
@@ -68,7 +68,7 @@ public class ChecksumSyslogMessageModifier extends AbstractSyslogMessageModifier
         }
     }
 
-    public String modify(SyslogIF syslog, int facility, int level, String message) {
+    public String modify(Syslogger syslog, int facility, int level, String message) {
         synchronized (this.config.getChecksum()) {
             StringBuilder messageBuffer = new StringBuilder(message);
             byte[] messageBytes = SyslogUtility.getBytes(syslog.getConfig(), message);

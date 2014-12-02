@@ -1,12 +1,12 @@
 package org.xbib.tools.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
 import org.xbib.io.Packet;
 import org.xbib.io.Session;
 import org.xbib.io.archive.tar.TarSession;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.AbstractPipeline;
 import org.xbib.pipeline.Pipeline;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class AbstractTarReader extends AbstractPipeline<LongPipelineElement, PipelineException> {
 
-    private final Logger logger = LoggerFactory.getLogger(AbstractTarReader.class.getName());
+    private final static Logger logger = LogManager.getLogger(AbstractTarReader.class.getName());
 
     private final ConnectionService<TarSession> service = ConnectionService.getInstance();
 

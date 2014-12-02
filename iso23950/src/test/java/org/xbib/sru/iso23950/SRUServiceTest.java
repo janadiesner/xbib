@@ -39,11 +39,11 @@ import java.io.Writer;
 import java.util.Arrays;
 import javax.xml.stream.util.XMLEventConsumer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 
 import org.xbib.io.Request;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.Diagnostics;
 import org.xbib.sru.client.SRUClient;
 import org.xbib.sru.iso23950.service.ZSRUService;
@@ -55,7 +55,7 @@ import org.xbib.xml.transform.StylesheetTransformer;
 
 public class SRUServiceTest {
 
-    private final Logger logger = LoggerFactory.getLogger(SRUServiceTest.class.getName());
+    private final static Logger logger = LogManager.getLogger(SRUServiceTest.class.getName());
 
     @Test
     public void testSearchRetrieve() throws Exception {

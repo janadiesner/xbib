@@ -33,10 +33,10 @@ package org.xbib.opensearch.elasticsearch;
 
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.server.provider.managed.FeedConfiguration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -49,7 +49,7 @@ import java.util.Properties;
 public class OpenSearchClientTest {
 
     /** the logger */
-    private static final Logger logger = LoggerFactory.getLogger(OpenSearchClientTest.class.getName());
+    private static final Logger logger = LogManager.getLogger(OpenSearchClientTest.class.getName());
 
     @Test
     public void testFeedControllerCQL() throws Exception {

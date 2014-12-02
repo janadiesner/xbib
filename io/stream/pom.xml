@@ -15,12 +15,4 @@
     <name>stream</name>
     <description>Buffered and I/O streaming</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.xbib</groupId>
-            <artifactId>logging</artifactId>
-            <type>jar</type>
-        </dependency>
-    </dependencies>
-
 </project>

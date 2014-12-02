@@ -34,8 +34,6 @@ package org.xbib.tools.feed.elasticsearch.medline;
 import org.xbib.io.InputService;
 import org.xbib.iri.IRI;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentBuilder;
@@ -59,8 +57,6 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
  * Elasticsearch indexer tool for Medline XML files
  */
 public final class Medline extends Feeder {
-
-    private final static Logger logger = LoggerFactory.getLogger(Medline.class.getSimpleName());
 
     @Override
     public String getName() {

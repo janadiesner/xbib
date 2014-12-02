@@ -6,12 +6,9 @@ import java.io.LineNumberReader;
 import java.io.StringReader;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public class CQLTest extends Assert {
 
-    private final static Logger logger = LoggerFactory.getLogger(CQLTest.class.getName());
 
     @Test
     public void testValidQueries() throws IOException {
@@ -36,7 +33,7 @@ public class CQLTest extends Assert {
                     process(line);
                     ok++;
                 } catch (Exception e) {
-                    logger.warn(e.getMessage());
+                    //logger.warn(e.getMessage());
                     errors++;
                 }
             }
@@ -48,6 +45,6 @@ public class CQLTest extends Assert {
     private void process(String line) throws Exception {
         CQLParser parser = new CQLParser(new StringReader(line));
         parser.parse();
-        logger.info("{} ===> {}", line, parser.getCQLQuery());
+        //logger.info("{} ===> {}", line, parser.getCQLQuery());
     }
 }

@@ -3,6 +3,8 @@ package org.asynchttpclient.providers.netty;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHandler;
 import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.AsyncHttpProvider;
@@ -11,12 +13,10 @@ import org.asynchttpclient.Request;
 import org.asynchttpclient.providers.netty.channel.Channels;
 import org.asynchttpclient.providers.netty.handler.NettyChannelHandler;
 import org.asynchttpclient.providers.netty.request.NettyRequestSender;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public class NettyAsyncHttpProvider implements AsyncHttpProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(NettyAsyncHttpProvider.class.getName());
+    private static final Logger logger = LogManager.getLogger(NettyAsyncHttpProvider.class.getName());
 
     private final AsyncHttpClientConfig config;
     private final NettyAsyncHttpProviderConfig nettyConfig;

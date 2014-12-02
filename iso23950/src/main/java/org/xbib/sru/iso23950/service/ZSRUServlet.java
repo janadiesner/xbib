@@ -42,10 +42,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.negotiate.ContentTypeNegotiator;
 import org.xbib.io.negotiate.MediaRangeSpec;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.sru.Diagnostics;
 import org.xbib.sru.SRUVersion;
 import org.xbib.sru.client.SRUClient;
@@ -55,12 +55,9 @@ import org.xbib.sru.util.SRUContentTypeNegotiator;
 import org.xbib.sru.searchretrieve.SearchRetrieveRequest;
 import org.xbib.xml.transform.StylesheetTransformer;
 
-/**
- *
- */
 public class ZSRUServlet extends HttpServlet implements SRUConstants {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZSRUServlet.class.getName());
+    private static final Logger logger = LogManager.getLogger(ZSRUServlet.class.getName());
 
     private final Map<String, String> mediaTypes = new HashMap();
 

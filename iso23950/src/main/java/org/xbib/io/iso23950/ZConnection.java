@@ -42,9 +42,9 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.URI;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.Connection;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import z3950.v3.Close;
 import z3950.v3.CloseReason;
 import z3950.v3.PDU;
@@ -55,7 +55,7 @@ import z3950.v3.PDU;
  */
 public class ZConnection implements Connection<ZSession> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZConnection.class.getName());
+    private static final Logger logger = LogManager.getLogger(ZConnection.class.getName());
 
     private final long DEFAULT_TIMEOUT_MILLIS = 30000L;
 

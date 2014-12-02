@@ -9,20 +9,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHttpProviderConfig;
 import org.asynchttpclient.providers.netty.response.DefaultResponseBodyPart;
 import org.asynchttpclient.providers.netty.response.LazyResponseBodyPart;
 import org.asynchttpclient.providers.netty.response.ResponseBodyPart;
 import org.asynchttpclient.providers.netty.util.ByteBufUtil;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 /**
  * This class can be used to pass Netty's internal configuration options. See Netty documentation for more information.
  */
 public class NettyAsyncHttpProviderConfig implements AsyncHttpProviderConfig<String, Object> {
 
-    private final static Logger logger = LoggerFactory.getLogger(NettyAsyncHttpProviderConfig.class.getName());
+    private final static Logger logger = LogManager.getLogger(NettyAsyncHttpProviderConfig.class.getName());
 
     /**
      * Allow configuring the Netty's event loop.

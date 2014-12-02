@@ -31,10 +31,10 @@
  */
 package elasticsearch;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.query.cql.CQLParser;
 import org.xbib.query.cql.elasticsearch.ESQueryGenerator;
 
@@ -48,8 +48,7 @@ import java.util.ResourceBundle;
  */
 public class ESQueryGeneratorTest extends Assert {
 
-    private final static Logger logger = LoggerFactory.getLogger(ESQueryGeneratorTest.class.getName());
-
+    private final static Logger logger = LogManager.getLogger(ESQueryGeneratorTest.class.getName());
 
     @Test
     public void testValid() throws Exception {

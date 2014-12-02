@@ -2,18 +2,18 @@ package org.xbib.io.archives.tar;
 
 import java.io.File;
 import java.net.URI;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.testng.annotations.Test;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
 import org.xbib.io.Session;
 import org.xbib.io.ObjectPacket;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public class TarSessionTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(TarSessionTest.class.getName());
-
+    private static final Logger logger = LogManager.getLogger(TarSessionTest.class.getName());
 
     public void readFromTar() throws Exception {
         URI uri = URI.create("resource:test.tar.bz2");
@@ -30,11 +30,9 @@ public class TarSessionTest {
         c.close();
     }
 
-
     public void writeToTar() throws Exception {
-        new File("target/test.tar.bz2").delete();
         URI fromUri = URI.create("file:src/test/resources/test.tar.bz2");
-        URI toUri = URI.create("file:target/test.tar.bz2");
+        URI toUri = URI.create("file:test.tar.bz2");
         Connection<Session> from = ConnectionService.getInstance()
                 .getConnectionFactory(fromUri)
                 .getConnection(fromUri);

@@ -1,14 +1,14 @@
 package org.asynchttpclient;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Simple {@link AsyncHandler} of type {@link Response}
  */
 public class AsyncCompletionHandlerBase extends AsyncCompletionHandler<Response> {
 
-    private final static Logger logger = LoggerFactory.getLogger(AsyncCompletionHandlerBase.class.getName());
+    private final static Logger logger = LogManager.getLogger(AsyncCompletionHandlerBase.class.getName());
 
     /**
      * {@inheritDoc}

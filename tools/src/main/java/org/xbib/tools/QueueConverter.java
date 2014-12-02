@@ -31,8 +31,8 @@
  */
 package org.xbib.tools;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
@@ -46,7 +46,7 @@ import java.util.concurrent.BlockingQueue;
 public abstract class QueueConverter<T, R extends PipelineRequest, P extends Pipeline<T, R>, E extends PipelineElement>
         extends Converter<T, R, P> {
 
-    private final Logger logger = LoggerFactory.getLogger(QueueConverter.class.getSimpleName());
+    private final static Logger logger = LogManager.getLogger(QueueConverter.class.getSimpleName());
 
     private static QueueConverter converter;
 
@@ -76,7 +76,7 @@ public abstract class QueueConverter<T, R extends PipelineRequest, P extends Pip
             if (executor != null) {
                 executor.shutdown(getPoisonElement()); // must be non null
                 executor.shutdown();
-                writeMetrics(writer);
+                writeMetrics(metric(), writer);
             }
         }
     }

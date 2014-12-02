@@ -81,14 +81,14 @@ public class MABTest extends StreamTester {
         InputStream in = getClass().getResource("DE-605-aleph500-publish.xml").openStream();
         File file = File.createTempFile("DE-605-aleph500-publish-out.", ".xml");
         FileOutputStream out = new FileOutputStream(file);
-        MarcXchangeReader reader = new MarcXchangeReader()
+        MarcXchangeReader reader = new MarcXchangeReader(in)
                 .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
         reader.setTransformer("088$  $a", value -> "Das ist ein Test").setTransform(true);
         MarcXchangeWriter writer = new MarcXchangeWriter(out);
         reader.setMarcXchangeListener(writer);
         writer.startDocument();
         writer.beginCollection();
-        reader.parse(in);
+        reader.parse();
         writer.endCollection();
         writer.endDocument();
         out.close();
@@ -96,16 +96,16 @@ public class MABTest extends StreamTester {
                 new FileInputStream(file));
     }
 
-    private void read(Reader source, Writer target) throws IOException, SAXException {
-        Iso2709Reader reader = new Iso2709Reader();
-        reader.setFormat("MAB");
-        reader.setType("Titel");
-        MarcXchangeWriter writer = new MarcXchangeWriter(target);
-        reader.setMarcXchangeListener(writer);
-        writer.startDocument();
-        writer.beginCollection();
-        reader.parse(new InputSource(source));
-        writer.endCollection();
-        writer.endDocument();
+    private void read(Reader reader, Writer writer) throws IOException, SAXException {
+        Iso2709Reader iso2709Reader = new Iso2709Reader(reader);
+        iso2709Reader.setFormat("MAB");
+        iso2709Reader.setType("Titel");
+        MarcXchangeWriter marcXchangeWriter = new MarcXchangeWriter(writer);
+        iso2709Reader.setMarcXchangeListener(marcXchangeWriter);
+        marcXchangeWriter.startDocument();
+        marcXchangeWriter.beginCollection();
+        iso2709Reader.parse();
+        marcXchangeWriter.endCollection();
+        marcXchangeWriter.endDocument();
     }
 }

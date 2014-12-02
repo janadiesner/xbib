@@ -2,9 +2,9 @@ package org.asynchttpclient.multipart;
 
 import static org.asynchttpclient.util.MiscUtil.isNonEmpty;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.FluentCaseInsensitiveStringsMap;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,7 +17,7 @@ import java.util.Random;
  */
 public class MultipartRequestEntity implements RequestEntity {
 
-    private final static Logger logger = LoggerFactory.getLogger(MultipartRequestEntity.class.getName());
+    private final static Logger logger = LogManager.getLogger(MultipartRequestEntity.class.getName());
 
     /**
      * The Content-Type for multipart/form-data.

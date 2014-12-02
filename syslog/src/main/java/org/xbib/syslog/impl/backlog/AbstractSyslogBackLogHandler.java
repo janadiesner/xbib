@@ -1,7 +1,7 @@
 package org.xbib.syslog.impl.backlog;
 
 import org.xbib.syslog.SyslogBackLogHandlerIF;
-import org.xbib.syslog.SyslogIF;
+import org.xbib.syslog.Syslogger;
 import org.xbib.syslog.util.SyslogUtility;
 
 /**
@@ -12,7 +12,7 @@ import org.xbib.syslog.util.SyslogUtility;
 public abstract class AbstractSyslogBackLogHandler implements SyslogBackLogHandlerIF {
     protected boolean appendReason = true;
 
-    protected String combine(SyslogIF syslog, int level, String message, String reason) {
+    protected String combine(Syslogger syslog, int level, String message, String reason) {
         // Note: syslog is explicitly ignored by default
 
         String _message = message != null ? message : "UNKNOWN";

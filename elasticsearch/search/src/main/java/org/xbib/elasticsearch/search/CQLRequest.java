@@ -37,12 +37,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.unit.TimeValue;
 
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.elasticsearch.action.search.support.BasicSearchRequest;
-import org.xbib.logging.Logger;
 import org.xbib.query.cql.CQLParser;
 import org.xbib.query.cql.elasticsearch.ESFilterGenerator;
 import org.xbib.query.cql.elasticsearch.ESQueryGenerator;

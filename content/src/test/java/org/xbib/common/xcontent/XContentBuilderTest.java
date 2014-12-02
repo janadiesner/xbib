@@ -2,9 +2,6 @@ package org.xbib.common.xcontent;
 
 import org.testng.annotations.Test;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.Loggers;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;

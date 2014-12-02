@@ -31,13 +31,13 @@
  */
 package org.xbib.tools.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionService;
 import org.xbib.io.Packet;
 import org.xbib.io.Session;
 import org.xbib.io.archive.tar.TarSession;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.dialects.pica.DNBPICAConstants;
@@ -69,7 +69,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<LongPipelineElement, PipelineException>
         implements DNBPICAConstants, MarcXchangeListener {
 
-    private final Logger logger = LoggerFactory.getLogger(DNBPICAXmlTarReader.class.getName());
+    private final static Logger logger = LogManager.getLogger(DNBPICAXmlTarReader.class.getName());
 
     private final ConnectionService<TarSession> service = ConnectionService.getInstance();
 

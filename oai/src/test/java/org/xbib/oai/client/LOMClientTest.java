@@ -31,10 +31,9 @@
  */
 package org.xbib.oai.client;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
-import org.xbib.iri.IRI;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
@@ -59,7 +58,7 @@ import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
 
 public class LOMClientTest {
 
-    private final Logger logger = LoggerFactory.getLogger(LOMClientTest.class.getName());
+    private final static Logger logger = LogManager.getLogger(LOMClientTest.class.getName());
 
     @Test
     public void testListRecordsLOM() throws Exception {

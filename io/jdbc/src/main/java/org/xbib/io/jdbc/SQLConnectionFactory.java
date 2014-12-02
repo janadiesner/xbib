@@ -32,11 +32,11 @@
 package org.xbib.io.jdbc;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.Connection;
 import org.xbib.io.ConnectionFactory;
 import org.xbib.util.URIUtil;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -54,10 +54,7 @@ import java.util.Properties;
  */
 public final class SQLConnectionFactory implements ConnectionFactory<SQLSession> {
 
-    /**
-     * the logger
-     */
-    private static final Logger logger = LoggerFactory.getLogger(SQLConnectionFactory.class.getName());
+    private static final Logger logger = LogManager.getLogger(SQLConnectionFactory.class.getName());
 
     private Properties properties;
 

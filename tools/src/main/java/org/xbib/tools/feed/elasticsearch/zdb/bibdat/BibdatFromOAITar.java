@@ -31,13 +31,13 @@
  */
 package org.xbib.tools.feed.elasticsearch.zdb.bibdat;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.entities.marc.dialects.pica.PicaEntityBuilderState;
 import org.xbib.entities.marc.dialects.pica.PicaEntityQueue;
 import org.xbib.io.Packet;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
@@ -66,7 +66,7 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 public final class BibdatFromOAITar extends Feeder {
 
-    private final static Logger logger = LoggerFactory.getLogger(BibdatFromOAITar.class.getSimpleName());
+    private final static Logger logger = LogManager.getLogger(BibdatFromOAITar.class.getSimpleName());
 
     private static AtomicLong total = new AtomicLong(0L);
 

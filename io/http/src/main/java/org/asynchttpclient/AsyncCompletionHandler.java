@@ -1,7 +1,8 @@
 package org.asynchttpclient;
 
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * An {@link AsyncHandler} augmented with an {@link #onCompleted(Response)} convenience method which gets called
@@ -12,7 +13,7 @@ import org.xbib.logging.LoggerFactory;
  */
 public abstract class AsyncCompletionHandler<T> implements AsyncHandler<T>, ProgressAsyncHandler<T> {
 
-    private final Logger log = LoggerFactory.getLogger(AsyncCompletionHandlerBase.class.getName());
+    private final static Logger log = LogManager.getLogger(AsyncCompletionHandlerBase.class.getName());
 
     private final Response.ResponseBuilder builder = new Response.ResponseBuilder();
 

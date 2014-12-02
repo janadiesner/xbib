@@ -31,6 +31,8 @@
  */
 package org.xbib.io.http.netty;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.Realm;
 import org.asynchttpclient.Request;
 import org.asynchttpclient.RequestBuilder;
@@ -38,8 +40,6 @@ import org.asynchttpclient.RequestBuilder;
 import org.xbib.io.http.HttpPacket;
 import org.xbib.io.http.HttpRequest;
 import org.xbib.io.http.PreparedHttpRequest;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 import org.xbib.util.URIUtil;
 
 import java.io.IOException;
@@ -52,7 +52,7 @@ import java.nio.charset.Charset;
  */
 public class NettyHttpRequest extends HttpPacket implements HttpRequest {
 
-    private final Logger logger = LoggerFactory.getLogger(NettyHttpRequest.class.getName());
+    private final static Logger logger = LogManager.getLogger(NettyHttpRequest.class.getName());
 
     private final NettyHttpSession session;
 

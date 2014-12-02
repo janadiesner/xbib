@@ -1,5 +1,7 @@
 package org.asynchttpclient.resumable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHandler;
 import org.asynchttpclient.HttpResponseBodyPart;
 import org.asynchttpclient.HttpResponseHeaders;
@@ -9,8 +11,6 @@ import org.asynchttpclient.RequestBuilder;
 import org.asynchttpclient.Response;
 import org.asynchttpclient.Response.ResponseBuilder;
 import org.asynchttpclient.listener.TransferCompletionHandler;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class ResumableAsyncHandler implements AsyncHandler<Response> {
 
-    private final static Logger logger = LoggerFactory.getLogger(TransferCompletionHandler.class.getName());
+    private final static Logger logger = LogManager.getLogger(TransferCompletionHandler.class.getName());
 
     private final AtomicLong byteTransferred;
     private Integer contentLength;

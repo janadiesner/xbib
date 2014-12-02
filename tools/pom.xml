@@ -17,14 +17,6 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <!-- enforce 1.8 here -->
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <useSystemClassLoader>true</useSystemClassLoader>
@@ -60,15 +52,11 @@
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>contextualization</artifactId>
+            <artifactId>entity</artifactId>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>pipeline</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
-            <artifactId>elasticsearch-rdf</artifactId>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
@@ -89,25 +77,6 @@
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>compress</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
-            <artifactId>logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>

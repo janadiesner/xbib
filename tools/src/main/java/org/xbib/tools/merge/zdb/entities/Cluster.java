@@ -31,10 +31,10 @@
  */
 package org.xbib.tools.merge.zdb.entities;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.common.collect.ImmutableSet;
 import org.xbib.entities.support.EnumerationAndChronology;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,7 +52,7 @@ import static com.google.common.collect.Sets.newTreeSet;
 
 public class Cluster extends TreeSet<Manifestation> {
 
-    private final static Logger logger = LoggerFactory.getLogger(TimeLine.class.getName());
+    private final static Logger logger = LogManager.getLogger(TimeLine.class.getName());
 
     private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 

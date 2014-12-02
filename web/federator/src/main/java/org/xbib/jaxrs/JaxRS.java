@@ -1,10 +1,10 @@
 
 package org.xbib.jaxrs;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.negotiate.ContentTypeNegotiator;
 import org.xbib.io.negotiate.MediaRangeSpec;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -17,7 +17,7 @@ import java.util.Set;
 @ApplicationPath("/")
 public class JaxRS extends Application {
 
-    private final static Logger logger = LoggerFactory.getLogger(JaxRS.class.getName());
+    private final static Logger logger = LogManager.getLogger(JaxRS.class.getName());
 
     public Set<Class<?>> getClasses() {
         return new HashSet<Class<?>>(Arrays.asList(SearchService.class, FederatorService.class));

@@ -29,6 +29,8 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.asynchttpclient.AsyncHandler;
 import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.Body;
@@ -54,12 +56,10 @@ import org.asynchttpclient.providers.netty.request.FeedableBodyGenerator.FeedLis
 import org.asynchttpclient.util.AsyncHttpProviderUtils;
 import org.asynchttpclient.util.ProxyUtils;
 import org.asynchttpclient.websocket.WebSocketUpgradeHandler;
-import org.xbib.logging.Logger;
-import org.xbib.logging.LoggerFactory;
 
 public class NettyRequestSender {
 
-    private static final Logger logger = LoggerFactory.getLogger(NettyRequestSender.class.getName());
+    private static final Logger logger = LogManager.getLogger(NettyRequestSender.class.getName());
 
     private final AtomicBoolean closed;
     private final AsyncHttpClientConfig config;
