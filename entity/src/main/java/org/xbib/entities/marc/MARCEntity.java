@@ -34,6 +34,7 @@ package org.xbib.entities.marc;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xbib.entities.Entity;
+import org.xbib.marc.Field;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.rdf.Resource;
@@ -44,7 +45,7 @@ import java.util.Map;
 /**
  * A MARC entity
  */
-public class MARCEntity implements Entity<FieldList, String>, MarcXchangeConstants {
+public class MARCEntity implements Entity, MarcXchangeConstants {
 
     protected static final Logger logger = LogManager.getLogger(MARCEntity.class.getName());
 
@@ -81,4 +82,8 @@ public class MARCEntity implements Entity<FieldList, String>, MarcXchangeConstan
         return value;
     }
 
+
+    public MARCEntity facetize(MARCEntityQueue.MARCWorker worker, Field field) {
+        return this;
+    }
 }

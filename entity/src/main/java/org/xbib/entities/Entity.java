@@ -36,10 +36,8 @@ import java.util.Map;
 /**
  * Marker interface for an Entity
  *
- * @param <K> the key
- * @param <V> the value
  */
-public interface Entity<K,V> {
+public interface Entity {
 
-    Entity<K,V> setSettings(Map<String,Object> config);
+    Entity setSettings(Map<String,Object> config);
 }

@@ -24,7 +24,7 @@
                 <include>org.xbib:stream</include>
                 <include>org.xbib:iso2709</include>
                 <include>org.xbib:matching</include>
-                <include>org.xbib:contextualization</include>
+                <include>org.xbib:entity</include>
                 <include>org.xbib:pipeline</include>
                 <include>org.xbib:http</include>
                 <include>org.xbib:oai</include>
@@ -45,7 +45,6 @@
                 <include>com.fasterxml.jackson.dataformat:jackson-dataformat-xml</include>
                 <include>org.xbib:query</include>
                 <include>org.xbib:elasticsearch-search</include>
-                <include>org.xbib:elasticsearch-rdf</include>
                 <include>org.xbib:elasticsearch-sru</include>
                 <include>org.xbib.elasticsearch.plugin:elasticsearch-support</include>
                 <include>org.elasticsearch:elasticsearch</include>

@@ -35,7 +35,7 @@ import org.xbib.entities.Entity;
 
 import java.util.Map;
 
-public class DublinCoreEntity implements Entity<String, String> {
+public class DublinCoreEntity implements Entity {
 
     private Map<String,Object> params;
 

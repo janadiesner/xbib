@@ -38,7 +38,7 @@ import org.xbib.marc.FieldList;
 
 import java.util.Map;
 
-public class PicaEntity implements Entity<FieldList, String> {
+public class PicaEntity implements Entity {
 
     protected static final Logger logger = LogManager.getLogger(PicaEntity.class.getName());
 
@@ -56,9 +56,9 @@ public class PicaEntity implements Entity<FieldList, String> {
     /**
      * Process mapped element. Empty by default.
      *
-     * @param worker
-     * @param fields
-     * @param value
+     * @param worker the worker
+     * @param fields the fields
+     * @param value the value
      */
     public void fields(PicaEntityQueue.PicaKeyValueWorker worker,
                        FieldList fields, String value) {
