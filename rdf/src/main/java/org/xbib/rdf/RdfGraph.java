@@ -33,27 +33,20 @@ package org.xbib.rdf;
 
 import org.xbib.iri.IRI;
 
-import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
-public interface RdfGraph<Params extends RdfGraphParams> extends RdfContentGenerator<Params> {
+public interface RdfGraph<Params extends RdfGraphParams>
+        extends RdfContentGenerator<Params> {
 
     Collection<Resource> getResources();
 
-    RdfGraph setParams(Params params);
+    Map<IRI,Resource> getResourceMap();
 
-    RdfGraph begin();
+    RdfGraph<Params> putResource(IRI predicate, Resource resource);
 
-    RdfGraph startPrefixMapping(String prefix, String uri);
+    Resource getResource(IRI predicate);
 
-    RdfGraph endPrefixMapping(String prefix);
-
-    RdfGraph receive(IRI identifier);
-
-    RdfGraph receive(Triple triple);
-
-    RdfGraph end();
-
-    RdfGraph receive(Resource resource) throws IOException;
+    boolean hasResource(IRI predicate);
 
 }

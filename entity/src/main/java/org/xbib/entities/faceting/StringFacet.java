@@ -63,8 +63,9 @@ public class StringFacet implements Facet {
         return type;
     }
 
+    @Override
     public StringFacet addValue(Object value) {
-        if (value != null) {
+        if (value != null && !value.toString().isEmpty()) {
             values.add(value);
         }
         return this;

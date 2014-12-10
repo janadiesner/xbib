@@ -71,7 +71,7 @@ public class ZDBBibTest extends Assert {
             //new GZIPInputStream(new FileInputStream(System.getProperty("user.home") + "/Daten/zdb/1302zdbtitgesamt.mrc.gz"));
         BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591));
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
-        MyQueue queue = new MyQueue("/org/xbib/analyzer/marc/zdb/bib.json", Runtime.getRuntime().availableProcessors());
+        MyQueue queue = new MyQueue();
                 queue.setUnmappedKeyListener((id, key) -> unmapped.add(key.toString()));
         queue.execute();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
@@ -106,7 +106,7 @@ public class ZDBBibTest extends Assert {
     public void testZDBOAI() throws Exception {
         InputStream in = getClass().getResourceAsStream("zdb-oai-marc.xml");
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
-        MyQueue queue = new MyQueue("/org/xbib/analyzer/marc/zdb/bib.json", Runtime.getRuntime().availableProcessors());
+        MyQueue queue = new MyQueue();
         queue.setUnmappedKeyListener((id, key) -> unmapped.add(key.toString()));
         queue.execute();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
@@ -134,17 +134,14 @@ public class ZDBBibTest extends Assert {
         assertEquals(queue.getCounter(), 50);
     }
 
-
     class MyQueue extends MARCEntityQueue {
 
         final AtomicInteger counter = new AtomicInteger();
 
-        public MyQueue(String path) {
-            super(path);
-        }
-
-        public MyQueue(String path, int workers) {
-            super(path, workers);
+        public MyQueue() {
+            super("org.xbib.analyzer.marc.bib",
+                    Runtime.getRuntime().availableProcessors(),
+                    "org/xbib/analyzer/marc/zdb/bib.json");
         }
 
         @Override

@@ -53,38 +53,30 @@ public class ValueMaps {
     private ValueMaps() {
     }
 
-    public static Map getMap(String format) {
-        return getMap("", format);
-    }
-
-    public synchronized static Map getMap(String path, String format) {
-        if (!maps.containsKey(format)) {
+    public synchronized static Map getMap(ClassLoader cl, String path, String format) {
+        if (cl != null && !maps.containsKey(format)) {
             try {
-                InputStream json = ValueMaps.class.getResourceAsStream(path + format + ".json");
-                if (json == null) {
-                    throw new IOException("format " + format + " not found: " + path + format + ".json");
+                InputStream in = cl.getResource(path).openStream();
+                if (in == null) {
+                    throw new IOException("format " + format + " not found: " + path + format);
                 }
-                ObjectMapper mapper = new ObjectMapper();
-                maps.put(format, mapper.readValue(json, HashMap.class));
-            } catch (IOException e) {
+                maps.put(format, new ObjectMapper().readValue(in, HashMap.class));
+                in.close();
+            } catch (Exception e) {
                 logger.warn(e.getMessage(), e);
             }
         }
         return (Map) maps.get(format);
     }
 
-    public static Map<String, String> getAssocStringMap(String format) {
-        return getAssocStringMap("", format);
-    }
-
-    public synchronized static Map<String, String> getAssocStringMap(String path, String format) {
-        if (!maps.containsKey(format)) {
+    public synchronized static Map<String, String> getAssocStringMap(ClassLoader cl, String path, String format) {
+        if (cl != null && !maps.containsKey(format)) {
             try {
-                InputStream json = ValueMaps.class.getResourceAsStream(path + format + ".json");
-                if (json == null) {
-                    throw new IOException("format " + format + " not found: " + path + format + ".json");
+                InputStream in = cl.getResource(path).openStream();
+                if (in == null) {
+                    throw new IOException("format " + format + " not found: " + path + format);
                 }
-                Map result = new ObjectMapper().readValue(json, HashMap.class);
+                Map result = new ObjectMapper().readValue(in, HashMap.class);
                 Object values = result.get(format);
                 Collection<String> c = (Collection<String>) values;
                 if (c != null) {
@@ -96,7 +88,8 @@ public class ValueMaps {
                     }
                     maps.put(format, map);
                 }
-            } catch (IOException e) {
+                in.close();
+            } catch (Exception e) {
                 logger.warn(e.getMessage(), e);
             }
         }

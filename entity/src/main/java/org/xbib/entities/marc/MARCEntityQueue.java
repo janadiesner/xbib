@@ -58,16 +58,12 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
 
     private UnmappedKeyListener<FieldList> listener;
 
-    public MARCEntityQueue(String path) {
-        super(path, new MARCSpecification(), 1);
+    public MARCEntityQueue(String packageName, int workers, String... paths) {
+        super(new MARCSpecification(), workers, packageName, paths);
     }
 
-    public MARCEntityQueue(String path, int workers) {
-        super(path, new MARCSpecification(), workers);
-    }
-
-    public MARCEntityQueue(String path, Map<String, Object> params, int workers) {
-        super(path, new MARCSpecification().setParameters(params), workers);
+    public MARCEntityQueue(String packageName, Map<String, Object> params, int workers,  String... paths) {
+        super(new MARCSpecification().addParameters(params), workers, packageName, paths);
     }
 
     public MARCEntityQueue setUnmappedKeyListener(UnmappedKeyListener<FieldList> listener) {
@@ -143,6 +139,7 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
             }
         }
 
+        @SuppressWarnings("unchecked")
         public void addToResource(Resource resource, FieldList fields, MARCEntity entity, String value) throws IOException {
             // setup
             Map<String, Object> defaultSubfields = (Map<String, Object>) entity.getSettings().get("subfields");

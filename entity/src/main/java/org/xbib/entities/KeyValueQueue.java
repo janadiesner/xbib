@@ -96,6 +96,7 @@ public class KeyValueQueue<K, V>
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public KeyValueQueue<K, V> end() {
         if (closed) {

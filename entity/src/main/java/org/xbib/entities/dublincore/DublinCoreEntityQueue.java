@@ -35,8 +35,12 @@ import org.xbib.entities.EntityQueue;
 
 public class DublinCoreEntityQueue extends EntityQueue<DublinCoreEntityBuilderState, DublinCoreEntity, String, String> {
 
-    public DublinCoreEntityQueue(String format, int workers) {
-        super(format, new DublinCoreSpecification(), workers);
+    public DublinCoreEntityQueue(String packageName, String... paths) {
+        super(new DublinCoreSpecification(), 1, packageName, paths);
+    }
+
+    public DublinCoreEntityQueue(String packageName, int workers, String... paths) {
+        super(new DublinCoreSpecification(), workers, packageName, paths);
     }
 
 }

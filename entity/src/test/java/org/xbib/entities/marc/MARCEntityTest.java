@@ -56,10 +56,10 @@ public class MARCEntityTest extends Assert {
 
     @Test
     public void testSetup() throws Exception {
-        MARCEntityQueue queue = new MARCEntityQueue("/org/xbib/analyzer/marc/bib.json");
         File file = File.createTempFile("marc-bib-entities.", ".json");
         Writer writer = new FileWriter(file);
-        queue.specification().dump("/org/xbib/analyzer/marc/bib.json", writer);
+        MyQueue queue = new MyQueue();
+        queue.specification().dump("org/xbib/analyzer/marc/bib.json", writer);
         writer.close();
         queue.execute();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(queue);
@@ -72,7 +72,7 @@ public class MARCEntityTest extends Assert {
     public void testStbBonn() throws Exception {
         InputStream in = getClass().getResourceAsStream("stb-bonn.mrc");
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
-        MyQueue queue = new MyQueue("/org/xbib/analyzer/marc/bib.json");
+        MyQueue queue = new MyQueue();
         queue.setUnmappedKeyListener((id, key) -> unmapped.add(key.toString()));
         queue.execute();
         MarcXchange2KeyValue kv = new MarcXchange2KeyValue().addListener(queue);
@@ -90,8 +90,8 @@ public class MARCEntityTest extends Assert {
 
         final AtomicInteger counter = new AtomicInteger();
 
-        public MyQueue(String path) {
-            super(path);
+        public MyQueue() {
+            super("org.xbib.analyzer.marc.bib", 1, "org/xbib/analyzer/marc/bib.json");
         }
 
         @Override

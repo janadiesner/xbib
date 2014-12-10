@@ -42,7 +42,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class MemoryRdfGraph<Params extends RdfGraphParams> implements RdfGraph<Params> {
+public class MemoryRdfGraph<Params extends RdfGraphParams>
+        implements RdfGraph<Params> {
 
     private RdfGraphParams params = MemoryRdfGraphParams.DEFAULT_PARAMS;
 
@@ -50,6 +51,23 @@ public class MemoryRdfGraph<Params extends RdfGraphParams> implements RdfGraph<P
 
     public Collection<Resource> getResources() {
         return resources.values();
+    }
+
+    public Map<IRI,Resource> getResourceMap() {
+        return resources;
+    }
+
+    public RdfGraph<Params> putResource(IRI predicate, Resource resource) {
+        resources.put(predicate, resource);
+        return this;
+    }
+
+    public Resource getResource(IRI predicate) {
+        return resources.get(predicate);
+    }
+
+    public boolean hasResource(IRI predicate) {
+        return resources.containsKey(predicate);
     }
 
     @Override

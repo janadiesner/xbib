@@ -107,7 +107,7 @@ public class ResourceTest extends Assert {
     }
 
     @Test
-    public void testObjects() throws Exception {
+    public void testUniqueObjects() throws Exception {
         Resource r = new MemoryResource().id(IRI.create("urn:doc4"));
         r.add("urn:hasAttribute", "a")
                 .add("urn:hasAttribute", "b")

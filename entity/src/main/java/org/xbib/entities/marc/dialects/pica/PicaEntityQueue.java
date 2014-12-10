@@ -46,12 +46,12 @@ public class PicaEntityQueue extends EntityQueue<PicaEntityBuilderState, PicaEnt
 
     private UnmappedKeyListener<FieldList> listener;
 
-    public PicaEntityQueue(String format) {
-        super(format, new PicaSpecification(), 1);
+    public PicaEntityQueue(String packageName, String... paths) {
+        super(new PicaSpecification(), 1, packageName, paths);
     }
 
-    public PicaEntityQueue(String format, int workers) {
-        super(format, new PicaSpecification(), workers);
+    public PicaEntityQueue(String packageName, int workers, String... paths) {
+        super(new PicaSpecification(), workers, packageName, paths);
     }
 
     public PicaEntityQueue setUnmappedKeyListener(UnmappedKeyListener<FieldList> listener) {
@@ -73,6 +73,8 @@ public class PicaEntityQueue extends EntityQueue<PicaEntityBuilderState, PicaEnt
     }
 
     public class PicaKeyValueWorker extends EntityWorker {
+
+        @SuppressWarnings("unchecked")
         @Override
         public void build(FieldList fields, String value) throws IOException {
             if (fields == null) {
@@ -122,7 +124,6 @@ public class PicaEntityQueue extends EntityQueue<PicaEntityBuilderState, PicaEnt
                             }
                             newResource.add(property, field.data());
                         }
-                        //entity.field(this, field, value);
                     }
                     // add child resource
                     resource.add(predicate, newResource);
@@ -133,7 +134,6 @@ public class PicaEntityQueue extends EntityQueue<PicaEntityBuilderState, PicaEnt
                     listener.unknown(state().getRecordNumber(), fields);
                 }
             }
-            //builder().build(state(), entity, fields, value);
         }
     }
 }

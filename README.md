@@ -1,0 +1,1 @@
+# xbib [![Build Status](https://travis-ci.org/xbib/xbib.svg?branch=master)](https://travis-ci.org/xbib/xbib) [![Coverage Status](https://coveralls.io/repos/xbib/xbib/badge.png?branch=master)](https://coveralls.io/r/xbib/xbib)

@@ -54,8 +54,9 @@ public class TextualHoldings extends MARCEntity {
 
     private Pattern[] movingwallPatterns;
 
+    @SuppressWarnings("unchecked")
     @Override
-    public TextualHoldings setSettings(Map params) {
+    public TextualHoldings setSettings(Map<String,Object> params) {
         super.setSettings(params);
         List<String> movingwalls = (List<String>) params.get("movingwall");
         if (movingwalls != null) {

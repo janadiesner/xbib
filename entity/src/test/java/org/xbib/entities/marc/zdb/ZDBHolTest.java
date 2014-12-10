@@ -68,7 +68,7 @@ public class ZDBHolTest extends Assert {
         final InputStream in = getClass().getResource("zdblokutf8.mrc").openStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591));
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
-        MyQueue queue = new MyQueue("/org/xbib/analyzer/marc/zdb/hol.json");
+        MyQueue queue = new MyQueue();
         queue.setUnmappedKeyListener((id, key) -> {
             unmapped.add(key.toString());
             logger.warn("record {}: unknown key: {}", id, key);
@@ -107,8 +107,8 @@ public class ZDBHolTest extends Assert {
 
         final AtomicInteger counter = new AtomicInteger();
 
-        public MyQueue(String path) {
-            super(path);
+        public MyQueue() {
+            super("org.xbib.analyzer.marc.zdb.hol", 1, "org/xbib/analyzer/marc/zdb/hol.json");
         }
 
         @Override

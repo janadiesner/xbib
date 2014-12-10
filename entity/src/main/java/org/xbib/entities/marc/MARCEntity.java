@@ -51,6 +51,7 @@ public class MARCEntity implements Entity, MarcXchangeConstants {
 
     private Map<String,Object> params;
 
+    @Override
     public MARCEntity setSettings(Map<String,Object> params) {
         this.params = params;
         return this;

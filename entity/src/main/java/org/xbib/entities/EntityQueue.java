@@ -61,30 +61,15 @@ public class EntityQueue<S extends EntityBuilderState, E extends Entity, K, V>
 
     private boolean closed;
 
-    public EntityQueue(String path, Specification specification, int workers) {
-        this(new URIClassLoader(), path, specification, workers);
+    public EntityQueue(Specification specification, int workers, String packageName, String... paths) {
+        this(specification, workers, new URIClassLoader(), packageName, paths);
     }
 
-    public EntityQueue(String path, Specification specification,  Map<String,Object> map, int workers) {
-        this(new URIClassLoader(), path, specification, map, workers);
-    }
-
-    public EntityQueue(ClassLoader cl, String path, Specification specification, int workers) {
+    public EntityQueue(Specification specification, int workers, ClassLoader cl, String packageName, String... paths) {
         super(workers);
         this.specification = specification;
         try {
-            this.map = specification.getEntityMap(cl, path);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public EntityQueue(ClassLoader cl, String path, Specification specification, Map<String,Object> map, int workers) {
-        super(workers);
-        this.specification = specification;
-        try {
-            this.map = specification.getEntityMap(cl, path);
-            this.map.putAll(map);
+            this.map = specification.getEntityMap(cl, packageName, paths);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -122,6 +107,7 @@ public class EntityQueue<S extends EntityBuilderState, E extends Entity, K, V>
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public EntityQueue<S, E, K, V> end() {
         if (closed) {
@@ -192,6 +178,7 @@ public class EntityQueue<S extends EntityBuilderState, E extends Entity, K, V>
         public void build(K key, V value) throws IOException {
         }
 
+        @SuppressWarnings("unchecked")
         public S newState() {
             return (S) new DefaultEntityBuilderState(new MemoryRdfGraph<>(), contentBuilderProviders());
         }

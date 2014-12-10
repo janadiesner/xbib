@@ -44,7 +44,7 @@ public class PicaEntity implements Entity {
 
     private  Map<String,Object> params;
     
-    public PicaEntity setSettings(Map params) {
+    public PicaEntity setSettings(Map<String,Object> params) {
         this.params = params;
         return this;
     }

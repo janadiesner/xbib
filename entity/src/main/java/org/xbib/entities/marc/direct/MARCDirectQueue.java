@@ -40,8 +40,8 @@ import java.io.IOException;
 
 public class MARCDirectQueue extends MARCEntityQueue {
 
-    public MARCDirectQueue(String path, int workers) {
-        super(path, workers);
+    public MARCDirectQueue(String packageName, int workers, String... paths) {
+        super(packageName, workers, paths);
     }
 
     @Override

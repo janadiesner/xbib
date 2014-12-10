@@ -33,9 +33,12 @@ package org.xbib.sru.client;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import javax.xml.stream.util.XMLEventConsumer;
 
 import io.netty.channel.ConnectTimeoutException;
@@ -54,97 +57,102 @@ public class AsyncClientTest {
     private static final Logger logger = LogManager.getLogger(AsyncClientTest.class.getName());
 
     @Test
-    public void testMultiClient() throws Exception {
-        for (String s : Arrays.asList("Bielefeld", "Gent", "Lund")) {
-            SRUClient client = SRUClientFactory.newClient(s);
-            String query = "title=linux";
-            int from = 0;
-            int size = 10;
-            SearchRetrieveRequest request = client
-                    .newSearchRetrieveRequest()
-                    .setQuery(query)
-                    .setStartRecord(from)
-                    .setMaximumRecords(size);
-            File file = File.createTempFile("sru-async-"+s+".", ".xml");
-            FileOutputStream out = new FileOutputStream(file);
-            Writer writer = new OutputStreamWriter(out, "UTF-8");
+    public void testMultiClient()  {
+        try {
+            for (String s : Arrays.asList("Bielefeld", "Gent", "Lund")) {
+                SRUClient client = SRUClientFactory.newClient(s);
+                String query = "title=linux";
+                int from = 0;
+                int size = 10;
+                SearchRetrieveRequest request = client
+                        .newSearchRetrieveRequest()
+                        .setQuery(query)
+                        .setStartRecord(from)
+                        .setMaximumRecords(size);
+                File file = File.createTempFile("sru-async-" + s + ".", ".xml");
+                FileOutputStream out = new FileOutputStream(file);
+                Writer writer = new OutputStreamWriter(out, "UTF-8");
 
-            SearchRetrieveListener listener = new SearchRetrieveResponseAdapter() {
+                SearchRetrieveListener listener = new SearchRetrieveResponseAdapter() {
 
-                @Override
-                public void onConnect(Request request) {
-                    logger.info("connect, request = " + request);
-                }
+                    @Override
+                    public void onConnect(Request request) {
+                        logger.info("connect, request = " + request);
+                    }
 
-                @Override
-                public void version(String version) {
-                    logger.info("version = " + version);
-                }
+                    @Override
+                    public void version(String version) {
+                        logger.info("version = " + version);
+                    }
 
-                @Override
-                public void numberOfRecords(long numberOfRecords) {
-                    logger.info("numberOfRecords = " + numberOfRecords);
-                }
+                    @Override
+                    public void numberOfRecords(long numberOfRecords) {
+                        logger.info("numberOfRecords = " + numberOfRecords);
+                    }
 
-                @Override
-                public void beginRecord() {
-                    logger.info("begin record");
-                }
+                    @Override
+                    public void beginRecord() {
+                        logger.info("begin record");
+                    }
 
-                @Override
-                public void recordSchema(String recordSchema) {
-                    logger.info("got record scheme:" + recordSchema);
-                }
+                    @Override
+                    public void recordSchema(String recordSchema) {
+                        logger.info("got record scheme:" + recordSchema);
+                    }
 
-                @Override
-                public void recordPacking(String recordPacking) {
-                    logger.info("got recordPacking: " + recordPacking);
-                }
-                @Override
-                public void recordIdentifier(String recordIdentifier) {
-                    logger.info("got recordIdentifier=" + recordIdentifier);
-                }
+                    @Override
+                    public void recordPacking(String recordPacking) {
+                        logger.info("got recordPacking: " + recordPacking);
+                    }
 
-                @Override
-                public void recordPosition(int recordPosition) {
-                    logger.info("got recordPosition=" + recordPosition);
-                }
+                    @Override
+                    public void recordIdentifier(String recordIdentifier) {
+                        logger.info("got recordIdentifier=" + recordIdentifier);
+                    }
 
-                @Override
-                public XMLEventConsumer recordData() {
-                    //logger.info("recordData = " + record.size() + " events");
-                    return null;
-                }
+                    @Override
+                    public void recordPosition(int recordPosition) {
+                        logger.info("got recordPosition=" + recordPosition);
+                    }
 
-                @Override
-                public XMLEventConsumer extraRecordData() {
-                    //logger.info("extraRecordData = " + record.size() + " events");
-                    return null;
-                }
+                    @Override
+                    public XMLEventConsumer recordData() {
+                        //logger.info("recordData = " + record.size() + " events");
+                        return null;
+                    }
 
-                @Override
-                public void endRecord() {
-                    logger.info("end record");
-                }
+                    @Override
+                    public XMLEventConsumer extraRecordData() {
+                        //logger.info("extraRecordData = " + record.size() + " events");
+                        return null;
+                    }
 
-                @Override
-                public void onDisconnect(Request request) {
-                    logger.info("disconnect, request = " + request);
+                    @Override
+                    public void endRecord() {
+                        logger.info("end record");
+                    }
+
+                    @Override
+                    public void onDisconnect(Request request) {
+                        logger.info("disconnect, request = " + request);
+                    }
+                };
+                request.addListener(listener);
+                StylesheetTransformer transformer = new StylesheetTransformer("src/test/resources/xsl");
+                try {
+                    SRUResponse response = client
+                            .searchRetrieve(request)
+                            .setStylesheetTransformer(transformer)
+                            .to(writer);
+                } catch (ConnectTimeoutException e) {
+                    logger.error(e.getMessage(), e);
                 }
-            };
-            request.addListener(listener);
-            StylesheetTransformer transformer = new StylesheetTransformer("src/test/resources/xsl");
-            try {
-                SRUResponse response = client
-                        .searchRetrieve(request)
-                        .setStylesheetTransformer(transformer)
-                        .to(writer);
-            } catch (ConnectTimeoutException e) {
-                logger.error(e.getMessage(), e);
+                transformer.close();
+                client.close();
+                out.close();
             }
-            transformer.close();
-            client.close();
-            out.close();
+        } catch (InterruptedException | ExecutionException | IOException | TimeoutException e) {
+            logger.error(e.getMessage(), e);
         }
     }
 }

@@ -33,7 +33,6 @@ package org.xbib.marc.json;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.entities.marc.MARCEntityBuilderState;
 import org.xbib.entities.marc.MARCEntityQueue;
@@ -76,7 +75,7 @@ public class MarcXchangeJSONLinesWriterTest extends StreamTester {
         //new GZIPInputStream(new FileInputStream(System.getProperty("user.home") + "/Daten/zdb/1302zdbtitgesamt.mrc.gz"));
         BufferedReader br = new BufferedReader(new InputStreamReader(in, ISO88591));
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
-        MyQueue queue = new MyQueue("/org/xbib/analyzer/marc/zdb/bib.json", Runtime.getRuntime().availableProcessors());
+        MyQueue queue = new MyQueue();
         queue.setUnmappedKeyListener((id, key) -> unmapped.add(key.toString()));
         queue.execute();
         FileOutputStream out = new FileOutputStream("zdbtit.marc.jsonl");
@@ -117,12 +116,8 @@ public class MarcXchangeJSONLinesWriterTest extends StreamTester {
 
         final AtomicInteger counter = new AtomicInteger();
 
-        public MyQueue(String path) {
-            super(path);
-        }
-
-        public MyQueue(String path, int workers) {
-            super(path, workers);
+        public MyQueue() {
+            super("org.xbib.analyzer.marc.zdb.bib", 1, "org/xbib/analyzer/marc/zdb/bib.json");
         }
 
         @Override

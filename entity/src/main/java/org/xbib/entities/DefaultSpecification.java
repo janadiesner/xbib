@@ -40,7 +40,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
@@ -73,8 +72,8 @@ public class DefaultSpecification implements Specification {
     public DefaultSpecification() {
     }
 
-    public DefaultSpecification setParameters(Map<String,Object> params) {
-        this.params = params;
+    public DefaultSpecification addParameters(Map<String,Object> params) {
+        this.params.putAll(params);
         return this;
     }
 
@@ -82,10 +81,13 @@ public class DefaultSpecification implements Specification {
         return maps;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Map getEntityMap(ClassLoader cl, String path)
-            throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
-            NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
+    public Map getEntityMap(ClassLoader cl, String packageName, String... paths) throws Exception {
+        if (paths == null || paths.length == 0) {
+            return null;
+        }
+        String path = paths[0];
         if (maps.containsKey(path)) {
             return maps.get(path);
         }
@@ -103,37 +105,32 @@ public class DefaultSpecification implements Specification {
             } else {
                 lock.lock();
             }
-            init(cl, path);
+            final Map elementMap = newTreeMap();
+            for (String s : paths) {
+                logger.info("initializing from {}", s);
+                InputStream in = loadResource(cl, s);
+                if (in == null) {
+                    String msg = "not found: " + s;
+                    throw new IOException(msg);
+                }
+                Map<String, Map<String, Object>> defs = new ObjectMapper()
+                        .configure(Feature.ALLOW_COMMENTS, true).readValue(in, Map.class);
+                init(cl, packageName, s, elementMap, defs);
+            }
+            maps.put(path, elementMap);
+            logger.info("initialized {} elements", elementMap.size());
             return maps.get(path);
         } finally {
             lock.unlock();
         }
     }
 
-    private void init(ClassLoader cl, String path)
-            throws IOException, ClassNotFoundException, InstantiationException,
-            IllegalAccessException, NoSuchMethodException, IllegalArgumentException,
-            InvocationTargetException {
-        logger.info("initializing from {}", path);
-        InputStream resource = loadResource(cl, path);
-        if (resource == null) {
-            String msg = "not found: " + path;
-            throw new IOException(msg);
-        }
-        final Map elementMap = newTreeMap();
-        Map<String, Map<String, Object>> defs =
-                new ObjectMapper().configure(Feature.ALLOW_COMMENTS, true).readValue(resource, Map.class);
-        init(cl, path, elementMap, defs);
-        logger.info("initialized {} elements", elementMap.size());
-    }
-
-    private void init(ClassLoader cl, String path, Map elementMap, Map<String, Map<String, Object>> defs)
-                throws IOException, ClassNotFoundException, InstantiationException,
-                IllegalAccessException, NoSuchMethodException, IllegalArgumentException,
-                InvocationTargetException {
+    @SuppressWarnings("unchecked")
+    private void init(ClassLoader cl, String packageName, String path, Map elementMap, Map<String, Map<String, Object>> defs)
+                throws Exception {
         for (String key : defs.keySet()) {
             Map<String, Object> struct = defs.get(key);
-            // override static struct map from json with given transient params
+            // allow override static struct map from json with given params
             struct.putAll(params);
             Entity entity = null;
             Collection<String> values = (Collection<String>) struct.get("values");
@@ -165,11 +162,10 @@ public class DefaultSpecification implements Specification {
                     Map<String, Map<String, Object>> children =
                             new ObjectMapper().configure(Feature.ALLOW_COMMENTS, true).readValue(in, Map.class);
                     // recursive
-                    init(cl, path + key, elementMap, children);
+                    init(cl, packageName, path + key, elementMap, children);
                 } else {
-                    // load class in this xbib element package
-                    String clazzName = getPackageFromPath(path) + key;
-                    Class clazz = loadClass(cl, clazzName);
+                    // load class
+                    Class clazz = loadClass(cl, packageName + "." + key);
                     if (clazz == null) {
                         // custom class name, try without package
                         clazz = loadClass(cl, key);
@@ -184,7 +180,7 @@ public class DefaultSpecification implements Specification {
                             } catch (NullPointerException e) {
                                 logger.error("'getInstance' method declared not static in {}" + clazz.getName());
                             } catch (ClassCastException e) {
-                                logger.error("not an org.xbib.elements.Element class: " + clazz.getName());
+                                logger.error("not an Entity class: " + clazz.getName());
                             }
                         }
                         if (entity != null) {
@@ -200,7 +196,6 @@ public class DefaultSpecification implements Specification {
                 }
             }
         }
-        maps.put(path, elementMap);
     }
 
     public Entity getEntity(String key, Map map) {
@@ -219,6 +214,7 @@ public class DefaultSpecification implements Specification {
         return map;
     }
 
+    @SuppressWarnings("unchecked")
     public void dump(String format, Writer writer) throws IOException {
         Map<String,Object> m = map().get(format);
         if (m == null) {
@@ -229,7 +225,6 @@ public class DefaultSpecification implements Specification {
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(writer, elements);
     }
-
 
     private Entity getElement(String head, String tail, Map map) {
         if (head == null) {
@@ -247,7 +242,7 @@ public class DefaultSpecification implements Specification {
         }
     }
 
-    private String getPackageFromPath(String path) {
+    /*private String getPackageFromPath(String path) {
         // remove suffix
         int pos = path.lastIndexOf('.');
         if (pos > 0) {
@@ -261,7 +256,7 @@ public class DefaultSpecification implements Specification {
             packageName = packageName + '.';
         }
         return packageName;
-    }
+    }*/
 
     private String getString(Reader input) throws IOException {
         StringWriter sw = new StringWriter();
@@ -308,6 +303,7 @@ public class DefaultSpecification implements Specification {
         return clazz;
     }
 
+    @SuppressWarnings("unchecked")
     private void dump(String key, Map<String,Object> m) {
         for (String k : m.keySet()) {
             Object o = m.get(k);

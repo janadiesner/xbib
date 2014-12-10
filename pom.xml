@@ -129,6 +129,13 @@
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.18</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>xml-apis</groupId>
+                            <artifactId>xml-apis</artifactId>
+                            <version>1.4.01</version>
+                        </dependency>
+                    </dependencies>
                     <configuration>
                         <skip>false</skip>
                         <workingDirectory>${project.build.directory}</workingDirectory>
@@ -623,6 +630,11 @@
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
                 <version>2.11.0</version>
+            </dependency>
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>1.4.01</version>
             </dependency>
             <dependency>
                 <groupId>xalan</groupId>

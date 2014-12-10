@@ -37,13 +37,13 @@ import java.util.Map;
 
 public interface Specification {
 
+    Map getEntityMap(ClassLoader cl, String analyzerPackageName, String... path) throws Exception;
+
     Entity getEntity(String spec, Map map);
 
     Entity getEntityByKey(String key, Map map);
 
     Map<String,Map> map();
-
-    Map getEntityMap(ClassLoader cl, String path) throws Exception;
 
     void dump(String format, Writer writer) throws IOException;
 }

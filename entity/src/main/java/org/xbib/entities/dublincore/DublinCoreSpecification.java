@@ -52,6 +52,7 @@ public class DublinCoreSpecification extends DefaultSpecification {
         return map;
     }
 
+    @SuppressWarnings("unchecked")
     private Map addKey(String head, String tail, Entity entity, Map map) {
         if (head == null) {
             if (map.containsKey(tail)) {
