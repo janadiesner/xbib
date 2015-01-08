@@ -50,6 +50,7 @@ import org.xbib.tools.Feeder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.text.Normalizer;
 import java.util.Collections;
@@ -121,7 +122,9 @@ public final class BibdatFromPPXML extends Feeder {
 
                 });
         InputStream in = InputService.getInputStream(uri);
-        new DNBPICAXmlReader().setListener(kv).parse(in);
+        DNBPICAXmlReader reader = new DNBPICAXmlReader(new InputStreamReader(in, "UTF-8"));
+        reader.setMarcXchangeListener(kv);
+        reader.parse();
         in.close();
         queue.close();
         if (settings.getAsBoolean("detect", false)) {

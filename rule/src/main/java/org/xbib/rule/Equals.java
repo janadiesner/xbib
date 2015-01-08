@@ -1,9 +1,8 @@
 package org.xbib.rule;
 
-import java.util.Map;
 import java.util.Stack;
 
-public class Equals extends Operation {
+public class Equals extends AbstractOperator {
     public Equals() {
         super("=");
     }
@@ -14,7 +13,7 @@ public class Equals extends Operation {
     }
 
     @Override
-    public int parse(final String[] tokens, int pos, Stack<Expression> stack) {
+    public int execute(final String[] tokens, int pos, Stack<Expression> stack) {
         if (pos - 1 >= 0 && tokens.length >= pos + 1) {
             String var = tokens[pos - 1];
             this.leftOperand = new Variable(var);
@@ -26,9 +25,9 @@ public class Equals extends Operation {
     }
 
     @Override
-    public boolean interpret(Map<String, ?> bindings) {
+    public boolean interpret(Binding binding) {
         Variable v = (Variable) this.leftOperand;
-        Object obj = bindings.get(v.getName());
+        Object obj = binding.get(v.getName());
         if (obj == null) {
             return false;
         }

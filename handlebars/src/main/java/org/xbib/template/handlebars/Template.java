@@ -43,8 +43,7 @@ public interface Template {
         @SuppressWarnings({"rawtypes", "unchecked"})
         @Override
         public <T> TypeSafeTemplate<T> as() {
-            TypeSafeTemplate template = as(TypeSafeTemplate.class);
-            return template;
+            return as(TypeSafeTemplate.class);
         }
 
         @SuppressWarnings("unchecked")

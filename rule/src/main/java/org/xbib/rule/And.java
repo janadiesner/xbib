@@ -1,21 +1,21 @@
 package org.xbib.rule;
 
-import java.util.Map;
 import java.util.Stack;
 
-public class And extends Operation {
+public class And extends AbstractOperator {
     public And() {
         super("AND");
     }
 
+    @Override
     public And copy() {
         return new And();
     }
 
     @Override
-    public int parse(String[] tokens, int pos, Stack<Expression> stack) {
+    public int execute(String[] tokens, int pos, Stack<Expression> stack) {
         Expression left = stack.pop();
-        int i = findNextExpression(tokens, pos + 1, stack);
+        int i = executeNext(tokens, pos + 1, stack);
         Expression right = stack.pop();
         this.leftOperand = left;
         this.rightOperand = right;
@@ -24,7 +24,7 @@ public class And extends Operation {
     }
 
     @Override
-    public boolean interpret(Map<String, ?> bindings) {
-        return leftOperand.interpret(bindings) && rightOperand.interpret(bindings);
+    public boolean interpret(Binding binding) {
+        return leftOperand.interpret(binding) && rightOperand.interpret(binding);
     }
 }

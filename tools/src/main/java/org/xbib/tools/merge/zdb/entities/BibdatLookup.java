@@ -1,29 +1,27 @@
 package org.xbib.tools.merge.zdb.entities;
 
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import org.xbib.common.xcontent.XContentBuilder;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 
 import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Sets.newHashSet;
-import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 public class BibdatLookup {
 
-    private Map<String, String> lookup = newHashMap();
+    private final static Logger logger = LogManager.getLogger(BibdatLookup.class);
 
-    private Map<String, Set<String>> groups = newHashMap();
+    private Map<String, String> libraries = newHashMap();
+
+    private Map<String, String> other = newHashMap();
 
     public void buildLookup(Client client, String index) throws IOException {
         int size = 1000;
@@ -34,6 +32,7 @@ public class BibdatLookup {
                 .setSearchType(SearchType.SCAN)
                 .setScroll(TimeValue.timeValueMillis(millis));
         SearchResponse searchResponse = searchRequest.execute().actionGet();
+        logger.info("bibdat index size = {}", searchResponse.getHits().getTotalHits());
         while (searchResponse.getScrollId() != null) {
             searchResponse = client.prepareSearchScroll(searchResponse.getScrollId())
                     .setScroll(TimeValue.timeValueMillis(millis))
@@ -44,35 +43,72 @@ public class BibdatLookup {
             }
             for (SearchHit hit : hits) {
                 Map<String, Object> m = hit.getSource();
+                String type = m.containsKey("Organization") ?
+                        (String) ((Map<String, Object>) m.get("Organization")).get("organizationType") : null;
+                if (type == null) {
+                    continue;
+                }
                 String key = m.containsKey("Identifier") ?
                         (String) ((Map<String, Object>) m.get("Identifier")).get("identifierAuthorityISIL") : null;
+                if (key == null) {
+                    continue;
+                }
                 String value = m.containsKey("LibraryService") ?
                         (String) ((Map<String, Object>) m.get("LibraryService")).get("libraryServiceRegion") : null;
-                if (key != null && value != null) {
-                    lookup.put(key, value);
-                    Set<String> g = groups.get(value);
-                    if (g == null) {
-                        g = newHashSet();
+                if (value == null) {
+                    continue;
+                }
+                // organization state = "Adresse", "Information"
+                String state = m.containsKey("Organization") ?
+                        (String) ((Map<String, Object>) m.get("Organization")).get("organizationState") : null;
+                if (state == null) {
+                    continue;
+                }
+                if ("Adresse".equals(state) ) {
+                    switch (type) {
+                        case "Abteilungsbibliothek, Institutsbibliothek, Fachbereichsbibliothek (Universität)":
+                        case "Wissenschaftliche Spezialbibliothek":
+                        case "Öffentliche Bibliothek":
+                        case "Mediathek":
+                        case "Zentrale Hochschulbibliothek, nicht Universität":
+                        case "Zentrale Universitätsbibliothek":
+                        case "Abteilungsbibliothek, Fachbereichsbibliothek (Hochschule, nicht Universität)":
+                        case "Regionalbibliothek":
+                        case "Öffentliche Bibliothek für besondere Benutzergruppen":
+                        case "Nationalbibliothek":
+                        case "Zentrale Fachbibliothek":
+                        case "Verbundsystem/ -katalog":
+                            if (!libraries.containsKey(key)) {
+                                libraries.put(key, value);
+                            } else {
+                                logger.warn("entry {} already exists", key);
+                            }
+                            break;
+                        default:
+                            if (!other.containsKey(key)) {
+                                other.put(key, value);
+                            } else {
+                                logger.warn("entry {} already exists in other", key);
+                            }
+                            break;
                     }
-                    g.add(key);
-                    groups.put(value, g);
+                } else {
+                    if (!other.containsKey(key)) {
+                        other.put(key, value);
+                    } else {
+                        logger.warn("entry {} already exists in other", key);
+                    }
                 }
             }
         }
-        // index groups
-        for (String s : groups.keySet()) {
-            XContentBuilder builder = jsonBuilder();
-            builder.startObject().array("members", groups.get(s)).endObject();
-            client.index(Requests.indexRequest().index(index).type("groups").id(s).source(builder.string())).actionGet();
-        }
     }
 
-    public Map<String, String> lookup() {
-        return lookup;
+    public Map<String, String> lookupLibrary() {
+        return libraries;
     }
 
-    public Map<String, Set<String>> groups() {
-        return groups;
+    public Map<String, String> lookupOther() {
+        return other;
     }
 
 }

@@ -46,6 +46,6 @@ public class Ignore extends MARCEntity {
     @Override
     public boolean fields(MARCEntityQueue.MARCWorker worker,
                           FieldList fields, String value) {
-        return true;
+        return true; // ignore!
     }
 }

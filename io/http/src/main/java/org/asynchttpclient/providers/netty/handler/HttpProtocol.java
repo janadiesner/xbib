@@ -358,13 +358,10 @@ final class HttpProtocol extends Protocol {
     @Override
     public void handle(final ChannelHandlerContext ctx, final NettyResponseFuture future, final Object e) throws Exception {
         future.touch();
-
-        // The connect timeout occurred.
         if (future.isCancelled() || future.isDone()) {
             channels.finishChannel(ctx);
             return;
         }
-
         HttpRequest nettyRequest = future.getNettyRequest();
         AsyncHandler handler = future.getAsyncHandler();
         ProxyServer proxyServer = future.getProxyServer();
@@ -375,21 +372,16 @@ final class HttpProtocol extends Protocol {
                 future.setPendingResponse(response);
                 return;
             }
-
             if (e instanceof HttpContent) {
-
                 HttpResponse response = future.getPendingResponse();
                 future.setPendingResponse(null);
                 if (handler != null) {
                     if (response != null && handleResponseAndExit(ctx, future, handler, nettyRequest, proxyServer, response)) {
                         return;
                     }
-
                     HttpContent chunk = (HttpContent) e;
-
                     boolean interrupt = false;
                     boolean last = chunk instanceof LastHttpContent;
-
                     if (last) {
                         LastHttpContent lastChunk = (LastHttpContent) chunk;
                         HttpHeaders trailingHeaders = lastChunk.trailingHeaders();
@@ -397,15 +389,14 @@ final class HttpProtocol extends Protocol {
                             interrupt = handler.onHeadersReceived(new ResponseHeaders(future.getURI(), future.getHttpResponse().headers(), trailingHeaders)) != STATE.CONTINUE;
                         }
                     }
-
                     ByteBuf buf = chunk.content();
                     if (!interrupt && buf.readableBytes() > 0) {
                         interrupt = updateBodyAndInterrupt(future, handler, nettyConfig.getBodyPartFactory().newResponseBodyPart(buf, last));
                     }
-
                     if (interrupt || last) {
                         finishUpdate(future, ctx, !last);
                     }
+                    buf.release();
                 }
             }
         } catch (Exception t) {

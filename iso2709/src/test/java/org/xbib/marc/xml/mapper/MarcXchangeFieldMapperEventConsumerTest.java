@@ -30,11 +30,10 @@ public class MarcXchangeFieldMapperEventConsumerTest extends StreamTester {
         writer.setFormat("AlephXML").setType("Bibliographic");
         writer.startDocument();
         writer.beginCollection();
-
-        MarcXchangeFieldMapperReader consumer = new MarcXchangeFieldMapperReader()
-                .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd")
-                .setMarcXchangeListener(writer);
         try (InputStream in = getClass().getResourceAsStream("HT016424175.xml")) {
+            MarcXchangeFieldMapperReader consumer = new MarcXchangeFieldMapperReader(in)
+                    .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd")
+                    .setMarcXchangeListener(writer);
             XMLEventReader xmlReader = factory.createXMLEventReader(in);
             while (xmlReader.hasNext()) {
                 XMLEvent event = xmlReader.nextEvent();
@@ -70,12 +69,11 @@ public class MarcXchangeFieldMapperEventConsumerTest extends StreamTester {
         Map<String,Object> fields = new HashMap();
         fields.put("331", indicators);
 
-        MarcXchangeFieldMapperReader consumer = new org.xbib.marc.xml.stream.mapper.MarcXchangeFieldMapperReader()
-                .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd")
-                .setMarcXchangeListener(writer)
-                .addFieldMap("test", fields);
-
         try (InputStream in = getClass().getResourceAsStream("HT016424175.xml")) {
+            MarcXchangeFieldMapperReader consumer = new org.xbib.marc.xml.stream.mapper.MarcXchangeFieldMapperReader(in)
+                    .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd")
+                    .setMarcXchangeListener(writer)
+                    .addFieldMap("test", fields);
             XMLEventReader xmlReader = factory.createXMLEventReader(in);
             while (xmlReader.hasNext()) {
                 XMLEvent event = xmlReader.nextEvent();

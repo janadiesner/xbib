@@ -46,15 +46,19 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Stack;
 
-public class DNBPicaXmlReader implements XMLEventConsumer, DNBPICAConstants, MarcXchangeListener {
+public class DNBPICAXmlReader implements XMLEventConsumer, DNBPICAConstants, MarcXchangeListener {
+
+    private final Reader reader;
 
     private Stack<Field> stack = new Stack<Field>();
+
+    private Map<String,MarcXchangeListener> listeners = new HashMap<String,MarcXchangeListener>();
 
     private MarcXchangeListener listener;
 
@@ -62,16 +66,21 @@ public class DNBPicaXmlReader implements XMLEventConsumer, DNBPICAConstants, Mar
 
     private boolean inRecord = false;
 
-    public DNBPicaXmlReader setMarcXchangeListener(MarcXchangeListener listener) {
-        this.listener = listener;
+    public DNBPICAXmlReader(Reader reader) {
+        this.reader = reader;
+    }
+
+    public DNBPICAXmlReader addListener(String type, MarcXchangeListener listener) {
+        this.listeners.put(type, listener);
         return this;
     }
 
-    public void parse(InputStream in) throws IOException {
-        parse(new InputStreamReader(in, "UTF-8"));
+    public DNBPICAXmlReader setMarcXchangeListener(MarcXchangeListener listener) {
+        this.listeners.put("XML", listener);
+        return this;
     }
 
-    public void parse(Reader reader) throws IOException {
+    public void parse() throws IOException {
         try {
             XMLInputFactory inputFactory = XMLInputFactory.newInstance();
             XMLEventReader xmlEventReader = inputFactory.createXMLEventReader(reader);
@@ -83,7 +92,6 @@ public class DNBPicaXmlReader implements XMLEventConsumer, DNBPICAConstants, Mar
             throw new IOException(e);
         }
     }
-
 
     @Override
     public void beginCollection() {
@@ -101,6 +109,7 @@ public class DNBPicaXmlReader implements XMLEventConsumer, DNBPICAConstants, Mar
 
     @Override
     public void beginRecord(String format, String type) {
+        this.listener = listeners.get(type != null ? type : "XML");
         if (listener != null) {
             listener.beginRecord(format, type);
         }

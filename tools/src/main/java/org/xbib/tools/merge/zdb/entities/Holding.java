@@ -38,7 +38,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 
 public class Holding implements Comparable<Holding> {
@@ -47,7 +49,7 @@ public class Holding implements Comparable<Holding> {
 
     protected String identifier;
 
-    protected String parent;
+    protected List<String> parents = newLinkedList();
 
     protected String isil;
 
@@ -72,7 +74,7 @@ public class Holding implements Comparable<Holding> {
 
     private List<Manifestation> manifestations = newLinkedList();
 
-    private String serviceisil;
+    protected String serviceisil;
 
     private String organization;
 
@@ -99,15 +101,16 @@ public class Holding implements Comparable<Holding> {
         }
         Object o = inner.get(key[0]);
         if (o instanceof List) {
-            o = ((List) o).get(0);
+            o = ((List) o).get(0); // only first entry
         }
         return (T) (o instanceof Map && key.length > 1 ?
                 get((Map) o, Arrays.copyOfRange(key, 1, key.length)) : o);
     }
 
     protected void build() {
-        this.identifier = getString("identifierRecord");
-        this.parent = getString("identifierParent").toLowerCase(); // DNB-ID, turn 'X' to lower case
+        this.identifier = getString("identifierForTheRecord");
+        String parent = getString("identifierForTheParentRecord").toLowerCase(); // DNB-ID, turn 'X' to lower case
+        parents.add(parent);
         Object leader = map.get("leader");
         if (!(leader instanceof List)) {
             leader = Arrays.asList(leader);
@@ -152,6 +155,10 @@ public class Holding implements Comparable<Holding> {
             this.info = buildInfo();
             buildService();
         }
+        // serviceisil may be null
+        if (serviceisil == null) {
+            serviceisil = isil;
+        }
         this.dates = buildDateArray();
         this.priority = findPriority();
     }
@@ -160,8 +167,12 @@ public class Holding implements Comparable<Holding> {
         return identifier;
     }
 
-    public String parent() {
-        return parent;
+    public void addParent(String parent) {
+        this.parents.add(parent);
+    }
+
+    public List<String> parents() {
+        return parents;
     }
 
     public String getISIL() {
@@ -195,6 +206,10 @@ public class Holding implements Comparable<Holding> {
 
     public Object getServiceType() {
         return servicetype;
+    }
+
+    public void setServiceMode(Object servicemode) {
+        this.servicemode = servicemode;
     }
 
     public Object getServiceMode() {
@@ -269,29 +284,45 @@ public class Holding implements Comparable<Holding> {
     }
 
     private Map<String, Object> buildInfo() {
-        Map<String, Object> m = newLinkedHashMap();
+        Map<String, Object> info = newLinkedHashMap();
         List l = new ArrayList();
-        Object o = map.get("Location");
-        if (o != null) {
-            if (!(o instanceof List)) {
-                o = Arrays.asList(o);
+        for (String locKey : new String[]{"Location","AdditionalLocation"}) {
+            Object o = map.get(locKey);
+            if (o != null) {
+                if (!(o instanceof List)) {
+                    o = Arrays.asList(o);
+                }
+                for (Map<String,Object> oldlocation : (List<Map<String,Object>>)o) {
+                    Map<String,Object> location = newHashMap();
+                    // Beschreibung
+                    if (oldlocation.containsKey("collection")) {
+                        location.put("collection", oldlocation.get("collection"));
+                    }
+                    // Signatur
+                    if (oldlocation.containsKey("shelvinglocation")) {
+                        location.put("callnumber", oldlocation.get("shelvinglocation"));
+                    }
+                    // Notiz, e.g. Digitalisierungsmaster
+                    if (oldlocation.containsKey("publicnote")) {
+                        location.put("publicnote", oldlocation.get("publicnote"));
+                    }
+                    // Bestandsverlauf
+                    if (oldlocation.containsKey("enumerationAndChronology")) {
+                        location.put("enumerationAndChronology", oldlocation.get("enumerationAndChronology"));
+                    }
+                    if (!location.isEmpty()) {
+                        l.add(location);
+                    }
+                }
             }
-            l.addAll((List) o);
         }
-        Object p = map.get("AdditionalLocation");
-        if (p != null) {
-            if (!(p instanceof List)) {
-                p = Arrays.asList(p);
-            }
-            l.addAll((List) p);
-        }
-        m.put("location", l);
+        info.put("location", l);
 
         Object textualholdings = map.get("textualholdings");
-        m.put("textualholdings", textualholdings);
-        m.put("holdings", map.get("holdings"));
+        info.put("textualholdings", textualholdings);
+        info.put("holdings", map.get("holdings"));
         if (map.containsKey("ElectronicLocationAndAccess")) {
-            m.put("links", map.get("ElectronicLocationAndAccess"));
+            info.put("links", map.get("ElectronicLocationAndAccess"));
         }
         this.license = (Map<String, Object>) map.get("license");
         if (license != null) {
@@ -299,9 +330,9 @@ public class Holding implements Comparable<Holding> {
             license.remove("typeSource");
             license.remove("scopeSource");
             license.remove("chargeSource");
-            m.put("license", license);
+            info.put("license", license);
         }
-        return m;
+        return info;
     }
 
     private void buildService() {
@@ -310,13 +341,16 @@ public class Holding implements Comparable<Holding> {
             //setOrganization((String)service.remove("region"));
             service.remove("organization"); // drop Sigel
             service.remove("region"); // drop region marker here, we use bibdat
-            service.remove("bik");
-            service.remove("servicetypeSource");
-            service.remove("servicemodeSource");
+            service.remove("bik"); // not required
+            service.remove("servicetypeSource");  // not required
+            service.remove("servicemodeSource"); // not required
             this.servicetype = service.remove("servicetype");
             map.put("type", this.servicetype);
-            this.servicemode = service.remove("servicemode");
-            map.put("mode", this.servicemode);
+            Object o = service.remove("servicemode");
+            // split to array if copy-loan
+            this.servicemode = "copy-loan".equals(o) ? Arrays.asList("copy", "loan") : o;
+            map.put("mode", servicemode);
+            // in ZDB holdings there is no distribution information, but wek keep it here
             this.servicedistribution = service.remove("servicedistribution");
             map.put("distribution", this.servicedistribution);
         }
@@ -351,47 +385,44 @@ public class Holding implements Comparable<Holding> {
      * carrier type, and same date period (if any).
      *
      * @param holdings the holdings to check for similarity against this holding
-     * @return a holding which is similar, or null if no holding is similar
+     * @return collection of holdings which are similar, or an empty collection if no holding is similar
      */
-    protected Holding getSame(Collection<Holding> holdings) {
+    protected Collection<Holding> getSame(Collection<Holding> holdings) {
+        Collection<Holding> same = newArrayList();
         for (Holding holding : holdings) {
-            if (this == holding) {
-                continue; // skip if we match against ourselves
-            }
-            if (mediaType.equals(holding.mediaType)
+            // same ISIL, media, carrier, from/to?
+            if (isil.equals(holding.isil)
+                    && serviceisil.equals(holding.serviceisil)
+                    && mediaType.equals(holding.mediaType)
                     && carrierType.equals(holding.carrierType)) {
+
                 // check if begin date / end date are the same
                 // both no dates?
-                if (dates == null && holding.dates() == null) {
+                if (dates == null && holding.dates == null) {
                     // hit, no dates at all
-                    return holding;
-                } else if (dates != null && !dates.isEmpty() && holding.dates() != null && !holding.dates().isEmpty()) {
+                    same.add(holding);
+                } else if (dates != null && !dates.isEmpty()
+                        && holding.dates != null && !holding.dates.isEmpty()) {
                     // compare first date and last date
                     Integer d1 = dates.get(0);
                     Integer d2 = dates.get(dates.size() - 1);
-                    Integer e1 = holding.dates().get(0);
-                    Integer e2 = holding.dates().get(holding.dates().size() - 1);
+                    Integer e1 = holding.dates.get(0);
+                    Integer e2 = holding.dates.get(holding.dates.size() - 1);
                     if (d1.equals(e1) && d2.equals(e2)) {
-                        return holding;
+                        same.add(holding);
                     }
                 }
             }
         }
-        return null;
-    }
-
-    public String getRoutingKey() {
-        return getOrganization() + getPriority();
+        return same;
     }
 
     public static Comparator<Holding> getRoutingComparator() {
-        return new Comparator<Holding>() {
+        return (h1, h2) -> h1.getRoutingKey().compareTo(h2.getRoutingKey());
+    }
 
-            @Override
-            public int compare(Holding h1, Holding h2) {
-                return h1.getRoutingKey().compareTo(h2.getRoutingKey());
-            }
-        };
+    public String getRoutingKey() {
+        return getOrganization() + getPriority() + identifier;
     }
 
     public String toString() {

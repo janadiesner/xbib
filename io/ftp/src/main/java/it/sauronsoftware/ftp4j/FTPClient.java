@@ -349,12 +349,12 @@ public class FTPClient {
 	/**
 	 * Lock object used for synchronization.
 	 */
-	private Object lock = new Object();
+	private final Object lock = new Object();
 
 	/**
 	 * Lock object used for synchronization in abort operations.
 	 */
-	private Object abortLock = new Object();
+	private final Object abortLock = new Object();
 
 	/**
 	 * The communication channel established with the server.

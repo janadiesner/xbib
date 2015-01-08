@@ -64,12 +64,6 @@ public class GeonamesFromZIP extends Converter {
         return this;
     }
 
-    @Override
-    protected Converter cleanup() {
-        super.cleanup();
-        return this;
-    }
-
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return new PipelineProvider<Pipeline>() {
             @Override
@@ -108,7 +102,7 @@ public class GeonamesFromZIP extends Converter {
                 String elevationStr = line[i++];
                 Integer elevation = Strings.isNullOrEmpty(elevationStr) ? 0 : Integer.parseInt(line[i++]);
                 String dem = line[i++];
-                String timezone = line[i++];
+                String timezone = line[i];
             }
         }
         zin.close();

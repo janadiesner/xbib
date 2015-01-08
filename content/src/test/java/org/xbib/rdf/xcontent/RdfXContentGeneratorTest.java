@@ -102,4 +102,21 @@ public class RdfXContentGeneratorTest
                 "{\"urn:property\":\"Hello World\",\"urn:date\":2013,\"rdf:type\":\"urn:type1\",\"urn:embedded\":{\"rdf:type\":\"urn:type2\"},\"urn:embedded2\":{\"rdf:type\":\"urn:type3\"}}");
     }
 
+    @Test
+    public void testContentBuilderEmptyEmbedded() throws Exception {
+        Resource resource = new MemoryResource();
+        MemoryLiteral l = new MemoryLiteral("2013")
+                .type(IRI.create("xsd:gYear"));
+        resource.id(IRI.create("urn:res"))
+                .add("urn:property", "Hello World")
+                .add("urn:date", l)
+                .add("rdf:type", IRI.create("urn:type1"))
+                .newResource("urn:embedded"); // empty resource, do not copy
+        RdfXContentParams params = new RdfXContentParams();
+        RdfContentBuilder builder = rdfXContentBuilder(params);
+        builder.receive(resource);
+        String result = params.getGenerator().get();
+        assertEquals(result,
+                "{\"urn:property\":\"Hello World\",\"urn:date\":2013,\"rdf:type\":\"urn:type1\"}");
+    }
 }

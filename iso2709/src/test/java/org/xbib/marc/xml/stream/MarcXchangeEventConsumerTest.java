@@ -24,11 +24,10 @@ public class MarcXchangeEventConsumerTest extends StreamTester {
         writer.setFormat("AlephXML").setType("Bibliographic");
         writer.startDocument();
         writer.beginCollection();
-
-        MarcXchangeReader consumer = new MarcXchangeReader()
-                .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd")
-                .setMarcXchangeListener(writer);
         try (InputStream in = getClass().getResourceAsStream("HT016424175.xml")) {
+            MarcXchangeReader consumer = new MarcXchangeReader(in)
+                    .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd")
+                    .setMarcXchangeListener(writer);
             XMLEventReader xmlReader = XMLInputFactory.newInstance().createXMLEventReader(in);
             while (xmlReader.hasNext()) {
                 XMLEvent event = xmlReader.nextEvent();

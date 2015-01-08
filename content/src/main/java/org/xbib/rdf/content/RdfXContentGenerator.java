@@ -160,17 +160,21 @@ public class RdfXContentGenerator<R extends RdfXContentParams> implements RdfCon
             // second, the embedded resources
             final List<Resource> resources = resource.embeddedResources(predicate);
             if (resources.size() == 1) {
-                builder.field(params.getNamespaceContext().compact(predicate));
-                builder.startObject();
-                build(resources.get(0));
-                builder.endObject();
+                if (!resources.get(0).isEmpty()) {
+                    builder.field(params.getNamespaceContext().compact(predicate));
+                    builder.startObject();
+                    build(resources.get(0));
+                    builder.endObject();
+                }
             } else if (resources.size() > 1) {
                 builder.field(params.getNamespaceContext().compact(predicate));
                 builder.startArray();
                 for (Resource res : resources) {
-                    builder.startObject();
-                    build(res);
-                    builder.endObject();
+                    if (!res.isEmpty()) {
+                        builder.startObject();
+                        build(res);
+                        builder.endObject();
+                    }
                 }
                 builder.endArray();
             }

@@ -35,7 +35,7 @@ import org.xbib.entities.faceting.StringFacet;
 import org.xbib.entities.marc.dialects.mab.MABEntity;
 import org.xbib.entities.marc.dialects.mab.MABEntityBuilderState;
 import org.xbib.entities.marc.dialects.mab.MABEntityQueue;
-import org.xbib.entities.support.TSVClassifier;
+import org.xbib.entities.support.ConfigurableClassifier;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Resource;
 
@@ -82,22 +82,27 @@ public class RecordIdentifier extends MABEntity {
             // ignore
         }
         // check for classifier
-        TSVClassifier classifier = worker.classifier();
+        ConfigurableClassifier classifier = worker.classifier();
         if (classifier != null) {
             String isil = identifier;
             String key = identifier + "." + state.getRecordIdentifier() + ".";
-            TSVClassifier.Entry entry = classifier.lookup(key);
+            ConfigurableClassifier.Entry entry = classifier.lookup(key);
+            logger.debug("classifier lookup: key={}, entry={}", key, entry);
             if (entry != null) {
-                String facet = taxonomyFacet + "." + isil + ".notation";
-                if (state.getFacets().get(facet) == null) {
-                    state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                if (entry.getCode() != null && !entry.getCode().trim().isEmpty()) {
+                    String facet = taxonomyFacet + "." + isil + ".notation";
+                    if (state.getFacets().get(facet) == null) {
+                        state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                    }
+                    state.getFacets().get(facet).addValue(entry.getCode());
                 }
-                state.getFacets().get(facet).addValue(entry.getCode());
-                facet = taxonomyFacet + "." + isil + ".text";
-                if (state.getFacets().get(facet) == null) {
-                    state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                if (entry.getText() != null && !entry.getText().trim().isEmpty()) {
+                    String facet = taxonomyFacet + "." + isil + ".text";
+                    if (state.getFacets().get(facet) == null) {
+                        state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                    }
+                    state.getFacets().get(facet).addValue(entry.getText());
                 }
-                state.getFacets().get(facet).addValue(entry.getText());
             }
         }
         return v;

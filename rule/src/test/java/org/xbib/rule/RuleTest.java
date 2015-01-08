@@ -2,9 +2,6 @@ package org.xbib.rule;
 
 import org.testng.annotations.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class RuleTest {
 
     @Test
@@ -17,42 +14,30 @@ public class RuleTest {
         operations.registerOperation(new Equals());
         operations.registerOperation(new Not());
         // defines the triggers when a rule should fire
-        Expression ex3 = ExpressionParser.fromString("PATIENT_TYPE = 'A' AND NOT ADMISSION_TYPE = 'O'");
-        Expression ex1 = ExpressionParser.fromString("PATIENT_TYPE = 'A' AND ADMISSION_TYPE = 'O'");
-        Expression ex2 = ExpressionParser.fromString("PATIENT_TYPE = 'B'");
-        // define the possible actions for rules that fire
-        ActionDispatcher inPatient = new ActionDispatcher() {
-            @Override
-            public void fire() {
-                sb.append("patient in");
-            }
-        };
-        ActionDispatcher outPatient = new ActionDispatcher() {
-            @Override
-            public void fire() {
-                sb.append("patient out");
-            }
-        };
-        // create the rules and link them to the accoridng expression and action
+        Expression ex1 = ExpressionParser.parse("PATIENT_TYPE = 'A' AND ADMISSION_TYPE = 'O'");
+        Expression ex2 = ExpressionParser.parse("PATIENT_TYPE = 'B'");
+        Expression ex3 = ExpressionParser.parse("PATIENT_TYPE = 'A' AND NOT ADMISSION_TYPE = 'O'");
+        // create the rules and link them to the expression and action
         Rule rule1 = new Rule.Builder()
-                .withExpression(ex1)
-                .withDispatcher(outPatient)
+                .with(ex1)
+                .then((expr, binding) -> sb.append("patient out"))
                 .build();
         Rule rule2 = new Rule.Builder()
-                .withExpression(ex2)
-                .withExpression(ex3)
-                .withDispatcher(inPatient)
+                .with(ex2)
+                .with(ex3)
+                .then((expr, binding) -> sb.append("patient in"))
                 .build();
         // add all rules to a single container
-        Rules rules = new Rules();
-        rules.add(rule1);
-        rules.add(rule2);
+        RuleSet ruleSet = new RuleSet();
+        ruleSet.add(rule1);
+        ruleSet.add(rule2);
         // for test purpose define a variable binding ...
-        Map<String, String> bindings = new HashMap<>();
-        bindings.put("PATIENT_TYPE", "'A'");
-        bindings.put("ADMISSION_TYPE", "'O'");
+        Binding binding = new Binding();
+        binding.put("PATIENT_TYPE", "'A'");
+        binding.put("ADMISSION_TYPE", "'O'");
         // and evaluate the defined rules with the specified bindings
-        boolean triggered = rules.apply(null, bindings);
+        boolean triggered = ruleSet.apply(null, binding);
         sb.append("Action triggered: " + triggered);
+        System.err.println(sb.toString());
     }
 }

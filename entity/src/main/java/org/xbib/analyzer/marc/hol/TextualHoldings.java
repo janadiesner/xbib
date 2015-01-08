@@ -80,10 +80,14 @@ public class TextualHoldings extends MARCEntity {
     public boolean fields(MARCEntityQueue.MARCWorker worker,
                           FieldList fields, String value) throws IOException {
         for (Field field : fields) {
-            worker.state().getResource().add("textualholdings", field.data());
+            String data = field.data();
+            if (data == null || data.isEmpty()) {
+                continue;
+            }
+            worker.state().getResource().add("textualholdings", data);
             if (field.subfieldId().equals("a")) {
                 Resource r = worker.state().getResource().newResource("holdings");
-                Resource parsedHoldings = EnumerationAndChronology.parse(field.data(), r, getMovingwallPatterns());
+                Resource parsedHoldings = EnumerationAndChronology.parse(data, r, getMovingwallPatterns());
                 if (!parsedHoldings.isEmpty()) {
                     Set<Integer> dates = EnumerationAndChronology.dates(worker.state().getResource().id(), parsedHoldings);
                     for (Integer date : dates) {

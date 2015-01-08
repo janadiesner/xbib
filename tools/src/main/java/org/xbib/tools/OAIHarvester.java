@@ -44,10 +44,10 @@ import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
-import org.xbib.oai.rdf.RdfMetadataHandler;
+import org.xbib.oai.rdf.RdfSimpleMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
-import org.xbib.oai.xml.MetadataHandler;
-import org.xbib.oai.xml.XmlMetadataHandler;
+import org.xbib.oai.xml.SimpleMetadataHandler;
+import org.xbib.oai.xml.XmlSimpleMetadataHandler;
 import org.xbib.rdf.RdfContentParams;
 import org.xbib.util.DateUtil;
 import org.xbib.util.URIUtil;
@@ -137,20 +137,20 @@ public abstract class OAIHarvester extends Converter {
         client.close();
     }
 
-    protected MetadataHandler xmlMetadataHandler() {
-        return new XmlPacketHandler().setWriter(new StringWriter());
+    protected SimpleMetadataHandler xmlMetadataHandler() {
+        return new XmlPacketHandlerSimple().setWriter(new StringWriter());
     }
 
-    protected MetadataHandler turtleMetadataHandler() throws IOException {
-        final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
+    protected SimpleMetadataHandler turtleMetadataHandler() throws IOException {
+        final RdfSimpleMetadataHandler metadataHandler = new RdfSimpleMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();
         metadataHandler.setHandler(resourceHandler)
                 .setBuilder(turtleBuilder());
         return metadataHandler;
     }
 
-    protected MetadataHandler ntripleMetadataHandler() throws IOException {
-        final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
+    protected SimpleMetadataHandler ntripleMetadataHandler() throws IOException {
+        final RdfSimpleMetadataHandler metadataHandler = new RdfSimpleMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();
         metadataHandler.setHandler(resourceHandler)
                 .setBuilder(ntripleBuilder());
@@ -162,7 +162,7 @@ public abstract class OAIHarvester extends Converter {
         return new RdfResourceHandler(params);
     }
 
-    protected class XmlPacketHandler extends XmlMetadataHandler {
+    protected class XmlPacketHandlerSimple extends XmlSimpleMetadataHandler {
 
         public void endDocument() throws SAXException {
             super.endDocument();

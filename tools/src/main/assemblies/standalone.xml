@@ -14,7 +14,6 @@
             <includes>
                 <include>org.xbib:tools</include>
                 <include>org.xbib:util</include>
-                <include>org.xbib:logging</include>
                 <include>org.xbib:compress</include>
                 <include>org.xbib:xml</include>
                 <include>org.xbib:json</include>
@@ -49,16 +48,9 @@
                 <include>org.xbib.elasticsearch.plugin:elasticsearch-support</include>
                 <include>org.elasticsearch:elasticsearch</include>
                 <include>org.apache.lucene:lucene-core</include>
-                <!--
-                yes, required, otherwise
-
-Caused by: java.lang.ClassNotFoundException: org.apache.lucene.analysis.standard.StandardAnalyzer
-	at java.net.URLClassLoader$1.run(URLClassLoader.java:372)
-	at java.net.URLClassLoader$1.run(URLClassLoader.java:361)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.net.URLClassLoader.findClass(URLClassLoader.java:360)
-                 -->
                 <include>org.apache.lucene:lucene-analyzers-common</include>
+                <include>org.apache.lucene:lucene-queries</include>
+                <include>org.apache.lucene:lucene-memory</include>
             </includes>
         </dependencySet>
     </dependencySets>

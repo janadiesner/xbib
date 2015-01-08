@@ -35,7 +35,6 @@ import org.xbib.iri.IRI;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.Resource;
-import org.xbib.rdf.memory.MemoryResource;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
@@ -46,8 +45,6 @@ import java.util.Stack;
  */
 public abstract class AbstractXmlResourceHandler
         extends AbstractXmlHandler implements XmlResourceHandler {
-
-    private final static Resource resource = new MemoryResource();
 
     private final Stack<Resource> stack = new Stack<Resource>();
 
@@ -77,7 +74,7 @@ public abstract class AbstractXmlResourceHandler
      */
     @Override
     public void openPredicate(QName parent, QName name, int level) {
-        IRI p = toProperty(resource.newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
+        IRI p = toProperty(getResource().newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
         stack.push(stack.peek().newResource(p));
     }
 
@@ -87,12 +84,15 @@ public abstract class AbstractXmlResourceHandler
 
     @Override
     public void closePredicate(QName parent, QName name, int level) {
-        IRI p = toProperty(resource.newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
+        IRI p = toProperty(getResource().newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
         Resource r = stack.pop();
         if (level < 0) {
             // it's a Resource
             if (!stack.isEmpty()) {
-                stack.peek().add(p, r);
+                // avoid empty resource
+                if (!r.isEmpty()) {
+                    stack.peek().add(p, r);
+                }
             }
         } else {
             // it's a property
@@ -100,11 +100,14 @@ public abstract class AbstractXmlResourceHandler
             if (s != null) {
                 // compact predicate because it has only a single value
                 if (!stack.isEmpty()) {
-                    Object o = resource.newObject(toObject(name, s));
+                    Object o = getResource().newObject(toObject(name, s));
                     if (o instanceof Literal) {
                         r.add(p, (Literal) o);
                     } else if (o instanceof Resource) {
-                        r.add(p, (Resource) o);
+                        Resource resource = (Resource)o;
+                        if (!resource.isEmpty()) {
+                            r.add(p, resource);
+                        }
                     }
                     stack.peek().compactPredicate(p);
                 }

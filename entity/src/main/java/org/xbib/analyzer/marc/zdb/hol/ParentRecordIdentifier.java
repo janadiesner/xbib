@@ -47,11 +47,14 @@ public class ParentRecordIdentifier extends org.xbib.analyzer.marc.bib.Identifie
     @Override
     public boolean fields(MARCEntityQueue.MARCWorker worker,
                           FieldList fields, String value) throws IOException {
+        if (value == null || value.isEmpty()) {
+            return false;
+        }
         String predicate = getClass().getSimpleName();
         if (getSettings().containsKey("_predicate")) {
             predicate = (String) getSettings().get("_predicate");
         }
-        worker.state().getResource().add(predicate, value);
+        worker.state().getResource().add(predicate, value.toLowerCase());
         return false;
     }
 }

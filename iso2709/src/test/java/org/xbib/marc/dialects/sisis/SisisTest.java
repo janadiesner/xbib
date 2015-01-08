@@ -22,13 +22,13 @@ public class SisisTest extends StreamTester {
         File file = File.createTempFile("DE-A96-" + s + "-sisis.", ".xml");
         FileOutputStream out = new FileOutputStream(file);
         try (InputStreamReader r = new InputStreamReader(in, "UTF-8")) {
-            SisisReader reader = new SisisReader();
+            SisisReader reader = new SisisReader(r);
             MarcXchangeWriter writer = new MarcXchangeWriter(out);
             writer.setFormat(MarcXchangeConstants.MARCXCHANGE);
             reader.setMarcXchangeListener(writer);
             writer.startDocument();
             writer.beginCollection();
-            reader.parse(r);
+            reader.parse();
             writer.endCollection();
             writer.endDocument();
             assertNull(writer.getException());

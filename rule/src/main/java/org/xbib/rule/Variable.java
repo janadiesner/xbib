@@ -1,7 +1,5 @@
 package org.xbib.rule;
 
-import java.util.Map;
-
 public class Variable implements Expression {
     private String name;
 
@@ -14,7 +12,7 @@ public class Variable implements Expression {
     }
 
     @Override
-    public boolean interpret(Map<String, ?> bindings) {
+    public boolean interpret(Binding binding) {
         return true;
     }
 }

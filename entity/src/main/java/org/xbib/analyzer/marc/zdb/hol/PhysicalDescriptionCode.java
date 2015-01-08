@@ -61,7 +61,7 @@ public class PhysicalDescriptionCode extends MARCEntity {
         }
         for (Field field: fields) {
             String data = field.data();
-            if (data == null) {
+            if (data == null || data.isEmpty()) {
                 continue;
             }
             check(worker, codes, data);

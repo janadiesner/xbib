@@ -238,7 +238,7 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
                 }
                 if (!invalid.isEmpty()) {
                     logger.debug("dates {} in holdings for {} out of range {}-{}",
-                            invalid, holding.parent(), firstDate, lastDate);
+                            invalid, holding.parents(), firstDate, lastDate);
                 }
             }
         }
@@ -311,7 +311,7 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
             }
             if (!invalid.isEmpty()) {
                 logger.debug("dates {} in license for {} out of range {}-{}",
-                        invalid, license.parent(), firstDate, lastDate);
+                        invalid, license.parents(), firstDate, lastDate);
             }
         }
     }
@@ -396,24 +396,24 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
                 .field("@type", type)
                 .fieldIfNotNull("@tag", tag)
                 .field("title", titles)
-                .field("firstDate", firstDate)
-                .field("lastDate", lastDate)
-                .field("countryCount", countries.size())
+                .field("firstdate", firstDate)
+                .field("lastdate", lastDate)
+                .field("countrycount", countries.size())
                 .field("country", countries)
-                .field("languageCount", languages.size())
+                .field("languagecount", languages.size())
                 .field("language", languages)
-                .field("isilCount", isils.size())
+                .field("isilcount", isils.size())
                 .field("isil", isils)
-                .field("volumeCount", dates.size())
+                .field("volumecount", dates.size())
                 .field("volume", dates)
-                .field("timelineCount", size())
+                .field("timelinecount", size())
                 .startArray("timeline");
         Set<String> visited = newHashSet();
         for (Manifestation m : this) {
             m.build(builder, tag, visited);
         }
         builder.endArray();
-        builder.field("manifestationCount", visited.size());
+        builder.field("manifestationcount", visited.size());
         builder.endObject();
         return ids;
     }

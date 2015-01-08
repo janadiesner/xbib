@@ -80,13 +80,13 @@
         "values" : [
         "001"
         ],
-        "_predicate" : "identifierRecord"
+        "_predicate" : "identifierForTheRecord"
     },
     "ParentRecordIdentifier" : {
         "values" : [
         "004"
         ],
-        "_predicate" : "identifierParent"
+        "_predicate" : "identifierForTheParentRecord"
     },
     "PhysicalDescriptionCode" : {
         "values" : [
@@ -945,7 +945,8 @@
             "a" : "marcorg",
             "b" : "collection",
             "c" : "shelvinglocation",
-            "z" : "publicnote"            
+            "z" : "publicnote",
+            "=" : "custom" /* ZDB Erweiterung für Fernleihindikator */
         },
         "custom" : {
                 "a" : "loan",

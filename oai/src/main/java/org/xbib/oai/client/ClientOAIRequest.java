@@ -36,17 +36,12 @@ import org.xbib.oai.OAIConstants;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.OAIRequest;
 import org.xbib.oai.OAISession;
-import org.xbib.oai.client.listrecords.ListRecordsListener;
-import org.xbib.oai.xml.MetadataHandler;
 import org.xbib.util.DateUtil;
 import org.xbib.io.http.netty.NettyHttpRequest;
 import org.xbib.oai.util.ResumptionToken;
 
 import java.net.URI;
 import java.util.Date;
-import java.util.List;
-
-import static com.google.common.collect.Lists.newLinkedList;
 
 /**
  * Client OAI request
@@ -199,29 +194,9 @@ public class ClientOAIRequest<R extends ClientOAIRequest>
 
     class ListRecordsRequest extends ClientOAIRequest<ListRecordsRequest> {
 
-        private List<ListRecordsListener> listeners = newLinkedList();
-
-        private List<MetadataHandler> handlers = newLinkedList();
-
         public ListRecordsRequest(OAISession session) {
             super(session);
             addParameter(OAIConstants.VERB_PARAMETER, LIST_RECORDS);
-        }
-
-        public void addListener(ListRecordsListener listener) {
-            listeners.add(listener);
-        }
-
-        public List<ListRecordsListener> getListeners() {
-            return listeners;
-        }
-
-        public void addHandler(MetadataHandler handler) {
-            handlers.add(handler);
-        }
-
-        public List<MetadataHandler> getHandlers() {
-            return handlers;
         }
 
     }

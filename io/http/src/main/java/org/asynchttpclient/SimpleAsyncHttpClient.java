@@ -135,22 +135,18 @@ public class SimpleAsyncHttpClient implements Closeable {
     public Future<Response> put(Part... parts) throws IOException {
         RequestBuilder r = rebuildRequest(requestBuilder.build());
         r.setMethod("POST");
-
         for (Part part : parts) {
             r.addBodyPart(part);
         }
-
         return execute(r, null, null);
     }
 
     public Future<Response> put(BodyConsumer consumer, Part... parts) throws IOException {
         RequestBuilder r = rebuildRequest(requestBuilder.build());
         r.setMethod("POST");
-
         for (Part part : parts) {
             r.addBodyPart(part);
         }
-
         return execute(r, consumer, null);
     }
 
@@ -270,10 +266,8 @@ public class SimpleAsyncHttpClient implements Closeable {
         if (throwableHandler == null) {
             throwableHandler = defaultThrowableHandler;
         }
-
         Request request = rb.build();
         ProgressAsyncHandler<Response> handler = new BodyConsumerAsyncHandler(bodyConsumer, throwableHandler, errorDocumentBehaviour, request.getUrl(), listener);
-
         if (resumeEnabled && request.getMethod().equals("GET") &&
                 bodyConsumer != null && bodyConsumer instanceof ResumableBodyConsumer) {
             ResumableBodyConsumer fileBodyConsumer = (ResumableBodyConsumer) bodyConsumer;
@@ -281,7 +275,6 @@ public class SimpleAsyncHttpClient implements Closeable {
             fileBodyConsumer.resume();
             handler = new ResumableBodyConsumerAsyncHandler(length, handler);
         }
-
         return asyncHttpClient().executeRequest(request, handler);
     }
 
@@ -745,9 +738,6 @@ public class SimpleAsyncHttpClient implements Closeable {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public STATE onBodyPartReceived(final HttpResponseBodyPart content) throws Exception {
             fireReceived(content);
             if (omitBody) {
@@ -762,10 +752,6 @@ public class SimpleAsyncHttpClient implements Closeable {
             return STATE.CONTINUE;
         }
 
-
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public Response onCompleted(Response response) throws Exception {
             fireCompleted(response);

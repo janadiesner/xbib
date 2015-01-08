@@ -1,9 +1,8 @@
 package org.xbib.rule;
 
-import java.util.Map;
 import java.util.Stack;
 
-public class Not extends Operation {
+public class Not extends AbstractOperator {
     public Not() {
         super("NOT");
     }
@@ -13,15 +12,15 @@ public class Not extends Operation {
     }
 
     @Override
-    public int parse(String[] tokens, int pos, Stack<Expression> stack) {
-        int i = findNextExpression(tokens, pos + 1, stack);
+    public int execute(String[] tokens, int pos, Stack<Expression> stack) {
+        int i = executeNext(tokens, pos + 1, stack);
         this.rightOperand = stack.pop();
         stack.push(this);
         return i;
     }
 
     @Override
-    public boolean interpret(final Map<String, ?> bindings) {
-        return !this.rightOperand.interpret(bindings);
+    public boolean interpret(Binding binding) {
+        return !this.rightOperand.interpret(binding);
     }
 }

@@ -37,7 +37,7 @@ public class RecordType extends MARCEntity {
 
     private final static RecordType instance = new RecordType();
     
-    public static MARCEntity getInstance() {
+    public static RecordType getInstance() {
         return instance;
     }
 }

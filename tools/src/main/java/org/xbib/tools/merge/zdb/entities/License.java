@@ -55,8 +55,10 @@ public class License extends Holding {
     @Override
     protected void build() {
         this.identifier = getString("ezb:license_entry_id");
-        this.parent = getString("ezb:zdbid");
+        String parent = getString("ezb:zdbid");
+        addParent(parent);
         this.isil = getString("ezb:isil");
+        this.serviceisil = isil;
         this.deleted = "delete".equals(getString("ezb:action"));
         this.dates = buildDateArray();
         this.info = buildInfo();
@@ -127,14 +129,14 @@ public class License extends Holding {
                 case "copy-loan":
                 case "ja, Leihe und Kopie": {
                     servicetype = "interlibrary";
-                    servicemode = "copy-loan";
+                    servicemode = Arrays.asList("copy", "loan");
                     servicedistribution = "unrestricted";
                     break;
                 }
                 case "copy-loan-domestic":
                 case "ja, Leihe und Kopie (nur Inland)": {
                     servicetype = "interlibrary";
-                    servicemode = "copy-loan";
+                    servicemode = Arrays.asList("copy", "loan");
                     servicedistribution = "domestic";
                     break;
                 }
@@ -175,7 +177,6 @@ public class License extends Holding {
                 }
             }
         }
-
         // additional qualifiers for service distribution
         String q = getString("ezb:ill_relevance.ezb:inland_only");
         String r = getString("ezb:ill_relevance.ezb:il_electronic_forbidden");
@@ -186,12 +187,10 @@ public class License extends Holding {
         } else if ("true".equals(r)) {
             servicedistribution = "postal";
         }
-
         String comment = getString("ezb:ill_relevance.ezb:comment");
         if (!Strings.isNullOrEmpty(comment)) {
             servicecomment = comment;
         }
-
         // no textualholdings
         Map<String, Object> holdings = newHashMap();
         // first date and last date is obligatory

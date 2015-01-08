@@ -1,10 +1,8 @@
 package org.xbib.rule;
 
-import java.util.Map;
-
 public class BaseType<T> implements Expression {
-    public T value;
-    public Class<T> type;
+    private T value;
+    private Class<T> type;
 
     public BaseType(T value, Class<T> type) {
         this.value = value;
@@ -20,7 +18,7 @@ public class BaseType<T> implements Expression {
     }
 
     @Override
-    public boolean interpret(Map<String, ?> bindings) {
+    public boolean interpret(Binding binding) {
         return true;
     }
 
@@ -28,7 +26,6 @@ public class BaseType<T> implements Expression {
         if (string == null) {
             throw new IllegalArgumentException("The provided string must not be null");
         }
-
         if ("true".equals(string) || "false".equals(string)) {
             return new BaseType<>(Boolean.getBoolean(string), Boolean.class);
         } else if (string.startsWith("'")) {

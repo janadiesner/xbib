@@ -53,7 +53,7 @@ public class Aleph500PublishSubjectStaXTest extends StreamTester {
         InputStream in = getClass().getResource("DE-605-aleph500-publish-subject.xml").openStream();
         File file = File.createTempFile("DE-605-publish-subject.", ".xml");
         FileOutputStream out = new FileOutputStream(file);
-        MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader()
+        MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader(in)
             .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
 
         Map<String,Object> fields = new HashMap();
@@ -147,7 +147,7 @@ public class Aleph500PublishSubjectStaXTest extends StreamTester {
         reader.setMarcXchangeListener(writer);
         writer.startDocument();
         writer.beginCollection();
-        reader.parse(in);
+        reader.parse();
         writer.endCollection();
         writer.endDocument();
         out.close();

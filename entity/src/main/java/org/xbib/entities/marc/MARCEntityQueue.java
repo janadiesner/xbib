@@ -31,6 +31,8 @@
  */
 package org.xbib.entities.marc;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.entities.EntityQueue;
 import org.xbib.entities.UnmappedKeyListener;
 import org.xbib.iri.IRI;
@@ -51,6 +53,8 @@ import java.util.regex.Pattern;
 
 public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEntity, FieldList, String>
         implements Closeable {
+
+    private final static Logger logger = LogManager.getLogger(MARCEntityQueue.class.getName());
 
     private final static IRI tempPredicate = IRI.create("tmp");
 
@@ -235,31 +239,40 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
                         // default subfield map
                         String fieldName = me.getKey();
                         if (entity.getSettings().containsKey(fieldName)) {
-                            Map<String, Object> vm = (Map<String, Object>) entity.getSettings().get(fieldName);
-                            int pos = v.indexOf(' ');
-                            String vv = pos > 0 ? v.substring(0, pos) : v;
-                            if (vm.containsKey(v)) {
-                                newResource.add(me.getKey() + "Source", v);
-                                v = (String) vm.get(v);
-                            } else if (vm.containsKey(vv)) {
-                                newResource.add(me.getKey() + "Source", v);
-                                v = (String) vm.get(vv);
-                            } else {
-                                // relation by pattern?
-                                List<Map<String, String>> patterns = (List<Map<String, String>>) entity.getSettings().get(fieldName + "pattern");
-                                if (patterns != null) {
-                                    for (Map<String, String> pattern : patterns) {
-                                        Map.Entry<String, String> mme = pattern.entrySet().iterator().next();
-                                        String p = mme.getKey();
-                                        String rel = mme.getValue();
-                                        Matcher m = Pattern.compile(p, Pattern.CASE_INSENSITIVE).matcher(v);
-                                        if (m.matches()) {
-                                            newResource.add(me.getKey() + "Source", v);
-                                            v = rel;
-                                            break;
+                            try {
+                                Map<String, Object> vm = (Map<String, Object>) entity.getSettings().get(fieldName);
+                                int pos = v.indexOf(' ');
+                                String vv = pos > 0 ? v.substring(0, pos) : v;
+                                if (vm.containsKey(v)) {
+                                    newResource.add(me.getKey() + "Source", v);
+                                    v = (String) vm.get(v);
+                                } else if (vm.containsKey(vv)) {
+                                    newResource.add(me.getKey() + "Source", v);
+                                    v = (String) vm.get(vv);
+                                } else {
+                                    // relation by pattern?
+                                    List<Map<String, String>> patterns = (List<Map<String, String>>) entity.getSettings().get(fieldName + "pattern");
+                                    if (patterns != null) {
+                                        for (Map<String, String> pattern : patterns) {
+                                            Map.Entry<String, String> mme = pattern.entrySet().iterator().next();
+                                            String p = mme.getKey();
+                                            String rel = mme.getValue();
+                                            Matcher m = Pattern.compile(p, Pattern.CASE_INSENSITIVE).matcher(v);
+                                            if (m.matches()) {
+                                                newResource.add(me.getKey() + "Source", v);
+                                                v = rel;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
+                            } catch (ClassCastException e) {
+                                logger.warn("entity {}: found {} of class {} in entity settings {} for key {} but must be a map",
+                                        entity.getClass(),
+                                        entity.getSettings().get(me.getKey()),
+                                        entity.getSettings().get(me.getKey()).getClass(),
+                                        entity.getSettings(),
+                                        me.getKey());
                             }
                         }
                     }

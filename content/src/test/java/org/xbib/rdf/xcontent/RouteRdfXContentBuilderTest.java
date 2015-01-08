@@ -61,6 +61,7 @@ public class RouteRdfXContentBuilderTest extends Assert {
                 ));
         RdfContentBuilder builder = routeRdfXContentBuilder(params);
         builder.receive(resource);
+        // TODO assert
 
     }
 

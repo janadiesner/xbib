@@ -32,6 +32,7 @@
 package org.xbib.marc.xml.stream.mapper;
 
 import org.xbib.marc.Field;
+import org.xbib.marc.FieldReader;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.event.FieldEvent;
@@ -50,7 +51,6 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -66,9 +66,10 @@ import java.util.Stack;
  * The MarcXchange mapping event consumer reads StaX events, maps the MarcXchange fields to
  * other fields, and fires MarcXchange events
  */
-public class MarcXchangeFieldMapperReader
-    extends MarcXchangeFieldMapper
-    implements XMLEventConsumer, MarcXchangeConstants {
+public class MarcXchangeFieldMapperReader extends MarcXchangeFieldMapper
+    implements FieldReader, XMLEventConsumer, MarcXchangeConstants {
+
+    private final Reader reader;
 
     private Stack<Field> stack = new Stack<Field>();
 
@@ -100,13 +101,20 @@ public class MarcXchangeFieldMapperReader
 
     private boolean transform = false;
 
-    private Integer bufferSize;
-
     private Set<String> validNamespaces = new HashSet<String>() {{
         add(MARCXCHANGE_V1_NS_URI);
         add(MARCXCHANGE_V2_NS_URI);
         add(MARC21_NS_URI);
     }};
+
+    public MarcXchangeFieldMapperReader(InputStream in) throws IOException {
+        this(new InputStreamReader(in, "UTF-8"));
+    }
+
+    public MarcXchangeFieldMapperReader(Reader reader) {
+        this.reader = reader;
+    }
+
 
     public MarcXchangeFieldMapperReader setMarcXchangeListener(String type, MarcXchangeListener listener) {
         this.listeners.put(type, listener);
@@ -158,28 +166,15 @@ public class MarcXchangeFieldMapperReader
         return this;
     }
 
-
-    public MarcXchangeFieldMapperReader setBufferSize(Integer bufferSize) {
-        this.bufferSize = bufferSize;
-        return this;
-    }
-
     @Override
     public MarcXchangeFieldMapperReader addFieldMap(String fieldMapName, Map<String,Object> fieldMap) {
         super.addFieldMap(fieldMapName, fieldMap);
         return this;
     }
 
-    public void parse(InputStream in) throws IOException {
-        parse(new InputStreamReader(in, "UTF-8"));
-    }
-
-    public void parse(Reader reader) throws IOException {
+    public void parse() throws IOException {
         try {
             XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-            if (bufferSize != null) {
-                reader = new BufferedReader(reader, bufferSize);
-            }
             XMLEventReader xmlEventReader = inputFactory.createXMLEventReader(reader);
             while (xmlEventReader.hasNext()) {
                 add(xmlEventReader.nextEvent());

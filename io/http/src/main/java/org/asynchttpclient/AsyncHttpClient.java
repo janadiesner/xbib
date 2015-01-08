@@ -19,62 +19,56 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This class support asynchronous and synchronous HTTP request.
- * <p/>
+ *
  * To execute synchronous HTTP request, you just need to do
- * <blockquote><pre>
+ * <blockquote>
  *    AsyncHttpClient c = new AsyncHttpClient();
  *    Future<Response> f = c.prepareGet("http://www.ning.com/").execute();
- * </pre></blockquote
- * <p/>
+ * </blockquote
+ *
  * The code above will block until the response is fully received. To execute asynchronous HTTP request, you
  * create an {@link org.asynchttpclient.AsyncHandler} or its abstract implementation, {@link org.asynchttpclient.AsyncCompletionHandler}
- * <p/>
- * <blockquote><pre>
+ *
+ * <blockquote>
  *       AsyncHttpClient c = new AsyncHttpClient();
  *       Future<Response> f = c.prepareGet("http://www.ning.com/").execute(new AsyncCompletionHandler<Response>() &#123;
- * <p/>
  *          &#64;Override
  *          public Response onCompleted(Response response) throws IOException &#123;
  *               // Do something
  *              return response;
  *          &#125;
- * <p/>
  *          &#64;Override
  *          public void onThrowable(Throwable t) &#123;
  *          &#125;
  *      &#125;);
  *      Response response = f.get();
- * <p/>
  *      // We are just interested to retrieve the status code.
  *     Future<Integer> f = c.prepareGet("http://www.ning.com/").execute(new AsyncCompletionHandler<Integer>() &#123;
- * <p/>
  *          &#64;Override
  *          public Integer onCompleted(Response response) throws IOException &#123;
  *               // Do something
  *              return response.getStatusCode();
  *          &#125;
- * <p/>
  *          &#64;Override
  *          public void onThrowable(Throwable t) &#123;
  *          &#125;
  *      &#125;);
  *      Integer statusCode = f.get();
- * </pre></blockquote
+ * </blockquote
  * The {@link org.asynchttpclient.AsyncCompletionHandler#onCompleted(Response)} will be invoked once the http response has been fully read, which include
  * the http headers and the response body. Note that the entire response will be buffered in memory.
- * <p/>
  * You can also have more control about the how the response is asynchronously processed by using a {@link org.asynchttpclient.AsyncHandler}
  * <blockquote><pre>
  *      AsyncHttpClient c = new AsyncHttpClient();
  *      Future<String> f = c.prepareGet("http://www.ning.com/").execute(new AsyncHandler<String>() &#123;
  *          private StringBuilder builder = new StringBuilder();
- * <p/>
+ *
  *          &#64;Override
  *          public STATE onStatusReceived(HttpResponseStatus s) throws Exception &#123;
  *               // return STATE.CONTINUE or STATE.ABORT
  *               return STATE.CONTINUE
  *          }
- * <p/>
+ *
  *          &#64;Override
  *          public STATE onHeadersReceived(HttpResponseHeaders bodyPart) throws Exception &#123;
  *               // return STATE.CONTINUE or STATE.ABORT

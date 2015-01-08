@@ -1,0 +1,103 @@
+{
+        "date_detection" : false,
+        "_timestamp" : { "enabled" : true },
+        "properties" : {
+          "xbib" : {
+             "properties" : {
+                 "uid" : { "type" : "string", "analyzer" : "keyword" }
+             }
+          },
+          "Item" : {
+            "properties" : {
+              "callnumber" : {
+                "type" : "string", "analyzer" : "keyword"
+              },
+              "collection" : {
+                "type" : "string", "analyzer" : "keyword"
+              },
+              "identifier" : {
+                "type" : "string", "analyzer" : "keyword"
+              },
+              "shelfmark" : {
+                "type" : "string", "analyzer" : "keyword"
+              },
+              "status" : {
+                "type" : "string", "analyzer" : "keyword"
+              }
+            }
+          },
+            "OnlineAccessRemote" : {
+              "properties" : {
+                "access" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "identifier" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "accessnumber" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "compression" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "contact" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "electronicname" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "format" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "hostname" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "hoursaccess" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "instruction" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "label" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "locationofhost" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "nonpublicnote" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "password" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "path" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "persistentidentifier" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "port" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "prefix" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "processor" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "publicnote" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "relatedto" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "size" : {
+                  "type" : "string", "analyzer" : "keyword"
+                },
+                "uri" : {
+                  "type" : "string", "analyzer" : "keyword"
+                }
+              }
+            }
+        }
+}

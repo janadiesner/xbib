@@ -78,11 +78,9 @@
     },
     "RecordIdentifier" : {
         "values" : [
-        "001"
+            "001"
         ],
-        "tags" : {
-            "001" : "identifierForTheRecord"
-        }
+        "_predicate" : "identifierForTheRecord"
     },
     "PhysicalDescriptionCode" : {
         "values" : [
@@ -1879,7 +1877,7 @@
         "044$  $ccc"
         ],
         "tags" : {
-            "044" : "publishingCountry"
+            "044" : "PublishingCountry"
         },
         "subfields" : {
             "a" : "country",
@@ -1889,7 +1887,7 @@
             "6" : "linkage",
             "8" : "sequenceNumber"
         },
-        "publishingCountry" : {
+        "PublishingCountry" : {
             "c" : "isoCountryCodes"
         },
         "isoCountryCodes" : {
@@ -2733,7 +2731,7 @@
             "d" : "personalDate",
             "e" : "relatorTerm",
             "n" : "personalNumber",
-            "0" : "identifier",
+            "0" : "personalIdentifier",
             "4" : "roleTerm",
             "7" : "unknown",
             "9" : null
@@ -3231,7 +3229,7 @@
             "f" : "dateOfWork",
             "g" : "corporatePlace",
             "n" : "corporateNumber",
-            "0" : "identifier",
+            "0" : "corporateIdentifier",
             "4" : "roleTerm",
             "7" : "unknown",
             "8" : "sequenceNumber",
@@ -3283,7 +3281,7 @@
             "q" : "nameOfMeetingFollowingJurisdictionName",
             "t" : "titleofWork",
             "u" : "affiliation",
-            "0" : "identifier",
+            "0" : "meetingIdentifier",
             "4" : "relatorCode",
             "6" : "linkage",
             "7" : "unknown",
@@ -4772,7 +4770,7 @@
             "x" : "generalSubdivision",
             "y" : "chronologicalSubdivision",
             "z" : "geographicSubdivision",
-            "0" : "identifier",
+            "0" : "subjectIdentifier",
             "2" : "source",
             "3" : "material",
             "4" : "relatorCode",
@@ -4838,7 +4836,7 @@
             "i" : "relation",
             "a" : "author",
             "t" : "title",
-            "w" : "identifier"
+            "w" : "id"
         },
         "relation" : {
             "Original-Ausg." : "hasOriginalEdition",
@@ -5807,7 +5805,7 @@
             "s" : "uniformTitle",
             "t" : "title",
             "u" : "standardTechnicalReportNumber",
-            "w" : "identifier",
+            "w" : "id",
             "x" : "issn",
             "y" : "coden",
             "z" : "isbn",
@@ -5906,7 +5904,7 @@
             "i" : "relation",
             "a" : "author",
             "t" : "title",
-            "w" : "identifier"
+            "w" : "id"
         },
         "relation" : {
             "Vorg." : "precededBy",
@@ -6148,7 +6146,7 @@
             "i" : "relation",
             "a" : "author",
             "t" : "title",
-            "w" : "identifier"
+            "w" : "id"
         },
         "relation" : {
             "Forts." : "succeededBy",

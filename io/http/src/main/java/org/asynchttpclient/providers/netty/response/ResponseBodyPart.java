@@ -29,25 +29,16 @@ public abstract class ResponseBodyPart extends HttpResponseBodyPart {
         this.last = last;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isLast() {
         return last;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void markUnderlyingConnectionAsToBeClosed() {
         closeConnection = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isUnderlyingConnectionToBeClosed() {
         return closeConnection;

@@ -36,6 +36,7 @@ import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.rdf.Resource;
 
 public class Identifier extends MARCEntity {
+
     private final static Identifier instance = new Identifier();
     
     public static Identifier getInstance() {

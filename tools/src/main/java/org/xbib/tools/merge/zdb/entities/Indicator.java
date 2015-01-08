@@ -37,6 +37,8 @@ import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -46,6 +48,8 @@ public class Indicator extends License {
 
     private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 
+    private final static Pattern movingWallYearPattern = Pattern.compile("\\-(\\d+)Y");
+
     public Indicator(Map<String, Object> m) {
         super(m);
         // do not call complete(), it's done with super(m)
@@ -54,8 +58,10 @@ public class Indicator extends License {
     @Override
     protected void build() {
         this.identifier = getString("dc:identifier");
-        this.parent = getString("xbib:identifier");
+        String parent = getString("xbib:identifier");
+        addParent(parent);
         this.isil = getString("xbib:isil");
+        this.serviceisil = isil;
         this.dates = buildDateArray();
         this.info = buildInfo();
         this.findContentType();
@@ -77,8 +83,15 @@ public class Indicator extends License {
         if (!Strings.isNullOrEmpty(firstDate)) {
             first = Integer.parseInt(firstDate);
             String lastDate = getString("xbib:lastDate");
-            last = Strings.isNullOrEmpty(lastDate) ?
-                    currentYear : Integer.parseInt(lastDate);
+            last = Strings.isNullOrEmpty(lastDate) ? currentYear : Integer.parseInt(lastDate);
+            String movingWall = getString("xbib:movingWall");
+            if (movingWall != null) {
+                Matcher m = movingWallYearPattern.matcher(movingWall);
+                if (m.find()) {
+                    Integer delta = Integer.parseInt(m.group(1));
+                    last = last - delta;
+                }
+            }
             if (first > 0 && last > 0) {
                 for (int d = first; d <= last; d++) {
                     dates.add(d);

@@ -37,6 +37,7 @@ import org.xbib.entities.marc.SubfieldValueMapper;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldList;
 import org.xbib.rdf.Resource;
+import org.xbib.rdf.memory.MemoryRdfGraph;
 
 import java.io.IOException;
 import java.util.Map;
@@ -46,12 +47,12 @@ public class PicaEntityQueue extends EntityQueue<PicaEntityBuilderState, PicaEnt
 
     private UnmappedKeyListener<FieldList> listener;
 
-    public PicaEntityQueue(String packageName, String... paths) {
-        super(new PicaSpecification(), 1, packageName, paths);
-    }
-
     public PicaEntityQueue(String packageName, int workers, String... paths) {
         super(new PicaSpecification(), workers, packageName, paths);
+    }
+
+    public PicaEntityQueue(String packageName, Map<String, Object> params, int workers,  String... paths) {
+        super(new PicaSpecification().addParameters(params), workers, packageName, paths);
     }
 
     public PicaEntityQueue setUnmappedKeyListener(UnmappedKeyListener<FieldList> listener) {
@@ -73,6 +74,11 @@ public class PicaEntityQueue extends EntityQueue<PicaEntityBuilderState, PicaEnt
     }
 
     public class PicaKeyValueWorker extends EntityWorker {
+
+        @Override
+        public PicaEntityBuilderState newState() {
+            return new PicaEntityBuilderState(new MemoryRdfGraph<>(), contentBuilderProviders());
+        }
 
         @SuppressWarnings("unchecked")
         @Override

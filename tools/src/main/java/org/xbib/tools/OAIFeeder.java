@@ -33,32 +33,34 @@ package org.xbib.tools;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
-import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.joda.time.DateTime;
+import org.elasticsearch.common.joda.time.format.DateTimeFormat;
 import org.elasticsearch.common.unit.TimeValue;
-import org.xbib.io.NullWriter;
+import org.xbib.oai.OAIConstants;
 import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfResourceHandler;
-import org.xbib.oai.xml.MetadataHandler;
+import org.xbib.oai.xml.SimpleMetadataHandler;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.content.RouteRdfXContentParams;
 import org.xbib.rdf.io.ntriple.NTripleContentParams;
-import org.xbib.rdf.io.xml.XmlHandler;
 import org.xbib.util.DateUtil;
 import org.xbib.util.URIUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Date;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.google.common.collect.Queues.newConcurrentLinkedQueue;
 import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
@@ -66,37 +68,32 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 /**
  * Harvest from OAI and feed to Elasticsearch
  */
-public abstract class OAIFeeder extends Feeder {
+public abstract class OAIFeeder extends TimewindowFeeder {
 
     private final static Logger logger = LogManager.getLogger(OAIFeeder.class.getSimpleName());
 
     @Override
     protected OAIFeeder prepare() throws IOException {
-        String index = settings.get("index");
-        String type = settings.get("type");
-        Integer shards = settings.getAsInt("shards", 1);
-        Integer replica = settings.getAsInt("replica", 0);
-        Integer maxbulkactions = settings.getAsInt("maxbulkactions", 100);
+        ingest = createIngest();
+        String timeWindow = settings.get("timewindow") != null ?
+                DateTimeFormat.forPattern(settings.get("timewindow")).print(new DateTime()) : "";
+        setConcreteIndex(resolveAlias(getIndex() + timeWindow));
+        Pattern pattern = Pattern.compile("^(.*)\\d+$");
+        Matcher m = pattern.matcher(getConcreteIndex());
+        setIndex(m.matches() ? m.group() : getConcreteIndex());
+        logger.info("base index name = {}, concrete index name = {}", getIndex(), getConcreteIndex());
+
+        Integer maxbulkactions = settings.getAsInt("maxbulkactions", 1000);
         Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
                 Runtime.getRuntime().availableProcessors());
-        String maxtimewait = settings.get("maxtimewait", "60s");
-        ingest = createIngest();
         ingest.maxActionsPerBulkRequest(maxbulkactions)
                 .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
-                .maxRequestWait(TimeValue.parseTimeValue(maxtimewait, TimeValue.timeValueSeconds(60)))
-                .newClient(ImmutableSettings.settingsBuilder()
-                        .put("cluster.name", settings.get("elasticsearch.cluster"))
-                        .put("host", settings.get("elasticsearch.host"))
-                        .put("port", settings.getAsInt("elasticsearch.port", 9300))
-                        .put("sniff", settings.getAsBoolean("elasticsearch.sniff", false))
-                        .build());
-        ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
-        beforeIndexCreation(ingest);
-        ingest.shards(shards).replica(replica).newIndex(index).startBulk(index);
+                .maxRequestWait(TimeValue.timeValueSeconds(60));
+        createIndex(getConcreteIndex());
 
-        String[] inputs = settings.getAsArray("input");
+        String[] inputs = settings.getAsArray("uri");
         if (inputs == null) {
-            throw new IllegalArgumentException("no input given");
+            throw new IllegalArgumentException("no parameter 'uri' given");
         }
         input = newConcurrentLinkedQueue();
         for (String uri : inputs) {
@@ -109,12 +106,17 @@ public abstract class OAIFeeder extends Feeder {
     public void process(URI uri) throws Exception {
         Map<String, String> params = URIUtil.parseQueryString(uri);
         String server = uri.toString();
+        String verb = params.get("verb");
         String metadataPrefix = params.get("metadataPrefix");
         String set = params.get("set");
         Date from = DateUtil.parseDateISO(params.get("from"));
         Date until = DateUtil.parseDateISO(params.get("until"));
         final OAIClient client = OAIClientFactory.newClient(server);
         client.setTimeout(settings.getAsInt("timeout", 60000));
+        if (!verb.equals(OAIConstants.LIST_RECORDS)) {
+            logger.warn("no verb {}, returning", OAIConstants.LIST_RECORDS);
+            return;
+        }
         ListRecordsRequest request = client.newListRecordsRequest()
                 .setMetadataPrefix(metadataPrefix)
                 .setSet(set)
@@ -126,9 +128,10 @@ public abstract class OAIFeeder extends Feeder {
                 ListRecordsListener listener = new ListRecordsListener(request);
                 request.prepare().execute(listener).waitFor();
                 if (listener.getResponse() != null) {
-                    logger.debug("got OAI response");
-                    NullWriter w = new NullWriter();
+                    logger.info("got OAI response");
+                    StringWriter w = new StringWriter();
                     listener.getResponse().to(w);
+                    logger.info("{}", w);
                     request = client.resume(request, listener.getResumptionToken());
                 } else {
                     logger.debug("no valid OAI response");
@@ -146,31 +149,26 @@ public abstract class OAIFeeder extends Feeder {
         return new RdfResourceHandler(params);
     }
 
-    protected MetadataHandler newMetadataHandler() {
-        RdfResourceHandler rdfResourceHandler = rdfResourceHandler();
-        return new XmlMetadataHandler().setHandler(rdfResourceHandler);
+    protected SimpleMetadataHandler newMetadataHandler() {
+        return new MySimpleMetadataHandler();
     }
 
-    class XmlMetadataHandler extends MetadataHandler {
+    public class MySimpleMetadataHandler extends SimpleMetadataHandler {
 
-        final IRINamespaceContext namespaceContext;
+        private final IRINamespaceContext namespaceContext;
 
-        XmlHandler handler;
+        private RdfResourceHandler handler;
 
-        XmlMetadataHandler() {
+        public MySimpleMetadataHandler() {
             namespaceContext = IRINamespaceContext.newInstance();
             namespaceContext.addNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
             namespaceContext.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
         }
 
-        public XmlMetadataHandler setHandler(XmlHandler handler) {
-            this.handler = handler;
-            handler.setDefaultNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
-            return this;
-        }
-
         @Override
         public void startDocument() throws SAXException {
+            this.handler = rdfResourceHandler();
+            handler.setDefaultNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/");
             handler.startDocument();
         }
 
@@ -183,7 +181,21 @@ public abstract class OAIFeeder extends Feeder {
                         settings.get("type", "oai"));
                 params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), getHeader().getIdentifier(), content));
                 RdfContentBuilder builder = routeRdfXContentBuilder(params);
-                builder.receive(rdfResourceHandler().getResource());
+                builder.receive(handler.getResource());
+                if (settings.getAsBoolean("mock", false)) {
+                    logger.info("{}", builder.string());
+                }
+                if (executor != null) {
+                    // tell executor we increased document count by one
+                    executor.metric().mark();
+                    if (executor.metric().count() % 10000 == 0) {
+                        try {
+                            writeMetrics(executor.metric(), null);
+                        } catch (Exception e) {
+                            throw new IOException("metric failed", e);
+                        }
+                    }
+                }
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 throw new SAXException(e);

@@ -38,8 +38,8 @@ import org.xbib.oai.OAIDateResolution;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
 import org.xbib.oai.rdf.RdfResourceHandler;
-import org.xbib.oai.xml.MetadataHandler;
-import org.xbib.oai.xml.XmlMetadataHandler;
+import org.xbib.oai.xml.SimpleMetadataHandler;
+import org.xbib.oai.xml.XmlSimpleMetadataHandler;
 import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.RdfContentParams;
 import org.xbib.iri.namespace.IRINamespaceContext;
@@ -88,7 +88,7 @@ public class LOMClientTest {
         client.close();
     }
 
-    protected MetadataHandler xmlMetadataHandler() {
+    protected SimpleMetadataHandler xmlMetadataHandler() {
         /*IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
         Context<Resource> context = new MemoryContext()
                 .setContentBuilder(new RdfXContentGenerator())
@@ -96,10 +96,10 @@ public class LOMClientTest {
         context.setNamespaceContext(IRINamespaceContext.getInstance());*/
         RdfContentParams params = IRINamespaceContext::getInstance;
         RdfResourceHandler handler = new RdfResourceHandler(params);
-        return new LOMHandler(params).setHandler(handler);
+        return new LOMHandlerSimple(params).setHandler(handler);
     }
 
-    class LOMHandler extends XmlMetadataHandler {
+    class LOMHandlerSimple extends XmlSimpleMetadataHandler {
 
         private RdfContentParams params;
 
@@ -115,11 +115,11 @@ public class LOMClientTest {
 
         private String qname;
 
-        public LOMHandler(RdfContentParams params) {
+        public LOMHandlerSimple(RdfContentParams params) {
             this.params = params;
         }
 
-        public LOMHandler setHandler(XmlHandler handler) {
+        public LOMHandlerSimple setHandler(XmlHandler handler) {
             this.handler = handler;
             try {
                 this.builder = ntripleBuilder();

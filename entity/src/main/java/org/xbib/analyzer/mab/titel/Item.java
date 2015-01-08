@@ -38,7 +38,7 @@ import org.xbib.entities.marc.dialects.mab.MABEntityBuilderState;
 import org.xbib.entities.marc.dialects.mab.MABEntityQueue;
 import org.xbib.entities.support.IdentifierMapper;
 import org.xbib.entities.support.StatusCodeMapper;
-import org.xbib.entities.support.TSVClassifier;
+import org.xbib.entities.support.ConfigurableClassifier;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldList;
 import org.xbib.rdf.Literal;
@@ -113,11 +113,11 @@ public class Item extends MABEntity {
                 }
             }
         } else if ("callnumber".equals(property)) {
-            TSVClassifier classifier = worker.classifier();
+            ConfigurableClassifier classifier = worker.classifier();
             if (classifier != null) {
                 String isil = state.getISIL();
                 String doc = state.getRecordIdentifier();
-                TSVClassifier.Entry entry = classifier.lookup(isil, doc, value, null);
+                ConfigurableClassifier.Entry entry = classifier.lookup(isil, doc, value, null);
                 if (entry != null) {
                     String facet = taxonomyFacet + "." + isil + ".notation";
                     if (state.getFacets().get(facet) == null) {

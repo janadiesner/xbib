@@ -34,6 +34,7 @@ package org.xbib.analyzer.marc.zdb.bib;
 import org.xbib.entities.marc.MARCEntity;
 
 public class SeriesStatement extends MARCEntity {
+
     private final static SeriesStatement instance = new SeriesStatement();
     
     public static SeriesStatement getInstance() {

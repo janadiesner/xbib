@@ -42,7 +42,7 @@ import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.util.DateUtil;
 import org.xbib.iri.IRI;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
-import org.xbib.oai.rdf.RdfMetadataHandler;
+import org.xbib.oai.rdf.RdfSimpleMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
 
 import javax.xml.namespace.QName;
@@ -62,7 +62,7 @@ public class DOAJClientTest {
 
         RdfContentParams params = IRINamespaceContext::getInstance;
 
-        final RdfMetadataHandler metadataHandler = new RdfMetadataHandler(params);
+        final RdfSimpleMetadataHandler metadataHandler = new RdfSimpleMetadataHandler(params);
         final RdfResourceHandler resourceHandler = new DOAJResourceHandler(params);
         //final RdfOutput out = new MyOutput(metadataHandler.getContext());
 

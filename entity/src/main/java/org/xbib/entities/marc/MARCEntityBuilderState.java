@@ -38,10 +38,8 @@ import org.xbib.rdf.RdfGraph;
 import org.xbib.rdf.RdfGraphParams;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.memory.MemoryResource;
-import org.xbib.util.DateUtil;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Map;
 
 public class MARCEntityBuilderState extends DefaultEntityBuilderState {
@@ -87,10 +85,7 @@ public class MARCEntityBuilderState extends DefaultEntityBuilderState {
     public void complete() throws IOException {
         if (graph().getResources() != null) {
             for (Resource resource : graph().getResources()) {
-                resource.add("xbib:timestamp", DateUtil.formatDateISO(new Date()));
-                resource.add("xbib:label", label);
                 if (recordNumber != null) {
-                    resource.add("xbib:id", recordNumber);
                     resource.id(IRI.builder().fragment(recordNumber).build());
                 }
             }

@@ -37,7 +37,6 @@ import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileWriter;
 import java.io.InputStream;
 
 public class MarcXchangeOAITest extends StreamTester {

@@ -34,6 +34,7 @@ package org.xbib.analyzer.marc.zdb.hol;
 import org.xbib.entities.marc.MARCEntity;
 
 public class Codes extends MARCEntity {
+
     private final static Codes instance = new Codes();
     
     public static Codes getInstance() {

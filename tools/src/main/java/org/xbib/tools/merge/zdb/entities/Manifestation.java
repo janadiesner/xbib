@@ -36,6 +36,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.pipeline.PipelineRequest;
@@ -43,6 +44,7 @@ import org.xbib.util.Strings;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
@@ -52,42 +54,50 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
-import static com.google.common.collect.Sets.newLinkedHashSet;
 import static com.google.common.collect.Sets.newTreeSet;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 public class Manifestation implements Comparable<Manifestation>, PipelineRequest {
 
-    protected final Map<String, Object> map;
-
     private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
+
+    protected final Map<String, Object> map;
 
     private boolean forced;
 
-    private String id;
+    protected String id;
 
-    private String externalID;
+    protected String externalID;
 
     private String key;
 
-    private String publisher;
+    protected String title;
 
-    private String publisherPlace;
+    protected String corporate;
 
-    private String language;
+    protected String meeting;
 
-    private Integer firstDate;
+    protected String publisher;
 
-    private Integer lastDate;
+    protected String publisherPlace;
+
+    protected String language;
+
+    protected List<String> country;
+
+    protected Integer firstDate;
+
+    protected Integer lastDate;
 
     private Set<Integer> greenDates;
 
     private String description;
 
-    private Map<String, Object> identifiers;
+    protected Map<String, Object> identifiers;
 
     private final SetMultimap<String, Manifestation> relatedManifestations = TreeMultimap.create();
 
@@ -95,27 +105,13 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
 
     private final SetMultimap<Integer, Holding> relatedVolumes = TreeMultimap.create();
 
-    private final static Supplier<Set<String>> supplier = new Supplier<Set<String>>() {
-
-        @Override
-        public Set<String> get() {
-            return newLinkedHashSet();
-        }
-    };
+    private final static Supplier<Set<String>> supplier = Sets::newLinkedHashSet;
 
     private final SetMultimap<String, String> relations = Multimaps.newSetMultimap(Maps.newTreeMap(), supplier);
 
     private final SetMultimap<String, String> externalRelations = Multimaps.newSetMultimap(Maps.newTreeMap(), supplier);
 
-    private String title;
-
-    private String corporate;
-
-    private String meeting;
-
-    private List<String> country;
-
-    private String genre;
+    protected String genre;
 
     private boolean isPeriodical;
 
@@ -151,25 +147,26 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
 
     private List<Map<String, Object>> links;
 
+    private final List<Volume> volumes = newArrayList();
+
+    private final List<String> volumeIDs = newArrayList();
+
     public Manifestation(Map<String, Object> map) {
         this.map = map;
         build();
     }
 
-    private void build() {
+    protected void build() {
         // we use DNB ID. ZDB ID collides with GND ID. Example: 21573803
         String s = getString("IdentifierDNB.identifierDNB");
-        this.id = s != null ? s : "";
+        this.id = s != null ? s : "undefined";
         s = getString("IdentifierZDB.identifierZDB");
-        this.externalID = s != null ? s : "";
-
+        this.externalID = s != null ? s : "undefined";
         this.isSubseries = getString("TitleStatement.titlePartName") != null
                 || getString("TitleStatement.titlePartNumber") != null;
-
         makeCorporate();
         makeMeeting();
         makeTitle();
-
         this.publisher = getString("PublicationStatement.publisherName");
         this.publisherPlace = getPublisherPlace();
         this.language = getString("Language.value", "unknown");
@@ -188,11 +185,15 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
                 || "ag".equals(genre);
         this.isPacket = "pt".equals(genre);
         this.isNewspaper = "Newspaper".equals(resourceType)
-                || "fn".equals(genre) || "lp".equals(genre) || "ao".equals(genre)
-                || "eo".equals(genre) || "up".equals(genre) || "zt".equals(genre);
+                || "fn".equals(genre)
+                || "lp".equals(genre)
+                || "ao".equals(genre)
+                || "eo".equals(genre)
+                || "up".equals(genre)
+                || "zt".equals(genre);
         this.isWebsite = "Updating Web site".equals(resourceType);
-        // "Monographic series"
-        // "Updating loose-leaf"
+        // TODO "Monographic series"
+        // TODO "Updating loose-leaf"
 
         // first, compute content types
         computeContentTypes();
@@ -200,7 +201,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         this.key = computeKey();
 
         // ISSN, CODEN, ...
-        this.identifiers = makeIdentifiers();
+        makeIdentifiers();
 
         // relations to other manifestations on ID basis
         makeRelations();
@@ -219,23 +220,24 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
                 .createIdentifier();*/
 
         this.timelineKey = makeTimelineKey();
-
     }
 
     private <T> T get(String key) {
         return this.<T>get(map, key.split("\\."));
     }
 
-    private <T> T get(Map inner, String[] key) {
-        if (inner == null) {
+    private <T> T get(Map m, String[] key) {
+        if (m == null) {
             return null;
         }
-        Object o = inner.get(key[0]);
+        Object o = m.get(key[0]);
         if (o instanceof List) {
             o = ((List) o).get(0);
         }
-        return (T) (o instanceof Map && key.length > 1 ?
-                get((Map) o, Arrays.copyOfRange(key, 1, key.length)) : o);
+        if (o instanceof Map && key.length > 1) {
+            return get((Map) o, Arrays.copyOfRange(key, 1, key.length));
+        }
+        return (T)o;
     }
 
     private Object get(String key, Object defValue) {
@@ -243,21 +245,25 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         return (o != null) ? o : defValue;
     }
 
-    public String getString(String key) {
+    protected String getString(String key) {
         return get(key);
     }
 
-    private String getString(String key, String defValue) {
+    protected String getString(String key, String defValue) {
         return (String) get(key, defValue);
     }
 
-    private <T> T getAnyObject(String key) {
+    protected <T> T getAnyObject(String key) {
         return get(key);
     }
 
-    private Integer getInteger(String key) {
-        Object o = get(key);
-        return o == null ? null : o instanceof Integer ? (Integer) o : Integer.parseInt(o.toString());
+    protected Integer getInteger(String key) {
+        try {
+            Object o = get(key);
+            return o == null ? null : o instanceof Integer ? (Integer) o : Integer.parseInt(o.toString());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     public Map map() {
@@ -448,6 +454,30 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         return greenDates;
     }
 
+    public void addVolume(Volume volume) {
+        synchronized (volumes) {
+            volumes.add(volume);
+        }
+    }
+
+    public List<Volume> getVolumes() {
+        return volumes;
+    }
+
+    public void addVolumeIDs(List<String> volumeIDs) {
+        this.volumeIDs.addAll(volumeIDs);
+    }
+
+    public Set<VolumeHolding> getVolumeHoldings() {
+        Set<VolumeHolding> set = newTreeSet();
+        synchronized (volumes) {
+            for (Volume volume : volumes) {
+                set.addAll(volume.getHoldings());
+            }
+        }
+        return set;
+    }
+
     public boolean hasCarrierRelations() {
         synchronized (relations) {
             for (String key : relations.keys()) {
@@ -467,7 +497,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         }
     }
 
-    private void makeTitle() {
+    protected void makeTitle() {
         // shorten title (series statement after '/' or ':')
         // but combine with corporate name, meeting name, and part specification
         StringBuilder sb = new StringBuilder();
@@ -503,27 +533,23 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         }
     }
 
-    private String clean(String title) {
+    protected String clean(String title) {
         if (title == null) {
             return null;
         }
-        int pos = title.indexOf('/');
+        int pos = title.indexOf("/ ");
         if (pos > 0) {
-            title = title.substring(0, pos - 1);
-        }
-        pos = title.indexOf(':');
-        if (pos > 0) {
-            title = title.substring(0, pos - 1);
+            title = title.substring(0, pos);
         }
         title = title.replaceAll("\\[.*?\\]", "").trim();
         return title;
     }
 
-    private void makeCorporate() {
+    protected void makeCorporate() {
         this.corporate = getString("CorporateName.corporateName");
     }
 
-    private void makeMeeting() {
+    protected void makeMeeting() {
         this.meeting = getString("MeetingName.meetingName");
     }
 
@@ -634,7 +660,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         this.carrierType = "volume";
     }
 
-    private final static String[] ER = new String[]{
+    private final static String[] ER = new String[] {
             "Elektronische Ressource"
     };
 
@@ -687,7 +713,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         return d2Str.length() + d2Str + deltaStr.length() + deltaStr + sb.toString();
     }
 
-    private void findCountry() {
+    protected void findCountry() {
         Object o = getAnyObject("publishingCountry.isoCountryCodesSource");
         if (o instanceof List) {
             this.country = (List<String>) o;
@@ -702,7 +728,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         }
     }
 
-    private Map<String, Object> makeIdentifiers() {
+    protected void makeIdentifiers() {
         Map<String, Object> m = newHashMap();
         // get and convert all ISSN
         Object o = map.get("IdentifierISSN");
@@ -726,9 +752,8 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
             m.put("coden", o);
         }
         // TODO more identifiers?
-        return m;
+        this.identifiers = m;
     }
-
 
     /**
      * Iterate through relations. Check for DNB IDs and remember as internal IDs.
@@ -915,10 +940,10 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         if (isSupplement()) {
             builder.field("supplement", isSupplement());
         }
-        // add information for linking
+        // list external relations for linking
         synchronized (externalRelations) {
             SetMultimap<String, String> map = externalRelations;
-            if (map != null && !map.isEmpty()) {
+            if (!map.isEmpty()) {
                 builder.startArray("relations");
                 for (String rel : map.keySet()) {
                     for (String relid : map.get(rel)) {
@@ -935,17 +960,33 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         if (hasLinks()) {
             builder.array("links", getLinks());
         }
+        // list monographic volumes
+        if (!volumeIDs.isEmpty()) {
+            builder.array("volumeids", volumeIDs);
+        }
+        if (!volumes.isEmpty()) {
+            synchronized (volumes) {
+                builder.startArray("volumes");
+                int count = 0;
+                for (Volume volume : volumes) {
+                    volume.build(builder, tag, null);
+                    count++;
+                }
+                builder.endArray();
+                builder.field("volumescount", count);
+            }
+        }
         builder.endObject();
         return id;
     }
 
-    public String buildVolume(XContentBuilder builder, String tag, String parentIdentifier,
-                              Integer date, Set<Holding> holdings)
+    public String buildHoldingsByDate(XContentBuilder builder, String tag, String parentIdentifier,
+                                      Integer date, Set<Holding> holdings)
             throws IOException {
         String id = tag != null ? tag + "." + parentIdentifier : parentIdentifier;
         builder.startObject()
                 .field("@id", id)
-                .field("@type", "Volume")
+                .field("@type", "DateHoldings")
                 .fieldIfNotNull("@tag", tag);
         if (date != -1) {
             builder.field("date", date);
@@ -1004,8 +1045,8 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         return id;
     }
 
-    public String buildHolding(XContentBuilder builder, String tag, String parentIdentifier,
-                               String isil, Set<Holding> holdings)
+    public String buildHoldingsByISIL(XContentBuilder builder, String tag, String parentIdentifier,
+                                      String isil, Set<Holding> holdings)
             throws IOException {
         if (holdings == null || holdings.isEmpty()) {
             return null;
@@ -1013,7 +1054,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         String id = tag != null ? tag + "." + parentIdentifier : parentIdentifier;
         builder.startObject()
                 .field("@id", id)
-                .field("@type", "Holding")
+                .field("@type", "Holdings")
                 .fieldIfNotNull("@tag", tag)
                 .field("isil", isil);
         if (hasLinks()) {
@@ -1021,7 +1062,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         }
         builder.field("servicecount", holdings.size())
                 .startArray("service");
-        for (Holding holding : holdings) {
+        for (Holding holding : unique(holdings)) {
             builder.startObject()
                     .field("@id", holding.identifier())
                     .field("@type", "Service")
@@ -1044,19 +1085,30 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
 
     /**
      * Iterate through holdings and complete a new list that contains
-     * unique holdings.
+     * unified holdings, with the most recent service settings.
      *
      * @param holdings the holdings
-     * @return unique holdings
+     * @return the unified holdings
      */
     private Set<Holding> unique(Set<Holding> holdings) {
-        Set<Holding> newHoldings = newTreeSet(Holding.getRoutingComparator());
+        Set<Holding> newHoldings = newTreeSet();
         for (Holding holding : holdings) {
-            if (holding instanceof License) {
-                Holding other = holding.getSame(holdings);
-                if (other != null) {
+            if (holding instanceof Indicator) {
+                // check if there are other licenses that match indicator
+                Collection<Holding> other = holding.getSame(holdings);
+                if (other.isEmpty() || other.size() == 1) {
                     newHoldings.add(holding);
+                } else {
+                    // move most recent license info
+                    for (Holding h : other) {
+                        h.servicetype = holding.servicetype;
+                        h.servicemode = holding.servicemode;
+                        h.servicedistribution = holding.servicedistribution;
+                        h.servicecomment = holding.servicecomment;
+                    }
                 }
+            } else {
+                newHoldings.add(holding);
             }
         }
         return newHoldings;
@@ -1072,27 +1124,9 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
 
     @Override
     public boolean equals(Object other) {
-        return toString().equals(other.toString());
+        return other instanceof Manifestation && toString().equals(other.toString());
     }
 
-    @Override
-    public int hashCode() {
-        return toString().hashCode();
-    }
-
-    @Override
-    public int compareTo(Manifestation m) {
-        return externalID.compareTo(m.externalID());
-    }
-
-    public static Comparator<Manifestation> getKeyComparator() {
-        return new Comparator<Manifestation>() {
-            @Override
-            public int compare(Manifestation m1, Manifestation m2) {
-                return m2.getKey().compareTo(m1.getKey());
-            }
-        };
-    }
 
     private String makeTimelineKey() {
         Integer d1 = firstDate() == null ? currentYear : firstDate();
@@ -1128,13 +1162,22 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         }
     }
 
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
+
+    @Override
+    public int compareTo(Manifestation m) {
+        return externalID.compareTo(m.externalID());
+    }
+
+    public static Comparator<Manifestation> getKeyComparator() {
+        return (m1, m2) -> m2.getKey().compareTo(m1.getKey());
+    }
+
     public static Comparator<Manifestation> getTimeComparator() {
-        return new Comparator<Manifestation>() {
-            @Override
-            public int compare(Manifestation m1, Manifestation m2) {
-                return m1.timelineKey.compareTo(m2.timelineKey);
-            }
-        };
+        return (m1, m2) -> m1.timelineKey.compareTo(m2.timelineKey);
     }
 }
 

@@ -45,7 +45,7 @@ import org.xbib.util.DateUtil;
 import org.xbib.oai.client.identify.IdentifyRequest;
 import org.xbib.oai.client.identify.IdentifyResponseListener;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
-import org.xbib.oai.xml.MetadataHandler;
+import org.xbib.oai.xml.SimpleMetadataHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -70,7 +70,7 @@ public class DNBClientTest {
                 .setMetadataPrefix("PicaPlus-xml");
         //final XmlContentParser reader = new XmlContentParser();
         final AtomicLong count = new AtomicLong(0L);
-        MetadataHandler metadataHandler = new MetadataHandler() {
+        SimpleMetadataHandler simpleMetadataHandler = new SimpleMetadataHandler() {
             @Override
             public void startDocument() throws SAXException {
                 logger.debug("startDocument");
@@ -107,7 +107,7 @@ public class DNBClientTest {
         FileWriter sw = new FileWriter(file);
         do {
             try {
-                request.addHandler(metadataHandler);
+                request.addHandler(simpleMetadataHandler);
                 ListRecordsListener listener = new ListRecordsListener(request);
                 request.prepare().execute(listener).waitFor();
                 if (listener.getResponse() != null) {

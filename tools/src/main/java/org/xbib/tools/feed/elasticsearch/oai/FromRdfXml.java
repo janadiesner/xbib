@@ -38,7 +38,7 @@ import org.xbib.oai.client.OAIClient;
 import org.xbib.oai.client.OAIClientFactory;
 import org.xbib.oai.client.listrecords.ListRecordsListener;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
-import org.xbib.oai.xml.MetadataHandler;
+import org.xbib.oai.xml.SimpleMetadataHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentBuilder;
@@ -98,8 +98,8 @@ public class FromRdfXml extends Feeder {
         RdfContentBuilder builder = routeRdfXContentBuilder(params);
         RdfXmlContentParser parser = new RdfXmlContentParser((InputStream)null);
         parser.setBuilder(builder);
-        MetadataHandler metadataHandler = new MyHandler(params, builder, parser.getHandler());
-        request.addHandler(metadataHandler);
+        SimpleMetadataHandler simpleMetadataHandler = new MyHandlerSimple(params, builder, parser.getHandler());
+        request.addHandler(simpleMetadataHandler);
         ListRecordsListener listener = new ListRecordsListener(request);
         do {
             try {
@@ -116,7 +116,7 @@ public class FromRdfXml extends Feeder {
         client.close();
     }
 
-    private class MyHandler extends MetadataHandler {
+    private class MyHandlerSimple extends SimpleMetadataHandler {
 
         final XmlHandler handler;
 
@@ -124,7 +124,7 @@ public class FromRdfXml extends Feeder {
 
         final RdfContentBuilder builder;
 
-        MyHandler(RouteRdfXContentParams params, RdfContentBuilder builder, XmlHandler handler) {
+        MyHandlerSimple(RouteRdfXContentParams params, RdfContentBuilder builder, XmlHandler handler) {
             this.handler = handler;
             this.params = params;
             this.builder = builder;

@@ -54,32 +54,37 @@ public class ListRecordsFilterReader extends XMLFilterReader {
     public void startElement(String uri, String localname, String qname, Attributes atts) throws SAXException {
         super.startElement(uri, localname, qname, atts);
         if (OAIConstants.NS_URI.equals(uri)) {
-            if (localname.equals("header")) {
-                header = new RecordHeader();
-            } else if (localname.equals("error")) {
-                response.setError(atts.getValue("code"));
-            } else if (localname.equals("metadata")) {
-                inMetadata = true;
-                for (MetadataHandler mh : request.getHandlers()) {
-                    mh.startDocument();
-                }
-            } else if (localname.equals("resumptionToken")) {
-                try {
-                    token = ResumptionToken.newToken(null);
-                    String cursor = atts.getValue("cursor");
-                    if (cursor != null) {
-                        token.setCursor(Integer.parseInt(cursor));
+            switch (localname) {
+                case "header":
+                    header = new RecordHeader();
+                    break;
+                case "error":
+                    response.setError(atts.getValue("code"));
+                    break;
+                case "metadata":
+                    inMetadata = true;
+                    for (MetadataHandler mh : request.getHandlers()) {
+                        mh.startDocument();
                     }
-                    String completeListSize = atts.getValue("completeListSize");
-                    if (completeListSize != null) {
-                        token.setCompleteListSize(Integer.parseInt(completeListSize));
+                    break;
+                case "resumptionToken":
+                    try {
+                        token = ResumptionToken.newToken(null);
+                        String cursor = atts.getValue("cursor");
+                        if (cursor != null) {
+                            token.setCursor(Integer.parseInt(cursor));
+                        }
+                        String completeListSize = atts.getValue("completeListSize");
+                        if (completeListSize != null) {
+                            token.setCompleteListSize(Integer.parseInt(completeListSize));
+                        }
+                        if (!token.isComplete()) {
+                            request.setResumptionToken(token);
+                        }
+                    } catch (Exception e) {
+                        throw new SAXException(e);
                     }
-                    if (!token.isComplete()) {
-                        request.setResumptionToken(token);
-                    }
-                } catch (Exception e) {
-                    throw new SAXException(e);
-                }
+                    break;
             }
             return;
         }
@@ -94,43 +99,53 @@ public class ListRecordsFilterReader extends XMLFilterReader {
     public void endElement(String nsURI, String localname, String qname) throws SAXException {
         super.endElement(nsURI, localname, qname);
         if (OAIConstants.NS_URI.equals(nsURI)) {
-            if (localname.equals("header")) {
-                for (MetadataHandler mh : request.getHandlers()) {
-                    mh.setHeader(header);
-                }
-                header = new RecordHeader();
-            } else if (localname.equals("metadata")) {
-                for (MetadataHandler mh : request.getHandlers()) {
-                    mh.endDocument();
-                }
-                inMetadata = false;
-            } else if (localname.equals("responseDate")) {
-                response.setDate(DateUtil.parseDateISO(content.toString()));
-            } else if (localname.equals("resumptionToken")) {
-                if (token != null && content != null && content.length() > 0) {
-                    token.setValue(content.toString());
-                    // feedback to request
-                    request.setResumptionToken(token);
-                } else {
-                    // some servers send a null or an empty token as last token
-                    token = null;
-                    request.setResumptionToken(null);
-                }
-            } else if (localname.equals("identifier")) {
-                if (header != null && content != null && content.length() > 0) {
-                    String id = content.toString().trim();
-                    header.setIdentifier(id);
-                }
-            } else if (localname.equals("datestamp")) {
-                if (header != null && content != null && content.length() > 0) {
-                    header.setDatestamp(DateUtil.parseDateISO(content.toString().trim()));
-                }
-            } else if (localname.equals("setSpec")) {
-                if (header != null && content != null && content.length() > 0) {
-                    header.setSetspec(content.toString().trim());
-                }
+            switch (localname) {
+                case "header":
+                    for (MetadataHandler mh : request.getHandlers()) {
+                        mh.setHeader(header);
+                    }
+                    header = new RecordHeader();
+                    break;
+                case "metadata":
+                    for (MetadataHandler mh : request.getHandlers()) {
+                        mh.endDocument();
+                    }
+                    inMetadata = false;
+                    break;
+                case "responseDate":
+                    response.setDate(DateUtil.parseDateISO(content.toString()));
+                    break;
+                case "resumptionToken":
+                    if (token != null && content != null && content.length() > 0) {
+                        token.setValue(content.toString());
+                        // feedback to request
+                        request.setResumptionToken(token);
+                    } else {
+                        // some servers send a null or an empty token as last token
+                        token = null;
+                        request.setResumptionToken(null);
+                    }
+                    break;
+                case "identifier":
+                    if (header != null && content != null && content.length() > 0) {
+                        String id = content.toString().trim();
+                        header.setIdentifier(id);
+                    }
+                    break;
+                case "datestamp":
+                    if (header != null && content != null && content.length() > 0) {
+                        header.setDatestamp(DateUtil.parseDateISO(content.toString().trim()));
+                    }
+                    break;
+                case "setSpec":
+                    if (header != null && content != null && content.length() > 0) {
+                        header.setSetspec(content.toString().trim());
+                    }
+                    break;
             }
-            content.setLength(0);
+            if (content != null) {
+                content.setLength(0);
+            }
             return;
         }
         if (inMetadata) {

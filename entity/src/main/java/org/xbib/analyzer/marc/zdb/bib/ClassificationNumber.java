@@ -32,11 +32,35 @@
 package org.xbib.analyzer.marc.zdb.bib;
 
 import org.xbib.entities.marc.MARCEntity;
+import org.xbib.entities.marc.MARCEntityQueue;
+import org.xbib.rdf.Resource;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class ClassificationNumber extends MARCEntity {
+
     private final static ClassificationNumber instance = new ClassificationNumber();
     
     public static ClassificationNumber getInstance() {
         return instance;
+    }
+
+    private Map<String,Object> ddc;
+
+    @Override
+    public MARCEntity setSettings(Map params) {
+        super.setSettings(params);
+        ddc = (Map<String, Object>) getSettings().get("ddc");
+        return this;
+    }
+
+    @Override
+    public String data(MARCEntityQueue.MARCWorker worker,
+                       String predicate, Resource resource, String property, String value) throws IOException {
+        if (ddc != null && ddc.containsKey(value)) {
+            resource.add(property + "Text", (String)ddc.get(value));
+        }
+        return value;
     }
 }

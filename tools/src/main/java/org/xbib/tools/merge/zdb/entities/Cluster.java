@@ -136,13 +136,17 @@ public class Cluster extends TreeSet<Manifestation> {
                 }
                 if (!invalid.isEmpty()) {
                     logger.debug("dates {} in holdings for {} out of range {}-{}",
-                            invalid, holding.parent(), firstDate, lastDate);
+                            invalid, holding.parents(), firstDate, lastDate);
                 }
             }
         }
     }
 
-    public void setLicensesAndIndicators(Set<License> licenses) {
+    /**
+     * Reorder licenses by date, sort out those out of range
+     * @param licenses a set of licenses
+     */
+    public void validateByDateRange(Set<License> licenses) {
         licensesByDate = newTreeMap();
         if (licenses == null) {
             return;
@@ -167,7 +171,7 @@ public class Cluster extends TreeSet<Manifestation> {
             }
             if (!invalid.isEmpty()) {
                 logger.debug("dates {} in license for {} out of range {}-{}",
-                        invalid, license.parent(), firstDate, lastDate);
+                        invalid, license.parents(), firstDate, lastDate);
             }
         }
     }

@@ -33,6 +33,7 @@ package org.xbib.entities.marc.dialects.pica;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.Normalizer;
 import java.util.Collections;
 import java.util.Set;
@@ -42,6 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
+import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
 import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.marc.FieldList;
@@ -54,16 +56,19 @@ public class DNBPICAElementsTest extends Assert {
 
     private static final Logger logger = LogManager.getLogger(DNBPICAElementsTest.class.getName());
 
+    @Test
     public void testPicaSetup() throws Exception {
-        PicaEntityQueue queue = new PicaEntityQueue("/org/xbib/analyzer/pica/zdb/bibdat.json");
+        PicaEntityQueue queue = new PicaEntityQueue("org.xbib.analyzer.pica.zdb.bibdat",
+                1,
+                "/org/xbib/analyzer/pica/zdb/bibdat.json");
         queue.execute();
         queue.close();
     }
 
-
+    @Test
     public void testZdbBib() throws Exception {
         final Set<String> unmapped = Collections.synchronizedSet(new TreeSet<String>());
-        final MyQueue queue = new MyQueue("/org/xbib/analyzer/pica/zdb/bibdat.json");
+        final MyQueue queue = new MyQueue();
         queue.setUnmappedKeyListener((id, key) -> {
             unmapped.add(key.toString());
             logger.warn("record {}: unknown key {}", id, key);
@@ -74,7 +79,9 @@ public class DNBPICAElementsTest extends Assert {
                 .addListener(queue)
                 .addListener(new OurAdapter());
         final InputStream in = getClass().getResourceAsStream("zdb-oai-bib.xml");
-        new DNBPICAXmlReader().setListener(kv).parse(in);
+        DNBPICAXmlReader reader = new DNBPICAXmlReader(new InputStreamReader(in, "UTF-8"));
+        reader.setMarcXchangeListener(kv);
+        reader.parse();
         in.close();
         queue.close();
         logger.info("counter={}, detected unknown elements = {}", queue.getCounter(), unmapped);
@@ -119,8 +126,10 @@ public class DNBPICAElementsTest extends Assert {
 
         final AtomicInteger counter = new AtomicInteger();
 
-        public MyQueue(String path) {
-            super(path);
+        public MyQueue() {
+            super("org.xbib.analyzer.pica.zdb.bibdat",
+                    1,
+                    "/org/xbib/analyzer/pica/zdb/bibdat.json");
         }
 
         @Override

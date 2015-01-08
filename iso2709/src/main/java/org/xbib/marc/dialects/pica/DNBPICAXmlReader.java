@@ -49,9 +49,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * PICA XML parser
@@ -59,7 +59,11 @@ import java.io.Reader;
 public class DNBPICAXmlReader
         implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler, DNBPICAConstants, MarcXchangeListener {
 
+    private final Reader reader;
+
     private ContentHandler contentHandler;
+
+    private Map<String,MarcXchangeListener> listeners = new HashMap<String,MarcXchangeListener>();
 
     private MarcXchangeListener listener;
 
@@ -67,21 +71,26 @@ public class DNBPICAXmlReader
 
     private StringBuilder content = new StringBuilder();
 
+    public DNBPICAXmlReader(Reader reader) {
+        this.reader = reader;
+    }
+
     public DNBPICAXmlReader setContentHandler(ContentHandler handler) {
         this.contentHandler = handler;
         return this;
     }
 
-    public DNBPICAXmlReader setListener(MarcXchangeListener listener) {
-        this.listener = listener;
+    public DNBPICAXmlReader addListener(String type, MarcXchangeListener listener) {
+        this.listeners.put(type, listener);
         return this;
     }
 
-    public void parse(InputStream in) throws IOException {
-        parse(new InputStreamReader(in, "UTF-8"));
+    public DNBPICAXmlReader setMarcXchangeListener(MarcXchangeListener listener) {
+        this.listeners.put("XML", listener);
+        return this;
     }
 
-    public void parse(Reader reader) throws IOException {
+    public void parse() throws IOException {
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setNamespaceAware(true);
@@ -110,6 +119,7 @@ public class DNBPICAXmlReader
 
     @Override
     public void beginRecord(String format, String type) {
+        this.listener = listeners.get(type != null ? type : "XML");
         if (listener != null) {
             listener.beginRecord(format, type);
         }
@@ -205,7 +215,7 @@ public class DNBPICAXmlReader
             case RECORD: {
                 // get format and type
                 String format = "Pica";
-                String type = " XML";
+                String type = "XML";
                 beginRecord(format, type);
                 break;
             }

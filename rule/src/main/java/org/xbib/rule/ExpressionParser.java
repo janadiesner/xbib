@@ -6,14 +6,13 @@ public class ExpressionParser {
 
     private static final Operations operations = Operations.INSTANCE;
 
-    public static Expression fromString(String expr) {
+    public static Expression parse(String expr) {
         Stack<Expression> stack = new Stack<>();
         String[] tokens = expr.split("\\s");
         for (int i = 0; i < tokens.length - 1; i++) {
-            Operation op = operations.getOperation(tokens[i]);
+            Operator op = operations.getOperation(tokens[i]);
             if (op != null) {
-                op = op.copy();
-                i = op.parse(tokens, i, stack);
+                i = op.copy().execute(tokens, i, stack);
             }
         }
         return stack.pop();

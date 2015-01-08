@@ -2,22 +2,21 @@ package org.xbib.rule;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class Rule {
     private List<Expression> expressions;
-    private ActionDispatcher dispatcher;
+    private Dispatcher dispatcher;
 
     public static class Builder {
         private List<Expression> expressions = new ArrayList<>();
-        private ActionDispatcher dispatcher = new NullActionDispatcher();
+        private Dispatcher dispatcher = new NullDispatcher();
 
-        public Builder withExpression(Expression expr) {
+        public Builder with(Expression expr) {
             expressions.add(expr);
             return this;
         }
 
-        public Builder withDispatcher(ActionDispatcher dispatcher) {
+        public Builder then(Dispatcher dispatcher) {
             this.dispatcher = dispatcher;
             return this;
         }
@@ -27,17 +26,17 @@ public class Rule {
         }
     }
 
-    private Rule(List<Expression> expressions, ActionDispatcher dispatcher) {
+    private Rule(List<Expression> expressions, Dispatcher dispatcher) {
         this.expressions = expressions;
         this.dispatcher = dispatcher;
     }
 
-    public boolean apply(RuleContext ruleContext, Map<String, ?> bindings) {
+    public boolean apply(RuleContext ruleContext, Binding binding) {
         boolean eval = false;
         for (Expression expression : expressions) {
-            eval = expression.interpret(bindings);
+            eval = expression.interpret(binding);
             if (eval) {
-                dispatcher.fire();
+                dispatcher.fire(expression, binding);
             }
         }
         return eval;

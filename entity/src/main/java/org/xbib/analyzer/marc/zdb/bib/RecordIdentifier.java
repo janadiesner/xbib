@@ -48,8 +48,15 @@ public class RecordIdentifier extends MARCEntity {
     @Override
     public boolean fields(MARCEntityQueue.MARCWorker worker,
                           FieldList fields, String value) throws IOException {
-        super.fields(worker, fields, value);
+        if (value == null || value.isEmpty()) {
+            return false;
+        }
+        String predicate = getClass().getSimpleName();
+        if (getSettings().containsKey("_predicate")) {
+            predicate = (String) getSettings().get("_predicate");
+        }
         worker.state().setRecordNumber(value);
+        worker.state().getResource().add(predicate, value.toLowerCase());
         return false;
     }
 }

@@ -35,10 +35,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xbib.csv.CSVGenerator;
 import org.xbib.iri.IRI;
-import org.xbib.oai.rdf.RdfMetadataHandler;
+import org.xbib.oai.rdf.RdfSimpleMetadataHandler;
 import org.xbib.oai.rdf.RdfResourceHandler;
-import org.xbib.oai.xml.MetadataHandler;
-import org.xbib.oai.xml.XmlMetadataHandler;
+import org.xbib.oai.xml.SimpleMetadataHandler;
+import org.xbib.oai.xml.XmlSimpleMetadataHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentBuilder;
@@ -101,11 +101,11 @@ public class FromOAI2CSV extends OAIHarvester {
         };
     }
 
-    protected MetadataHandler xmlMetadataHandler() {
-        return new XmlPacketHandler().setWriter(new StringWriter());
+    protected SimpleMetadataHandler xmlMetadataHandler() {
+        return new XmlPacketHandlerSimple().setWriter(new StringWriter());
     }
 
-    protected class XmlPacketHandler extends XmlMetadataHandler {
+    protected class XmlPacketHandlerSimple extends XmlSimpleMetadataHandler {
 
         public void endDocument() throws SAXException {
             super.endDocument();
@@ -114,8 +114,8 @@ public class FromOAI2CSV extends OAIHarvester {
         }
     }
 
-    protected MetadataHandler ntripleMetadataHandler() {
-        final RdfMetadataHandler metadataHandler = new RdfMetadataHandler();
+    protected SimpleMetadataHandler ntripleMetadataHandler() {
+        final RdfSimpleMetadataHandler metadataHandler = new RdfSimpleMetadataHandler();
         final RdfResourceHandler resourceHandler = rdfResourceHandler();
         try {
             RdfContentBuilder builder = ntripleBuilder();

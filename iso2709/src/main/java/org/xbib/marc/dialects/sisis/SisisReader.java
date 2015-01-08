@@ -31,6 +31,7 @@
  */
 package org.xbib.marc.dialects.sisis;
 
+import org.xbib.marc.FieldReader;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.event.EventListener;
@@ -52,7 +53,9 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SisisReader implements XMLReader, MarcXchangeConstants {
+public class SisisReader implements FieldReader, XMLReader, MarcXchangeConstants {
+
+    private final Reader reader;
 
     /**
      * The format property
@@ -126,7 +129,13 @@ public class SisisReader implements XMLReader, MarcXchangeConstants {
         }
     };
 
-    public SisisReader() {
+
+    public SisisReader(InputStream in, String encoding) throws IOException {
+        this(new InputStreamReader(in, encoding));
+    }
+
+    public SisisReader(Reader reader) {
+        this.reader = reader;
         this.adapter = new SisisSaxAdapter();
     }
 
@@ -271,27 +280,15 @@ public class SisisReader implements XMLReader, MarcXchangeConstants {
                 .setTransformData(transformData);
     }
 
-    public SisisFieldStreamReader stream(InputStream in) throws IOException {
-        return setup(adapter).setInputStream(in).sisisFieldStream();
-    }
-
-    public SisisFieldStreamReader mappedStream(InputStream in) throws IOException {
-        return setup(adapter).setInputStream(in).sisisMappedFieldStream();
-    }
-
-    public SisisFieldStreamReader stream(Reader reader) throws IOException {
+    public SisisFieldStreamReader stream() throws IOException {
         return setup(adapter).setReader(reader).sisisFieldStream();
     }
 
-    public SisisFieldStreamReader mappedStream(Reader reader) throws IOException {
+    public SisisFieldStreamReader mappedStream() throws IOException {
         return setup(adapter).setReader(reader).sisisMappedFieldStream();
     }
 
-    public void parse(InputStream in) throws IOException {
-        parse(new InputStreamReader(in, "UTF-8"));
-    }
-
-    public void parse(Reader reader) throws IOException {
+    public void parse() throws IOException {
         parse(new InputSource(reader));
     }
 

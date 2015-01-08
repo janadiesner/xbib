@@ -37,6 +37,7 @@ import org.xbib.marc.MarcXchangeListener;
 
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class DNBPICAXmlReaderTest {
 
@@ -99,9 +100,9 @@ public class DNBPICAXmlReaderTest {
             }
 
         };
-        DNBPICAXmlReader reader = new DNBPICAXmlReader();
-        reader.setListener(listener);
-        reader.parse(in);
+        DNBPICAXmlReader reader = new DNBPICAXmlReader(new InputStreamReader(in, "UTF-8"));
+        reader.setMarcXchangeListener(listener);
+        reader.parse();
 
         FileWriter fw = new FileWriter("zdb-oai-bib-keyvalue.txt");
         fw.write(sb.toString());

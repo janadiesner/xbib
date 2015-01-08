@@ -32,6 +32,7 @@
 package org.xbib.marc.xml.stream;
 
 import org.xbib.marc.Field;
+import org.xbib.marc.FieldReader;
 import org.xbib.marc.MarcXchangeConstants;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.event.FieldEvent;
@@ -50,7 +51,6 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventConsumer;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -65,7 +65,9 @@ import java.util.Stack;
 /**
  * The MarcXchange event consumer listens to StaX events and converts them to MarcXchange events
  */
-public class MarcXchangeReader implements XMLEventConsumer, MarcXchangeConstants, MarcXchangeListener {
+public class MarcXchangeReader implements FieldReader, XMLEventConsumer, MarcXchangeConstants, MarcXchangeListener {
+
+    private final Reader reader;
 
     private Stack<Field> stack = new Stack<Field>();
 
@@ -97,13 +99,19 @@ public class MarcXchangeReader implements XMLEventConsumer, MarcXchangeConstants
 
     private boolean transform = false;
 
-    private Integer bufferSize;
-
     private Set<String> validNamespaces = new HashSet<String>() {{
         add(MARCXCHANGE_V1_NS_URI);
         add(MARCXCHANGE_V2_NS_URI);
         add(MARC21_NS_URI);
     }};
+
+    public MarcXchangeReader(InputStream in) throws IOException {
+        this(new InputStreamReader(in, "UTF-8"));
+    }
+
+    public MarcXchangeReader(Reader reader) {
+        this.reader = reader;
+    }
 
     public MarcXchangeReader setMarcXchangeListener(String type, MarcXchangeListener listener) {
         this.listeners.put(type, listener);
@@ -135,11 +143,6 @@ public class MarcXchangeReader implements XMLEventConsumer, MarcXchangeConstants
         return this;
     }
 
-    public MarcXchangeReader setBufferSize(Integer bufferSize) {
-        this.bufferSize = bufferSize;
-        return this;
-    }
-
     public MarcXchangeReader addNamespace(String uri) {
         this.validNamespaces.add(uri);
         return this;
@@ -160,16 +163,9 @@ public class MarcXchangeReader implements XMLEventConsumer, MarcXchangeConstants
         return this;
     }
 
-    public void parse(InputStream in) throws IOException {
-        parse(new InputStreamReader(in, "UTF-8"));
-    }
-
-    public void parse(Reader reader) throws IOException {
+    public void parse() throws IOException {
         try {
             XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-            if (bufferSize != null) {
-                reader = new BufferedReader(reader, bufferSize);
-            }
             XMLEventReader xmlEventReader = inputFactory.createXMLEventReader(reader);
             while (xmlEventReader.hasNext()) {
                 add(xmlEventReader.nextEvent());

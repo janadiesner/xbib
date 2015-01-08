@@ -12,6 +12,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
 
@@ -39,7 +40,7 @@ public class MarcXmlTarReader extends AbstractTarReader {
 
     @Override
     protected void process(Packet packet) throws IOException {
-        MarcXchangeReader consumer = new MarcXchangeReader();
+        MarcXchangeReader consumer = new MarcXchangeReader((Reader)null);
         consumer.setMarcXchangeListener(listener);
         StringReader sr = new StringReader(packet.toString());
         try {

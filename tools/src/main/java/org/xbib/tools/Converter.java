@@ -176,7 +176,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
         return this;
     }
 
-    protected Converter<T, R, P> cleanup() {
+    protected Converter<T, R, P> cleanup() throws IOException {
         return this;
     }
 

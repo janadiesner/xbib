@@ -36,6 +36,7 @@ import org.apache.logging.log4j.Logger;
 import org.xbib.entities.Entity;
 import org.xbib.marc.FieldList;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class PicaEntity implements Entity {
@@ -61,7 +62,7 @@ public class PicaEntity implements Entity {
      * @param value the value
      */
     public void fields(PicaEntityQueue.PicaKeyValueWorker worker,
-                       FieldList fields, String value) {
+                       FieldList fields, String value) throws IOException {
         // should be overridden
     }
 

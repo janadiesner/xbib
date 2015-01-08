@@ -38,6 +38,7 @@ import org.xbib.marc.FieldList;
 import java.io.IOException;
 
 public class RecordIdentifier extends MARCEntity {
+
     private final static RecordIdentifier instance = new RecordIdentifier();
 
     public static RecordIdentifier getInstance() {
@@ -47,12 +48,15 @@ public class RecordIdentifier extends MARCEntity {
     @Override
     public boolean fields(MARCEntityQueue.MARCWorker worker,
                           FieldList fields, String value) throws IOException {
+        if (value == null || value.isEmpty()) {
+            return false;
+        }
         String predicate = getClass().getSimpleName();
         if (getSettings().containsKey("_predicate")) {
             predicate = (String) getSettings().get("_predicate");
         }
         worker.state().setRecordNumber(value);
-        worker.state().getResource().add(predicate, value);
+        worker.state().getResource().add(predicate, value.toLowerCase());
         return false;
     }
 }

@@ -79,10 +79,9 @@ public class MARCEntity implements Entity, MarcXchangeConstants {
      * Transform field data
      */
     public String data(MARCEntityQueue.MARCWorker worker,
-                       String resourcePredicate, Resource resource, String property, String value) {
+                       String resourcePredicate, Resource resource, String property, String value) throws IOException {
         return value;
     }
-
 
     public MARCEntity facetize(MARCEntityQueue.MARCWorker worker, Field field) {
         return this;

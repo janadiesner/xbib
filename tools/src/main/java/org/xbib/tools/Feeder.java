@@ -43,7 +43,6 @@ import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
 import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineRequest;
-import org.xbib.util.DateUtil;
 import org.xbib.util.DurationFormatUtil;
 import org.xbib.util.FormatUtil;
 
@@ -71,30 +70,39 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
         return this;
     }
 
+    protected String getIndex() {
+        return settings.get("index");
+    }
+
+    protected String getType() {
+        return settings.get("type");
+    }
+
     protected Ingest createIngest() {
         return settings.getAsBoolean("mock", false) ?
                 new MockIngestTransportClient() :
-                "ingest".equals(settings.get("client")) ?
-                        new IngestTransportClient() :
+                "ingest".equals(settings.get("client")) ? new IngestTransportClient() :
                         new BulkTransportClient();
     }
 
     @Override
     protected Feeder<T, R, P> prepare() throws IOException {
         super.prepare();
-        Integer maxbulkactions = settings.getAsInt("maxbulkactions", 1000);
-        Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
-                Runtime.getRuntime().availableProcessors());
-        ingest = createIngest();
-        ingest.maxActionsPerBulkRequest(maxbulkactions)
-                .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
-                .maxRequestWait(TimeValue.timeValueSeconds(60));
-        createIndex(ingest);
+        if (ingest == null) {
+            Integer maxbulkactions = settings.getAsInt("maxbulkactions", 1000);
+            Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
+                    Runtime.getRuntime().availableProcessors());
+            ingest.maxActionsPerBulkRequest(maxbulkactions)
+                    .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
+                    .maxRequestWait(TimeValue.timeValueSeconds(60));
+            ingest = createIngest();
+        }
+        createIndex(getIndex());
         return this;
     }
 
     @Override
-    protected Feeder<T, R, P> cleanup() {
+    protected Feeder<T, R, P> cleanup() throws IOException {
         super.cleanup();
         if (ingest != null) {
             try {
@@ -115,62 +123,57 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
 
     @Override
     protected void writeMetrics(MeterMetric metric, Writer writer) throws Exception {
-        // TODO write output metrics, index output metrics
         long docs = metric.count();
-        long bytes = 0L;
+        double mean = metric.meanRate();
+        double oneminute = metric.oneMinuteRate();
+        double fiveminute = metric.fiveMinuteRate();
+        double fifteenminute = metric.fifteenMinuteRate();
+        long bytes = ingest.getState() != null ?
+                ingest.getState().getTotalIngestSizeInBytes().count() : 0L;
         long elapsed = metric.elapsed() / 1000000;
-        double dps = docs * 1000 / elapsed;
+        String elapsedhuman = DurationFormatUtil.formatDurationWords(elapsed, true, true);
         double avg = bytes / (docs + 1); // avoid div by zero
-        double mbps = (bytes * 1000 / elapsed) / (1024 * 1024);
+        double mbps = (bytes * 1000.0 / elapsed) / (1024.0 * 1024.0);
         NumberFormat formatter = NumberFormat.getNumberInstance();
-        logger.info("Indexing complete. {} inputs, {} docs, {} = {} ms, {} = {} bytes, {} = {} avg getSize, {} dps, {} MB/s",
-                input.size(),
+        logger.info("indexing metrics: elapsed {}, {} docs, {} bytes, {} avgsize, {} MB/s, {} ({} {} {})",
+                elapsedhuman,
                 docs,
-                DurationFormatUtil.formatDurationWords(elapsed, true, true),
-                elapsed,
-                bytes,
                 FormatUtil.convertFileSize(bytes),
                 FormatUtil.convertFileSize(avg),
-                formatter.format(avg),
-                formatter.format(dps),
-                formatter.format(mbps));
-
-        for (Pipeline p : executor.getPipelines()) {
-            logger.info("pipeline {}, started {}, ended {}, took {}, count = {}",
-                    p,
-                    DateUtil.formatDateISO(p.getMetric().startedAt()),
-                    DateUtil.formatDateISO(p.getMetric().stoppedAt()),
-                    DurationFormatUtil.formatDurationWords(p.getMetric().elapsed() / 1000000, true, true),
-                    p.getMetric().count());
-        }
+                formatter.format(mbps),
+                mean,
+                oneminute,
+                fiveminute,
+                fifteenminute
+        );
 
         if (writer != null) {
-            String metrics = String.format("Indexing complete. %d inputs, %d docs, %s = %d ms, %d = %s bytes, %s = %s avg getSize, %s dps, %s MB/s",
-                    input.size(),
+            String metrics = String.format("indexing metrics: elapsed %s, %d docs, %s bytes, %s avgsize, %s MB/s, %f (%f %f %f)",
+                    elapsedhuman,
                     docs,
-                    DurationFormatUtil.formatDurationWords(elapsed, true, true),
-                    elapsed,
-                    bytes,
                     FormatUtil.convertFileSize(bytes),
                     FormatUtil.convertFileSize(avg),
-                    formatter.format(avg),
-                    formatter.format(dps),
-                    formatter.format(mbps));
+                    formatter.format(mbps),
+                    mean,
+                    oneminute,
+                    fiveminute,
+                    fifteenminute
+            );
             writer.append(metrics);
         }
     }
 
-    protected Feeder createIndex(Ingest output) throws IOException {
-        output.newClient(ImmutableSettings.settingsBuilder()
+    protected Feeder createIndex(String index) throws IOException {
+        ingest.newClient(ImmutableSettings.settingsBuilder()
                 .put("cluster.name", settings.get("elasticsearch.cluster"))
                 .put("host", settings.get("elasticsearch.host"))
                 .put("port", settings.getAsInt("elasticsearch.port", 9300))
                 .put("sniff", settings.getAsBoolean("elasticsearch.sniff", false))
                 .build());
-        output.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
+        ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         try {
-            beforeIndexCreation(output);
-            output.newIndex(settings.get("index"));
+            beforeIndexCreation(ingest);
+            ingest.newIndex(index);
         } catch (Exception e) {
             if (!settings.getAsBoolean("ignoreindexcreationerror", false)) {
                 throw e;

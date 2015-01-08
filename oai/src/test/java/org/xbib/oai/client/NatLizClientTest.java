@@ -42,7 +42,7 @@ import org.xbib.io.Session;
 import org.xbib.io.archive.tar.TarConnectionFactory;
 import org.xbib.io.archive.tar.TarSession;
 import org.xbib.oai.client.listrecords.ListRecordsRequest;
-import org.xbib.oai.xml.XmlMetadataHandler;
+import org.xbib.oai.xml.XmlSimpleMetadataHandler;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class NatLizClientTest {
         session = connection.createSession();
         session.open(Session.Mode.WRITE);
 
-        final XmlMetadataHandler metadataHandler = new NatLizHandler()
+        final XmlSimpleMetadataHandler metadataHandler = new NatLizHandlerSimple()
                 .setWriter(new StringWriter());
 
         do {
@@ -96,7 +96,7 @@ public class NatLizClientTest {
         client.close();
     }
 
-    class NatLizHandler extends XmlMetadataHandler {
+    class NatLizHandlerSimple extends XmlSimpleMetadataHandler {
 
         public void endDocument() throws SAXException {
             super.endDocument();

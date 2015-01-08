@@ -33,13 +33,12 @@ package org.xbib.analyzer.pica.zdb.bibdat;
 
 import org.xbib.entities.marc.dialects.pica.PicaEntity;
 
-public class Identifier extends PicaEntity implements LibraryAddressProperties {
+public class Identifier extends PicaEntity {
     private final static Identifier instance = new Identifier();
     
     public static Identifier getInstance() {
         return instance;
     }
-
 }
 
 

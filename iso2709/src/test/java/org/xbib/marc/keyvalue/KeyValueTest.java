@@ -96,7 +96,7 @@ public class KeyValueTest extends StreamTester {
     @Test
     public void testDE605KeyValue() throws IOException, SAXException {
         InputStream in = getClass().getResource("DE-605-aleph500-publish.xml").openStream();
-        MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader()
+        MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader(in)
                 .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
 
         final StringWriter sw = new StringWriter();
@@ -127,7 +127,7 @@ public class KeyValueTest extends StreamTester {
 
                         })
         );
-        reader.parse(in);
+        reader.parse();
         assertStream(getClass().getResource("DE-605-aleph500-publish-keyvalue.txt").openStream(),
                 new ByteArrayInputStream(sw.toString().getBytes("UTF-8")));
     }
@@ -135,7 +135,7 @@ public class KeyValueTest extends StreamTester {
     @Test
     public void testDE605MappedKeyValue() throws IOException, SAXException {
         InputStream in = getClass().getResource("DE-605-aleph500-publish.xml").openStream();
-        MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader()
+        MarcXchangeFieldMapperReader reader = new MarcXchangeFieldMapperReader(in)
                 .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
 
         // transform MAB to MARC21
@@ -219,7 +219,7 @@ public class KeyValueTest extends StreamTester {
 
                         })
         );
-        reader.parse(in);
+        reader.parse();
         assertStream(getClass().getResource("DE-605-aleph500-publish-mapped-keyvalue.txt").openStream(),
                 new ByteArrayInputStream(sw.toString().getBytes("UTF-8")));
     }

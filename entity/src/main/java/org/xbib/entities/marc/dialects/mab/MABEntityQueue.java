@@ -40,7 +40,7 @@ import org.xbib.entities.marc.SubfieldValueMapper;
 import org.xbib.entities.support.ClasspathURLStreamHandler;
 import org.xbib.entities.support.IdentifierMapper;
 import org.xbib.entities.support.StatusCodeMapper;
-import org.xbib.entities.support.TSVClassifier;
+import org.xbib.entities.support.ConfigurableClassifier;
 import org.xbib.entities.support.ValueMaps;
 import org.xbib.iri.IRI;
 import org.xbib.marc.Field;
@@ -75,7 +75,7 @@ public class MABEntityQueue extends EntityQueue<MABEntityBuilderState, MABEntity
 
     private StatusCodeMapper statusMapper;
 
-    private TSVClassifier classifier;
+    private ConfigurableClassifier classifier;
 
     public MABEntityQueue(String packageName, String... paths) {
         this(packageName, new HashMap<String,Object>(), 1, paths);
@@ -146,7 +146,7 @@ public class MABEntityQueue extends EntityQueue<MABEntityBuilderState, MABEntity
 
     public MABEntityQueue addClassifier(String prefix, String isil, String classifierPath) throws IOException {
         if (classifier == null) {
-            classifier = new TSVClassifier();
+            classifier = new ConfigurableClassifier();
         }
         URL url = classifierPath.startsWith("classpath:") ?
                 new URL(null, classifierPath, new ClasspathURLStreamHandler()) :
@@ -398,7 +398,7 @@ public class MABEntityQueue extends EntityQueue<MABEntityBuilderState, MABEntity
             return newResource;
         }
 
-        public TSVClassifier classifier() {
+        public ConfigurableClassifier classifier() {
             return classifier;
         }
 
