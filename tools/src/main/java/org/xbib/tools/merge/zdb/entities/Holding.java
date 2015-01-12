@@ -37,11 +37,13 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
+import static com.google.common.collect.Sets.newHashSet;
 
 public class Holding implements Comparable<Holding> {
 
@@ -49,7 +51,7 @@ public class Holding implements Comparable<Holding> {
 
     protected String identifier;
 
-    protected List<String> parents = newLinkedList();
+    protected Set<String> parents = newHashSet();
 
     protected String isil;
 
@@ -171,7 +173,7 @@ public class Holding implements Comparable<Holding> {
         this.parents.add(parent);
     }
 
-    public List<String> parents() {
+    public Set<String> parents() {
         return parents;
     }
 
@@ -330,6 +332,7 @@ public class Holding implements Comparable<Holding> {
             license.remove("typeSource");
             license.remove("scopeSource");
             license.remove("chargeSource");
+            license.remove("accessSource");
             info.put("license", license);
         }
         return info;

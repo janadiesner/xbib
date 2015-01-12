@@ -33,7 +33,7 @@ package org.xbib.marc.dialects.pica.stream;
 
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.marc.dialects.pica.DNBPICAConstants;
+import org.xbib.marc.dialects.pica.DNBPicaConstants;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -52,7 +52,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
-public class DNBPICAXmlReader implements XMLEventConsumer, DNBPICAConstants, MarcXchangeListener {
+public class DNBPicaXmlReader implements XMLEventConsumer, DNBPicaConstants, MarcXchangeListener {
 
     private final Reader reader;
 
@@ -66,16 +66,16 @@ public class DNBPICAXmlReader implements XMLEventConsumer, DNBPICAConstants, Mar
 
     private boolean inRecord = false;
 
-    public DNBPICAXmlReader(Reader reader) {
+    public DNBPicaXmlReader(Reader reader) {
         this.reader = reader;
     }
 
-    public DNBPICAXmlReader addListener(String type, MarcXchangeListener listener) {
+    public DNBPicaXmlReader addListener(String type, MarcXchangeListener listener) {
         this.listeners.put(type, listener);
         return this;
     }
 
-    public DNBPICAXmlReader setMarcXchangeListener(MarcXchangeListener listener) {
+    public DNBPicaXmlReader setMarcXchangeListener(MarcXchangeListener listener) {
         this.listeners.put("XML", listener);
         return this;
     }

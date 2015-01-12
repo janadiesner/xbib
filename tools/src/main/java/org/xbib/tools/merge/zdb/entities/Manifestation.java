@@ -468,16 +468,6 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         this.volumeIDs.addAll(volumeIDs);
     }
 
-    public Set<VolumeHolding> getVolumeHoldings() {
-        Set<VolumeHolding> set = newTreeSet();
-        synchronized (volumes) {
-            for (Volume volume : volumes) {
-                set.addAll(volume.getHoldings());
-            }
-        }
-        return set;
-    }
-
     public boolean hasCarrierRelations() {
         synchronized (relations) {
             for (String key : relations.keys()) {
@@ -995,7 +985,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
             builder.field("links", getLinks());
         }
         SetMultimap<String, Holding> institutions = HashMultimap.create();
-        for (Holding holding : holdings) {
+        for (Holding holding : unique(holdings)) {
             institutions.put(holding.getISIL(), holding);
         }
         builder.field("institutioncount", institutions.size())
@@ -1005,7 +995,8 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
             Set<Holding> holdingsPerInstitution = institutions.get(institution);
             XContentBuilder institutionBuilder = jsonBuilder();
             institutionBuilder.startObject()
-                    .field("isil", institution)
+                    .field("@id", institution)
+                    .field("organization", holdingsPerInstitution.iterator().next().getOrganization())
                     .field("servicecount", holdingsPerInstitution.size())
                     .startArray("service");
             List<XContentBuilder> list = newLinkedList();

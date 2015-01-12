@@ -92,10 +92,10 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
             Integer maxbulkactions = settings.getAsInt("maxbulkactions", 1000);
             Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
                     Runtime.getRuntime().availableProcessors());
+            ingest = createIngest();
             ingest.maxActionsPerBulkRequest(maxbulkactions)
                     .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
                     .maxRequestWait(TimeValue.timeValueSeconds(60));
-            ingest = createIngest();
         }
         createIndex(getIndex());
         return this;

@@ -28,15 +28,29 @@
             "date": {
                 "type": "long"
             },
+            "institutioncount": {
+                "type": "long"
+            },
             "institution": {
                 "properties": {
-                    "isil": {
+                    "@id": {
                         "analyzer": "keyword",
                         "index_options": "docs",
                         "norms": {
                             "enabled": false
                         },
                         "type": "string"
+                    },
+                    "@type": {
+                        "analyzer": "keyword",
+                        "index_options": "docs",
+                        "norms": {
+                            "enabled": false
+                        },
+                        "type": "string"
+                    },
+                    "servicecount": {
+                        "type": "long"
                     },
                     "service": {
                         "properties": {
@@ -64,7 +78,23 @@
                                 },
                                 "type": "string"
                             },
+                            "mediatype": {
+                                "analyzer": "keyword",
+                                "index_options": "docs",
+                                "norms": {
+                                    "enabled": false
+                                },
+                                "type": "string"
+                            },
                             "carriertype": {
+                                "analyzer": "keyword",
+                                "index_options": "docs",
+                                "norms": {
+                                    "enabled": false
+                                },
+                                "type": "string"
+                            },
+                            "comment": {
                                 "analyzer": "keyword",
                                 "index_options": "docs",
                                 "norms": {
@@ -75,38 +105,30 @@
                             "date": {
                                 "type": "long"
                             },
+                            "distribution": {
+                                "analyzer": "keyword",
+                                "index_options": "docs",
+                                "norms": {
+                                    "enabled": false
+                                },
+                                "type": "string"
+                            },
                             "info": {
                                 "properties": {
                                     "holdings": {
                                         "properties": {
-                                            "firstdate": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
-                                            "firstissue": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
-                                            "firstvolume": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
                                             "group": {
                                                 "properties": {
                                                     "begindate": {
                                                         "type": "long"
+                                                    },
+                                                    "beginissue": {
+                                                        "analyzer": "keyword",
+                                                        "index_options": "docs",
+                                                        "norms": {
+                                                            "enabled": false
+                                                        },
+                                                        "type": "string"
                                                     },
                                                     "beginvolume": {
                                                         "analyzer": "keyword",
@@ -118,6 +140,14 @@
                                                     },
                                                     "enddate": {
                                                         "type": "long"
+                                                    },
+                                                    "endissue": {
+                                                        "analyzer": "keyword",
+                                                        "index_options": "docs",
+                                                        "norms": {
+                                                            "enabled": false
+                                                        },
+                                                        "type": "string"
                                                     },
                                                     "endvolume": {
                                                         "analyzer": "keyword",
@@ -136,44 +166,12 @@
                                                         "type": "string"
                                                     }
                                                 }
-                                            },
-                                            "lastdate": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
-                                            "lastissue": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
-                                            "lastvolume": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
                                             }
                                         }
                                     },
                                     "license": {
                                         "properties": {
                                             "access": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
-                                            "accessSource": {
                                                 "analyzer": "keyword",
                                                 "index_options": "docs",
                                                 "norms": {
@@ -189,23 +187,7 @@
                                                 },
                                                 "type": "string"
                                             },
-                                            "licensetype": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
                                             "origin": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
-                                            "pricetype": {
                                                 "analyzer": "keyword",
                                                 "index_options": "docs",
                                                 "norms": {
@@ -280,14 +262,6 @@
                                                     "enabled": false
                                                 },
                                                 "type": "string"
-                                            },
-                                            "url": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
                                             }
                                         }
                                     },
@@ -324,14 +298,6 @@
                                                     "enabled": false
                                                 },
                                                 "type": "string"
-                                            },
-                                            "shelfmark": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
                                             }
                                         }
                                     },
@@ -345,22 +311,6 @@
                                                 "type": "string"
                                             },
                                             "distribution": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
-                                            "funding": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
-                                            "fundingSource": {
                                                 "analyzer": "keyword",
                                                 "index_options": "docs",
                                                 "norms": {
@@ -383,31 +333,7 @@
                                                 },
                                                 "type": "string"
                                             },
-                                            "ssgnotation": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
-                                            "ssgnumber": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
                                             "type": {
-                                                "analyzer": "keyword",
-                                                "index_options": "docs",
-                                                "norms": {
-                                                    "enabled": false
-                                                },
-                                                "type": "string"
-                                            },
-                                            "zdbprio": {
                                                 "analyzer": "keyword",
                                                 "index_options": "docs",
                                                 "norms": {
@@ -468,14 +394,8 @@
                                 "type": "string"
                             }
                         }
-                    },
-                    "servicecount": {
-                        "type": "long"
                     }
                 }
-            },
-            "institutioncount": {
-                "type": "long"
             },
             "links": {
                 "properties": {

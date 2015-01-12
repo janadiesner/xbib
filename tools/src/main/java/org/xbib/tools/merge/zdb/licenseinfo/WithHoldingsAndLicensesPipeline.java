@@ -70,13 +70,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.google.common.collect.Sets.newSetFromMap;
-import static com.google.common.collect.Sets.newTreeSet;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
@@ -781,18 +779,14 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                     for (String parent : license.parents()) {
                         Manifestation m = manifestations.get(parent);
                         m.addRelatedHolding(isil, license);
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("license {} attached to manifestation {}", license.identifier(), m.externalID());
-                        }
+                        logger.debug("license {} attached to manifestation {}", license.identifier(), m.externalID());
                         license.addManifestation(m);
                         // trick: add also to print manifestation if possible
                         if (m.hasPrint()) {
                             Manifestation p = manifestations.get(m.getPrintExternalID());
                             if (p != null) {
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("license {} attached to another manifestation {}",
+                                logger.debug("license {} attached to another manifestation {}",
                                             license.identifier(), p.externalID());
-                                }
                                 license.addManifestation(p);
                             }
                         }
@@ -801,10 +795,8 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                 }
             }
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("found {} licenses for manifestations {}",
+        logger.debug("found {} licenses for manifestations {}",
                     licenses.size(), manifestations);
-        }
     }
 
     private void searchIndicators(Set<License> indicators, Map<String, Manifestation> manifestations) throws IOException {
@@ -842,7 +834,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                     break;
                 }
                 for (SearchHit hit : hits) {
-                    //Indicator indicator = new Indicator(mapper.readValue(hit.source(), Map.class));
                     Indicator indicator = new Indicator(hit.getSource());
                     String isil = indicator.getISIL();
                     if (isil == null) {
@@ -856,19 +847,15 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                         Manifestation m = manifestations.get(parent);
                         m.addRelatedHolding(isil, indicator);
                         indicator.addManifestation(m);
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("indicator {} parent {} attached to manifestation {}",
+                        logger.debug("indicator {} parent {} attached to manifestation {}",
                                     indicator.identifier(), parent, m.externalID());
-                        }
                         // trick: add also to print manifestation if possible
                         if (m.hasPrint()) {
                             Manifestation p = manifestations.get(m.getPrintExternalID());
                             if (p != null) {
                                 indicator.addManifestation(p);
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("indicator {} parent {} attached to manifestation {}",
+                                logger.debug("indicator {} parent {} attached to manifestation {}",
                                             indicator.identifier(), parent, p.externalID());
-                                }
                             }
                         }
                     }

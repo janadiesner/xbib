@@ -51,10 +51,8 @@ import static com.google.common.collect.Sets.newTreeSet;
 
 /**
  * Parsing patterns of enumeration and chronology
- * <p/>
  * Rules are given by Zeitschriftendatenbank
  * http://support.d-nb.de/iltis/katricht/zdb/8032.pdf
- *
  */
 public class EnumerationAndChronology {
 

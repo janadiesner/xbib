@@ -189,13 +189,13 @@ public final class EZBXML extends TimewindowFeeder {
                 case "type_id": {
                     switch (Integer.parseInt(content)) {
                         case 1:
-                            return "full-text-online"; //"Volltext nur online";
+                            return "online"; //"Volltext nur online";
                         case 2:
-                            return "full-text-online-and-print"; //"Volltext online und Druckausgabe";
+                            return "online-and-print"; //"Volltext online und Druckausgabe";
                         case 9:
-                            return "local"; //"lokale Zeitschrift";
+                            return "self-hosted"; //"lokale Zeitschrift";
                         case 11:
-                            return "digitized"; //"retrodigitalisiert";
+                            return "digitalization"; //"retrodigitalisiert";
                         default:
                             throw new IllegalArgumentException("unknown type_id: " + content);
                     }
@@ -203,11 +203,11 @@ public final class EZBXML extends TimewindowFeeder {
                 case "license_type_id": {
                     switch (Integer.parseInt(content)) {
                         case 1:
-                            return "local-license"; // "Einzellizenz";
+                            return "solitary"; // "Einzellizenz";
                         case 2:
-                            return "consortia-license"; //"Konsortiallizenz";
+                            return "consortial"; //"Konsortiallizenz";
                         case 4:
-                            return "supra-regional-license"; // "Nationallizenz";
+                            return "national"; // "Nationallizenz";
                         default:
                             throw new IllegalArgumentException("unknown license_type_id: " + content);
                     }
@@ -215,11 +215,11 @@ public final class EZBXML extends TimewindowFeeder {
                 case "price_type_id": {
                     switch (Integer.parseInt(content)) {
                         case 1:
-                            return "no-fee"; //"lizenzfrei";
+                            return "no"; //"lizenzfrei";
                         case 2:
-                            return "no-fee-included-in-print"; //"Kostenlos mit Druckausgabe";
+                            return "no-with-print"; //"Kostenlos mit Druckausgabe";
                         case 3:
-                            return "fee"; //"Kostenpflichtig";
+                            return "yes"; //"Kostenpflichtig";
                         default:
                             throw new IllegalArgumentException("unknown price_type_id: " + content);
                     }

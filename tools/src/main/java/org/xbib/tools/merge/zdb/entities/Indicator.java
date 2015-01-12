@@ -155,27 +155,29 @@ public class Indicator extends License {
                 servicecomment = comment;
             }
         }
-        Map<String, Object> holdings = newHashMap();
-        holdings.put("firstdate", getString("xbib:firstDate"));
+        Map<String, Object> group = newHashMap();
+        group.put("begindate", getString("xbib:firstDate"));
         String lastDate = getString("xbib:lastDate");
-        holdings.put("lastdate", Strings.isNullOrEmpty(lastDate) ? currentYear : lastDate);
+        group.put("enddate", Strings.isNullOrEmpty(lastDate) ? currentYear : lastDate);
         // optional, can be null
         String firstVolume = getString("xbib:firstVolume");
         if (!Strings.isNullOrEmpty(firstVolume)) {
-            holdings.put("firstvolume", firstVolume);
+            group.put("beginvolume", firstVolume);
         }
         String lastVolume = getString("xbib:lastVolume");
         if (!Strings.isNullOrEmpty(lastVolume)) {
-            holdings.put("lastvolume", lastVolume);
+            group.put("endvolume", lastVolume);
         }
         String firstIssue = getString("xbib:firstIssue");
         if (!Strings.isNullOrEmpty(firstIssue)) {
-            holdings.put("firstissue", firstIssue);
+            group.put("beginissue", firstIssue);
         }
         String lastIssue = getString("xbib:lastIssue");
         if (!Strings.isNullOrEmpty(lastIssue)) {
-            holdings.put("lastissue", lastIssue);
+            group.put("endissue", lastIssue);
         }
+        Map<String, Object> holdings = newHashMap();
+        holdings.put("group", group);
         m.put("holdings", holdings);
         return m;
     }

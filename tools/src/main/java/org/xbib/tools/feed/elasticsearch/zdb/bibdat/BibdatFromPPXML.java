@@ -41,7 +41,7 @@ import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
-import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
+import org.xbib.marc.dialects.pica.DNBPicaXmlReader;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentBuilder;
@@ -122,7 +122,7 @@ public final class BibdatFromPPXML extends Feeder {
 
                 });
         InputStream in = InputService.getInputStream(uri);
-        DNBPICAXmlReader reader = new DNBPICAXmlReader(new InputStreamReader(in, "UTF-8"));
+        DNBPicaXmlReader reader = new DNBPicaXmlReader(new InputStreamReader(in, "UTF-8"));
         reader.setMarcXchangeListener(kv);
         reader.parse();
         in.close();

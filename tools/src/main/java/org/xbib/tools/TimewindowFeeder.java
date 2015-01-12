@@ -44,7 +44,15 @@ public abstract class TimewindowFeeder extends Feeder {
 
     @Override
     protected TimewindowFeeder prepare() throws IOException {
-        ingest = createIngest();
+        if (ingest == null) {
+            Integer maxbulkactions = settings.getAsInt("maxbulkactions", 1000);
+            Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
+                    Runtime.getRuntime().availableProcessors());
+            ingest = createIngest();
+            ingest.maxActionsPerBulkRequest(maxbulkactions)
+                    .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
+                    .maxRequestWait(TimeValue.timeValueSeconds(60));
+        }
         String timeWindow = settings.get("timewindow") != null ?
                 DateTimeFormat.forPattern(settings.get("timewindow")).print(new DateTime()) : "";
         setConcreteIndex(resolveAlias(getIndex() + timeWindow));

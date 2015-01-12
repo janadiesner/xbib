@@ -56,8 +56,8 @@ import java.util.Map;
 /**
  * PICA XML parser
  */
-public class DNBPICAXmlReader
-        implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler, DNBPICAConstants, MarcXchangeListener {
+public class DNBPicaXmlReader
+        implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler, DNBPicaConstants, MarcXchangeListener {
 
     private final Reader reader;
 
@@ -71,21 +71,21 @@ public class DNBPICAXmlReader
 
     private StringBuilder content = new StringBuilder();
 
-    public DNBPICAXmlReader(Reader reader) {
+    public DNBPicaXmlReader(Reader reader) {
         this.reader = reader;
     }
 
-    public DNBPICAXmlReader setContentHandler(ContentHandler handler) {
+    public DNBPicaXmlReader setContentHandler(ContentHandler handler) {
         this.contentHandler = handler;
         return this;
     }
 
-    public DNBPICAXmlReader addListener(String type, MarcXchangeListener listener) {
+    public DNBPicaXmlReader addListener(String type, MarcXchangeListener listener) {
         this.listeners.put(type, listener);
         return this;
     }
 
-    public DNBPICAXmlReader setMarcXchangeListener(MarcXchangeListener listener) {
+    public DNBPicaXmlReader setMarcXchangeListener(MarcXchangeListener listener) {
         this.listeners.put("XML", listener);
         return this;
     }

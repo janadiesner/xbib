@@ -97,7 +97,7 @@ public class VolumeHolding extends Holding {
 
     public String build(XContentBuilder builder, String tag)
             throws IOException {
-        String taggedId = tag != null ? tag + "." + identifier : identifier;
+        String taggedId = tag != null ? tag + "." + volume.externalID : volume.externalID;
         builder.startObject();
         builder.field("@id", taggedId)
                 .field("@type", "VolumeHolding")
@@ -105,7 +105,7 @@ public class VolumeHolding extends Holding {
                 .fieldIfNotNull("@tag", tag);
         builder.field("date", dates.get(0))
                 .startObject("institution")
-                .field("isil", isil)
+                .field("@id", isil)
                 .startObject("service")
                 .array("@parent", parents)
                 .field("@type", "Service")
@@ -127,7 +127,7 @@ public class VolumeHolding extends Holding {
                         // https://www.hbz-nrw.de/dokumentencenter/produkte/verbunddatenbank/aktuell/plausi/Exemplar-Online-Kurzform.pdf
                 .fieldIfNotNull("collection", map.get("shelfmark")) // 088 b sublocation (Standort)
                 .fieldIfNotNull("callnumber", map.get("callnumber")) // 088 c (Signatur)
-                        //.fieldIfNotNull("collection", map.get("collection")) // 088 d zus. Bestandsangabe
+                        //.fieldIfNotNull("collection", map.get("collection")) // 088 d zus. Bestandsangabe (nicht vorhanden)
 
                 .endObject();
         builder.endObject().endObject();

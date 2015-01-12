@@ -39,7 +39,7 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class DNBPICAXmlReaderTest {
+public class DNBPicaXmlReaderTest {
 
     @Test
     public void testZDBBIBFromOAI() throws Exception {
@@ -100,7 +100,7 @@ public class DNBPICAXmlReaderTest {
             }
 
         };
-        DNBPICAXmlReader reader = new DNBPICAXmlReader(new InputStreamReader(in, "UTF-8"));
+        DNBPicaXmlReader reader = new DNBPicaXmlReader(new InputStreamReader(in, "UTF-8"));
         reader.setMarcXchangeListener(listener);
         reader.parse();
 

@@ -17,21 +17,18 @@ java="java"
 
 set=bib
 
-# 120 months = 10 years (2004-2014)
-iterations=120
-
 d=`gdate +%Y-%m-%d`
-while [ ${iterations} -gt 0 ]; do
-  p1=`gdate -d "${d} -1 months" +%Y-%m-%d`
-  p2=`gdate -d "${d}" +%Y-%m-%d`
+p1=`gdate -d "${d} -1 months" +"%Y-%m-%dT%H:%M:%SZ"`
+p2=`gdate -d "${d}" +"%Y-%m-%dT%H:%M:%SZ"`
 
-  echo "p1=${p1} p2=${p2}"
+echo "p1=${p1} p2=${p2}"
   
-  echo '
+echo '
   {
     "uri" : [
         "http://services.dnb.de/oai/repository?verb=ListRecords&metadataPrefix=PicaPlus-xml&set='${set}'&from='${p1}'&until='${p2}'"
     ],
+    "count" : 120,
     "elements" : "/org/xbib/analyzer/pica/zdb/bibdat.json",
     "package" : "org.xbib.analyzer.pica.zdb.bibdat",
     "concurrency" : 1,
@@ -59,7 +56,3 @@ while [ ${iterations} -gt 0 ]; do
     -Dlog4j.configurationFile=${bin}/log4j2.xml \
     org.xbib.tools.Runner \
     org.xbib.tools.feed.elasticsearch.zdb.bibdat.BibdatOAI
-
-  d=${p1}
-  iterations=$((${iterations}-1))
-done

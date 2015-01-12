@@ -191,40 +191,41 @@ public class License extends Holding {
         if (!Strings.isNullOrEmpty(comment)) {
             servicecomment = comment;
         }
-        // no textualholdings
-        Map<String, Object> holdings = newHashMap();
+        Map<String, Object> group = newHashMap();
         // first date and last date is obligatory
-        holdings.put("firstdate", getString("ezb:license_period.ezb:first_date"));
-        holdings.put("lastdate", getString("ezb:license_period.ezb:last_date"));
+        group.put("begindate", getString("ezb:license_period.ezb:first_date"));
+        group.put("enddate", getString("ezb:license_period.ezb:last_date"));
         // volume is optional
         String firstVolume = getString("ezb:license_period.ezb:first_volume");
         if (firstVolume != null) {
-            holdings.put("firstvolume", firstVolume);
+            group.put("beginvolume", firstVolume);
         }
         String lastVolume = getString("ezb:license_period.ezb:last_volume");
         if (lastVolume != null) {
-            holdings.put("lastvolume", lastVolume);
+            group.put("endvolume", lastVolume);
         }
         // issue is optional
         String firstIssue = getString("ezb:license_period.ezb:first_issue");
         if (firstIssue != null) {
-            holdings.put("firstissue", firstIssue);
+            group.put("beginissue", firstIssue);
         }
         String lastIssue = getString("ezb:license_period.ezb:last_issue");
         if (lastIssue != null) {
-            holdings.put("lastissue", lastIssue);
+            group.put("endissue", lastIssue);
         }
+        Map<String, Object> holdings = newHashMap();
+        holdings.put("group", group);
         m.put("holdings", holdings);
 
         Map<String, Object> link = newHashMap();
-        link.put("url", map.get("ezb:reference_url"));
+        link.put("uri", map.get("ezb:reference_url"));
         link.put("nonpublicnote", "Verlagsangebot"); // ZDB = "Volltext"
         m.put("links", Arrays.asList(link));
 
         this.license = newHashMap();
         license.put("type", map.get("ezb:type_id"));
-        license.put("licensetype", map.get("ezb:license_type_id"));
-        license.put("pricetype", map.get("ezb:price_type_id"));
+        license.put("scope", map.get("ezb:license_type_id"));
+        license.put("charge", map.get("ezb:price_type_id"));
         license.put("readme", map.get("ezb:readme_url"));
         m.put("license", license);
 

@@ -699,9 +699,12 @@
         "subfields": {
             "a" : "origin", /* Herkunft, Erfassungsrichtung */
             "b" : "access", /* Angaben zu den Zugriffsrechten */
+            "c" : "accessparallel", /*  Angaben zur Zahl der parallelen Zugriffe */
+            "d" : "accesscomment", /*  Kommentar zu den Zugriffsrechten  */
             "e" : "type", /* Angaben zum Dokumenttyp */
             "f" : "scope", /* Angaben zum Lizenztyp */
-            "g" : "charge" /* Angaben zum Preistyp */
+            "g" : "charge", /* Angaben zum Preistyp */
+            "h" : "comment"
         },
         "origin" : {
                 "a" : "EZB",
@@ -713,7 +716,7 @@
                 "a" : "restricted-to-domain",
                 "b" : "unrestricted",
                 "c" : "blocked",
-                "d" : "restricted-to-domain"
+                "d" : "restricted-to-domain-plus-user"
         },
         "type" : {
                 "a" : "online",
@@ -723,8 +726,8 @@
         },
         "scope" : {
                 "a" : "national",
-                "b" : "consortia",
-                "c" : "stand-alone"
+                "b" : "consortial",
+                "c" : "solitary"
         },
         "charge" : {
                 "a" : "no",

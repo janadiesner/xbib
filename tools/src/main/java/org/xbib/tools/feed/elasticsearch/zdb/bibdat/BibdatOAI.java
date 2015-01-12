@@ -36,7 +36,7 @@ import org.apache.logging.log4j.Logger;
 import org.xbib.entities.marc.dialects.pica.PicaEntityBuilderState;
 import org.xbib.entities.marc.dialects.pica.PicaEntityQueue;
 import org.xbib.iri.namespace.IRINamespaceContext;
-import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
+import org.xbib.marc.dialects.pica.DNBPicaXmlReader;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
 import org.xbib.oai.OAIConstants;
 import org.xbib.oai.OAIDateResolution;
@@ -51,7 +51,6 @@ import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.content.RouteRdfXContentParams;
 import org.xbib.tools.OAIFeeder;
-import org.xbib.util.DateUtil;
 import org.xbib.util.URIUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
@@ -62,6 +61,14 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.text.Normalizer;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -109,50 +116,61 @@ public final class BibdatOAI extends OAIFeeder {
             }
         });
         queue.execute();
+
         Map<String, String> oaiparams = URIUtil.parseQueryString(uri);
         String server = uri.toString();
         String verb = oaiparams.get("verb");
         String metadataPrefix = oaiparams.get("metadataPrefix");
         String set = oaiparams.get("set");
-        Date from = DateUtil.parseDateISO(oaiparams.get("from"));
-        Date until = DateUtil.parseDateISO(oaiparams.get("until"));
-        final OAIClient client = OAIClientFactory.newClient(server);
-        client.setTimeout(settings.getAsInt("timeout", 60000));
-        if (settings.get("proxyhost") != null) {
-            client.setProxy(settings.get("proxyhost"), settings.getAsInt("proxyport", 3128));
-        }
-        if (!verb.equals(OAIConstants.LIST_RECORDS)) {
-            logger.warn("no verb {}, returning", OAIConstants.LIST_RECORDS);
-            return;
-        }
-        ListRecordsRequest request = client.newListRecordsRequest()
-                .setMetadataPrefix(metadataPrefix)
-                .setSet(set)
-                .setFrom(from, OAIDateResolution.DAY)
-                .setUntil(until, OAIDateResolution.DAY);
+        Date from = Date.from(Instant.parse(oaiparams.get("from")));
+        Date until = Date.from(Instant.parse(oaiparams.get("until")));
+        // interval
+        long interval = ChronoUnit.DAYS.between(from.toInstant(), until.toInstant());
+        long count = settings.getAsLong("count", 1L);
         do {
-            try {
-                final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                        .setStringTransformer(value -> Normalizer.normalize(value, Normalizer.Form.NFKC))
-                        .addListener(queue);
-                PicaMetadataHandler handler = new PicaMetadataHandler(kv);
-                request.addHandler(handler);
-                ListRecordsListener listener = new ListRecordsListener(request);
-                request.prepare().execute(listener).waitFor();
-                if (listener.getResponse() != null) {
-                    StringWriter w = new StringWriter();
-                    listener.getResponse().to(w);
-                    logger.debug("got OAI response: {}", w);
-                    request = client.resume(request, listener.getResumptionToken());
-                } else {
-                    logger.debug("no valid OAI response");
-                }
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                request = null;
+            final OAIClient client = OAIClientFactory.newClient(server);
+            client.setTimeout(settings.getAsInt("timeout", 60000));
+            if (settings.get("proxyhost") != null) {
+                client.setProxy(settings.get("proxyhost"), settings.getAsInt("proxyport", 3128));
             }
-        } while (request != null);
-        client.close();
+            if (!verb.equals(OAIConstants.LIST_RECORDS)) {
+                logger.warn("no verb {}, returning", OAIConstants.LIST_RECORDS);
+                return;
+            }
+            ListRecordsRequest request = client.newListRecordsRequest()
+                    .setMetadataPrefix(metadataPrefix)
+                    .setSet(set)
+                    .setFrom(from, OAIDateResolution.DAY)
+                    .setUntil(until, OAIDateResolution.DAY);
+            do {
+                try {
+                    final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
+                            .setStringTransformer(value -> Normalizer.normalize(value, Normalizer.Form.NFKC))
+                            .addListener(queue);
+                    PicaMetadataHandler handler = new PicaMetadataHandler(kv);
+                    request.addHandler(handler);
+                    ListRecordsListener listener = new ListRecordsListener(request);
+                    request.prepare().execute(listener).waitFor();
+                    if (listener.getResponse() != null) {
+                        StringWriter w = new StringWriter();
+                        listener.getResponse().to(w);
+                        logger.debug("got OAI response: {}", w);
+                        request = client.resume(request, listener.getResumptionToken());
+                    } else {
+                        logger.debug("no valid OAI response");
+                    }
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                    request = null;
+                }
+            } while (request != null);
+            client.close();
+            // switch to next request
+            LocalDateTime ldt = LocalDateTime.ofInstant(from.toInstant(), ZoneOffset.UTC).plusDays(-interval);
+            from = Date.from(ldt.toInstant(ZoneOffset.UTC));
+            ldt = LocalDateTime.ofInstant(from.toInstant(), ZoneOffset.UTC).plusDays(-interval);
+            until = Date.from(ldt.toInstant(ZoneOffset.UTC));
+        } while (count-- > 0L);
         queue.close();
         if (settings.getAsBoolean("detect", false)) {
             logger.info("unknown keys = {}", unmapped);
@@ -204,16 +222,16 @@ public final class BibdatOAI extends OAIFeeder {
     }
     class PicaMetadataHandler implements MetadataHandler {
 
-        DNBPICAXmlReader reader;
+        DNBPicaXmlReader reader;
 
         RecordHeader header;
 
         PicaMetadataHandler(MarcXchange2KeyValue kv) {
-            this.reader = new DNBPICAXmlReader((Reader)null);
+            this.reader = new DNBPicaXmlReader((Reader)null);
             reader.setMarcXchangeListener(kv);
         }
 
-        public DNBPICAXmlReader getReader() {
+        public DNBPicaXmlReader getReader() {
             return reader;
         }
 

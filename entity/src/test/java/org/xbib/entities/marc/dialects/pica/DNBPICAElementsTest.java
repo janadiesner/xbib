@@ -49,12 +49,12 @@ import org.xbib.keyvalue.KeyValueStreamAdapter;
 import org.xbib.marc.FieldList;
 import org.xbib.marc.Field;
 import org.xbib.marc.keyvalue.MarcXchange2KeyValue;
-import org.xbib.marc.dialects.pica.DNBPICAXmlReader;
+import org.xbib.marc.dialects.pica.DNBPicaXmlReader;
 import org.xbib.marc.transformer.StringTransformer;
 
-public class DNBPICAElementsTest extends Assert {
+public class DNBPicaElementsTest extends Assert {
 
-    private static final Logger logger = LogManager.getLogger(DNBPICAElementsTest.class.getName());
+    private static final Logger logger = LogManager.getLogger(DNBPicaElementsTest.class.getName());
 
     @Test
     public void testPicaSetup() throws Exception {
@@ -79,7 +79,7 @@ public class DNBPICAElementsTest extends Assert {
                 .addListener(queue)
                 .addListener(new OurAdapter());
         final InputStream in = getClass().getResourceAsStream("zdb-oai-bib.xml");
-        DNBPICAXmlReader reader = new DNBPICAXmlReader(new InputStreamReader(in, "UTF-8"));
+        DNBPicaXmlReader reader = new DNBPicaXmlReader(new InputStreamReader(in, "UTF-8"));
         reader.setMarcXchangeListener(kv);
         reader.parse();
         in.close();

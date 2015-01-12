@@ -40,7 +40,7 @@ import org.xbib.io.Session;
 import org.xbib.io.archive.tar.TarSession;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
-import org.xbib.marc.dialects.pica.DNBPICAConstants;
+import org.xbib.marc.dialects.pica.DNBPicaConstants;
 import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.AbstractPipeline;
 import org.xbib.pipeline.Pipeline;
@@ -66,10 +66,10 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
 
 
-public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<LongPipelineElement, PipelineException>
-        implements DNBPICAConstants, MarcXchangeListener {
+public class DNBPicaXmlTarReader<P extends Packet> extends AbstractPipeline<LongPipelineElement, PipelineException>
+        implements DNBPicaConstants, MarcXchangeListener {
 
-    private final static Logger logger = LogManager.getLogger(DNBPICAXmlTarReader.class.getName());
+    private final static Logger logger = LogManager.getLogger(DNBPicaXmlTarReader.class.getName());
 
     private final ConnectionService<TarSession> service = ConnectionService.getInstance();
 
@@ -95,20 +95,20 @@ public class DNBPICAXmlTarReader<P extends Packet> extends AbstractPipeline<Long
 
     private MarcXchangeListener listener;
 
-    public DNBPICAXmlTarReader() {
+    public DNBPicaXmlTarReader() {
     }
 
-    public DNBPICAXmlTarReader setURI(URI uri) {
+    public DNBPicaXmlTarReader setURI(URI uri) {
         this.uri = uri;
         return this;
     }
 
-    public DNBPICAXmlTarReader setIterator(Iterator<Long> iterator) {
+    public DNBPicaXmlTarReader setIterator(Iterator<Long> iterator) {
         this.iterator = iterator;
         return this;
     }
 
-    public DNBPICAXmlTarReader setListener(MarcXchangeListener listener) {
+    public DNBPicaXmlTarReader setListener(MarcXchangeListener listener) {
         this.listener = listener;
         return this;
     }

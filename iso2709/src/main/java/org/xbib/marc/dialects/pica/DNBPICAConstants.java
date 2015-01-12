@@ -31,7 +31,7 @@
  */
 package org.xbib.marc.dialects.pica;
 
-public interface DNBPICAConstants {
+public interface DNBPicaConstants {
 
     String NS_URI = "http://www.oclcpica.org/xmlns/ppxml-1.0";
 
