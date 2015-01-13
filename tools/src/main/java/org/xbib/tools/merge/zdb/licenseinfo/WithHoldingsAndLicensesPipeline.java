@@ -120,9 +120,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
     private final String dateHoldingsIndex;
     private final String dateHoldingsIndexType;
 
-    private MeterMetric metric;
-
-    private MeterMetric serviceMetric;
 
     public WithHoldingsAndLicensesPipeline(WithHoldingsAndLicenses service, int number) {
         this.number = number;
@@ -158,6 +155,11 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
     @Override
     public String getName() {
         return getClass().getName();
+    }
+
+    @Override
+    public MeterMetric getMetric() {
+        return null;
     }
 
     @Override
@@ -202,8 +204,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
     public Boolean call() throws Exception {
         logger.info("pipeline starting");
         try {
-            this.metric = new MeterMetric(5L, TimeUnit.SECONDS);
-            this.serviceMetric = new MeterMetric(5L, TimeUnit.SECONDS);
             while (hasNext()) {
                 manifestation = next();
                 if (check(manifestation)) {
@@ -212,7 +212,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                 for (PipelineRequestListener listener : listeners.values()) {
                     listener.newRequest(this, manifestation);
                 }
-                metric.mark();
             }
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
@@ -220,19 +219,9 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             logger.error("exiting, exception while processing {}", manifestation);
         } finally {
             service.countDown();
-            metric.stop();
         }
         logger.info("pipeline terminating");
         return true;
-    }
-
-    @Override
-    public MeterMetric getMetric() {
-        return metric;
-    }
-
-    public MeterMetric getServiceMetric() {
-        return serviceMetric;
     }
 
     @Override
@@ -378,10 +367,10 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                     service.ingest().index(dateHoldingsIndex, dateHoldingsIndexType, vid + "." + volumeHolding.dates().get(0), builder.string());
                 }
                 int n = 1 + 2 * volume.getHoldings().size();
-                serviceMetric.mark(n);
+                service.indexMetric().mark(n);
             }
             int n = m.getVolumes().size();
-            serviceMetric.mark(n);
+            service.indexMetric().mark(n);
         }
         m.addVolumeIDs(vids);
 
@@ -389,6 +378,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         XContentBuilder builder = jsonBuilder();
         String docid = m.build(builder, tag, null);
         service.ingest().index(manifestationsIndex, manifestationsIndexType, docid, builder.string());
+        service.indexMetric().mark(1);
         // holdings by date and the services for them
         if (!m.getVolumesByDate().isEmpty()) {
             SetMultimap<Integer, Holding> volumesByDate;
@@ -402,9 +392,9 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                     builder = jsonBuilder();
                     docid = m.buildHoldingsByDate(builder, tag, m.externalID(), date, holdings);
                     service.ingest().index(dateHoldingsIndex, dateHoldingsIndexType, identifier, builder.string());
+                    service.indexMetric().mark(1);
                     logger.debug("indexed volume {} date {}", docid, date);
                 }
-                serviceMetric.mark(holdings.size());
             }
         }
         // holdings (list of institutions)
@@ -419,10 +409,8 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                 docid = m.buildHoldingsByISIL(builder, tag, m.externalID(), holder, holdings.get(holder));
             }
             builder.endArray().endObject();
-            if (docid != null) {
-                service.ingest().index(holdingsIndex, holdingsIndexType, docid, builder.string());
-            }
-            serviceMetric.mark(holdings.size());
+            service.ingest().index(holdingsIndex, holdingsIndexType, docid, builder.string());
+            service.indexMetric().mark(1);
             logger.debug("indexed {} holdings for {}", holdings.size(), docid);
         }
         // index related manifestations
@@ -464,9 +452,11 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             searchRequest.setTypes(sourceTitleType);
         }
         SearchResponse searchResponse = searchRequest.execute().actionGet();
+        service.queryMetric().mark();
         searchResponse = service.client().prepareSearchScroll(searchResponse.getScrollId())
                 .setScroll(TimeValue.timeValueMillis(service.millis()))
                 .execute().actionGet();
+        service.queryMetric().mark();
         SearchHits hits = searchResponse.getHits();
         if (hits.getHits().length == 0) {
             return;
@@ -482,6 +472,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             searchResponse = service.client().prepareSearchScroll(searchResponse.getScrollId())
                     .setScroll(TimeValue.timeValueMillis(service.millis()))
                     .execute().actionGet();
+            service.queryMetric().mark();
             hits = searchResponse.getHits();
         } while (hits.getHits().length > 0);
     }
@@ -508,6 +499,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         searchResponse = service.client().prepareSearchScroll(searchResponse.getScrollId())
                 .setScroll(TimeValue.timeValueMillis(service.millis()))
                 .execute().actionGet();
+        service.queryMetric().mark();
         SearchHits hits = searchResponse.getHits();
         if (hits.getHits().length == 0) {
             return;
@@ -605,6 +597,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             searchResponse = service.client().prepareSearchScroll(searchResponse.getScrollId())
                     .setScroll(TimeValue.timeValueMillis(service.millis()))
                     .execute().actionGet();
+            service.queryMetric().mark();
             hits = searchResponse.getHits();
         } while (hits.getHits().length > 0);
     }
@@ -673,6 +666,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                 searchResponse = service.client().prepareSearchScroll(searchResponse.getScrollId())
                         .setScroll(TimeValue.timeValueMillis(service.millis()))
                         .execute().actionGet();
+                service.queryMetric().mark();
                 SearchHits hits = searchResponse.getHits();
                 if (hits.getHits().length == 0) {
                     break;
@@ -700,11 +694,9 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                 }
             }
         }
-        if (logger.isDebugEnabled()) {
             for (Manifestation m : manifestations.values()) {
                 logger.debug("found holdings of {} = {} ", m.externalID(), m.getVolumesByHolder().size());
             }
-        }
     }
 
     private Set<License> searchLicensesAndIndicators(Collection<Manifestation> manifestations) throws IOException {
@@ -759,6 +751,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                 searchResponse = service.client().prepareSearchScroll(searchResponse.getScrollId())
                         .setScroll(TimeValue.timeValueMillis(service.millis()))
                         .execute().actionGet();
+                service.queryMetric().mark();
                 SearchHits hits = searchResponse.getHits();
                 if (hits.getHits().length == 0) {
                     break;
@@ -894,12 +887,14 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                     .setScroll(TimeValue.timeValueMillis(service.millis()))
                     .setQuery(termQuery("IdentifierZDB.identifierZDB", id));
             SearchResponse searchResponse = searchRequest.execute().actionGet();
+            service.queryMetric().mark();
             logger.debug("searchVolumes search request = {} hits={}",
                     searchRequest.toString(), searchResponse.getHits().getTotalHits());
             while (searchResponse.getScrollId() != null) {
                 searchResponse = service.client().prepareSearchScroll(searchResponse.getScrollId())
                         .setScroll(TimeValue.timeValueMillis(service.millis()))
                         .execute().actionGet();
+                service.queryMetric().mark();
                 SearchHits hits = searchResponse.getHits();
                 if (hits.getHits().length == 0) {
                     break;
@@ -928,12 +923,14 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                 .setScroll(TimeValue.timeValueMillis(service.millis()))
                 .setQuery(termQuery("xbib.uid", key));
         SearchResponse holdingSearchResponse = holdingsSearchRequest.execute().actionGet();
+        service.queryMetric().mark();
         logger.debug("searchExtraHoldings search request = {} hits={}",
                 holdingsSearchRequest.toString(), holdingSearchResponse.getHits().getTotalHits());
         while (holdingSearchResponse.getScrollId() != null) {
             holdingSearchResponse = service.client().prepareSearchScroll(holdingSearchResponse.getScrollId())
                     .setScroll(TimeValue.timeValueMillis(service.millis()))
                     .execute().actionGet();
+            service.queryMetric().mark();
             SearchHits holdingHits = holdingSearchResponse.getHits();
             if (holdingHits.getHits().length == 0) {
                 break;
@@ -978,12 +975,14 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                 .setQuery(boolQuery().should(termQuery("SeriesAddedEntryUniformTitle.designation", parent.id()))
                         .should(termQuery("RecordIdentifierSuper.recordIdentifierSuper", parent.id())));
         SearchResponse searchResponse = searchRequest.execute().actionGet();
+        service.queryMetric().mark();
         logger.debug("searchSeriesVolumeHoldings search request={} hits={}",
                 searchRequest.toString(), searchResponse.getHits().getTotalHits());
         while (searchResponse.getScrollId() != null) {
             searchResponse = service.client().prepareSearchScroll(searchResponse.getScrollId())
                     .setScroll(TimeValue.timeValueMillis(service.millis()))
                     .execute().actionGet();
+            service.queryMetric().mark();
             SearchHits hits = searchResponse.getHits();
             if (hits.getHits().length == 0) {
                 break;
@@ -999,12 +998,14 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                         .setScroll(TimeValue.timeValueMillis(service.millis()))
                         .setQuery(termQuery("xbib.uid", volume.id()));
                 SearchResponse holdingSearchResponse = holdingsSearchRequest.execute().actionGet();
+                service.queryMetric().mark();
                 logger.debug("searchSeriesVolumeHoldings search request={} hits={}",
                         holdingsSearchRequest.toString(), holdingSearchResponse.getHits().getTotalHits());
                 while (holdingSearchResponse.getScrollId() != null) {
                     holdingSearchResponse = service.client().prepareSearchScroll(holdingSearchResponse.getScrollId())
                             .setScroll(TimeValue.timeValueMillis(service.millis()))
                             .execute().actionGet();
+                    service.queryMetric().mark();
                     SearchHits holdingHits = holdingSearchResponse.getHits();
                     if (holdingHits.getHits().length == 0) {
                         break;

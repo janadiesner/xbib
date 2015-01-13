@@ -51,6 +51,7 @@ import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
 import org.xbib.elasticsearch.support.client.search.SearchClient;
 import org.xbib.entities.support.StatusCodeMapper;
 import org.xbib.entities.support.ValueMaps;
+import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.queue.QueuePipelineExecutor;
 import org.xbib.tools.CommandLineInterpreter;
@@ -116,6 +117,10 @@ public class WithHoldingsAndLicenses
     private static BibdatLookup bibdatLookup;
 
     private static BlackListedISIL isilbl;
+
+    private static MeterMetric queryMetric;
+
+    private static MeterMetric indexMetric;
 
     private final static AtomicLong extraCounter = new AtomicLong();
 
@@ -228,6 +233,9 @@ public class WithHoldingsAndLicenses
         ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
         ingest.startBulk(index);
 
+        queryMetric = new MeterMetric(5L, TimeUnit.SECONDS);
+        indexMetric = new MeterMetric(5L, TimeUnit.SECONDS);
+
         super.setPipelineProvider(new PipelineProvider<WithHoldingsAndLicensesPipeline>() {
             int i = 0;
 
@@ -246,18 +254,16 @@ public class WithHoldingsAndLicenses
         logger.info("shutdown in progress");
         shutdown(new SearchHitPipelineElement().set(null));
 
-        long total = 0L;
-        for (WithHoldingsAndLicensesPipeline p : getPipelines()) {
-            logger.info("pipeline {}, started {}, ended {}, took {}, count = {}, service count = {}",
-                    p,
-                    DateUtil.formatDateISO(p.getMetric().startedAt()),
-                    DateUtil.formatDateISO(p.getMetric().stoppedAt()),
-                    TimeValue.timeValueMillis(p.getMetric().elapsed() / 1000000).format(),
-                    p.getMetric().count(),
-                    p.getServiceMetric().count());
-            total += p.getMetric().count();
-        }
-        logger.info("total={}", total);
+        logger.info("query: started {}, ended {}, took {}, count = {}",
+                DateUtil.formatDateISO(queryMetric.startedAt()),
+                DateUtil.formatDateISO(queryMetric.stoppedAt()),
+                TimeValue.timeValueMillis(queryMetric.elapsed() / 1000000).format(),
+                queryMetric.count());
+        logger.info("index: started {}, ended {}, took {}, count = {}",
+                DateUtil.formatDateISO(indexMetric.startedAt()),
+                DateUtil.formatDateISO(indexMetric.stoppedAt()),
+                TimeValue.timeValueMillis(indexMetric.elapsed() / 1000000).format(),
+                indexMetric.count());
 
         logger.info("ingest shutdown in progress");
         ingest.flushIngest();
@@ -454,6 +460,14 @@ public class WithHoldingsAndLicenses
         extraCounter.addAndGet(delta);
     }
 
+    public MeterMetric queryMetric() {
+        return queryMetric;
+    }
+
+    public MeterMetric indexMetric() {
+        return indexMetric;
+    }
+
     class ScheduleThread extends Thread {
 
         public void run() {
@@ -463,21 +477,16 @@ public class WithHoldingsAndLicenses
                         count, total, percent,
                         processed.size(), indexed.size(), skipped.size(),
                         extraCounter);
-                Double meanRate = 0.0;
-                Double oneMinuteRate = 0.0;
-                Double fiveMinuteRate = 0.0;
-                Double fifteenMinuteRate = 0.0;
-                for (WithHoldingsAndLicensesPipeline p : getPipelines()) {
-                    meanRate += p.getServiceMetric().meanRate();
-                    oneMinuteRate += p.getServiceMetric().oneMinuteRate();
-                    fiveMinuteRate += p.getServiceMetric().fiveMinuteRate();
-                    fifteenMinuteRate += p.getServiceMetric().fifteenMinuteRate();
-                }
-                logger.info("metric={} ({} {} {})",
-                        meanRate,
-                        oneMinuteRate,
-                        fiveMinuteRate,
-                        fifteenMinuteRate);
+                logger.info("query metric={} ({} {} {})",
+                        queryMetric.meanRate(),
+                        queryMetric.oneMinuteRate(),
+                        queryMetric.fiveMinuteRate(),
+                        queryMetric.fifteenMinuteRate());
+                logger.info("index metric={} ({} {} {})",
+                        indexMetric.meanRate(),
+                        indexMetric.oneMinuteRate(),
+                        indexMetric.fiveMinuteRate(),
+                        indexMetric.fifteenMinuteRate());
                 try {
                     Thread.sleep(10000L);
                 } catch (InterruptedException e) {
