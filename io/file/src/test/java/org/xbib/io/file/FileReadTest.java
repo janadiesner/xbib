@@ -16,13 +16,12 @@ public class FileReadTest {
 
     private final Logger logger = LogManager.getLogger(FileReadTest.class.getName());
 
-    private String name = "/Users/joerg/10_Recommended.zip";
+    private String name = "test.zip";
 
     private int SIZE = 8192;
 
     private int BIGSIZE = 1024 * 1024;
 
-    @Test
     public void test02() throws IOException {
         FileInputStream f = new FileInputStream(name);
         byte[] barray = new byte[SIZE];
@@ -49,7 +48,7 @@ public class FileReadTest {
         logger.info("test 3 done {}", checkSum);
     }
 
-    @Test
+
     public void test04() throws IOException {
         BufferedInputStream f = new BufferedInputStream(new FileInputStream(name));
         byte[] barray = new byte[SIZE];
@@ -64,7 +63,7 @@ public class FileReadTest {
         logger.info("test 4 done {}", checkSum);
     }
 
-    @Test
+
     public void test06() throws IOException {
         RandomAccessFile f = new RandomAccessFile(name, "r");
         byte[] barray = new byte[SIZE];
@@ -79,7 +78,7 @@ public class FileReadTest {
         logger.info("test 6 done {}", checkSum);
     }
 
-    @Test
+
     public void test07() throws IOException {
         // > 1 sec
         FileInputStream f = new FileInputStream(name);
@@ -102,7 +101,7 @@ public class FileReadTest {
         logger.info("test 7 done {}", checkSum);
     }
 
-    @Test
+
     public void test08() throws IOException {
         FileInputStream f = new FileInputStream(name);
         FileChannel ch = f.getChannel();
@@ -129,7 +128,7 @@ public class FileReadTest {
         logger.info("test 8 done {}", checkSum);
     }
 
-    @Test
+
     public void test09() throws IOException {
         FileInputStream f = new FileInputStream(name);
         FileChannel ch = f.getChannel();
@@ -147,8 +146,6 @@ public class FileReadTest {
         logger.info("test 9 done {}", checkSum);
     }
 
-
-    @Test
     public void test10() throws IOException {
         // > 1 sec
         FileInputStream f = new FileInputStream(name);
@@ -168,7 +165,7 @@ public class FileReadTest {
         logger.info("test 10 done {}", checkSum);
     }
 
-    @Test
+
     public void test11() throws IOException {
         FileInputStream f = new FileInputStream(name);
         FileChannel ch = f.getChannel();
@@ -195,7 +192,6 @@ public class FileReadTest {
         logger.info("test 11 done {}", checkSum);
     }
 
-    @Test
     public void test14() throws IOException {
         FileInputStream f = new FileInputStream(name);
         MappedByteBufferInputStream in = new MappedByteBufferInputStream(f.getChannel());
