@@ -146,12 +146,14 @@ public class WithHoldingsAndLicenses
         logger.info("preparing bibdat lookup...");
         bibdatLookup = new BibdatLookup();
         try {
-            bibdatLookup.buildLookup(client, "bibdat");
+            bibdatLookup.buildLookup(client, settings.get("index-bibdat", "bibdat"));
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
-        logger.info("bibdat prepared: {} libraries, {} other",
-                bibdatLookup.lookupLibrary().size(), bibdatLookup.lookupOther().size());
+        logger.info("bibdat prepared, {} in organization lookup, {} in region lookup, {} in other",
+                bibdatLookup.lookupOrganization().size(),
+                bibdatLookup.lookupRegion().size(),
+                bibdatLookup.lookupOther().size());
 
         logger.info("preparing ISIL blacklist...");
         isilbl = new BlackListedISIL();

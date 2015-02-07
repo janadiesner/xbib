@@ -48,35 +48,34 @@ import org.xbib.oai.rdf.RdfResourceHandler;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * DOAJ client test
- *
  */
 public class DOAJClientTest {
 
     private final static Logger logger = LogManager.getLogger(DOAJClientTest.class.getName());
 
     @Test
-    public void testListRecordsDOAJ() throws Exception {
+    public void testListRecordsDOAJ() {
 
         RdfContentParams params = IRINamespaceContext::getInstance;
 
         final RdfSimpleMetadataHandler metadataHandler = new RdfSimpleMetadataHandler(params);
         final RdfResourceHandler resourceHandler = new DOAJResourceHandler(params);
-        //final RdfOutput out = new MyOutput(metadataHandler.getContext());
 
         metadataHandler.setHandler(resourceHandler);
-            //.setOutput(out);
 
-        OAIClient client = OAIClientFactory.newClient("DOAJ");
-        ListRecordsRequest request = client.newListRecordsRequest()
-                .setFrom( DateUtil.parseDateISO("2014-04-16T00:00:00Z"), OAIDateResolution.DAY)
-                .setUntil(DateUtil.parseDateISO("2014-04-17T00:00:00Z"), OAIDateResolution.DAY)
-                .setMetadataPrefix("oai_dc");
+        try {
+            OAIClient client = OAIClientFactory.newClient("DOAJ");
+            ListRecordsRequest request = client.newListRecordsRequest()
+                    .setFrom( DateUtil.parseDateISO("2014-04-16T00:00:00Z"), OAIDateResolution.DAY)
+                    .setUntil(DateUtil.parseDateISO("2014-04-17T00:00:00Z"), OAIDateResolution.DAY)
+                    .setMetadataPrefix("oai_dc");
 
-        do {
-            try {
+            do {
                 ListRecordsListener listener = new ListRecordsListener(request);
                 request.addHandler(metadataHandler);
                 request.prepare().execute(listener).waitFor();
@@ -86,13 +85,11 @@ public class DOAJClientTest {
                     logger.info("response  = {}", sw);
                 }
                 request = client.resume(request, listener.getResumptionToken());
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                request= null;
-            }
-        } while (request != null);
-
-        client.close();
+            } while (request != null);
+            client.close();
+        } catch (IOException | InterruptedException | TimeoutException | ExecutionException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     private final IRI ISSN = IRI.create("urn:ISSN");

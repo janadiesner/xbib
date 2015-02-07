@@ -31,14 +31,11 @@
  */
 package org.xbib.xml.namespace;
 
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import javax.xml.namespace.NamespaceContext;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -49,8 +46,6 @@ import java.util.TreeMap;
  * Contains a simple context for XML namespaces
  */
 public class XmlNamespaceContext implements NamespaceContext {
-
-    private static final Logger logger = LogManager.getLogger(XmlNamespaceContext.class.getName());
 
     private static final String DEFAULT_RESOURCE = "org.xbib.xml.namespaces";
 
@@ -71,7 +66,7 @@ public class XmlNamespaceContext implements NamespaceContext {
         }
     }
 
-    protected static String bundleName() {
+    private static String bundleName() {
         return DEFAULT_RESOURCE;
     }
 
@@ -89,10 +84,13 @@ public class XmlNamespaceContext implements NamespaceContext {
     }
 
     public static XmlNamespaceContext newInstance(String bundleName) {
+        return newInstance(bundleName, Locale.getDefault(), Thread.currentThread().getContextClassLoader());
+    }
+
+    public static XmlNamespaceContext newInstance(String bundleName, Locale locale, ClassLoader classLoader) {
         try {
-            return new XmlNamespaceContext(ResourceBundle.getBundle(bundleName));
+            return new XmlNamespaceContext(ResourceBundle.getBundle(bundleName, locale, classLoader));
         } catch (MissingResourceException e) {
-            logger.warn("bundle name {} not found, namespace will be empty", bundleName);
             return new XmlNamespaceContext();
         }
     }

@@ -157,7 +157,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         return getClass().getName();
     }
 
-    @Override
     public MeterMetric getMetric() {
         return null;
     }
@@ -280,12 +279,14 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             candidates.add(manifestation);
             state = State.COLLECTING;
             // there are certain serial genres which are not fitting into our model of timelines
-            if (dirty || (!manifestation.isDatabase() && !manifestation.isNewspaper() && !manifestation.isPacket())) {
+            if (dirty || (!manifestation.isDatabase() && !manifestation.isPacket())) {
                 // retrieve all docs that are connected by relationships into the candidate set
                 retrieveCandidates(manifestation, candidates);
             } else {
-                logger.debug("{} skipped candidate retrieval because of genre {}",
-                        manifestation, manifestation.genre());
+                logger.debug("{} skipped candidate retrieval, dirty={} isDatabase={} isNewspaper={} isPacket={}",
+                        manifestation, dirty,
+                        manifestation.isDatabase(),
+                        manifestation.isPacket());
             }
             state = State.PROCESSING;
 
@@ -305,12 +306,12 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
 
             // Now, this is expensive. Find holdings, licenses, indicators of candidates
             Set<Holding> holdings = searchHoldings(candidates);
-            if (holdings.size() > 1000) {
+            if (holdings.size() > 5000) {
                 logger.warn("large list of holdings for {} ({})", manifestation, holdings.size());
             }
             cluster.setHoldings(holdings);
             Set<License> licenses = searchLicensesAndIndicators(candidates);
-            if (licenses.size() > 1000) {
+            if (licenses.size() > 5000) {
                 logger.warn("large list of licenses for {} ({})", manifestation, licenses.size());
             }
             // search monographic volumes
@@ -521,12 +522,8 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
             hits = searchResponse.getHits();
             for (int i = c.pos; i < hits.getHits().length; i++) {
                 SearchHit hit = hits.getAt(i);
-                //Manifestation m = new Manifestation(mapper.readValue(hit.source(), Map.class));
                 Manifestation m = new Manifestation(hit.getSource());
                 if (m.id().equals(c.manifestation.id())) {
-                    continue;
-                }
-                if (m.isNewspaper()) {
                     continue;
                 }
                 if (m.isDatabase()) {
@@ -590,6 +587,8 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                 }
                 // Look for more candidates for this manifestation iff temporal or carrier relation.
                 // Also expand if there are any other print/online editions.
+                logger.debug("id={} temporalRelation={} carrierRelation={} hasCarrierRelations={}",
+                        m.id(), temporalRelation, carrierRelation, m.hasCarrierRelations());
                 if (temporalRelation || carrierRelation || m.hasCarrierRelations()) {
                     retrieveCandidates(m, cluster);
                 }
@@ -684,7 +683,8 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                     if (service.blackListedISIL().lookup().contains(isil)) {
                         continue;
                     }
-                    holding.setOrganization(service.bibdatLookup().lookupLibrary().get(isil));
+                    holding.setRegion(service.bibdatLookup().lookupRegion().get(isil));
+                    holding.setOrganization(service.bibdatLookup().lookupOrganization().get(isil));
                     for (String parent : holding.parents()) {
                         Manifestation parentManifestation = manifestations.get(parent);
                         parentManifestation.addRelatedHolding(isil, holding);
@@ -768,11 +768,13 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                     if (service.blackListedISIL().lookup().contains(isil)) {
                         continue;
                     }
-                    license.setOrganization(service.bibdatLookup().lookupLibrary().get(isil));
+                    license.setRegion(service.bibdatLookup().lookupRegion().get(isil));
+                    license.setOrganization(service.bibdatLookup().lookupOrganization().get(isil));
                     for (String parent : license.parents()) {
                         Manifestation m = manifestations.get(parent);
                         m.addRelatedHolding(isil, license);
-                        logger.debug("license {} attached to manifestation {}", license.identifier(), m.externalID());
+                        logger.debug("license {} attached to manifestation {} print={} online={}",
+                                license.identifier(), m.externalID(), m.getPrintExternalID(), m.getOnlineExternalID());
                         license.addManifestation(m);
                         // trick: add also to print manifestation if possible
                         if (m.hasPrint()) {
@@ -832,7 +834,8 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                     if (isil == null) {
                         continue;
                     }
-                    indicator.setOrganization(service.bibdatLookup().lookupLibrary().get(isil));
+                    indicator.setRegion(service.bibdatLookup().lookupRegion().get(isil));
+                    indicator.setOrganization(service.bibdatLookup().lookupOrganization().get(isil));
                     if (service.blackListedISIL().lookup().contains(isil)) {
                         continue;
                     }
@@ -947,7 +950,8 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                         volumeHolding.setMediaType(manifestation.mediaType());
                         volumeHolding.setCarrierType(manifestation.carrierType());
                         volumeHolding.setDate(volume.firstDate(), volume.lastDate());
-                        volumeHolding.setOrganization(service.bibdatLookup().lookupLibrary().get(volumeHolding.getISIL()));
+                        volumeHolding.setRegion(service.bibdatLookup().lookupRegion().get(volumeHolding.getISIL()));
+                        volumeHolding.setOrganization(service.bibdatLookup().lookupOrganization().get(volumeHolding.getISIL()));
                         volumeHolding.setServiceMode(service.statusCodeMapper().lookup(volumeHolding.getStatus()));
                         if ("interlibrary".equals(volumeHolding.getServiceType()) && volumeHolding.getISIL() != null) {
                             volume.addHolding(volumeHolding);
@@ -976,8 +980,8 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                         .should(termQuery("RecordIdentifierSuper.recordIdentifierSuper", parent.id())));
         SearchResponse searchResponse = searchRequest.execute().actionGet();
         service.queryMetric().mark();
-        logger.debug("searchSeriesVolumeHoldings search request={} hits={}",
-                searchRequest.toString(), searchResponse.getHits().getTotalHits());
+        //logger.debug("searchSeriesVolumeHoldings search request={} hits={}",
+        //        searchRequest.toString(), searchResponse.getHits().getTotalHits());
         while (searchResponse.getScrollId() != null) {
             searchResponse = service.client().prepareSearchScroll(searchResponse.getScrollId())
                     .setScroll(TimeValue.timeValueMillis(service.millis()))
@@ -1024,7 +1028,8 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                                 volumeHolding.setMediaType(manifestation.mediaType());
                                 volumeHolding.setCarrierType(manifestation.carrierType());
                                 volumeHolding.setDate(volume.firstDate(), volume.lastDate());
-                                volumeHolding.setOrganization(service.bibdatLookup().lookupLibrary().get(volumeHolding.getISIL()));
+                                volumeHolding.setRegion(service.bibdatLookup().lookupRegion().get(volumeHolding.getISIL()));
+                                volumeHolding.setOrganization(service.bibdatLookup().lookupOrganization().get(volumeHolding.getISIL()));
                                 volumeHolding.setServiceMode(service.statusCodeMapper().lookup(volumeHolding.getStatus()));
                                 if ("interlibrary".equals(volumeHolding.getServiceType()) && volumeHolding.getISIL() != null) {
                                     volume.addHolding(volumeHolding);

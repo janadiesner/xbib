@@ -5,7 +5,7 @@
 
     <groupId>org.xbib</groupId>
     <artifactId>xbib</artifactId>
-    <version>1.0.0.Beta7</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -267,6 +267,23 @@
                                 <goal>site</goal>
                             </goals>
                             <phase>site</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>1.7</version>
+                    <executions>
+                        <execution>
+                            <id>remove-old-artifacts</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>remove-project-artifact</goal>
+                            </goals>
+                            <configuration>
+                                <removeAll>true</removeAll><!-- remove all versions of built artifacts including all versions.  Install phase will regenerate -->
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -820,6 +837,14 @@
     </dependencies>
 
     <modules>
+        <module>io/stream</module>
+        <module>io/file</module>
+        <module>io/http</module>
+        <module>io/ftp</module>
+        <module>io/rsync</module>
+        <module>io/jdbc</module>
+        <module>io/posix</module>
+
         <module>charset</module>
         <module>compress</module>
         <module>util</module>
@@ -843,14 +868,6 @@
         <module>opensearch</module>
         <module>syslog</module>
         <module>rule</module>
-
-        <module>io/stream</module>
-        <module>io/file</module>
-        <module>io/http</module>
-        <module>io/ftp</module>
-        <module>io/rsync</module>
-        <module>io/jdbc</module>
-        <module>io/posix</module>
 
         <module>elasticsearch/search</module>
         <module>elasticsearch/sru</module>

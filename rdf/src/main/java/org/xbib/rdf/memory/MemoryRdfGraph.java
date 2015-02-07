@@ -66,6 +66,10 @@ public class MemoryRdfGraph<Params extends RdfGraphParams>
         return resources.get(predicate);
     }
 
+    public Resource removeResource(IRI predicate) {
+        return resources.remove(predicate);
+    }
+
     public boolean hasResource(IRI predicate) {
         return resources.containsKey(predicate);
     }

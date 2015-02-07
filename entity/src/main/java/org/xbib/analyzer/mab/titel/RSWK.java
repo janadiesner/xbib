@@ -78,7 +78,7 @@ public class RSWK extends MABEntity {
     @Override
     public boolean fields(MABEntityQueue.MABWorker worker,
                           FieldList fields, String value) throws IOException {
-        Resource res = worker.addToResource(worker.state().getResource(), fields, this, value);
+        Resource res = worker.addToResource(worker.state().getResource(), fields, this);
         // sequence name is first indicator
         sequence(worker.state(), "SubjectHeadingSequence.number" + fields.getLast().indicator().charAt(0), res);
         return true; // done!

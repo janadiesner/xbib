@@ -39,6 +39,7 @@ import org.xbib.entities.marc.dialects.mab.MABEntityQueue;
 import org.xbib.entities.support.IdentifierMapper;
 import org.xbib.entities.support.StatusCodeMapper;
 import org.xbib.entities.support.ConfigurableClassifier;
+import org.xbib.iri.IRI;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldList;
 import org.xbib.rdf.Literal;
@@ -81,7 +82,7 @@ public class Item extends MABEntity {
     @Override
     public boolean fields(MABEntityQueue.MABWorker worker,
                           FieldList fields, String value) throws IOException {
-        worker.addToResource(worker.state().getItemResource(), fields, this, value);
+        worker.addToResource(worker.state().getNextItemResource(), fields, this);
         return true;
     }
 
@@ -93,11 +94,12 @@ public class Item extends MABEntity {
             return null;
         }
         MABEntityBuilderState state = worker.state();
-        if ("member".equals(property)) {
+        if ("identifier".equals(property)) {
             IdentifierMapper mapper = worker.identifierMapper();
             if (mapper != null) {
                 String isil = mapper.lookup(value);
                 if (isil != null) {
+                    resource.add("identifier", isil);
                     state.setISIL(isil);
                     if (state.getFacets().get(identifierFacet) == null) {
                         state.getFacets().put(identifierFacet, new StringFacet().setName(identifierFacet).setType(Literal.STRING));
@@ -109,26 +111,26 @@ public class Item extends MABEntity {
                     if (isil.indexOf("-") < pos) {
                         holderFacet.addValue(isil.substring(0, pos));
                     }
+                    ConfigurableClassifier classifier = worker.classifier();
+                    if (classifier != null) {
+                        String doc = state.getRecordIdentifier();
+                        java.util.Collection<ConfigurableClassifier.Entry> entries = classifier.lookup(isil, doc, value, null);
+                        if (entries != null) {
+                            for (ConfigurableClassifier.Entry entry : entries) {
+                                String facet = taxonomyFacet + "." + isil + ".notation";
+                                if (state.getFacets().get(facet) == null) {
+                                    state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                                }
+                                state.getFacets().get(facet).addValue(entry.getCode());
+                                facet = taxonomyFacet + "." + isil + ".text";
+                                if (state.getFacets().get(facet) == null) {
+                                    state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                                }
+                                state.getFacets().get(facet).addValue(entry.getText());
+                            }
+                        }
+                    }
                     return isil;
-                }
-            }
-        } else if ("callnumber".equals(property)) {
-            ConfigurableClassifier classifier = worker.classifier();
-            if (classifier != null) {
-                String isil = state.getISIL();
-                String doc = state.getRecordIdentifier();
-                ConfigurableClassifier.Entry entry = classifier.lookup(isil, doc, value, null);
-                if (entry != null) {
-                    String facet = taxonomyFacet + "." + isil + ".notation";
-                    if (state.getFacets().get(facet) == null) {
-                        state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
-                    }
-                    state.getFacets().get(facet).addValue(entry.getCode());
-                    facet = taxonomyFacet + "." + isil + ".text";
-                    if (state.getFacets().get(facet) == null) {
-                        state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
-                    }
-                    state.getFacets().get(facet).addValue(entry.getText());
                 }
             }
         } else if ("status".equals(property)) {

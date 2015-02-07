@@ -171,7 +171,7 @@ public class WithCitations
             shutdown(new SearchHitPipelineElement().set(null));
 
             long total = 0L;
-            for (Pipeline p : getPipelines()) {
+            for (WithCitationsPipeline p : getPipelines()) {
                 logger.info("pipeline {}, count {}, started {}, ended {}, took {}",
                         p,
                         p.getMetric().count(),
@@ -242,7 +242,7 @@ public class WithCitations
                         logger.info("{}/{} {}% docs={}",
                                 count, total, percent,
                                 docs.size());
-                        for (Pipeline p : getPipelines()) {
+                        for (WithCitationsPipeline p : getPipelines()) {
                             logger.info("{} throughput={} {} {} mean={}",
                                     p.toString(),
                                     p.getMetric().oneMinuteRate(),

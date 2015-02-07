@@ -4,6 +4,7 @@ import org.xbib.entities.faceting.StringFacet;
 import org.xbib.entities.marc.dialects.mab.MABEntity;
 import org.xbib.entities.marc.dialects.mab.MABEntityBuilderState;
 import org.xbib.entities.marc.dialects.mab.MABEntityQueue;
+import org.xbib.marc.Field;
 import org.xbib.marc.FieldList;
 import org.xbib.rdf.Literal;
 
@@ -22,9 +23,6 @@ public class FormatCarrierSimplified extends MABEntity {
 
     private String predicate;
 
-    private Map<String, Object> codes;
-
-    private Map<String, Object> facetcodes;
 
     @Override
     public MABEntity setSettings(Map params) {
@@ -33,8 +31,6 @@ public class FormatCarrierSimplified extends MABEntity {
         if (params.containsKey("_predicate")) {
             this.predicate = params.get("_predicate").toString();
         }
-        this.codes = (Map<String, Object>) getSettings().get("codes");
-        this.facetcodes = (Map<String, Object>) getSettings().get("facetcodes");
         return this;
     }
 
@@ -44,24 +40,40 @@ public class FormatCarrierSimplified extends MABEntity {
         if (value == null || value.isEmpty()) {
             value = fields.getLast().data();
         }
-        if (codes != null) {
-            for (int i = 0; i < value.length(); i++) {
-                String code = (String) codes.get(value.substring(i, i + 1));
-                if (code == null && (i + 1 < value.length())) {
-                    // two letters?
-                    code = (String) codes.get(value.substring(i, i + 2));
-                }
-                worker.state().getResource().add(predicate, code);
-            }
+        Map<String, Object> tags = (Map<String, Object>) getSettings().get("tags");
+        if (tags == null) {
+            return true;
         }
-        if (facetcodes != null) {
-            for (int i = 0; i < value.length(); i++) {
-                String code = (String) facetcodes.get(value.substring(i, i + 1));
-                if (code == null && (i + 1 < value.length())) {
-                    // two letters?
-                    code = (String) facetcodes.get(value.substring(i, i + 2));
+        for (Field field : fields) {
+            String key = (String)tags.get(field.tag());
+            if (key == null) {
+                continue;
+            }
+            Map<String, Object> values = (Map<String, Object>) getSettings().get(key);
+            if (values == null) {
+                continue;
+            }
+            Map<String, Object> codes = (Map<String, Object>)values.get("codes");
+            Map<String, Object> facetcodes = (Map<String, Object>)values.get("facetcodes");
+            if (codes != null) {
+                for (int i = 0; i < value.length(); i++) {
+                    String code = (String) codes.get(value.substring(i, i + 1));
+                    if (code == null && (i + 1 < value.length())) {
+                        // two letters?
+                        code = (String) codes.get(value.substring(i, i + 2));
+                    }
+                    worker.state().getResource().add(predicate, code);
                 }
-                facetize(worker.state(), code);
+            }
+            if (facetcodes != null) {
+                for (int i = 0; i < value.length(); i++) {
+                    String code = (String) facetcodes.get(value.substring(i, i + 1));
+                    if (code == null && (i + 1 < value.length())) {
+                        // two letters?
+                        code = (String) facetcodes.get(value.substring(i, i + 2));
+                    }
+                    facetize(worker.state(), code);
+                }
             }
         }
         return true; // done!

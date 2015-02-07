@@ -1,15 +1,12 @@
 package org.xbib.io.ftp.sauron;
 
-import it.sauronsoftware.ftp4j.FTPAbortedException;
 import it.sauronsoftware.ftp4j.FTPClient;
-import it.sauronsoftware.ftp4j.FTPDataTransferException;
-import it.sauronsoftware.ftp4j.FTPException;
-import it.sauronsoftware.ftp4j.FTPIllegalReplyException;
-import it.sauronsoftware.ftp4j.FTPListParseException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 
+import it.sauronsoftware.ftp4j.FTPException;
+import it.sauronsoftware.ftp4j.FTPIllegalReplyException;
 import org.xbib.io.Session;
 import org.xbib.io.StringPacket;
 
@@ -89,4 +86,17 @@ public class FTPSession implements Session<StringPacket> {
             throw new IOException(ex);
         }
     }
+
+    public void rename(String oldPath, String newPath) throws FTPException, IOException, FTPIllegalReplyException {
+        if (client != null) {
+            client.rename(oldPath, newPath);
+        }
+    }
+
+    public void mkdir(String path) throws FTPException, IOException, FTPIllegalReplyException {
+        if (client != null) {
+            client.createDirectory(path);
+        }
+    }
+
 }

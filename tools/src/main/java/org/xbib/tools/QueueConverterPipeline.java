@@ -72,7 +72,6 @@ public abstract class QueueConverterPipeline<T, R extends PipelineRequest, P ext
         return this;
     }
 
-    @Override
     public MeterMetric getMetric() {
         return metric;
     }

@@ -53,9 +53,9 @@ public class RecordIdentifierSuper extends MABEntity {
         if (params.containsKey("_prefix")) {
             this.prefix = params.get("_prefix").toString();
         }
-        // override prefix by "identifier" with braces
-        if (params.containsKey("identifier")) {
-            this.prefix = "(" + params.get("identifier").toString() + ")";
+        // override prefix by "catalogid" with braces
+        if (params.containsKey("catalogid")) {
+            this.prefix = "(" + params.get("catalogid").toString() + ")";
         }
         return this;
     }

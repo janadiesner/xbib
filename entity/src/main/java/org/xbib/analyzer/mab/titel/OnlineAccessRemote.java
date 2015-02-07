@@ -31,10 +31,14 @@
  */
 package org.xbib.analyzer.mab.titel;
 
+import org.xbib.entities.faceting.StringFacet;
 import org.xbib.entities.marc.dialects.mab.MABEntity;
+import org.xbib.entities.marc.dialects.mab.MABEntityBuilderState;
 import org.xbib.entities.marc.dialects.mab.MABEntityQueue;
+import org.xbib.entities.support.ConfigurableClassifier;
 import org.xbib.entities.support.IdentifierMapper;
 import org.xbib.marc.FieldList;
+import org.xbib.rdf.Literal;
 import org.xbib.rdf.Resource;
 
 import java.io.IOException;
@@ -47,29 +51,50 @@ public class OnlineAccessRemote extends MABEntity {
         return element;
     }
 
+    private final static String taxonomyFacet = "xbib.taxonomy";
+
+    @Override
+    public boolean fields(MABEntityQueue.MABWorker worker,
+                          FieldList fields, String value) throws IOException {
+        worker.addToResource(worker.state().getNextItemResource(), fields, this);
+        return true;
+    }
+
     @Override
     public String data(MABEntityQueue.MABWorker worker,
                        String predicate, Resource resource, String property, String value) {
         if (value == null) {
             return null;
         }
-        if ("member".equals(property)) {
+        MABEntityBuilderState state = worker.state();
+        String isil = value;
+        if ("identifier".equals(property)) {
             IdentifierMapper mapper = worker.identifierMapper();
             if (mapper != null) {
-                String isil = mapper.lookup(value);
-                if (isil != null) {
-                    return isil;
+                isil = mapper.lookup(value);
+            }
+            resource.add("identifier", isil);
+            ConfigurableClassifier classifier = worker.classifier();
+            if (classifier != null) {
+                String key = isil + "." + state.getRecordIdentifier() + ".";
+                java.util.Collection<ConfigurableClassifier.Entry> entries = classifier.lookup(key);
+                if (entries != null) {
+                    for (ConfigurableClassifier.Entry entry : entries) {
+                        String facet = taxonomyFacet + "." + isil + ".notation";
+                        if (state.getFacets().get(facet) == null) {
+                            state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                        }
+                        state.getFacets().get(facet).addValue(entry.getCode());
+                        facet = taxonomyFacet + "." + isil + ".text";
+                        if (state.getFacets().get(facet) == null) {
+                            state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                        }
+                        state.getFacets().get(facet).addValue(entry.getText());
+                    }
                 }
             }
         }
-        return value;
-    }
-
-    @Override
-    public boolean fields(MABEntityQueue.MABWorker worker,
-                          FieldList fields, String value) throws IOException {
-        worker.addToResource(worker.state().getItemResource(), fields, this, value);
-        return true;
+        return isil;
     }
 
 }

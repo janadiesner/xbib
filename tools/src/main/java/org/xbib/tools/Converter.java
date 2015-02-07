@@ -155,6 +155,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
     }
 
     public Converter<T, R, P> run(Settings newSettings, Queue<URI> newInput) throws Exception {
+        Thread metricThread = null;
         try {
             settings = newSettings;
             input = newInput;
@@ -162,12 +163,18 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
             executor = new MetricSimplePipelineExecutor<T, R, P>()
                     .setConcurrency(settings.getAsInt("concurrency", 1))
                     .setPipelineProvider(pipelineProvider())
-                    .prepare()
-                    .execute()
+                    .prepare();
+            metricThread = new MetricThread();
+            metricThread.setDaemon(true);
+            metricThread.start();
+            executor.execute()
                     .waitFor();
             logger.info("execution completed");
         } finally {
             cleanup();
+            if (metricThread != null) {
+                metricThread.interrupt();
+            }
             if (executor != null) {
                 executor.shutdown();
                 writeMetrics(executor.metric(), writer);
@@ -203,7 +210,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
     }
 
     @Override
-    public void newRequest(Pipeline<MeterMetric, URIPipelineElement> pipeline, URIPipelineElement request) {
+    public void newRequest(Pipeline<Boolean, URIPipelineElement> pipeline, URIPipelineElement request) {
         try {
             process(request.get());
         } catch (Exception ex) {
@@ -212,8 +219,24 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
     }
 
     @Override
-    public void error(Pipeline<MeterMetric, URIPipelineElement> pipeline, URIPipelineElement request, PipelineException error) {
+    public void error(Pipeline<Boolean, URIPipelineElement> pipeline, URIPipelineElement request, PipelineException error) {
         logger.error(error.getMessage(), error);
+    }
+
+    class MetricThread extends Thread {
+
+        public void run() {
+            while (!interrupted()) {
+                try {
+                    if (executor != null) {
+                        writeMetrics(executor.metric(), null);
+                    }
+                    Thread.sleep(10000L);
+                } catch (Exception e) {
+                    //
+                }
+            }
+        }
     }
 
     protected void writeMetrics(MeterMetric metric, Writer writer) throws Exception {

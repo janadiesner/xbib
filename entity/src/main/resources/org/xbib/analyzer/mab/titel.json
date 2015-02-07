@@ -3564,7 +3564,7 @@
     },
     "Item": {
         "subfields": {
-            "a": "member",
+            "a": "identifier",
             "b": "shelfmark",
             "c": "callnumber",
             "d": "collection",
@@ -4789,7 +4789,7 @@
             "": "access",
             " ": "access",
             "$": "label",
-            "2": "member",
+            "2": "identifier",
             "3": "relatedto",
             "6": "linkage",
             "8": "pos",

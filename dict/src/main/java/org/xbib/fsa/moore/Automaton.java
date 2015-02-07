@@ -1,7 +1,5 @@
 package org.xbib.fsa.moore;
 
-import org.xbib.fsa.moore.levenshtein.State;
-
 import java.util.Set;
 
 /**

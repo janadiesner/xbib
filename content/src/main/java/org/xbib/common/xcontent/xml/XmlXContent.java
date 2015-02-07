@@ -31,6 +31,8 @@
  */
 package org.xbib.common.xcontent.xml;
 
+import com.ctc.wstx.stax.WstxInputFactory;
+import com.ctc.wstx.stax.WstxOutputFactory;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 
@@ -55,18 +57,27 @@ import java.io.Writer;
  */
 public class XmlXContent implements XContent {
 
-    private final static XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+    private final static XMLInputFactory inputFactory;
 
-    private final static XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+    private final static XMLOutputFactory outputFactory;
 
+    private final static XmlFactory xmlFactory;
+
+    private final static XmlXContent xmlXContent;
+
+    /**
+     * We need Woodstox, the default Stax JDK parser is too buggy.
+     */
     static {
+        inputFactory = new WstxInputFactory();
         inputFactory.setProperty("javax.xml.stream.isNamespaceAware", Boolean.TRUE);
         inputFactory.setProperty("javax.xml.stream.isValidating", Boolean.FALSE);
         inputFactory.setProperty("javax.xml.stream.isCoalescing", Boolean.TRUE);
         inputFactory.setProperty("javax.xml.stream.isReplacingEntityReferences", Boolean.FALSE);
         inputFactory.setProperty("javax.xml.stream.isSupportingExternalEntities", Boolean.FALSE);
 
-        outputFactory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.TRUE);
+        outputFactory = new WstxOutputFactory();
+        outputFactory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.FALSE);
 
         xmlFactory = new XmlFactory(inputFactory, outputFactory);
 
@@ -88,10 +99,6 @@ public class XmlXContent implements XContent {
         }
         return builder;
     }
-
-    private final static XmlFactory xmlFactory;
-
-    private final static XmlXContent xmlXContent;
 
     private XmlXContent() {
     }

@@ -33,7 +33,6 @@ package org.xbib.tools.feed.elasticsearch.zdb.bib;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.common.unit.TimeValue;
 import org.xbib.entities.marc.MARCEntityBuilderState;
 import org.xbib.entities.marc.MARCEntityQueue;
 import org.xbib.iri.namespace.IRINamespaceContext;
@@ -52,7 +51,6 @@ import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.content.RouteRdfXContentParams;
 import org.xbib.tools.OAIFeeder;
-import org.xbib.util.DateUtil;
 import org.xbib.util.URIUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
@@ -62,6 +60,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URI;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -69,7 +71,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Queues.newConcurrentLinkedQueue;
 import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 
 /**
@@ -120,43 +121,56 @@ public class MarcBibOAI extends OAIFeeder {
         String verb = oaiparams.get("verb");
         String metadataPrefix = oaiparams.get("metadataPrefix");
         String set = oaiparams.get("set");
-        Date from = DateUtil.parseDateISO(oaiparams.get("from"));
-        Date until = DateUtil.parseDateISO(oaiparams.get("until"));
-        final OAIClient client = OAIClientFactory.newClient(server);
-        client.setTimeout(settings.getAsInt("timeout", 60000));
+        Date from = Date.from(Instant.parse(oaiparams.get("from")));
+        Date until = Date.from(Instant.parse(oaiparams.get("until")));
+        // compute interval
+        long interval = ChronoUnit.DAYS.between(from.toInstant(), until.toInstant());
+        long count = settings.getAsLong("count", 1L);
         if (!verb.equals(OAIConstants.LIST_RECORDS)) {
             logger.warn("no verb {}, returning", OAIConstants.LIST_RECORDS);
             return;
         }
-        ListRecordsRequest request = client.newListRecordsRequest()
-                .setMetadataPrefix(metadataPrefix)
-                .setSet(set)
-                .setFrom(from, OAIDateResolution.DAY)
-                .setUntil(until, OAIDateResolution.DAY);
         do {
-            try {
-                final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
-                        .addListener(queue);
-                MarcMetadataHandler handler = new MarcMetadataHandler(kv);
-                request.addHandler(handler);
-                ListRecordsListener listener = new ListRecordsListener(request);
-                request.prepare().execute(listener).waitFor();
-                if (listener.getResponse() != null) {
-                    logger.debug("got OAI response");
-                    StringWriter w = new StringWriter();
-                    listener.getResponse().to(w);
-                    request = client.resume(request, listener.getResumptionToken());
-                } else {
-                    logger.debug("no valid OAI response");
-                }
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                request = null;
+            final OAIClient client = OAIClientFactory.newClient(server);
+            client.setTimeout(settings.getAsInt("timeout", 60000));
+            if (settings.get("proxyhost") != null) {
+                client.setProxy(settings.get("proxyhost"), settings.getAsInt("proxyport", 3128));
             }
-        } while (request != null);
-        client.close();
+            ListRecordsRequest request = client.newListRecordsRequest()
+                    .setMetadataPrefix(metadataPrefix)
+                    .setSet(set)
+                    .setFrom(from, OAIDateResolution.DAY)
+                    .setUntil(until, OAIDateResolution.DAY);
+            do {
+                try {
+                    final MarcXchange2KeyValue kv = new MarcXchange2KeyValue()
+                            .addListener(queue);
+                    MarcMetadataHandler handler = new MarcMetadataHandler(kv);
+                    request.addHandler(handler);
+                    ListRecordsListener listener = new ListRecordsListener(request);
+                    request.prepare().execute(listener).waitFor();
+                    if (listener.getResponse() != null) {
+                        logger.debug("got OAI response");
+                        StringWriter w = new StringWriter();
+                        listener.getResponse().to(w);
+                        request = client.resume(request, listener.getResumptionToken());
+                    } else {
+                        logger.debug("no valid OAI response");
+                    }
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                    request = null;
+                }
+            } while (request != null);
+            client.close();
+            // switch to next request
+            LocalDateTime ldt = LocalDateTime.ofInstant(from.toInstant(), ZoneOffset.UTC).plusDays(-interval);
+            from = Date.from(ldt.toInstant(ZoneOffset.UTC));
+            ldt = LocalDateTime.ofInstant(until.toInstant(), ZoneOffset.UTC).plusDays(-interval);
+            until = Date.from(ldt.toInstant(ZoneOffset.UTC));
+        } while (count-- > 0L);
         queue.close();
-        if (settings.getAsBoolean("detect", false)) {
+        if (settings.getAsBoolean("detect-unknown", false)) {
             logger.info("unknown keys = {}", unmapped);
         }
     }

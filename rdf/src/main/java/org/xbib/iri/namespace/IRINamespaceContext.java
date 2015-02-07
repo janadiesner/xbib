@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -61,9 +62,13 @@ public final class IRINamespaceContext extends XmlNamespaceContext implements Co
     }
 
     public static IRINamespaceContext getInstance() {
+        return getInstance(Locale.getDefault(), Thread.currentThread().getContextClassLoader());
+    }
+
+    public static IRINamespaceContext getInstance(Locale locale, ClassLoader classLoader) {
         if (instance == null) {
             try {
-                instance = new IRINamespaceContext(ResourceBundle.getBundle("org.xbib.xml.namespaces"));
+                instance = new IRINamespaceContext(ResourceBundle.getBundle("org.xbib.xml.namespaces", locale, classLoader));
             } catch (MissingResourceException e) {
                 instance = new IRINamespaceContext();
             }

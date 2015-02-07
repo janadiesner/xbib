@@ -20,7 +20,7 @@ import java.util.List;
 
 public class Dictionary {
 
-    private final Charset UTF8 = Charset.forName("UTF-8");
+    private final static Charset UTF8 = Charset.forName("UTF-8");
 
     private FSA fsa;
 

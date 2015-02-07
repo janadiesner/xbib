@@ -20,11 +20,4 @@ public interface Pipeline<T,R extends PipelineRequest>
 
     String getName();
 
-    /**
-     * Return the pipeline metric.
-     *
-     * @return the pipeline metric
-     */
-    MeterMetric getMetric();
-
 }

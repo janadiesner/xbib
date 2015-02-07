@@ -47,6 +47,8 @@ public interface RdfGraph<Params extends RdfGraphParams>
 
     Resource getResource(IRI predicate);
 
+    Resource removeResource(IRI predicate);
+
     boolean hasResource(IRI predicate);
 
 }

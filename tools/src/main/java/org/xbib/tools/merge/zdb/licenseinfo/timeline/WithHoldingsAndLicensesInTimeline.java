@@ -301,7 +301,7 @@ public class WithHoldingsAndLicensesInTimeline
                         logger.info("{}/{} {}% processed={} timelines={} indexed={} skipped={}",
                                 count, total, percent,
                                 processed.size(), timelines.size(), indexed.size(), skipped.size());
-                        for (Pipeline p : getPipelines()) {
+                        for (WithHoldingsAndLicensesInTimelinePipeline p : getPipelines()) {
                             logger.info("{} throughput={} {} {} mean={}",
                                     p.toString(),
                                     p.getMetric().oneMinuteRate(),

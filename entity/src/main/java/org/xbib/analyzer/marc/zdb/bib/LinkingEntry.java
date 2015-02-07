@@ -45,7 +45,7 @@ public class LinkingEntry extends MARCEntity {
     @Override
     public String data(MARCEntityQueue.MARCWorker worker,
                        String predicate, Resource resource, String property, String value) {
-        if ("identifier".equals(property)) {
+        if ("id".equals(property)) {
             if (value.startsWith("(DE-600)")) {
                 resource.add("identifierZDB", value.substring(8).replaceAll("\\-","").toLowerCase());
                 return null;

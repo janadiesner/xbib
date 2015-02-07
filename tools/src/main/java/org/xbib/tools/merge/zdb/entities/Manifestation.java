@@ -38,6 +38,8 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.pipeline.PipelineRequest;
 import org.xbib.util.Strings;
@@ -62,6 +64,8 @@ import static com.google.common.collect.Sets.newTreeSet;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 public class Manifestation implements Comparable<Manifestation>, PipelineRequest {
+
+    private final static Logger logger = LogManager.getLogger(Manifestation.class);
 
     private final static Integer currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 
@@ -110,10 +114,6 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
     private final SetMultimap<String, String> relations = Multimaps.newSetMultimap(Maps.newTreeMap(), supplier);
 
     private final SetMultimap<String, String> externalRelations = Multimaps.newSetMultimap(Maps.newTreeMap(), supplier);
-
-    protected String genre;
-
-    private boolean isPeriodical;
 
     private boolean isDatabase;
 
@@ -178,20 +178,12 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         findLinks();
         this.description = getString("DatesOfPublication.value");
         findSupplement();
-        this.genre = getString("OtherCodes.genreSource");
+        String genre = getString("OtherCodes.genreSource");
         String resourceType = getString("typeOfContinuingResource");
-        this.isPeriodical = "Periodical".equals(resourceType);
-        this.isDatabase = "Updating database".equals(resourceType)
-                || "ag".equals(genre);
-        this.isPacket = "pt".equals(genre);
-        this.isNewspaper = "Newspaper".equals(resourceType)
-                || "fn".equals(genre)
-                || "lp".equals(genre)
-                || "ao".equals(genre)
-                || "eo".equals(genre)
-                || "up".equals(genre)
-                || "zt".equals(genre);
         this.isWebsite = "Updating Web site".equals(resourceType);
+        this.isDatabase = "Updating database".equals(resourceType);
+        this.isPacket = "pt".equals(genre);
+        this.isNewspaper = "Newspaper".equals(resourceType);
         // TODO "Monographic series"
         // TODO "Updating loose-leaf"
 
@@ -356,14 +348,6 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
 
     public String description() {
         return description;
-    }
-
-    public String genre() {
-        return genre;
-    }
-
-    public boolean isPeriodical() {
-        return isPeriodical;
     }
 
     public boolean isSupplement() {
@@ -750,13 +734,13 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
      * Check for ZDB IDs and remember as external IDs.
      */
     private void makeRelations() {
-
         this.isInTimeline = false;
         boolean hasSuccessor = false;
         boolean hasPredecessor = false;
         boolean hasTransient = false;
 
         for (String rel : relationEntries) {
+            logger.debug("rel={}", rel);
             Object o = map.get(rel);
             if (o == null) {
                 continue;
@@ -768,6 +752,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
                 Map<String, Object> m = (Map<String, Object>) obj;
                 Object relObj = m.get("relation");
                 if (relObj == null) {
+                    logger.debug("relation=null");
                     continue;
                 }
                 String key = relObj instanceof List ?
@@ -784,7 +769,6 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
                 synchronized (relations) {
                     relations.put(key, internal);
                 }
-
                 // external ID = ZDB ID (used for external typed linking, internal linking may collide with GND ID)
                 Object externalObj = m.get("identifierZDB");
                 String external = externalObj == null ? null : externalObj instanceof List ?
@@ -795,7 +779,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
                 synchronized (externalRelations) {
                     externalRelations.put(key, external);
                 }
-
+                logger.debug("key={}", key);
                 switch (key) {
                     case "succeededBy":
                         hasSuccessor = true;
@@ -994,9 +978,11 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         for (String institution : institutions.keySet()) {
             Set<Holding> holdingsPerInstitution = institutions.get(institution);
             XContentBuilder institutionBuilder = jsonBuilder();
+            Holding h = holdingsPerInstitution.iterator().next();
             institutionBuilder.startObject()
                     .field("@id", institution)
-                    .field("organization", holdingsPerInstitution.iterator().next().getOrganization())
+                    .field("region", h.getRegion())
+                    .field("organization", h.getOrganization())
                     .field("servicecount", holdingsPerInstitution.size())
                     .startArray("service");
             List<XContentBuilder> list = newLinkedList();
@@ -1012,6 +998,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
                 serviceBuilder.endArray()
                         .field("mediatype", holding.mediaType())
                         .field("carriertype", holding.carrierType())
+                        .field("region", holding.getRegion())
                         .field("organization", holding.getOrganization())
                         .field("isil", institution)
                         .field("serviceisil", holding.getServiceISIL())
@@ -1060,6 +1047,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
                     .field("@parent", parentIdentifier)
                     .field("mediatype", holding.mediaType())
                     .field("carriertype", holding.carrierType())
+                    .field("region", holding.getRegion())
                     .field("organization", holding.getOrganization())
                     .field("isil", holding.getServiceISIL())
                     .field("priority", holding.getPriority())

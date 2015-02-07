@@ -48,6 +48,8 @@ import org.xbib.iri.namespace.IRINamespaceContext;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * DOAJ client test
@@ -62,7 +64,7 @@ public class DOAJArticleClientTest {
     private final static String DOAJ_NS_URI = "http://www.doaj.org/schemas/";
 
     @Test
-    public void testListRecordsDOAJArticles() throws Exception {
+    public void testListRecordsDOAJArticles() {
 
         IRINamespaceContext namespaceContext = RdfSimpleMetadataHandler.getDefaultContext();
         namespaceContext.addNamespace(DOAJ_NS_PREFIX, DOAJ_NS_URI);
@@ -71,19 +73,17 @@ public class DOAJArticleClientTest {
         final RdfSimpleMetadataHandler metadataHandler = new RdfSimpleMetadataHandler(params);
         final RdfResourceHandler resourceHandler = new DOAJResourceHandler(params);
         resourceHandler.setDefaultNamespace(DOAJ_NS_PREFIX,  DOAJ_NS_URI);
-        //final RdfOutput out = new MyOutput(metadataHandler.getContext());
 
         metadataHandler.setHandler(resourceHandler);
-            //.setOutput(out);
 
-        OAIClient client = OAIClientFactory.newClient("http://doaj.org/oai.article");
-        ListRecordsRequest request = client.newListRecordsRequest()
-                .setFrom( DateUtil.parseDateISO("2014-04-16T00:00:00Z"), OAIDateResolution.DAY)
-                .setUntil(DateUtil.parseDateISO("2014-04-17T00:00:00Z"), OAIDateResolution.DAY)
-                .setMetadataPrefix("oai_dc"); // doajArticle format no longer there!
+        try {
+            OAIClient client = OAIClientFactory.newClient("http://doaj.org/oai.article");
+            ListRecordsRequest request = client.newListRecordsRequest()
+                    .setFrom( DateUtil.parseDateISO("2014-04-16T00:00:00Z"), OAIDateResolution.DAY)
+                    .setUntil(DateUtil.parseDateISO("2014-04-17T00:00:00Z"), OAIDateResolution.DAY)
+                    .setMetadataPrefix("oai_dc"); // doajArticle format no longer there!
 
-        do {
-            try {
+            do {
                 ListRecordsListener listener = new ListRecordsListener(request);
                 request.addHandler(metadataHandler);
                 request.prepare().execute(listener).waitFor();
@@ -93,13 +93,12 @@ public class DOAJArticleClientTest {
                     logger.info("response = {}", sw);
                 }
                 request = client.resume(request, listener.getResumptionToken());
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                request = null;
-            }
-        } while (request != null);
+            } while (request != null);
 
-        client.close();
+            client.close();
+        } catch (IOException | InterruptedException | TimeoutException | ExecutionException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     private final IRI ISSN = IRI.create("urn:ISSN");

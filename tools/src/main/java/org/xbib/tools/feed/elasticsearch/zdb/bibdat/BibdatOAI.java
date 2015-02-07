@@ -62,12 +62,8 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.text.Normalizer;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
@@ -127,15 +123,15 @@ public final class BibdatOAI extends OAIFeeder {
         // interval
         long interval = ChronoUnit.DAYS.between(from.toInstant(), until.toInstant());
         long count = settings.getAsLong("count", 1L);
+        if (!verb.equals(OAIConstants.LIST_RECORDS)) {
+            logger.warn("no verb {}, returning", OAIConstants.LIST_RECORDS);
+            return;
+        }
         do {
             final OAIClient client = OAIClientFactory.newClient(server);
             client.setTimeout(settings.getAsInt("timeout", 60000));
             if (settings.get("proxyhost") != null) {
                 client.setProxy(settings.get("proxyhost"), settings.getAsInt("proxyport", 3128));
-            }
-            if (!verb.equals(OAIConstants.LIST_RECORDS)) {
-                logger.warn("no verb {}, returning", OAIConstants.LIST_RECORDS);
-                return;
             }
             ListRecordsRequest request = client.newListRecordsRequest()
                     .setMetadataPrefix(metadataPrefix)
@@ -168,7 +164,7 @@ public final class BibdatOAI extends OAIFeeder {
             // switch to next request
             LocalDateTime ldt = LocalDateTime.ofInstant(from.toInstant(), ZoneOffset.UTC).plusDays(-interval);
             from = Date.from(ldt.toInstant(ZoneOffset.UTC));
-            ldt = LocalDateTime.ofInstant(from.toInstant(), ZoneOffset.UTC).plusDays(-interval);
+            ldt = LocalDateTime.ofInstant(until.toInstant(), ZoneOffset.UTC).plusDays(-interval);
             until = Date.from(ldt.toInstant(ZoneOffset.UTC));
         } while (count-- > 0L);
         queue.close();
@@ -209,14 +205,6 @@ public final class BibdatOAI extends OAIFeeder {
             builder.receive(state.getResource());
             if (settings.getAsBoolean("mock", false)) {
                 logger.info("{}", builder.string());
-            }
-            metric().mark();
-            if (metric().count() % 100 == 0) {
-                try {
-                    writeMetrics(metric(), null);
-                } catch (Exception e) {
-                    throw new IOException("metric failed", e);
-                }
             }
         }
     }

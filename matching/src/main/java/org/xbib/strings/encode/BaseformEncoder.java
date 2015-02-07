@@ -31,8 +31,8 @@
  */
 package org.xbib.strings.encode;
 
-import org.xbib.util.URIUtil;
-
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
 import java.util.Locale;
@@ -53,9 +53,9 @@ public class BaseformEncoder {
     public static String normalizedFromUTF8(String name) {
         String s;
         try {
-            s = URIUtil.decode(name, UTF8);
-        } catch (StringIndexOutOfBoundsException e) {
-            // ignore
+            s = URLDecoder.decode(name, "UTF-8"); // URIUtil.decode(name, UTF8);
+        } catch (UnsupportedEncodingException | StringIndexOutOfBoundsException e) {
+            //ignore
         }
         s = Normalizer.normalize(name, Normalizer.Form.NFC);
         s = p.matcher(s).replaceAll("");
@@ -66,8 +66,8 @@ public class BaseformEncoder {
     public static String normalizedFromISO88591(String name) {
         String s;
         try {
-            s = URIUtil.decode(name, UTF8);
-        } catch (StringIndexOutOfBoundsException e) {
+            s = URLDecoder.decode(name, "UTF-8"); //URIUtil.decode(name, UTF8);
+        } catch (UnsupportedEncodingException | StringIndexOutOfBoundsException e) {
             // ignore
         }
         s = Normalizer.normalize(new String(name.getBytes(ISO88591), UTF8), Normalizer.Form.NFC);

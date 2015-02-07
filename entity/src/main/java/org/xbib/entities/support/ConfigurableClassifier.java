@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -46,32 +47,41 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.google.common.collect.Lists.newLinkedList;
+
 public class ConfigurableClassifier {
 
     private final static Logger logger = LogManager.getLogger(ConfigurableClassifier.class);
 
     private String classifierID;
 
-    private Map<String,Entry> map;
+    private Map<String,Collection<Entry>> map;
 
     public ConfigurableClassifier load(InputStream in, String name, String classifierID) throws IOException {
         return load(new InputStreamReader(in, "UTF-8"), name, classifierID);
     }
 
     public ConfigurableClassifier load(Reader reader, String name, String classifierID) throws IOException {
-        this.map = new HashMap<String,Entry>();
+        this.map = new HashMap<String,Collection<Entry>>();
         this.classifierID = classifierID;
         try (BufferedReader bufferedReader = new BufferedReader(reader)) {
             bufferedReader.lines()
                     .map(mapToKeyValue)
                     .filter(Objects::nonNull)
-                    .forEach(kv -> map.put(name + '.' + kv.doc + '.' + kv.code, kv));
+                    .forEach(kv -> putEntry(map, name, kv));
         }
-        logger.debug("classifier map={}", map);
         return this;
     }
 
-    public Map<String,Entry> getMap() {
+    private void putEntry(Map<String,Collection<Entry>> map, String name, Entry entry) {
+        String key = name + '.' + entry.doc + '.';
+        Collection<Entry> entries = map.containsKey(key) ? map.get(key) : newLinkedList();
+        entries.add(entry);
+        map.put(key, entries);
+        map.put(name + '.' + entry.doc + '.' + entry.code, entries);
+    }
+
+    public Map<String,Collection<Entry>> getMap() {
         return map;
     }
 
@@ -80,7 +90,7 @@ public class ConfigurableClassifier {
      * @param key the key e.g. DE-605.12345.ABC
      * @return found entry or null
      */
-    public Entry lookup(String key) {
+    public Collection<Entry> lookup(String key) {
         return map.get(key);
     }
 
@@ -92,23 +102,23 @@ public class ConfigurableClassifier {
      * @param pattern optional regex for examining the code
      * @return found entry or null
      */
-    public Entry lookup(String name, String doc, String code, Pattern pattern) {
+    public Collection<Entry> lookup(String name, String doc, String code, Pattern pattern) {
         if (code == null || code.isEmpty() || code.trim().isEmpty()) {
             return null;
         }
         String k = name + '.' + doc + '.' + code;
-        Entry entry = map.containsKey(k) ? map.get(k) : null;
-        if (entry != null) {
-            return entry;
+        Collection<Entry> entries = map.containsKey(k) ? map.get(k) : null;
+        if (entries != null) {
+            return entries;
         }
         if (pattern == null) {
             // split code into fragments
             String[] array = code.split("\\s+");
             for (String s : array) {
                 if (s.length() > 0 && !code.equals(s)) {
-                    entry = lookup(name, doc, s, null);
-                    if (entry != null) {
-                        return entry;
+                    entries = lookup(name, doc, s, null);
+                    if (entries != null) {
+                        return entries;
                     }
                 }
             }
@@ -117,9 +127,9 @@ public class ConfigurableClassifier {
             // pattern matching
             Matcher m = pattern.matcher(code);
             if (m.find()) {
-                entry = lookup(name, doc, code.substring(m.start(), m.end()), null);
-                if (entry != null) {
-                    return entry;
+                entries = lookup(name, doc, code.substring(m.start(), m.end()), null);
+                if (entries != null) {
+                    return entries;
                 }
             }
         }

@@ -1,7 +1,6 @@
 
 package org.xbib.fsa.moore;
 
-import org.xbib.fsa.moore.levenshtein.State;
 import org.xbib.util.CompactHashMap;
 
 import java.util.Collection;

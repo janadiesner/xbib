@@ -156,7 +156,7 @@ public class Handlebars implements HelperRegistry {
     /**
      * The helper registry.
      */
-    private HelperRegistry registry = new DefaultHelperRegistry();
+    private HelperRegistry registry;
 
     /**
      * If true, templates will be able to call him self directly or indirectly. Use with caution.
@@ -189,21 +189,36 @@ public class Handlebars implements HelperRegistry {
      */
     private String endDelimiter = DELIM_END;
 
+    public Handlebars() {
+        this(Handlebars.class.getClassLoader());
+    }
+
     /**
      * Creates a new {@link Handlebars} with no cache.
      *
      * @param loader The template loader. Required.
      */
     public Handlebars(final TemplateLoader loader) {
-        with(loader);
+        this(Handlebars.class.getClassLoader(), loader);
     }
 
     /**
      * Creates a new {@link Handlebars} with a {@link org.xbib.template.handlebars.io.ClassPathTemplateLoader} and no
      * cache.
      */
-    public Handlebars() {
-        this(new ClassPathTemplateLoader());
+    public Handlebars(ClassLoader classLoader) {
+        this(classLoader, new ClassPathTemplateLoader(classLoader));
+    }
+
+    /**
+     * Creates a new {@link Handlebars} with no cache.
+     *
+     * @param classLoader the class loader
+     * @param loader The template loader. Required.
+     */
+    public Handlebars(ClassLoader classLoader, final TemplateLoader loader) {
+        this.registry = new DefaultHelperRegistry(classLoader);
+        with(loader);
     }
 
     /**
@@ -794,7 +809,6 @@ public class Handlebars implements HelperRegistry {
      */
     public Handlebars with(final HelperRegistry registry) {
         this.registry = Validate.notNull(registry, "The registry is required.");
-
         return this;
     }
 

@@ -1,23 +1,30 @@
 #!/bin/bash
 
+# sync data
+dir="/Users/joerg/import/ezb/"
+pushd ${dir}
+wget --timestamping -r ftp://fize:gebida@rzblx5.uni-regensburg.de/
+popd
+
 # cron?
 tty -s
 if [ "$?" -gt "0" ]
 then
     cd $HOME/hbz-toolbox
-    pwd=$(pwd)/bin
+    pwd=$(pwd)
+    bin=${pwd}/bin
+    lib=${pwd}/lib
 else
     pwd="$( cd -P "$( dirname "$0" )" && pwd )"
+    bin=${pwd}/../../../bin
+    lib=${pwd}/../../../lib
 fi
-
-bin=${pwd}/../../../bin
-lib=${pwd}/../../../lib
 
 java="java"
 
 echo '
 {
-    "path" : "/Users/joerg/import/ezb/rzblx5.uni-regensburg.de",
+    "path" : "'${dir}'rzblx5.uni-regensburg.de",
     "pattern" : "HBZ*.gz",
     "isChronologicallySorted" : true,
     "concurrency" : 4,

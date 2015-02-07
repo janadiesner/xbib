@@ -29,12 +29,21 @@ public class DefaultHelperRegistry implements HelperRegistry {
     /**
      * The helper registry.
      */
-    private final Map<String, Helper<?>> helpers =
-            new HashMap<String, Helper<?>>();
+    private final Map<String, Helper<?>> helpers = new HashMap<String, Helper<?>>();
 
-    {
-        // make sure default helpers are registered
-        registerBuiltinsHelpers(this);
+    public DefaultHelperRegistry(ClassLoader classLoader) {
+        registerHelper(WithHelper.NAME, WithHelper.INSTANCE);
+        registerHelper(IfHelper.NAME, IfHelper.INSTANCE);
+        registerHelper(IfConditionHelper.NAME, IfConditionHelper.INSTANCE);
+        registerHelper(SelectHelper.NAME, SelectHelper.INSTANCE);
+        registerHelper(EvalHelper.NAME, EvalHelper.INSTANCE);
+        registerHelper(UnlessHelper.NAME, UnlessHelper.INSTANCE);
+        registerHelper(EachHelper.NAME, EachHelper.INSTANCE);
+        registerHelper(EmbeddedHelper.NAME, EmbeddedHelper.INSTANCE);
+        registerHelper(BlockHelper.NAME, BlockHelper.INSTANCE);
+        registerHelper(PartialHelper.NAME, PartialHelper.INSTANCE);
+        registerHelper("i18n", new I18nHelper(classLoader));
+        registerHelper("i18nJs", new I18nJSHelper(classLoader));
     }
 
     @SuppressWarnings("unchecked")
@@ -162,26 +171,6 @@ public class DefaultHelperRegistry implements HelperRegistry {
         }
         isTrue((size + replaced) != helpers.size(),
                 "No helper method was found in: " + clazz.getName());
-    }
-
-    /**
-     * Register built-in helpers.
-     *
-     * @param registry The handlebars instance.
-     */
-    private static void registerBuiltinsHelpers(final HelperRegistry registry) {
-        registry.registerHelper(WithHelper.NAME, WithHelper.INSTANCE);
-        registry.registerHelper(IfHelper.NAME, IfHelper.INSTANCE);
-        registry.registerHelper(IfConditionHelper.NAME, IfConditionHelper.INSTANCE);
-        registry.registerHelper(SelectHelper.NAME, SelectHelper.INSTANCE);
-        registry.registerHelper(EvalHelper.NAME, EvalHelper.INSTANCE);
-        registry.registerHelper(UnlessHelper.NAME, UnlessHelper.INSTANCE);
-        registry.registerHelper(EachHelper.NAME, EachHelper.INSTANCE);
-        registry.registerHelper(EmbeddedHelper.NAME, EmbeddedHelper.INSTANCE);
-        registry.registerHelper(BlockHelper.NAME, BlockHelper.INSTANCE);
-        registry.registerHelper(PartialHelper.NAME, PartialHelper.INSTANCE);
-        registry.registerHelper("i18n", I18nHelper.i18n);
-        registry.registerHelper("i18nJs", I18nHelper.i18nJs);
     }
 
 }

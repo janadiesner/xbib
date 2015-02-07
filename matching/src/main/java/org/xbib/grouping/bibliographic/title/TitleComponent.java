@@ -86,13 +86,13 @@ public class TitleComponent extends LinkedList<String>
      * That is, at most one short title word is added
      * (for very compact and short titles) at the first component position.
      *
-     * @param value
+     * @param value the value
      */
     @Override
     public boolean add(String value) {
         String normalized = normalize(value);
         int n = size();
-        return n > 5 || (normalized.length() < 4 && n > 1) ? false : super.add(normalized);
+        return !(n > 5 || (normalized.length() < 4 && n > 1)) && super.add(normalized);
     }
 
     /**

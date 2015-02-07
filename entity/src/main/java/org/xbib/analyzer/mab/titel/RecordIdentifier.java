@@ -54,7 +54,7 @@ public class RecordIdentifier extends MABEntity {
 
     private String prefix = "";
 
-    private String identifier = "";
+    private String catalogid = "";
 
     @Override
     public MABEntity setSettings(Map params) {
@@ -62,9 +62,9 @@ public class RecordIdentifier extends MABEntity {
         if (params.containsKey("_prefix")) {
             this.prefix = params.get("_prefix").toString();
         }
-        if (params.containsKey("identifier")) {
-            this.identifier = params.get("identifier").toString();
-            this.prefix = "(" + this.identifier + ")";
+        if (params.containsKey("catalogid")) {
+            this.catalogid = params.get("catalogid").toString();
+            this.prefix = "(" + this.catalogid + ")";
         }
         return this;
     }
@@ -84,24 +84,25 @@ public class RecordIdentifier extends MABEntity {
         // check for classifier
         ConfigurableClassifier classifier = worker.classifier();
         if (classifier != null) {
-            String isil = identifier;
-            String key = identifier + "." + state.getRecordIdentifier() + ".";
-            ConfigurableClassifier.Entry entry = classifier.lookup(key);
-            logger.debug("classifier lookup: key={}, entry={}", key, entry);
-            if (entry != null) {
-                if (entry.getCode() != null && !entry.getCode().trim().isEmpty()) {
-                    String facet = taxonomyFacet + "." + isil + ".notation";
-                    if (state.getFacets().get(facet) == null) {
-                        state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+            String isil = catalogid;
+            String key = catalogid + "." + state.getRecordIdentifier() + ".";
+            java.util.Collection<ConfigurableClassifier.Entry> entries = classifier.lookup(key);
+            if (entries != null) {
+                for (ConfigurableClassifier.Entry entry : entries) {
+                    if (entry.getCode() != null && !entry.getCode().trim().isEmpty()) {
+                        String facet = taxonomyFacet + "." + isil + ".notation";
+                        if (state.getFacets().get(facet) == null) {
+                            state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                        }
+                        state.getFacets().get(facet).addValue(entry.getCode());
                     }
-                    state.getFacets().get(facet).addValue(entry.getCode());
-                }
-                if (entry.getText() != null && !entry.getText().trim().isEmpty()) {
-                    String facet = taxonomyFacet + "." + isil + ".text";
-                    if (state.getFacets().get(facet) == null) {
-                        state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                    if (entry.getText() != null && !entry.getText().trim().isEmpty()) {
+                        String facet = taxonomyFacet + "." + isil + ".text";
+                        if (state.getFacets().get(facet) == null) {
+                            state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                        }
+                        state.getFacets().get(facet).addValue(entry.getText());
                     }
-                    state.getFacets().get(facet).addValue(entry.getText());
                 }
             }
         }

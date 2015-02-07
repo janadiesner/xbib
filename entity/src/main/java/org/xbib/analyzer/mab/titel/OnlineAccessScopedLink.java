@@ -31,8 +31,12 @@
  */
 package org.xbib.analyzer.mab.titel;
 
+import org.xbib.entities.faceting.StringFacet;
 import org.xbib.entities.marc.dialects.mab.MABEntity;
+import org.xbib.entities.marc.dialects.mab.MABEntityBuilderState;
 import org.xbib.entities.marc.dialects.mab.MABEntityQueue;
+import org.xbib.entities.support.ConfigurableClassifier;
+import org.xbib.rdf.Literal;
 import org.xbib.rdf.Resource;
 
 import java.util.Map;
@@ -45,9 +49,11 @@ public class OnlineAccessScopedLink extends OnlineAccessRemote {
         return element;
     }
 
+    private final static String taxonomyFacet = "xbib.taxonomy";
+
     private String prefix = "";
 
-    private String identifier = "";
+    private String catalogid = "";
 
     @Override
     public MABEntity setSettings(Map<String,Object> params) {
@@ -55,9 +61,9 @@ public class OnlineAccessScopedLink extends OnlineAccessRemote {
         if (params.containsKey("_prefix")) {
             this.prefix = params.get("_prefix").toString();
         }
-        // override by "identifier"
-        if (params.containsKey("identifier")) {
-            this.identifier = params.get("identifier").toString();
+        // override by "catalogid"
+        if (params.containsKey("catalogid")) {
+            this.catalogid = params.get("catalogid").toString();
         }
         return this;
     }
@@ -68,9 +74,30 @@ public class OnlineAccessScopedLink extends OnlineAccessRemote {
         if (value == null) {
             return null;
         }
-        if ("scope".equals(property) && identifier != null && !identifier.isEmpty()) {
-            // add identifier
-            resource.add("identifier", identifier);
+        MABEntityBuilderState state = worker.state();
+        if ("scope".equals(property) && catalogid != null && !catalogid.isEmpty()) {
+            String isil = catalogid;
+            resource.add("identifier", isil);
+            ConfigurableClassifier classifier = worker.classifier();
+            if (classifier != null) {
+                String key = isil + "." + state.getRecordIdentifier() + ".";
+                java.util.Collection<ConfigurableClassifier.Entry> entries = classifier.lookup(key);
+                if (entries != null) {
+                    for (ConfigurableClassifier.Entry entry : entries) {
+                        String facet = taxonomyFacet + "." + isil + ".notation";
+                        if (state.getFacets().get(facet) == null) {
+                            state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                        }
+                        state.getFacets().get(facet).addValue(entry.getCode());
+                        facet = taxonomyFacet + "." + isil + ".text";
+                        if (state.getFacets().get(facet) == null) {
+                            state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                        }
+                        state.getFacets().get(facet).addValue(entry.getText());
+                    }
+                }
+            }
+            return isil;
         }
         return value;
     }

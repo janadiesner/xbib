@@ -111,6 +111,7 @@ public class VolumeHolding extends Holding {
                 .field("@type", "Service")
                 .field("mediatype", mediaType)
                 .field("carriertype", carrierType)
+                .field("region", getRegion())
                 .field("organization", getOrganization())
                 .field("isil", getISIL())
                 .field("serviceisil", getISIL())

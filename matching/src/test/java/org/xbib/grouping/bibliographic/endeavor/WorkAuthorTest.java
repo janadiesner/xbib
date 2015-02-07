@@ -8,6 +8,5 @@ public class WorkAuthorTest extends Assert {
     @Test
     public void test() throws Exception {
         assertFalse(new WorkAuthor().blacklist().isEmpty());
-
     }
 }

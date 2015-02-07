@@ -1,7 +1,8 @@
-package org.xbib.fsa.moore.levenshtein;
+package org.xbib.fsa.moore.dictionary;
 
 import org.xbib.fsa.moore.AbstractAutomaton;
 import org.xbib.fsa.moore.CompactState;
+import org.xbib.fsa.moore.State;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -9,7 +10,7 @@ import java.util.TreeSet;
 
 public class DictionaryAutomaton extends AbstractAutomaton<Character, CharSequence> {
 
-    private Set<Character> alphabet = new TreeSet<Character>();
+    private final Set<Character> alphabet = new TreeSet<Character>();
 
     public DictionaryAutomaton(Iterator<CharSequence> words) {
         createInitialInput(words);
@@ -21,14 +22,14 @@ public class DictionaryAutomaton extends AbstractAutomaton<Character, CharSequen
 
     @Override
     protected State<Character, CharSequence> newState() {
-        return new CompactState();
+        return new CompactState<Character, CharSequence>();
     }
 
     /**
      * Set the name of this dictionary automaton
      *
-     * @param name
-     * @return
+     * @param name name
+     * @return this automaton
      */
     public DictionaryAutomaton name(String name) {
         setName(name);
@@ -38,7 +39,7 @@ public class DictionaryAutomaton extends AbstractAutomaton<Character, CharSequen
     /**
      * Add a word to the dictionary automaton.
      *
-     * @param word
+     * @param word word
      * @return the DictionaryAutomaton
      */
     public DictionaryAutomaton add(CharSequence word) {
@@ -61,6 +62,18 @@ public class DictionaryAutomaton extends AbstractAutomaton<Character, CharSequen
     @Override
     public Set<Character> getAlphabet() {
         return alphabet;
+    }
+
+    public boolean accept(CharSequence word) {
+        State<Character,CharSequence> state = getCurrentState();
+        for (int i = 0; i < word.length(); i++) {
+            Character ch = word.charAt(i);
+            state = state.getNextState(ch);
+            if (state == null) {
+                return false;
+            }
+        }
+        return state.isAccept();
     }
 
     private void createInitialInput(Iterator<CharSequence> words) {

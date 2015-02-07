@@ -45,6 +45,7 @@ import org.xbib.common.xcontent.XContentType;
 import org.xbib.xml.ToQName;
 import org.xbib.xml.namespace.XmlNamespaceContext;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
@@ -76,9 +77,9 @@ public class XmlXContentGenerator implements XContentGenerator {
     public XmlXContentGenerator setParams(XmlXParams params) {
         this.params = params;
         try {
-            generator.getStaxWriter().setDefaultNamespace(params.getQName().getNamespaceURI());
-        } catch(XMLStreamException e) {
-            // ignore
+            generator.getStaxWriter().setPrefix(getParams().getRoot().getPrefix(), getParams().getRoot().getNamespaceURI());
+        } catch (XMLStreamException e) {
+            //
         }
         return this;
     }
@@ -115,16 +116,17 @@ public class XmlXContentGenerator implements XContentGenerator {
 
     public void writeStartObject() throws IOException {
         if (!rootUsed) {
-            generator.startWrappedValue(null, getParams().getQName());
+            generator.setNextName(getParams().getRoot());
         }
         generator.writeStartObject();
         if (!rootUsed) {
             try {
                 for (String prefix : getNamespaceContext().getNamespaces().keySet()) {
                     generator.getStaxWriter().writeNamespace(prefix, getNamespaceContext().getNamespaceURI(prefix));
+                    //generator.getStaxWriter().setPrefix(prefix, getNamespaceContext().getNamespaceURI(prefix));
                 }
             } catch (XMLStreamException e) {
-                // ignore
+                //  e.printStackTrace();
             }
             rootUsed = true;
         }
@@ -400,9 +402,34 @@ public class XmlXContentGenerator implements XContentGenerator {
     private static final SerializedString LF = new SerializedString("\n");
 
     private void writeFieldNameWithNamespace(String name) throws IOException {
-        QName qname = ToQName.toQName(params.getQName(), params.getNamespaceContext(), name);
+        QName qname = toQName(params.getNamespaceContext(), name);
+        try {
+            generator.getStaxWriter().setPrefix(qname.getPrefix(), qname.getNamespaceURI());
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
+        }
         generator.setNextName(qname);
         generator.writeFieldName(qname.getLocalPart());
+    }
+
+    private QName toQName(NamespaceContext context, String name) {
+        if (name.startsWith("_")) {
+            name = name.substring(1);
+        } else if (name.startsWith("@")) {
+            name = name.substring(1);
+        }
+        int pos = name.indexOf(':');
+        String nsPrefix = "";
+        String nsURI = context.getNamespaceURI("");
+        if (pos > 0) {
+            nsPrefix = name.substring(0, pos);
+            nsURI = context.getNamespaceURI(nsPrefix);
+            if (nsURI == null) {
+                throw new IllegalArgumentException("unknown namespace prefix: " + nsPrefix);
+            }
+            name = name.substring(pos + 1);
+        }
+        return new QName(nsURI, name, nsPrefix);
     }
 
 }

@@ -17,7 +17,6 @@ import java.util.List;
 
 /**
  * A mutable finite state transducer implementation.
- * <p/>
  * Holds an ArrayList of {@link State} objects allowing
  * additions/deletions.
  */

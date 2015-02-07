@@ -151,14 +151,7 @@ public class QueuePipelineExecutor<T, R extends PipelineRequest, P extends Pipel
             return;
         }
         closed = true;
-        // how many pipelines are still running?
-        int active = 0;
-        for (P pipeline : pipelines) {
-            if (pipeline.getMetric().stopped() == 0L) {
-                active++;
-            }
-        }
-        for (int i = 0; i < active; i++) {
+        for (int i = 0; i < pipelines.size(); i++) {
             queue.offer(poisonElement, 30, TimeUnit.SECONDS);
         }
         waitFor();

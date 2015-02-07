@@ -62,7 +62,7 @@ public class Shelfmark extends Item {
     @Override
     public boolean fields(MABEntityQueue.MABWorker worker,
                           FieldList fields, String value) throws IOException {
-        worker.addToResource(worker.state().getItemResource(), fields, this, value);
+        worker.addToResource(worker.state().getNextItemResource(), fields, this);
         return true;
     }
 

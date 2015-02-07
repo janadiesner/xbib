@@ -106,7 +106,6 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
         return this;
     }
 
-    @Override
     public MeterMetric getMetric() {
         return metric;
     }

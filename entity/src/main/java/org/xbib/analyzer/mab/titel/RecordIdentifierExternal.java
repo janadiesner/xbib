@@ -81,26 +81,4 @@ public class RecordIdentifierExternal extends MABEntity {
         return true; // done!
     }
 
-    /*@Override
-    public String data(ElementBuilder<FieldList, String, MABElement, MABContext> builder, String predicate, Resource resource, String property, String value) {
-        if (value == null) {
-            return null;
-        }
-        if ("source".equals(property)) {
-            // try to find the "identifierForTheExternalRecord" in the resource
-            Node node = resource.literal("identifierForTheExternalRecord");
-            if (node != null) {
-                if (codes.containsKey(value)) {
-                    String prefix = (String)codes.get(value);
-                    if (prefix != null) {
-                        resource.add("identifier", prefix + node.nativeValue());
-                    }
-                    return null;
-                } else {
-                    logger.warn("no external source key configured for '{}'", value);
-                }
-            }
-        }
-        return value;
-    }*/
 }

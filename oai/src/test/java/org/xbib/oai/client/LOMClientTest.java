@@ -89,11 +89,6 @@ public class LOMClientTest {
     }
 
     protected SimpleMetadataHandler xmlMetadataHandler() {
-        /*IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
-        Context<Resource> context = new MemoryContext()
-                .setContentBuilder(new RdfXContentGenerator())
-                .setNamespaceContext(namespaceContext);
-        context.setNamespaceContext(IRINamespaceContext.getInstance());*/
         RdfContentParams params = IRINamespaceContext::getInstance;
         RdfResourceHandler handler = new RdfResourceHandler(params);
         return new LOMHandlerSimple(params).setHandler(handler);
@@ -106,8 +101,6 @@ public class LOMClientTest {
         private RdfContentBuilder builder;
 
         private XmlHandler handler;
-
-        //private Resource resource = new MemoryResource();
 
         private boolean attributes;
 
@@ -138,51 +131,14 @@ public class LOMClientTest {
 
         public void endDocument() throws SAXException {
             handler.endDocument();
-            String identifier = getHeader().getIdentifier();
-            /*if (resource != null) {
-                IRI iri = IRI.builder().scheme("http")
-                        .host("test")
-                        .query("test")
-                        .fragment(identifier).build();
-                resource.id(iri);
-            }*/
-            //output.write(resourceContext);
-            /*if (context.getResources() == null) {
-                // single document
-                //mock.output(resourceContext, resourceContext.getResource(), resourceContext.getContentBuilder());
-            } else for (Resource resource : context.getResources()) {
-                // multiple documents. Rewrite IRI for ES index/type addressing
-                String index = "test";
-                String type = "test";
-                if (index.equals(resource.id().getHost())) {
-                    IRI iri = IRI.builder().scheme("http").host(index).query(type)
-                            .fragment(resource.id().getFragment()).build();
-                    resource.add("iri", resource.id().getFragment());
-                    resource.id(iri);
-                } else {
-                    IRI iri = IRI.builder().scheme("http").host(index).query(type)
-                            .fragment(resource.id().toString()).build();
-                    resource.add("iri", resource.id().toString());
-                    resource.id(iri);
-                }
-                //mock.output(resourceContext, resource, resourceContext.getContentBuilder());
-            }*/
+            //logger.info("{}", builder.string());
+            // re-open builder
             try {
-                /*StringWriter sw = new StringWriter();
-                NTripleContentGenerator writer = new NTripleContentGenerator(sw);
-                writer.write(context);*/
-                logger.info("{}", builder.string());
-                // re-open builder
-                try {
-                    this.builder = ntripleBuilder();
-                } catch (IOException e) {
-                    // empty
-                }
-                handler.setBuilder(builder);
-
+                this.builder = ntripleBuilder();
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                // empty
             }
+            handler.setBuilder(builder);
         }
 
         @Override

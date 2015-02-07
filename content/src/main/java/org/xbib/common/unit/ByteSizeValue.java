@@ -7,7 +7,6 @@ import org.xbib.io.stream.StreamOutput;
 import org.xbib.io.stream.Streamable;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Locale;
 
 public class ByteSizeValue implements Streamable {

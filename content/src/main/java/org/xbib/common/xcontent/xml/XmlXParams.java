@@ -37,20 +37,16 @@ import javax.xml.namespace.QName;
 
 /**
  * XML parameters for XML XContent
- *
  */
 public class XmlXParams {
 
-    private static QName getDefaultRoot() {
-        return new QName("http://elasticsearch.org/ns/1.0/", "root", "es");
-    }
+    private final static QName defaultRoot = new QName("root");
 
-    private final static XmlXParams DEFAULT_PARAMS =
-            new XmlXParams(getDefaultRoot(), XmlNamespaceContext.newInstance());
-
-    private final QName root;
+    private final static XmlXParams DEFAULT_PARAMS = new XmlXParams(defaultRoot, XmlNamespaceContext.newInstance());
 
     private final XmlNamespaceContext namespaceContext;
+
+    private QName root;
 
     public XmlXParams() {
         this(null, null);
@@ -65,12 +61,18 @@ public class XmlXParams {
     }
 
     public XmlXParams(QName root, XmlNamespaceContext namespaceContext) {
-        this.root = root == null ? DEFAULT_PARAMS.getQName() : root;
         this.namespaceContext = namespaceContext == null ? DEFAULT_PARAMS.getNamespaceContext() : namespaceContext;
-        this.namespaceContext.addNamespace(getDefaultRoot().getPrefix(), getDefaultRoot().getNamespaceURI());
+        this.root = root;
+        if (root == null ) {
+            this.root = defaultRoot;
+        }
+        String prefix = this.root.getPrefix();
+        if (prefix != null && !prefix.isEmpty()) {
+            this.namespaceContext.addNamespace(prefix, this.root.getNamespaceURI());
+        }
     }
 
-    public QName getQName() {
+    public QName getRoot() {
         return root;
     }
 

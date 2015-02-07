@@ -18,6 +18,7 @@ import org.xbib.entities.support.ClasspathURLStreamHandler;
 import org.xbib.entities.support.ValueMaps;
 import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.RdfContentBuilder;
+import org.xbib.rdf.Resource;
 import org.xbib.rdf.content.RouteRdfXContentParams;
 import org.xbib.tools.Feeder;
 
@@ -303,39 +304,37 @@ public abstract class TitleHoldingsFeeder extends Feeder {
 
         @Override
         public void afterCompletion(MABEntityBuilderState state) throws IOException {
+            int docs = 0;
             // write title resource
             RouteRdfXContentParams params = new RouteRdfXContentParams(IRINamespaceContext.getInstance(),
-                    getConcreteIndex(), getType());
+                    getConcreteIndex(), settings.get("title-type"));
             params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), state.getIdentifier(), content));
             RdfContentBuilder builder = routeRdfXContentBuilder(params);
             if (settings.get("collection") != null) {
                 state.getResource().add("collection", settings.get("collection"));
             }
             builder.receive(state.getResource());
+            docs++;
             if (settings.getAsBoolean("mock", false)) {
-                logger.info("{}", builder.string());
+                logger.info("main id={} {}", state.getResource().id(), builder.string());
             }
-            if (state.getItemResource() != null) {
-                // write item resource
+            // write related resources (holdings etc.)
+            for (Resource resource : state.graph().getResources()) {
+                if (resource.equals(state.getResource())) {
+                    continue;
+                }
                 params = new RouteRdfXContentParams(IRINamespaceContext.getInstance(),
-                        getConcreteHoldingsIndex(), getHoldingsType());
-                params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), state.getIdentifier(), content));
+                        getConcreteHoldingsIndex(), settings.get("holdings-type"));
+                params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(),
+                        state.getIdentifier() + "." + resource.id(), content));
                 builder = routeRdfXContentBuilder(params);
-                // attach holdings to title
-                state.getItemResource().newResource("xbib").add("uid", state.getIdentifier());
-                state.getItemResource().newResource("xbib").add("uid", state.getRecordIdentifier());
-                builder.receive(state.getItemResource());
+                resource.newResource("xbib").add("uid", state.getIdentifier());
+                resource.newResource("xbib").add("uid", state.getRecordIdentifier());
+                builder.receive(resource);
+                docs++;
             }
             if (executor != null) {
-                // tell executor we increased document count by one
-                executor.metric().mark();
-                if (executor.metric().count() % 10000 == 0) {
-                    try {
-                        writeMetrics(executor.metric(), null);
-                    } catch (Exception e) {
-                        throw new IOException("metric failed", e);
-                    }
-                }
+                executor.metric().mark(docs);
             }
         }
     }

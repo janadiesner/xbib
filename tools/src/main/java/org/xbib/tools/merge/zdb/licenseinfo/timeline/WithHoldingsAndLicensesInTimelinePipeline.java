@@ -232,7 +232,6 @@ public class WithHoldingsAndLicensesInTimelinePipeline implements Pipeline<Boole
         return true;
     }
 
-    @Override
     public MeterMetric getMetric() {
         return metric;
     }
@@ -731,7 +730,8 @@ public class WithHoldingsAndLicensesInTimelinePipeline implements Pipeline<Boole
                     if (service.blackListedISIL().lookup().contains(isil)) {
                         continue;
                     }
-                    holding.setOrganization(service.bibdatLookup().lookupLibrary().get(isil));
+                    holding.setRegion(service.bibdatLookup().lookupRegion().get(isil));
+                    holding.setOrganization(service.bibdatLookup().lookupOrganization().get(isil));
                     for (String parent : holding.parents()) {
                         Manifestation parentManifestation = manifestations.get(parent);
                         parentManifestation.addRelatedHolding(isil, holding);
@@ -816,7 +816,8 @@ public class WithHoldingsAndLicensesInTimelinePipeline implements Pipeline<Boole
                     if (service.blackListedISIL().lookup().contains(isil)) {
                         continue;
                     }
-                    license.setOrganization(service.bibdatLookup().lookupLibrary().get(isil));
+                    license.setRegion(service.bibdatLookup().lookupRegion().get(isil));
+                    license.setOrganization(service.bibdatLookup().lookupOrganization().get(isil));
                     for (String parent : license.parents()) {
                         Manifestation m = manifestations.get(parent);
                         m.addRelatedHolding(isil, license);
@@ -883,7 +884,8 @@ public class WithHoldingsAndLicensesInTimelinePipeline implements Pipeline<Boole
                     if (isil == null) {
                         continue;
                     }
-                    indicator.setOrganization(service.bibdatLookup().lookupLibrary().get(isil));
+                    indicator.setRegion(service.bibdatLookup().lookupRegion().get(isil));
+                    indicator.setOrganization(service.bibdatLookup().lookupOrganization().get(isil));
                     if (service.blackListedISIL().lookup().contains(isil)) {
                         continue;
                     }

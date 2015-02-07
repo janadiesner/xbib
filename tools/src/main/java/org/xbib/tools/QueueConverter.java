@@ -76,7 +76,7 @@ public abstract class QueueConverter<T, R extends PipelineRequest, P extends Pip
             if (executor != null) {
                 executor.shutdown(getPoisonElement()); // must be non null
                 executor.shutdown();
-                writeMetrics(metric(), writer);
+                writeMetrics(executor.getMetric(), writer);
             }
         }
     }

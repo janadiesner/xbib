@@ -31,11 +31,15 @@
  */
 package org.xbib.grouping.bibliographic.endeavor;
 
-import org.xbib.io.InputService;
 import org.xbib.strings.encode.BaseformEncoder;
 import org.xbib.strings.encode.EncoderException;
 import org.xbib.strings.encode.WordBoundaryEntropyEncoder;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -51,9 +55,8 @@ public class WorkAuthor implements IdentifiableEndeavor {
 
     private final WordBoundaryEntropyEncoder encoder = new WordBoundaryEntropyEncoder();
 
-    private final static Set<String> blacklist =
-            InputService.asLinesFromResource(
-                    "/org/xbib/grouping/bibliographic/endeavor/work-blacklist.txt");
+    /* These work titles can not be work titles */
+    private final static Set<String> blacklist = readResource("org/xbib/grouping/bibliographic/endeavor/work-blacklist.txt");
 
     public WorkAuthor() {
     }
@@ -113,7 +116,19 @@ public class WorkAuthor implements IdentifiableEndeavor {
     }
 
     protected boolean blacklisted(CharSequence work) {
-        return blacklist.contains(work)
-                || p1.matcher(work).matches();
+        return blacklist.contains(work.toString()) || p1.matcher(work).matches();
+    }
+
+    private static Set<String> readResource(String resource) {
+        URL url = Thread.currentThread().getContextClassLoader().getResource(resource);
+        Set<String> set = new HashSet<String>();
+        if (url != null) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                reader.lines().filter(line -> !line.startsWith("#")).forEach(set::add);
+            } catch (IOException e) {
+                // do nothing
+            }
+        }
+        return set;
     }
 }

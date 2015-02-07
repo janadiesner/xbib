@@ -53,6 +53,10 @@ public class TitleSuper extends Title {
         if (params.containsKey("_prefix")) {
             this.prefix = params.get("_prefix").toString();
         }
+        // override prefix by "catalogid" with braces
+        if (params.containsKey("catalogid")) {
+            this.prefix = "(" + params.get("catalogid").toString() + ")";
+        }
         return this;
     }
     @Override

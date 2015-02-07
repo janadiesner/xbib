@@ -78,6 +78,8 @@ public class Holding implements Comparable<Holding> {
 
     protected String serviceisil;
 
+    private String region;
+
     private String organization;
 
     public Holding(Map<String, Object> map) {
@@ -195,6 +197,15 @@ public class Holding implements Comparable<Holding> {
 
     public String getServiceISIL() {
         return serviceisil != null ? serviceisil : isil;
+    }
+
+    public Holding setRegion(String region) {
+        this.region = region;
+        return this;
+    }
+
+    public String getRegion() {
+        return region;
     }
 
     public Holding setOrganization(String organization) {
@@ -425,7 +436,7 @@ public class Holding implements Comparable<Holding> {
     }
 
     public String getRoutingKey() {
-        return getOrganization() + getPriority() + identifier;
+        return getRegion() + getPriority() + identifier;
     }
 
     public String toString() {

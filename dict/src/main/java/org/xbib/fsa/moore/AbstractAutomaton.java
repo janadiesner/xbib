@@ -1,8 +1,5 @@
 package org.xbib.fsa.moore;
 
-import org.xbib.fsa.moore.levenshtein.State;
-import org.xbib.fsa.moore.Automaton;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -34,8 +31,8 @@ public abstract class AbstractAutomaton<T, E> implements Automaton<T, E> {
     /**
      * Add element to automaton, reachable by input.
      *
-     * @param input
-     * @param element
+     * @param input input
+     * @param element element
      */
     @Override
     public void add(T[] input, E element) {

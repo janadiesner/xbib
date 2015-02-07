@@ -1279,7 +1279,9 @@
     },
     "IdentifierISRC" : {
         "values" : [
-        "024$0 $a","024$00$aitw","024$08$aitw" /*  International Standard Recording Code ISRC */
+          "024$0 $a",
+          "024$00$aitw",
+          "024$08$aitw" /*  International Standard Recording Code ISRC */
         ],
         "subfields" : {
             "a" : "value"
@@ -1287,7 +1289,8 @@
     },
     "IdentifierUPC" : {
         "values" : [
-        "024$10$abc","024$10$abh" /* Universal Product Code UPC */
+          "024$10$abc",
+          "024$10$abh" /* Universal Product Code UPC */
         ],
         "subfields" : {
             "a" : "value"

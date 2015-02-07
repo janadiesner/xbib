@@ -2,6 +2,8 @@ package org.xbib.fsa.moore.levenshtein;
 
 import org.xbib.fsa.moore.AbstractAutomaton;
 import org.xbib.fsa.moore.CompactState;
+import org.xbib.fsa.moore.State;
+import org.xbib.fsa.moore.dictionary.DictionaryAutomaton;
 import org.xbib.util.FixedLengthBitSet;
 
 import java.util.ArrayList;

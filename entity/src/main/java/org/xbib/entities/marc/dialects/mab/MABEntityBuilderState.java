@@ -55,6 +55,8 @@ import static com.google.common.collect.Maps.newHashMap;
 
 public class MABEntityBuilderState extends DefaultEntityBuilderState {
 
+    private final IRI ITEM = IRI.create("item");
+
     private final Map<String, Facet> facets = newHashMap();
 
     private final Map<String, Sequence> sequences = newHashMap();
@@ -71,8 +73,6 @@ public class MABEntityBuilderState extends DefaultEntityBuilderState {
 
     private Resource root;
 
-    private Resource itemResource;
-
     private String isil;
 
     public MABEntityBuilderState(RdfGraph<RdfGraphParams> graph, Map<IRI,RdfContentBuilderProvider> providers) {
@@ -81,10 +81,10 @@ public class MABEntityBuilderState extends DefaultEntityBuilderState {
 
     public Resource getResource() throws IOException {
         if (graph().getResources().isEmpty()) {
-            root = new MemoryResource().blank();
+            this.root = new MemoryResource().blank();
             graph().receive(root);
         }
-        return root;
+        return this.root;
     }
 
     public Resource getResource(IRI predicate) throws IOException {
@@ -95,11 +95,14 @@ public class MABEntityBuilderState extends DefaultEntityBuilderState {
         return graph().getResource(predicate);
     }
 
-    public Resource getItemResource() {
-        if (itemResource == null) {
-            itemResource = new MemoryResource();
+    public Resource getNextItemResource() {
+        if (graph().hasResource(ITEM)) {
+            Resource resource = graph().removeResource(ITEM);
+            graph().putResource(resource.id(), resource);
         }
-        return itemResource;
+        MemoryResource item = new MemoryResource().blank();
+        graph().putResource(ITEM, item);
+        return item;
     }
 
     public MABEntityBuilderState setIdentifier(String identifier) {
@@ -170,6 +173,13 @@ public class MABEntityBuilderState extends DefaultEntityBuilderState {
             // no facet logic / sequence logic for deleted records
             return;
         }
+
+        // last item
+        if (graph().hasResource(ITEM)) {
+            Resource resource = graph().removeResource(ITEM);
+            graph().putResource(resource.id(), resource);
+        }
+
         // create default facets
         Facet languageFacet = facets.get(Language.FACET);
         if (languageFacet == null) {
@@ -236,6 +246,7 @@ public class MABEntityBuilderState extends DefaultEntityBuilderState {
             }
         }
         sequences.clear();
+
         // continue with completion in parent
         super.complete();
     }

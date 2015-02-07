@@ -33,6 +33,22 @@ public class XContentHelper {
         }
     }
 
+    public static Map<String, Object> convertFromXmlToMap(Reader reader) {
+        try {
+            return XContentFactory.xContent(XContentType.XML).createParser(reader).mapOrderedAndClose();
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Failed to parse content to map", e);
+        }
+    }
+
+    public static Map<String, Object> convertFromXmlToMap(String data) {
+        try {
+            return XContentFactory.xContent(XContentType.XML).createParser(data).mapOrderedAndClose();
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Failed to parse content to map", e);
+        }
+    }
+
     public static Map<String, Object> convertToMap(String data) {
         try {
             return XContentFactory.xContent(XContentFactory.xContentType(data)).createParser(data).mapOrderedAndClose();

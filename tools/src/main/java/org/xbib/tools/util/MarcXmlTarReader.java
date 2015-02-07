@@ -3,7 +3,6 @@ package org.xbib.tools.util;
 import org.xbib.io.Packet;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.xml.stream.MarcXchangeReader;
-import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.element.LongPipelineElement;
 
@@ -59,7 +58,7 @@ public class MarcXmlTarReader extends AbstractTarReader {
     }
 
     @Override
-    public void newRequest(Pipeline<MeterMetric, LongPipelineElement> pipeline, LongPipelineElement request) {
+    public void newRequest(Pipeline<Boolean, LongPipelineElement> pipeline, LongPipelineElement request) {
         try {
             StringReader sr = new StringReader(packet.toString());
             XMLEventReader xmlReader = factory.createXMLEventReader(sr);

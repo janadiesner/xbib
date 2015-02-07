@@ -1,4 +1,4 @@
-package org.xbib.fsa.moore.levenshtein;
+package org.xbib.fsa.moore;
 
 import java.util.Collection;
 

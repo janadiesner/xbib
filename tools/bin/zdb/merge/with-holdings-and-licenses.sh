@@ -27,7 +27,7 @@ echo '
     "hol-index" : "zdbholdings",
     "xml-license-index" : "ezbxml",
     "web-license-index" : "ezbweb",
-    "volume-index" : "hbztitle",
+    "volume-index" : "hbz",
     "volume-hol-index" : "hbzholdings",
     "index" : "xbib2",
     "maxBulkActions" : 1000,

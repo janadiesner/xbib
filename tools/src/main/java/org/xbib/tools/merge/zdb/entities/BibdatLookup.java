@@ -19,7 +19,9 @@ public class BibdatLookup {
 
     private final static Logger logger = LogManager.getLogger(BibdatLookup.class);
 
-    private Map<String, String> libraries = newHashMap();
+    private Map<String, String> region = newHashMap();
+
+    private Map<String, String> organization = newHashMap();
 
     private Map<String, String> other = newHashMap();
 
@@ -53,9 +55,14 @@ public class BibdatLookup {
                 if (key == null) {
                     continue;
                 }
-                String value = m.containsKey("LibraryService") ?
+                String region = m.containsKey("LibraryService") ?
                         (String) ((Map<String, Object>) m.get("LibraryService")).get("libraryServiceRegion") : null;
-                if (value == null) {
+                if (region == null) {
+                    continue;
+                }
+                String organization = m.containsKey("LibraryService") ?
+                        (String) ((Map<String, Object>) m.get("LibraryService")).get("libraryServiceOrganization") : null;
+                if (organization == null) {
                     continue;
                 }
                 // organization state = "Adresse", "Information"
@@ -78,15 +85,20 @@ public class BibdatLookup {
                         case "Nationalbibliothek":
                         case "Zentrale Fachbibliothek":
                         case "Verbundsystem/ -katalog":
-                            if (!libraries.containsKey(key)) {
-                                libraries.put(key, value);
+                            if (!this.region.containsKey(key)) {
+                                this.region.put(key, region);
+                            } else {
+                                logger.warn("entry {} already exists", key);
+                            }
+                            if (!this.organization.containsKey(key)) {
+                                this.organization.put(key, organization);
                             } else {
                                 logger.warn("entry {} already exists", key);
                             }
                             break;
                         default:
                             if (!other.containsKey(key)) {
-                                other.put(key, value);
+                                other.put(key, region);
                             } else {
                                 logger.warn("entry {} already exists in other", key);
                             }
@@ -94,7 +106,7 @@ public class BibdatLookup {
                     }
                 } else {
                     if (!other.containsKey(key)) {
-                        other.put(key, value);
+                        other.put(key, region);
                     } else {
                         logger.warn("entry {} already exists in other", key);
                     }
@@ -103,8 +115,12 @@ public class BibdatLookup {
         }
     }
 
-    public Map<String, String> lookupLibrary() {
-        return libraries;
+    public Map<String, String> lookupRegion() {
+        return region;
+    }
+
+    public Map<String, String> lookupOrganization() {
+        return organization;
     }
 
     public Map<String, String> lookupOther() {

@@ -213,7 +213,7 @@ public class MABEntityQueue extends EntityQueue<MABEntityBuilderState, MABEntity
                 if (done) {
                     return;
                 }
-                addToResource(state().getResource(), fields, entity, value);
+                addToResource(state().getResource(), fields, entity);
                 // build facets and classify
                 if (value != null && !value.isEmpty()) {
                     entity.facetize(this, fields.getFirst().data(value));
@@ -232,8 +232,7 @@ public class MABEntityQueue extends EntityQueue<MABEntityBuilderState, MABEntity
         @SuppressWarnings("unchecked")
         public Resource addToResource(Resource resource,
                                       FieldList fields,
-                                      MABEntity element,
-                                      String value) throws IOException {
+                                      MABEntity element) throws IOException {
             // setup
             Map<String, Object> defaultSubfields = (Map<String, Object>) element.getSettings().get("subfields");
             if (defaultSubfields == null) {

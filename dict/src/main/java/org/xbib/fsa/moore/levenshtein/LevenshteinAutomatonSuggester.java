@@ -1,9 +1,12 @@
 package org.xbib.fsa.moore.levenshtein;
 
 import org.xbib.fsa.moore.Automaton;
+import org.xbib.fsa.moore.Suggester;
+import org.xbib.fsa.moore.dictionary.DictionaryAutomaton;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * A Suggester based on Levenshtein automaton method.
@@ -31,7 +34,7 @@ import java.util.Collection;
  * Edit distances of greater than 2 are generally too expensive to detect.
  * Therefore, such Levenshtein automata are not used by this Suggester.
  */
-public class LevenshteinAutomatonSuggester {
+public class LevenshteinAutomatonSuggester implements Suggester {
 
     /**
      * Trivial Levenshtein automaton with an edit distance of 0.
@@ -51,20 +54,23 @@ public class LevenshteinAutomatonSuggester {
      */
     private final LevenshteinAutomaton ls3 = new LevenshteinAutomaton(3);
     /**
-     * The dictionary
-     */
-    //private Dictionary dictionary;
-    /**
      * The dictionary automaton constructed form the dictionary.
      */
     private DictionaryAutomaton automaton;
 
     public LevenshteinAutomatonSuggester(Iterable<CharSequence> sequence) {
-        //this.dictionary = dict;
-        this.automaton = new DictionaryAutomaton(sequence);
+        this(new DictionaryAutomaton(sequence));
     }
 
-    public Automaton getDictionaryAutomaton() {
+    public LevenshteinAutomatonSuggester(Iterator<CharSequence> sequence) {
+        this(new DictionaryAutomaton(sequence));
+    }
+
+    public LevenshteinAutomatonSuggester(DictionaryAutomaton automaton) {
+        this.automaton = automaton;
+    }
+
+    public Automaton getAutomaton() {
         return automaton;
     }
 

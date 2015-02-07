@@ -38,7 +38,6 @@ import org.xbib.entities.UnmappedKeyListener;
 import org.xbib.iri.IRI;
 import org.xbib.marc.Field;
 import org.xbib.marc.FieldList;
-import org.xbib.rdf.RdfContentBuilderProvider;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.memory.MemoryRdfGraph;
 
@@ -58,8 +57,6 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
 
     private final static IRI tempPredicate = IRI.create("tmp");
 
-    private Map<IRI,RdfContentBuilderProvider> providers;
-
     private UnmappedKeyListener<FieldList> listener;
 
     public MARCEntityQueue(String packageName, int workers, String... paths) {
@@ -73,16 +70,6 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
     public MARCEntityQueue setUnmappedKeyListener(UnmappedKeyListener<FieldList> listener) {
         this.listener = listener;
         return this;
-    }
-
-    public MARCEntityQueue setContentBuilderProviders(Map<IRI,RdfContentBuilderProvider> providers) {
-        this.providers = providers;
-        return this;
-    }
-
-    @Override
-    public Map<IRI,RdfContentBuilderProvider> contentBuilderProviders() {
-        return providers;
     }
 
     @Override

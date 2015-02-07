@@ -7,7 +7,6 @@ import org.xbib.morph.fsa.FSA5Test;
 import org.xbib.morph.fsa.FSABuilder;
 import org.xbib.morph.fsa.FSAFlags;
 import org.xbib.morph.fsa.FSATestUtils;
-import org.xbib.morph.fsa.io.FSACodec;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
