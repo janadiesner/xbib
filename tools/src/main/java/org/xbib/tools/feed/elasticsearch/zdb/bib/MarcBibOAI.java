@@ -87,7 +87,7 @@ public class MarcBibOAI extends OAIFeeder {
 
     @Override
     public String getName() {
-        return "zdb-oai-elasticsearch";
+        return "marc-bib-oai-elasticsearch";
     }
 
     @Override

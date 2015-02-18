@@ -34,8 +34,6 @@ package org.xbib.rdf.content;
 import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.RdfContentParams;
 import org.xbib.rdf.RdfContentType;
-import org.xbib.rdf.RdfGraph;
-import org.xbib.rdf.RdfGraphParams;
 import org.xbib.rdf.io.ntriple.NTripleContent;
 import org.xbib.rdf.io.ntriple.NTripleContentParams;
 import org.xbib.rdf.io.rdfxml.RdfXmlContent;
@@ -44,11 +42,13 @@ import org.xbib.rdf.io.turtle.TurtleContent;
 import org.xbib.rdf.io.turtle.TurtleContentParams;
 import org.xbib.rdf.io.xml.XmlContent;
 import org.xbib.rdf.io.xml.XmlContentParams;
-import org.xbib.rdf.memory.MemoryRdfGraph;
 
 import java.io.IOException;
 
 public class RdfXContentFactory {
+
+    private RdfXContentFactory() {
+    }
 
     public static RdfContentBuilder ntripleBuilder() throws IOException {
         return rdfContentBuilder(ExtendedRdfContentType.NTRIPLE, NTripleContentParams.DEFAULT_PARAMS);
@@ -107,7 +107,4 @@ public class RdfXContentFactory {
         throw new IllegalArgumentException("no content type for " + type);
     }
 
-    public static <Params extends RdfGraphParams> RdfGraph<Params> memoryGraph() throws IOException {
-        return new MemoryRdfGraph<Params>();
-    }
 }

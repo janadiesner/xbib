@@ -33,6 +33,7 @@ package org.xbib.rdf.content;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -48,13 +48,11 @@ import java.util.Map;
 public class JsonContentGenerator
         implements RdfContentGenerator<JsonContentParams>, Flushable {
 
+    private final Writer writer;
+
     private boolean nsWritten;
 
-    private StringBuilder sb;
-
     private Resource resource;
-
-    private String sortLangTag;
 
     private JsonContentParams params = JsonContentParams.DEFAULT_PARAMS;
 
@@ -63,9 +61,9 @@ public class JsonContentGenerator
     }
 
     JsonContentGenerator(Writer writer) throws IOException {
+        this.writer = writer;
         this.nsWritten = false;
         this.resource = new MemoryResource();
-        this.sb = new StringBuilder();
     }
 
     @Override
@@ -114,7 +112,8 @@ public class JsonContentGenerator
 
     @Override
     public JsonContentGenerator receive(Triple triple) {
-        return this; // TODO
+        resource.add(triple);
+        return this;
     }
 
     @Override
@@ -122,13 +121,13 @@ public class JsonContentGenerator
         return this;
     }
 
-    public JsonContentGenerator writeNamespaces() throws IOException {
+    private JsonContentGenerator writeNamespaces() throws IOException {
         nsWritten = false;
         for (Map.Entry<String, String> entry : params.getNamespaceContext().getNamespaces().entrySet()) {
             if (entry.getValue().length() > 0) {
-                String nsURI = entry.getValue().toString();
+                String nsURI = entry.getValue();
                 if (!RdfConstants.NS_URI.equals(nsURI)) {
-                    writeNamespace(entry.getKey(), nsURI);
+                    //writeNamespace(entry.getKey(), nsURI);
                     nsWritten = true;
                 }
             }
@@ -136,9 +135,6 @@ public class JsonContentGenerator
         return this;
     }
 
-    private void writeNamespace(String prefix, String name) throws IOException {
-        // TODO
-    }
 
     @Override
     public void flush() throws IOException {

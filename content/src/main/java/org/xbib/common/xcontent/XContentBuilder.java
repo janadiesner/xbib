@@ -22,10 +22,6 @@ import org.xbib.io.BytesArray;
 import org.xbib.io.BytesReference;
 import org.xbib.io.stream.BytesStream;
 import org.xbib.io.FastByteArrayOutputStream;
-//import org.xbib.time.Instant;
-//import org.xbib.time.ZoneId;
-//import org.xbib.time.ZonedDateTime;
-//import org.xbib.time.format.DateTimeFormatter;
 
 public final class XContentBuilder implements BytesStream, ToXContent {
 

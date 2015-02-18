@@ -50,11 +50,11 @@ public class RouteRdfXContentParams extends RdfXContentParams {
     private RouteRdfXContent.RouteHandler handler;
 
     public RouteRdfXContentParams(IRINamespaceContext namespaceContext) {
-        super(namespaceContext, false);
+        super(namespaceContext);
     }
 
     public RouteRdfXContentParams(IRINamespaceContext namespaceContext, String index, String type) {
-        super(namespaceContext, false);
+        super(namespaceContext);
         this.index = index;
         this.type = type;
     }

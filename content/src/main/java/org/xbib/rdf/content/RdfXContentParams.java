@@ -38,20 +38,16 @@ public class RdfXContentParams implements RdfContentParams {
 
     private final IRINamespaceContext namespaceContext;
 
-    private final boolean writeNamespaceContext;
-
-    public final static RdfXContentParams DEFAULT_PARAMS = new RdfXContentParams(IRINamespaceContext.getInstance(), true);
+    public final static RdfXContentParams DEFAULT_PARAMS = new RdfXContentParams();
 
     private RdfXContentGenerator generator;
 
     public RdfXContentParams() {
         this.namespaceContext = IRINamespaceContext.getInstance();
-        this.writeNamespaceContext = true;
     }
 
-    public RdfXContentParams(IRINamespaceContext namespaceContext, boolean writeNamespaceContext) {
+    public RdfXContentParams(IRINamespaceContext namespaceContext) {
         this.namespaceContext = namespaceContext;
-        this.writeNamespaceContext = writeNamespaceContext;
     }
 
     public RdfXContentParams setGenerator(RdfXContentGenerator generator) {

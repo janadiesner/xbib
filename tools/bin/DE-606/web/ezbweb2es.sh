@@ -4,14 +4,16 @@
 tty -s
 if [ "$?" -gt "0" ]
 then
-    cd $HOME/hbz-toolbox
-    pwd=$(pwd)/bin
+    # cron
+    cd $HOME/xbib
+    pwd=$(pwd)
+    bin=${pwd}/bin
+    lib=${pwd}/lib
 else
     pwd="$( cd -P "$( dirname "$0" )" && pwd )"
+    bin=${pwd}/../../../bin
+    lib=${pwd}/../../../lib
 fi
-
-bin=${pwd}/../../../bin
-lib=${pwd}/../../../lib
 
 java="java"
 

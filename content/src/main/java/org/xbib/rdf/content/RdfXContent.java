@@ -40,8 +40,6 @@ import org.xbib.rdf.StandardRdfContentType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
 
 public class RdfXContent implements RdfContent {
 
@@ -65,17 +63,7 @@ public class RdfXContent implements RdfContent {
     }
 
     @Override
-    public RdfContentGenerator createGenerator(Writer writer) throws IOException {
-        return null;
-    }
-
-    @Override
     public RdfContentParser createParser(InputStream in) throws IOException {
-        return null;
-    }
-
-    @Override
-    public RdfContentParser createParser(Reader reader) throws IOException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

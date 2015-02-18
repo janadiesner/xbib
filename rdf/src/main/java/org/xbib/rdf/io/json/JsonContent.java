@@ -9,8 +9,6 @@ import org.xbib.rdf.StandardRdfContentType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
 
 public class JsonContent implements RdfContent {
 
@@ -38,17 +36,7 @@ public class JsonContent implements RdfContent {
     }
 
     @Override
-    public RdfContentGenerator createGenerator(Writer writer) throws IOException {
-        return new JsonContentGenerator(writer);
-    }
-
-    @Override
     public RdfContentParser createParser(InputStream in) throws IOException {
         return new JsonContentParser(in);
-    }
-
-    @Override
-    public RdfContentParser createParser(Reader reader) throws IOException {
-        return new JsonContentParser(reader);
     }
 }

@@ -693,8 +693,13 @@
             "093$  $f",
             "093$  $g",
             "093$  $eg",
-            "093$  $bcefg"
+            "093$  $bcefg",
+          "933$  $a"
         ],
+        "tags" : {
+          "093" : "LicenseInformation",
+          "993" : "CustomLicenseInformation"
+        },
         "_predicate" : "license",
         "subfields": {
             "a" : "origin", /* Herkunft, Erfassungsrichtung */
@@ -705,6 +710,9 @@
             "f" : "scope", /* Angaben zum Lizenztyp */
             "g" : "charge", /* Angaben zum Preistyp */
             "h" : "comment"
+        },
+        "CustomLicenseInformation" : {
+            "a" : "name"
         },
         "origin" : {
                 "a" : "EZB",

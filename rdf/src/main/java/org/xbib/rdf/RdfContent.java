@@ -31,11 +31,13 @@
  */
 package org.xbib.rdf;
 
+import org.xbib.rdf.io.ntriple.NTripleContent;
+import org.xbib.rdf.io.rdfxml.RdfXmlContent;
+import org.xbib.rdf.io.turtle.TurtleContent;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
 
 public interface RdfContent {
 
@@ -43,9 +45,13 @@ public interface RdfContent {
 
     RdfContentGenerator createGenerator(OutputStream out) throws IOException;
 
-    RdfContentGenerator createGenerator(Writer writer) throws IOException;
-
     RdfContentParser createParser(InputStream in) throws IOException;
 
-    RdfContentParser createParser(Reader reader) throws IOException;
+    NTripleContent nTripleContent = NTripleContent.nTripleContent;
+
+    RdfXmlContent rdfXmlContent = RdfXmlContent.rdfXmlContent;
+
+    TurtleContent turtleContent = TurtleContent.turtleContent;
+
+
 }

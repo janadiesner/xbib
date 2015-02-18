@@ -48,7 +48,7 @@ while [ ${iterations} -gt 0 ]; do
     "maxbulkactions" : 1000,
     "maxconcurrentbulkrequests" : 1,
     "mock" : false,
-    "detect" : true,
+    "detect-unknown" : true,
     "client" : "ingest",
     "timewindow" : "yyyyMMddHH",
     "aliases" : true,
