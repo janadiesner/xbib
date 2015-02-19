@@ -5,6 +5,7 @@ import org.junit.runner.Description;
 import org.junit.runners.Parameterized;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,70 +29,23 @@ public class SpecRunner extends Parameterized {
             Spec spec = (Spec) parameterArray[0];
             labels.add(spec.name());
         }
-
     }
 
     private Collection<Object[]> getParameterArrays() throws Exception {
-        Method testClassMethod = getDeclaredMethod(this.getClass(),
-                "getTestClass");
-        Class<?> returnType = testClassMethod.getReturnType();
-        if (returnType == Class.class) {
-            return getParameterArrays4_3();
-        } else {
-            return getParameterArrays4_4();
-        }
+        return getParameterArrays4_12();
     }
 
-    private Collection<Object[]> getParameterArrays4_3() throws Exception {
-        Object[][] methodCalls = new Object[][]{new Object[]{"getTestClass"}};
-        Class<?> cl = invokeMethodChain(this, methodCalls);
-        Method[] methods = cl.getMethods();
-
-        Method parametersMethod = null;
-        for (Method method : methods) {
-            boolean providesParameters = method
-                    .isAnnotationPresent(Parameters.class);
-            if (!providesParameters) {
-                continue;
-            }
-
-            if (parametersMethod != null) {
-                throw new Exception(
-                        "Only one method should be annotated with @Labels");
-            }
-
-            parametersMethod = method;
-        }
-
-        if (parametersMethod == null) {
-            throw new Exception("No @Parameters method found");
-        }
-
-        @SuppressWarnings("unchecked")
-        Collection<Object[]> parameterArrays =
-                (Collection<Object[]>) parametersMethod
-                        .invoke(null);
-        return parameterArrays;
-
-    }
-
-    private Collection<Object[]> getParameterArrays4_4() throws Exception {
+    private Collection<Object[]> getParameterArrays4_12() throws Exception {
         Object[][] methodCalls = new Object[][]{
                 new Object[]{"getTestClass"},
-                new Object[]{"getAnnotatedMethods", Class.class,
-                        Parameters.class},
+                new Object[]{"getAnnotatedMethods", Class.class, Parameters.class},
                 new Object[]{"get", int.class, 0},
-                // use array type for varargs (equivalent (almost))
-                new Object[]{"invokeExplosively", Object.class, null,
-                        Object[].class, new Object[]{}}};
-        Collection<Object[]> parameterArrays = invokeMethodChain(this,
-                methodCalls);
-        return parameterArrays;
+                new Object[]{"invokeExplosively", Object.class, null, Object[].class, new Object[]{}}};
+        return invokeMethodChain(this, methodCalls);
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T invokeMethodChain(Object object, final Object[][] methodCalls)
-            throws Exception {
+    private <T> T invokeMethodChain(Object object, final Object[][] methodCalls) throws Exception {
         for (Object[] methodCall : methodCalls) {
             String methodName = (String) methodCall[0];
             int parameterCount = (methodCall.length - 1) / 2;
@@ -104,8 +58,12 @@ public class SpecRunner extends Parameterized {
                 classes[index] = cl;
                 arguments[index] = argument;
             }
-            Method method = getDeclaredMethod(object.getClass(), methodName,
-                    classes);
+            Method method = getDeclaredMethod(object.getClass(), methodName, classes);
+            if (!method.isAccessible()) {
+                if (Modifier.isPublic(method.getModifiers())) {
+                    method.setAccessible(true);
+                }
+            }
             object = method.invoke(object, arguments);
         }
         return (T) object;
@@ -117,16 +75,13 @@ public class SpecRunner extends Parameterized {
                                      final Class<?>... parameterTypes) throws NoSuchMethodException {
         do {
             try {
-                Method method = cl
-                        .getDeclaredMethod(methodName, parameterTypes);
-                return method;
+                return cl.getDeclaredMethod(methodName, parameterTypes);
             } catch (NoSuchMethodException e) {
                 // do nothing - just fall through to the below
             }
             cl = cl.getSuperclass();
         } while (cl != null);
-        throw new NoSuchMethodException("Method " + methodName
-                + "() not found in hierarchy");
+        throw new NoSuchMethodException("Method " + methodName + "() not found in hierarchy");
     }
 
     private void generateLabelledDescription() throws Exception {

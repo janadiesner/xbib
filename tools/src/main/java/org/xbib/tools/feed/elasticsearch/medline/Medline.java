@@ -71,7 +71,7 @@ public final class Medline extends Feeder {
     @Override
     public void process(URI uri) throws Exception {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
-        RdfContentParams params = new RdfXContentParams(namespaceContext, false);
+        RdfContentParams params = new RdfXContentParams(namespaceContext);
         AbstractXmlHandler handler = new Handler(params)
                 .setDefaultNamespace("ml", "http://www.nlm.nih.gov/medline");
         InputStream in = InputService.getInputStream(uri);

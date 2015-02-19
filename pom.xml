@@ -83,7 +83,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>dd.MM.yyyy HH:mm</maven.build.timestamp.format>
         <java.compiler.source>1.8</java.compiler.source>
-        <elasticsearch.support.plugin.version>1.4.0.1</elasticsearch.support.plugin.version>
+        <elasticsearch.support.plugin.version>1.4.0.2</elasticsearch.support.plugin.version>
     </properties>
 
     <build>
@@ -642,7 +642,7 @@
             <dependency>
                 <groupId>xml-apis</groupId>
                 <artifactId>xml-apis</artifactId>
-                <version>2.0.2</version>
+                <version>1.4.01</version>
             </dependency>
             <dependency>
                 <groupId>xalan</groupId>
@@ -721,7 +721,7 @@
             <dependency>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-runtime</artifactId>
-                <version>4.3</version>
+                <version>4.5</version>
             </dependency>
             <dependency>
                 <groupId>com.carrotsearch</groupId>

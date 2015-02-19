@@ -90,7 +90,7 @@ public final class EZBXML extends TimewindowFeeder {
     @Override
     public void process(URI uri) throws Exception {
         IRINamespaceContext namespaceContext = IRINamespaceContext.getInstance();
-        RdfContentParams params = new RdfXContentParams(namespaceContext, false);
+        RdfContentParams params = new RdfXContentParams(namespaceContext);
         EZBHandler handler = new EZBHandler(params);
         handler.setDefaultNamespace("ezb", "http://ezb.uni-regensburg.de/ezeit/");
         InputStream in = InputService.getInputStream(uri);
