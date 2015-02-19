@@ -133,6 +133,27 @@ public class Item extends MABEntity {
                     return isil;
                 }
             }
+        } else if ("callnumber".equals(property)) {
+            ConfigurableClassifier classifier = worker.classifier();
+            if (classifier != null) {
+                String isil = state.getISIL();
+                String doc = state.getRecordIdentifier();
+                java.util.Collection<ConfigurableClassifier.Entry> entries = classifier.lookup(isil, doc, value, null);
+                if (entries != null) {
+                    for (ConfigurableClassifier.Entry entry : entries) {
+                        String facet = taxonomyFacet + "." + isil + ".notation";
+                        if (state.getFacets().get(facet) == null) {
+                            state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                        }
+                        state.getFacets().get(facet).addValue(entry.getCode());
+                        facet = taxonomyFacet + "." + isil + ".text";
+                        if (state.getFacets().get(facet) == null) {
+                            state.getFacets().put(facet, new StringFacet().setName(facet).setType(Literal.STRING));
+                        }
+                        state.getFacets().get(facet).addValue(entry.getText());
+                    }
+                }
+            }
         } else if ("status".equals(property)) {
             StatusCodeMapper mapper = worker.statusCodeMapper();
             if (mapper != null && mapper.getMap().containsKey(value)) {
