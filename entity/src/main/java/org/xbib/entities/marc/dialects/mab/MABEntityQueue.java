@@ -386,11 +386,9 @@ public class MABEntityQueue extends EntityQueue<MABEntityBuilderState, MABEntity
                     } catch (ClassCastException e) {
                         logger.error("cannot use string property of '" + subfieldId + "' for field " + field);
                     }
-                    if (property == null) {
-                        // unmapped subfield ID
-                        property = subfieldId;
+                    if (property != null) {
+                        newResource.add(property, element.data(this, predicate, newResource, property, field.data()));
                     }
-                    newResource.add(property, element.data(this, predicate, newResource, property, field.data()));
                 }
             }
             resource.rename(tempPredicate, IRI.builder().curie(predicate).build());

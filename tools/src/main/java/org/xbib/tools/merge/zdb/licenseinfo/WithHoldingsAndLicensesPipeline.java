@@ -376,10 +376,6 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         m.addVolumeIDs(vids);
 
         // index this manifestation
-        XContentBuilder builder = jsonBuilder();
-        String docid = m.build(builder, tag, null);
-        service.ingest().index(manifestationsIndex, manifestationsIndexType, docid, builder.string());
-        service.indexMetric().mark(1);
         // holdings by date and the services for them
         if (!m.getVolumesByDate().isEmpty()) {
             SetMultimap<Integer, Holding> volumesByDate;
@@ -390,14 +386,19 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
                 String identifier = (tag != null ? tag + "." : "") + m.externalID() + (date != -1 ? "." + date : "");
                 Set<Holding> holdings = volumesByDate.get(date);
                 if (holdings != null && !holdings.isEmpty()) {
-                    builder = jsonBuilder();
-                    docid = m.buildHoldingsByDate(builder, tag, m.externalID(), date, holdings);
+                    XContentBuilder builder = jsonBuilder();
+                    String docid = m.buildHoldingsByDate(builder, tag, m.externalID(), date, holdings);
                     service.ingest().index(dateHoldingsIndex, dateHoldingsIndexType, identifier, builder.string());
                     service.indexMetric().mark(1);
                     logger.debug("indexed volume {} date {}", docid, date);
                 }
             }
         }
+        XContentBuilder builder = jsonBuilder();
+        String docid = m.build(builder, tag, null);
+        service.ingest().index(manifestationsIndex, manifestationsIndexType, docid, builder.string());
+        service.indexMetric().mark(1);
+
         // holdings (list of institutions)
         if (!m.getVolumesByHolder().isEmpty()) {
             final SetMultimap<String, Holding> holdings;

@@ -92,7 +92,7 @@ public abstract class OAIFeeder extends TimewindowFeeder {
         createIndex(getConcreteIndex());
 
         String[] inputs = settings.getAsArray("uri");
-        if (inputs == null) {
+        if (inputs == null || inputs.length == 0) {
             throw new IllegalArgumentException("no parameter 'uri' given");
         }
         input = newConcurrentLinkedQueue();
@@ -128,10 +128,10 @@ public abstract class OAIFeeder extends TimewindowFeeder {
                 ListRecordsListener listener = new ListRecordsListener(request);
                 request.prepare().execute(listener).waitFor();
                 if (listener.getResponse() != null) {
-                    logger.info("got OAI response");
+                    logger.debug("got OAI response");
                     StringWriter w = new StringWriter();
                     listener.getResponse().to(w);
-                    logger.info("{}", w);
+                    logger.debug("{}", w);
                     request = client.resume(request, listener.getResumptionToken());
                 } else {
                     logger.debug("no valid OAI response");
@@ -177,8 +177,7 @@ public abstract class OAIFeeder extends TimewindowFeeder {
             handler.endDocument();
             try {
                 RouteRdfXContentParams params = new RouteRdfXContentParams(namespaceContext,
-                        settings.get("index", "oai"),
-                        settings.get("type", "oai"));
+                        getConcreteIndex(), getType());
                 params.setHandler((content, p) -> ingest.index(p.getIndex(), p.getType(), getHeader().getIdentifier(), content));
                 RdfContentBuilder builder = routeRdfXContentBuilder(params);
                 builder.receive(handler.getResource());

@@ -84,6 +84,7 @@
         <maven.build.timestamp.format>dd.MM.yyyy HH:mm</maven.build.timestamp.format>
         <java.compiler.source>1.8</java.compiler.source>
         <elasticsearch.support.plugin.version>1.4.0.2</elasticsearch.support.plugin.version>
+        <antlr.version>4.5</antlr.version>
     </properties>
 
     <build>
@@ -310,7 +311,7 @@
                 <plugin>
                     <groupId>org.antlr</groupId>
                     <artifactId>antlr4-maven-plugin</artifactId>
-                    <version>4.3</version>
+                    <version>${antlr.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -721,7 +722,7 @@
             <dependency>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-runtime</artifactId>
-                <version>4.5</version>
+                <version>${antlr.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.carrotsearch</groupId>

@@ -36,8 +36,8 @@ import org.xbib.oai.rdf.RdfResourceHandler;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.rdf.RdfContentParams;
-import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.rdf.XSDResourceIdentifiers;
+import org.xbib.rdf.memory.MemoryLiteral;
 import org.xbib.tools.OAIFeeder;
 
 import javax.xml.namespace.QName;
@@ -45,11 +45,11 @@ import javax.xml.namespace.QName;
 /**
  * OAI harvester for DOAJ
  */
-public class FromDOAJ extends OAIFeeder {
+public class FromDOAJArticle extends OAIFeeder {
 
     @Override
     public String getName() {
-        return "doaj-es";
+        return "doaj-article-es";
     }
 
 
@@ -65,7 +65,7 @@ public class FromDOAJ extends OAIFeeder {
 
     @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
-        return FromDOAJ::new;
+        return FromDOAJArticle::new;
     }
 
     @Override
@@ -82,6 +82,7 @@ public class FromDOAJ extends OAIFeeder {
 
         @Override
         public IRI toProperty(IRI property) {
+            // obsolete
             if ("issn".equals(property.getSchemeSpecificPart())) {
                 return IRI.builder().curie("dc", "identifier").build();
             }
@@ -89,6 +90,14 @@ public class FromDOAJ extends OAIFeeder {
                 return IRI.builder().curie("dc", "identifier").build();
             }
             return property;
+        }
+
+        @Override
+        public String toElementName(String elementName) {
+            if (elementName.endsWith("subject")) {
+                return "oaidc:subjectResource";
+            }
+            return elementName;
         }
 
         @Override

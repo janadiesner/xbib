@@ -74,7 +74,9 @@ public abstract class AbstractXmlResourceHandler
      */
     @Override
     public void openPredicate(QName parent, QName name, int level) {
-        IRI p = toProperty(getResource().newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
+        String prefix = makePrefix(name.getPrefix());
+        String elementName = prefix + ":" + name.getLocalPart();
+        IRI p = toProperty(getResource().newPredicate(elementName));
         stack.push(stack.peek().newResource(p));
     }
 
@@ -84,32 +86,44 @@ public abstract class AbstractXmlResourceHandler
 
     @Override
     public void closePredicate(QName parent, QName name, int level) {
-        IRI p = toProperty(getResource().newPredicate(makePrefix(name.getPrefix()) + ":" + name.getLocalPart()));
         Resource r = stack.pop();
+        String prefix = makePrefix(name.getPrefix());
+        String elementName = prefix + ":" + name.getLocalPart();
         if (level < 0) {
-            // it's a Resource
+            // it's a resource
             if (!stack.isEmpty()) {
                 // avoid empty resource
                 if (!r.isEmpty()) {
+                    IRI p = toProperty(getResource().newPredicate(elementName));
                     stack.peek().add(p, r);
                 }
             }
         } else {
-            // it's a property
+            // it's a property with object
             String s = content();
             if (s != null) {
-                // compact predicate because it has only a single value
                 if (!stack.isEmpty()) {
+                    IRI p = toProperty(getResource().newPredicate(elementName));
                     Object o = getResource().newObject(toObject(name, s));
                     if (o instanceof Literal) {
                         r.add(p, (Literal) o);
                     } else if (o instanceof Resource) {
-                        Resource resource = (Resource)o;
+                        Resource resource = (Resource) o;
                         if (!resource.isEmpty()) {
                             r.add(p, resource);
                         }
                     }
+                    // compact predicate because it has only a single value
                     stack.peek().compactPredicate(p);
+                    // optional rename. This can help if OAI source
+                    // emits both string.object under same element name which leads
+                    // to ElasticsearchIllegalArgumentException "unknown property"
+                    if (o instanceof Literal) {
+                        String newElementName = toElementName(elementName);
+                        if (!elementName.equals(newElementName)) {
+                            stack.peek().rename(elementName, newElementName);
+                        }
+                    }
                 }
             }
         }
@@ -119,6 +133,11 @@ public abstract class AbstractXmlResourceHandler
         return property;
     }
 
+    public String toElementName(String elementName) {
+        return elementName;
+    }
+
+    @Override
     public Object toObject(QName name, String content) {
         return content;
     }

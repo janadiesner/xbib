@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -96,6 +97,8 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
     protected Integer firstDate;
 
     protected Integer lastDate;
+
+    private Set<Integer> dates;
 
     private Set<Integer> greenDates;
 
@@ -175,6 +178,7 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         this.firstDate = firstDate == null ? null : firstDate == 9999 ? null : firstDate;
         Integer lastDate = getInteger("date2");
         this.lastDate = lastDate == null ? null : lastDate == 9999 ? null : lastDate;
+        this.dates = getIntegerSet("Dates");
         findLinks();
         this.description = getString("DatesOfPublication.value");
         findSupplement();
@@ -256,6 +260,14 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
         } catch (NumberFormatException e) {
             return null;
         }
+    }
+
+    protected Set<Integer> getIntegerSet(String key) {
+        Object o = map.get(key);
+        if (o instanceof List) {
+            return new HashSet<Integer>((List<Integer>)o);
+        }
+        return null;
     }
 
     public Map map() {
@@ -902,6 +914,18 @@ public class Manifestation implements Comparable<Manifestation>, PipelineRequest
                 .field("carriertype", carrierType())
                 .field("firstdate", firstDate())
                 .field("lastdate", lastDate());
+        // dates with holdings and missing dates
+        synchronized (relatedVolumes) {
+            Set<Integer> volumeDates = relatedVolumes.keySet();
+            if (!volumeDates.isEmpty()) {
+                builder.array("dates", volumeDates);
+                if (dates != null && !dates.isEmpty()) {
+                    // difference set = missing
+                    dates.removeAll(volumeDates);
+                    builder.array("missingdates", dates);
+                }
+            }
+        }
         if (greenDates != null && !greenDates.isEmpty()) {
             builder.field("greendate", greenDates);
         }

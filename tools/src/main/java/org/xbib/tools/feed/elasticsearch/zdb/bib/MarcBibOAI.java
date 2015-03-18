@@ -100,7 +100,6 @@ public class MarcBibOAI extends OAIFeeder {
         return settings.get("bib-type");
     }
 
-
     @Override
     public void process(URI uri) throws Exception {
         // set identifier prefix (ISIL)
