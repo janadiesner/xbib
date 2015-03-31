@@ -62,7 +62,7 @@ public class DE468MABTest extends StreamTester {
      * @throws IOException
      * @throws SAXException
      */
-    @Test
+
     public void testDE468() throws IOException, SAXException {
         InputStream in = getClass().getResource("aleph500-subfields.mrc").openStream();
         File file = File.createTempFile("DE-468.", ".xml");
@@ -93,7 +93,6 @@ public class DE468MABTest extends StreamTester {
         FileOutputStream out = new FileOutputStream(file);
         Iso2709Reader reader = new Iso2709Reader(in, "UTF-8");
         reader.setFormat("MAB");
-
         // custom subfield delimiter. Will be automatically quoted before used as split pattern.
         reader.setSubfieldDelimiter("$$");
         // fix subfield code length
@@ -128,7 +127,7 @@ public class DE468MABTest extends StreamTester {
                 new FileInputStream(file));
     }
 
-    @Test
+
     public void testKeyValueDE468MAB() throws Exception {
         File file = File.createTempFile("DE-468-keyvalue.", ".txt");
         StringWriter sw = new StringWriter();
@@ -174,8 +173,8 @@ public class DE468MABTest extends StreamTester {
                 new FileInputStream(file));
     }
 
-    @Test
-    public void testFieldDropperDE468() throws IOException, SAXException {
+
+    public void testFieldKillerDE468() throws IOException, SAXException {
         InputStream in = getClass().getResource("aleph500-subfields.mrc").openStream();
         File file = File.createTempFile("DE-468-killed-fields.", ".xml");
         FileOutputStream out = new FileOutputStream(file);

@@ -42,7 +42,8 @@ import org.xbib.common.xcontent.XContentGenerator;
 import org.xbib.common.xcontent.XContentHelper;
 import org.xbib.common.xcontent.XContentParser;
 import org.xbib.common.xcontent.XContentType;
-import org.xbib.xml.ToQName;
+import org.xbib.xml.ISO9075;
+import org.xbib.xml.XMLUtil;
 import org.xbib.xml.namespace.XmlNamespaceContext;
 
 import javax.xml.namespace.NamespaceContext;
@@ -109,7 +110,6 @@ public class XmlXContentGenerator implements XContentGenerator {
         generator.writeStartArray();
     }
 
-
     public void writeEndArray() throws IOException {
         generator.writeEndArray();
     }
@@ -123,7 +123,6 @@ public class XmlXContentGenerator implements XContentGenerator {
             try {
                 for (String prefix : getNamespaceContext().getNamespaces().keySet()) {
                     generator.getStaxWriter().writeNamespace(prefix, getNamespaceContext().getNamespaceURI(prefix));
-                    //generator.getStaxWriter().setPrefix(prefix, getNamespaceContext().getNamespaceURI(prefix));
                 }
             } catch (XMLStreamException e) {
                 //  e.printStackTrace();
@@ -142,22 +141,24 @@ public class XmlXContentGenerator implements XContentGenerator {
 
     @Override
     public void writeFieldName(XContentString name) throws IOException {
-
+        writeFieldNameWithNamespace(name);
     }
 
     public void writeString(String text) throws IOException {
-        generator.writeString(text);
+        generator.writeString(XMLUtil.sanitizeXml10(text));
     }
 
     public void writeString(char[] text, int offset, int len) throws IOException {
-        generator.writeString(text, offset, len);
+        generator.writeString(XMLUtil.sanitizeXml10(text, offset, len));
     }
 
     public void writeUTF8String(byte[] text, int offset, int length) throws IOException {
+        // unsupported operation
         generator.writeUTF8String(text, offset, length);
     }
 
     public void writeBinary(byte[] data, int offset, int len) throws IOException {
+        // base64
         generator.writeBinary(data, offset, len);
     }
 
@@ -412,12 +413,17 @@ public class XmlXContentGenerator implements XContentGenerator {
         generator.writeFieldName(qname.getLocalPart());
     }
 
+    private void writeFieldNameWithNamespace(XContentString name) throws IOException {
+        writeFieldNameWithNamespace(name.getValue());
+    }
+
     private QName toQName(NamespaceContext context, String name) {
         if (name.startsWith("_")) {
             name = name.substring(1);
         } else if (name.startsWith("@")) {
             name = name.substring(1);
         }
+        name = ISO9075.encode(name);
         int pos = name.indexOf(':');
         String nsPrefix = "";
         String nsURI = context.getNamespaceURI("");

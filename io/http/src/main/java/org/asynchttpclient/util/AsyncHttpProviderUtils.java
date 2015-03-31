@@ -246,7 +246,7 @@ public class AsyncHttpProviderUtils {
         return result;
     }
     
-    public final static InputStream contentAsStream(List<HttpResponseBodyPart> bodyParts)
+    public static InputStream contentAsStream(List<HttpResponseBodyPart> bodyParts)
     {
         switch (bodyParts.size()) {
         case 0:
@@ -261,7 +261,7 @@ public class AsyncHttpProviderUtils {
         return new SequenceInputStream(streams.elements());
     }
     
-    public final static String getHost(URI uri) {
+    public static String getHost(URI uri) {
         String host = uri.getHost();
         if (host == null) {
             host = uri.getAuthority();
@@ -269,7 +269,7 @@ public class AsyncHttpProviderUtils {
         return host;
     }
 
-    public final static URI getRedirectUri(URI uri, String location) {
+    public static URI getRedirectUri(URI uri, String location) {
         if(location == null)
             throw new IllegalArgumentException("URI " + uri + " was redirected to null location");
         

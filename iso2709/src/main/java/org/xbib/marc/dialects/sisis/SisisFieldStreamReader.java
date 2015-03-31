@@ -48,11 +48,9 @@ public class SisisFieldStreamReader extends LineFeedStreamReader {
 
     private RecordLabel label;
 
-    private String lastNumber;
-
     public SisisFieldStreamReader(Reader reader, FieldListener listener) {
         super(reader);
-        this.label = new RecordLabel().setIndicatorLength(2).setSubfieldIdentifierLength(0);
+        this.label = new RecordLabel().setIndicatorLength(2).setSubfieldIdentifierLength(1);
         this.listener = listener;
     }
 
@@ -60,7 +58,7 @@ public class SisisFieldStreamReader extends LineFeedStreamReader {
         listener.data(label.getRecordLabel());
     }
 
-    public void process(String line) throws Exception {
+    public void processLine(String line) throws Exception {
         if (line == null || line.isEmpty()) {
             return;
         }
@@ -79,8 +77,8 @@ public class SisisFieldStreamReader extends LineFeedStreamReader {
             // number is always four characters, take the last three and make the first character to "indicator 1"
             String ind1 = number.substring(0,1);
             number = number.substring(1,4);
-            char sep = FieldSeparator.RS;
             String data;
+            String designator;
             // special field 9999 means "end of record" (group delimiter)
             if ("999".equals(number)) {
                 listener.mark(FieldSeparator.GS);
@@ -88,22 +86,22 @@ public class SisisFieldStreamReader extends LineFeedStreamReader {
             } else {
                 if ("000".equals(number)) {
                     number = "001";
-                    data = number + value;
+                    designator = number;
                 } else if (number.startsWith("00")) {
                     if (!" ".equals(ind2)) {
                         // move fields out of controlfield area "000"-"009" to "900-909" plus ind2="9"
                         // if there is a numbering, to avoid validation errors
-                        data = "9" + number.substring(1,3) + "9" + ind2 + value;
+                        designator = "9" + number.substring(1,3) + "9" + ind2 + "a";
                     } else {
-                        data = number + value;
+                        designator = number;
                     }
                 } else {
-                    data = number + ind1 + ind2 + value;
+                    designator = number + ind1 + ind2 + "a";
                 }
-                listener.mark(sep);
+                data = designator + value;
+                listener.mark(FieldSeparator.RS);
                 listener.data(data);
             }
-            lastNumber = number;
         }
     }
 
@@ -111,6 +109,5 @@ public class SisisFieldStreamReader extends LineFeedStreamReader {
         listener.mark(FieldSeparator.GS);
         listener.mark(FieldSeparator.FS);
     }
-
 
 }

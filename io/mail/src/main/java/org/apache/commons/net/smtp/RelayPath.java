@@ -18,21 +18,18 @@
 package org.apache.commons.net.smtp;
 
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.List;
 
 /***
  * A class used to represent forward and reverse relay paths.  The
  * SMTP MAIL command requires a reverse relay path while the SMTP RCPT
  * command requires a forward relay path.  See RFC 821 for more details.
  * In general, you will not have to deal with relay paths.
- * <p>
- * <p>
- * @see SMTPClient
  ***/
 
 public final class RelayPath
 {
-    Vector<String> _path;
+    List<String> _path;
     String _emailAddress;
 
     /***

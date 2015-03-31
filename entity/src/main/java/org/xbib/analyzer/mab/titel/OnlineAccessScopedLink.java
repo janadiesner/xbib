@@ -36,9 +36,11 @@ import org.xbib.entities.marc.dialects.mab.MABEntity;
 import org.xbib.entities.marc.dialects.mab.MABEntityBuilderState;
 import org.xbib.entities.marc.dialects.mab.MABEntityQueue;
 import org.xbib.entities.support.ConfigurableClassifier;
+import org.xbib.marc.FieldList;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Resource;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class OnlineAccessScopedLink extends OnlineAccessRemote {
@@ -51,16 +53,12 @@ public class OnlineAccessScopedLink extends OnlineAccessRemote {
 
     private final static String taxonomyFacet = "xbib.taxonomy";
 
-    private String prefix = "";
 
     private String catalogid = "";
 
     @Override
     public MABEntity setSettings(Map<String,Object> params) {
         super.setSettings(params);
-        if (params.containsKey("_prefix")) {
-            this.prefix = params.get("_prefix").toString();
-        }
         // override by "catalogid"
         if (params.containsKey("catalogid")) {
             this.catalogid = params.get("catalogid").toString();
@@ -69,17 +67,24 @@ public class OnlineAccessScopedLink extends OnlineAccessRemote {
     }
 
     @Override
+    public boolean fields(MABEntityQueue.MABWorker worker,
+                          FieldList fields, String value) throws IOException {
+        worker.addToResource(worker.state().getNextItemResource(), fields, this);
+        return true;
+    }
+
+    @Override
     public String data(MABEntityQueue.MABWorker worker,
                        String predicate, Resource resource, String property, String value) {
         if (value == null) {
             return null;
         }
-        MABEntityBuilderState state = worker.state();
         if ("scope".equals(property) && catalogid != null && !catalogid.isEmpty()) {
             String isil = catalogid;
             resource.add("identifier", isil);
             ConfigurableClassifier classifier = worker.classifier();
             if (classifier != null) {
+                MABEntityBuilderState state = worker.state();
                 String key = isil + "." + state.getRecordIdentifier() + ".";
                 java.util.Collection<ConfigurableClassifier.Entry> entries = classifier.lookup(key);
                 if (entries != null) {

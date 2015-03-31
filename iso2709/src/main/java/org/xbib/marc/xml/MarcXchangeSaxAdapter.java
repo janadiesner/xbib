@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.io.field.BufferedFieldStreamReader;
 import org.xbib.io.field.FieldListener;
 import org.xbib.io.field.FieldSeparator;
@@ -69,6 +71,8 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
         implements MarcXchangeConstants, MarcXchangeListener {
+
+    private final static Logger logger = LogManager.getLogger(MarcXchangeSaxAdapter.class);
 
     private static final AttributesImpl EMPTY_ATTRIBUTES = new AttributesImpl();
 
@@ -664,7 +668,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                             leader(recordLabel.getRecordLabel());
                             directory = new FieldDirectory(recordLabel, fieldContent);
                             if (directory.isEmpty()) {
-                                designator = new Field(recordLabel, fieldContent.substring(RecordLabel.LENGTH));
+                                designator = new Field(getFormat(), recordLabel, fieldContent.substring(RecordLabel.LENGTH));
                                 if (designator.tag() != null && !Field.ERROR_TAG.equals(designator.tag())) {
                                     if (subfieldDelimiter != null) {
                                         // skip tag if custom subfield delimiter
@@ -685,7 +689,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                     recordOpen = true;
                                     leader(recordLabel.getRecordLabel());
                                 }
-                                designator = new Field(recordLabel, fieldContent);
+                                designator = new Field(getFormat(), recordLabel, fieldContent);
                                 beginDataField(designator);
                                 datafieldOpen = true;
                             } else {
@@ -700,7 +704,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                             endDataField(null);
                         }
                         if (directory == null || directory.isEmpty()) {
-                            designator = new Field(recordLabel, fieldContent);
+                            designator = new Field(getFormat(), recordLabel, fieldContent);
                         } else if (directory.containsKey(position)) {
                             designator = new Field(recordLabel, directory.get(position), fieldContent, false);
                         } else {
@@ -811,6 +815,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
         @SuppressWarnings("fallthrough")
         @Override
         public void data(String data) {
+            logger.info("data={}", data);
             String fieldContent = data;
             try {
                 switch (mark) {
@@ -820,7 +825,8 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                         // start/end of group within a stream
                         if (datafieldOpen) {
                             datafieldOpen = false;
-                            addField(Field.EMPTY_FIELD); // is this required?
+                            addField(Field.EMPTY_FIELD);
+                            flushField();
                         }
                         flushRecord(getFormat(), getType());
                         // fall through is ok!
@@ -849,7 +855,7 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                             // auto-repair label
                             directory = new FieldDirectory(recordLabel, fieldContent);
                             if (directory.isEmpty()) {
-                                designator = new Field(recordLabel, fieldContent.substring(RecordLabel.LENGTH));
+                                designator = new Field(getFormat(), recordLabel, fieldContent.substring(RecordLabel.LENGTH));
                                 if (designator.tag() != null) {
                                     if (subfieldDelimiter != null) {
                                         // skip tag if custom subfield delimiter
@@ -874,10 +880,11 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                     case FieldSeparator.RS: {
                         if (datafieldOpen) {
                             datafieldOpen = false;
-                            addField(Field.EMPTY_FIELD); // is this required?
+                            addField(Field.EMPTY_FIELD);
+                            flushField();
                         }
                         if (directory == null || directory.isEmpty()) {
-                            designator = new Field(recordLabel, fieldContent);
+                            designator = new Field(getFormat(), recordLabel, fieldContent);
                         } else if (directory.containsKey(position)) {
                             designator = new Field(recordLabel, directory.get(position), fieldContent, false);
                         } else {
@@ -903,7 +910,6 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
                                     }
                                     addField(designator);
                                 }
-                                flushField();
                             }
                         } else {
                             if (scrub) {

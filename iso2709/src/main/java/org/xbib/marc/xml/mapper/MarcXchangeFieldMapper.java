@@ -143,8 +143,11 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeConstants, Ma
     }
 
     /**
-     * Flush a single data field by taking the designator and push it to the destination record field.
-     * If mapping exist, set up mapping process, and iterate over subfield mappings.
+     * Flush a data field by taking the designator
+     * and push it to the destination record field.
+     * This must be called after a data field is closed.
+     * If mapping exist, set up mapping process,
+     * and iterate over subfield mappings.
      */
     protected void flushField() {
         if (datafields == null || datafields.isEmpty()) {
@@ -182,6 +185,7 @@ public abstract class MarcXchangeFieldMapper implements MarcXchangeConstants, Ma
         }
         if (op.equals(Operation.KEEP)) {
             // inject datafield "open" event if subfield tag has changed
+            // we accept only subfield data
             if (!record.isEmpty() && record.getLast().isSubField() && datafield.isSubField()
                     && !datafield.tag().equals(record.getLast().tag())) {
                 record.add(new Field(datafield).subfieldId(null));

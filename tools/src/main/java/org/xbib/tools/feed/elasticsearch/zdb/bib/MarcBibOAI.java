@@ -120,6 +120,10 @@ public class MarcBibOAI extends OAIFeeder {
         String verb = oaiparams.get("verb");
         String metadataPrefix = oaiparams.get("metadataPrefix");
         String set = oaiparams.get("set");
+        // we accept only ISO format in Zulu timezone, e.g.
+        // d=`date +%Y-%m-%d`
+        // from=`date -d "${d} -1 days" +"%Y-%m-%dT%H:%M:%SZ"`
+        // until=`date -d "${d}" +"%Y-%m-%dT%H:%M:%SZ"`
         Date from = Date.from(Instant.parse(oaiparams.get("from")));
         Date until = Date.from(Instant.parse(oaiparams.get("until")));
         // compute interval

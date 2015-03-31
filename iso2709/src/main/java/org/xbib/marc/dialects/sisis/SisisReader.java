@@ -224,8 +224,10 @@ public class SisisReader implements FieldReader, XMLReader, MarcXchangeConstants
     }
 
     public SisisReader addFieldMap(String fieldMapName, Map<String, Object> fieldMap) {
-        this.adapter.addFieldMap(fieldMapName, fieldMap);
-        properties.put(FIELDMAPPER, Boolean.TRUE);
+        if (fieldMap != null) {
+            this.adapter.addFieldMap(fieldMapName, fieldMap);
+            properties.put(FIELDMAPPER, Boolean.TRUE);
+        }
         return this;
     }
 
@@ -280,13 +282,13 @@ public class SisisReader implements FieldReader, XMLReader, MarcXchangeConstants
                 .setTransformData(transformData);
     }
 
-    public SisisFieldStreamReader stream() throws IOException {
+    /*public SisisFieldStreamReader stream() throws IOException {
         return setup(adapter).setReader(reader).sisisFieldStream();
     }
 
     public SisisFieldStreamReader mappedStream() throws IOException {
         return setup(adapter).setReader(reader).sisisMappedFieldStream();
-    }
+    }*/
 
     public void parse() throws IOException {
         parse(new InputSource(reader));

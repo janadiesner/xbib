@@ -149,21 +149,56 @@ public class EnumerationAndChronology {
     // yyyy,v - i.yyyy
     private final static Pattern[] p3d = new Pattern[] {
             // 1981,31 - 25.1997
-            //
+            // 115.1921/22(1923) - 1125.1937
             Pattern.compile("(\\d{4}),(.*?)\\s*\\-\\s*(\\d+)\\.(\\d{4})")
     };
     // i.yyyy - yyyy,v
     private final static Pattern[] p3e = new Pattern[]{
             Pattern.compile("(.*?)\\.(\\d{4})\\s*\\-\\s*(\\d{4}),(.*?)")
     };
+
+    // Erscheinungsjahre in runden Klammern (yyyy), (yyyy/yy), (yyyy/yyyy)
     private final static Pattern[] p4a = new Pattern[] {
             // 2.1938/40(1942)
             // 9.1996/97(1997)
-            // 115.1921/22(1923) - 1125.1937
             // 1961/62(1963)
             // 1965/70(1971/72)
             Pattern.compile("\\((\\d{4}/?\\d{0,4})\\)")
     };
+
+    /**
+     * NEU
+     */
+
+    // 115.1921/22(1923) - 1125.1937
+    // Jahrgänge, mit Zählung, geschlossen
+    private final static Pattern[] g1a = new Pattern[] {
+    };
+
+    // 115.1921/22(1923) -
+    // Jahrgänge, mit Zählung, offen
+    private final static Pattern[] g1b = new Pattern[] {
+    };
+
+    // 2.1938/40(1942)
+    // 9.1996/97(1997)
+    // einzelner Jahrgang
+    // 1 = Berichtsjahr Zählung
+    // 2 = Berichtsjahr
+    // 3 = Erscheinungsjahr in runden Klammern (yyyy), (yyyy/yy), (yyyy/yyyy)
+    private final static Pattern[] g1c = new Pattern[] {
+            Pattern.compile("(.*?)\\.(\\d{4}/?\\d{0,4})\\((\\d{4}/?\\d{0,4})\\)")
+    };
+
+    // 1961/62(1963)
+    // 1965/70(1971/72)
+    // einzelner Jahrgang
+    // 1 = Berichtsjahr
+    // 2 = Erscheinungsjahr
+    private final static Pattern[] g1d = new Pattern[] {
+            Pattern.compile("(\\d{4}/?\\d{0,4})\\((\\d{4}/?\\d{0,4})\\)")
+    };
+
 
     private EnumerationAndChronology() {
     }

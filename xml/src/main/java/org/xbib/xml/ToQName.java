@@ -44,6 +44,7 @@ public class ToQName {
         } else if (name.startsWith("@")) {
             name = name.substring(1);
         }
+        name = ISO9075.encode(name);
         int pos = name.indexOf(':');
         if (pos > 0) {
             nsPrefix = name.substring(0, pos);

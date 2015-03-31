@@ -291,14 +291,29 @@ public final class XMLUtil {
 
     private final static Pattern invalidXml10 = Pattern.compile("[^\u0009\n\r\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF]");
 
-    public static CharSequence sanitizeXml10(CharSequence sequence) {
+    /**
+     * Does not work.
+     * @param sequence the charatcer sequence
+     * @return sanitized string
+     */
+    public static String sanitizeXml10(CharSequence sequence) {
         if (sequence == null) {
             return null;
         }
         if (sequence.length() == 0) {
-            return sequence;
+            return "";
         }
         return invalidXml10.matcher(sequence).replaceAll("\uFFFD");
+    }
+
+    public static String sanitizeXml10(char[] sequence, int offset, int length) {
+        if (sequence == null) {
+            return null;
+        }
+        if (sequence.length == 0) {
+            return "";
+        }
+        return sanitizeXml10(new String(sequence, offset, length));
     }
 
     /**

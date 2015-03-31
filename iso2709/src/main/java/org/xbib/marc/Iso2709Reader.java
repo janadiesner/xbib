@@ -336,6 +336,11 @@ public class Iso2709Reader implements FieldReader, XMLReader, MarcXchangeConstan
                 .setTransformData(transformData);
     }
 
+    /**
+     * for Java 8 streaming API
+     * @return a stream
+     * @throws IOException if stream fails
+     */
     public BufferedFieldStreamReader stream() throws IOException {
         return setup(adapter).setReader(reader).fieldStream();
     }

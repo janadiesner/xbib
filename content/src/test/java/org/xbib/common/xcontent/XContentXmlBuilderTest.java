@@ -196,4 +196,14 @@ public class XContentXmlBuilderTest extends Assert {
                 .loadFromReader(sr).build();
     }
 
+    @Test
+    public void testInvalidWhiteSpaceCharacter() throws Exception {
+        QName root = new QName("root");
+        XContentBuilder builder = xmlBuilder(new XmlXParams(root));
+        builder.startObject().field("Hello", "World\u001b").endObject();
+        assertEquals(builder.string(),
+                "<root><Hello>World�</Hello></root>"
+        );
+    }
+
 }

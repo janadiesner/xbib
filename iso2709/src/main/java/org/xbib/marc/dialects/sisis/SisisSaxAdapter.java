@@ -126,7 +126,6 @@ public class SisisSaxAdapter extends MarcXchangeSaxAdapter {
         return this;
     }
 
-
     public SisisSaxAdapter addFieldMap(String fieldMapName, Map<String, Object> map) {
         super.addFieldMap(fieldMapName, map);
         return this;
@@ -140,16 +139,15 @@ public class SisisSaxAdapter extends MarcXchangeSaxAdapter {
         return new SisisFieldStreamReader(reader,  new MappedStreamListener());
     }
 
-    public void parseCollection(SisisFieldStreamReader stream) throws Exception {
+    public void parseCollection(SisisFieldStreamReader reader) throws Exception {
         beginCollection();
         String s;
-        stream.begin();
-        while ((s = stream.readLine ()) != null) {
-           // System.err.println("s="+s);
-            stream.process(s);
+        reader.begin();
+        while ((s = reader.readLine ()) != null) {
+            reader.processLine(s);
         }
-        stream.end();
-        stream.close();
+        reader.end();
+        reader.close();
         endCollection();
     }
 

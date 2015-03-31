@@ -66,11 +66,11 @@ public class Field implements Comparable<Field> {
     private boolean isControl;
 
     public Field() {
-        this(null, null, null);
+        this(null, (String)null, null);
     }
 
     public Field(String tag) {
-        this(tag, null, null);
+        this(tag, (String)null, null);
     }
 
     public Field(String tag, char ind1) {
@@ -122,12 +122,12 @@ public class Field implements Comparable<Field> {
     }
 
     /**
-     * Create field, try to derive tag, indicators, and subfield ID from rawContent
+     * Create field, try to derive tag, indicators, subfield from raw content
      *
      * @param label the label
      * @param rawContent raw content
      */
-    public Field(RecordLabel label, String rawContent) {
+    public Field(String format, RecordLabel label, String rawContent) {
         this.tag = rawContent.length() > 2 ? rawContent.substring(0, 3) : ERROR_TAG;
         this.isControl = tag.charAt(0) == '0' && tag.charAt(1) == '0';
         if (isControlField()) {
@@ -139,9 +139,22 @@ public class Field implements Comparable<Field> {
         } else {
             if (label != null) {
                 int indlen = label.getIndicatorLength();
-                this.indicator = rawContent.length() > 2 + indlen ? rawContent.substring(3, 3 + indlen) : null;
-                this.subfieldId = null; // assume datafield
-                data(rawContent.length() > 2 + indlen ? rawContent.substring(3 + indlen) : null);
+                int pos = 3 + indlen;
+                this.indicator = rawContent.length() >= pos ? rawContent.substring(3, pos) : null;
+                if ("MAB".equals(format)) {
+                    // challenge here is "Aleph MAB" export. In this format, everything is wrong:
+                    // no leading subfield, wrong subfield ID length (=1), wrong subfield delimiter = "$$"
+                    // still "Aleph MAB" is defined to have no subfields(!)
+                    this.subfieldId = null;
+                    data(rawContent.length() > pos ? rawContent.substring(pos) : null);
+                } else {
+                    // all other
+                    int subfieldidlen = label.getSubfieldIdentifierLength();
+                    this.subfieldId = subfieldidlen == 1 && rawContent.length() > pos ?
+                            rawContent.substring(pos, pos + subfieldidlen) : null;
+                    data(rawContent.length() >= pos + subfieldidlen ?
+                            rawContent.substring(pos + subfieldidlen) : null);
+                }
             } else {
                 data(rawContent.substring(3));
             }
@@ -167,7 +180,7 @@ public class Field implements Comparable<Field> {
         int subfieldidlen = label.getSubfieldIdentifierLength();
         if (asSubfield) {
             this.indicator = designator.indicator();
-            // subfield code length = length of subfield delimiter + length of data lement indentifier (always 2 in MARC)
+            // subfield code length = length of subfield delimiter + length of data element indentifier (always 2 in MARC)
             if (subfieldidlen > 1 && content.length() > subfieldidlen - 1) {
                 this.subfieldId = content.substring(0, subfieldidlen - 1);
                 data(content.substring(subfieldidlen - 1));

@@ -36,6 +36,7 @@ import com.ctc.wstx.stax.WstxOutputFactory;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import org.xbib.io.BytesReference;
 import org.xbib.io.FastStringReader;
 import org.xbib.common.xcontent.XContent;
@@ -77,9 +78,11 @@ public class XmlXContent implements XContent {
         inputFactory.setProperty("javax.xml.stream.isSupportingExternalEntities", Boolean.FALSE);
 
         outputFactory = new WstxOutputFactory();
+
         outputFactory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.FALSE);
 
         xmlFactory = new XmlFactory(inputFactory, outputFactory);
+        xmlFactory.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
 
         xmlXContent = new XmlXContent();
     }
