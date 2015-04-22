@@ -81,12 +81,12 @@ public class ZDBHolTest extends Assert {
                 .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                     @Override
                     public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
-                        logger.debug("begin");
+                        logger.debug("startStream");
                         for (Field f : key) {
                             logger.debug("tag={} ind={} subf={} data={}",
                                     f.tag(), f.indicator(), f.subfieldId(), f.data());
                         }
-                        logger.debug("end");
+                        logger.debug("endStream");
                         return this;
                     }
 

@@ -25,6 +25,11 @@ public class FromMARCToMarcJSON extends Converter {
     private final static Charset UTF8 = Charset.forName("UTF-8");
 
     @Override
+    public String getName() {
+        return getClass().getName();
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return FromMARCToMarcJSON::new;
     }

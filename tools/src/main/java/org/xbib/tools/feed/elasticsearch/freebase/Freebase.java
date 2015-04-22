@@ -89,7 +89,7 @@ public class Freebase extends Feeder {
         }
 
         @Override
-        public Triple.Builder begin() {
+        public Triple.Builder startStream() {
             return this;
         }
 

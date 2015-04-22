@@ -1,7 +1,4 @@
-
 package org.xbib.pipeline;
-
-import org.xbib.metric.MeterMetric;
 
 import java.io.Closeable;
 import java.util.Iterator;
@@ -15,9 +12,5 @@ import java.util.concurrent.Callable;
  */
 public interface Pipeline<T,R extends PipelineRequest>
         extends Callable<T>, Closeable, Iterator<R> {
-
-    Integer getNumber();
-
-    String getName();
 
 }

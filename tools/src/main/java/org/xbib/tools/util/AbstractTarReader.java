@@ -7,6 +7,7 @@ import org.xbib.io.ConnectionService;
 import org.xbib.io.Packet;
 import org.xbib.io.Session;
 import org.xbib.io.archive.tar.TarSession;
+import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.AbstractPipeline;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineException;
@@ -67,12 +68,12 @@ public abstract class AbstractTarReader extends AbstractPipeline<LongPipelineEle
     }
 
     @Override
-    public void newRequest(Pipeline<Boolean, LongPipelineElement> pipeline, LongPipelineElement request) {
+    public void newRequest(Pipeline<MeterMetric, LongPipelineElement> pipeline, LongPipelineElement request) {
 
     }
 
     @Override
-    public void error(Pipeline<Boolean, LongPipelineElement> pipeline, LongPipelineElement request, PipelineException error) {
+    public void error(Pipeline<MeterMetric, LongPipelineElement> pipeline, LongPipelineElement request, PipelineException error) {
         logger.error(error.getMessage(), error);
 
     }

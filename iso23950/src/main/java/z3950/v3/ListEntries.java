@@ -120,7 +120,7 @@ public final class ListEntries extends ASN1Any {
         BEREncoding p;
 
         // Remaining elements are optional, set variables
-        // to null (not present) so can return at end of BER
+        // to null (not present) so can return at endStream of BER
 
         s_entries = null;
         s_nonsurrogateDiagnostics = null;

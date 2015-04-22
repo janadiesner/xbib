@@ -66,17 +66,8 @@ import z3950.v3.InternationalString;
  * }
  * </pre>
  *
- * @version $Release$ $Date$
  */
-
-
-
 public final class ExtendedServicesInfo extends ASN1Any {
-
-    public final static String VERSION = "Copyright (C) Hoylen Sue, 1998. 199809080315Z";
-
-
-
     /**
      * Default constructor for a ExtendedServicesInfo.
      */
@@ -124,7 +115,7 @@ public final class ExtendedServicesInfo extends ASN1Any {
             ber_cons = (BERConstructed) ber;
         } catch (ClassCastException e) {
             throw new ASN1EncodingException
-                    ("Zebulun ExtendedServicesInfo: bad BER form\n");
+                    ("ExtendedServicesInfo: bad BER form\n");
         }
 
         // Prepare to decode the components
@@ -137,7 +128,7 @@ public final class ExtendedServicesInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesInfo: incomplete");
+            throw new ASN1Exception("ExtendedServicesInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
@@ -151,14 +142,14 @@ public final class ExtendedServicesInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesInfo: incomplete");
+            throw new ASN1Exception("ExtendedServicesInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 1 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ExtendedServicesInfo: bad tag in s_type\n");
+                    ("ExtendedServicesInfo: bad tag in s_type\n");
         }
 
         s_type = new ASN1ObjectIdentifier(p, false);
@@ -168,7 +159,7 @@ public final class ExtendedServicesInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesInfo: incomplete");
+            throw new ASN1Exception("ExtendedServicesInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
@@ -182,14 +173,14 @@ public final class ExtendedServicesInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesInfo: incomplete");
+            throw new ASN1Exception("ExtendedServicesInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 3 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ExtendedServicesInfo: bad tag in s_privateType\n");
+                    ("ExtendedServicesInfo: bad tag in s_privateType\n");
         }
 
         s_privateType = new ASN1Boolean(p, false);
@@ -199,14 +190,14 @@ public final class ExtendedServicesInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesInfo: incomplete");
+            throw new ASN1Exception("ExtendedServicesInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 5 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ExtendedServicesInfo: bad tag in s_restrictionsApply\n");
+                    ("ExtendedServicesInfo: bad tag in s_restrictionsApply\n");
         }
 
         s_restrictionsApply = new ASN1Boolean(p, false);
@@ -216,14 +207,14 @@ public final class ExtendedServicesInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesInfo: incomplete");
+            throw new ASN1Exception("ExtendedServicesInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 6 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ExtendedServicesInfo: bad tag in s_feeApply\n");
+                    ("ExtendedServicesInfo: bad tag in s_feeApply\n");
         }
 
         s_feeApply = new ASN1Boolean(p, false);
@@ -233,14 +224,14 @@ public final class ExtendedServicesInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesInfo: incomplete");
+            throw new ASN1Exception("ExtendedServicesInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 7 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ExtendedServicesInfo: bad tag in s_available\n");
+                    ("ExtendedServicesInfo: bad tag in s_available\n");
         }
 
         s_available = new ASN1Boolean(p, false);
@@ -250,14 +241,14 @@ public final class ExtendedServicesInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesInfo: incomplete");
+            throw new ASN1Exception("ExtendedServicesInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 8 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ExtendedServicesInfo: bad tag in s_retentionSupported\n");
+                    ("ExtendedServicesInfo: bad tag in s_retentionSupported\n");
         }
 
         s_retentionSupported = new ASN1Boolean(p, false);
@@ -267,14 +258,14 @@ public final class ExtendedServicesInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesInfo: incomplete");
+            throw new ASN1Exception("ExtendedServicesInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 9 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ExtendedServicesInfo: bad tag in s_waitAction\n");
+                    ("ExtendedServicesInfo: bad tag in s_waitAction\n");
         }
 
         s_waitAction = new ASN1Integer(p, false);
@@ -329,7 +320,7 @@ public final class ExtendedServicesInfo extends ASN1Any {
         // Should not be any more parts
 
         if (part < num_parts) {
-            throw new ASN1Exception("Zebulun ExtendedServicesInfo: bad BER: extra data " + part + "/" + num_parts + " processed");
+            throw new ASN1Exception("ExtendedServicesInfo: bad BER: extra data " + part + "/" + num_parts + " processed");
         }
     }
 
@@ -589,7 +580,4 @@ public final class ExtendedServicesInfo extends ASN1Any {
     public static final int E_depends = 4;
     public static final int E_notSaying = 5;
 
-} // ExtendedServicesInfo
-
-
-//EOF
+}

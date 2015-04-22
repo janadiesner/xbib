@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -98,7 +99,18 @@ public class RdfXmlContentGenerator
     }
 
     @Override
-    public RdfXmlContentGenerator begin() {
+    public RdfXmlContentParams getParams() {
+        return params;
+    }
+
+    @Override
+    public RdfXmlContentGenerator startStream() {
+        return this;
+    }
+
+    @Override
+    public RdfContentGenerator setBaseUri(String baseUri) {
+        startPrefixMapping("", baseUri);
         return this;
     }
 
@@ -109,7 +121,7 @@ public class RdfXmlContentGenerator
     }
 
     @Override
-    public RdfXmlContentGenerator end() {
+    public RdfXmlContentGenerator endStream() {
         return this;
     }
 
@@ -135,7 +147,9 @@ public class RdfXmlContentGenerator
         }
         startRDF();
         writeHeader();
-        for (Triple t : resource.triples()) {
+        Iterator<Triple> tripleIterator = resource.triples();
+        while (tripleIterator.hasNext()) {
+            Triple t = tripleIterator.next();
             writeTriple(t);
         }
         endRDF();

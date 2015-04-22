@@ -108,16 +108,6 @@ public abstract class QueueConverter<T, R extends PipelineRequest, P extends Pip
         }
 
         @Override
-        public String getName() {
-            return getClass().getName();
-        }
-
-        @Override
-        public Integer getNumber() {
-            return null;
-        }
-
-        @Override
         public DefaultPipelineRequest next() {
             return new DefaultPipelineRequest(getElement());
         }

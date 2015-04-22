@@ -35,7 +35,7 @@ import java.io.IOException;
 
 class CQLLexer implements CQLTokens {
 
-  /** This character denotes the end of file */
+  /** This character denotes the endStream of file */
   public static final int YYEOF = -1;
 
   /** initial size of the lookahead buffer */
@@ -414,7 +414,7 @@ class CQLLexer implements CQLTokens {
       zzEndRead+= numRead;
       return false;
     }
-    // unlikely but not impossible: read 0 characters, but not at end of stream    
+    // unlikely but not impossible: read 0 characters, but not at end of stream
     if (numRead == 0) {
       int c = zzReader.read();
       if (c == -1) {
@@ -434,7 +434,7 @@ class CQLLexer implements CQLTokens {
    * Closes the input stream.
    */
   public final void yyclose() throws java.io.IOException {
-    zzAtEOF = true;            /* indicate end of file */
+    zzAtEOF = true;            /* indicate endStream of file */
     zzEndRead = zzStartRead;  /* invalidate buffer    */
 
     if (zzReader != null)
@@ -559,7 +559,7 @@ class CQLLexer implements CQLTokens {
 
   /**
    * Resumes scanning until the next regular expression is matched,
-   * the end of input is encountered or an I/O-Error occurs.
+   * the endStream of input is encountered or an I/O-Error occurs.
    *
    * @return      the next token
    * @exception   java.io.IOException  if any I/O-Error occurs

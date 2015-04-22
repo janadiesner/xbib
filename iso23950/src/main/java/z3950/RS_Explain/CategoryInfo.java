@@ -43,7 +43,7 @@ import z3950.v3.InternationalString;
 
 /**
  * Class for representing a <code>CategoryInfo</code> from <code>RecordSyntax-explain</code>
- * <p/>
+ *
  * <pre>
  * CategoryInfo ::=
  * SEQUENCE {
@@ -54,17 +54,8 @@ import z3950.v3.InternationalString;
  * }
  * </pre>
  *
- * @version $Release$ $Date$
  */
-
-
-
 public final class CategoryInfo extends ASN1Any {
-
-    public final static String VERSION = "Copyright (C) Hoylen Sue, 1998. 199809080315Z";
-
-
-
     /**
      * Default constructor for a CategoryInfo.
      */
@@ -112,7 +103,7 @@ public final class CategoryInfo extends ASN1Any {
             ber_cons = (BERConstructed) ber;
         } catch (ClassCastException e) {
             throw new ASN1EncodingException
-                    ("Zebulun CategoryInfo: bad BER form\n");
+                    ("CategoryInfo: bad BER form\n");
         }
 
         // Prepare to decode the components
@@ -125,14 +116,14 @@ public final class CategoryInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun CategoryInfo: incomplete");
+            throw new ASN1Exception("CategoryInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 1 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun CategoryInfo: bad tag in s_category\n");
+                    ("CategoryInfo: bad tag in s_category\n");
         }
 
         s_category = new InternationalString(p, false);
@@ -187,7 +178,7 @@ public final class CategoryInfo extends ASN1Any {
         // Should not be any more parts
 
         if (part < num_parts) {
-            throw new ASN1Exception("Zebulun CategoryInfo: bad BER: extra data " + part + "/" + num_parts + " processed");
+            throw new ASN1Exception("CategoryInfo: bad BER: extra data " + part + "/" + num_parts + " processed");
         }
     }
 

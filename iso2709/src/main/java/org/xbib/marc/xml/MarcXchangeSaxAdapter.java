@@ -808,6 +808,11 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
             mark = separator;
             position++;
             if (mark == FieldSeparator.FS) {
+                if (datafieldOpen) {
+                    datafieldOpen = false;
+                    addField(Field.EMPTY_FIELD);
+                    flushField();
+                }
                 flushRecord(getFormat(), getType());
             }
         }
@@ -815,7 +820,6 @@ public class MarcXchangeSaxAdapter extends MarcXchangeFieldMapper
         @SuppressWarnings("fallthrough")
         @Override
         public void data(String data) {
-            logger.info("data={}", data);
             String fieldContent = data;
             try {
                 switch (mark) {

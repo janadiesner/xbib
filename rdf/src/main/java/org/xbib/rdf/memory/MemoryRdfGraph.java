@@ -31,57 +31,81 @@
  */
 package org.xbib.rdf.memory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.iri.IRI;
+import org.xbib.rdf.Node;
+import org.xbib.rdf.RdfContentGenerator;
 import org.xbib.rdf.RdfGraph;
 import org.xbib.rdf.RdfGraphParams;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
-public class MemoryRdfGraph<Params extends RdfGraphParams>
-        implements RdfGraph<Params> {
+public class MemoryRdfGraph implements RdfGraph<RdfGraphParams> {
+
+    private final static Logger logger = LogManager.getLogger(MemoryRdfGraph.class);
 
     private RdfGraphParams params = MemoryRdfGraphParams.DEFAULT_PARAMS;
 
     private Map<IRI, Resource> resources = new LinkedHashMap<IRI, Resource>();
 
-    public Collection<Resource> getResources() {
-        return resources.values();
+    @Override
+    public Iterator<Resource> getResources() {
+        return resources.values()
+                .stream()
+                //.filter(r -> !r.isEmbedded())
+                //.map(this::expand)
+                .iterator();
     }
 
-    public Map<IRI,Resource> getResourceMap() {
-        return resources;
-    }
-
-    public RdfGraph<Params> putResource(IRI predicate, Resource resource) {
-        resources.put(predicate, resource);
+    @Override
+    public RdfGraph<RdfGraphParams> putResource(IRI id, Resource resource) {
+        resources.put(id, resource);
         return this;
     }
 
+    @Override
     public Resource getResource(IRI predicate) {
         return resources.get(predicate);
     }
 
+    @Override
     public Resource removeResource(IRI predicate) {
         return resources.remove(predicate);
     }
 
+    @Override
     public boolean hasResource(IRI predicate) {
         return resources.containsKey(predicate);
     }
 
     @Override
-    public RdfGraph setParams(RdfGraphParams params) {
+    public MemoryRdfGraph setParams(RdfGraphParams params) {
         this.params = params;
         return this;
     }
 
     @Override
-    public MemoryRdfGraph begin() {
+    public RdfGraphParams getParams() {
+        return params;
+    }
+
+    @Override
+    public MemoryRdfGraph startStream() {
+        return this;
+    }
+
+    @Override
+    public RdfContentGenerator setBaseUri(String baseUri) {
+        startPrefixMapping("", baseUri);
         return this;
     }
 
@@ -114,7 +138,7 @@ public class MemoryRdfGraph<Params extends RdfGraphParams>
     }
 
     @Override
-    public MemoryRdfGraph end() {
+    public MemoryRdfGraph endStream() {
         return this;
     }
 
@@ -131,4 +155,58 @@ public class MemoryRdfGraph<Params extends RdfGraphParams>
     @Override
     public void flush() throws IOException {
     }
+
+    private Resource expand(Resource resource) {
+        Resource expanded = new MemoryResource().id(resource.id());
+        new GraphTriples(resource).triples.stream().forEach(expanded::add);
+        return expanded;
+    }
+
+    class GraphTriples {
+
+        private final List<Triple> triples;
+
+        GraphTriples(Resource resource) {
+            this.triples = unfold(resource);
+        }
+
+        private List<Triple> unfold(final Resource resource) {
+            List<Triple> list = new LinkedList<>();
+            if (resource == null) {
+                return list;
+            }
+            resource.predicates().forEach(new Consumer<IRI>() {
+                @Override
+                public void accept(IRI pred) {
+                    resource.objects(pred)
+                            .forEachRemaining(new Consumer<Node>() {
+                                                  @Override
+                                                  public void accept(Node node) {
+                                                      if (node instanceof Resource) {
+                                                          Resource resource = (Resource)node;
+                                                          if (resource.isEmbedded()) {
+                                                              Resource r = getResource(resource.id());
+                                                              if (r != null) {
+                                                                  list.add(new MemoryTriple(resource, pred, r.id()));
+                                                                  list.addAll(unfold(r));
+                                                              } else {
+                                                                  logger.error("huh? {}", resource.id());
+                                                              }
+                                                          } else {
+                                                              list.addAll(unfold(resource));
+                                                          }
+                                                      } else {
+                                                          list.add(new MemoryTriple(resource, pred, node));
+                                                      }
+                                                  }
+                                              }
+                            );
+
+                }
+            });
+            return list;
+        }
+    }
+
+
 }

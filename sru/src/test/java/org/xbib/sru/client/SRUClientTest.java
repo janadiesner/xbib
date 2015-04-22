@@ -72,13 +72,13 @@ public class SRUClientTest {
                 .addListener(new KeyValueStreamAdapter<FieldList, String>() {
                     @Override
                     public KeyValueStreamAdapter<FieldList, String> begin() {
-                        logger.debug("begin object");
+                        logger.debug("start object");
                         return this;
                     }
 
                     @Override
                     public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
-                        logger.debug("begin");
+                        logger.debug("start");
                         for (Field f : key) {
                             logger.debug("tag={} ind={} subf={} data={}",
                                     f.tag(), f.indicator(), f.subfieldId(), f.data());
@@ -127,7 +127,7 @@ public class SRUClientTest {
 
                 @Override
                 public void beginRecord() {
-                    logger.info("begin record");
+                    logger.info("startStream record");
                 }
 
                 @Override

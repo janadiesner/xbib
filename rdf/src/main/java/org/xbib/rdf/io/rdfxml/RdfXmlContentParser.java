@@ -124,12 +124,12 @@ public class RdfXmlContentParser implements RdfConstants, RdfContentParser {
     public RdfXmlContentParser parse(XMLReader reader, InputSource source) throws IOException, SAXException {
         if (builder != null) {
             xmlHandler.setBuilder(builder);
-            builder.begin();
+            builder.startStream();
         }
         reader.setContentHandler(xmlHandler);
         reader.parse(source);
         if (builder != null) {
-            builder.end();
+            builder.endStream();
         }
         return this;
     }
@@ -372,7 +372,7 @@ public class RdfXmlContentParser implements RdfConstants, RdfContentParser {
         out.append(">");
     }
 
-    // produce a reasonably canonical end tag
+    // produce a reasonably canonical endStream tag
     private void xmlLiteralEnd(StringBuilder out, String qn) {
         out.append("</").append(qn).append(">");
     }

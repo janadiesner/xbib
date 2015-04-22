@@ -42,7 +42,7 @@ import asn1.BEREncoding;
 
 /**
  * Class for representing a <code>CompSpec</code> from <code>Z39-50-APDU-1995</code>
- * <p/>
+ *
  * <pre>
  * CompSpec ::=
  * SEQUENCE {
@@ -195,7 +195,7 @@ public final class CompSpec extends ASN1Any {
         // Should not be any more parts
 
         if (part < num_parts) {
-            throw new ASN1Exception("Zebulun CompSpec: bad BER: extra data " + part + "/" + num_parts + " processed");
+            throw new ASN1Exception("CompSpec: bad BER: extra data " + part + "/" + num_parts + " processed");
         }
     }
 

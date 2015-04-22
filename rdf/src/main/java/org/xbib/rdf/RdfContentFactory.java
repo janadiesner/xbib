@@ -39,7 +39,6 @@ import org.xbib.rdf.io.turtle.TurtleContent;
 import org.xbib.rdf.io.turtle.TurtleContentParams;
 import org.xbib.rdf.io.xml.XmlContent;
 import org.xbib.rdf.io.xml.XmlContentParams;
-import org.xbib.rdf.memory.MemoryRdfGraph;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -113,9 +112,5 @@ public class RdfContentFactory {
             return XmlContent.contentBuilder((XmlContentParams) params);
         }
         throw new IllegalArgumentException("no content type for " + type);
-    }
-
-    public static <Params extends RdfGraphParams> RdfGraph<Params> memoryGraph() throws IOException {
-        return new MemoryRdfGraph<Params>();
     }
 }

@@ -49,11 +49,6 @@ public class MemoryLiteral implements Literal, Comparable<Literal> {
         this.value = value;
     }
 
-    public MemoryLiteral(Object value, String lang) {
-        this.value = value;
-        this.lang = lang;
-    }
-
     @Override
     public MemoryLiteral object(Object value) {
         this.value = value;

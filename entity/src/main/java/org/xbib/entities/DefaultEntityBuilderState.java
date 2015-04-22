@@ -38,6 +38,7 @@ import org.xbib.rdf.RdfGraphParams;
 import org.xbib.rdf.Resource;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 
 public class DefaultEntityBuilderState implements EntityBuilderState {
@@ -65,7 +66,9 @@ public class DefaultEntityBuilderState implements EntityBuilderState {
     @Override
     public void complete() throws IOException {
         if (graph.getResources() != null) {
-            for (Resource resource : graph.getResources()) {
+            Iterator<Resource> it = graph.getResources();
+            while (it.hasNext()) {
+                Resource resource = it.next();
                 if (builders != null) {
                     for (RdfContentBuilderProvider provider : builders.values()) {
                         provider.newContentBuilder().receive(resource);

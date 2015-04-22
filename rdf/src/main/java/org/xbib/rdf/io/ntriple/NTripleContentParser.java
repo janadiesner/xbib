@@ -31,6 +31,8 @@
  */
 package org.xbib.rdf.io.ntriple;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfContentBuilder;
@@ -52,13 +54,12 @@ import java.util.regex.PatternSyntaxException;
 
 /**
  * Parser for NTriple RDF format
- * <p>
  * See also the <a href="http://www.w3.org/TR/rdf-testcases/#convert">NTriple
  * specification</a>
  */
 public class NTripleContentParser implements RdfContentParser {
 
-    private final Reader reader;
+    private final static Logger logger = LogManager.getLogger(NTripleContentParser.class);
 
     private final static Resource resource = new MemoryResource();
 
@@ -71,8 +72,11 @@ public class NTripleContentParser implements RdfContentParser {
     private static final String subjectExpression = "(" + anonymousExpression + "|" + resourceExpression + ")";
     private static final String predicateExpression = "(" + resourceExpression + ")";
     private static final String objectExpression = "(" + anonymousExpression + "|" + resourceExpression + "|" + literalExpression + ")";
-    public static final String tripleExpression = subjectExpression + "\\s+" + predicateExpression + "\\s+" + objectExpression + "\\s*\\.";
-    public static final Pattern NTRIPLE_PATTERN = Pattern.compile(tripleExpression);
+    private static final String tripleExpression = subjectExpression + "\\s+" + predicateExpression + "\\s+" + objectExpression + "\\s*\\.";
+    private static final Pattern NTRIPLE_PATTERN = Pattern.compile(tripleExpression);
+
+    private final Reader reader;
+
     private boolean eof;
 
     private RdfContentBuilder builder;
@@ -90,7 +94,7 @@ public class NTripleContentParser implements RdfContentParser {
         return StandardRdfContentType.NTRIPLE;
     }
 
-    public NTripleContentParser builder(RdfContentBuilder builder) {
+    public NTripleContentParser setBuilder(RdfContentBuilder builder) {
         this.builder = builder;
         return this;
     }
@@ -150,13 +154,13 @@ public class NTripleContentParser implements RdfContentParser {
         IRI predicate;
         Node object;
         if (!matcher.matches()) {
-            throw new PatternSyntaxException("The given pattern " + tripleExpression + " doesn't match the expression:", s, -1);
+            throw new PatternSyntaxException("the given pattern " + tripleExpression + " doesn't match the expression:", s, -1);
         }
         // subject
         if (matcher.group(2) != null) {
-            subject = new MemoryResource().blank(matcher.group(1));  //resource.newEmbeddedNode(matcher.group(1));
+            subject = new MemoryResource().blank(matcher.group(1));
         } else {
-            // getResource node
+            // resource node
             String subj = matcher.group(1);
             IRI subjURI = IRI.create(subj.substring(1, subj.length() - 1));
             subject = resource.newSubject(subjURI);
@@ -167,20 +171,35 @@ public class NTripleContentParser implements RdfContentParser {
         // object
         if (matcher.group(7) != null) {
             // anonymous node
-            object = new MemoryResource().blank(matcher.group(6));  // resource.newBlankNode(matcher.group(6));
+            object = new MemoryResource().blank(matcher.group(6));
         } else if (matcher.group(8) != null) {
-            // getResource node
+            // resource node
             String obj = matcher.group(6);
-            object = resource.newObject(IRI.create(obj.substring(1, obj.length() - 1)));
+            logger.info("obj={}", obj);
+            object = resource.newObject(IRI.builder().curie(obj.substring(1, obj.length()-1)).build());
         } else {
             // literal node
             // 10 is without quotes or apostrophs
             // with quotes or apostrophes. to have the value without them you need to look at groups 12 and 15
             String literal = matcher.group(10);
-            object = resource.newLiteral(literal);
+            literal = literal.length() > 2 ? literal.substring(1, literal.length()-1) : literal;
+            logger.info("new literal 9={} 10={} 11={} 12={}",
+                    matcher.group(9),
+                    matcher.group(10),
+                    matcher.group(11),
+                    matcher.group(12));
+            if (matcher.groupCount() > 15) {
+                logger.info("new literal 13={} 14={} 15={} 16={}",
+                        matcher.group(13),
+                        matcher.group(14),
+                        matcher.group(15),
+                        matcher.group(16));
+                object = resource.newLiteral(literal).language(matcher.group(16));
+            } else {
+                object = resource.newLiteral(literal);
+            }
         }
         if (builder != null) {
-            // TODO begin/end
             builder.receive(new MemoryTriple(subject, predicate, object));
         }
     }

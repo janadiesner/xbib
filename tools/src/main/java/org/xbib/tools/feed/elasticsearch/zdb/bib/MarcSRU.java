@@ -190,7 +190,7 @@ public class MarcSRU extends Feeder {
 
             @Override
             public void beginRecord() {
-                logger.info("begin record");
+                logger.info("startStream record");
             }
 
             @Override

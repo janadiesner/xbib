@@ -41,7 +41,7 @@ import asn1.BEREncoding;
 
 /**
  * Class for representing a <code>AccessControlRequest</code> from <code>Z39-50-APDU-1995</code>
- * <p/>
+ *
  * <pre>
  * AccessControlRequest ::=
  * SEQUENCE {
@@ -66,7 +66,7 @@ public final class AccessControlRequest extends ASN1Any {
 
     /**
      * Constructor for a AccessControlRequest from a BER encoding.
-     * <p/>
+     *
      *
      * @param ber       the BER encoding.
      * @param check_tag will check tag if true, use false

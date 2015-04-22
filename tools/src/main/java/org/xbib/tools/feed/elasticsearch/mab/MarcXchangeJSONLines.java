@@ -25,4 +25,8 @@ public class MarcXchangeJSONLines extends TitleHoldingsFeeder {
         in.close();
     }
 
+    @Override
+    public String getName() {
+        return getClass().getName();
+    }
 }

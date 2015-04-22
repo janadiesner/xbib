@@ -175,7 +175,7 @@ public final class TermListInfo_termLists extends ASN1Any {
         part++;
 
         // Remaining elements are optional, set variables
-        // to null (not present) so can return at end of BER
+        // to null (not present) so can return at endStream of BER
 
         s_broader = null;
         s_narrower = null;

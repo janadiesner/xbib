@@ -53,5 +53,4 @@ public interface RdfContent {
 
     TurtleContent turtleContent = TurtleContent.turtleContent;
 
-
 }

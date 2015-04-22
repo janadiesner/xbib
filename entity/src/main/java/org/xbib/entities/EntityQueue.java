@@ -180,7 +180,7 @@ public class EntityQueue<S extends EntityBuilderState, E extends Entity, K, V>
 
         @SuppressWarnings("unchecked")
         public S newState() {
-            return (S) new DefaultEntityBuilderState(new MemoryRdfGraph<>(), contentBuilderProviders());
+            return (S) new DefaultEntityBuilderState(new MemoryRdfGraph(), contentBuilderProviders());
         }
     }
 

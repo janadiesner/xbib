@@ -96,7 +96,7 @@ public final class ProximitySupport extends ASN1Any {
             ber_cons = (BERConstructed) ber;
         } catch (ClassCastException e) {
             throw new ASN1EncodingException
-                    ("Zebulun ProximitySupport: bad BER form\n");
+                    ("ProximitySupport: bad BER form\n");
         }
 
         // Prepare to decode the components
@@ -109,14 +109,14 @@ public final class ProximitySupport extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ProximitySupport: incomplete");
+            throw new ASN1Exception("ProximitySupport: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 0 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ProximitySupport: bad tag in s_anySupport\n");
+                    ("ProximitySupport: bad tag in s_anySupport\n");
         }
 
         s_anySupport = new ASN1Boolean(p, false);
@@ -153,7 +153,7 @@ public final class ProximitySupport extends ASN1Any {
         // Should not be any more parts
 
         if (part < num_parts) {
-            throw new ASN1Exception("Zebulun ProximitySupport: bad BER: extra data " + part + "/" + num_parts + " processed");
+            throw new ASN1Exception("ProximitySupport: bad BER: extra data " + part + "/" + num_parts + " processed");
         }
     }
 

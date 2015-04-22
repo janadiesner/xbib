@@ -60,7 +60,7 @@ public class DNBOAITest {
             /*final TripleListener stmt = new TripleListener() {
 
                 @Override
-                public TripleListener begin() {
+                public TripleListener startStream() {
                     return this;
                 }
 
@@ -87,7 +87,7 @@ public class DNBOAITest {
                 }
 
                 @Override
-                public TripleListener end() {
+                public TripleListener endStream() {
                     return this;
                 }
             };*/

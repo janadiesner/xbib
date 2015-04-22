@@ -124,7 +124,6 @@ public final class IRINamespaceContext extends XmlNamespaceContext implements Co
         }
         // drop fragment (useful for resource counters in fragments)
         final String s = dropfragment ? new IRI(uri.getScheme(), uri.getSchemeSpecificPart(), null).toString() : uri.toString();
-
         // search from longest to shortest namespace prefix
         if (namespaces != null) {
             for (String ns : namespaces) {
@@ -134,6 +133,25 @@ public final class IRINamespaceContext extends XmlNamespaceContext implements Co
             }
         }
         return s;
+    }
+
+    @Override
+    public String expand(IRI curie) {
+        String ns = getNamespaceURI(curie.getScheme());
+        return ns != null ? ns + curie.getSchemeSpecificPart() : curie.toString();
+    }
+
+    @Override
+    public IRI expandIRI(IRI curie) {
+        String ns = getNamespaceURI(curie.getScheme());
+        return ns != null ? IRI.builder().curie(ns + curie.getSchemeSpecificPart()).build() : curie;
+    }
+
+    @Override
+    public IRI expandIRI(String iri) {
+        IRI curie = IRI.builder().curie(iri).build();
+        String ns = getNamespaceURI(curie.getScheme());
+        return ns != null ? IRI.builder().curie(ns + curie.getSchemeSpecificPart()).build() : curie;
     }
 
     public String getPrefix(IRI uri) {

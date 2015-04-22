@@ -80,7 +80,7 @@ public class MABEntityBuilderState extends DefaultEntityBuilderState {
     }
 
     public Resource getResource() throws IOException {
-        if (graph().getResources().isEmpty()) {
+        if (!graph().getResources().hasNext()) {
             this.root = new MemoryResource().blank();
             graph().receive(root);
         }

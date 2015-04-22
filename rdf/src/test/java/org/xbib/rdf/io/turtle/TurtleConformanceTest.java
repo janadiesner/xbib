@@ -63,6 +63,7 @@ public class TurtleConformanceTest extends StreamTester {
             turtleParser.parse();
             sw.write(builder.string());
             sw.close();
+            // TODO assert
             //logger.info("test {} -> {}", n, builder.string());
         }
 

@@ -40,6 +40,7 @@ import org.xbib.rdf.Resource;
 import org.xbib.rdf.memory.MemoryResource;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 
 public class MARCEntityBuilderState extends DefaultEntityBuilderState {
@@ -74,7 +75,7 @@ public class MARCEntityBuilderState extends DefaultEntityBuilderState {
     }
 
     public Resource getResource() throws IOException {
-        if (graph().getResources().isEmpty()) {
+        if (!graph().getResources().hasNext()) {
             root = new MemoryResource().blank();
             graph().receive(root);
         }
@@ -83,11 +84,11 @@ public class MARCEntityBuilderState extends DefaultEntityBuilderState {
 
     @Override
     public void complete() throws IOException {
-        if (graph().getResources() != null) {
-            for (Resource resource : graph().getResources()) {
-                if (recordNumber != null) {
-                    resource.id(IRI.builder().fragment(recordNumber).build());
-                }
+        Iterator<Resource> it = graph().getResources();
+        while (it.hasNext()) {
+            Resource resource = it.next();
+            if (recordNumber != null) {
+                resource.id(IRI.builder().fragment(recordNumber).build());
             }
         }
         super.complete();

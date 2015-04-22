@@ -39,10 +39,13 @@ public interface CompactingNamespaceContext {
 
     void addNamespace(String prefix, String namespace);
 
-    void removeNamespace(String prefix);
-
     Map<String, String> getNamespaces();
 
     String compact(IRI uri);
 
+    String expand(IRI curie);
+
+    IRI expandIRI(IRI curie);
+
+    IRI expandIRI(String curie);
 }

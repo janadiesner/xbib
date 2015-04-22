@@ -56,27 +56,13 @@ import z3950.v3.InternationalString;
  *   description [6] IMPLICIT HumanString OPTIONAL
  * }
  * </pre>
- *
- * @version $Release$ $Date$
  */
-
-
-
 public final class ElementInfo extends ASN1Any {
-
-    public final static String VERSION = "Copyright (C) Hoylen Sue, 1998. 199809080315Z";
-
-
-
     /**
      * Default constructor for a ElementInfo.
      */
-
     public ElementInfo() {
     }
-
-
-
     /**
      * Constructor for a ElementInfo from a BER encoding.
      * <p/>
@@ -115,7 +101,7 @@ public final class ElementInfo extends ASN1Any {
             ber_cons = (BERConstructed) ber;
         } catch (ClassCastException e) {
             throw new ASN1EncodingException
-                    ("Zebulun ElementInfo: bad BER form\n");
+                    (" ElementInfo: bad BER form\n");
         }
 
         // Prepare to decode the components
@@ -129,14 +115,14 @@ public final class ElementInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ElementInfo: incomplete");
+            throw new ASN1Exception(" ElementInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 1 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ElementInfo: bad tag in s_elementName\n");
+                    (" ElementInfo: bad tag in s_elementName\n");
         }
 
         s_elementName = new InternationalString(p, false);
@@ -146,14 +132,14 @@ public final class ElementInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ElementInfo: incomplete");
+            throw new ASN1Exception(" ElementInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 2 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ElementInfo: bad tag in s_elementTagPath\n");
+                    (" ElementInfo: bad tag in s_elementTagPath\n");
         }
 
         s_elementTagPath = new Path(p, false);
@@ -163,7 +149,7 @@ public final class ElementInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ElementInfo: incomplete");
+            throw new ASN1Exception(" ElementInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
@@ -173,11 +159,11 @@ public final class ElementInfo extends ASN1Any {
                 tagged = (BERConstructed) p;
             } catch (ClassCastException e) {
                 throw new ASN1EncodingException
-                        ("Zebulun ElementInfo: bad BER encoding: s_dataType tag bad\n");
+                        (" ElementInfo: bad BER encoding: s_dataType tag bad\n");
             }
             if (tagged.number_components() != 1) {
                 throw new ASN1EncodingException
-                        ("Zebulun ElementInfo: bad BER encoding: s_dataType tag bad\n");
+                        (" ElementInfo: bad BER encoding: s_dataType tag bad\n");
             }
 
             s_dataType = new ElementDataType(tagged.elementAt(0), true);
@@ -188,14 +174,14 @@ public final class ElementInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ElementInfo: incomplete");
+            throw new ASN1Exception(" ElementInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 4 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ElementInfo: bad tag in s_required\n");
+                    (" ElementInfo: bad tag in s_required\n");
         }
 
         s_required = new ASN1Boolean(p, false);
@@ -205,14 +191,14 @@ public final class ElementInfo extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ElementInfo: incomplete");
+            throw new ASN1Exception(" ElementInfo: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 5 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ElementInfo: bad tag in s_repeatable\n");
+                    (" ElementInfo: bad tag in s_repeatable\n");
         }
 
         s_repeatable = new ASN1Boolean(p, false);
@@ -239,7 +225,7 @@ public final class ElementInfo extends ASN1Any {
         // Should not be any more parts
 
         if (part < num_parts) {
-            throw new ASN1Exception("Zebulun ElementInfo: bad BER: extra data " + part + "/" + num_parts + " processed");
+            throw new ASN1Exception(" ElementInfo: bad BER: extra data " + part + "/" + num_parts + " processed");
         }
     }
 

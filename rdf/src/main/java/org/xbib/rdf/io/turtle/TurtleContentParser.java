@@ -98,7 +98,7 @@ public class TurtleContentParser implements RdfContentParser {
      */
     private StringBuilder sb;
     /**
-     * Indicate if end of stream is reached
+     * Indicate if endStream of stream is reached
      */
     private boolean eof;
     /**
@@ -153,7 +153,7 @@ public class TurtleContentParser implements RdfContentParser {
         this.eof = false;
         this.triples = new Stack<Triple>();
         if (builder != null) {
-            builder.begin();
+            builder.startStream();
         }
         try {
             while (!eof) {
@@ -170,7 +170,7 @@ public class TurtleContentParser implements RdfContentParser {
         } finally {
             this.reader.close();
             if (builder != null) {
-                builder.end();
+                builder.endStream();
             }
         }
         return this;

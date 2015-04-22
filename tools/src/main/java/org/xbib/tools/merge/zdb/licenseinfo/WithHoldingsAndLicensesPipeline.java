@@ -152,17 +152,7 @@ public class WithHoldingsAndLicensesPipeline implements Pipeline<Boolean, Manife
         this.dateHoldingsIndexType = settings.get("date-holdings-type", "DateHoldings");
     }
 
-    @Override
-    public String getName() {
-        return getClass().getName();
-    }
-
     public MeterMetric getMetric() {
-        return null;
-    }
-
-    @Override
-    public Integer getNumber() {
         return null;
     }
 

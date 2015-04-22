@@ -39,7 +39,7 @@ import org.xbib.rdf.memory.MemoryResource;
 import org.xbib.util.DateUtil;
 import org.xbib.rdf.Resource;
 
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -820,18 +820,18 @@ public class EnumerationAndChronology {
     public static Set<Integer> dates(IRI id, Resource resource) {
         final Set<Integer> dates = newTreeSet();
         for (IRI iri : resource.predicates()) {
-            resource.resources(iri).forEach(new Consumer<Resource>() {
+            resource.resources(iri).forEachRemaining(new Consumer<Resource>() {
                 @Override
                 public void accept(Resource group) {
-                    Collection<Node> begindateCollection = group.objects("begindate");
-                    Object begindate = begindateCollection != null && !begindateCollection.isEmpty() ?
-                            begindateCollection.iterator().next() : null;
-                    Collection<Node> enddateCollection = group.objects("enddate");
-                    Object enddate = enddateCollection != null && !enddateCollection.isEmpty() ?
-                            enddateCollection.iterator().next() : null;
-                    Collection<Node> openCollection = group.objects("open");
-                    Object open = openCollection != null && !openCollection.isEmpty() ?
-                            openCollection.iterator().next() : null;
+                    Iterator<Node> begindateCollection = group.objects("begindate");
+                    Object begindate = begindateCollection != null && begindateCollection.hasNext() ?
+                            begindateCollection.next() : null;
+                    Iterator<Node> enddateCollection = group.objects("enddate");
+                    Object enddate = enddateCollection != null && enddateCollection.hasNext() ?
+                            enddateCollection.next() : null;
+                    Iterator<Node> openCollection = group.objects("open");
+                    Object open = openCollection != null && openCollection.hasNext() ?
+                            openCollection.next() : null;
                     List<Integer> starts;
                     int start = -1;
                     if (begindate != null) {

@@ -197,7 +197,7 @@ public final class TaggedElement extends ASN1Any {
         part++;
 
         // Remaining elements are optional, set variables
-        // to null (not present) so can return at end of BER
+        // to null (not present) so can return at endStream of BER
 
         s_metaData = null;
         s_appliedVariant = null;

@@ -58,7 +58,7 @@ public class CustomIdentifier extends org.xbib.analyzer.marc.bib.CustomIdentifie
     public String data(MARCEntityQueue.MARCWorker worker,
                        String predicate, Resource resource, String property, String value) {
         if ("IdentifierZDB".equals(value) && "type".equals(property)) {
-            String v = resource.objects("value").iterator().next().toString();
+            String v = resource.objects("value").next().toString();
             resource.add("identifierZDB", v.replaceAll("\\-", "").toLowerCase());
             return value;
         }

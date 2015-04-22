@@ -220,14 +220,14 @@ public class XmlReaderTest extends StreamTester {
         }
 
         @Override
-        public RdfContentGenerator receive(Triple triple) {
+        public MyBuilder receive(Triple triple) {
             triples.add(triple);
             return this;
         }
 
         @Override
-        public RdfContentGenerator receive(Resource resource) throws IOException {
-            triples.addAll(resource.triples().stream().collect(Collectors.toList()));
+        public MyBuilder receive(Resource resource) throws IOException {
+            resource.triples().forEachRemaining(triples::add);
             return this;
         }
 

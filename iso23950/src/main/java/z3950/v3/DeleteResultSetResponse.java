@@ -41,7 +41,7 @@ import asn1.BEREncoding;
 
 /**
  * Class for representing a <code>DeleteResultSetResponse</code> from <code>Z39-50-APDU-1995</code>
- * <p/>
+ *
  * <pre>
  * DeleteResultSetResponse ::=
  * SEQUENCE {
@@ -68,7 +68,7 @@ public final class DeleteResultSetResponse extends ASN1Any {
 
     /**
      * Constructor for a DeleteResultSetResponse from a BER encoding.
-     * <p/>
+     *
      *
      * @param ber       the BER encoding.
      * @param check_tag will check tag if true, use false

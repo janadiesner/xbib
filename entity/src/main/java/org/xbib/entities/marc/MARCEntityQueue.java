@@ -100,7 +100,7 @@ public class MARCEntityQueue extends EntityQueue<MARCEntityBuilderState, MARCEnt
 
         @Override
         public MARCEntityBuilderState newState() {
-            return new MARCEntityBuilderState(new MemoryRdfGraph<>(), contentBuilderProviders());
+            return new MARCEntityBuilderState(new MemoryRdfGraph(), contentBuilderProviders());
         }
 
         @Override

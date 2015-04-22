@@ -20,6 +20,11 @@ import java.util.zip.GZIPOutputStream;
 public class FromMarcXchangeToMarcJSON extends Converter {
 
     @Override
+    public String getName() {
+        return getClass().getName();
+    }
+
+    @Override
     protected PipelineProvider<Pipeline> pipelineProvider() {
         return FromMarcXchangeToMarcJSON::new;
     }

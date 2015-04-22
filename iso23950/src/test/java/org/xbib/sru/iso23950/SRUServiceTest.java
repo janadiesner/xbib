@@ -85,7 +85,7 @@ public class SRUServiceTest {
 
                         @Override
                         public void beginRecord() {
-                            logger.info("begin record");
+                            logger.info("startStream record");
                         }
 
                         @Override
@@ -119,7 +119,7 @@ public class SRUServiceTest {
 
                         @Override
                         public void endRecord() {
-                            logger.info("end record");
+                            logger.info("endStream record");
                         }
 
                         @Override

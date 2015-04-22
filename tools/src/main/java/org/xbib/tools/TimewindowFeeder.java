@@ -5,6 +5,9 @@ import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.common.hppc.cursors.ObjectCursor;
 import org.elasticsearch.common.joda.time.DateTime;
 import org.elasticsearch.common.joda.time.format.DateTimeFormat;
@@ -15,6 +18,8 @@ import org.xbib.entities.support.ClasspathURLStreamHandler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,7 +63,7 @@ public abstract class TimewindowFeeder extends Feeder {
         setConcreteIndex(resolveAlias(getIndex() + timeWindow));
         Pattern pattern = Pattern.compile("^(.*)\\d+$");
         Matcher m = pattern.matcher(getConcreteIndex());
-        setIndex(m.matches() ? m.group() : getConcreteIndex());
+        setIndex(m.matches() ? m.group(1) : getConcreteIndex());
         logger.info("base index name = {}, concrete index name = {}", getIndex(), getConcreteIndex());
         super.prepare();
         return this;
@@ -146,6 +151,74 @@ public abstract class TimewindowFeeder extends Feeder {
                 }
             }
             requestBuilder.execute().actionGet();
+            if (settings.getAsBoolean("retention.enabled", false)) {
+                performRetentionPolicy(
+                        getIndex(),
+                        getConcreteIndex(),
+                        settings.getAsInt("retention.diff", 48),
+                        settings.getAsInt("retention.mintokeep", 2));
+            }
+        }
+    }
+
+    public void performRetentionPolicy(String index, String concreteIndex, int timestampdiff, int mintokeep) {
+        if (ingest.client() == null) {
+            return;
+        }
+        if (index.equals(concreteIndex)) {
+            return;
+        }
+        GetIndexResponse getIndexResponse = ingest.client().admin().indices()
+                .prepareGetIndex()
+                .execute().actionGet();
+        Pattern pattern = Pattern.compile("^(.*?)(\\d+)$");
+        List<String> indices = new ArrayList<>();
+        logger.info("{} indices", getIndexResponse.getIndices().length);
+        for (String s : getIndexResponse.getIndices()) {
+            Matcher m = pattern.matcher(s);
+            if (m.matches()) {
+                if (index.equals(m.group(1)) && !s.equals(concreteIndex)) {
+                    indices.add(s);
+                }
+            }
+        }
+        if (indices.isEmpty()) {
+            logger.info("no indices found, retention policy skipped");
+            return;
+        }
+        if (mintokeep > 0 && indices.size() < mintokeep) {
+            logger.info("{} indices found, not enough for retention policy ({}),  skipped",
+                    indices.size(), mintokeep);
+            return;
+        } else {
+            logger.info("candidates for deletion = {}", indices);
+        }
+        List<String> indicesToDelete = new ArrayList<String>();
+        // our index
+        Matcher m1 = pattern.matcher(concreteIndex);
+        if (m1.matches()) {
+            Integer i1 = Integer.parseInt(m1.group(2));
+            for (String s : indices) {
+                Matcher m2 = pattern.matcher(s);
+                if (m2.matches()) {
+                    Integer i2 = Integer.parseInt(m2.group(2));
+                    int kept = 1 + indices.size() - indicesToDelete.size();
+                    if (timestampdiff > 0 && i1 - i2 > timestampdiff && mintokeep <= kept) {
+                        indicesToDelete.add(s);
+                    }
+                }
+            }
+        }
+        logger.info("indices to delete = {}", indicesToDelete);
+        if (indicesToDelete.isEmpty()) {
+            logger.info("not enough indices found to delete, retention policy complete");
+            return;
+        }
+        String[] s = indicesToDelete.toArray(new String[indicesToDelete.size()]);
+        DeleteIndexRequestBuilder requestBuilder = ingest.client().admin().indices().prepareDelete(s);
+        DeleteIndexResponse response = requestBuilder.execute().actionGet();
+        if (!response.isAcknowledged()) {
+            logger.warn("retention delete index operation was not acknowledged");
         }
     }
 

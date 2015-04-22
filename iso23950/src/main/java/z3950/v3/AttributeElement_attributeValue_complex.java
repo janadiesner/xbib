@@ -41,7 +41,7 @@ import asn1.BEREncoding;
 
 /**
  * Class for representing a <code>AttributeElement_attributeValue_complex</code> from <code>Z39-50-APDU-1995</code>
- * <p/>
+ *
  * <pre>
  * AttributeElement_attributeValue_complex ::=
  * SEQUENCE {
@@ -165,7 +165,7 @@ public final class AttributeElement_attributeValue_complex extends ASN1Any {
         // Should not be any more parts
 
         if (part < num_parts) {
-            throw new ASN1Exception("Zebulun AttributeElement_attributeValue_complex: bad BER: extra data " + part + "/" + num_parts + " processed");
+            throw new ASN1Exception("AttributeElement_attributeValue_complex: bad BER: extra data " + part + "/" + num_parts + " processed");
         }
     }
 

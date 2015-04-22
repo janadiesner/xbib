@@ -126,7 +126,7 @@ public final class FromMARC extends Converter {
     class LoggingAdapter extends KeyValueStreamAdapter<FieldList, String> {
         @Override
         public KeyValueStreamAdapter<FieldList, String> begin() {
-            logger.debug("begin");
+            logger.debug("start");
             return this;
         }
 

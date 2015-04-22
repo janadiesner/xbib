@@ -410,7 +410,7 @@ public class Holding implements Comparable<Holding> {
                     && mediaType.equals(holding.mediaType)
                     && carrierType.equals(holding.carrierType)) {
 
-                // check if begin date / end date are the same
+                // check if start date / end date are the same
                 // both no dates?
                 if (dates == null && holding.dates == null) {
                     // hit, no dates at all

@@ -947,7 +947,6 @@ public final class XContentBuilder implements BytesStream, ToXContent {
 
     private void writeMap(Map<String, Object> map) throws IOException {
         generator.writeStartObject();
-
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             field(entry.getKey());
             Object value = entry.getValue();

@@ -50,15 +50,11 @@ import asn1.BEREncoding;
  * }
  * </pre>
  *
- * @version $Release$ $Date$
  */
 
 
 
 public final class DiagFormat extends ASN1Any {
-
-    public final static String VERSION = "Copyright (C) Hoylen Sue, 1998. 199809080315Z";
-
 
 
     /**

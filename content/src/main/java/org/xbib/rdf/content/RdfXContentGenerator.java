@@ -33,10 +33,13 @@ package org.xbib.rdf.content;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbib.common.xcontent.XContentBuilder;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.Literal;
@@ -49,6 +52,8 @@ import org.xbib.rdf.memory.MemoryResource;
 import static org.xbib.common.xcontent.XContentFactory.jsonBuilder;
 
 public class RdfXContentGenerator<R extends RdfXContentParams> implements RdfContentGenerator<R> {
+
+    private final static Logger logger = LogManager.getLogger(RdfXContentGenerator.class);
 
     private R params;
 
@@ -74,8 +79,14 @@ public class RdfXContentGenerator<R extends RdfXContentParams> implements RdfCon
     }
 
     @Override
-    public RdfXContentGenerator begin() {
+    public RdfXContentGenerator startStream() {
         resource = new MemoryResource();
+        return this;
+    }
+
+    @Override
+    public RdfContentGenerator setBaseUri(String baseUri) {
+        startPrefixMapping("", baseUri);
         return this;
     }
 
@@ -92,7 +103,12 @@ public class RdfXContentGenerator<R extends RdfXContentParams> implements RdfCon
 
     @Override
     public RdfXContentGenerator receive(IRI identifier) throws IOException {
-        resource.id(identifier);
+        builder = jsonBuilder(out);
+        builder.startObject();
+        build(resource);
+        builder.endObject();
+        logger.info("receive builder={}", builder.string());
+        resource = new MemoryResource().id(identifier);
         return this;
     }
 
@@ -103,18 +119,23 @@ public class RdfXContentGenerator<R extends RdfXContentParams> implements RdfCon
     }
 
     @Override
-    public RdfXContentGenerator end() {
+    public RdfXContentGenerator endStream() throws IOException {
+        if (!resource.isEmpty()) {
+            builder = jsonBuilder(out);
+            builder.startObject();
+            build(resource);
+            builder.endObject();
+            logger.info("endStream {}", builder.string());
+        }
         return this;
     }
 
     @Override
     public void close() throws IOException {
-
     }
 
     @Override
     public void flush() throws IOException {
-
     }
 
     @Override
@@ -141,8 +162,9 @@ public class RdfXContentGenerator<R extends RdfXContentParams> implements RdfCon
         for (IRI predicate : resource.predicates()) {
             // first, the values
             final List<Object> values = new ArrayList<Object>(32);
-            final List<Node> nodes = resource.visibleObjects(predicate);
-            for (Node node : nodes) {
+            final Iterator<Node> it = resource.visibleObjects(predicate);
+            while (it.hasNext()) {
+                Node node = it.next();
                 if (node instanceof Resource) {
                     values.add(((Resource) node).id().toString()); // URLs
                 } else if (node instanceof Literal) {
@@ -159,12 +181,13 @@ public class RdfXContentGenerator<R extends RdfXContentParams> implements RdfCon
                 builder.array(params.getNamespaceContext().compact(predicate), values);
             }
             // second, the embedded resources
-            final List<Resource> resources = resource.embeddedResources(predicate);
+            final Collection<Resource> resources = resource.embeddedResources(predicate);
             if (resources.size() == 1) {
-                if (!resources.get(0).isEmpty()) {
+                Resource res = resources.iterator().next();
+                if (!res.isEmpty()) {
                     builder.field(params.getNamespaceContext().compact(predicate));
                     builder.startObject();
-                    build(resources.get(0));
+                    build(res);
                     builder.endObject();
                 }
             } else if (resources.size() > 1) {

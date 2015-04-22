@@ -68,6 +68,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
@@ -317,7 +318,7 @@ public class JsonCoins extends Converter {
 
             String author = null;
             String work = null;
-            Collection<Node> issns = null;
+            Iterator<Node> issns = null;
 
             @Override
             public void received(String k, String v) {
@@ -372,14 +373,14 @@ public class JsonCoins extends Converter {
                         if (serialsdb.getMap().containsKey(v)) {
                             Resource serial = serialsdb.getMap().get(v);
                             issns = serial.objects("prism:issn");
-                            if (issns != null) {
-                                for (Node issn : issns) {
-                                    j.add("prism:issn", issn.toString());
-                                }
+                            while (issns.hasNext()) {
+                                Node issn  = issns.next();
+                                j.add("prism:issn", issn.toString());
                             }
-                            Collection<Node> publisher = serial.objects("dc:publisher");
-                            if (publisher != null && !publisher.isEmpty()) {
-                                j.add("dc:publisher", publisher.iterator().next().toString());
+                            Iterator<Node> publishers = serial.objects("dc:publisher");
+                            while (publishers.hasNext()) {
+                                Node publisher = publishers.next();
+                                j.add("dc:publisher", publisher.toString());
                             }
                         } else {
                             missingserial = true;

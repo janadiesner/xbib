@@ -1,3 +1,3 @@
-_:c14n0 <http://example.org/vocab#p1> _:c14n1 .
-_:c14n0 <http://example.org/vocab#p1> _:c14n2 .
-_:c14n1 <http://example.org/vocab#p1> _:c14n3 .
+_:b0 <http://example.org/vocab#p1> _:b2 .
+_:b0 <http://example.org/vocab#p1> _:b4 .
+_:b2 <http://example.org/vocab#p1> _:b6 .

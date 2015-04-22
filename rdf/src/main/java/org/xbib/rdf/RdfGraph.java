@@ -33,15 +33,11 @@ package org.xbib.rdf;
 
 import org.xbib.iri.IRI;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.Iterator;
 
-public interface RdfGraph<Params extends RdfGraphParams>
-        extends RdfContentGenerator<Params> {
+public interface RdfGraph<Params extends RdfGraphParams> extends RdfContentGenerator<Params> {
 
-    Collection<Resource> getResources();
-
-    Map<IRI,Resource> getResourceMap();
+    Iterator<Resource> getResources();
 
     RdfGraph<Params> putResource(IRI predicate, Resource resource);
 

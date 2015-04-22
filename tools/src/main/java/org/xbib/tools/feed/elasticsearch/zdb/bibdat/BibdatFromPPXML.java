@@ -94,7 +94,7 @@ public final class BibdatFromPPXML extends Feeder {
                     @Override
                     public KeyValueStreamAdapter<FieldList, String> begin() {
                         if (logger.isTraceEnabled()) {
-                            logger.trace("begin object");
+                            logger.trace("startStream object");
                         }
                         return this;
                     }
@@ -102,7 +102,7 @@ public final class BibdatFromPPXML extends Feeder {
                     @Override
                     public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
                         if (logger.isTraceEnabled()) {
-                            logger.trace("begin");
+                            logger.trace("startStream");
                             for (Field f : key) {
                                 logger.trace("tag={} ind={} subf={} data={}",
                                         f.tag(), f.indicator(), f.subfieldId(), f.data());

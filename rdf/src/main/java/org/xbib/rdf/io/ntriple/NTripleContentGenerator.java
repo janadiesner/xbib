@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Iterator;
 
 /**
  * NTriple content generator
@@ -71,7 +72,7 @@ public class NTripleContentGenerator
 
     @Override
     public NTripleContentGenerator receive(IRI iri) throws IOException {
-        // ignore
+        //String compact = params.getNamespaceContext().compact(iri);
         return this;
     }
 
@@ -82,7 +83,18 @@ public class NTripleContentGenerator
     }
 
     @Override
-    public NTripleContentGenerator begin() {
+    public NTripleContentParams getParams() {
+        return params;
+    }
+
+    @Override
+    public NTripleContentGenerator startStream() {
+        return this;
+    }
+
+    @Override
+    public RdfContentGenerator setBaseUri(String baseUri) {
+        startPrefixMapping("", baseUri);
         return this;
     }
 
@@ -93,7 +105,7 @@ public class NTripleContentGenerator
     }
 
     @Override
-    public NTripleContentGenerator end() {
+    public NTripleContentGenerator endStream() {
         return this;
     }
 
@@ -112,7 +124,9 @@ public class NTripleContentGenerator
 
     @Override
     public NTripleContentGenerator receive(Resource resource) throws IOException {
-        for (Triple t : resource.triples()) {
+        Iterator<Triple> tripleIterator = resource.triples();
+        while (tripleIterator.hasNext()) {
+            Triple t = tripleIterator.next();
             writer.write(writeStatement(t));
         }
         return this;
@@ -131,9 +145,7 @@ public class NTripleContentGenerator
     }
 
     public String writeSubject(Resource subject) {
-        return subject.isEmbedded() ?
-                subject.toString() :
-                "<" + escape(subject.toString()) + ">";
+        return subject.isEmbedded() ? subject.toString() : "<" + escape(subject.toString()) + ">";
     }
 
     public String writePredicate(IRI predicate) {
@@ -156,8 +168,10 @@ public class NTripleContentGenerator
                 return s + "^^<" + escape(type.toString()) + ">";
             }
             return s;
+        } else if (object instanceof IRI) {
+            return  "<" + escape(object.toString()) + ">";
         }
-        return "<???>";
+        return "<class?>^^" + object.getClass();
     }
 
     private String escape(String buffer) {
@@ -200,7 +214,6 @@ public class NTripleContentGenerator
 
     /**
      * Translate a literal according to given sort language (e.g. mechanical word order, sort area).
-     * <p>
      * see http://www.w3.org/International/articles/language-tags/
      *
      * @param literal the literal

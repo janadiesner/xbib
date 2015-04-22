@@ -77,7 +77,7 @@ public class PicaEntityQueue extends EntityQueue<PicaEntityBuilderState, PicaEnt
 
         @Override
         public PicaEntityBuilderState newState() {
-            return new PicaEntityBuilderState(new MemoryRdfGraph<>(), contentBuilderProviders());
+            return new PicaEntityBuilderState(new MemoryRdfGraph(), contentBuilderProviders());
         }
 
         @SuppressWarnings("unchecked")

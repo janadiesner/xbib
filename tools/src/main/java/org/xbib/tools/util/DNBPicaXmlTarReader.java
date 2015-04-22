@@ -41,6 +41,7 @@ import org.xbib.io.archive.tar.TarSession;
 import org.xbib.marc.Field;
 import org.xbib.marc.MarcXchangeListener;
 import org.xbib.marc.dialects.pica.DNBPicaConstants;
+import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.AbstractPipeline;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineException;
@@ -206,7 +207,7 @@ public class DNBPicaXmlTarReader<P extends Packet> extends AbstractPipeline<Long
     }
 
     @Override
-    public void newRequest(Pipeline<Boolean, LongPipelineElement> pipeline, LongPipelineElement request) {
+    public void newRequest(Pipeline<MeterMetric, LongPipelineElement> pipeline, LongPipelineElement request) {
         try {
             try (StringReader sr = new StringReader(clob)) {
                 XMLEventReader xmlReader = factory.createXMLEventReader(sr);
@@ -222,7 +223,7 @@ public class DNBPicaXmlTarReader<P extends Packet> extends AbstractPipeline<Long
     }
 
     @Override
-    public void error(Pipeline<Boolean, LongPipelineElement> pipeline, LongPipelineElement request, PipelineException error) {
+    public void error(Pipeline<MeterMetric, LongPipelineElement> pipeline, LongPipelineElement request, PipelineException error) {
         logger.error(error.getMessage(), error);
 
     }
@@ -325,7 +326,7 @@ public class DNBPicaXmlTarReader<P extends Packet> extends AbstractPipeline<Long
                 }
                 default: {
                     logger.error("unknown element {}", localName);
-                    throw new IllegalArgumentException("unknown begin element: " + uri + " " + localName);
+                    throw new IllegalArgumentException("unknown startStream element: " + uri + " " + localName);
                 }
             }
         } else if (event.isCharacters()) {

@@ -82,7 +82,7 @@ public class ClientTest {
 
             @Override
             public void beginRecord() {
-                logger.info("begin record");
+                logger.info("start record");
             }
 
             @Override

@@ -34,6 +34,7 @@ package org.xbib.rdf.io.json;
 import org.xbib.iri.IRI;
 import org.xbib.rdf.RdfConstants;
 import org.xbib.rdf.RdfContentGenerator;
+import org.xbib.rdf.RdfGraph;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.memory.MemoryResource;
@@ -66,6 +67,10 @@ public class JsonContentGenerator
         this.resource = new MemoryResource();
     }
 
+    public JsonContentParams getParams() {
+        return params;
+    }
+
     @Override
     public void close() throws IOException {
         // write last resource
@@ -96,7 +101,12 @@ public class JsonContentGenerator
     }
 
     @Override
-    public JsonContentGenerator begin() {
+    public JsonContentGenerator startStream() {
+        return this;
+    }
+
+    @Override
+    public RdfContentGenerator setBaseUri(String baseUri) {
         return this;
     }
 
@@ -117,7 +127,7 @@ public class JsonContentGenerator
     }
 
     @Override
-    public JsonContentGenerator end() {
+    public JsonContentGenerator endStream() {
         return this;
     }
 

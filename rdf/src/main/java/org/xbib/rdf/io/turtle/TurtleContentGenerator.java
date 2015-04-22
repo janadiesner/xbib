@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
@@ -143,20 +144,21 @@ public class TurtleContentGenerator
     public TurtleContentGenerator receive(IRI iri) throws IOException {
         if (iri != null && !iri.equals(resource.id())) {
             receive(resource);
-            resource = new MemoryResource();
-            resource.id(iri);
+            resource = new MemoryResource().id(iri);
         }
         return this;
     }
 
     @Override
-    public TurtleContentGenerator end() {
+    public TurtleContentGenerator endStream() {
         return this;
     }
 
     @Override
     public RdfContentGenerator receive(Resource resource) throws IOException {
-        for (Triple t : resource.triples()) {
+        Iterator<Triple> tripleIterator = resource.triples();
+        while (tripleIterator.hasNext()) {
+            Triple t = tripleIterator.next();
             writeTriple(t);
         }
         while (!embedded.isEmpty()) {
@@ -182,7 +184,13 @@ public class TurtleContentGenerator
     }
 
     @Override
-    public TurtleContentGenerator begin() {
+    public TurtleContentGenerator startStream() {
+        return this;
+    }
+
+    @Override
+    public RdfContentGenerator setBaseUri(String baseUri) {
+        startPrefixMapping("", baseUri);
         return this;
     }
 

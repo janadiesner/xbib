@@ -20,6 +20,7 @@ import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.content.RouteRdfXContentParams;
 import org.xbib.tools.Feeder;
+import org.xbib.tools.TimewindowFeeder;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -40,7 +41,7 @@ import static org.xbib.rdf.content.RdfXContentFactory.routeRdfXContentBuilder;
 /**
  * Elasticsearch indexer tool for MARC bibliographic data
  */
-public abstract class BibliographicFeeder extends Feeder {
+public abstract class BibliographicFeeder extends TimewindowFeeder {
 
     private final static Logger logger = LogManager.getLogger(BibliographicFeeder.class.getSimpleName());
 
@@ -174,42 +175,16 @@ public abstract class BibliographicFeeder extends Feeder {
     }
 
     protected void updateAliases() {
-        String bibIndex = getIndex();
-        String concreteIndex = getConcreteIndex();
-        if (!bibIndex.equals(concreteIndex)) {
-            IndicesAliasesRequestBuilder requestBuilder = ingest.client().admin().indices().prepareAliases();
-            GetAliasesResponse getAliasesResponse = ingest.client().admin().indices().prepareGetAliases(bibIndex).execute().actionGet();
-            if (getAliasesResponse.getAliases().isEmpty()) {
-                logger.info("adding alias {} to index {}", bibIndex, concreteIndex);
-                requestBuilder.addAlias(concreteIndex, bibIndex);
-                // identifier is alias
-                if (settings.get("identifier") != null) {
-                    requestBuilder.addAlias(concreteIndex, settings.get("identifier"));
-                }
-            } else {
-                for (ObjectCursor<String> indexName : getAliasesResponse.getAliases().keys()) {
-                    if (indexName.value.startsWith(bibIndex)) {
-                        logger.info("switching alias {} from index {} to index {}", bibIndex, indexName.value, concreteIndex);
-                        requestBuilder.removeAlias(indexName.value, bibIndex)
-                                .addAlias(concreteIndex, bibIndex);
-                        if (settings.get("identifier") != null) {
-                            requestBuilder.removeAlias(indexName.value, settings.get("identifier"))
-                                    .addAlias(concreteIndex, settings.get("identifier"));
-                        }
-                    }
-                }
-            }
-            requestBuilder.execute().actionGet();
-        }
+        super.updateAliases();
+        // identifier is alias
         if (settings.get("identifier") != null) {
-            // identifier is alias
             IndicesAliasesRequestBuilder requestBuilder = ingest.client().admin().indices().prepareAliases();
-            logger.debug("adding alias {} to index {}",  settings.get("identifier"), bibIndex);
-            requestBuilder.addAlias(bibIndex, settings.get("identifier"));
+            logger.debug("adding alias {} to index {}", settings.get("identifier"), getIndex());
+            requestBuilder.addAlias(getIndex(), settings.get("identifier"));
             requestBuilder.execute().actionGet();
         }
+        // for union catalog, create aliases for "main ISILs" using xbib.identifier
         if ("DE-605".equals(settings.get("identifier"))) {
-            // for union catalog, create aliases for "main ISILs" using xbib.identifier
             Map<String, String> sigel2isil = ValueMaps.getAssocStringMap(getClass().getClassLoader(),
                     settings.get("sigel2isil", "/org/xbib/analyzer/mab/sigel2isil.json"), "sigel2isil");
             final List<String> newAliases = newLinkedList();
@@ -223,7 +198,7 @@ public abstract class BibliographicFeeder extends Feeder {
                         requestBuilder.addAlias(concreteIndex, isil, FilterBuilders.termsFilter("xbib.identifier", isil));
                         newAliases.add(isil);
                     } else for (ObjectCursor<String> indexName : getAliasesResponse.getAliases().keys()) {
-                        if (indexName.value.startsWith(bibIndex)) {
+                        if (indexName.value.startsWith(getIndex())) {
                             requestBuilder.removeAlias(indexName.value, isil)
                                     .addAlias(concreteIndex, isil, FilterBuilders.termsFilter("xbib.identifier", isil));
                             switchedAliases.add(isil);

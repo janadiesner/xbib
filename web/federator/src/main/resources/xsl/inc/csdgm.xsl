@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <xsl:variable name="projections">
-        <!-- begin USGS values http://erg.usgs.gov/isb/pubs/MapProjections/projections.html -->
+        <!-- startStream USGS values http://erg.usgs.gov/isb/pubs/MapProjections/projections.html -->
         <xsl:text>Globe</xsl:text>
         <xsl:text>Mercator</xsl:text>
         <xsl:text>Transverse Mercator</xsl:text>
@@ -21,7 +21,7 @@
         <xsl:text>Equidistant Conic</xsl:text>
         <xsl:text>Polyonic</xsl:text>
         <xsl:text>Biplolar Oblique Conic Conformal</xsl:text>
-        <!-- begin CSDGM values http://fgdc.er.usgs.gov/metadata/csdgm/04.html .  Normalized values have removed the underscore character -->
+        <!-- startStream CSDGM values http://fgdc.er.usgs.gov/metadata/csdgm/04.html .  Normalized values have removed the underscore character -->
         <xsl:text>Albers_Conical_Equal_Area</xsl:text>
         <xsl:text>Albers Conical Equal Area</xsl:text>
         <xsl:text>Azimuthal_Equidistant</xsl:text>

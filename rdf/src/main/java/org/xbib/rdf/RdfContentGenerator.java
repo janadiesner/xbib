@@ -41,7 +41,11 @@ public interface RdfContentGenerator<Params extends RdfContentParams> extends Fl
 
     RdfContentGenerator setParams(Params rdfContentParams);
 
-    RdfContentGenerator begin();
+    Params getParams();
+
+    RdfContentGenerator startStream() throws IOException;
+
+    RdfContentGenerator setBaseUri(String baseUri);
 
     RdfContentGenerator startPrefixMapping(String prefix, String uri);
 
@@ -53,6 +57,6 @@ public interface RdfContentGenerator<Params extends RdfContentParams> extends Fl
 
     RdfContentGenerator receive(Resource resource) throws IOException;
 
-    RdfContentGenerator end();
+    RdfContentGenerator endStream() throws IOException;
 
 }

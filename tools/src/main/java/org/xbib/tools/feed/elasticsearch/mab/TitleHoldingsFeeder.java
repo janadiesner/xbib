@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -319,7 +320,9 @@ public abstract class TitleHoldingsFeeder extends Feeder {
                 logger.info("main id={} {}", state.getResource().id(), builder.string());
             }
             // write related resources (holdings etc.)
-            for (Resource resource : state.graph().getResources()) {
+            Iterator<Resource> it = state.graph().getResources();
+            while (it.hasNext()) {
+                Resource resource  = it.next();
                 if (resource.equals(state.getResource())) {
                     continue;
                 }

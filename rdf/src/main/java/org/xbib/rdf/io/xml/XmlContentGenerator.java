@@ -35,6 +35,7 @@ import org.xbib.iri.IRI;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfContentGenerator;
+import org.xbib.rdf.RdfGraph;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
 import org.xbib.rdf.memory.MemoryResource;
@@ -50,6 +51,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -73,6 +75,10 @@ public class XmlContentGenerator
     }
     public XmlContentGenerator(Writer writer) throws IOException {
         this.writer = writer;
+    }
+
+    public XmlContentParams getParams() {
+        return params;
     }
 
     @Override
@@ -110,7 +116,13 @@ public class XmlContentGenerator
     }
 
     @Override
-    public XmlContentGenerator begin() {
+    public XmlContentGenerator startStream() {
+        return this;
+    }
+
+    @Override
+    public RdfContentGenerator setBaseUri(String baseUri) {
+        startPrefixMapping("", baseUri);
         return this;
     }
 
@@ -121,7 +133,7 @@ public class XmlContentGenerator
     }
 
     @Override
-    public XmlContentGenerator end() {
+    public XmlContentGenerator endStream() {
         return this;
     }
 
@@ -160,11 +172,13 @@ public class XmlContentGenerator
         return this;
     }
 
+
     private void writeResource(XMLEventConsumer consumer, Resource resource, QName parent)
             throws XMLStreamException {
         boolean startElementWritten = false;
-        List<Triple> triples = resource.properties();
-        for (Triple triple : triples) {
+        Iterator<Triple> triples = resource.properties();
+        while (triples.hasNext()) {
+            Triple triple = triples.next();
             if (!startElementWritten) {
                 if (parent != null) {
                     consumer.add(eventFactory.createStartElement(parent, null, null));

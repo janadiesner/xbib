@@ -113,7 +113,7 @@ public final class HitVector extends ASN1Any {
         BEREncoding p;
 
         // Remaining elements are optional, set variables
-        // to null (not present) so can return at end of BER
+        // to null (not present) so can return at endStream of BER
 
         s_satisfier = null;
         s_offsetIntoElement = null;

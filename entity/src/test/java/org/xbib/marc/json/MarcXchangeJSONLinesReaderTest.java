@@ -80,7 +80,6 @@ public class MarcXchangeJSONLinesReaderTest extends StreamTester {
         MarcXchangeJSONLinesReader reader = new MarcXchangeJSONLinesReader(in, handler);
         reader.parse();
         in.close();
-
         assertStream(getClass().getResource("zdb-marc-json.txt").openStream(),
                 new ByteArrayInputStream(sb.toString().getBytes("UTF-8")));
 
@@ -112,7 +111,7 @@ public class MarcXchangeJSONLinesReaderTest extends StreamTester {
 
             @Override
             public void beginControlField(Field field) {
-                sb.append("begin controlfield=").append(field).append("\n");
+                sb.append("start controlfield=").append(field).append("\n");
             }
 
             @Override
@@ -122,7 +121,7 @@ public class MarcXchangeJSONLinesReaderTest extends StreamTester {
 
             @Override
             public void beginDataField(Field field) {
-                sb.append("begin datafield=").append(field).append("\n");
+                sb.append("start datafield=").append(field).append("\n");
             }
 
             @Override
@@ -132,7 +131,7 @@ public class MarcXchangeJSONLinesReaderTest extends StreamTester {
 
             @Override
             public void beginSubField(Field field) {
-                sb.append("begin subfield=").append(field).append("\n");
+                sb.append("start subfield=").append(field).append("\n");
             }
 
             @Override

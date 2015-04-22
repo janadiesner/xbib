@@ -143,7 +143,7 @@ public final class ExtendedServicesResponse extends ASN1Any {
         part++;
 
         // Remaining elements are optional, set variables
-        // to null (not present) so can return at end of BER
+        // to null (not present) so can return at endStream of BER
 
         s_diagnostics = null;
         s_taskPackage = null;

@@ -97,7 +97,7 @@ public final class AttributeTypeDetails extends ASN1Any {
             ber_cons = (BERConstructed) ber;
         } catch (ClassCastException e) {
             throw new ASN1EncodingException
-                    ("Zebulun AttributeTypeDetails: bad BER form\n");
+                    ("AttributeTypeDetails: bad BER form\n");
         }
 
         // Prepare to decode the components
@@ -110,7 +110,7 @@ public final class AttributeTypeDetails extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun AttributeTypeDetails: incomplete");
+            throw new ASN1Exception("AttributeTypeDetails: incomplete");
         }
         p = ber_cons.elementAt(part);
 

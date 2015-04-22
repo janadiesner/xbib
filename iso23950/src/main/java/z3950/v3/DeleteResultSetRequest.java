@@ -41,7 +41,7 @@ import asn1.BEREncoding;
 
 /**
  * Class for representing a <code>DeleteResultSetRequest</code> from <code>Z39-50-APDU-1995</code>
- * <p/>
+ *
  * <pre>
  * DeleteResultSetRequest ::=
  * SEQUENCE {
@@ -65,7 +65,7 @@ public final class DeleteResultSetRequest extends ASN1Any {
 
     /**
      * Constructor for a DeleteResultSetRequest from a BER encoding.
-     * <p/>
+     *
      *
      * @param ber       the BER encoding.
      * @param check_tag will check tag if true, use false
@@ -99,7 +99,7 @@ public final class DeleteResultSetRequest extends ASN1Any {
             ber_cons = (BERConstructed) ber;
         } catch (ClassCastException e) {
             throw new ASN1EncodingException
-                    ("Zebulun DeleteResultSetRequest: bad BER form\n");
+                    ("DeleteResultSetRequest: bad BER form\n");
         }
 
         // Prepare to decode the components
@@ -112,7 +112,7 @@ public final class DeleteResultSetRequest extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun DeleteResultSetRequest: incomplete");
+            throw new ASN1Exception("DeleteResultSetRequest: incomplete");
         }
         p = ber_cons.elementAt(part);
 
@@ -127,14 +127,14 @@ public final class DeleteResultSetRequest extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun DeleteResultSetRequest: incomplete");
+            throw new ASN1Exception("DeleteResultSetRequest: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 32 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun DeleteResultSetRequest: bad tag in s_deleteFunction\n");
+                    ("DeleteResultSetRequest: bad tag in s_deleteFunction\n");
         }
 
         s_deleteFunction = new ASN1Integer(p, false);

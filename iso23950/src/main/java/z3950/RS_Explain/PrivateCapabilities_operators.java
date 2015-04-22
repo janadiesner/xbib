@@ -97,7 +97,7 @@ public final class PrivateCapabilities_operators extends ASN1Any {
             ber_cons = (BERConstructed) ber;
         } catch (ClassCastException e) {
             throw new ASN1EncodingException
-                    ("Zebulun PrivateCapabilities_operators: bad BER form\n");
+                    ("PrivateCapabilities_operators: bad BER form\n");
         }
 
         // Prepare to decode the components
@@ -110,14 +110,14 @@ public final class PrivateCapabilities_operators extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun PrivateCapabilities_operators: incomplete");
+            throw new ASN1Exception("PrivateCapabilities_operators: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 0 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun PrivateCapabilities_operators: bad tag in s_operator\n");
+                    ("PrivateCapabilities_operators: bad tag in s_operator\n");
         }
 
         s_operator = new InternationalString(p, false);
@@ -144,7 +144,7 @@ public final class PrivateCapabilities_operators extends ASN1Any {
         // Should not be any more parts
 
         if (part < num_parts) {
-            throw new ASN1Exception("Zebulun PrivateCapabilities_operators: bad BER: extra data " + part + "/" + num_parts + " processed");
+            throw new ASN1Exception("PrivateCapabilities_operators: bad BER: extra data " + part + "/" + num_parts + " processed");
         }
     }
 

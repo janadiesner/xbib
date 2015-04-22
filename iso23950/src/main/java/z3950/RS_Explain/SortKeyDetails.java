@@ -112,7 +112,7 @@ public final class SortKeyDetails extends ASN1Any {
         BERConstructed tagged;
 
         // Remaining elements are optional, set variables
-        // to null (not present) so can return at end of BER
+        // to null (not present) so can return at endStream of BER
 
         s_description = null;
         s_elementSpecifications = null;

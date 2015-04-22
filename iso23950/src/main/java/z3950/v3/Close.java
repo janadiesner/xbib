@@ -41,7 +41,7 @@ import asn1.BEREncoding;
 
 /**
  * Class for representing a <code>Close</code> from <code>Z39-50-APDU-1995</code>
- * <p/>
+ *
  * <pre>
  * Close ::=
  * SEQUENCE {
@@ -67,7 +67,7 @@ public final class Close extends ASN1Any {
 
     /**
      * Constructor for a Close from a BER encoding.
-     * <p/>
+     *
      *
      * @param ber       the BER encoding.
      * @param check_tag will check tag if true, use false
@@ -212,7 +212,7 @@ public final class Close extends ASN1Any {
         // Should not be any more parts
 
         if (part < num_parts) {
-            throw new ASN1Exception("Zebulun Close: bad BER: extra data " + part + "/" + num_parts + " processed");
+            throw new ASN1Exception("Close: bad BER: extra data " + part + "/" + num_parts + " processed");
         }
     }
 

@@ -33,7 +33,6 @@ package org.xbib.rdf.io.rdfxml;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
 import org.xbib.iri.namespace.IRINamespaceContext;

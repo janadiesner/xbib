@@ -91,16 +91,6 @@ public class WithCitationsPipeline implements Pipeline<Boolean, Manifestation> {
         this.listeners = newHashMap();
     }
 
-    @Override
-    public String getName() {
-        return getClass().getName();
-    }
-
-    @Override
-    public Integer getNumber() {
-        return null;
-    }
-
     public Pipeline<Boolean, Manifestation> add(String name, PipelineRequestListener listener) {
         this.listeners.put(name, listener);
         return this;

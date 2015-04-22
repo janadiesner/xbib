@@ -98,14 +98,14 @@ public class DNBPicaElementsTest extends Assert {
     class OurAdapter extends KeyValueStreamAdapter<FieldList, String> {
         @Override
         public KeyValueStreamAdapter<FieldList, String> begin() {
-            logger.debug("begin object");
+            logger.debug("startStream object");
             return this;
         }
 
         @Override
         public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
             if (logger.isDebugEnabled()) {
-                logger.debug("begin");
+                logger.debug("start");
                 for (Field f : key) {
                     logger.debug("tag={} ind={} subf={} data={}",
                             f.tag(), f.indicator(), f.subfieldId(), f.data());

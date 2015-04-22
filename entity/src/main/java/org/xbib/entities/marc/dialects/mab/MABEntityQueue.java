@@ -193,7 +193,7 @@ public class MABEntityQueue extends EntityQueue<MABEntityBuilderState, MABEntity
 
         @Override
         public MABEntityBuilderState newState() {
-            return new MABEntityBuilderState(new MemoryRdfGraph<>(), contentBuilderProviders());
+            return new MABEntityBuilderState(new MemoryRdfGraph(), contentBuilderProviders());
         }
 
         @Override

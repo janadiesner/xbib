@@ -57,10 +57,15 @@ public class RdfContentBuilder implements RdfContentGenerator {
         this(rdfContent, rdfParams, new FastByteArrayOutputStream());
     }
 
+    @SuppressWarnings("unchecked")
     public RdfContentBuilder(RdfContent rdfContent, RdfContentParams rdfContentParams, OutputStream out) throws IOException {
         this.out = out;
         this.generator = rdfContent.createGenerator(out);
         this.generator.setParams(rdfContentParams);
+    }
+
+    public RdfContentParams getParams() {
+        return generator.getParams();
     }
 
     @Override
@@ -90,45 +95,57 @@ public class RdfContentBuilder implements RdfContentGenerator {
     }
 
     @Override
-    public RdfContentGenerator setParams(RdfContentParams rdfContentParams) {
-        return generator.setParams(rdfContentParams);
-    }
-
-    @Override
-    public RdfContentGenerator begin() {
-        return generator.begin();
-    }
-
-    @Override
-    public RdfContentGenerator startPrefixMapping(String prefix, String uri) {
-        return generator.startPrefixMapping(prefix, uri);
-    }
-
-    @Override
-    public RdfContentGenerator endPrefixMapping(String prefix) {
-        return generator.endPrefixMapping(prefix);
-    }
-
-    @Override
-    public RdfContentGenerator receive(IRI identifier) throws IOException {
-        return generator.receive(identifier);
-    }
-
-    @Override
-    public RdfContentGenerator receive(Triple triple) throws IOException {
-        return generator.receive(triple);
-    }
-
-    @Override
-    public RdfContentGenerator end() {
-        return generator.end();
-    }
-
-    @Override
-    public RdfContentGenerator receive(Resource resource) throws IOException {
-        generator.receive(resource);
+    public RdfContentBuilder setParams(RdfContentParams rdfContentParams) {
+        generator.setParams(rdfContentParams);
         return this;
     }
 
+    @Override
+    public RdfContentBuilder startStream() throws IOException {
+        generator.startStream();
+        return this;
+    }
+
+    @Override
+    public RdfContentBuilder endStream() throws IOException {
+        generator.endStream();
+        return this;
+    }
+
+    @Override
+    public RdfContentBuilder setBaseUri(String baseUri) {
+        generator.startPrefixMapping("", baseUri);
+        return this;
+    }
+
+    @Override
+    public RdfContentBuilder startPrefixMapping(String prefix, String uri) {
+        generator.startPrefixMapping(prefix, uri);
+        return this;
+    }
+
+    @Override
+    public RdfContentBuilder endPrefixMapping(String prefix) {
+        generator.endPrefixMapping(prefix);
+        return this;
+    }
+
+    @Override
+    public RdfContentBuilder receive(IRI identifier) throws IOException {
+        generator.receive(identifier);
+        return this;
+    }
+
+    @Override
+    public RdfContentBuilder receive(Triple triple) throws IOException {
+        generator.receive(triple);
+        return this;
+    }
+
+    @Override
+    public RdfContentBuilder receive(Resource resource) throws IOException {
+        generator.receive(resource);
+        return this;
+    }
 
 }

@@ -31,17 +31,27 @@
  */
 package org.xbib.rdf.memory;
 
+import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
+import org.xbib.rdf.RdfContentBuilder;
 import org.xbib.rdf.Resource;
 import org.xbib.rdf.Triple;
+import org.xbib.rdf.io.ntriple.NTripleContentParams;
+
+import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
 
 public class ResourceTest extends Assert {
+
+    private final static Logger logger = LogManager.getLogger(ResourceTest.class);
 
     @Test
     public void deleted() throws Exception {
@@ -82,7 +92,7 @@ public class ResourceTest extends Assert {
         Resource r = new MemoryResource().id(IRI.create("urn:root"));
         r.add("urn:property", "Hello World");
         assertEquals(r.isEmpty(), false);
-        assertEquals(r.triples().iterator().next().object().toString(), "Hello World");
+        assertEquals(r.triples().next().object().toString(), "Hello World");
     }
 
     @Test
@@ -91,7 +101,7 @@ public class ResourceTest extends Assert {
         MemoryLiteral literal = new MemoryLiteral(123).type(Literal.INT);
         r.add("urn:property", literal);
         assertEquals(r.isEmpty(), false);
-        assertEquals(r.triples().iterator().next().object().toString(), "123^^xsd:int");
+        assertEquals(r.triples().next().object().toString(), "123^^xsd:int");
     }
 
     @Test
@@ -111,9 +121,11 @@ public class ResourceTest extends Assert {
         Resource r = new MemoryResource().id(IRI.create("urn:doc4"));
         r.add("urn:hasAttribute", "a")
                 .add("urn:hasAttribute", "b")
-                .add("urn:hasAttribute", "a") // another a
+                .add("urn:hasAttribute", "a") // another a, must be suppressed
                 .add("urn:hasAttribute", "c");
-        assertEquals("[a, b, c]", r.objects("urn:hasAttribute").toString());
+        StringBuilder sb = new StringBuilder();
+        r.objects("urn:hasAttribute").forEachRemaining(sb::append);
+        assertEquals(sb.toString(), "abc");
     }
 
     @Test
@@ -124,7 +136,7 @@ public class ResourceTest extends Assert {
                 .add("urn:valueURI", "Hello World")
                 .add("urn:name", "Smith")
                 .add("urn:name", "Jones");
-        Iterator<Triple> it = r.properties().iterator();
+        Iterator<Triple> it = r.properties();
         assertEquals("urn:doc2 urn:valueURI Hello World", it.next().toString());
         assertEquals("urn:doc2 urn:name Smith", it.next().toString());
         assertEquals("urn:doc2 urn:name Jones", it.next().toString());
@@ -146,7 +158,7 @@ public class ResourceTest extends Assert {
 
         assertEquals(r.predicates().size(), 3);
         
-        Iterator<Triple> it = r.triples().iterator();
+        Iterator<Triple> it = r.triples();
         assertEquals("urn:doc1 urn:valueURI Hello World", it.next().toString());
         assertEquals("urn:doc1 urn:name Smith", it.next().toString());
         assertEquals("urn:doc1 urn:name Jones", it.next().toString());
@@ -159,18 +171,18 @@ public class ResourceTest extends Assert {
         Iterator<IRI> itp = r.predicates().iterator();
         IRI pred = itp.next();
         assertEquals("urn:valueURI", pred.toString());
-        Iterator<Node> values = r.objects(pred).iterator();
+        Iterator<Node> values = r.objects(pred);
         assertEquals("Hello World", values.next().toString());
         assertFalse(values.hasNext());
         pred = itp.next();
         assertEquals("urn:name", pred.toString());
-        values = r.objects(pred).iterator();
+        values = r.objects(pred);
         assertEquals("Smith", values.next().toString());
         assertEquals("Jones", values.next().toString());
         assertFalse(values.hasNext());
         pred = itp.next();
         assertEquals("urn:res1", pred.toString());
-        values = r.objects(pred).iterator();
+        values = r.objects(pred);
         assertEquals("_:b4", values.next().toString());
         assertEquals("_:b5", values.next().toString());
         assertFalse(values.hasNext());
@@ -185,7 +197,7 @@ public class ResourceTest extends Assert {
         IRI predicate = IRI.create("urn:pred");
         Resource r1 = r.newResource(predicate);
         r1.add(predicate, "a value");
-        Iterator<Triple> it = r.triples().iterator();
+        Iterator<Triple> it = r.triples();
         int cnt = 0;
         while (it.hasNext()) {
             it.next();
@@ -194,7 +206,7 @@ public class ResourceTest extends Assert {
         assertEquals(cnt, 3);        
   
         r.compactPredicate(predicate);
-        it = r.triples().iterator();
+        it = r.triples();
         assertEquals("urn:doc urn:value1 Hello World", it.next().toString());
         assertEquals("urn:doc urn:pred a value", it.next().toString());
         assertFalse(it.hasNext());
@@ -232,7 +244,7 @@ public class ResourceTest extends Assert {
         r.add(predicate, u);
         r.add(predicate, v);
 
-        Iterator<Triple> it = r.triples().iterator();
+        Iterator<Triple> it = r.triples();
         assertEquals("urn:r urn:value Hello R", it.next().toString());
         assertEquals("urn:r dc:subject urn:s", it.next().toString());
         assertEquals("urn:s urn:value Hello S", it.next().toString());
@@ -243,5 +255,30 @@ public class ResourceTest extends Assert {
         assertEquals("urn:r dc:subject _:b2", it.next().toString());
         assertEquals("_:b2 urn:value Hello V", it.next().toString());
         assertFalse(it.hasNext());
+    }
+
+
+    @Test
+    public void testTripleAdder() throws IOException {
+        IRINamespaceContext context = IRINamespaceContext.newInstance();
+        context.addNamespace("vcard", "http://www.w3.org/2006/vcard/ns#");
+        context.addNamespace("owl", "http://www.w3.org/2002/07/owl#");
+
+        // ID with compact IRI, will be expanded
+        Resource r = MemoryResource.create(context, "vcard:value");
+        // triples with expanded IRIs
+        Triple t1 = new MemoryTriple(MemoryResource.create("http://www.w3.org/2006/vcard/ns#value"),
+                IRI.create("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+                IRI.create("http://www.w3.org/2002/07/owl#DatatypeProperty"));
+        Triple t2 =  new MemoryTriple(MemoryResource.create("http://www.w3.org/2006/vcard/ns#value"),
+                IRI.create("http://www.w3.org/1999/02/22-rdf-syntax-ns#label"),
+                new MemoryLiteral("value@en"));
+        r.add(t1).add(t2);
+        NTripleContentParams params = new NTripleContentParams(context);
+        RdfContentBuilder builder = ntripleBuilder(params);
+        builder.receive(r);
+        assertEquals("<http://www.w3.org/2006/vcard/ns#value> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .\n" +
+                "<http://www.w3.org/2006/vcard/ns#value> <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> \"value@en\" .",
+                builder.string().trim());
     }
 }

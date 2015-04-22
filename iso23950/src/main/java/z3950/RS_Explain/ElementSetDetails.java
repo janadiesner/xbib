@@ -45,7 +45,7 @@ import z3950.v3.ElementSetName;
 
 /**
  * Class for representing a <code>ElementSetDetails</code> from <code>RecordSyntax-explain</code>
- * <p/>
+ *
  * <pre>
  * ElementSetDetails ::=
  * SEQUENCE {
@@ -59,16 +59,8 @@ import z3950.v3.ElementSetName;
  * }
  * </pre>
  *
- * @version $Release$ $Date$
  */
-
-
-
 public final class ElementSetDetails extends ASN1Any {
-
-    public final static String VERSION = "Copyright (C) Hoylen Sue, 1998. 199809080315Z";
-
-
 
     /**
      * Default constructor for a ElementSetDetails.
@@ -117,7 +109,7 @@ public final class ElementSetDetails extends ASN1Any {
             ber_cons = (BERConstructed) ber;
         } catch (ClassCastException e) {
             throw new ASN1EncodingException
-                    ("Zebulun ElementSetDetails: bad BER form\n");
+                    ("ElementSetDetails: bad BER form\n");
         }
 
         // Prepare to decode the components
@@ -130,7 +122,7 @@ public final class ElementSetDetails extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ElementSetDetails: incomplete");
+            throw new ASN1Exception("ElementSetDetails: incomplete");
         }
         p = ber_cons.elementAt(part);
 
@@ -144,14 +136,14 @@ public final class ElementSetDetails extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ElementSetDetails: incomplete");
+            throw new ASN1Exception("ElementSetDetails: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 1 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ElementSetDetails: bad tag in s_databaseName\n");
+                    ("ElementSetDetails: bad tag in s_databaseName\n");
         }
 
         s_databaseName = new DatabaseName(p, false);
@@ -161,14 +153,14 @@ public final class ElementSetDetails extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ElementSetDetails: incomplete");
+            throw new ASN1Exception("ElementSetDetails: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 2 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ElementSetDetails: bad tag in s_elementSetName\n");
+                    ("ElementSetDetails: bad tag in s_elementSetName\n");
         }
 
         s_elementSetName = new ElementSetName(p, false);
@@ -178,14 +170,14 @@ public final class ElementSetDetails extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ElementSetDetails: incomplete");
+            throw new ASN1Exception("ElementSetDetails: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 3 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ElementSetDetails: bad tag in s_recordSyntax\n");
+                    ("ElementSetDetails: bad tag in s_recordSyntax\n");
         }
 
         s_recordSyntax = new ASN1ObjectIdentifier(p, false);
@@ -195,14 +187,14 @@ public final class ElementSetDetails extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ElementSetDetails: incomplete");
+            throw new ASN1Exception("ElementSetDetails: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 4 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ElementSetDetails: bad tag in s_schema\n");
+                    ("ElementSetDetails: bad tag in s_schema\n");
         }
 
         s_schema = new ASN1ObjectIdentifier(p, false);
@@ -253,7 +245,7 @@ public final class ElementSetDetails extends ASN1Any {
         // Should not be any more parts
 
         if (part < num_parts) {
-            throw new ASN1Exception("Zebulun ElementSetDetails: bad BER: extra data " + part + "/" + num_parts + " processed");
+            throw new ASN1Exception("ElementSetDetails: bad BER: extra data " + part + "/" + num_parts + " processed");
         }
     }
 
@@ -431,9 +423,6 @@ public final class ElementSetDetails extends ASN1Any {
     }
 
 
-/*
- * Internal variables for class.
- */
 
     public CommonInfo s_commonInfo; // optional
     public DatabaseName s_databaseName;
@@ -443,7 +432,4 @@ public final class ElementSetDetails extends ASN1Any {
     public HumanString s_description; // optional
     public PerElementDetails s_detailsPerElement[]; // optional
 
-} // ElementSetDetails
-
-
-//EOF
+}

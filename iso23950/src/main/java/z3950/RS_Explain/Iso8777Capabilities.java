@@ -97,7 +97,7 @@ public final class Iso8777Capabilities extends ASN1Any {
             ber_cons = (BERConstructed) ber;
         } catch (ClassCastException e) {
             throw new ASN1EncodingException
-                    ("Zebulun Iso8777Capabilities: bad BER form\n");
+                    ("Iso8777Capabilities: bad BER form\n");
         }
 
         // Prepare to decode the components
@@ -110,14 +110,14 @@ public final class Iso8777Capabilities extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun Iso8777Capabilities: incomplete");
+            throw new ASN1Exception("Iso8777Capabilities: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 0 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun Iso8777Capabilities: bad tag in s_searchKeys\n");
+                    ("Iso8777Capabilities: bad tag in s_searchKeys\n");
         }
 
         try {
@@ -154,7 +154,7 @@ public final class Iso8777Capabilities extends ASN1Any {
         // Should not be any more parts
 
         if (part < num_parts) {
-            throw new ASN1Exception("Zebulun Iso8777Capabilities: bad BER: extra data " + part + "/" + num_parts + " processed");
+            throw new ASN1Exception("Iso8777Capabilities: bad BER: extra data " + part + "/" + num_parts + " processed");
         }
     }
 

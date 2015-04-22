@@ -243,7 +243,7 @@ public class EZBXML extends Converter {
     /*private class ResourceBuilder implements TripleListener {
 
         @Override
-        public TripleListener begin() {
+        public TripleListener startStream() {
             return this;
         }
 

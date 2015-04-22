@@ -81,7 +81,7 @@ public class ZDBBibTest extends Assert {
                     @Override
                     public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
                         if (logger.isDebugEnabled()) {
-                            logger.debug("begin");
+                            logger.debug("start");
                             for (Field f : key) {
                                 logger.debug("tag={} ind={} subf={} data={}",
                                     f.tag(), f.indicator(), f.subfieldId(), f.data());
@@ -115,7 +115,7 @@ public class ZDBBibTest extends Assert {
                     @Override
                     public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
                         if (logger.isDebugEnabled()) {
-                            logger.debug("begin");
+                            logger.debug("start");
                             for (Field f : key) {
                                 logger.debug("tag={} ind={} subf={} data={}",
                                     f.tag(), f.indicator(), f.subfieldId(), f.data());

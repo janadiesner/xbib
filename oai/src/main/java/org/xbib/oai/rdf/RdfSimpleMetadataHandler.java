@@ -133,7 +133,7 @@ public class RdfSimpleMetadataHandler extends SimpleMetadataHandler implements O
     }
 
     /**
-     * At the end of each OAI metadata, the resource context receives the identifier from
+     * At the endStream of each OAI metadata, the resource context receives the identifier from
      * the metadata header. The resource context is pushed to the RDF output.
      * Any IOException is converted to a SAXException.
      *

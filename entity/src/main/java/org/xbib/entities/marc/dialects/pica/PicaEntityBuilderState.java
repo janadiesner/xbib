@@ -58,7 +58,7 @@ public class PicaEntityBuilderState extends DefaultEntityBuilderState {
     }
 
     public Resource getResource() throws IOException {
-        if (graph().getResources().isEmpty()) {
+        if (!graph().getResources().hasNext()) {
             root = new MemoryResource().blank();
             graph().receive(root);
         }

@@ -58,7 +58,7 @@ public class BlankNodeTest extends Assert {
         // we test here resource adding
         r.add("a:res", q);
 
-        Iterator<Triple> it = r.properties().iterator();
+        Iterator<Triple> it = r.properties();
         assertEquals(it.next().toString(), "urn:meta1 urn:res1 _:b1");
         assertEquals(it.next().toString(), "urn:meta1 urn:has a first property");
         assertEquals(it.next().toString(), "urn:meta1 a:res urn:meta2");
@@ -81,7 +81,7 @@ public class BlankNodeTest extends Assert {
                 .add("p1", "l1")
                 .add("p2", "l2");
 
-        Iterator<Triple> it = r.triples().iterator();
+        Iterator<Triple> it = r.triples();
         assertEquals(it.next().toString(), "res1 p0 l0");
         assertEquals(it.next().toString(), "res1 res2 _:b1");
         assertEquals(it.next().toString(), "_:b1 p1 l1");
@@ -111,7 +111,7 @@ public class BlankNodeTest extends Assert {
                 .add("p1", "l1")
                 .add("p2", "l2");
 
-        Iterator<Triple> it = r.triples().iterator();
+        Iterator<Triple> it = r.triples();
         assertEquals(it.next().toString(), "res0 p0 l0");
         assertEquals(it.next().toString(), "res0 res _:b1");
         assertEquals(it.next().toString(), "_:b1 p1 l1");

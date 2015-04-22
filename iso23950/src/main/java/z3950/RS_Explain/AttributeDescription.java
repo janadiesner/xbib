@@ -42,7 +42,7 @@ import z3950.v3.StringOrNumeric;
 
 /**
  * Class for representing a <code>AttributeDescription</code> from <code>RecordSyntax-explain</code>
- * <p/>
+ *
  * <pre>
  * AttributeDescription ::=
  * SEQUENCE {

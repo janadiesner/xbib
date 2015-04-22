@@ -31,9 +31,12 @@
  */
 package org.xbib.pipeline;
 
+import org.xbib.metric.MeterMetric;
+
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Basic pipeline for pressing pipeline requests.
@@ -43,42 +46,22 @@ import java.util.Map;
  * @param <E> the pipeline error type
  */
 public abstract class AbstractPipeline<R extends PipelineRequest, E extends PipelineException>
-        implements Pipeline<Boolean,R>, PipelineRequestListener<Boolean,R>,
-        PipelineErrorListener<Boolean,R,E> {
+        implements Pipeline<MeterMetric,R>, PipelineRequestListener<MeterMetric,R>,
+        PipelineErrorListener<MeterMetric,R,E> {
 
-    private String name;
-
-    private Integer number;
+    private MeterMetric metric;
 
     /**
      * A list of request listeners for processing requests
      */
-    private Map<String,PipelineRequestListener<Boolean,R>> requestListeners =
-            new LinkedHashMap<String,PipelineRequestListener<Boolean,R>>();
+    private Map<String,PipelineRequestListener<MeterMetric,R>> requestListeners =
+            new LinkedHashMap<String,PipelineRequestListener<MeterMetric,R>>();
 
     /**
      * A list of error listeners for processing errors
      */
-    private Map<String,PipelineErrorListener<Boolean,R,E>> errorListeners =
-            new LinkedHashMap<String,PipelineErrorListener<Boolean,R,E>>();
-
-    public AbstractPipeline<R,E> setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public AbstractPipeline<R,E> setNumber(Integer number) {
-        this.number = number;
-        return this;
-    }
-
-    public Integer getNumber() {
-        return number;
-    }
+    private Map<String,PipelineErrorListener<MeterMetric,R,E>> errorListeners =
+            new LinkedHashMap<String,PipelineErrorListener<MeterMetric,R,E>>();
 
     /**
      * Add a pipeline request listener to the pipeline. The listener is called each time
@@ -87,7 +70,7 @@ public abstract class AbstractPipeline<R extends PipelineRequest, E extends Pipe
      * @param listener the listener
      * @return this pipeline
      */
-    public Pipeline<Boolean,R> add(String name, PipelineRequestListener<Boolean,R> listener) {
+    public Pipeline<MeterMetric,R> add(String name, PipelineRequestListener<MeterMetric,R> listener) {
         if (name != null) {
             this.requestListeners.put(name,listener);
         }
@@ -101,7 +84,7 @@ public abstract class AbstractPipeline<R extends PipelineRequest, E extends Pipe
      * @param listener the listener
      * @return this pipeline
      */
-    public Pipeline<Boolean,R> add(String name, PipelineErrorListener<Boolean,R,E> listener) {
+    public Pipeline<MeterMetric,R> add(String name, PipelineErrorListener<MeterMetric,R,E> listener) {
         if (name != null) {
             this.errorListeners.put(name,listener);
         }
@@ -117,26 +100,33 @@ public abstract class AbstractPipeline<R extends PipelineRequest, E extends Pipe
      * @throws Exception if pipeline execution was sborted by a non-PipelineException
      */
     @Override
-    public Boolean call() throws Exception {
-        Iterator<R> it = this;
-        while (it.hasNext()) {
-            R r = it.next();
-            // add ourselves if not already done
-            requestListeners.put(null, this);
-            errorListeners.put(null, this);
-            for (PipelineRequestListener<Boolean,R> requestListener : requestListeners.values()) {
-                try {
-                    requestListener.newRequest(this, r);
-                } catch (PipelineException e) {
-                    for (PipelineErrorListener<Boolean,R,E> errorListener : errorListeners.values()) {
-                        errorListener.error(this, r, (E) e);
+    public MeterMetric call() throws Exception {
+        try {
+            metric = new MeterMetric(5L, TimeUnit.SECONDS);
+            Iterator<R> it = this;
+            while (it.hasNext()) {
+                R r = it.next();
+                // add ourselves if not already done
+                requestListeners.put(null, this);
+                errorListeners.put(null, this);
+                for (PipelineRequestListener<MeterMetric, R> requestListener : requestListeners.values()) {
+                    try {
+                        requestListener.newRequest(this, r);
+                    } catch (PipelineException e) {
+                        for (PipelineErrorListener<MeterMetric, R, E> errorListener : errorListeners.values()) {
+                            errorListener.error(this, r, (E) e);
+                        }
                     }
                 }
+                metric.mark();
             }
+            close();
+        } finally {
+            metric.stop();
         }
-        close();
-        return true;
+        return getMetric();
     }
+
 
     /**
      * Removing pipeline requests is not supported.
@@ -147,11 +137,20 @@ public abstract class AbstractPipeline<R extends PipelineRequest, E extends Pipe
     }
 
     /**
+     * Return the metric.
+     *
+     * @return the metric of this pipeline
+     */
+    public MeterMetric getMetric() {
+        return metric;
+    }
+
+    /**
      * A new request for the pipeline is processed.
      * @param pipeline the pipeline
      * @param request the pipeline request
      */
-    public abstract void newRequest(Pipeline<Boolean,R> pipeline, R request);
+    public abstract void newRequest(Pipeline<MeterMetric,R> pipeline, R request);
 
     /**
      * A PipelineException occured.
@@ -159,6 +158,6 @@ public abstract class AbstractPipeline<R extends PipelineRequest, E extends Pipe
      * @param request the pipeline request
      * @param error the pipeline error
      */
-    public abstract void error(Pipeline<Boolean,R> pipeline, R request, E error);
+    public abstract void error(Pipeline<MeterMetric,R> pipeline, R request, E error);
 
 }

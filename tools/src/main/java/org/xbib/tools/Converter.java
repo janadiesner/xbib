@@ -210,7 +210,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
     }
 
     @Override
-    public void newRequest(Pipeline<Boolean, URIPipelineElement> pipeline, URIPipelineElement request) {
+    public void newRequest(Pipeline<MeterMetric, URIPipelineElement> pipeline, URIPipelineElement request) {
         try {
             process(request.get());
         } catch (Exception ex) {
@@ -219,7 +219,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
     }
 
     @Override
-    public void error(Pipeline<Boolean, URIPipelineElement> pipeline, URIPipelineElement request, PipelineException error) {
+    public void error(Pipeline<MeterMetric, URIPipelineElement> pipeline, URIPipelineElement request, PipelineException error) {
         logger.error(error.getMessage(), error);
     }
 

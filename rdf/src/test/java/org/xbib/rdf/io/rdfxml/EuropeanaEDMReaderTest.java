@@ -49,6 +49,7 @@ import org.xbib.rdf.memory.MemoryTriple;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 
 import static org.xbib.rdf.RdfContentFactory.ntripleBuilder;
 
@@ -62,7 +63,7 @@ public class EuropeanaEDMReaderTest extends StreamTester {
             throw new IOException("file " + filename + " not found");
         }
 
-        MemoryRdfGraph<MemoryRdfGraphParams> graph = new MemoryRdfGraph<MemoryRdfGraphParams>();
+        MemoryRdfGraph graph = new MemoryRdfGraph();
 
         RdfXmlContentParser reader = new RdfXmlContentParser(in);
         GeoJSONFilter filter = new GeoJSONFilter(NTripleContent.nTripleContent, NTripleContentParams.DEFAULT_PARAMS, graph);
@@ -70,7 +71,9 @@ public class EuropeanaEDMReaderTest extends StreamTester {
         reader.parse();
 
         RdfContentBuilder builder = ntripleBuilder();
-        for (Resource resource : graph.getResources()) {
+        Iterator<Resource> resourceIterator = graph.getResources();
+        while (resourceIterator.hasNext()) {
+            Resource resource = resourceIterator.next();
             builder.receive(resource);
         }
         assertStream(getClass().getResource("edm.nt").openStream(),

@@ -91,7 +91,7 @@ public final class BibdatZDB extends Converter {
                     @Override
                     public KeyValueStreamAdapter<FieldList, String> keyValue(FieldList key, String value) {
                         if (logger.isTraceEnabled()) {
-                            logger.trace("begin");
+                            logger.trace("startStream");
                             for (Field f : key) {
                                 logger.trace("tag={} ind={} subf={} data={}",
                                         f.tag(), f.indicator(), f.subfieldId(), f.data());

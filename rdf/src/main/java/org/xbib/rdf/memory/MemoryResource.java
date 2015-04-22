@@ -32,6 +32,7 @@
 package org.xbib.rdf.memory;
 
 import org.xbib.iri.IRI;
+import org.xbib.iri.namespace.IRINamespaceContext;
 import org.xbib.rdf.Literal;
 import org.xbib.rdf.Node;
 import org.xbib.rdf.RdfConstants;
@@ -43,11 +44,13 @@ import org.xbib.util.MultiMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -86,9 +89,21 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
     }
 
     public MemoryResource blank(String id) {
-        id(IRI.builder().curie(GENID, id).build());
+        id(id != null && id.startsWith(PLACEHOLDER) ?
+                IRI.builder().curie(id).build() : IRI.builder().curie(GENID, id).build());
         this.embedded = true;
         return this;
+    }
+
+    public static Resource create(String id) {
+        IRI iri = IRI.builder().curie(id).build();
+        return new MemoryResource().id(iri);
+    }
+
+    public static Resource create(IRINamespaceContext context, String id) {
+        IRI iri = IRI.builder().curie(id).build();
+        IRI ext = context.expandIRI(iri);
+        return new MemoryResource().id(ext);
     }
 
     @Override
@@ -189,7 +204,7 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
         if (resource.id() == null) {
             resource.id(id());
             Resource r = newResource(predicate);
-            resource.triples().forEach(r::add);
+            resource.triples().forEachRemaining(r::add);
         } else {
             attributes.put(predicate, resource);
         }
@@ -212,18 +227,18 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
     }
 
     @Override
-    public Resource add(IRI predicate, List list) {
-        for (Object object : list) {
+    public Resource add(IRI predicate, Iterator it) {
+        it.forEachRemaining(object -> {
             if (object instanceof Map) {
                 add(predicate, (Map) object);
             } else if (object instanceof List) {
-                add(predicate, (List) object);
+                add(predicate, ((List) object).iterator());
             } else if (object instanceof Resource) {
                 add(predicate, (Resource) object);
             } else {
                 add(predicate, newLiteral(object));
             }
-        }
+        });
         return this;
     }
 
@@ -235,7 +250,7 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
             if (obj instanceof Map) {
                 r.add(newPredicate(pred), (Map) obj);
             } else if (obj instanceof List) {
-                r.add(newPredicate(pred), (List) obj);
+                r.add(newPredicate(pred), ((List) obj).iterator());
             } else if (obj instanceof Resource) {
                 r.add(newPredicate(pred), (Resource) obj);
             } else {
@@ -281,8 +296,8 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
     }
 
     @Override
-    public Resource add(String predicate, List list) {
-        return add(newPredicate(predicate), list);
+    public Resource add(String predicate, Iterator it) {
+        return add(newPredicate(predicate), it);
     }
 
     @Override
@@ -293,7 +308,7 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
                 Resource r = newResource(newPredicate(pred));
                 r.add((Map) obj);
             } else if (obj instanceof List) {
-                add(newPredicate(pred), (List) obj);
+                add(newPredicate(pred), ((List) obj).iterator());
             } else if (obj instanceof Resource) {
                 add(newPredicate(pred), (Resource) obj);
             } else {
@@ -351,34 +366,46 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
         return attributes.keySet();
     }
 
+    private final static Iterator<Node> EMPTY_ITERATOR = new Iterator<Node>() {
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public Node next() {
+            return null;
+        }
+    };
+
     @Override
-    public Collection<Node> objects(IRI predicate) {
-        return attributes.get(predicate);
+    public Iterator<Node> objects(IRI predicate) {
+        return attributes.containsKey(predicate) ? attributes.get(predicate).iterator() : EMPTY_ITERATOR;
     }
 
     @Override
-    public Collection<Node> objects(String predicate) {
-        return attributes.get(newPredicate(predicate));
+    public Iterator<Node> objects(String predicate) {
+        return objects(newPredicate(predicate));
     }
 
     @Override
-    public List<Literal> literals(IRI predicate) {
+    public Iterator<Literal> literals(IRI predicate) {
         return attributes.get(predicate).stream()
                 .filter(n -> n instanceof Literal)
                 .map(Literal.class::cast)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()).iterator();
     }
 
     @Override
-    public List<Resource> resources(IRI predicate) {
+    public Iterator<Resource> resources(IRI predicate) {
         return attributes.get(predicate).stream()
                 .filter(n -> n instanceof Resource)
                 .map(Resource.class::cast)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()).iterator();
     }
 
     @Override
-    public List<Resource> embeddedResources(IRI predicate) {
+    public Collection<Resource> embeddedResources(IRI predicate) {
         return attributes.get(predicate).stream()
                 .filter(n -> n instanceof Resource)
                 .map(Resource.class::cast)
@@ -387,19 +414,10 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
     }
 
     @Override
-    public List<Resource> linkedResources(IRI predicate) {
-        return attributes.get(predicate).stream()
-                .filter(n -> n instanceof Resource)
-                .map(Resource.class::cast)
-                .filter(n -> !n.isEmbedded())
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Node> visibleObjects(IRI predicate) {
+    public Iterator<Node> visibleObjects(IRI predicate) {
         return attributes.get(predicate).stream()
                 .filter(Node::isVisible)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()).iterator();
     }
 
     /**
@@ -411,11 +429,11 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
      */
     @Override
     public void compactPredicate(IRI predicate) {
-        List<Resource> resources = embeddedResources(predicate);
+        Collection<Resource> resources = embeddedResources(predicate);
         if (resources.size() == 1) {
-            Resource r = resources.get(0);
+            Resource r = resources.iterator().next();
             attributes.remove(predicate, r);
-            attributes.putAll(predicate, r.objects(predicate));
+            r.objects(predicate).forEachRemaining(object -> attributes.put(predicate, object));
         }
     }
 
@@ -464,13 +482,13 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
     }
 
     @Override
-    public List<Triple> triples() {
-        return new Triples(this, true).list();
+    public Iterator<Triple> triples() {
+        return new Triples(this, true).list().iterator();
     }
 
     @Override
-    public List<Triple> properties() {
-        return new Triples(this, false).list();
+    public Iterator<Triple> properties() {
+        return new Triples(this, false).list().iterator();
     }
 
     @Override
@@ -553,12 +571,17 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
                 return list;
             }
             for (IRI pred : resource.predicates()) {
-                for (Node obj : resource.objects(pred)) {
-                    list.add(new MemoryTriple(resource, pred, obj));
-                    if (recursive && obj instanceof Resource) {
-                        list.addAll(unfold((Resource) obj));
-                    }
-                }
+                resource.objects(pred)
+                        .forEachRemaining(new Consumer<Node>() {
+                                              @Override
+                                              public void accept(Node node) {
+                                                  list.add(new MemoryTriple(resource, pred, node));
+                                                  if (recursive && node instanceof Resource) {
+                                                      list.addAll(unfold((Resource) node));
+                                                  }
+                                              }
+                                          }
+                        );
             }
             return list;
         }
@@ -569,19 +592,27 @@ public class MemoryResource implements Resource, Comparable<Resource>, XSDResour
                 return list;
             }
             if (resource.predicates().contains(predicate)) {
-                for (Node node : resource.objects(predicate)) {
-                    if (literal.equals(node)) {
-                        list.add(new MemoryTriple(resource, predicate, node));
-                        return list;
+                resource.objects(predicate).forEachRemaining(new Consumer<Node>() {
+                    @Override
+                    public void accept(Node node) {
+                        if (literal.equals(node)) {
+                            list.add(new MemoryTriple(resource, predicate, node));
+                        }
                     }
+                });
+                if (!list.isEmpty()) {
+                    return list;
                 }
             } else {
                 for (IRI pred : resource.predicates()) {
-                    for (Node obj : resource.objects(pred)) {
-                        if (obj instanceof Resource) {
-                            list.addAll(find((Resource) obj, predicate, literal));
+                    resource.objects(pred).forEachRemaining(new Consumer<Node>() {
+                        @Override
+                        public void accept(Node node) {
+                            if (node instanceof Resource) {
+                                list.addAll(find((Resource) node, predicate, literal));
+                            }
                         }
-                    }
+                    });
                 }
             }
             return list;

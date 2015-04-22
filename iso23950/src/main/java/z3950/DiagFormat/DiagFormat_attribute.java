@@ -114,14 +114,14 @@ public final class DiagFormat_attribute extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun DiagFormat_attribute: incomplete");
+            throw new ASN1Exception("DiagFormat_attribute: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 1 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun DiagFormat_attribute: bad tag in s_id\n");
+                    ("DiagFormat_attribute: bad tag in s_id\n");
         }
 
         s_id = new ASN1ObjectIdentifier(p, false);

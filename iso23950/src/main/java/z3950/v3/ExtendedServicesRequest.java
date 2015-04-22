@@ -43,7 +43,7 @@ import asn1.BEREncoding;
 
 /**
  * Class for representing a <code>ExtendedServicesRequest</code> from <code>Z39-50-APDU-1995</code>
- * <p/>
+ *
  * <pre>
  * ExtendedServicesRequest ::=
  * SEQUENCE {
@@ -109,7 +109,7 @@ public final class ExtendedServicesRequest extends ASN1Any {
             ber_cons = (BERConstructed) ber;
         } catch (ClassCastException e) {
             throw new ASN1EncodingException
-                    ("Zebulun ExtendedServicesRequest: bad BER form\n");
+                    ("ExtendedServicesRequest: bad BER form\n");
         }
 
         // Prepare to decode the components
@@ -122,7 +122,7 @@ public final class ExtendedServicesRequest extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesRequest: incomplete");
+            throw new ASN1Exception("ExtendedServicesRequest: incomplete");
         }
         p = ber_cons.elementAt(part);
 
@@ -171,7 +171,7 @@ public final class ExtendedServicesRequest extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesRequest: incomplete");
+            throw new ASN1Exception("ExtendedServicesRequest: incomplete");
         }
         p = ber_cons.elementAt(part);
 
@@ -185,7 +185,7 @@ public final class ExtendedServicesRequest extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesRequest: incomplete");
+            throw new ASN1Exception("ExtendedServicesRequest: incomplete");
         }
         p = ber_cons.elementAt(part);
 
@@ -199,7 +199,7 @@ public final class ExtendedServicesRequest extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesRequest: incomplete");
+            throw new ASN1Exception("ExtendedServicesRequest: incomplete");
         }
         p = ber_cons.elementAt(part);
 
@@ -213,7 +213,7 @@ public final class ExtendedServicesRequest extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesRequest: incomplete");
+            throw new ASN1Exception("ExtendedServicesRequest: incomplete");
         }
         p = ber_cons.elementAt(part);
 
@@ -227,7 +227,7 @@ public final class ExtendedServicesRequest extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesRequest: incomplete");
+            throw new ASN1Exception("ExtendedServicesRequest: incomplete");
         }
         p = ber_cons.elementAt(part);
 
@@ -241,7 +241,7 @@ public final class ExtendedServicesRequest extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesRequest: incomplete");
+            throw new ASN1Exception("ExtendedServicesRequest: incomplete");
         }
         p = ber_cons.elementAt(part);
 
@@ -255,14 +255,14 @@ public final class ExtendedServicesRequest extends ASN1Any {
 
         if (num_parts <= part) {
             // End of record, but still more elements to get
-            throw new ASN1Exception("Zebulun ExtendedServicesRequest: incomplete");
+            throw new ASN1Exception("ExtendedServicesRequest: incomplete");
         }
         p = ber_cons.elementAt(part);
 
         if (p.tag_get() != 11 ||
                 p.tag_type_get() != BEREncoding.CONTEXT_SPECIFIC_TAG) {
             throw new ASN1EncodingException
-                    ("Zebulun ExtendedServicesRequest: bad tag in s_waitAction\n");
+                    ("ExtendedServicesRequest: bad tag in s_waitAction\n");
         }
 
         s_waitAction = new ASN1Integer(p, false);
