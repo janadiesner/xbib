@@ -251,6 +251,7 @@ public class Cluster extends TreeSet<Manifestation> {
     }
 
     private List<Integer> parseDates(List<Map<String, Object>> groups) {
+        EnumerationAndChronology eac = new EnumerationAndChronology();
         List<Integer> begin = newLinkedList();
         List<Integer> end = newLinkedList();
         List<String> beginvolume = newLinkedList();
@@ -272,7 +273,7 @@ public class Cluster extends TreeSet<Manifestation> {
                 if (content == null) {
                     continue;
                 }
-                EnumerationAndChronology.parse(content, begin, end, beginvolume, endvolume, open);
+                eac.parse(content, begin, end, beginvolume, endvolume, open);
             }
         }
         List<Integer> dates = newLinkedList();

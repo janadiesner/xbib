@@ -245,6 +245,7 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
     }
 
     private List<Integer> parseDates(List<Map<String, Object>> groups) {
+        EnumerationAndChronology eac = new EnumerationAndChronology();
         List<Integer> begin = newLinkedList();
         List<Integer> end = newLinkedList();
         List<String> beginvolume = newLinkedList();
@@ -266,7 +267,7 @@ public class TimeLine extends TreeSet<Manifestation> implements Comparable<TimeL
                 if (content == null) {
                     continue;
                 }
-                EnumerationAndChronology.parse(content, begin, end, beginvolume, endvolume, open);
+                eac.parse(content, begin, end, beginvolume, endvolume, open);
             }
         }
         List<Integer> dates = newLinkedList();
