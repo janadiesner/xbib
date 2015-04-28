@@ -35,17 +35,19 @@ import org.elasticsearch.common.settings.ImmutableSettings;
 import org.xbib.common.settings.Settings;
 import org.xbib.elasticsearch.support.client.search.SearchClient;
 
+import java.io.IOException;
+
 /**
  * Some support for Common Query Language with Elasticsearch
  */
 public class SearchSupport extends SearchClient {
 
-    public SearchSupport newClient() {
+    public SearchSupport newClient() throws IOException {
         this.newClient(findSettings());
         return this;
     }
 
-    public SearchSupport newClient(Settings settings) {
+    public SearchSupport newClient(Settings settings) throws IOException {
         super.newClient(ImmutableSettings.settingsBuilder()
                 .put(settings.getAsMap()).build());
         return this;

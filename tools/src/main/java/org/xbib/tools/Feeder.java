@@ -37,9 +37,9 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
+import org.xbib.elasticsearch.support.client.transport.BulkTransportClient;
 import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
-import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
+import org.xbib.elasticsearch.support.client.mock.MockTransportClient;
 import org.xbib.metric.MeterMetric;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineRequest;
@@ -80,7 +80,7 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
 
     protected Ingest createIngest() {
         return settings.getAsBoolean("mock", false) ?
-                new MockIngestTransportClient() :
+                new MockTransportClient() :
                 "ingest".equals(settings.get("client")) ? new IngestTransportClient() :
                         new BulkTransportClient();
     }
@@ -94,8 +94,7 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
                     Runtime.getRuntime().availableProcessors());
             ingest = createIngest();
             ingest.maxActionsPerBulkRequest(maxbulkactions)
-                    .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
-                    .maxRequestWait(TimeValue.timeValueSeconds(60));
+                    .maxConcurrentBulkRequests(maxconcurrentbulkrequests);
         }
         createIndex(getIndex());
         return this;
@@ -128,8 +127,7 @@ public abstract class Feeder<T, R extends PipelineRequest, P extends Pipeline<T,
         double oneminute = metric.oneMinuteRate();
         double fiveminute = metric.fiveMinuteRate();
         double fifteenminute = metric.fifteenMinuteRate();
-        long bytes = ingest.getState() != null ?
-                ingest.getState().getTotalIngestSizeInBytes().count() : 0L;
+        long bytes = ingest.getMetric().getTotalIngestSizeInBytes().count();
         long elapsed = metric.elapsed() / 1000000;
         String elapsedhuman = DurationFormatUtil.formatDurationWords(elapsed, true, true);
         double avg = bytes / (docs + 1); // avoid div by zero

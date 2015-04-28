@@ -36,7 +36,6 @@ import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.xbib.elasticsearch.search.CQLRequest;
-import org.xbib.elasticsearch.search.SearchSupport;
 
 /**
  *  Elasticsearch filter generation
@@ -48,12 +47,11 @@ public class ESFacetFilterGeneratorTest extends Assert {
     @Test
     public void testFacetFilter() throws Exception {
 
-        SearchSupport support = new SearchSupport().newClient();
         String cql = "Köln";
         String cqlFilter = "dc.format = online and dc.date = 2012";
 
         // creating CQL from SearchRetrieve request
-        CQLRequest cqlRequest  = support.newSearchRequest()
+        CQLRequest cqlRequest  = new CQLRequest().newRequest()
                 .index("*")
                 .type("*")
                 .from(0)
@@ -63,9 +61,7 @@ public class ESFacetFilterGeneratorTest extends Assert {
                 .cqlFacetFilter(cqlFilter)
                 .facet("10:dc.format", null, null)
                 ;
-
-        logger.info("CQL query = {}", cqlRequest);
-
+        assertEquals("{\"from\":0,\"size\":10, \"query\" : {\"match\":{\"_all\":{\"query\":\"Köln\"}}}, \"filter\" : {\"query\":{\"bool\":{\"must\":{\"term\":{\"dc:format.dcterms:medium\":\"online\"}},\"must\":{\"term\":{\"dc:date.xbib:date\":\"2012\"}}}}}}", cqlRequest.toString());
     }
 
 }

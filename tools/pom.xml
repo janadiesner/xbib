@@ -60,10 +60,6 @@
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>elasticsearch-sru</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.xbib</groupId>
             <artifactId>jdbc</artifactId>
         </dependency>
         <dependency>
@@ -77,6 +73,14 @@
         <dependency>
             <groupId>org.xbib</groupId>
             <artifactId>compress</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.xbib</groupId>
+            <artifactId>sru</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.xbib</groupId>
+            <artifactId>elasticsearch-search</artifactId>
         </dependency>
     </dependencies>
 </project>

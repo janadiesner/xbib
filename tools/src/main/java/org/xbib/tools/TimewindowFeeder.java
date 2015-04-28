@@ -55,8 +55,7 @@ public abstract class TimewindowFeeder extends Feeder {
                     Runtime.getRuntime().availableProcessors());
             ingest = createIngest();
             ingest.maxActionsPerBulkRequest(maxbulkactions)
-                    .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
-                    .maxRequestWait(TimeValue.timeValueSeconds(60));
+                    .maxConcurrentBulkRequests(maxconcurrentbulkrequests);
         }
         String timeWindow = settings.get("timewindow") != null ?
                 DateTimeFormat.forPattern(settings.get("timewindow")).print(new DateTime()) : "";
@@ -98,7 +97,7 @@ public abstract class TimewindowFeeder extends Feeder {
                         indexSettingsInput, indexMappingsInput);
                 indexSettingsInput.close();
                 indexMappingsInput.close();
-                ingest.startBulk(getConcreteIndex());
+                ingest.startBulk(getConcreteIndex(), -1, 1000);
             } catch (Exception e) {
                 if (!settings.getAsBoolean("ignoreindexcreationerror", false)) {
                     throw e;

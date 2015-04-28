@@ -44,11 +44,10 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.xbib.common.settings.Settings;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
+import org.xbib.elasticsearch.support.client.transport.BulkTransportClient;
 import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
-import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
+import org.xbib.elasticsearch.support.client.mock.MockTransportClient;
 import org.xbib.elasticsearch.support.client.search.SearchClient;
-import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
 import org.xbib.pipeline.queue.QueuePipelineExecutor;
 import org.xbib.tools.CommandLineInterpreter;
@@ -176,15 +175,14 @@ public class WithHoldingsAndLicensesInTimeline
         this.identifier = settings.get("identifier");
 
         this.ingest = settings.getAsBoolean("mock", false) ?
-                new MockIngestTransportClient() :
+                new MockTransportClient() :
                 "ingest".equals(settings.get("client")) ?
                         new IngestTransportClient() :
                         new BulkTransportClient();
 
         ingest.maxActionsPerBulkRequest(settings.getAsInt("maxBulkActions", 100))
                 .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests",
-                        Runtime.getRuntime().availableProcessors()))
-                .maxRequestWait(TimeValue.parseTimeValue(settings.get("maxWait", "180s"), TimeValue.timeValueSeconds(180)));
+                        Runtime.getRuntime().availableProcessors()));
         ingest.setting(WithHoldingsAndLicensesInTimeline.class.getResourceAsStream("transport-client-settings.json"));
         ingest.newClient(ImmutableSettings.settingsBuilder()
                 .put("cluster.name", settings.get("target.cluster"))
@@ -203,7 +201,7 @@ public class WithHoldingsAndLicensesInTimeline
         ingest.shards(settings.getAsInt("shards", 3));
         ingest.replica(settings.getAsInt("replica", 0));
         ingest.newIndex(index);
-        ingest.startBulk(index);
+        ingest.startBulk(index, -1, 1000);
 
         super.setPipelineProvider(new PipelineProvider<WithHoldingsAndLicensesInTimelinePipeline>() {
             int i = 0;

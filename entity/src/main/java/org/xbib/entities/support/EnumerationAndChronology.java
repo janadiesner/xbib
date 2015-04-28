@@ -167,53 +167,88 @@ public class EnumerationAndChronology {
     };
 
     /**
-     * NEU
+     * Berichtsjahr/Erscheinungsjahr
+     * report date / publication date
      */
 
+    // Jahrgänge, mit zwei Zählungen, jeweils Berichtsjahr/Erscheinungsjahr, geschlossen
+    // 115.1921/22(1923) - 116.1922/23(1924)
     // 115.1921/22(1923) - 1125.1937
-    // Jahrgänge, mit Zählung, geschlossen
+    // 1 = Zählung
+    // 2 = Berichtsjahr
+    // 3 = Erscheinungsjahr (yyyy), (yyyy/yy), (yyyy/yyyy)
+    // 4 = Zählung
+    // 5 = Berichtsjahr
+    // 6 = Erscheinungsjahr (yyyy), (yyyy/yy), (yyyy/yyyy)
     private final static Pattern[] g1a = new Pattern[] {
+            Pattern.compile("(.*?)\\.(\\d{4}/?\\d{0,4})\\((\\d{4}/?\\d{0,4})\\)\\s*\\-\\s*(.*?)\\.(\\d{4}/?\\d{0,4})\\((\\d{4}/?\\d{0,4})\\)"),
     };
 
-    // 115.1921/22(1923) -
     // Jahrgänge, mit Zählung, offen
-    private final static Pattern[] g1b = new Pattern[] {
+    // 115.1921/22(1923) -
+    private final static Pattern[] g1c = new Pattern[] {
+            Pattern.compile("(.*?)\\.(\\d{4}/?\\d{0,4})\\((\\d{4}/?\\d{0,4})\\)\\s*\\-")
     };
 
+    // einzelner Jahrgang mit Zählung
     // 2.1938/40(1942)
     // 9.1996/97(1997)
-    // einzelner Jahrgang
-    // 1 = Berichtsjahr Zählung
+    // 1 = Zählung Berichtsjahr
     // 2 = Berichtsjahr
-    // 3 = Erscheinungsjahr in runden Klammern (yyyy), (yyyy/yy), (yyyy/yyyy)
-    private final static Pattern[] g1c = new Pattern[] {
+    // 3 = Erscheinungsjahr (yyyy), (yyyy/yy), (yyyy/yyyy)
+    private final static Pattern[] g1d = new Pattern[] {
             Pattern.compile("(.*?)\\.(\\d{4}/?\\d{0,4})\\((\\d{4}/?\\d{0,4})\\)")
     };
 
+    // einzelner Jahrgang
     // 1961/62(1963)
     // 1965/70(1971/72)
-    // einzelner Jahrgang
     // 1 = Berichtsjahr
     // 2 = Erscheinungsjahr
-    private final static Pattern[] g1d = new Pattern[] {
+    private final static Pattern[] g1e = new Pattern[] {
             Pattern.compile("(\\d{4}/?\\d{0,4})\\((\\d{4}/?\\d{0,4})\\)")
     };
 
+    final Set<Integer> dates = newTreeSet();
 
-    private EnumerationAndChronology() {
+    final Set<Integer> reportDates = newTreeSet();
+
+    final Set<Integer> publicationDates = newTreeSet();
+
+    public EnumerationAndChronology() {
     }
 
-    public static Resource parse(String values) {
+    public Resource parse(String values) {
         return parse(values, new MemoryResource(), null);
     }
 
-    public static Resource parse(String values, Resource resource, Pattern[] movingwalls) {
+    public Resource parse(String values, Resource resource, Pattern[] movingwalls) {
         if (values == null) {
             return resource;
         }
         for (String value : values.split(";")) {
             boolean found;
-            // first, check dates in parentheses
+
+            // Jahrgänge, mit zwei Zählungen, jeweils Berichtsjahr/Erscheinungsjahr, geschlossen
+            for (Pattern p : g1a) {
+                Matcher m = p.matcher(value);
+                found = m.find();
+                if (found) {
+                    List<Integer> l1 = fractionDate(m.group(2));
+                    List<Integer> l2 = fractionDate(m.group(5));
+                    Integer b = sanitizeDate(l1.get(0));
+                    Integer e = sanitizeDate(l2.get(l2.size() - 1));
+                    resource.newResource("group")
+                            .add("begindate", b)
+                            .add("enddate", e)
+                            .add("beginvolume", m.group(1))
+                            .add("endvolume", m.group(4))
+                            .add("beginpubdate", m.group(3))
+                            .add("endpubdate", m.group(6));
+                }
+            }
+
+            found = false;
             for (Pattern p : p4a) {
                 Matcher m = p.matcher(value);
                 found = m.find();
@@ -481,7 +516,7 @@ public class EnumerationAndChronology {
         return resource;
     }
 
-    public static void parse(String content,
+    public void parse(String content,
                              List<Integer> begin,
                              List<Integer> end,
                              List<String> beginVolume,
@@ -769,8 +804,7 @@ public class EnumerationAndChronology {
         }
     }
 
-
-    public static Integer sanitizeDate(String date) {
+    public Integer sanitizeDate(String date) {
         int pos = date.indexOf("/");
         if (pos > 0) {
             if (pos > 4) {
@@ -785,11 +819,11 @@ public class EnumerationAndChronology {
         }
     }
 
-    public static Integer sanitizeDate(Integer date) {
+    public Integer sanitizeDate(Integer date) {
         return date > 1500 && date <= DateUtil.getYear() ? date : null;
     }
 
-    public static List<Integer> fractionDate(String date) {
+    public List<Integer> fractionDate(String date) {
         List<Integer> dates = newLinkedList();
         int pos = date.indexOf("/");
         if (pos > 0) {
@@ -817,8 +851,7 @@ public class EnumerationAndChronology {
         return dates;
     }
 
-    public static Set<Integer> dates(IRI id, Resource resource) {
-        final Set<Integer> dates = newTreeSet();
+    public Set<Integer> dates(IRI id, Resource resource) {
         for (IRI iri : resource.predicates()) {
             resource.resources(iri).forEachRemaining(new Consumer<Resource>() {
                 @Override
@@ -829,6 +862,12 @@ public class EnumerationAndChronology {
                     Iterator<Node> enddateCollection = group.objects("enddate");
                     Object enddate = enddateCollection != null && enddateCollection.hasNext() ?
                             enddateCollection.next() : null;
+                    Iterator<Node> beginpubdateCollection = group.objects("beginpubdate");
+                    Object beginpubdate = beginpubdateCollection != null && beginpubdateCollection.hasNext() ?
+                            beginpubdateCollection.next() : null;
+                    Iterator<Node> endpubdateCollection = group.objects("endpubdate");
+                    Object endpubdate = endpubdateCollection != null && endpubdateCollection.hasNext() ?
+                            endpubdateCollection.next() : null;
                     Iterator<Node> openCollection = group.objects("open");
                     Object open = openCollection != null && openCollection.hasNext() ?
                             openCollection.next() : null;
@@ -839,10 +878,20 @@ public class EnumerationAndChronology {
                         dates.addAll(starts);
                         start = starts.get(0);
                     }
+                    if (beginpubdate != null) {
+                        starts = fractionDate(beginpubdate.toString());
+                        dates.addAll(starts);
+                        start = starts.get(0);
+                    }
                     int end = -1;
                     List<Integer> ends;
                     if (enddate != null) {
                         ends = fractionDate(enddate.toString());
+                        dates.addAll(ends);
+                        end = ends.get(0);
+                    }
+                    if (endpubdate != null) {
+                        ends = fractionDate(endpubdate.toString());
                         dates.addAll(ends);
                         end = ends.get(0);
                     }

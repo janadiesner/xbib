@@ -81,6 +81,11 @@ public class CQLRequest extends BasicSearchRequest {
         return this;
     }
 
+    public CQLRequest newRequest() {
+        this.generator = new ESQueryGenerator(resourceBundle);
+        return this;
+    }
+
     public CQLRequest newRequest(SearchRequestBuilder searchRequestBuilder) {
         super.newRequest(searchRequestBuilder);
         this.generator = new ESQueryGenerator(resourceBundle);

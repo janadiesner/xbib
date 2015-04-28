@@ -78,6 +78,7 @@ public class EnumerationAndChronology extends MARCEntity {
     @Override
     public boolean fields(MARCEntityQueue.MARCWorker worker,
                           FieldList fields, String value) throws IOException {
+        org.xbib.entities.support.EnumerationAndChronology eac = new org.xbib.entities.support.EnumerationAndChronology();
         for (Field field : fields) {
             String data = field.data();
             if (data == null || data.isEmpty()) {
@@ -86,9 +87,9 @@ public class EnumerationAndChronology extends MARCEntity {
             worker.state().getResource().add("TextualEnumerationAndChronology", data);
             if ("a".equals(field.subfieldId())) {
                 Resource r = worker.state().getResource().newResource("EnumerationAndChronology");
-                Resource parsedHoldings = org.xbib.entities.support.EnumerationAndChronology.parse(data, r, getMovingwallPatterns());
+                Resource parsedHoldings = eac.parse(data, r, getMovingwallPatterns());
                 if (!parsedHoldings.isEmpty()) {
-                    Set<Integer> dates = org.xbib.entities.support.EnumerationAndChronology.dates(r.id(), parsedHoldings);
+                    Set<Integer> dates = eac.dates(r.id(), parsedHoldings);
                     for (Integer date : dates) {
                         worker.state().getResource().add("Dates", date);
                     }

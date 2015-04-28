@@ -35,7 +35,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
+import org.xbib.elasticsearch.support.client.transport.BulkTransportClient;
 import org.xbib.io.InputService;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;

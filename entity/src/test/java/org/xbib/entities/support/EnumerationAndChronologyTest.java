@@ -55,7 +55,8 @@ public class EnumerationAndChronologyTest extends Assert {
             "1963,21(22.Mai) -",
             "[19]81/82 - [19]83",
             "1981,31 - 25.1997",
-            "1.1983 - 79/80.1992"
+            "1.1983 - 79/80.1992",
+            "115.1921/22(1923) - 116.1922/23(1924)"
         };
         String[] dates = {
             "[1961]",
@@ -92,7 +93,8 @@ public class EnumerationAndChronologyTest extends Assert {
             "",
             "[1981, 1982, 1983]",
             "[1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997]",
-            "[1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992]"
+            "[1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992]",
+            "[1921, 1922, 1923, 1924]"
         };
         // set dynamic years
         int year =  Calendar.getInstance().get(Calendar.YEAR);
@@ -103,9 +105,10 @@ public class EnumerationAndChronologyTest extends Assert {
         dates[31] = "[" + createYearList(1963, year) + "]";
 
         for (int i = 0; i < specs.length; i++) {
+            EnumerationAndChronology eac = new EnumerationAndChronology();
             String s = specs[i];
-            Resource r = EnumerationAndChronology.parse(s);
-            Set<Integer> d = EnumerationAndChronology.dates(r.id(), r);
+            Resource r = eac.parse(s);
+            Set<Integer> d = eac.dates(r.id(), r);
             logger.info("{} {}", d.toString(), dates[i]);
             assertEquals(d.toString(), dates[i]);
         }
@@ -113,12 +116,13 @@ public class EnumerationAndChronologyTest extends Assert {
 
     @Test
     public void testMovingwall() {
+        EnumerationAndChronology eac = new EnumerationAndChronology();
         Pattern[] p = new Pattern[]{Pattern.compile("Letzte (\\d+) Jg")};
         String s = "Letzte 10 Jg.";
-        Resource r = EnumerationAndChronology.parse(s, new MemoryResource(), p);
-        Set<Integer> d = EnumerationAndChronology.dates(r.id(), r);
+        Resource r = eac.parse(s, new MemoryResource(), p);
+        Set<Integer> d = eac.dates(r.id(), r);
         // yeah, moving wall
-        Set<Integer> set = new TreeSet();
+        Set<Integer> set = new TreeSet<Integer>();
         for (int i = 0; i < 11; i++) {
             set.add(DateUtil.getYear() - i);
         }

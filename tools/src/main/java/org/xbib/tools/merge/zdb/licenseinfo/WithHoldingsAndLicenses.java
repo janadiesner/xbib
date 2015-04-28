@@ -45,9 +45,9 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.xbib.common.settings.Settings;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
+import org.xbib.elasticsearch.support.client.transport.BulkTransportClient;
 import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
-import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
+import org.xbib.elasticsearch.support.client.mock.MockTransportClient;
 import org.xbib.elasticsearch.support.client.search.SearchClient;
 import org.xbib.entities.support.StatusCodeMapper;
 import org.xbib.entities.support.ValueMaps;
@@ -200,15 +200,13 @@ public class WithHoldingsAndLicenses
         this.identifier = settings.get("identifier");
 
         this.ingest = settings.getAsBoolean("mock", false) ?
-                new MockIngestTransportClient() :
+                new MockTransportClient() :
                 "ingest".equals(settings.get("client")) ?
                         new IngestTransportClient() :
                         new BulkTransportClient();
 
         ingest.maxActionsPerBulkRequest(settings.getAsInt("maxBulkActions", 100))
-                .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests",
-                        Runtime.getRuntime().availableProcessors()))
-                .maxRequestWait(TimeValue.parseTimeValue(settings.get("maxWait", "180s"), TimeValue.timeValueSeconds(180)));
+                .maxConcurrentBulkRequests(settings.getAsInt("maxConcurrentBulkRequests", Runtime.getRuntime().availableProcessors()));
 
         InputStream clientSettings = getClass().getResource(settings.get("transport-client-settings", "transport-client-settings.json")).openStream();
         ingest.setting(clientSettings);
@@ -233,7 +231,7 @@ public class WithHoldingsAndLicenses
             logger.warn(e.getMessage(), e);
         }
         ingest.waitForCluster(ClusterHealthStatus.YELLOW, TimeValue.timeValueSeconds(30));
-        ingest.startBulk(index);
+        ingest.startBulk(index, -1, 1000);
 
         queryMetric = new MeterMetric(5L, TimeUnit.SECONDS);
         indexMetric = new MeterMetric(5L, TimeUnit.SECONDS);

@@ -164,7 +164,7 @@ public class OpenSearchAtomFeedFactory implements AtomFeedFactory {
                 .put("port", properties.containsKey(FEED_PORT_PROPERTY_KEY) ?
                         properties.getProperty(FEED_PORT_PROPERTY_KEY) : "9300")
                 .build();
-        support.newClient(settings.getAsMap());
+        support.newClient(settings);
         String index = properties.getProperty(FEED_INDEX);
         String type =  properties.getProperty(FEED_TYPE);
         try {

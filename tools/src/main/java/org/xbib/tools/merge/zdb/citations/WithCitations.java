@@ -44,9 +44,9 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.xbib.common.settings.Settings;
 import org.xbib.elasticsearch.support.client.Ingest;
-import org.xbib.elasticsearch.support.client.bulk.BulkTransportClient;
+import org.xbib.elasticsearch.support.client.transport.BulkTransportClient;
 import org.xbib.elasticsearch.support.client.ingest.IngestTransportClient;
-import org.xbib.elasticsearch.support.client.ingest.MockIngestTransportClient;
+import org.xbib.elasticsearch.support.client.mock.MockTransportClient;
 import org.xbib.elasticsearch.support.client.search.SearchClient;
 import org.xbib.pipeline.Pipeline;
 import org.xbib.pipeline.PipelineProvider;
@@ -131,7 +131,7 @@ public class WithCitations
             this.identifier = settings.get("identifier");
 
             this.ingest = settings.getAsBoolean("mock", false) ?
-                    new MockIngestTransportClient() :
+                    new MockTransportClient() :
                     "ingest".equals(settings.get("client")) ?
                             new IngestTransportClient() :
                             new BulkTransportClient();
@@ -155,7 +155,7 @@ public class WithCitations
             ingest.shards(settings.getAsInt("shards", 3))
                     .replica(settings.getAsInt("replica", 0))
                     .newIndex(settings.get("targetCitationIndex"))
-                    .startBulk(settings.get("targetCitationIndex"));
+                    .startBulk(settings.get("targetCitationIndex"), -1, 1000);
             super.setPipelineProvider(new PipelineProvider<WithCitationsPipeline>() {
                 int i = 0;
 

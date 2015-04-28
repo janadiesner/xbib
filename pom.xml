@@ -83,7 +83,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>dd.MM.yyyy HH:mm</maven.build.timestamp.format>
         <java.compiler.source>1.8</java.compiler.source>
-        <elasticsearch.support.plugin.version>1.4.0.2</elasticsearch.support.plugin.version>
+        <elasticsearch.support.plugin.version>1.5.2.0</elasticsearch.support.plugin.version>
         <antlr.version>4.5</antlr.version>
     </properties>
 
@@ -422,11 +422,6 @@
             </dependency>
             <dependency>
                 <groupId>org.xbib</groupId>
-                <artifactId>sru-test</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.xbib</groupId>
                 <artifactId>entity</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -526,26 +521,6 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.xbib</groupId>
-                <artifactId>elasticsearch-rdf</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.xbib</groupId>
-                <artifactId>elasticsearch-oai</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.xbib</groupId>
-                <artifactId>elasticsearch-sru</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.xbib</groupId>
-                <artifactId>elasticsearch-opensearch</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.xbib.elasticsearch.plugin</groupId>
                 <artifactId>elasticsearch-support</artifactId>
                 <version>${elasticsearch.support.plugin.version}</version>
@@ -563,11 +538,6 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.5.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
                 <version>2.5.2</version>
             </dependency>
             <dependency>
@@ -862,9 +832,6 @@
         <module>rule</module>
 
         <module>elasticsearch/search</module>
-        <module>elasticsearch/sru</module>
-        <module>elasticsearch/oai</module>
-        <module>elasticsearch/opensearch</module>
 
         <module>web/federator</module>
         <module>web/dispatcher</module>

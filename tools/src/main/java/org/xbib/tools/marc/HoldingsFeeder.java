@@ -62,8 +62,7 @@ public abstract class HoldingsFeeder extends Feeder {
         Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
                 Runtime.getRuntime().availableProcessors());
         ingest.maxActionsPerBulkRequest(maxbulkactions)
-                .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
-                .maxRequestWait(TimeValue.timeValueSeconds(60));
+                .maxConcurrentBulkRequests(maxconcurrentbulkrequests);
         ingest.newClient(ImmutableSettings.settingsBuilder()
                 .put("cluster.name", settings.get("elasticsearch.cluster"))
                 .put("host", settings.get("elasticsearch.host"))
@@ -107,7 +106,7 @@ public abstract class HoldingsFeeder extends Feeder {
                     logger.warn("index creation error, but configured to ignore", e);
                 }
             }
-            ingest.startBulk(getConcreteIndex());
+            ingest.startBulk(getConcreteIndex(), -1, 1000);
         }
         return this;
     }

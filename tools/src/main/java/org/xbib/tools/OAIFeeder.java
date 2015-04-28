@@ -87,8 +87,7 @@ public abstract class OAIFeeder extends TimewindowFeeder {
         Integer maxconcurrentbulkrequests = settings.getAsInt("maxconcurrentbulkrequests",
                 Runtime.getRuntime().availableProcessors());
         ingest.maxActionsPerBulkRequest(maxbulkactions)
-                .maxConcurrentBulkRequests(maxconcurrentbulkrequests)
-                .maxRequestWait(TimeValue.timeValueSeconds(60));
+                .maxConcurrentBulkRequests(maxconcurrentbulkrequests);
         createIndex(getConcreteIndex());
 
         String[] inputs = settings.getAsArray("uri");

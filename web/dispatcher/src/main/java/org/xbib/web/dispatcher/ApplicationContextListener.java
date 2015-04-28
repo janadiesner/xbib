@@ -8,6 +8,7 @@ import org.xbib.elasticsearch.search.SearchSupport;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.io.IOException;
 
 @WebListener
 public class ApplicationContextListener implements ServletContextListener {
@@ -20,15 +21,21 @@ public class ApplicationContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        searchSupport = new SearchSupport().newClient();
-        logger.info("Elasticsearch client initiated");
-        dispatcher = new Dispatcher();
+        try {
+            searchSupport = new SearchSupport().newClient();
+            logger.info("Elasticsearch client initiated");
+            dispatcher = new Dispatcher();
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        searchSupport.shutdown();
-        logger.info("Elasticsearch client shutdown");
+        if (searchSupport != null) {
+            searchSupport.shutdown();
+            logger.info("Elasticsearch client shutdown");
+        }
     }
 
 }

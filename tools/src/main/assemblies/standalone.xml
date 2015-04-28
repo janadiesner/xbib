@@ -44,7 +44,6 @@
                 <include>com.fasterxml.jackson.dataformat:jackson-dataformat-xml</include>
                 <include>org.xbib:query</include>
                 <include>org.xbib:elasticsearch-search</include>
-                <include>org.xbib:elasticsearch-sru</include>
                 <include>org.xbib.elasticsearch.plugin:elasticsearch-support</include>
                 <include>org.elasticsearch:elasticsearch</include>
                 <include>org.apache.lucene:lucene-core</include>
