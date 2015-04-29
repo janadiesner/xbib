@@ -9,10 +9,11 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>iso23950</artifactId>
-    <name>iso23950</name>
-    <description>ISO 23950 information retrieval</description>
+    <artifactId>xbib-iso23950</artifactId>
     <packaging>jar</packaging>
+
+    <name>xbib-iso23950</name>
+    <description>ISO 23950 information retrieval</description>
 
     <build>
         <plugins>
@@ -75,22 +76,22 @@
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>entity</artifactId>
+            <artifactId>xbib-entity</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>query</artifactId>
+            <artifactId>xbib-query</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>sru</artifactId>
+            <artifactId>xbib-sru</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>charset</artifactId>
+            <artifactId>xbib-charset</artifactId>
             <type>jar</type>
             <scope>test</scope>
         </dependency>

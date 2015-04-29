@@ -5,7 +5,6 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.PrematureChannelClosureException;
-import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.LastHttpContent;
 
 import java.io.IOException;
@@ -33,7 +32,7 @@ public class NettyChannelHandler extends ChannelInboundHandlerAdapter {
     private final Channels channels;
     private final AtomicBoolean closed;
     private final Protocol httpProtocol;
-    private final Protocol webSocketProtocol;
+    //private final Protocol webSocketProtocol;
 
     public NettyChannelHandler(AsyncHttpClientConfig config, NettyAsyncHttpProviderConfig nettyConfig, NettyRequestSender requestSender, Channels channels, AtomicBoolean isClose) {
         this.config = config;
@@ -41,7 +40,7 @@ public class NettyChannelHandler extends ChannelInboundHandlerAdapter {
         this.channels = channels;
         this.closed = isClose;
         httpProtocol = new HttpProtocol(channels, config, nettyConfig, requestSender);
-        webSocketProtocol = new WebSocketProtocol(channels, config, nettyConfig, requestSender);
+        //webSocketProtocol = new WebSocketProtocol(channels, config, nettyConfig, requestSender);
     }
 
     @Override
@@ -56,11 +55,10 @@ public class NettyChannelHandler extends ChannelInboundHandlerAdapter {
             Channels.setDefaultAttribute(ctx, DiscardEvent.INSTANCE);
 
         } else if (attribute instanceof NettyResponseFuture) {
-            Protocol p = (ctx.pipeline().get(HttpClientCodec.class) != null ? httpProtocol : webSocketProtocol);
+            //Protocol p = (ctx.pipeline().get(HttpClientCodec.class) != null ? httpProtocol : webSocketProtocol);
+            Protocol p = httpProtocol;
             NettyResponseFuture<?> future = (NettyResponseFuture<?>) attribute;
-
             p.handle(ctx, future, e);
-
         } else if (attribute != DiscardEvent.INSTANCE) {
             try {
                 logger.trace("Closing an orphan channel {}", ctx.channel());
@@ -99,10 +97,11 @@ public class NettyChannelHandler extends ChannelInboundHandlerAdapter {
                 return;
             }
 
-            Protocol p = (ctx.pipeline().get(HttpClientCodec.class) != null ? httpProtocol : webSocketProtocol);
+            Protocol p = httpProtocol;
+            //(ctx.pipeline().get(HttpClientCodec.class) != null ? httpProtocol : webSocketProtocol);
             p.onClose(ctx);
 
-            if (future != null && !future.isDone() && !future.isCancelled()) {
+            if (!future.isDone() && !future.isCancelled()) {
                 if (!requestSender.retry(ctx.channel(), future)) {
                     channels.abort(future, new IOException("Remotely Closed"));
                 }
@@ -174,7 +173,8 @@ public class NettyChannelHandler extends ChannelInboundHandlerAdapter {
             }
         }
 
-        Protocol protocol = ctx.pipeline().get(HttpClientCodec.class) != null ? httpProtocol : webSocketProtocol;
+        //Protocol protocol = ctx.pipeline().get(HttpClientCodec.class) != null ? httpProtocol : webSocketProtocol;
+        Protocol protocol = httpProtocol;
         protocol.onError(ctx, e);
 
         channels.closeChannel(ctx);

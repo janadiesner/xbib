@@ -9,10 +9,11 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>charset</artifactId>
-    <name>charset</name>
-    <description>Bibliographic character sets</description>
+    <artifactId>xbib-charset</artifactId>
     <packaging>jar</packaging>
+
+    <name>xbib-charset</name>
+    <description>Bibliographic character sets</description>
 
     <build>
         <plugins>

@@ -6,46 +6,35 @@
         <groupId>org.xbib</groupId>
         <artifactId>xbib</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../</relativePath>
+        <relativePath>../../</relativePath>
     </parent>
 
-    <artifactId>xml</artifactId>
+    <artifactId>xbib-content-rdf</artifactId>
     <packaging>jar</packaging>
 
-    <name>xml</name>
-    <description>XML</description>
+    <name>xbib-content-rdf</name>
+    <description>RDF framework / Linked Data</description>
 
     <dependencies>
-
         <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
+            <groupId>org.xbib</groupId>
+            <artifactId>xbib-util</artifactId>
             <type>jar</type>
         </dependency>
-
         <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
+            <groupId>org.xbib</groupId>
+            <artifactId>xbib-content-json</artifactId>
             <type>jar</type>
         </dependency>
-
         <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>serializer</artifactId>
+            <groupId>org.xbib</groupId>
+            <artifactId>xbib-io-stream</artifactId>
             <type>jar</type>
         </dependency>
-
         <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>Saxon-HE</artifactId>
+            <groupId>org.xbib</groupId>
+            <artifactId>xbib-io-http</artifactId>
             <type>jar</type>
-            <optional>true</optional>
         </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>woodstox-core-asl</artifactId>
-        </dependency>
-
     </dependencies>
 </project>

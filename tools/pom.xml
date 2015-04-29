@@ -9,10 +9,11 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>tools</artifactId>
-    <name>tools</name>
-    <description>Tools</description>
+    <artifactId>xbib-tools</artifactId>
     <packaging>jar</packaging>
+
+    <name>xbib-tools</name>
+    <description>Tools</description>
 
     <build>
         <plugins>
@@ -48,39 +49,46 @@
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>util</artifactId>
+            <artifactId>xbib-util</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>entity</artifactId>
+            <artifactId>xbib-entity</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>pipeline</artifactId>
+            <artifactId>xbib-pipeline</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>jdbc</artifactId>
+            <artifactId>xbib-io-jdbc</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>oai</artifactId>
+            <artifactId>xbib-oai</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>charset</artifactId>
+            <artifactId>xbib-charset</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>compress</artifactId>
+            <artifactId>xbib-compress</artifactId>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>sru</artifactId>
+            <artifactId>xbib-sru</artifactId>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>elasticsearch-search</artifactId>
+            <artifactId>xbib-elasticsearch-search</artifactId>
+            <type>jar</type>
         </dependency>
     </dependencies>
 </project>

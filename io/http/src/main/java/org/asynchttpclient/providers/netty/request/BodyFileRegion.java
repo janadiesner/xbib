@@ -59,6 +59,27 @@ class BodyFileRegion extends AbstractReferenceCounted implements FileRegion {
         return written;
     }
 
+    public BodyFileRegion retain() {
+        super.retain();
+        return this;
+    }
+
+    public BodyFileRegion retain(int increment) {
+        super.retain(increment);
+        return this;
+    }
+
+    @Override
+    public BodyFileRegion touch() {
+        super.touch();
+        return this;
+    }
+
+    @Override
+    public BodyFileRegion touch(Object o) {
+        return this;
+    }
+
     @Override
     protected void deallocate() {
         try {

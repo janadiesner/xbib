@@ -9,15 +9,16 @@
         <relativePath>../../</relativePath>
     </parent>
 
-    <artifactId>rsync</artifactId>
-    <name>rsync</name>
-    <description>xbib - Rsync algorithm</description>
+    <artifactId>xbib-io-rsync</artifactId>
     <packaging>jar</packaging>
+
+    <name>xbib-io-rsync</name>
+    <description>Rsync algorithm</description>
 
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>util</artifactId>
+            <artifactId>xbib-util</artifactId>
             <type>jar</type>
         </dependency>
     </dependencies>

@@ -9,10 +9,11 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>dict</artifactId>
-    <name>dict</name>
-    <description>Finite-state data structures for dictionaries</description>
+    <artifactId>xbib-dict</artifactId>
     <packaging>jar</packaging>
+
+    <name>xbib-dict</name>
+    <description>Finite-state data structures for dictionaries</description>
 
     <dependencies>
         <dependency>

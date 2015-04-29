@@ -9,30 +9,31 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>sru</artifactId>
-    <name>sru</name>
-    <description>SRU Search/Retrieve via URL</description>
+    <artifactId>xbib-sru</artifactId>
     <packaging>jar</packaging>
+
+    <name>xbib-sru</name>
+    <description>SRU Search/Retrieve via URL</description>
 
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>http</artifactId>
+            <artifactId>xbib-io-http</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>compress</artifactId>
+            <artifactId>xbib-compress</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>query</artifactId>
+            <artifactId>xbib-query</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>entity</artifactId>
+            <artifactId>xbib-entity</artifactId>
             <type>jar</type>
         </dependency>
     </dependencies>

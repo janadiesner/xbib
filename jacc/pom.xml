@@ -10,10 +10,11 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>jacc</artifactId>
-    <name>jacc</name>
-    <description>Jacc (Java Yacc Parser Generator)</description>
+    <artifactId>xbib-jacc</artifactId>
     <packaging>jar</packaging>
+
+    <name>xbib-jacc</name>
+    <description>Jacc (Java Yacc Parser Generator)</description>
 
     <dependencies>
         <dependency>

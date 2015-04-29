@@ -9,10 +9,11 @@
         <relativePath>../../</relativePath>
     </parent>
 
-    <artifactId>http</artifactId>
-    <name>http</name>
-    <description>xbib - HTTP client</description>
+    <artifactId>xbib-io-http</artifactId>
     <packaging>jar</packaging>
+
+    <name>xbib-io-http</name>
+    <description>HTTP client</description>
 
     <build>
         <plugins>
@@ -28,17 +29,42 @@
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>util</artifactId>
+            <artifactId>xbib-util</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>compress</artifactId>
+            <artifactId>xbib-compress</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
+            <artifactId>netty-buffer</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>

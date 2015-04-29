@@ -9,10 +9,11 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>syslog</artifactId>
-    <name>syslog</name>
-    <description>System logging</description>
+    <artifactId>xbib-syslog</artifactId>
     <packaging>jar</packaging>
+
+    <name>xbib-syslog</name>
+    <description>System logging</description>
 
     <dependencies>
         <dependency>

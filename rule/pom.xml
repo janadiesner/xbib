@@ -8,10 +8,10 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>rule</artifactId>
+    <artifactId>xbib-rule</artifactId>
     <packaging>jar</packaging>
 
-    <name>rule</name>
+    <name>xbib-rule</name>
     <description>Rule engine</description>
 
     <build>
@@ -39,7 +39,6 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
-            <version>4.3</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.abego.treelayout</groupId>

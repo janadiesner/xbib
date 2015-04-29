@@ -65,6 +65,17 @@ class BodyChunkedInput implements ChunkedInput<ByteBuf> {
     }
 
     @Override
+    public long length() {
+        return chunkSize;
+    }
+
+    @Override
+    public long progress() {
+        // TODO
+        return 0;
+    }
+
+    @Override
     public boolean isEndOfInput() throws Exception {
         return endOfInput;
     }

@@ -9,15 +9,16 @@
         <relativePath>../../</relativePath>
     </parent>
 
-    <artifactId>ftp</artifactId>
-    <name>ftp</name>
-    <description>xbib - FTP</description>
+    <artifactId>xbib-io-ftp</artifactId>
     <packaging>jar</packaging>
+
+    <name>xbib-io-ftp</name>
+    <description>FTP</description>
 
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>util</artifactId>
+            <artifactId>xbib-util</artifactId>
             <type>jar</type>
         </dependency>
     </dependencies>

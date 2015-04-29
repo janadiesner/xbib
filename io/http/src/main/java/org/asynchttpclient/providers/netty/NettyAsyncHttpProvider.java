@@ -23,7 +23,6 @@ public class NettyAsyncHttpProvider implements AsyncHttpProvider {
     private final AtomicBoolean closed = new AtomicBoolean(false);
     private final Channels channels;
     private final NettyRequestSender requestSender;
-    private final NettyChannelHandler channelHandler;
 
     public NettyAsyncHttpProvider(AsyncHttpClientConfig config) {
 
@@ -31,10 +30,9 @@ public class NettyAsyncHttpProvider implements AsyncHttpProvider {
         nettyConfig = config.getAsyncHttpProviderConfig() instanceof NettyAsyncHttpProviderConfig ? //
         NettyAsyncHttpProviderConfig.class.cast(config.getAsyncHttpProviderConfig())
                 : new NettyAsyncHttpProviderConfig();
-
         channels = new Channels(config, nettyConfig);
         requestSender = new NettyRequestSender(closed, config, channels);
-        channelHandler = new NettyChannelHandler(config, nettyConfig, requestSender, channels, closed);
+        NettyChannelHandler channelHandler = new NettyChannelHandler(config, nettyConfig, requestSender, channels, closed);
         channels.configure(channelHandler);
     }
 

@@ -9,11 +9,11 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <name>entity</name>
-    <description>Building bibliographic entities</description>
-
-    <artifactId>entity</artifactId>
+    <artifactId>xbib-entity</artifactId>
     <packaging>jar</packaging>
+
+    <name>xbib-entity</name>
+    <description>Building bibliographic entities</description>
 
     <build>
         <plugins>
@@ -40,33 +40,33 @@
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>util</artifactId>
+            <artifactId>xbib-util</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>keyvalue</artifactId>
+            <artifactId>xbib-keyvalue</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>iso2709</artifactId>
+            <artifactId>xbib-iso2709</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>content</artifactId>
+            <artifactId>xbib-content-common</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>charset</artifactId>
+            <artifactId>xbib-charset</artifactId>
             <type>jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>compress</artifactId>
+            <artifactId>xbib-compress</artifactId>
             <type>jar</type>
             <scope>test</scope>
         </dependency>

@@ -8,22 +8,14 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>iso2709</artifactId>
+    <artifactId>xbib-iso2709</artifactId>
     <packaging>jar</packaging>
 
-    <name>iso2709</name>
+    <name>xbib-iso2709</name>
     <description>ISO 2709 (MARC)</description>
 
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <!-- for loading charsets -->
@@ -43,22 +35,22 @@
     <dependencies>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>keyvalue</artifactId>
+            <artifactId>xbib-keyvalue</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>stream</artifactId>
+            <artifactId>xbib-io-stream</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>json</artifactId>
+            <artifactId>xbib-content-json</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.xbib</groupId>
-            <artifactId>charset</artifactId>
+            <artifactId>xbib-charset</artifactId>
             <type>jar</type>
             <scope>test</scope>
         </dependency>

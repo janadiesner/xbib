@@ -63,7 +63,8 @@ public class Channels {
     public static final String WS_DECODER_HANDLER = "ws-decoder";
     public static final String WS_ENCODER_HANDLER = "ws-encoder";
 
-    private static final AttributeKey<Object> DEFAULT_ATTRIBUTE = new AttributeKey<Object>("default");
+    private static final AttributeKey<Object> DEFAULT_ATTRIBUTE =
+            AttributeKey.newInstance("default");
 
     private final AsyncHttpClientConfig config;
     private final NettyAsyncHttpProviderConfig asyncHttpProviderConfig;
