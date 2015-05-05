@@ -33,8 +33,6 @@ package org.xbib.marc.dialects.mab;
 
 import org.testng.annotations.Test;
 import org.xbib.helper.StreamTester;
-import org.xbib.marc.Iso2709Reader;
-import org.xbib.marc.xml.MarcXchangeReader;
 import org.xbib.marc.xml.stream.MarcXchangeWriter;
 import org.xml.sax.SAXException;
 
@@ -48,62 +46,28 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 
-public class MABTest extends StreamTester {
-
+public class MABDisketteTest extends StreamTester {
 
     @Test
-    public void testZDBMAB() throws IOException, SAXException {
-        InputStream in = getClass().getResource("1217zdbtit.dat").openStream();
-        File file = File.createTempFile("zdb.", ".xml");
+    public void testMABDiskette() throws IOException, SAXException {
+        InputStream in = getClass().getResource("mgl.txt").openStream();
+        File file = File.createTempFile("mgl.", ".xml");
         FileOutputStream out = new FileOutputStream(file);
         try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
-            read(new InputStreamReader(in, "x-MAB"), w);
+            read(new InputStreamReader(in, "cp850"), w);
         }
-        assertStream(getClass().getResource("1217zdbtit.dat-out.xml").openStream(),
-                new FileInputStream(file));
-    }
-
-    @Test
-    public void testCreateMABXML() throws IOException, SAXException {
-        InputStream in = getClass().getResource("test.groupstream").openStream();
-        File file = File.createTempFile("test.groupstream.", ".xml");
-        FileOutputStream out = new FileOutputStream(file);
-        try (Writer w = new OutputStreamWriter(out, "UTF-8")) {
-            read(new InputStreamReader(in, "x-MAB"), w);
-        }
-        assertStream(getClass().getResource("test.groupstream-out.xml").openStream(),
-                new FileInputStream(file));
-    }
-
-    @Test
-    public void testReplacement() throws IOException, SAXException {
-        InputStream in = getClass().getResource("DE-605-aleph500-publish.xml").openStream();
-        File file = File.createTempFile("DE-605-aleph500-publish-out.", ".xml");
-        FileOutputStream out = new FileOutputStream(file);
-        MarcXchangeReader reader = new MarcXchangeReader(in)
-                .addNamespace("http://www.ddb.de/professionell/mabxml/mabxml-1.xsd");
-        reader.setTransformer("088$  $a", value -> "Das ist ein Test").setTransform(true);
-        MarcXchangeWriter writer = new MarcXchangeWriter(out);
-        reader.setMarcXchangeListener(writer);
-        writer.startDocument();
-        writer.beginCollection();
-        reader.parse();
-        writer.endCollection();
-        writer.endDocument();
-        out.close();
-        assertStream(getClass().getResource("DE-605-aleph500-publish-out.xml").openStream(),
+        assertStream(getClass().getResource("mgl.txt.xml").openStream(),
                 new FileInputStream(file));
     }
 
     private void read(Reader reader, Writer writer) throws IOException, SAXException {
-        Iso2709Reader iso2709Reader = new Iso2709Reader(reader);
-        iso2709Reader.setFormat("MAB");
-        iso2709Reader.setType("Titel");
+        MABDisketteReader mabDisketteReader = new MABDisketteReader(reader);
+        mabDisketteReader.setFormat("MABDiskette");
         MarcXchangeWriter marcXchangeWriter = new MarcXchangeWriter(writer);
-        iso2709Reader.setMarcXchangeListener(marcXchangeWriter);
+        mabDisketteReader.setMarcXchangeListener(marcXchangeWriter);
         marcXchangeWriter.startDocument();
         marcXchangeWriter.beginCollection();
-        iso2709Reader.parse();
+        mabDisketteReader.parse();
         marcXchangeWriter.endCollection();
         marcXchangeWriter.endDocument();
     }

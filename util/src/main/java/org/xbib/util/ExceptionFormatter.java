@@ -82,6 +82,7 @@ public final class ExceptionFormatter {
                 }
             }
         } catch (Exception ex) {
+            //
         }
     }
 

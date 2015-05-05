@@ -31,112 +31,284 @@
  */
 package org.xbib.marc.dialects.mab;
 
-import org.xbib.io.field.FieldSeparator;
+import org.xbib.marc.FieldReader;
+import org.xbib.marc.MarcXchangeConstants;
+import org.xbib.marc.MarcXchangeListener;
+import org.xbib.marc.event.EventListener;
+import org.xbib.marc.transformer.StringTransformer;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.DTDHandler;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
 
-import java.io.FilterReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * "MAB-Diskette" is an ISO2709 format derivative with custom padding symbold and field delimiters
  * created originally for diskette distribution to PC systems with MS-DOS.
  *
  */
-public class MABDisketteReader extends FilterReader {
+public class MABDisketteReader implements FieldReader, XMLReader, MarcXchangeConstants {
 
-    private LinkedList<Integer> pushback;
+    private final Reader reader;
 
-    private boolean started;
+    /**
+     * The format property
+     */
+    public static String FORMAT = "format";
+    /**
+     * The type property
+     */
+    public static String TYPE = "type";
 
-    private boolean ended;
+    /**
+     * Should errors abort the reader.
+     */
+    public static String FATAL_ERRORS = "fatal_errors";
 
-    private boolean leader;
+    /**
+     * Should the ISO 25577 tags be clean (validateable)?
+     * All erraneous tags will be assigned to "999".
+     * This mode is active by default.
+     */
+    public static String CLEAN_TAGS = "clean_tags";
 
-    public MABDisketteReader(Reader in) {
-        super(in);
-        pushback = new LinkedList<Integer>();
-        started = true;
-        ended = false;
-        leader = false;
+    /**
+     * Shall all data be XML 1.0 safe?
+     */
+    public static String SCRUB_DATA = "scrub_data";
+
+    /**
+     * Shall data transformations be allowed?
+     */
+    public static String TRANSFORM_DATA = "transform_data";
+
+    /**
+     * Buffer size for input stream
+     */
+    public static String BUFFER_SIZE = "buffer_size";
+
+    /**
+     * The schema property
+     */
+    public static String SCHEMA = "schema";
+
+    public static String FIELDMAPPER = "field_mapper";
+
+    /**
+     * The SaX service
+     */
+    private MABDisketteSaxAdapter adapter;
+    /**
+     * XML content handler
+     */
+    private ContentHandler contentHandler;
+
+    private EntityResolver entityResolver;
+
+    private DTDHandler dtdHandler;
+
+    private ErrorHandler errorHandler;
+
+    private Map<String, Boolean> features = new HashMap<String, Boolean>();
+
+    /**
+     * Properties for this reader
+     */
+    private Map<String, Object> properties = new HashMap<String, Object>() {
+        {
+            put(FORMAT, MARC21);
+            put(TYPE, BIBLIOGRAPHIC);
+            put(FATAL_ERRORS, Boolean.FALSE);
+            put(BUFFER_SIZE, 65536);
+        }
+    };
+
+    public MABDisketteReader(InputStream in, String encoding) throws IOException {
+        this(new InputStreamReader(in, encoding));
+    }
+
+    public MABDisketteReader(Reader reader) {
+        this.reader = reader;
+        this.adapter = new MABDisketteSaxAdapter();
+    }
+
+    public MABDisketteSaxAdapter getAdapter() {
+        return adapter;
     }
 
     @Override
-    public int read() throws IOException {
-        int ch;
-        ch = !pushback.isEmpty() ? pushback.pop() : in.read();
-        // skip carriage return
-        while (ch == '\r') {
-            ch = in.read();
-        }
-        // check for ###
-        if (ch == '#') {
-            int ch2 = in.read();
-            if (ch2 == '#') {
-                int ch3 = in.read();
-                if (ch3 == '#') {
-                    leader = true;
-                    in.read(); // skip blank after ###
-                    if (!started) {
-                        return FieldSeparator.GS;
-                    } else {
-                        started = false;
-                        return in.read();
-                    }
-                } else {
-                    return ch3;
-                }
-            } else {
-                return ch2;
-            }
-        }
-        if (ch == '\n') {
-            // slurp all subsequent line terminators
-            ch = in.read();
-            while (ch == '\n' || ch == '\r') {
-                ch = in.read();
-            }
-            if (leader) {
-                leader = false;
-                return ch;
-            }
-            pushback.addLast(ch);
-            ch = FieldSeparator.RS;
-            // no UNIT sep!
-        }
-        // insert a last GS if end of stream reached
-        if (ch == -1 && !ended) {
-            pushback.addLast(ch);
-            ended = true;
-            return FieldSeparator.GS;
-        }
-        return ch;
+    public boolean getFeature(String name) throws SAXNotRecognizedException, SAXNotSupportedException {
+        return features.get(name);
     }
 
     @Override
-    public int read(char cbuf[], int off, int len) throws IOException {
-        for (int i = 0; i < len; i++) {
-            int ch = read();
-            if (ch == -1) {
-                return (i == 0) ? -1 : i;
-            } else {
-                cbuf[i + off] = (char) ch;
-            }
-        }
-        return len;
+    public void setFeature(String name, boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
+        this.features.put(name, value);
     }
 
     @Override
-    public boolean markSupported() {
-        return false;
+    public Object getProperty(String name) throws SAXNotRecognizedException, SAXNotSupportedException {
+        return properties.get(name);
     }
 
     @Override
-    public boolean ready() throws IOException {
-        if (!pushback.isEmpty()) {
-            return true;
-        } else {
-            return in.ready();
+    public void setProperty(String name, Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
+        properties.put(name, value);
+    }
+
+    @Override
+    public void setEntityResolver(EntityResolver resolver) {
+        this.entityResolver = resolver;
+    }
+
+    @Override
+    public EntityResolver getEntityResolver() {
+        return entityResolver;
+    }
+
+    @Override
+    public void setDTDHandler(DTDHandler handler) {
+        this.dtdHandler = handler;
+    }
+
+    @Override
+    public DTDHandler getDTDHandler() {
+        return dtdHandler;
+    }
+
+    @Override
+    public void setContentHandler(ContentHandler handler) {
+        this.contentHandler = handler;
+    }
+
+    @Override
+    public ContentHandler getContentHandler() {
+        return contentHandler;
+    }
+
+    @Override
+    public void setErrorHandler(ErrorHandler handler) {
+        this.errorHandler = handler;
+    }
+
+    @Override
+    public ErrorHandler getErrorHandler() {
+        return errorHandler;
+    }
+
+    /**
+     * Set MarcXchange listener for this reader.
+     * @param listener the MarcXchange listener
+     * @return this reader
+     */
+    public MABDisketteReader setMarcXchangeListener(MarcXchangeListener listener) {
+        this.adapter.setMarcXchangeListener(listener);
+        return this;
+    }
+
+    public MABDisketteReader setMarcXchangeListener(String type, MarcXchangeListener listener) {
+        this.adapter.setMarcXchangeListener(type, listener);
+        return this;
+    }
+
+    public MABDisketteReader setTransformer(String fieldKey, StringTransformer transformer) {
+        this.adapter.setTransformer(fieldKey, transformer);
+        return this;
+    }
+
+    public MABDisketteReader addFieldMap(String fieldMapName, Map<String, Object> fieldMap) {
+        if (fieldMap != null) {
+            this.adapter.addFieldMap(fieldMapName, fieldMap);
+            properties.put(FIELDMAPPER, Boolean.TRUE);
+        }
+        return this;
+    }
+
+    public boolean isFieldMapped() {
+        return properties.get(FIELDMAPPER) != null;
+    }
+
+    public MABDisketteReader setFieldEventListener(EventListener eventListener) {
+        this.adapter.setFieldEventListener(eventListener);
+        return this;
+    }
+
+    public MABDisketteReader setFormat(String format) {
+        properties.put(FORMAT, format);
+        return this;
+    }
+
+    public String getFormat() {
+        return (String) properties.get(FORMAT);
+    }
+
+    public MABDisketteReader setType(String type) {
+        properties.put(TYPE, type);
+        return this;
+    }
+
+    public String getType() {
+        return (String) properties.get(TYPE);
+    }
+
+    private MABDisketteSaxAdapter setup(MABDisketteSaxAdapter adapter) {
+        Boolean fatalErrors = properties.get(FATAL_ERRORS) != null ?
+                (properties.get(FATAL_ERRORS) instanceof Boolean ? (Boolean)properties.get(FATAL_ERRORS) :
+                        Boolean.parseBoolean((String)properties.get(FATAL_ERRORS))) : null;
+        Boolean cleanTags = properties.get(CLEAN_TAGS) != null ?
+                (properties.get(CLEAN_TAGS) instanceof Boolean ? (Boolean)properties.get(CLEAN_TAGS) :
+                        Boolean.parseBoolean((String)properties.get(CLEAN_TAGS))) : Boolean.TRUE;
+        Boolean scrubData = properties.get(SCRUB_DATA) != null ?
+                (properties.get(SCRUB_DATA) instanceof Boolean ? (Boolean)properties.get(SCRUB_DATA) :
+                        Boolean.parseBoolean((String)properties.get(SCRUB_DATA))) : Boolean.TRUE;
+        Boolean transformData = properties.get(TRANSFORM_DATA) != null ?
+                (properties.get(TRANSFORM_DATA) instanceof Boolean ? (Boolean)properties.get(TRANSFORM_DATA) :
+                        Boolean.parseBoolean((String)properties.get(TRANSFORM_DATA))) : Boolean.TRUE;
+        return adapter.setBuffersize((Integer) properties.get(BUFFER_SIZE))
+                .setContentHandler(contentHandler)
+                .setSchema((String) properties.get(SCHEMA))
+                .setFormat(getFormat())
+                .setType(getType())
+                .setFatalErrors(fatalErrors)
+                .setCleanTags(cleanTags)
+                .setScrubData(scrubData)
+                .setTransformData(transformData);
+    }
+
+    public void parse() throws IOException {
+        parse(new InputSource(reader));
+    }
+
+    @Override
+    public void parse(InputSource input) throws IOException {
+        try {
+            setup(adapter).setInputSource(input).parseCollection(isFieldMapped() ?
+                            adapter.mabDisketteMappedFieldStream() : adapter.mabDisketteFieldStream());
+        } catch (Exception e) {
+            throw new IOException(e);
         }
     }
+
+    /**
+     * We do not support system ID based parsing.
+     * @param systemId the system ID
+     * @throws java.io.IOException
+     * @throws org.xml.sax.SAXException
+     */
+    @Override
+    public void parse(String systemId) throws IOException, SAXException {
+        throw new UnsupportedOperationException();
+    }
+
 }

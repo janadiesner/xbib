@@ -247,7 +247,7 @@ public abstract class Converter<T, R extends PipelineRequest, P extends Pipeline
         double avg = bytes / (docs + 1); // avoid div by zero
         double mbps = (bytes * 1000 / elapsed) / (1024 * 1024);
         NumberFormat formatter = NumberFormat.getNumberInstance();
-        logger.info("Converter complete. {} inputs, {} docs, {} = {} ms, {} = {} bytes, {} = {} avg getSize, {} dps, {} MB/s",
+        logger.info("Converter complete. {} inputs, {} docs, {} = {} ms, {} = {} bytes, {} = {} avg size, {} dps, {} MB/s",
                 input.size(),
                 docs,
                 DurationFormatUtil.formatDurationWords(elapsed, true, true),
